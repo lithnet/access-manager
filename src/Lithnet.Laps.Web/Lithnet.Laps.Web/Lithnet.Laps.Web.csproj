@@ -319,8 +319,6 @@
     <Content Include="Scripts\esm\popper-utils.min.js" />
     <Content Include="Scripts\esm\popper.js" />
     <Content Include="Scripts\esm\popper.min.js" />
-    <Content Include="Scripts\intlTelInput.js" />
-    <Content Include="Scripts\intlTelInput.min.js" />
     <Content Include="Scripts\popper-utils.js" />
     <Content Include="Scripts\popper-utils.min.js" />
     <Content Include="Scripts\popper.js" />
@@ -371,7 +369,6 @@
     <Content Include="App_Data\Templates\EmailAuditSuccess.html" />
     <Content Include="App_Data\Templates\LogAuditSuccess.txt" />
     <Content Include="App_Data\Templates\LogAuditFailure.txt" />
-    <Content Include="Scripts\utils.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -399,7 +396,7 @@
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\Lap\Show.cshtml" />
-    <Content Include="Views\Lap\AuthNError.cshtml" />
+    <Content Include="Views\Home\AuthNError.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
