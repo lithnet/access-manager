@@ -1,0 +1,14 @@
+﻿AUDIT: FAILURE          
+Username:			{user.SamAccountName}
+Name:				{user.DisplayName}
+UPN:				{user.UserPrincipalName}
+SID:				{user.Sid}
+User DN:				{user.DistinguishedName}
+Requestor IP:			{request.UnmaskedIPAddress}
+Requestor Hostname:		{request.HostName}
+Requested computer:		{requestedComputerName}
+Computer name:			{computer.SamAccountName}
+Computer DN:			{computer.DistinguishedName}
+Target ID:			{target.ID}
+Reader principal:			{reader.Principal}
+Detail:				{message}

@@ -1,0 +1,190 @@
+﻿body {
+    color: #666;
+    /*font-family: "Open Sans",Arial,Helvetica,sans-serif;*/
+    font-size: 13px;
+}
+
+.app-header {
+    display: block;
+    font-size: 18px;
+    font-weight: 300;
+    color: #242424;
+    padding: 15px 13px;
+    border-bottom-width: 0px;
+    border-bottom-style: solid;
+    border-bottom-color: rgba(0, 0, 0, .1);
+    background: white;
+    position: relative;
+    border: 1px solid #dcdcdc;
+    align-items: center;
+    text-align: center;
+}
+
+.app-logo {
+    max-width: 200px;
+}
+
+.app-title {
+    font-weight: 400;
+}
+
+body {
+    width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px;
+}
+
+.form-container {
+    background-color: #fefbfb;
+    border: 1px solid #dcdcdc;
+    position: relative;
+}
+
+    .form-container header {
+        display: block;
+        font-size: 18px;
+        font-weight: 300;
+        color: #242424;
+        padding: 15px 13px;
+        margin: 0;
+        border-bottom-width: 1px;
+        border-bottom-style: solid;
+        border-bottom-color: rgba(0,0,0,.1);
+        background: rgba(248,248,248,.9);
+        position: relative;
+    }
+
+    .form-container fieldset {
+        display: block;
+        padding: 25px 14px 5px;
+        border: none;
+        background: rgba(255,255,255,.9);
+        position: relative;
+    }
+
+    .form-container section {
+        margin-bottom: 15px;
+        position: relative;
+    }
+
+    .form-container label.title {
+        display: block;
+        margin-bottom: 3px;
+        line-height: 19px;
+        font-weight: 600;
+        font-size: 13px;
+        color: #333;
+    }
+
+    .form-container label.input {
+        position: relative;
+        display: block;
+        font-weight: 400;
+        max-width: 100%;
+        font-size: 13px;
+    }
+
+    .form-container i.icon-append {
+        border-color: #bdbdbd;
+        color: #a2a2a2;
+        right: 5px;
+        padding-left: 3px;
+        border-left-width: 1px;
+        border-left-style: solid;
+        position: absolute;
+        top: 5px;
+        width: 22px;
+        height: 22px;
+        font-size: 14px;
+        line-height: 22px;
+        text-align: center;
+    }
+
+    .form-container input.dataEntry {
+        display: block;
+        padding-right: 37px;
+        border-color: #bdbdbd;
+        width: 100%;
+        height: 32px;
+        padding: 5px 10px;
+        outline: 0;
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 0;
+        background: #fff;
+        color: #404040;
+    }
+
+    .form-container .tooltip {
+        position: absolute;
+        bottom: 100%;
+        margin-bottom: 15px;
+        z-index: 99999;
+        left: -9999px;
+        padding: 2px 8px 3px;
+        font-size: 11px;
+        line-height: 16px;
+        font-weight: 400;
+        background: rgba(0,0,0,.9);
+        color: #fff;
+        opacity: 0;
+    }
+
+        .form-container .tooltip::after {
+            top: 100%;
+            right: 11px;
+            border-top: 4px solid rgba(0,0,0,.9);
+            border-right: 4px solid transparent;
+            border-left: 4px solid transparent;
+            content: '';
+            position: absolute;
+            margin: 0;
+            padding: 0;
+        }
+
+    .form-container footer {
+        display: block;
+        padding: 7px 14px 15px;
+        border-top: 1px solid rgba(0,0,0,.1);
+        background: rgba(248,248,248,.9);
+        margin: 0;
+    }
+
+    .form-container .error {
+        color: #8f2626;
+        text-align: center;
+        display: block;
+    }
+
+input.resultsText {
+    border-color: #f0f0f0;
+    height: 32px;
+    padding: 5px 10px;
+    outline: 0;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 0;
+    background: #fbfbfb;
+    color: #404040;
+    width: 100%;
+    display: table-cell;
+    position: relative;
+}
+
+.input-group {
+    width: 100%;
+    display: table;
+}
+
+.input-group-append {
+    width: 1%;
+    vertical-align: middle;
+    display: table-cell;
+    height: 32px;
+}
+
+    .input-group-append button {
+        width: 32px;
+        height: 32px;
+    }

@@ -1,0 +1,40 @@
+﻿@{
+    ViewBag.Title = "Request Password";
+}
+
+@model Lithnet.Laps.Web.Models.LapRequestModel
+
+<div class="form-container">
+    @using (Html.BeginForm("Get", "Lap", FormMethod.Post))
+    {
+    <header>
+        @UIMessages.HeadingRequestPassword
+    </header>
+        <fieldset>
+
+            <section>
+                <label class="title">@UIMessages.ComputerName</label>
+                <label class="input">
+                    <i class="icon-append fa fa-desktop"></i>
+                    @Html.TextBoxFor(model => model.ComputerName, new { @class = "dataEntry" })
+                    @Html.ValidationMessageFor(model => model.ComputerName)
+                </label>
+            </section>
+
+            @if (Model?.FailureReason != null)
+            {
+                <section>
+                    <b class="error">
+                        <i class="fas fa-exclamation-circle"></i> @Html.DisplayTextFor(model => model.FailureReason)
+                    </b>
+                </section>
+            }
+
+        </fieldset>
+
+        <footer>
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-primary">@UIMessages.ButtonRequestPassword</button>
+        </footer>
+    }
+</div>

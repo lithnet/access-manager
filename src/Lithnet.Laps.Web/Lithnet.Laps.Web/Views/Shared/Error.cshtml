@@ -1,0 +1,17 @@
+﻿@using System.Configuration
+@{
+    ViewBag.Title = "Error";
+}
+
+<div class="form-container">
+    <fieldset>
+        <section>
+            <b class="error">
+                <i class="fas fa-exclamation-circle"></i> @UIMessages.UnexpectedError
+            </b>
+        </section>
+        <section>
+            <p class="text-center">@ViewBag.Message</p>
+        </section>
+    </fieldset>
+</div>

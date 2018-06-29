@@ -1,0 +1,51 @@
+﻿@{
+    ViewBag.Title = "Password";
+}
+
+@model Lithnet.Laps.Web.Models.LapEntryModel
+
+<div class="form-container">
+
+    <header>
+        @UIMessages.HeadingPasswordDetails
+    </header>
+    <fieldset>
+        <section>
+            <label class="title">@UIMessages.ComputerName</label>
+            <div class="input-group">
+                <input class="resultsText" id="ComputerName" type="text" value="@Html.DisplayFor(modelItem => Model.ComputerName)" readonly="readonly" />
+            </div>
+        </section>
+
+        <section>
+            <label class="title">@UIMessages.Password</label>
+            <div class="input-group">
+                <input class="resultsText" id="pwd" type="text" value="@Model.Password" readonly="readonly" />
+                <span id="inputGroupAppend" class="input-group-append">
+                    <button id="copy-button" type="button" data-clipboard-target="#pwd">
+                        <i class="far fa-copy"></i>
+                    </button>
+                </span>
+            </div>
+        </section>
+
+        <section>
+            <label class="title">@UIMessages.ValidUntil</label>
+            <div class="input-group">
+                <input class="resultsText" id="ValidDate" type="text" value="@Html.DisplayFor(modelItem => Model.ValidUntil)" readonly="readonly" />
+            </div>
+        </section>
+    </fieldset>
+
+    <footer>
+        @using (Html.BeginForm("Get", "Lap", FormMethod.Get))
+        {
+            <button type="submit" class="btn btn-primary">@UIMessages.ButtonRequestAnotherPassword</button>
+        }
+    </footer>
+
+</div>
+
+<script type="text/javascript">
+    new ClipboardJS('#copy-button');
+</script>
