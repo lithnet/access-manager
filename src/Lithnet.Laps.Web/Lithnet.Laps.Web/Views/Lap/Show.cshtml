@@ -20,7 +20,9 @@
         <section>
             <label class="title">@UIMessages.Password</label>
             <div class="input-group">
-                <input class="resultsText" id="pwd" type="text" value="@Model.Password" readonly="readonly" />
+                <div class="resultsText password-field" id="pwd" >
+                    @Html.Raw(Model.HtmlPassword)
+                </div>
                 <span id="inputGroupAppend" class="input-group-append">
                     <button id="copy-button" type="button" data-clipboard-target="#pwd">
                         <i class="far fa-copy"></i>

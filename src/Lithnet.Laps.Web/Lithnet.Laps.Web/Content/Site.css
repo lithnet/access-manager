@@ -1,4 +1,9 @@
-﻿body {
+﻿@font-face {
+    font-family: Inconsolata;
+    src: url('webfonts/Inconsolata-Regular.ttf');
+}
+
+body {
     color: #666;
     /*font-family: "Open Sans",Arial,Helvetica,sans-serif;*/
     font-size: 13px;
@@ -28,8 +33,8 @@
     font-weight: 400;
 }
 
-body {
-    width: 400px;
+.content {
+    width: 500px;
     margin-left: auto;
     margin-right: auto;
     padding: 10px;
@@ -157,7 +162,7 @@ body {
         display: block;
     }
 
-input.resultsText {
+.resultsText {
     border-color: #f0f0f0;
     height: 32px;
     padding: 5px 10px;
@@ -188,3 +193,63 @@ input.resultsText {
         width: 32px;
         height: 32px;
     }
+
+.password-field {
+    font-family: Inconsolata, Consolas, Courier New, Courier, monospace;
+    font-size: large;
+    font-weight: bold;
+}
+
+#copy-button {
+    margin-left: 10px;
+}
+
+.password-char-digit {
+    color: darkblue;
+    display: inline-block;
+}
+
+.password-char-letter {
+    color: slategray;
+    display: inline-block;
+}
+
+.password-char-other {
+    color: darkred;
+    display: inline-block;
+}
+
+@media only screen and (max-width: 600px) {
+    .form-container {
+        width: auto;
+        margin-right: 0;
+        margin-left: 0;
+        border: 0;
+        margin-top: 0;
+        box-shadow: none;
+    }
+
+    /*.auth-container .auth-content {
+        max-width: 316px;
+        margin: 0 auto;
+    }*/
+}
+
+@media only screen and (max-device-width: 480px) {
+    .content {
+        margin-top: 0;
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 400px) {
+    .content {
+        width: 100%;
+    }
+}
+
+@media only screen and (max-height: 750px) {
+    .content {
+        margin-top: 0;
+    }
+}

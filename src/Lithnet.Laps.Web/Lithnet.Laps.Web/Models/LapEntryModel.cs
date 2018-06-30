@@ -13,6 +13,8 @@ namespace Lithnet.Laps.Web.Models
 
         public string Password { get; set; }
 
+        public string HtmlPassword { get; set; }
+        
         public DateTime? ValidUntil { get; set; }
 
         public string FailureReason { get; set; }

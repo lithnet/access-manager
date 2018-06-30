@@ -6,6 +6,7 @@ using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Web;
 using System.Web.Caching;
 using System.Web.Mvc;
@@ -226,12 +227,39 @@ namespace Lithnet.Laps.Web.Controllers
 
         private static LapEntryModel CreateLapEntryModel(SearchResult result)
         {
-            return new LapEntryModel
+            LapEntryModel m = new LapEntryModel
             {
                 ComputerName = result.Properties[Directory.AttrSamAccountName][0].ToString(),
                 Password = result.GetPropertyString(Directory.AttrMsMcsAdmPwd) ?? UIMessages.NoLapsPasswordPlaceholder,
-                ValidUntil = result.GetPropertyDateTimeFromLong(Directory.AttrMsMcsAdmPwdExpirationTime)
+                ValidUntil = result.GetPropertyDateTimeFromLong(Directory.AttrMsMcsAdmPwdExpirationTime),
             };
+
+            m.HtmlPassword = BuildHtmlPassword(m.Password);
+
+            return m;
+        }
+
+        private static string BuildHtmlPassword(string password)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            foreach (char s in password)
+            {
+                if (char.IsDigit(s))
+                {
+                    builder.AppendFormat(@"<span class=""password-char-digit"">{0}</span>", s);
+                }
+                else if (char.IsLetter(s))
+                {
+                    builder.AppendFormat(@"<span class=""password-char-letter"">{0}</span>", s);
+                }
+                else
+                {
+                    builder.AppendFormat(@"<span class=""password-char-other"">{0}</span>", s);
+                }
+            }
+
+            return builder.ToString();
         }
 
         [Localizable(false)]

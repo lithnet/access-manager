@@ -7,14 +7,17 @@
     <title>@ConfigurationManager.AppSettings["app:Title"]</title>
     @Styles.Render("~/Content/css")
     <script src="@Url.Content("~/Scripts/clipboard.min.js")"></script>
-    <link href="@Url.Content("~/Content/fontawesome/fontawesome-all.css")" type="text/css" rel="stylesheet"/>
+    <link href="@Url.Content("~/Content/fontawesome/fontawesome-all.css")" type="text/css" rel="stylesheet" />
 </head>
 <body>
-    <div class="app-header">
-        <img class="app-logo" alt="@ConfigurationManager.AppSettings["app:Title"]" src="~/images/logo.png" />
-        <div class="app-title">@ConfigurationManager.AppSettings["app:Title"]</div>
+    <div class="content">
+        <div class="app-header">
+            <img class="app-logo" alt="@ConfigurationManager.AppSettings["app:Title"]" src="~/images/logo.png" />
+            <div class="app-title">@ConfigurationManager.AppSettings["app:Title"]</div>
+        </div>
+        @RenderBody()
+
     </div>
-    @RenderBody()
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
