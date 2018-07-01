@@ -2,9 +2,7 @@
 # Lithnet LAPS Web App
 The Lithnet LAPS Web App is an IIS application that allows you to manage access to local admin passwords that are managed by the [Microsoft Local Admin Password Solution (LAPS)](https://technet.microsoft.com/en-us/mt227395.aspx)
 
-It provides granular permissions, auditing, email alerting and rate-limited access to LAPS passwords stored in a directory. 
-
-It is compatible with OpenID Connect, WS-Federation (ADFS), and integrated windows authentication.
+It provides granular permissions, auditing, email alerting and rate-limited access to LAPS passwords stored in a directory and is compatible with OpenID Connect, WS-Federation (ADFS), and integrated windows authentication.
 
 ## Features
 ### Web-based accesss to LAPS passwords
