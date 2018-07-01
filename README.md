@@ -6,6 +6,28 @@ It provides granular permissions, auditing, email alerting and rate-limited acce
 
 It is compatible with OpenID Connect, WS-Federation (ADFS), and integrated windows authentication.
 
+### Screen shots
+#### Requesting a password
+The LAPS web app provides a simple interface for accessing local admin passwords. Simply provide the computer name, and if you have access, the password is shown.
+
+![](https://github.com/lithnet/laps-web/wiki/images/RequestPassword.png)
+
+Administrators also have the option of setting an expiry time when a password is accessed. This ensures that the password is rotated after use.
+
+![](https://github.com/lithnet/laps-web/wiki/images/ShowPassword.png)
+
+#### Audit success and failure event logs
+All success and failure events are logged to the event log
+
+![](https://github.com/lithnet/laps-web/wiki/images/AuditSuccess.png)
+
+![](https://github.com/lithnet/laps-web/wiki/images/AuditFail.png)
+
+#### Rate limiting
+To prevent mass enumeration of passwords, you can limit the number of passwords an IP address or user can access within a given period.
+
+![](https://github.com/lithnet/laps-web/wiki/images/RateLimited.png)
+
 ### Guides
 *   [Installing the app](https://github.com/lithnet/laps-web/wiki/Installing-the-app)
 *   [Configuration settings](https://github.com/lithnet/laps-web/wiki/Configuration-settings)
