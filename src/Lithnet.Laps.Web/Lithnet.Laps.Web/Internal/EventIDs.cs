@@ -26,7 +26,6 @@ namespace Lithnet.Laps.Web
         public const int ErrorLoadingTemplateResource = 603;
 
         public const int OidcAuthZCodeError = 700;
-        public const int OidcAuthNError = 701;
-        public const int WsFedAuthNError = 702;
+        public const int OwinAuthNError = 701;
     }
 }

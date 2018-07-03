@@ -192,7 +192,7 @@ namespace Lithnet.Laps.Web
 
         private static Task HandleAuthNFailed<TMessage, TOptions>(AuthenticationFailedNotification<TMessage, TOptions> context)
         {
-            Reporting.LogErrorEvent(EventIDs.WsFedAuthNError, LogMessages.AuthNProviderError, context.Exception);
+            Reporting.LogErrorEvent(EventIDs.OwinAuthNError, LogMessages.AuthNProviderError, context.Exception);
 
             context.HandleResponse();
             context.Response.Redirect($"/Home/AuthNError?message={HttpUtility.UrlEncode(context.Exception?.Message ?? "Unknown error")}");
