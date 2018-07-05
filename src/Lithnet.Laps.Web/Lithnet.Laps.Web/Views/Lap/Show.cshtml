@@ -4,6 +4,8 @@
 
 @model Lithnet.Laps.Web.Models.LapEntryModel
 
+<script src="@Url.Content("~/Scripts/init-clip.js")"></script>
+
 <div class="form-container">
 
     <header>
@@ -20,7 +22,7 @@
         <section>
             <label class="title">@UIMessages.Password</label>
             <div class="input-group">
-                <div class="resultsText password-field" id="pwd" >
+                <div class="resultsText password-field" id="pwd">
                     @Html.Raw(Model.HtmlPassword)
                 </div>
                 <span id="inputGroupAppend" class="input-group-append">
@@ -47,7 +49,3 @@
     </footer>
 
 </div>
-
-<script type="text/javascript">
-    new ClipboardJS('#copy-button');
-</script>
