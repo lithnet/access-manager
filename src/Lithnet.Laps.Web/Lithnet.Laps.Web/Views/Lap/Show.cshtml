@@ -24,7 +24,7 @@
                     @Html.Raw(Model.HtmlPassword)
                 </div>
                 <span id="inputGroupAppend" class="input-group-append">
-                    <button id="copy-button" type="button" data-clipboard-target="#pwd">
+                    <button id="copy-button" type="button" data-clipboard-text="@Model.Password">
                         <i class="far fa-copy"></i>
                     </button>
                 </span>
