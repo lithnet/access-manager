@@ -27,7 +27,7 @@ To prevent mass enumeration of passwords, you can limit the number of passwords 
 ![](https://github.com/lithnet/laps-web/wiki/images/RateLimited.png)
 
 ### Modern authentication options
-The web app supports traditional integrated windows authentication, as well as external authentication providers such as ADFS or 3rd party OpenID Connect providers. Using an external authentication provider allows you the option of providing additional protections for the application such as multifactor authentication.
+The web app supports traditional integrated windows authentication, as well as external authentication providers such as [ADFS](https://github.com/lithnet/laps-web/wiki/Setting-up-authentication-with-Active-Directory-Federation-Services) or 3rd party OpenID Connect providers such as [Azure AD](https://github.com/lithnet/laps-web/wiki/Setting-up-authentication-with-Azure-Active-Directory) and [Okta](https://github.com/lithnet/laps-web/wiki/Setting-up-authentication-with-Okta). Using an external authentication provider allows you the option of providing additional protections for the application such as multifactor authentication.
 
 ## Guides
 *   [Installing the app](https://github.com/lithnet/laps-web/wiki/Installing-the-app)
