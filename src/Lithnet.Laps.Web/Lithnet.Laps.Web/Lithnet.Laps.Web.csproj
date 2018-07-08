@@ -396,6 +396,7 @@
     <Content Include="Scripts\popper-utils.js.map" />
     <Content Include="Views\Lap\Show.cshtml" />
     <Content Include="Views\Home\AuthNError.cshtml" />
+    <Content Include="Views\Home\LogOut.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

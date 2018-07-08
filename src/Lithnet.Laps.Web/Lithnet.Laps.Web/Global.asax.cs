@@ -19,5 +19,7 @@ namespace Lithnet.Laps.Web
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
+
+        public static bool CanLogout => Startup.CanLogout && (HttpContext.Current?.User?.Identity?.IsAuthenticated ?? false);
     }
 }

@@ -42,10 +42,11 @@
     </fieldset>
 
     <footer>
-        @using (Html.BeginForm("Get", "Lap", FormMethod.Get))
-        {
-            <button type="submit" class="btn btn-primary">@UIMessages.ButtonRequestAnotherPassword</button>
-        }
+        <div class="center-content">
+            @using (Html.BeginForm("Get", "Lap", FormMethod.Get))
+            {
+                <button type="submit" class="btn btn-primary">@UIMessages.ButtonRequestAnotherPassword</button>
+            }
+        </div>
     </footer>
-
 </div>

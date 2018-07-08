@@ -16,8 +16,13 @@
             <div class="app-title">@ConfigurationManager.AppSettings["app:Title"]</div>
         </div>
         @RenderBody()
-
     </div>
+    @if (MvcApplication.CanLogout)
+    {
+        <div class="center-content">
+            <a class="logout-link" href="@Url.Action("SignOut", "Home")">Logout</a>
+        </div>
+    }
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")

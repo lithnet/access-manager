@@ -25,6 +25,11 @@ body {
     text-align: center;
 }
 
+.center-content {
+    align-items: center;
+    text-align: center;
+}
+
 .app-logo {
     max-width: 200px;
 }
@@ -252,4 +257,8 @@ body {
     .content {
         margin-top: 0;
     }
+}
+
+.logout-link {
+    color: #777;
 }

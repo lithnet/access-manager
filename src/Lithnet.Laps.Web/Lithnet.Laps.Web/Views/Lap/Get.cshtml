@@ -7,9 +7,9 @@
 <div class="form-container">
     @using (Html.BeginForm("Get", "Lap", FormMethod.Post))
     {
-    <header>
-        @UIMessages.HeadingRequestPassword
-    </header>
+        <header>
+            @UIMessages.HeadingRequestPassword
+        </header>
         <fieldset>
 
             <section>
@@ -33,8 +33,10 @@
         </fieldset>
 
         <footer>
-            @Html.AntiForgeryToken()
-            <button type="submit" class="btn btn-primary">@UIMessages.ButtonRequestPassword</button>
+            <div class="center-content">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-primary">@UIMessages.ButtonRequestPassword</button>
+            </div>
         </footer>
     }
 </div>

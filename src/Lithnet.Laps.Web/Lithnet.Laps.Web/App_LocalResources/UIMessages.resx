@@ -165,4 +165,7 @@
   <data name="RateLimitError" xml:space="preserve">
     <value>You have exceeded the maximum number of requests allowed in a specified period of time</value>
   </data>
+  <data name="LoggedOut" xml:space="preserve">
+    <value>You have been logged out. Please close all browser windows.</value>
+  </data>
 </root>

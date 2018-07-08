@@ -18,5 +18,24 @@ namespace Lithnet.Laps.Web.Controllers
         {
             return this.View();
         }
+
+        public ActionResult SignOut()
+        {
+            if (this.Request.GetOwinContext().Authentication.User.Identity.IsAuthenticated)
+            {
+                this.Request.GetOwinContext()
+                    .Authentication
+                    .SignOut(this.HttpContext.GetOwinContext()
+                        .Authentication.GetAuthenticationTypes()
+                        .Select(o => o.AuthenticationType).ToArray());
+            }
+
+            return this.View("LogOut");
+        }
+
+        public ActionResult LogOut()
+        {
+            return this.View();
+        }
     }
 }
