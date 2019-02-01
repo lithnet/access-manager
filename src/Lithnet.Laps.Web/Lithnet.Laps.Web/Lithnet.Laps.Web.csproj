@@ -259,6 +259,8 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
+    <Compile Include="Auth\ConfigurationFileAuthService.cs" />
+    <Compile Include="Auth\IAuthService.cs" />
     <Compile Include="ConfigSection\AuditElement.cs" />
     <Compile Include="ConfigSection\RateLimitIPElement.cs" />
     <Compile Include="ConfigSection\RateLimitUserElement.cs" />
@@ -408,12 +410,6 @@
     <Content Include="Views\Lap\Show.cshtml" />
     <Content Include="Views\Home\AuthNError.cshtml" />
     <Content Include="Views\Home\LogOut.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Lithnet.Laps.Auth\Lithnet.Laps.Auth.csproj">
-      <Project>{b0ba462e-66e3-467f-8f68-40b9332a3142}</Project>
-      <Name>Lithnet.Laps.Auth</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

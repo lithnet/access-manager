@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Web;
 
-namespace Lithnet.Laps.Auth
+namespace Lithnet.Laps.Web.Auth
 {
     public class ConfigurationFileAuthService : IAuthService
     {

@@ -1,4 +1,4 @@
-using Lithnet.Laps.Auth;
+using Lithnet.Laps.Web.Auth;
 using System;
 
 using Unity;
@@ -41,7 +41,8 @@ namespace Lithnet.Laps.Web
             // Make sure to add a Unity.Configuration to the using statements.
             // container.LoadConfiguration();
 
-            // (I would love to, but that didn't seem to work)
+            // (I would love to, but that didn't seem to work...
+            // Let's try that another time.)
 
             // TODO: Register your type's mappings here.
             // container.RegisterType<IProductRepository, ProductRepository>();

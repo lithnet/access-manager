@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Web;
-using System.Web.Caching;
 using System.Web.Mvc;
 using Lithnet.Laps.Web.App_LocalResources;
+using Lithnet.Laps.Web.Auth;
 using Lithnet.Laps.Web.Models;
 using NLog;
 
@@ -20,7 +18,14 @@ namespace Lithnet.Laps.Web.Controllers
     [Localizable(true)]
     public class LapController : Controller
     {
+        private readonly IAuthService authService;
+
         private static Logger logger = LogManager.GetCurrentClassLogger();
+
+        public LapController(IAuthService authService)
+        {
+            this.authService = authService;
+        }
 
         public ActionResult Get()
         {
