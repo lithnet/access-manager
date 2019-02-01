@@ -82,39 +82,52 @@ namespace Lithnet.Laps.Web.Controllers
                         computer: computer);
                 }
 
+                // Do authorization check first.
+
+                ReaderElement authorizedAs = null;
+
                 foreach (ReaderElement reader in target.Readers.OfType<ReaderElement>())
                 {
                     if (this.IsReaderAuthorized(reader, user))
                     {
                         logger.Trace($"User {user.SamAccountName} matches reader principal {reader.Principal} is authorized to read passwords from target {target.Name}");
 
-                        SearchResult searchResult = Directory.GetDirectoryEntry(computer, Directory.AttrSamAccountName, Directory.AttrMsMcsAdmPwd, Directory.AttrMsMcsAdmPwdExpirationTime);
-
-                        if (!searchResult.Properties.Contains(Directory.AttrMsMcsAdmPwd))
-                        {
-                            return this.LogAndReturnErrorResponse(model, UIMessages.NoLapsPassword, EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.SamAccountName, user.SamAccountName));
-                        }
-
-                        if (target.ExpireAfter != null)
-                        {
-                            LapController.UpdateTargetPasswordExpiry(target, computer);
-                            searchResult = Directory.GetDirectoryEntry(computer, Directory.AttrSamAccountName, Directory.AttrMsMcsAdmPwd, Directory.AttrMsMcsAdmPwdExpirationTime);
-                        }
-
-                        Reporting.PerformAuditSuccessActions(model, target, reader, user, computer, searchResult);
-
-                        return this.View("Show", LapController.CreateLapEntryModel(searchResult));
+                        authorizedAs = reader;
+                        break;
                     }
                 }
 
-                return this.AuditAndReturnErrorResponse(
-                    model: model,
-                    userMessage: UIMessages.NotAuthorized,
-                    eventID: EventIDs.AuthZFailedNoReaderPrincipalMatch,
-                    logMessage: string.Format(LogMessages.AuthZFailedNoReaderPrincipalMatch, user.SamAccountName, computer.SamAccountName),
-                    target: target,
-                    user: user,
-                    computer: computer);
+                if (authorizedAs == null)
+                {
+                    return this.AuditAndReturnErrorResponse(
+                        model: model,
+                        userMessage: UIMessages.NotAuthorized,
+                        eventID: EventIDs.AuthZFailedNoReaderPrincipalMatch,
+                        logMessage: string.Format(LogMessages.AuthZFailedNoReaderPrincipalMatch, user.SamAccountName, computer.SamAccountName),
+                        target: target,
+                        user: user,
+                        computer: computer);
+                }
+
+                // Do actual work only if authorized.
+
+                SearchResult searchResult = Directory.GetDirectoryEntry(computer, Directory.AttrSamAccountName, Directory.AttrMsMcsAdmPwd, Directory.AttrMsMcsAdmPwdExpirationTime);
+
+                if (!searchResult.Properties.Contains(Directory.AttrMsMcsAdmPwd))
+                {
+                    return this.LogAndReturnErrorResponse(model, UIMessages.NoLapsPassword, EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.SamAccountName, user.SamAccountName));
+                }
+
+                if (target.ExpireAfter != null)
+                {
+                    LapController.UpdateTargetPasswordExpiry(target, computer);
+                    searchResult = Directory.GetDirectoryEntry(computer, Directory.AttrSamAccountName, Directory.AttrMsMcsAdmPwd, Directory.AttrMsMcsAdmPwdExpirationTime);
+                }
+
+                Reporting.PerformAuditSuccessActions(model, target, authorizedAs, user, computer, searchResult);
+
+                return this.View("Show", LapController.CreateLapEntryModel(searchResult));
+
             }
             catch (Exception ex)
             {

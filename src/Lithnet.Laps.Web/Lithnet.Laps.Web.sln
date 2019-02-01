@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.27703.2000
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lithnet.Laps.Web", "Lithnet.Laps.Web\Lithnet.Laps.Web.csproj", "{AFF2B8F3-9BF2-4BDB-A841-F13AA9F4CEDC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lithnet.Laps.Auth", "Lithnet.Laps.Auth\Lithnet.Laps.Auth.csproj", "{B0BA462E-66E3-467F-8F68-40B9332A3142}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lithnet.Laps.Domain", "Lithnet.Laps.Domain\Lithnet.Laps.Domain.csproj", "{5E30C134-3C36-4907-BD94-3C49A853A7A5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{AFF2B8F3-9BF2-4BDB-A841-F13AA9F4CEDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFF2B8F3-9BF2-4BDB-A841-F13AA9F4CEDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFF2B8F3-9BF2-4BDB-A841-F13AA9F4CEDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0BA462E-66E3-467F-8F68-40B9332A3142}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0BA462E-66E3-467F-8F68-40B9332A3142}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0BA462E-66E3-467F-8F68-40B9332A3142}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0BA462E-66E3-467F-8F68-40B9332A3142}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E30C134-3C36-4907-BD94-3C49A853A7A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E30C134-3C36-4907-BD94-3C49A853A7A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E30C134-3C36-4907-BD94-3C49A853A7A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E30C134-3C36-4907-BD94-3C49A853A7A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
