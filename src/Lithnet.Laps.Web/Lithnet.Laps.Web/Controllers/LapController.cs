@@ -89,9 +89,13 @@ namespace Lithnet.Laps.Web.Controllers
 
                 // Do authorization check first.
 
-                var authResponse = authService.CanAccessPassword(user, computer?.SamAccountName, target);
+                var authResponse = authService.CanAccessPassword(
+                    user,
+                    model.ComputerName,
+                    target
+                );
 
-                if (authResponse.Success)
+                if (!authResponse.Success)
                 {
                     return this.AuditAndReturnErrorResponse(
                         model: model,

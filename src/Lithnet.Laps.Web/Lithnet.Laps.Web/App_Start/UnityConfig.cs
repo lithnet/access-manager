@@ -51,7 +51,7 @@ namespace Lithnet.Laps.Web
             // container.RegisterType<IAuthService, ConfigurationFileAuthService>();
 
             // Demo auth service:
-            container.RegisterType<IAuthService, ConfigurationFileAuthService>();
+            container.RegisterType<IAuthService, DemoAuthService>();
         }
     }
 }
