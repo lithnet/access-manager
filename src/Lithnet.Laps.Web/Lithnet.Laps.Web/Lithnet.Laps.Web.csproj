@@ -295,6 +295,7 @@
       <DependentUpon>UIMessages.resx</DependentUpon>
     </Compile>
     <Compile Include="Auth\AuthResponse.cs" />
+    <Compile Include="Auth\DemoAuthService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-grid.css" />

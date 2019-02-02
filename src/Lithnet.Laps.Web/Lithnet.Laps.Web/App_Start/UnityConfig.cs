@@ -47,6 +47,10 @@ namespace Lithnet.Laps.Web
             // TODO: Register your type's mappings here.
             // container.RegisterType<IProductRepository, ProductRepository>();
 
+            // Default auth service:
+            // container.RegisterType<IAuthService, ConfigurationFileAuthService>();
+
+            // Demo auth service:
             container.RegisterType<IAuthService, ConfigurationFileAuthService>();
         }
     }
