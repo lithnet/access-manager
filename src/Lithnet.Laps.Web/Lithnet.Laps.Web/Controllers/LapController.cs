@@ -89,20 +89,9 @@ namespace Lithnet.Laps.Web.Controllers
 
                 // Do authorization check first.
 
-                ReaderElement authorizedAs = null;
+                var authResponse = authService.CanAccessPassword(user, computer?.SamAccountName, target);
 
-                foreach (ReaderElement reader in target.Readers.OfType<ReaderElement>())
-                {
-                    if (this.IsReaderAuthorized(reader, user))
-                    {
-                        logger.Trace($"User {user.SamAccountName} matches reader principal {reader.Principal} is authorized to read passwords from target {target.Name}");
-
-                        authorizedAs = reader;
-                        break;
-                    }
-                }
-
-                if (authorizedAs == null)
+                if (authResponse.Success)
                 {
                     return this.AuditAndReturnErrorResponse(
                         model: model,
@@ -129,7 +118,7 @@ namespace Lithnet.Laps.Web.Controllers
                     searchResult = Directory.GetDirectoryEntry(computer, Directory.AttrSamAccountName, Directory.AttrMsMcsAdmPwd, Directory.AttrMsMcsAdmPwdExpirationTime);
                 }
 
-                Reporting.PerformAuditSuccessActions(model, target, authorizedAs, user, computer, searchResult);
+                Reporting.PerformAuditSuccessActions(model, target, authResponse.ReaderElement, user, computer, searchResult);
 
                 return this.View("Show", LapController.CreateLapEntryModel(searchResult));
 
@@ -205,26 +194,6 @@ namespace Lithnet.Laps.Web.Controllers
             }
 
             return matchingTargets.OrderBy(t => t.Type == TargetType.Computer).ThenBy(t => t.Type == TargetType.Group).FirstOrDefault();
-        }
-
-        private bool IsReaderAuthorized(ReaderElement reader, UserPrincipal currentUser)
-        {
-            Principal readerPrincipal = Directory.GetPrincipal(reader.Principal);
-
-            if (currentUser.Equals(readerPrincipal))
-            {
-                return true;
-            }
-
-            if (readerPrincipal is GroupPrincipal group)
-            {
-                if (Directory.IsPrincipalInGroup(currentUser, group))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private UserPrincipal GetCurrentUser()
