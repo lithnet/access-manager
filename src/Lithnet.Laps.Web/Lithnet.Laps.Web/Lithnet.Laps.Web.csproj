@@ -197,6 +197,9 @@
     <Reference Include="Unity.Abstractions, Version=4.0.2.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
       <HintPath>..\packages\Unity.Abstractions.4.0.2\lib\net46\Unity.Abstractions.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Configuration, Version=5.9.1.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.Configuration.5.9.1\lib\net46\Unity.Configuration.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Container, Version=5.9.3.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
       <HintPath>..\packages\Unity.Container.5.9.3\lib\net46\Unity.Container.dll</HintPath>
     </Reference>

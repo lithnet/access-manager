@@ -1,7 +1,9 @@
 using Lithnet.Laps.Web.Auth;
+using Microsoft.Practices.Unity.Configuration;
 using System;
 
 using Unity;
+using Unity.Configuration;
 
 namespace Lithnet.Laps.Web
 {
@@ -41,17 +43,10 @@ namespace Lithnet.Laps.Web
             // Make sure to add a Unity.Configuration to the using statements.
             // container.LoadConfiguration();
 
-            // (I would love to, but that didn't seem to work...
-            // Let's try that another time.)
+            container.LoadConfiguration();
 
             // TODO: Register your type's mappings here.
             // container.RegisterType<IProductRepository, ProductRepository>();
-
-            // Default auth service:
-            // container.RegisterType<IAuthService, ConfigurationFileAuthService>();
-
-            // Demo auth service:
-            container.RegisterType<IAuthService, DemoAuthService>();
         }
     }
 }
