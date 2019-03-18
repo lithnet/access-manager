@@ -217,6 +217,9 @@
       <Private>True</Private>
       <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>..\packages\System.Collections.Immutable.1.5.0\lib\netstandard2.0\System.Collections.Immutable.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Diagnostics.DiagnosticSource">
@@ -297,6 +300,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>UIMessages.resx</DependentUpon>
     </Compile>
+    <Compile Include="Audit\UsersToBeNotified.cs" />
     <Compile Include="Auth\AuthResponse.cs" />
     <Compile Include="Auth\DemoAuthService.cs" />
   </ItemGroup>
@@ -442,6 +446,9 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>UIMessages.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Audit\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
