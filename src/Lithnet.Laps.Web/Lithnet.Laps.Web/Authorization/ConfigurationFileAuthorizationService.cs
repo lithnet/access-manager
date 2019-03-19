@@ -10,11 +10,14 @@ namespace Lithnet.Laps.Web.Authorization
     {
         private readonly LapsConfigSection configSection;
         private readonly Logger logger;
+        private readonly Directory directory;
 
-        public ConfigurationFileAuthorizationService(LapsConfigSection configSection, Logger logger)
+        public ConfigurationFileAuthorizationService(LapsConfigSection configSection, Logger logger,
+            Directory directory)
         {
             this.configSection = configSection;
             this.logger = logger;
+            this.directory = directory;
         }
 
         /// <summary>
@@ -47,7 +50,7 @@ namespace Lithnet.Laps.Web.Authorization
 
         private bool IsReaderAuthorized(ReaderElement reader, UserPrincipal currentUser)
         {
-            Principal readerPrincipal = Directory.GetPrincipal(reader.Principal);
+            Principal readerPrincipal = directory.GetPrincipal(reader.Principal);
 
             if (currentUser.Equals(readerPrincipal))
             {
@@ -56,7 +59,7 @@ namespace Lithnet.Laps.Web.Authorization
 
             if (readerPrincipal is GroupPrincipal group)
             {
-                if (Directory.IsPrincipalInGroup(currentUser, group))
+                if (directory.IsPrincipalInGroup(currentUser, group))
                 {
                     return true;
                 }

@@ -1,54 +1,51 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
-using System.Security.Principal;
-using System.Web;
 
 namespace Lithnet.Laps.Web
 {
-    internal static class Directory
+    public sealed class Directory
     {
         public const string AttrSamAccountName = "samAccountName";
         public const string AttrMsMcsAdmPwd = "ms-Mcs-AdmPwd";
         public const string AttrMsMcsAdmPwdExpirationTime = "ms-Mcs-AdmPwdExpirationTime";
 
-        internal static bool IsPrincipalInOu(Principal p, string ou)
+        internal bool IsPrincipalInOu(Principal p, string ou)
         {
             DirectorySearcher d = new DirectorySearcher();
             d.SearchRoot = new DirectoryEntry($"LDAP://{ou}");
             d.SearchScope = SearchScope.Subtree;
-            d.Filter = $"objectGuid={p.Guid.ToOctetString()}";
+            d.Filter = $"objectGuid={ToOctetString(p.Guid)}";
 
             return d.FindOne() != null;
         }
 
-        internal static ComputerPrincipal GetComputerPrincipal(string name)
+        internal ComputerPrincipal GetComputerPrincipal(string name)
         {
             PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
             return ComputerPrincipal.FindByIdentity(ctx, name);
         }
 
-        internal static GroupPrincipal GetGroupPrincipal(string name)
+        internal GroupPrincipal GetGroupPrincipal(string name)
         {
             PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
             return GroupPrincipal.FindByIdentity(ctx, name);
         }
 
-        internal static Principal GetPrincipal(string name)
+        internal Principal GetPrincipal(string name)
         {
             PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
             return Principal.FindByIdentity(ctx, name);
         }
 
-        internal static Principal GetPrincipal(IdentityType type, string name)
+        internal Principal GetPrincipal(IdentityType type, string name)
         {
             PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
             return Principal.FindByIdentity(ctx, type, name);
         }
 
-        internal static bool IsPrincipalInGroup(Principal p, GroupPrincipal group)
+        internal bool IsPrincipalInGroup(Principal p, GroupPrincipal group)
         {
             if (group?.Sid == null || group.Sid.BinaryLength == 0)
             {
@@ -60,7 +57,7 @@ namespace Lithnet.Laps.Web
             return IsPrincipalInGroup(p, groupSid);
         }
 
-        private static bool IsPrincipalInGroup(Principal p, byte[] groupSid)
+        private bool IsPrincipalInGroup(Principal p, byte[] groupSid)
         {
             SearchResult result = GetDirectoryEntry(p, "tokenGroups");
 
@@ -80,12 +77,12 @@ namespace Lithnet.Laps.Web
             return false;
         }
 
-        internal static SearchResult GetDirectoryEntry(Principal p, params string[] propertiesToLoad)
+        internal SearchResult GetDirectoryEntry(Principal p, params string[] propertiesToLoad)
         {
             return GetDirectoryEntry(p.DistinguishedName, propertiesToLoad);
         }
 
-        internal static SearchResult GetDirectoryEntry(string dn, params string[] propertiesToLoad)
+        internal SearchResult GetDirectoryEntry(string dn, params string[] propertiesToLoad)
         {
             DirectorySearcher d = new DirectorySearcher();
             d.SearchRoot = new DirectoryEntry($"LDAP://{dn}");
@@ -99,7 +96,7 @@ namespace Lithnet.Laps.Web
             return d.FindOne();
         }
 
-        internal static string ToOctetString(this Guid? guid)
+        internal string ToOctetString(Guid? guid)
         {
             if (!guid.HasValue)
             {

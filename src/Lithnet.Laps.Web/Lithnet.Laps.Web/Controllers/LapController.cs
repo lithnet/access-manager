@@ -20,12 +20,14 @@ namespace Lithnet.Laps.Web.Controllers
     public class LapController : Controller
     {
         private readonly IAuthorizationService authorizationService;
+        private readonly Logger logger;
+        private readonly Directory directory;
 
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
-        public LapController(IAuthorizationService authorizationService)
+        public LapController(IAuthorizationService authorizationService, Logger logger, Directory directory)
         {
             this.authorizationService = authorizationService;
+            this.logger = logger;
+            this.directory = directory;
         }
 
         public ActionResult Get()
@@ -69,7 +71,7 @@ namespace Lithnet.Laps.Web.Controllers
 
                 Reporting.LogSuccessEvent(EventIDs.UserRequestedPassword, string.Format(LogMessages.UserHasRequestedPassword, user.SamAccountName, model.ComputerName));
 
-                ComputerPrincipal computer = Directory.GetComputerPrincipal(model.ComputerName);
+                ComputerPrincipal computer = directory.GetComputerPrincipal(model.ComputerName);
 
                 if (computer == null)
                 {
@@ -110,7 +112,7 @@ namespace Lithnet.Laps.Web.Controllers
 
                 // Do actual work only if authorized.
 
-                SearchResult searchResult = Directory.GetDirectoryEntry(computer, Directory.AttrSamAccountName, Directory.AttrMsMcsAdmPwd, Directory.AttrMsMcsAdmPwdExpirationTime);
+                SearchResult searchResult = directory.GetDirectoryEntry(computer, Directory.AttrSamAccountName, Directory.AttrMsMcsAdmPwd, Directory.AttrMsMcsAdmPwdExpirationTime);
 
                 if (!searchResult.Properties.Contains(Directory.AttrMsMcsAdmPwd))
                 {
@@ -119,8 +121,8 @@ namespace Lithnet.Laps.Web.Controllers
 
                 if (target.ExpireAfter != null)
                 {
-                    LapController.UpdateTargetPasswordExpiry(target, computer);
-                    searchResult = Directory.GetDirectoryEntry(computer, Directory.AttrSamAccountName, Directory.AttrMsMcsAdmPwd, Directory.AttrMsMcsAdmPwdExpirationTime);
+                    UpdateTargetPasswordExpiry(target, computer);
+                    searchResult = directory.GetDirectoryEntry(computer, Directory.AttrSamAccountName, Directory.AttrMsMcsAdmPwd, Directory.AttrMsMcsAdmPwdExpirationTime);
                 }
 
                 Reporting.PerformAuditSuccessActions(model, target, authResponse, user, computer, searchResult);
@@ -156,7 +158,7 @@ namespace Lithnet.Laps.Web.Controllers
             {
                 if (target.Type == TargetType.Container)
                 {
-                    if (Directory.IsPrincipalInOu(computer, target.Name))
+                    if (directory.IsPrincipalInOu(computer, target.Name))
                     {
                         logger.Trace($"Matched {computer.SamAccountName} to target OU {target.Name}");
                         matchingTargets.Add(target);
@@ -166,7 +168,7 @@ namespace Lithnet.Laps.Web.Controllers
                 }
                 else if (target.Type == TargetType.Computer)
                 {
-                    ComputerPrincipal p = Directory.GetComputerPrincipal(target.Name);
+                    ComputerPrincipal p = directory.GetComputerPrincipal(target.Name);
 
                     if (p == null)
                     {
@@ -182,7 +184,7 @@ namespace Lithnet.Laps.Web.Controllers
                 }
                 else
                 {
-                    GroupPrincipal g = Directory.GetGroupPrincipal(target.Name);
+                    GroupPrincipal g = directory.GetGroupPrincipal(target.Name);
 
                     if (g == null)
                     {
@@ -190,7 +192,7 @@ namespace Lithnet.Laps.Web.Controllers
                         continue;
                     }
 
-                    if (Directory.IsPrincipalInGroup(computer, g))
+                    if (directory.IsPrincipalInGroup(computer, g))
                     {
                         logger.Trace($"Matched {computer.SamAccountName} to target group {target.Name}");
                         matchingTargets.Add(target);
@@ -255,13 +257,13 @@ namespace Lithnet.Laps.Web.Controllers
         }
 
         [Localizable(false)]
-        private static void UpdateTargetPasswordExpiry(TargetElement target, ComputerPrincipal computer)
+        private void UpdateTargetPasswordExpiry(TargetElement target, ComputerPrincipal computer)
         {
             TimeSpan t = TimeSpan.Parse(target.ExpireAfter);
-            LapController.logger.Trace($"Target rule requires password to change after {t}");
+            logger.Trace($"Target rule requires password to change after {t}");
             DateTime newDateTime = DateTime.UtcNow.Add(t);
             LapController.SetExpiryTime(new DirectoryEntry($"LDAP://{computer.DistinguishedName}"), newDateTime);
-            LapController.logger.Trace($"Set expiry time for {computer.SamAccountName} to {newDateTime.ToLocalTime()}");
+            logger.Trace($"Set expiry time for {computer.SamAccountName} to {newDateTime.ToLocalTime()}");
         }
 
         private static void SetExpiryTime(DirectoryEntry d, DateTime newDateTime)
