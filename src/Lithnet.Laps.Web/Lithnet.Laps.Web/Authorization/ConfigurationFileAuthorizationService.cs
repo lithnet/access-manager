@@ -1,13 +1,12 @@
 ﻿using NLog;
 using System;
-using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
-using System.Web;
+using Lithnet.Laps.Web.Audit;
 
-namespace Lithnet.Laps.Web.Auth
+namespace Lithnet.Laps.Web.Authorization
 {
-    public class ConfigurationFileAuthService : IAuthService
+    public sealed class ConfigurationFileAuthorizationService : IAuthorizationService
     {
         // FIXME: Use dependency injection to inject the logger.
         private static Logger logger = LogManager.GetCurrentClassLogger();
@@ -17,14 +16,14 @@ namespace Lithnet.Laps.Web.Auth
         /// access the password of the computer with name
         /// <paramref name="computerName"/>
         /// </summary>
-        /// <param name="currentUser">a user. FIXME: We shouldn't depend on AD here.</param>
+        /// <param name="user">a user. FIXME: We shouldn't depend on AD here.</param>
         /// <param name="computerName">name of the computer</param>
         /// <param name="target">Target section in the web.config-file.
         /// FIXME: This shouldn't be in this interface. But I can't leave it out
         /// yet, because the code figuring out the target has way too many dependencies.
         /// </param>
-        /// <returns>An <see cref="AuthResponse"/> object.</returns>
-        public AuthResponse CanAccessPassword(UserPrincipal user, string computerName, TargetElement target = null)
+        /// <returns>An <see cref="AuthorizationResponse"/> object.</returns>
+        public AuthorizationResponse CanAccessPassword(UserPrincipal user, string computerName, TargetElement target = null)
         {
             // FIXME: This function doesn't even look at computerName, because it assumes this check already happened at some other place.
             foreach (ReaderElement reader in target.Readers.OfType<ReaderElement>())
@@ -33,11 +32,11 @@ namespace Lithnet.Laps.Web.Auth
                 {
                     logger.Trace($"User {user.SamAccountName} matches reader principal {reader.Principal} is authorized to read passwords from target {target.Name}");
 
-                    return new AuthResponse(true, reader);
+                    return new AuthorizationResponse(true, reader.Audit.UsersToNotify, reader.Principal);
                 }
             }
 
-            return new AuthResponse(false, null);
+            return new AuthorizationResponse(false, new UsersToNotify(), String.Empty);
         }
 
         private bool IsReaderAuthorized(ReaderElement reader, UserPrincipal currentUser)

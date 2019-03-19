@@ -1,4 +1,4 @@
-using Lithnet.Laps.Web.Auth;
+using Lithnet.Laps.Web.Authorization;
 using Microsoft.Practices.Unity.Configuration;
 using System;
 

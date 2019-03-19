@@ -9,7 +9,7 @@ using System.Text;
 using System.Web.Mvc;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.Audit;
-using Lithnet.Laps.Web.Auth;
+using Lithnet.Laps.Web.Authorization;
 using Lithnet.Laps.Web.Models;
 using NLog;
 
@@ -19,13 +19,13 @@ namespace Lithnet.Laps.Web.Controllers
     [Localizable(true)]
     public class LapController : Controller
     {
-        private readonly IAuthService authService;
+        private readonly IAuthorizationService authorizationService;
 
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        public LapController(IAuthService authService)
+        public LapController(IAuthorizationService authorizationService)
         {
-            this.authService = authService;
+            this.authorizationService = authorizationService;
         }
 
         public ActionResult Get()
@@ -90,7 +90,7 @@ namespace Lithnet.Laps.Web.Controllers
 
                 // Do authorization check first.
 
-                var authResponse = authService.CanAccessPassword(
+                var authResponse = authorizationService.CanAccessPassword(
                     user,
                     model.ComputerName,
                     target
@@ -123,7 +123,7 @@ namespace Lithnet.Laps.Web.Controllers
                     searchResult = Directory.GetDirectoryEntry(computer, Directory.AttrSamAccountName, Directory.AttrMsMcsAdmPwd, Directory.AttrMsMcsAdmPwdExpirationTime);
                 }
 
-                Reporting.PerformAuditSuccessActions(model, target, authResponse.ReaderElement, user, computer, searchResult);
+                Reporting.PerformAuditSuccessActions(model, target, authResponse, user, computer, searchResult);
 
                 return this.View("Show", LapController.CreateLapEntryModel(searchResult));
 
@@ -134,9 +134,9 @@ namespace Lithnet.Laps.Web.Controllers
             }
         }
 
-        private ViewResult AuditAndReturnErrorResponse(LapRequestModel model, string userMessage, int eventID, string logMessage = null, Exception ex = null, TargetElement target = null, ReaderElement reader = null, UserPrincipal user = null, ComputerPrincipal computer = null)
+        private ViewResult AuditAndReturnErrorResponse(LapRequestModel model, string userMessage, int eventID, string logMessage = null, Exception ex = null, TargetElement target = null, AuthorizationResponse authorizationResponse = null, UserPrincipal user = null, ComputerPrincipal computer = null)
         {
-            Reporting.PerformAuditFailureActions(model, userMessage, eventID, logMessage, ex, target, reader, user, computer);
+            Reporting.PerformAuditFailureActions(model, userMessage, eventID, logMessage, ex, target, authorizationResponse, user, computer);
             model.FailureReason = userMessage;
             return this.View("Get", model);
         }

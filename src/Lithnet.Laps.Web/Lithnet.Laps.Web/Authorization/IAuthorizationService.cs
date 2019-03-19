@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.DirectoryServices.AccountManagement;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.DirectoryServices.AccountManagement;
 
-namespace Lithnet.Laps.Web.Auth
+namespace Lithnet.Laps.Web.Authorization
 {
-    public interface IAuthService
+    public interface IAuthorizationService
     {
         /// <summary>
-        /// Check whether the user with name <paramref name="userName"/> can 
+        /// Check whether the user with name <paramref name="currentUser"/> can 
         /// access the password of the computer with name
         /// <paramref name="computerName"/>
         /// </summary>
@@ -20,7 +15,7 @@ namespace Lithnet.Laps.Web.Auth
         /// FIXME: This shouldn't be in this interface. But I can't leave it out
         /// yet, because the code figuring out the target has way too many dependencies.
         /// </param>
-        /// <returns>An <see cref="AuthResponse"/> object.</returns>
-        AuthResponse CanAccessPassword(UserPrincipal user, string computerName, TargetElement target = null);
+        /// <returns>An <see cref="AuthorizationResponse"/> object.</returns>
+        AuthorizationResponse CanAccessPassword(UserPrincipal currentUser, string computerName, TargetElement target = null);
     }
 }

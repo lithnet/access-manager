@@ -62,5 +62,15 @@ namespace Lithnet.Laps.Web.Audit
             GetUsersFromString(onError))
         {
         }
+
+        public IImmutableSet<string> All => OnSuccess.Union(OnFailure);
+
+        public UsersToNotify WithUserReplaced(string oldEmail, string newEmail)
+        {
+            return new UsersToNotify(
+                OnSuccess.Remove(oldEmail).Add(newEmail),
+                OnFailure.Remove(oldEmail).Add(newEmail)
+            );
+        }
     }
 }

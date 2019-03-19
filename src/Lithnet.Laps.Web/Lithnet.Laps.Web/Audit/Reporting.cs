@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Globalization;
 using System.Net.Mail;
 using System.Web;
 using Lithnet.Laps.Web.App_LocalResources;
+using Lithnet.Laps.Web.Authorization;
 using Lithnet.Laps.Web.Models;
 using NLog;
 
@@ -36,9 +38,9 @@ namespace Lithnet.Laps.Web.Audit
             Reporting.Logger.Info(logEvent);
         }
 
-        public static void PerformAuditSuccessActions(LapRequestModel model, TargetElement target, ReaderElement reader, UserPrincipal user, ComputerPrincipal computer, SearchResult searchResult)
+        public static void PerformAuditSuccessActions(LapRequestModel model, TargetElement target, AuthorizationResponse authorizationResponse, UserPrincipal user, ComputerPrincipal computer, SearchResult searchResult)
         {
-            Dictionary<string, string> tokens = BuildTokenDictionary(target, reader, user, computer, searchResult, model.ComputerName);
+            Dictionary<string, string> tokens = BuildTokenDictionary(target, authorizationResponse, user, computer, searchResult, model.ComputerName);
             string logSuccessMessage = Reporting.LogSuccessTemplate ?? LogMessages.DefaultAuditSuccessText;
             string emailSuccessMessage = Reporting.EmailSuccessTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditSuccessText}</pre></body></html>";
 
@@ -48,7 +50,7 @@ namespace Lithnet.Laps.Web.Audit
 
             try
             {
-                ICollection<string> recipients = Reporting.BuildRecipientList(target, reader, true, user);
+                var recipients = Reporting.BuildRecipientList(target, authorizationResponse, true, user);
 
                 if (recipients.Count > 0)
                 {
@@ -62,9 +64,9 @@ namespace Lithnet.Laps.Web.Audit
             }
         }
 
-        public static void PerformAuditFailureActions(LapRequestModel model, string userMessage, int eventID, string logMessage, Exception ex, TargetElement target, ReaderElement reader, UserPrincipal user, ComputerPrincipal computer)
+        public static void PerformAuditFailureActions(LapRequestModel model, string userMessage, int eventID, string logMessage, Exception ex, TargetElement target, AuthorizationResponse authorizationResponse, UserPrincipal user, ComputerPrincipal computer)
         {
-            Dictionary<string, string> tokens = BuildTokenDictionary(target, reader, user, computer, null, model.ComputerName, logMessage ?? userMessage);
+            Dictionary<string, string> tokens = BuildTokenDictionary(target, authorizationResponse, user, computer, null, model.ComputerName, logMessage ?? userMessage);
             string logFailureMessage = Reporting.LogFailureTemplate ?? LogMessages.DefaultAuditFailureText;
             string emailFailureMessage = Reporting.EmailFailureTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditFailureText}</pre></body></html>";
 
@@ -72,7 +74,7 @@ namespace Lithnet.Laps.Web.Audit
 
             try
             {
-                ICollection<string> recipients = Reporting.BuildRecipientList(target, reader, false);
+                var recipients = Reporting.BuildRecipientList(target, authorizationResponse, false);
 
                 if (recipients.Count > 0)
                 {
@@ -86,7 +88,7 @@ namespace Lithnet.Laps.Web.Audit
             }
         }
 
-        private static Dictionary<string, string> BuildTokenDictionary(TargetElement target = null, ReaderElement reader = null, UserPrincipal user = null, ComputerPrincipal computer = null, SearchResult directoryEntry = null, string requestedComputerName = null, string detailMessage = null)
+        private static Dictionary<string, string> BuildTokenDictionary(TargetElement target = null, AuthorizationResponse authorizationResponse = null, UserPrincipal user = null, ComputerPrincipal computer = null, SearchResult directoryEntry = null, string requestedComputerName = null, string detailMessage = null)
         {
             Dictionary<string, string> pairs = new Dictionary<string, string> {
                 { "{user.SamAccountName}", user?.SamAccountName},
@@ -106,8 +108,11 @@ namespace Lithnet.Laps.Web.Audit
                 { "{computer.Guid}", computer?.Guid?.ToString()},
                 { "{computer.Sid}", computer?.Sid?.ToString()},
                 { "{requestedComputerName}", requestedComputerName},
-                { "{reader.Principal}", reader?.Principal},
-                { "{reader.Notify}", reader?.Audit?.EmailAddresses},
+                // FIXME: The token {reader.Principal} actually contains the authorization details.
+                // This is the principal when the ConfigurationFileAuthorizationService is used, but it can be something
+                // else in case of other authorization services.
+                { "{reader.Principal}", authorizationResponse?.Details},
+                { "{reader.Notify}", string.Join(",", authorizationResponse?.UsersToNotify?.All ?? ImmutableHashSet<string>.Empty)},
                 { "{target.Notify}", target?.Audit?.EmailAddresses},
                 { "{target.ID}", target?.Name},
                 { "{target.IDType}", target?.Type.ToString()},
@@ -167,49 +172,29 @@ namespace Lithnet.Laps.Web.Audit
             }
         }
 
-        private static ICollection<string> BuildRecipientList(TargetElement target, ReaderElement reader, bool success, UserPrincipal user = null)
+        private static IImmutableSet<string> BuildRecipientList(TargetElement target, AuthorizationResponse authorizationResponse, bool success, UserPrincipal user = null)
         {
-            HashSet<string> list = new HashSet<string>(StringComparer.CurrentCultureIgnoreCase);
-            if ((success && (target?.Audit?.NotifySuccess ?? false))
-                || (!success && (target?.Audit?.NotifyFailure ?? false)))
+            // TODO: Avoid having to pass a TargetElement to this function.
+            // TODO: Make this testable.
+            var usersToNotify = target?.Audit?.UsersToNotify ?? new UsersToNotify();
+
+            if (authorizationResponse != null)
             {
-                Reporting.SplitRecipientsAndAddtoList(target?.Audit?.EmailAddresses, list);
+                usersToNotify = usersToNotify.Union(authorizationResponse.UsersToNotify);
             }
 
-            if ((success && (reader?.Audit?.NotifySuccess ?? false))
-                || (!success && (reader?.Audit?.NotifyFailure ?? false)))
+            if (LapsConfigSection.Configuration?.Audit?.UsersToNotify != null)
             {
-                Reporting.SplitRecipientsAndAddtoList(reader?.Audit?.EmailAddresses, list);
+                usersToNotify = usersToNotify.Union(LapsConfigSection.Configuration.Audit.UsersToNotify);
             }
 
-            if ((success && (LapsConfigSection.Configuration?.Audit?.NotifySuccess ?? false))
-                || (!success && (LapsConfigSection.Configuration?.Audit?.NotifyFailure ?? false)))
+            if (!string.IsNullOrWhiteSpace(user?.EmailAddress))
             {
-                Reporting.SplitRecipientsAndAddtoList(LapsConfigSection.Configuration?.Audit?.EmailAddresses, list);
+                // FIXME: This seems to be an undocumented feature?
+                usersToNotify = usersToNotify.WithUserReplaced("{user.EmailAddress}", user?.EmailAddress);
             }
 
-            if (list.Remove("{user.EmailAddress}"))
-            {
-                if (!string.IsNullOrWhiteSpace(user?.EmailAddress))
-                {
-                    list.Add(user.EmailAddress);
-                }
-            }
-
-            return list;
-        }
-
-        private static void SplitRecipientsAndAddtoList(string recepientList, HashSet<string> list)
-        {
-            if (string.IsNullOrWhiteSpace(recepientList))
-            {
-                return;
-            }
-
-            foreach (string item in recepientList.Split(new char[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                list.Add(item);
-            }
+            return success ? usersToNotify.OnSuccess : usersToNotify.OnFailure;
         }
 
         private static string LoadTemplate(string templateName)

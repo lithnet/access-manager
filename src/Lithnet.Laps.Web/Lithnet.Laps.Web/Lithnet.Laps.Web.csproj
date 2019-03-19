@@ -264,8 +264,8 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
-    <Compile Include="Auth\ConfigurationFileAuthService.cs" />
-    <Compile Include="Auth\IAuthService.cs" />
+    <Compile Include="Authorization\ConfigurationFileAuthorizationService.cs" />
+    <Compile Include="Authorization\IAuthorizationService.cs" />
     <Compile Include="ConfigSection\AuditElement.cs" />
     <Compile Include="ConfigSection\RateLimitIPElement.cs" />
     <Compile Include="ConfigSection\RateLimitUserElement.cs" />
@@ -301,8 +301,8 @@
       <DependentUpon>UIMessages.resx</DependentUpon>
     </Compile>
     <Compile Include="Audit\UsersToNotify.cs" />
-    <Compile Include="Auth\AuthResponse.cs" />
-    <Compile Include="Auth\DemoAuthService.cs" />
+    <Compile Include="Authorization\AuthorizationResponse.cs" />
+    <Compile Include="Authorization\DemoAuthorizationService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-grid.css" />
