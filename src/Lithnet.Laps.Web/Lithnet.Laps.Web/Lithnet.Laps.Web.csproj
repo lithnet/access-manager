@@ -274,7 +274,7 @@
     <Compile Include="ConfigSection\ReaderCollection.cs" />
     <Compile Include="ConfigSection\TargetElement.cs" />
     <Compile Include="ConfigSection\ReaderElement.cs" />
-    <Compile Include="ConfigSection\TargetType.cs" />
+    <Compile Include="Models\TargetType.cs" />
     <Compile Include="ConfigSection\TargetCollection.cs" />
     <Compile Include="Controllers\LapController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -288,6 +288,7 @@
     <Compile Include="ConfigSection\LapsConfigSection.cs" />
     <Compile Include="Models\LapEntryModel.cs" />
     <Compile Include="Models\LapRequestModel.cs" />
+    <Compile Include="Models\ITarget.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="App_LocalResources\LogMessages.Designer.cs">

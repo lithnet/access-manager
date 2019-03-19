@@ -4,7 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Web;
 
-namespace Lithnet.Laps.Web
+namespace Lithnet.Laps.Web.Models
 {
     public enum TargetType
     {

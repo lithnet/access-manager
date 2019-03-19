@@ -6,10 +6,10 @@ namespace Lithnet.Laps.Web.Authorization
     {
         public bool Success { get;  private set; }
 
-        public AuthorizationResponse(bool success, UsersToNotify usersToNotify, string details)
+        public AuthorizationResponse(bool success, UsersToNotify usersToNotify, string userDetails)
         {
             Success = success;
-            Details = details;
+            UserDetails = userDetails;
             UsersToNotify = usersToNotify;
         }
 
@@ -21,8 +21,8 @@ namespace Lithnet.Laps.Web.Authorization
         public UsersToNotify UsersToNotify { get; private set; }
 
         /// <summary>
-        /// This can be anything, offering more information about the authorization.
+        /// This can be anything, offering more information about the user.
         /// </summary>
-        public string Details { get; private set; }
+        public string UserDetails { get; private set; }
     }
 }
