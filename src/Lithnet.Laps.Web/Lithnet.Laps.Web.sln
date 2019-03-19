@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27703.2000
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lithnet.Laps.Web", "Lithnet.Laps.Web\Lithnet.Laps.Web.csproj", "{AFF2B8F3-9BF2-4BDB-A841-F13AA9F4CEDC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lithnet.Laps.WebTests", "Lithnet.Laps.WebTests\Lithnet.Laps.WebTests.csproj", "{35A5BF6B-7C92-41B4-B80C-021DEB49E97E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{AFF2B8F3-9BF2-4BDB-A841-F13AA9F4CEDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFF2B8F3-9BF2-4BDB-A841-F13AA9F4CEDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFF2B8F3-9BF2-4BDB-A841-F13AA9F4CEDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35A5BF6B-7C92-41B4-B80C-021DEB49E97E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35A5BF6B-7C92-41B4-B80C-021DEB49E97E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35A5BF6B-7C92-41B4-B80C-021DEB49E97E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35A5BF6B-7C92-41B4-B80C-021DEB49E97E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

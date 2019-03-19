@@ -1,19 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Globalization;
-using System.Linq;
-using System.Net.Configuration;
 using System.Net.Mail;
 using System.Web;
-using System.Web.Configuration;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.Models;
 using NLog;
 
-namespace Lithnet.Laps.Web
+namespace Lithnet.Laps.Web.Audit
 {
     internal static class Reporting
     {

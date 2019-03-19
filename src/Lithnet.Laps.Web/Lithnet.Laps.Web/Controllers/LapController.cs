@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Web.Mvc;
 using Lithnet.Laps.Web.App_LocalResources;
+using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Auth;
 using Lithnet.Laps.Web.Models;
 using NLog;

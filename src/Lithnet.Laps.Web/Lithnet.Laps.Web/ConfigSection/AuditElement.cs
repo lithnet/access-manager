@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Web;
+using Lithnet.Laps.Web.Audit;
 
 namespace Lithnet.Laps.Web
 {
@@ -21,5 +22,25 @@ namespace Lithnet.Laps.Web
  
         [ConfigurationProperty(PropEmailAddresses, IsRequired = false)]
         public string EmailAddresses => (string) this[PropEmailAddresses];
+
+        public UsersToNotify UsersToNotify
+        {
+            get
+            {
+                var result = new UsersToNotify();
+
+                if (NotifySuccess)
+                {
+                    result = result.NotifyOnSuccess(EmailAddresses);
+                }
+
+                if (NotifyFailure)
+                {
+                    result = result.NotifyOnFailure(EmailAddresses);
+                }
+
+                return result;
+            }
+        }
     }
 }

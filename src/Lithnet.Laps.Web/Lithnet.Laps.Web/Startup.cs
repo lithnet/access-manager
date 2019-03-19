@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Helpers;
 using IdentityModel.Client;
 using Lithnet.Laps.Web.App_LocalResources;
+using Lithnet.Laps.Web.Audit;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;

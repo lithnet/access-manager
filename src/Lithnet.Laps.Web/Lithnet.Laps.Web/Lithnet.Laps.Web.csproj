@@ -270,7 +270,7 @@
     <Compile Include="ConfigSection\RateLimitIPElement.cs" />
     <Compile Include="ConfigSection\RateLimitUserElement.cs" />
     <Compile Include="Internal\RateLimiter.cs" />
-    <Compile Include="Internal\Reporting.cs" />
+    <Compile Include="Audit\Reporting.cs" />
     <Compile Include="ConfigSection\ReaderCollection.cs" />
     <Compile Include="ConfigSection\TargetElement.cs" />
     <Compile Include="ConfigSection\ReaderElement.cs" />
@@ -300,7 +300,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>UIMessages.resx</DependentUpon>
     </Compile>
-    <Compile Include="Audit\UsersToBeNotified.cs" />
+    <Compile Include="Audit\UsersToNotify.cs" />
     <Compile Include="Auth\AuthResponse.cs" />
     <Compile Include="Auth\DemoAuthService.cs" />
   </ItemGroup>
@@ -447,9 +447,7 @@
       <LastGenOutput>UIMessages.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Audit\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
