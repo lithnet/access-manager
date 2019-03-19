@@ -7,6 +7,8 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using NLog;
+using Unity;
 
 namespace Lithnet.Laps.Web
 {
@@ -18,6 +20,11 @@ namespace Lithnet.Laps.Web
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            // Configure dependency injection.
+            // FIXME: There might be a better place to do this.
+            UnityConfig.Container.RegisterInstance<LapsConfigSection>(LapsConfigSection.GetConfiguration());
+            UnityConfig.Container.RegisterInstance<Logger>(LogManager.GetCurrentClassLogger());
         }
 
         public static bool CanLogout => Startup.CanLogout && (HttpContext.Current?.User?.Identity?.IsAuthenticated ?? false);

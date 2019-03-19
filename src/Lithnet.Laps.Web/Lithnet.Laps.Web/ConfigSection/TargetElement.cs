@@ -4,7 +4,7 @@ using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web
 {
-    public class TargetElement : ConfigurationElement
+    public class TargetElement : ConfigurationElement, ITarget
     {
         private Principal principal;
 
@@ -44,5 +44,9 @@ namespace Lithnet.Laps.Web
                 return this.principal;
             }
         }
+
+        TargetType ITarget.TargetType => Type;
+
+        string ITarget.TargetName => Name;
     }
 }

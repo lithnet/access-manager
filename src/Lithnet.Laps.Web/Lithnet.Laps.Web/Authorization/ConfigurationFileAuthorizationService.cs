@@ -8,13 +8,19 @@ namespace Lithnet.Laps.Web.Authorization
 {
     public sealed class ConfigurationFileAuthorizationService : IAuthorizationService
     {
-        // FIXME: Use dependency injection to inject the logger.
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly LapsConfigSection configSection;
+        private readonly Logger logger;
+
+        public ConfigurationFileAuthorizationService(LapsConfigSection configSection, Logger logger)
+        {
+            this.configSection = configSection;
+            this.logger = logger;
+        }
 
         /// <summary>
         /// Check whether the user with name <paramref name="userName"/> can 
         /// access the password of the computer with name
-        /// <paramref name="computerName"/>
+        /// <paramref name="computerName"/>, based on the reader elements under the targets in Web.Config.
         /// </summary>
         /// <param name="user">a user. FIXME: We shouldn't depend on AD here.</param>
         /// <param name="computerName">name of the computer</param>
