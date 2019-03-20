@@ -4,6 +4,7 @@ using System;
 
 using Unity;
 using Unity.Configuration;
+using Unity.NLog;
 
 namespace Lithnet.Laps.Web
 {
@@ -17,6 +18,7 @@ namespace Lithnet.Laps.Web
           new Lazy<IUnityContainer>(() =>
           {
               var container = new UnityContainer();
+              container.AddNewExtension<NLogExtension>();
               RegisterTypes(container);
               return container;
           });

@@ -21,11 +21,28 @@ using Microsoft.Owin.Security.OpenIdConnect;
 using Microsoft.Owin.Security.WsFederation;
 using NLog;
 using Owin;
+using Unity;
+using Unity.NLog;
 
 namespace Lithnet.Laps.Web
 {
     public class Startup
     {
+        /// <summary>
+        /// Wrapper class for a logger.
+        ///
+        /// This is a hack. I need this one to get a logger via the dependency injection container.
+        /// </summary>
+        private class StartupLoggerWrapper
+        {
+            public StartupLoggerWrapper(ILogger logger)
+            {
+                this.Logger = logger;
+            }
+
+            public ILogger Logger { get; }
+        }
+
         internal static bool CanLogout = false;
         internal static string ClaimName { get; set; } = "upn";
 
@@ -55,13 +72,17 @@ namespace Lithnet.Laps.Web
         /// <summary>
         /// Explicitly get the logger and the reporting from the DI-container.
         ///
-        /// Constructor injection doesn't seem to work for this class.
+        /// Constructor injection doesn't work for this class.
         /// </summary>
-        public Startup() : this(
-            (ILogger) UnityConfig.Container.Resolve(typeof(ILogger), String.Empty),
-            (Reporting) UnityConfig.Container.Resolve(typeof(Reporting), String.Empty)
-        )
+        public Startup()
         {
+            var container = UnityConfig.Container;
+
+            reporting = (Reporting) container.Resolve(typeof(Reporting), String.Empty);
+            // It seems I can't get a logger directly from the container; the following doesn't work:
+            // logger = (ILogger)UnityConfig.Container.Resolve(typeof(ILogger), String.Empty);
+            // So I hacked around this.
+            logger = ((StartupLoggerWrapper) container.Resolve(typeof(StartupLoggerWrapper), String.Empty)).Logger;
         }
 
         public void ConfigureOpenIDConnect(IAppBuilder app)
