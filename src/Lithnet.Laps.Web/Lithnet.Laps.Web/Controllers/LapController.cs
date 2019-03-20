@@ -71,40 +71,31 @@ namespace Lithnet.Laps.Web.Controllers
 
                 Reporting.LogSuccessEvent(EventIDs.UserRequestedPassword, string.Format(LogMessages.UserHasRequestedPassword, user.SamAccountName, model.ComputerName));
 
-                ComputerPrincipal computer = directory.GetComputerPrincipal(model.ComputerName);
+                // Do authorization check first.
 
-                if (computer == null)
-                {
-                    return this.LogAndReturnErrorResponse(model, UIMessages.ComputerNotFoundInDirectory, EventIDs.ComputerNotFound, string.Format(LogMessages.ComputerNotFoundInDirectory, user.SamAccountName, model.ComputerName));
-                }
+                var authResponse = authorizationService.CanAccessPassword(
+                    user,
+                    model.ComputerName
+                );
 
-                TargetElement target = this.GetMatchingTargetOrNull(computer);
-                if (target == null)
+                if (authResponse.ResultCode == EventIDs.AuthZFailedNoTargetMatch)
                 {
                     return this.AuditAndReturnErrorResponse(
                         model: model,
                         userMessage: UIMessages.NotAuthorized,
                         eventID: EventIDs.AuthZFailedNoTargetMatch,
-                        logMessage: string.Format(LogMessages.NoTargetsExist, user.SamAccountName, computer.SamAccountName),
+                        logMessage: string.Format(LogMessages.NoTargetsExist, user.SamAccountName, model.ComputerName),
                         user: user,
                         computer: computer);
                 }
 
-                // Do authorization check first.
-
-                var authResponse = authorizationService.CanAccessPassword(
-                    user,
-                    model.ComputerName,
-                    target
-                );
-
-                if (!authResponse.Success)
+                if (authResponse.ResultCode == EventIDs.AuthZFailedNoReaderPrincipalMatch)
                 {
                     return this.AuditAndReturnErrorResponse(
                         model: model,
                         userMessage: UIMessages.NotAuthorized,
                         eventID: EventIDs.AuthZFailedNoReaderPrincipalMatch,
-                        logMessage: string.Format(LogMessages.AuthZFailedNoReaderPrincipalMatch, user.SamAccountName, computer.SamAccountName),
+                        logMessage: string.Format(LogMessages.AuthZFailedNoReaderPrincipalMatch, user.SamAccountName, model.ComputerName),
                         target: target,
                         user: user,
                         computer: computer);
@@ -150,58 +141,7 @@ namespace Lithnet.Laps.Web.Controllers
             return this.View("Get", model);
         }
 
-        private TargetElement GetMatchingTargetOrNull(ComputerPrincipal computer)
-        {
-            List<TargetElement> matchingTargets = new List<TargetElement>();
 
-            foreach (TargetElement target in LapsConfigSection.Configuration.Targets.OfType<TargetElement>().OrderBy(t => t.Type == TargetType.Computer).ThenBy(t => t.Type == TargetType.Group))
-            {
-                if (target.Type == TargetType.Container)
-                {
-                    if (directory.IsPrincipalInOu(computer, target.Name))
-                    {
-                        logger.Trace($"Matched {computer.SamAccountName} to target OU {target.Name}");
-                        matchingTargets.Add(target);
-                    }
-
-                    continue;
-                }
-                else if (target.Type == TargetType.Computer)
-                {
-                    ComputerPrincipal p = directory.GetComputerPrincipal(target.Name);
-
-                    if (p == null)
-                    {
-                        logger.Trace($"Target computer {target.Name} was not found in the directory");
-                        continue;
-                    }
-
-                    if (p.Equals(computer))
-                    {
-                        logger.Trace($"Matched {computer.SamAccountName} to target computer {target.Name}");
-                        return target;
-                    }
-                }
-                else
-                {
-                    GroupPrincipal g = directory.GetGroupPrincipal(target.Name);
-
-                    if (g == null)
-                    {
-                        logger.Trace($"Target group {target.Name} was not found in the directory");
-                        continue;
-                    }
-
-                    if (directory.IsPrincipalInGroup(computer, g))
-                    {
-                        logger.Trace($"Matched {computer.SamAccountName} to target group {target.Name}");
-                        matchingTargets.Add(target);
-                    }
-                }
-            }
-
-            return matchingTargets.OrderBy(t => t.Type == TargetType.Computer).ThenBy(t => t.Type == TargetType.Group).FirstOrDefault();
-        }
 
         private UserPrincipal GetCurrentUser()
         {

@@ -4,11 +4,16 @@ namespace Lithnet.Laps.Web.Authorization
 {
     public sealed class AuthorizationResponse
     {
-        public bool Success { get;  private set; }
+        /// <summary>
+        /// One of the <see cref="EventIDs"/>.
+        /// </summary>
+        public int ResultCode { get; private set; }
 
-        public AuthorizationResponse(bool success, UsersToNotify usersToNotify, string userDetails)
+        public bool Success => ResultCode == EventIDs.UserAuthorizedForComputer;
+
+        public AuthorizationResponse(int resultCode, UsersToNotify usersToNotify, string userDetails)
         {
-            Success = success;
+            ResultCode = resultCode;
             UserDetails = userDetails;
             UsersToNotify = usersToNotify;
         }

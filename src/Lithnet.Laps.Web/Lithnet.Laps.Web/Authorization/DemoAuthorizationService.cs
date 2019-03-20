@@ -5,7 +5,7 @@ namespace Lithnet.Laps.Web.Authorization
 {
     public sealed class DemoAuthorizationService: IAuthorizationService
     {
-        public AuthorizationResponse CanAccessPassword(UserPrincipal user, string computerName, TargetElement target = null)
+        public AuthorizationResponse CanAccessPassword(UserPrincipal user, string computerName)
         {
             if (user?.SamAccountName == "u0115389" && computerName.ToUpper() == "GBW-L-W0499")
             {
