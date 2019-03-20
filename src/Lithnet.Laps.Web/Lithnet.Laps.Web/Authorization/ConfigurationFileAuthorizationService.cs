@@ -1,5 +1,4 @@
 ﻿using NLog;
-using System;
 using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
@@ -11,33 +10,25 @@ namespace Lithnet.Laps.Web.Authorization
     public sealed class ConfigurationFileAuthorizationService : IAuthorizationService
     {
         private readonly LapsConfigSection configSection;
-        private readonly Logger logger;
-        private readonly Directory directory;
+        private readonly ILogger logger;
+        private readonly ActiveDirectory.ActiveDirectory activeDirectory;
 
-        public ConfigurationFileAuthorizationService(LapsConfigSection configSection, Logger logger,
-            Directory directory)
+        public ConfigurationFileAuthorizationService(LapsConfigSection configSection, ILogger logger,
+            ActiveDirectory.ActiveDirectory activeDirectory)
         {
             this.configSection = configSection;
             this.logger = logger;
-            this.directory = directory;
+            this.activeDirectory = activeDirectory;
         }
 
-        /// <summary>
-        /// Check whether the user with name <paramref name="userName"/> can 
-        /// access the password of the computer with name
-        /// <paramref name="computerName"/>, based on the reader elements under the targets in Web.Config.
-        /// </summary>
-        /// <param name="user">a user. FIXME: We shouldn't depend on AD here.</param>
-        /// <param name="computerName">name of the computer</param>
-        /// <returns>An <see cref="AuthorizationResponse"/> object.</returns>
-        public AuthorizationResponse CanAccessPassword(UserPrincipal user, string computerName)
+        public AuthorizationResponse CanAccessPassword(UserPrincipal user, IComputer computer)
         {
-            var computer = directory.GetComputerPrincipal(computerName);
-            var target = GetMatchingTargetOrNull(computer);
+            var computerPrincipal = activeDirectory.GetComputerPrincipal(computer.SamAccountName);
+            var target = GetMatchingTargetOrNull(computerPrincipal);
 
             if (target == null)
             {
-                return new AuthorizationResponse(EventIDs.AuthZFailedNoTargetMatch, new UsersToNotify(), String.Empty);
+                return AuthorizationResponse.NoTarget(new UsersToNotify());
             }
 
             foreach (ReaderElement reader in target.Readers.OfType<ReaderElement>())
@@ -46,16 +37,16 @@ namespace Lithnet.Laps.Web.Authorization
                 {
                     logger.Trace($"User {user.SamAccountName} matches reader principal {reader.Principal} is authorized to read passwords from target {target.Name}");
 
-                    return new AuthorizationResponse(EventIDs.UserAuthorizedForComputer, reader.Audit.UsersToNotify, reader.Principal);
+                    return AuthorizationResponse.Authorized(((ITarget)target).UsersToNotify, target);
                 }
             }
 
-            return new AuthorizationResponse(EventIDs.AuthZFailedNoReaderPrincipalMatch, new UsersToNotify(), String.Empty);
+            return AuthorizationResponse.NoReader(((ITarget) target).UsersToNotify, target);
         }
 
         private bool IsReaderAuthorized(ReaderElement reader, UserPrincipal currentUser)
         {
-            var readerPrincipal = directory.GetPrincipal(reader.Principal);
+            var readerPrincipal = activeDirectory.GetPrincipal(reader.Principal);
 
             if (currentUser.Equals(readerPrincipal))
             {
@@ -64,7 +55,7 @@ namespace Lithnet.Laps.Web.Authorization
 
             if (readerPrincipal is GroupPrincipal group)
             {
-                if (directory.IsPrincipalInGroup(currentUser, group))
+                if (activeDirectory.IsPrincipalInGroup(currentUser, group))
                 {
                     return true;
                 }
@@ -81,7 +72,7 @@ namespace Lithnet.Laps.Web.Authorization
             {
                 if (target.Type == TargetType.Container)
                 {
-                    if (directory.IsPrincipalInOu(computer, target.Name))
+                    if (activeDirectory.IsPrincipalInOu(computer, target.Name))
                     {
                         logger.Trace($"Matched {computer.SamAccountName} to target OU {target.Name}");
                         matchingTargets.Add(target);
@@ -91,7 +82,7 @@ namespace Lithnet.Laps.Web.Authorization
                 }
                 else if (target.Type == TargetType.Computer)
                 {
-                    ComputerPrincipal p = directory.GetComputerPrincipal(target.Name);
+                    ComputerPrincipal p = activeDirectory.GetComputerPrincipal(target.Name);
 
                     if (p == null)
                     {
@@ -107,7 +98,7 @@ namespace Lithnet.Laps.Web.Authorization
                 }
                 else
                 {
-                    GroupPrincipal g = directory.GetGroupPrincipal(target.Name);
+                    GroupPrincipal g = activeDirectory.GetGroupPrincipal(target.Name);
 
                     if (g == null)
                     {
@@ -115,7 +106,7 @@ namespace Lithnet.Laps.Web.Authorization
                         continue;
                     }
 
-                    if (directory.IsPrincipalInGroup(computer, g))
+                    if (activeDirectory.IsPrincipalInGroup(computer, g))
                     {
                         logger.Trace($"Matched {computer.SamAccountName} to target group {target.Name}");
                         matchingTargets.Add(target);

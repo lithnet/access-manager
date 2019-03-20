@@ -1,4 +1,5 @@
 ﻿using Lithnet.Laps.Web.Audit;
+using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web.Authorization
 {
@@ -9,13 +10,36 @@ namespace Lithnet.Laps.Web.Authorization
         /// </summary>
         public int ResultCode { get; private set; }
 
-        public bool Success => ResultCode == EventIDs.UserAuthorizedForComputer;
+        public bool IsAuhtorized => ResultCode == EventIDs.UserAuthorizedForComputer;
 
-        public AuthorizationResponse(int resultCode, UsersToNotify usersToNotify, string userDetails)
+        public ITarget Target { get; private set; }
+
+        private AuthorizationResponse(int resultCode, UsersToNotify usersToNotify, ITarget target)
         {
             ResultCode = resultCode;
-            UserDetails = userDetails;
             UsersToNotify = usersToNotify;
+            Target = target;
+        }
+
+        public static AuthorizationResponse Authorized(UsersToNotify usersToNotify, ITarget target)
+        {
+            return new AuthorizationResponse(EventIDs.UserAuthorizedForComputer, usersToNotify, target);
+        }
+
+        public static AuthorizationResponse NoTarget(UsersToNotify usersToNotify)
+        {
+            return new AuthorizationResponse(EventIDs.AuthZFailedNoTargetMatch, usersToNotify, null);
+        }
+
+        public static AuthorizationResponse NoReader(UsersToNotify usersToNotify, ITarget target)
+        {
+            return new AuthorizationResponse(EventIDs.AuthZFailedNoReaderPrincipalMatch, usersToNotify,
+                target);
+        }
+
+        public static AuthorizationResponse Unauthorized(UsersToNotify usersToNotify)
+        {
+            return new AuthorizationResponse(EventIDs.AuthorizationFailed, usersToNotify, null);
         }
 
         /// <summary>

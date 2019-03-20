@@ -9,6 +9,7 @@ using System.Web.Helpers;
 using IdentityModel.Client;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.Audit;
+using Microsoft.Ajax.Utilities;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -41,7 +42,27 @@ namespace Lithnet.Laps.Web
         private readonly string signOutWreply = ConfigurationManager.AppSettings["ida:signOutWreply"];
         private readonly string metadata = ConfigurationManager.AppSettings["ida:metadata"];
 
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+        private readonly ILogger logger;
+
+        private readonly Reporting reporting;
+
+        public Startup(ILogger logger, Reporting reporting)
+        {
+            this.logger = logger;
+            this.reporting = reporting;
+        }
+
+        /// <summary>
+        /// Explicitly get the logger and the reporting from the DI-container.
+        ///
+        /// Constructor injection doesn't seem to work for this class.
+        /// </summary>
+        public Startup() : this(
+            (ILogger) UnityConfig.Container.Resolve(typeof(ILogger), String.Empty),
+            (Reporting) UnityConfig.Container.Resolve(typeof(Reporting), String.Empty)
+        )
+        {
+        }
 
         public void ConfigureOpenIDConnect(IAppBuilder app)
         {
@@ -117,7 +138,7 @@ namespace Lithnet.Laps.Web
                         }
                         catch (Exception ex)
                         {
-                            Reporting.LogErrorEvent(EventIDs.OidcAuthZCodeError, LogMessages.AuthZCodeFlowError, ex);
+                            reporting.LogErrorEvent(EventIDs.OidcAuthZCodeError, LogMessages.AuthZCodeFlowError, ex);
                             n.Response.Redirect($"/Home/AuthNError?message={HttpUtility.UrlEncode(ex.Message)}");
                         }
                     },
@@ -125,7 +146,7 @@ namespace Lithnet.Laps.Web
                     {
                         ClaimsIdentity user = n.AuthenticationTicket.Identity;
                         user.AddClaim(new Claim("id_token", n.ProtocolMessage.IdToken));
-                        return Startup.FindClaimIdentityInDirectoryOrFail(n);
+                        return FindClaimIdentityInDirectoryOrFail(n);
                     },
                     RedirectToIdentityProvider = n =>
                     {
@@ -143,7 +164,7 @@ namespace Lithnet.Laps.Web
                         logger.Trace($"Redirecting to IdP for {n.ProtocolMessage.RequestType}");
                         return Task.CompletedTask;
                     },
-                    AuthenticationFailed = Startup.HandleAuthNFailed
+                    AuthenticationFailed = HandleAuthNFailed
                 },
             });
         }
@@ -190,22 +211,22 @@ namespace Lithnet.Laps.Web
                     SignOutWreply = this.signOutWreply ?? new Uri(new Uri(this.realm.Trim('/', '\\')), "Home/LogOut").ToString(),
                     Notifications = new WsFederationAuthenticationNotifications
                     {
-                        SecurityTokenValidated = Startup.FindClaimIdentityInDirectoryOrFail,
-                        AuthenticationFailed = Startup.HandleAuthNFailed
+                        SecurityTokenValidated = FindClaimIdentityInDirectoryOrFail,
+                        AuthenticationFailed = HandleAuthNFailed
                     }
                 });
         }
 
-        private static Task HandleAuthNFailed<TMessage, TOptions>(AuthenticationFailedNotification<TMessage, TOptions> context)
+        private Task HandleAuthNFailed<TMessage, TOptions>(AuthenticationFailedNotification<TMessage, TOptions> context)
         {
-            Reporting.LogErrorEvent(EventIDs.OwinAuthNError, LogMessages.AuthNProviderError, context.Exception);
+            reporting.LogErrorEvent(EventIDs.OwinAuthNError, LogMessages.AuthNProviderError, context.Exception);
             context.HandleResponse();
             context.Response.Redirect($"/Home/AuthNError?message={HttpUtility.UrlEncode(context.Exception?.Message ?? "Unknown error")}");
 
             return Task.FromResult(0);
         }
 
-        private static Task FindClaimIdentityInDirectoryOrFail<TMessage, TOptions>(SecurityTokenValidatedNotification<TMessage, TOptions> context)
+        private Task FindClaimIdentityInDirectoryOrFail<TMessage, TOptions>(SecurityTokenValidatedNotification<TMessage, TOptions> context)
         {
             ClaimsIdentity user = context.AuthenticationTicket.Identity;
 
@@ -214,7 +235,7 @@ namespace Lithnet.Laps.Web
             if (sid == null)
             {
                 string message = string.Format(LogMessages.UserNotFoundInDirectory, user.ToClaimList());
-                Reporting.LogErrorEvent(EventIDs.SsoIdentityNotFound, message, null);
+                reporting.LogErrorEvent(EventIDs.SsoIdentityNotFound, message, null);
 
                 context.HandleResponse();
                 context.Response.Redirect($"/Home/AuthNError?message={HttpUtility.UrlEncode(UIMessages.SsoIdentityNotFound)}");
@@ -223,7 +244,7 @@ namespace Lithnet.Laps.Web
 
             user.AddClaim(new Claim(ClaimTypes.PrimarySid, sid));
 
-            Reporting.LogSuccessEvent(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, user.ToClaimList()));
+            reporting.LogSuccessEvent(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, user.ToClaimList()));
 
             return Task.CompletedTask;
         }

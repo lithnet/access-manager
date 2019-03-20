@@ -195,4 +195,7 @@ Reader principal:			{reader.Principal}</value>
   <data name="RateLimitExceededUser" xml:space="preserve">
     <value>The user {0} on IP {1} has exceeded the maximum allowed number of requests per user ({2} per {3} seconds)</value>
   </data>
+  <data name="AuthorizationFailed" xml:space="preserve">
+    <value>The user {0} is not authorized to access the computer {1}.</value>
+  </data>
 </root>

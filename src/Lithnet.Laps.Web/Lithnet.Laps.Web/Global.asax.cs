@@ -16,10 +16,12 @@ namespace Lithnet.Laps.Web
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            // Configure dependency injection.
-            // FIXME: There might be a better place to do this.
-            UnityConfig.Container.RegisterInstance<LapsConfigSection>(LapsConfigSection.GetConfiguration());
-            UnityConfig.Container.RegisterInstance<Logger>(LogManager.GetCurrentClassLogger());
+            // Configure dependency injection for the logger.
+            // FIXME: There is probably a better way do this.
+            // FIXME: In the original project, LogManager.GetCurrentClassLogger() was used,
+            // which caused each class to use its proper logger. I'm not sure how I can achieve this
+            // with unity dependency injection :-(
+            UnityConfig.Container.RegisterInstance<ILogger>(LogManager.GetLogger("laps-web"));
         }
 
         public static bool CanLogout => Startup.CanLogout && (HttpContext.Current?.User?.Identity?.IsAuthenticated ?? false);

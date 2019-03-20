@@ -254,6 +254,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActiveDirectory\ComputerAdapter.cs" />
     <Compile Include="App_LocalResources\UIMessages.it.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -269,16 +270,19 @@
     <Compile Include="ConfigSection\AuditElement.cs" />
     <Compile Include="ConfigSection\RateLimitIPElement.cs" />
     <Compile Include="ConfigSection\RateLimitUserElement.cs" />
+    <Compile Include="Models\IComputer.cs" />
+    <Compile Include="Models\IDirectory.cs" />
     <Compile Include="Internal\RateLimiter.cs" />
     <Compile Include="Audit\Reporting.cs" />
     <Compile Include="ConfigSection\ReaderCollection.cs" />
     <Compile Include="ConfigSection\TargetElement.cs" />
     <Compile Include="ConfigSection\ReaderElement.cs" />
+    <Compile Include="Models\Password.cs" />
     <Compile Include="Models\TargetType.cs" />
     <Compile Include="ConfigSection\TargetCollection.cs" />
     <Compile Include="Controllers\LapController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Internal\Directory.cs" />
+    <Compile Include="ActiveDirectory\ActiveDirectory.cs" />
     <Compile Include="Internal\EventIDs.cs" />
     <Compile Include="Exceptions\NoMatchingTargetException.cs" />
     <Compile Include="Internal\Extensions.cs" />

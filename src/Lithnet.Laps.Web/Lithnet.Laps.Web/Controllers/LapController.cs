@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Web.Mvc;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.Audit;
@@ -20,14 +16,19 @@ namespace Lithnet.Laps.Web.Controllers
     public class LapController : Controller
     {
         private readonly IAuthorizationService authorizationService;
-        private readonly Logger logger;
-        private readonly Directory directory;
+        private readonly ILogger logger;
+        private readonly IDirectory directory;
+        private readonly Reporting reporting;
+        private readonly RateLimiter rateLimiter;
 
-        public LapController(IAuthorizationService authorizationService, Logger logger, Directory directory)
+        public LapController(IAuthorizationService authorizationService, ILogger logger, IDirectory directory,
+            Reporting reporting, RateLimiter rateLimiter)
         {
             this.authorizationService = authorizationService;
             this.logger = logger;
             this.directory = directory;
+            this.reporting = reporting;
+            this.rateLimiter = rateLimiter;
         }
 
         public ActionResult Get()
@@ -64,61 +65,47 @@ namespace Lithnet.Laps.Web.Controllers
                     return this.LogAndReturnErrorResponse(model, UIMessages.SsoIdentityNotFound, EventIDs.SsoIdentityNotFound, null, ex);
                 }
 
-                if (RateLimiter.IsRateLimitExceeded(model, user, this.Request))
+                if (rateLimiter.IsRateLimitExceeded(model, user, this.Request))
                 {
                     return this.View("RateLimitExceeded");
                 }
 
-                Reporting.LogSuccessEvent(EventIDs.UserRequestedPassword, string.Format(LogMessages.UserHasRequestedPassword, user.SamAccountName, model.ComputerName));
+                reporting.LogSuccessEvent(EventIDs.UserRequestedPassword, string.Format(LogMessages.UserHasRequestedPassword, user.SamAccountName, model.ComputerName));
+
+                var computer = directory.GetComputer(model.ComputerName);
 
                 // Do authorization check first.
 
                 var authResponse = authorizationService.CanAccessPassword(
                     user,
-                    model.ComputerName
+                    computer
                 );
 
-                if (authResponse.ResultCode == EventIDs.AuthZFailedNoTargetMatch)
+                if (!authResponse.IsAuhtorized)
                 {
-                    return this.AuditAndReturnErrorResponse(
-                        model: model,
-                        userMessage: UIMessages.NotAuthorized,
-                        eventID: EventIDs.AuthZFailedNoTargetMatch,
-                        logMessage: string.Format(LogMessages.NoTargetsExist, user.SamAccountName, model.ComputerName),
-                        user: user,
-                        computer: computer);
-                }
-
-                if (authResponse.ResultCode == EventIDs.AuthZFailedNoReaderPrincipalMatch)
-                {
-                    return this.AuditAndReturnErrorResponse(
-                        model: model,
-                        userMessage: UIMessages.NotAuthorized,
-                        eventID: EventIDs.AuthZFailedNoReaderPrincipalMatch,
-                        logMessage: string.Format(LogMessages.AuthZFailedNoReaderPrincipalMatch, user.SamAccountName, model.ComputerName),
-                        target: target,
-                        user: user,
-                        computer: computer);
+                    return getViewForFailedAuthorization(model, user, computer, authResponse);
                 }
 
                 // Do actual work only if authorized.
 
-                SearchResult searchResult = directory.GetDirectoryEntry(computer, Directory.AttrSamAccountName, Directory.AttrMsMcsAdmPwd, Directory.AttrMsMcsAdmPwdExpirationTime);
+                var password = directory.GetPassword(computer);
 
-                if (!searchResult.Properties.Contains(Directory.AttrMsMcsAdmPwd))
+                if (password == null)
                 {
                     return this.LogAndReturnErrorResponse(model, UIMessages.NoLapsPassword, EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.SamAccountName, user.SamAccountName));
                 }
 
-                if (target.ExpireAfter != null)
+                if (authResponse.Target.ExpireAfter != null)
                 {
-                    UpdateTargetPasswordExpiry(target, computer);
-                    searchResult = directory.GetDirectoryEntry(computer, Directory.AttrSamAccountName, Directory.AttrMsMcsAdmPwd, Directory.AttrMsMcsAdmPwdExpirationTime);
+                    UpdateTargetPasswordExpiry(authResponse.Target, computer);
+
+                    // Get the password again with the updated expiracy date.
+                    password = directory.GetPassword(computer);
                 }
 
-                Reporting.PerformAuditSuccessActions(model, target, authResponse, user, computer, searchResult);
+                reporting.PerformAuditSuccessActions(model, authResponse.Target, authResponse, user, computer, password);
 
-                return this.View("Show", LapController.CreateLapEntryModel(searchResult));
+                return this.View("Show", new LapEntryModel(computer, password));
 
             }
             catch (Exception ex)
@@ -127,16 +114,60 @@ namespace Lithnet.Laps.Web.Controllers
             }
         }
 
-        private ViewResult AuditAndReturnErrorResponse(LapRequestModel model, string userMessage, int eventID, string logMessage = null, Exception ex = null, TargetElement target = null, AuthorizationResponse authorizationResponse = null, UserPrincipal user = null, ComputerPrincipal computer = null)
+        private ViewResult getViewForFailedAuthorization(LapRequestModel model, UserPrincipal user, IComputer computer,
+            AuthorizationResponse authResponse)
         {
-            Reporting.PerformAuditFailureActions(model, userMessage, eventID, logMessage, ex, target, authorizationResponse, user, computer);
+            ViewResult viewResult;
+
+            viewResult = this.AuditAndReturnErrorResponse(
+                model: model,
+                userMessage: UIMessages.NotAuthorized,
+                eventID: EventIDs.AuthorizationFailed,
+                logMessage: string.Format(LogMessages.AuthorizationFailed, user.SamAccountName,
+                    model.ComputerName),
+                user: user,
+                computer: computer);
+
+            // Handle specific result codes of the ConfigurationFileAuthorizationService.
+            // FIXME: This dependency on ConfigurationFileAuthorizationService is dodgy.
+            if (authResponse.ResultCode == EventIDs.AuthZFailedNoTargetMatch)
+            {
+                viewResult = this.AuditAndReturnErrorResponse(
+                    model: model,
+                    userMessage: UIMessages.NotAuthorized,
+                    eventID: EventIDs.AuthZFailedNoTargetMatch,
+                    logMessage: string.Format(LogMessages.NoTargetsExist, user.SamAccountName,
+                        model.ComputerName),
+                    user: user,
+                    computer: computer);
+            }
+
+            if (authResponse.ResultCode == EventIDs.AuthZFailedNoReaderPrincipalMatch)
+            {
+                viewResult = this.AuditAndReturnErrorResponse(
+                    model: model,
+                    userMessage: UIMessages.NotAuthorized,
+                    eventID: EventIDs.AuthZFailedNoReaderPrincipalMatch,
+                    logMessage: string.Format(LogMessages.AuthZFailedNoReaderPrincipalMatch,
+                        user.SamAccountName, model.ComputerName),
+                    target: authResponse.Target,
+                    user: user,
+                    computer: computer);
+            }
+
+            return viewResult;
+        }
+
+        private ViewResult AuditAndReturnErrorResponse(LapRequestModel model, string userMessage, int eventID, string logMessage = null, Exception ex = null, ITarget target = null, AuthorizationResponse authorizationResponse = null, UserPrincipal user = null, IComputer computer = null)
+        {
+            reporting.PerformAuditFailureActions(model, userMessage, eventID, logMessage, ex, target, authorizationResponse, user, computer);
             model.FailureReason = userMessage;
             return this.View("Get", model);
         }
 
         private ViewResult LogAndReturnErrorResponse(LapRequestModel model, string userMessage, int eventID, string logMessage = null, Exception ex = null)
         {
-            Reporting.LogErrorEvent(eventID, logMessage ?? userMessage, ex);
+            reporting.LogErrorEvent(eventID, logMessage ?? userMessage, ex);
             model.FailureReason = userMessage;
             return this.View("Get", model);
         }
@@ -159,57 +190,14 @@ namespace Lithnet.Laps.Web.Controllers
             return u ?? throw new NoMatchingPrincipalException(string.Format(LogMessages.UserNotFoundInDirectory, this.User.Identity.Name));
         }
 
-        private static LapEntryModel CreateLapEntryModel(SearchResult result)
-        {
-            LapEntryModel m = new LapEntryModel
-            {
-                ComputerName = result.Properties[Directory.AttrSamAccountName][0].ToString(),
-                Password = result.GetPropertyString(Directory.AttrMsMcsAdmPwd) ?? UIMessages.NoLapsPasswordPlaceholder,
-                ValidUntil = result.GetPropertyDateTimeFromLong(Directory.AttrMsMcsAdmPwdExpirationTime),
-            };
-
-            m.HtmlPassword = BuildHtmlPassword(m.Password);
-
-            return m;
-        }
-
-        private static string BuildHtmlPassword(string password)
-        {
-            StringBuilder builder = new StringBuilder();
-
-            foreach (char s in password)
-            {
-                if (char.IsDigit(s))
-                {
-                    builder.AppendFormat(@"<span class=""password-char-digit"">{0}</span>", s);
-                }
-                else if (char.IsLetter(s))
-                {
-                    builder.AppendFormat(@"<span class=""password-char-letter"">{0}</span>", s);
-                }
-                else
-                {
-                    builder.AppendFormat(@"<span class=""password-char-other"">{0}</span>", s);
-                }
-            }
-
-            return builder.ToString();
-        }
-
         [Localizable(false)]
-        private void UpdateTargetPasswordExpiry(TargetElement target, ComputerPrincipal computer)
+        private void UpdateTargetPasswordExpiry(ITarget target, IComputer computer)
         {
             TimeSpan t = TimeSpan.Parse(target.ExpireAfter);
             logger.Trace($"Target rule requires password to change after {t}");
             DateTime newDateTime = DateTime.UtcNow.Add(t);
-            LapController.SetExpiryTime(new DirectoryEntry($"LDAP://{computer.DistinguishedName}"), newDateTime);
+            directory.SetPasswordExpiryTime(computer, newDateTime);
             logger.Trace($"Set expiry time for {computer.SamAccountName} to {newDateTime.ToLocalTime()}");
-        }
-
-        private static void SetExpiryTime(DirectoryEntry d, DateTime newDateTime)
-        {
-            d.Properties[Directory.AttrMsMcsAdmPwdExpirationTime].Value = newDateTime.ToFileTimeUtc().ToString();
-            d.CommitChanges();
         }
     }
 }

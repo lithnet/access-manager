@@ -1,5 +1,6 @@
 ﻿using System.Configuration;
 using System.DirectoryServices.AccountManagement;
+using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web
@@ -48,5 +49,9 @@ namespace Lithnet.Laps.Web
         TargetType ITarget.TargetType => Type;
 
         string ITarget.TargetName => Name;
+
+        string ITarget.ExpireAfter => ExpireAfter;
+
+        UsersToNotify ITarget.UsersToNotify => Audit.UsersToNotify;
     }
 }

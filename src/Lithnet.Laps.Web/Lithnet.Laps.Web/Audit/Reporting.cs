@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Globalization;
 using System.Net.Mail;
@@ -13,82 +12,100 @@ using NLog;
 
 namespace Lithnet.Laps.Web.Audit
 {
-    internal static class Reporting
+    public sealed class Reporting
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-        private static readonly string LogSuccessTemplate = LoadTemplate("LogAuditSuccess.txt");
-        private static readonly string LogFailureTemplate = LoadTemplate("LogAuditFailure.txt");
-        private static readonly string EmailSuccessTemplate = LoadTemplate("EmailAuditSuccess.html");
-        private static readonly string EmailFailureTemplate = LoadTemplate("EmailAuditFailure.html");
+        private readonly ILogger logger;
+        private readonly LapsConfigSection configSection;
 
-        public static void LogErrorEvent(int eventID, string logMessage, Exception ex)
+        private static string _logSuccessTemplate = null;
+        private static string _logFailureTemplate = null;
+        private static string _emailSuccessTemplate = null;
+        private static string _emailFailureTemplate = null;
+
+        public Reporting(ILogger logger, LapsConfigSection configSection)
         {
-            LogEventInfo logEvent = new LogEventInfo(LogLevel.Error, Reporting.Logger.Name, logMessage);
+            this.logger = logger;
+            this.configSection = configSection;
+
+            MakeSureStaticTemplatesAreLoaded();
+        }
+
+        private void MakeSureStaticTemplatesAreLoaded()
+        {
+            if (_logSuccessTemplate == null) _logSuccessTemplate = LoadTemplate("LogAuditSuccess.txt");
+            if (_logFailureTemplate == null) _logFailureTemplate = LoadTemplate("LogAuditFailure.txt");
+            if (_emailSuccessTemplate == null) _emailSuccessTemplate = LoadTemplate("EmailAuditSuccess.html");
+            if (_emailFailureTemplate == null) _emailFailureTemplate = LoadTemplate("EmailAuditFailure.html");
+        }
+
+        public void LogErrorEvent(int eventID, string logMessage, Exception ex)
+        {
+            LogEventInfo logEvent = new LogEventInfo(LogLevel.Error, logger.Name, logMessage);
             logEvent.Properties.Add("EventID", eventID);
             logEvent.Exception = ex;
 
-            Reporting.Logger.Log(logEvent);
+            logger.Log(logEvent);
         }
 
-        public static void LogSuccessEvent(int eventID, string logMessage)
+        public void LogSuccessEvent(int eventID, string logMessage)
         {
-            LogEventInfo logEvent = new LogEventInfo(LogLevel.Error, Reporting.Logger.Name, logMessage);
+            LogEventInfo logEvent = new LogEventInfo(LogLevel.Error, logger.Name, logMessage);
             logEvent.Properties.Add("EventID", eventID);
 
-            Reporting.Logger.Info(logEvent);
+            logger.Info(logEvent);
         }
 
-        public static void PerformAuditSuccessActions(LapRequestModel model, TargetElement target, AuthorizationResponse authorizationResponse, UserPrincipal user, ComputerPrincipal computer, SearchResult searchResult)
+        public void PerformAuditSuccessActions(LapRequestModel model, ITarget target, AuthorizationResponse authorizationResponse, UserPrincipal user, IComputer computer, Password password)
         {
-            Dictionary<string, string> tokens = BuildTokenDictionary(target, authorizationResponse, user, computer, searchResult, model.ComputerName);
-            string logSuccessMessage = Reporting.LogSuccessTemplate ?? LogMessages.DefaultAuditSuccessText;
-            string emailSuccessMessage = Reporting.EmailSuccessTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditSuccessText}</pre></body></html>";
+            Dictionary<string, string> tokens = BuildTokenDictionary(target, authorizationResponse, user, computer, password, model.ComputerName);
+            string logSuccessMessage = _logSuccessTemplate ?? LogMessages.DefaultAuditSuccessText;
+            string emailSuccessMessage = _emailSuccessTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditSuccessText}</pre></body></html>";
 
-            LogEventInfo logEvent = new LogEventInfo(LogLevel.Info, Reporting.Logger.Name, ReplaceTokens(tokens, logSuccessMessage, false));
+            LogEventInfo logEvent = new LogEventInfo(LogLevel.Info, logger.Name, ReplaceTokens(tokens, logSuccessMessage, false));
             logEvent.Properties.Add("EventID", EventIDs.PasswordAccessed);
-            Reporting.Logger.Log(logEvent);
+            logger.Log(logEvent);
 
             try
             {
-                var recipients = Reporting.BuildRecipientList(target, authorizationResponse, true, user);
+                var recipients = BuildRecipientList(target, authorizationResponse, true, user);
 
                 if (recipients.Count > 0)
                 {
                     string subject = ReplaceTokens(tokens, LogMessages.AuditEmailSubjectSuccess, false);
-                    Reporting.SendEmail(recipients, subject, ReplaceTokens(tokens, emailSuccessMessage, true));
+                    SendEmail(recipients, subject, ReplaceTokens(tokens, emailSuccessMessage, true));
                 }
             }
             catch (Exception iex)
             {
-                Reporting.LogErrorEvent(EventIDs.AuditErrorCannotSendSuccessEmail, "An error occurred sending the success audit email", iex);
+                LogErrorEvent(EventIDs.AuditErrorCannotSendSuccessEmail, "An error occurred sending the success audit email", iex);
             }
         }
 
-        public static void PerformAuditFailureActions(LapRequestModel model, string userMessage, int eventID, string logMessage, Exception ex, TargetElement target, AuthorizationResponse authorizationResponse, UserPrincipal user, ComputerPrincipal computer)
+        public void PerformAuditFailureActions(LapRequestModel model, string userMessage, int eventID, string logMessage, Exception ex, ITarget target, AuthorizationResponse authorizationResponse, UserPrincipal user, IComputer computer)
         {
             Dictionary<string, string> tokens = BuildTokenDictionary(target, authorizationResponse, user, computer, null, model.ComputerName, logMessage ?? userMessage);
-            string logFailureMessage = Reporting.LogFailureTemplate ?? LogMessages.DefaultAuditFailureText;
-            string emailFailureMessage = Reporting.EmailFailureTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditFailureText}</pre></body></html>";
+            string logFailureMessage = _logFailureTemplate ?? LogMessages.DefaultAuditFailureText;
+            string emailFailureMessage = _emailFailureTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditFailureText}</pre></body></html>";
 
-            Reporting.LogErrorEvent(eventID, ReplaceTokens(tokens, logFailureMessage, false), ex);
+            LogErrorEvent(eventID, ReplaceTokens(tokens, logFailureMessage, false), ex);
 
             try
             {
-                var recipients = Reporting.BuildRecipientList(target, authorizationResponse, false);
+                var recipients = BuildRecipientList(target, authorizationResponse, false);
 
                 if (recipients.Count > 0)
                 {
                     string subject = ReplaceTokens(tokens, LogMessages.AuditEmailSubjectFailure, false);
-                    Reporting.SendEmail(recipients, subject, ReplaceTokens(tokens, emailFailureMessage, true));
+                    SendEmail(recipients, subject, ReplaceTokens(tokens, emailFailureMessage, true));
                 }
             }
             catch (Exception iex)
             {
-                Reporting.LogErrorEvent(EventIDs.AuditErrorCannotSendFailureEmail, "An error occurred sending the failure audit email", iex);
+                LogErrorEvent(EventIDs.AuditErrorCannotSendFailureEmail, "An error occurred sending the failure audit email", iex);
             }
         }
 
-        private static Dictionary<string, string> BuildTokenDictionary(TargetElement target = null, AuthorizationResponse authorizationResponse = null, UserPrincipal user = null, ComputerPrincipal computer = null, SearchResult directoryEntry = null, string requestedComputerName = null, string detailMessage = null)
+        private Dictionary<string, string> BuildTokenDictionary(ITarget target = null, AuthorizationResponse authorizationResponse = null, UserPrincipal user = null, IComputer computer = null, Password password = null, string requestedComputerName = null, string detailMessage = null)
         {
             Dictionary<string, string> pairs = new Dictionary<string, string> {
                 { "{user.SamAccountName}", user?.SamAccountName},
@@ -113,9 +130,9 @@ namespace Lithnet.Laps.Web.Audit
                 // else in case of other authorization services.
                 { "{reader.Principal}", authorizationResponse?.UserDetails},
                 { "{reader.Notify}", string.Join(",", authorizationResponse?.UsersToNotify?.All ?? ImmutableHashSet<string>.Empty)},
-                { "{target.Notify}", target?.Audit?.EmailAddresses},
-                { "{target.ID}", target?.Name},
-                { "{target.IDType}", target?.Type.ToString()},
+                { "{target.Notify}", string.Join(",", target?.UsersToNotify?.All ?? ImmutableHashSet<string>.Empty)},
+                { "{target.ID}", target?.TargetName},
+                { "{target.IDType}", target?.TargetType.ToString()},
                 { "{message}", detailMessage},
                 { "{request.IPAddress}", HttpContext.Current?.Request?.UserHostAddress},
                 { "{request.HostName}", HttpContext.Current?.Request?.UserHostName},
@@ -124,13 +141,13 @@ namespace Lithnet.Laps.Web.Audit
                 { "{request.UnmaskedIPAddress}", HttpContext.Current?.Request?.GetUnmaskedIP()},
                 { "{datetime}", DateTime.Now.ToString(CultureInfo.CurrentCulture)},
                 { "{datetimeutc}", DateTime.UtcNow.ToString(CultureInfo.CurrentCulture)},
-                { "{computer.LapsExpiryDate}", directoryEntry?.GetPropertyDateTimeFromLong(Directory.AttrMsMcsAdmPwdExpirationTime)?.ToString(CultureInfo.CurrentCulture)},
+                { "{computer.LapsExpiryDate}", password?.ExpirationTime?.ToString(CultureInfo.CurrentCulture)},
             };
 
             return pairs;
         }
 
-        private static string ReplaceTokens(Dictionary<string, string> tokens, string text, bool isHtml)
+        private string ReplaceTokens(Dictionary<string, string> tokens, string text, bool isHtml)
         {
             foreach (KeyValuePair<string, string> token in tokens)
             {
@@ -140,11 +157,11 @@ namespace Lithnet.Laps.Web.Audit
             return text;
         }
 
-        private static void SendEmail(IEnumerable<string> recipients, string subject, string body)
+        private void SendEmail(IEnumerable<string> recipients, string subject, string body)
         {
-            if (!Reporting.IsSmtpConfigured())
+            if (!IsSmtpConfigured())
             {
-                Logger.Trace("SMTP is not configured, discarding mail message");
+                logger.Trace("SMTP is not configured, discarding mail message");
                 return;
             }
 
@@ -159,7 +176,7 @@ namespace Lithnet.Laps.Web.Audit
 
                     if (message.To.Count == 0)
                     {
-                        Reporting.Logger.Trace($"Not sending notification email because there are no recipients");
+                        logger.Trace($"Not sending notification email because there are no recipients");
                         return;
                     }
 
@@ -172,20 +189,19 @@ namespace Lithnet.Laps.Web.Audit
             }
         }
 
-        private static IImmutableSet<string> BuildRecipientList(TargetElement target, AuthorizationResponse authorizationResponse, bool success, UserPrincipal user = null)
+        private IImmutableSet<string> BuildRecipientList(ITarget target, AuthorizationResponse authorizationResponse, bool success, UserPrincipal user = null)
         {
-            // TODO: Avoid having to pass a TargetElement to this function.
             // TODO: Make this testable.
-            var usersToNotify = target?.Audit?.UsersToNotify ?? new UsersToNotify();
+            var usersToNotify = target?.UsersToNotify ?? new UsersToNotify();
 
             if (authorizationResponse != null)
             {
                 usersToNotify = usersToNotify.Union(authorizationResponse.UsersToNotify);
             }
 
-            if (LapsConfigSection.Configuration?.Audit?.UsersToNotify != null)
+            if (configSection.Configuration?.Audit?.UsersToNotify != null)
             {
-                usersToNotify = usersToNotify.Union(LapsConfigSection.Configuration.Audit.UsersToNotify);
+                usersToNotify = usersToNotify.Union(configSection.Configuration.Audit.UsersToNotify);
             }
 
             if (!string.IsNullOrWhiteSpace(user?.EmailAddress))
@@ -197,7 +213,7 @@ namespace Lithnet.Laps.Web.Audit
             return success ? usersToNotify.OnSuccess : usersToNotify.OnFailure;
         }
 
-        private static string LoadTemplate(string templateName)
+        private string LoadTemplate(string templateName)
         {
             try
             {
@@ -212,7 +228,7 @@ namespace Lithnet.Laps.Web.Audit
             }
         }
 
-        private static bool IsSmtpConfigured()
+        private bool IsSmtpConfigured()
         {
             return !string.IsNullOrWhiteSpace(new SmtpClient().Host);
         }

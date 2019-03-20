@@ -2,10 +2,11 @@
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
+using Lithnet.Laps.Web.Models;
 
-namespace Lithnet.Laps.Web
+namespace Lithnet.Laps.Web.ActiveDirectory
 {
-    public sealed class Directory
+    public sealed class ActiveDirectory: IDirectory
     {
         public const string AttrSamAccountName = "samAccountName";
         public const string AttrMsMcsAdmPwd = "ms-Mcs-AdmPwd";
@@ -104,6 +105,33 @@ namespace Lithnet.Laps.Web
             }
 
             return $"\\{string.Join("\\", guid.Value.ToByteArray().Select(t => t.ToString("X2")))}";
+        }
+
+        IComputer IDirectory.GetComputer(string computerName)
+        {
+            return new ComputerAdapter(GetComputerPrincipal(computerName));
+        }
+
+        Password IDirectory.GetPassword(IComputer computer)
+        {
+            SearchResult searchResult = GetDirectoryEntry(computer.DistinguishedName, ActiveDirectory.AttrSamAccountName, ActiveDirectory.AttrMsMcsAdmPwd, ActiveDirectory.AttrMsMcsAdmPwdExpirationTime);
+
+            if (!searchResult.Properties.Contains(ActiveDirectory.AttrMsMcsAdmPwd))
+            {
+                return null;
+            }
+
+            return new Password(
+                searchResult.GetPropertyString(Web.ActiveDirectory.ActiveDirectory.AttrMsMcsAdmPwd),
+                searchResult.GetPropertyDateTimeFromLong(ActiveDirectory.AttrMsMcsAdmPwdExpirationTime)
+            );
+        }
+
+        void IDirectory.SetPasswordExpiryTime(IComputer computer, DateTime time)
+        {
+            var entry = new DirectoryEntry($"LDAP://{computer.DistinguishedName}");
+            entry.Properties[ActiveDirectory.AttrMsMcsAdmPwdExpirationTime].Value = time.ToFileTimeUtc().ToString();
+            entry.CommitChanges();
         }
     }
 }

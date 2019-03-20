@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Web;
+using Lithnet.Laps.Web.ActiveDirectory;
 
 namespace Lithnet.Laps.Web
 {
@@ -89,7 +90,7 @@ namespace Lithnet.Laps.Web
                 return null;
             }
 
-            return result.Properties[Directory.AttrMsMcsAdmPwd][0]?.ToString();
+            return result.Properties[ActiveDirectory.ActiveDirectory.AttrMsMcsAdmPwd][0]?.ToString();
         }
     }
 }
