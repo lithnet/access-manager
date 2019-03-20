@@ -258,6 +258,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActiveDirectory\ComputerAdapter.cs" />
+    <Compile Include="ActiveDirectory\UserAdapter.cs" />
     <Compile Include="App_LocalResources\UIMessages.it.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -280,6 +281,7 @@
     <Compile Include="ConfigSection\ReaderCollection.cs" />
     <Compile Include="ConfigSection\TargetElement.cs" />
     <Compile Include="ConfigSection\ReaderElement.cs" />
+    <Compile Include="Models\IUser.cs" />
     <Compile Include="Models\Password.cs" />
     <Compile Include="Models\TargetType.cs" />
     <Compile Include="ConfigSection\TargetCollection.cs" />

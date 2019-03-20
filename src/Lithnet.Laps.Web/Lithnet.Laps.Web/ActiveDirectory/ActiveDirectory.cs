@@ -95,7 +95,9 @@ namespace Lithnet.Laps.Web.ActiveDirectory
 
         IComputer IDirectory.GetComputer(string computerName)
         {
-            return new ComputerAdapter(GetComputerPrincipal(computerName));
+            var principal = GetComputerPrincipal(computerName);
+
+            return principal == null ? null : new ComputerAdapter(principal);
         }
 
         Password IDirectory.GetPassword(IComputer computer)
@@ -132,7 +134,9 @@ namespace Lithnet.Laps.Web.ActiveDirectory
 
         IGroup IDirectory.GetGroup(string groupName)
         {
-            return new GroupAdapter(GetGroupPrincipal(groupName));
+            var principal = GetGroupPrincipal(groupName);
+
+            return principal == null ? null : new GroupAdapter(principal);
         }
 
         bool IDirectory.IsComputerInGroup(IComputer computer, IGroup group)
@@ -140,9 +144,9 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             return IsPrincipalInGroup(computer.DistinguishedName, group.Sid);
         }
 
-        bool IDirectory.IsUserInGroup(string userName, IGroup group)
+        bool IDirectory.IsUserInGroup(IUser user, IGroup group)
         {
-            return IsPrincipalInGroup(userName, group.Sid);
+            return IsPrincipalInGroup(user.DistinguishedName, group.Sid);
         }
 
         private bool IsPrincipalInGroup(string distinguishedName, byte[] groupSid)

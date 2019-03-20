@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.DirectoryServices.AccountManagement;
 using System.Security.Claims;
 using System.Web.Mvc;
+using Lithnet.Laps.Web.ActiveDirectory;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Authorization;
@@ -94,10 +95,7 @@ namespace Lithnet.Laps.Web.Controllers
 
                 // Do authorization check first.
 
-                var authResponse = authorizationService.CanAccessPassword(
-                    user.SamAccountName,
-                    computer
-                );
+                var authResponse = authorizationService.CanAccessPassword(new UserAdapter(user), computer);
 
                 if (!authResponse.IsAuhtorized)
                 {

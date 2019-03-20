@@ -10,6 +10,6 @@ namespace Lithnet.Laps.Web.Models
         bool IsComputerInOu(IComputer computer, string ou);
 		IGroup GetGroup(string groupName);
         bool IsComputerInGroup(IComputer computer, IGroup group);
-        bool IsUserInGroup(string userName, IGroup group);
+        bool IsUserInGroup(IUser user, IGroup group);
     }
 }

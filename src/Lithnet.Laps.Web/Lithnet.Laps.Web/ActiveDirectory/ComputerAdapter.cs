@@ -7,7 +7,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory
 {
     public sealed class ComputerAdapter: IComputer
     {
-        private ComputerPrincipal computerPrincipal;
+        private readonly ComputerPrincipal computerPrincipal;
 
         public ComputerAdapter(ComputerPrincipal computerPrincipal)
         {

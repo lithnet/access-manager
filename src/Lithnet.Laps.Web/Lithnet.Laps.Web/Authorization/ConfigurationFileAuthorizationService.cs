@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using NLog;
-using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Models;
@@ -23,7 +22,7 @@ namespace Lithnet.Laps.Web.Authorization
             this.availableTargets = availableTargets;
         }
 
-        public AuthorizationResponse CanAccessPassword(string userName, IComputer computer)
+        public AuthorizationResponse CanAccessPassword(IUser user, IComputer computer)
         {
             var target = availableTargets.GetMatchingTargetOrNull(computer);
 
@@ -36,9 +35,9 @@ namespace Lithnet.Laps.Web.Authorization
 
             foreach (ReaderElement reader in readers)
             {
-                if (this.IsReaderAuthorized(reader, userName))
+                if (this.IsReaderAuthorized(reader, user))
                 {
-                    logger.Trace($"User {userName} matches reader principal {reader.Principal} is authorized to read passwords from target {target.TargetName}");
+                    logger.Trace($"User {user.SamAccountName} matches reader principal {reader.Principal} is authorized to read passwords from target {target.TargetName}");
 
                     return AuthorizationResponse.Authorized(((ITarget)target).UsersToNotify, target);
                 }
@@ -65,17 +64,17 @@ namespace Lithnet.Laps.Web.Authorization
             return readerCollection.OfType<ReaderElement>();
         }
 
-        private bool IsReaderAuthorized(ReaderElement reader, string userName)
+        private bool IsReaderAuthorized(ReaderElement reader, IUser user)
         {
             // TODO: Is this correct? Does it distinguish e.g. local users and domain users?
-            if (reader.Principal == userName)
+            if (reader.Principal == user.SamAccountName)
             {
                 return true;
             }
 
             var group = directory.GetGroup(reader.Principal);
 
-            return group != null && directory.IsUserInGroup(userName, group);
+            return group != null && directory.IsUserInGroup(user, group);
         }
     }
 }
