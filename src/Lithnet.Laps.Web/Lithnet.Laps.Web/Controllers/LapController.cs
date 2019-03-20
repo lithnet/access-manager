@@ -95,7 +95,7 @@ namespace Lithnet.Laps.Web.Controllers
                     return this.LogAndReturnErrorResponse(model, UIMessages.NoLapsPassword, EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.SamAccountName, user.SamAccountName));
                 }
 
-                if (authResponse.Target.ExpireAfter != null)
+                if (!String.IsNullOrEmpty(authResponse.Target.ExpireAfter))
                 {
                     UpdateTargetPasswordExpiry(authResponse.Target, computer);
 
