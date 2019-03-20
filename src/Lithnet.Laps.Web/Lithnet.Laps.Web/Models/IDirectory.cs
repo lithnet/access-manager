@@ -7,5 +7,9 @@ namespace Lithnet.Laps.Web.Models
         IComputer GetComputer(string computerName);
         Password GetPassword(IComputer computer);
         void SetPasswordExpiryTime(IComputer computer, DateTime time);
+        bool IsComputerInOu(IComputer computer, string ou);
+		IGroup GetGroup(string groupName);
+        bool IsComputerInGroup(IComputer computer, IGroup group);
+        bool IsUserInGroup(string userName, IGroup group);
     }
 }

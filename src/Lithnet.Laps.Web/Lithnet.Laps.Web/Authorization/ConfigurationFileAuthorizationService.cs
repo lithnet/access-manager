@@ -1,5 +1,5 @@
-﻿using NLog;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using NLog;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using Lithnet.Laps.Web.Audit;
@@ -11,31 +11,34 @@ namespace Lithnet.Laps.Web.Authorization
     {
         private readonly LapsConfigSection configSection;
         private readonly ILogger logger;
-        private readonly ActiveDirectory.ActiveDirectory activeDirectory;
+        private readonly IDirectory directory;
+        private readonly IAvailableTargets availableTargets;
 
         public ConfigurationFileAuthorizationService(LapsConfigSection configSection, ILogger logger,
-            ActiveDirectory.ActiveDirectory activeDirectory)
+            IDirectory directory, IAvailableTargets availableTargets)
         {
             this.configSection = configSection;
             this.logger = logger;
-            this.activeDirectory = activeDirectory;
+            this.directory = directory;
+            this.availableTargets = availableTargets;
         }
 
-        public AuthorizationResponse CanAccessPassword(UserPrincipal user, IComputer computer)
+        public AuthorizationResponse CanAccessPassword(string userName, IComputer computer)
         {
-            var computerPrincipal = activeDirectory.GetComputerPrincipal(computer.SamAccountName);
-            var target = GetMatchingTargetOrNull(computerPrincipal);
+            var target = availableTargets.GetMatchingTargetOrNull(computer);
 
             if (target == null)
             {
                 return AuthorizationResponse.NoTarget(new UsersToNotify());
             }
 
-            foreach (ReaderElement reader in target.Readers.OfType<ReaderElement>())
+            var readers = GetReadersForTarget(target);
+
+            foreach (ReaderElement reader in readers)
             {
-                if (this.IsReaderAuthorized(reader, user))
+                if (this.IsReaderAuthorized(reader, userName))
                 {
-                    logger.Trace($"User {user.SamAccountName} matches reader principal {reader.Principal} is authorized to read passwords from target {target.Name}");
+                    logger.Trace($"User {userName} matches reader principal {reader.Principal} is authorized to read passwords from target {target.TargetName}");
 
                     return AuthorizationResponse.Authorized(((ITarget)target).UsersToNotify, target);
                 }
@@ -44,77 +47,35 @@ namespace Lithnet.Laps.Web.Authorization
             return AuthorizationResponse.NoReader(((ITarget) target).UsersToNotify, target);
         }
 
-        private bool IsReaderAuthorized(ReaderElement reader, UserPrincipal currentUser)
+        private IEnumerable<ReaderElement> GetReadersForTarget(ITarget target)
         {
-            var readerPrincipal = activeDirectory.GetPrincipal(reader.Principal);
+            var targetElementCollection = configSection.Configuration.Targets;
+            
+            var query = from targetElement in targetElementCollection.OfType<TargetElement>()
+                where targetElement.Name == target.TargetName
+                select targetElement.Readers;
 
-            if (currentUser.Equals(readerPrincipal))
+            var readerCollection = query.FirstOrDefault();
+
+            if (readerCollection == null)
+            {
+                return new ReaderElement[0];
+            }
+
+            return readerCollection.OfType<ReaderElement>();
+        }
+
+        private bool IsReaderAuthorized(ReaderElement reader, string userName)
+        {
+            // TODO: Is this correct? Does it distinguish e.g. local users and domain users?
+            if (reader.Principal == userName)
             {
                 return true;
             }
 
-            if (readerPrincipal is GroupPrincipal group)
-            {
-                if (activeDirectory.IsPrincipalInGroup(currentUser, group))
-                {
-                    return true;
-                }
-            }
+            var group = directory.GetGroup(reader.Principal);
 
-            return false;
-        }
-
-        private TargetElement GetMatchingTargetOrNull(ComputerPrincipal computer)
-        {
-            List<TargetElement> matchingTargets = new List<TargetElement>();
-
-            foreach (TargetElement target in configSection.Configuration.Targets.OfType<TargetElement>().OrderBy(t => t.Type == TargetType.Computer).ThenBy(t => t.Type == TargetType.Group))
-            {
-                if (target.Type == TargetType.Container)
-                {
-                    if (activeDirectory.IsPrincipalInOu(computer, target.Name))
-                    {
-                        logger.Trace($"Matched {computer.SamAccountName} to target OU {target.Name}");
-                        matchingTargets.Add(target);
-                    }
-
-                    continue;
-                }
-                else if (target.Type == TargetType.Computer)
-                {
-                    ComputerPrincipal p = activeDirectory.GetComputerPrincipal(target.Name);
-
-                    if (p == null)
-                    {
-                        logger.Trace($"Target computer {target.Name} was not found in the directory");
-                        continue;
-                    }
-
-                    if (p.Equals(computer))
-                    {
-                        logger.Trace($"Matched {computer.SamAccountName} to target computer {target.Name}");
-                        return target;
-                    }
-                }
-                else
-                {
-                    GroupPrincipal g = activeDirectory.GetGroupPrincipal(target.Name);
-
-                    if (g == null)
-                    {
-                        logger.Trace($"Target group {target.Name} was not found in the directory");
-                        continue;
-                    }
-
-                    if (activeDirectory.IsPrincipalInGroup(computer, g))
-                    {
-                        logger.Trace($"Matched {computer.SamAccountName} to target group {target.Name}");
-                        matchingTargets.Add(target);
-                    }
-                }
-            }
-
-            return matchingTargets.OrderBy(t => t.Type == TargetType.Computer).ThenBy(t => t.Type == TargetType.Group).FirstOrDefault();
+            return group != null && directory.IsUserInGroup(userName, group);
         }
     }
 }

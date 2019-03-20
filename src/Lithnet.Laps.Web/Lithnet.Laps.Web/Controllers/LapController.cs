@@ -20,15 +20,17 @@ namespace Lithnet.Laps.Web.Controllers
         private readonly IDirectory directory;
         private readonly Reporting reporting;
         private readonly RateLimiter rateLimiter;
+        private readonly AvailableTargets availableTargets;
 
         public LapController(IAuthorizationService authorizationService, ILogger logger, IDirectory directory,
-            Reporting reporting, RateLimiter rateLimiter)
+            Reporting reporting, RateLimiter rateLimiter, AvailableTargets availableTargets)
         {
             this.authorizationService = authorizationService;
             this.logger = logger;
             this.directory = directory;
             this.reporting = reporting;
             this.rateLimiter = rateLimiter;
+            this.availableTargets = availableTargets;
         }
 
         public ActionResult Get()
@@ -74,10 +76,26 @@ namespace Lithnet.Laps.Web.Controllers
 
                 var computer = directory.GetComputer(model.ComputerName);
 
+                // Is a target configured?
+
+                var target = availableTargets.GetMatchingTargetOrNull(computer);
+
+                if (target == null)
+                {
+                    return this.AuditAndReturnErrorResponse(
+                    model: model,
+                    userMessage: UIMessages.NotAuthorized,
+                    eventID: EventIDs.AuthZFailedNoTargetMatch,
+                    logMessage: string.Format(LogMessages.NoTargetsExist, user.SamAccountName,
+                        model.ComputerName),
+                    user: user,
+                    computer: computer);
+                }
+
                 // Do authorization check first.
 
                 var authResponse = authorizationService.CanAccessPassword(
-                    user,
+                    user.SamAccountName,
                     computer
                 );
 
@@ -130,17 +148,6 @@ namespace Lithnet.Laps.Web.Controllers
 
             // Handle specific result codes of the ConfigurationFileAuthorizationService.
             // FIXME: This dependency on ConfigurationFileAuthorizationService is dodgy.
-            if (authResponse.ResultCode == EventIDs.AuthZFailedNoTargetMatch)
-            {
-                viewResult = this.AuditAndReturnErrorResponse(
-                    model: model,
-                    userMessage: UIMessages.NotAuthorized,
-                    eventID: EventIDs.AuthZFailedNoTargetMatch,
-                    logMessage: string.Format(LogMessages.NoTargetsExist, user.SamAccountName,
-                        model.ComputerName),
-                    user: user,
-                    computer: computer);
-            }
 
             if (authResponse.ResultCode == EventIDs.AuthZFailedNoReaderPrincipalMatch)
             {

@@ -311,6 +311,10 @@
     <Compile Include="Audit\UsersToNotify.cs" />
     <Compile Include="Authorization\AuthorizationResponse.cs" />
     <Compile Include="Authorization\DemoAuthorizationService.cs" />
+    <Compile Include="Authorization\IAvailableTargets.cs" />
+    <Compile Include="Authorization\AvailableTargets.cs" />
+    <Compile Include="Models\IGroup.cs" />
+    <Compile Include="ActiveDirectory\GroupAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-grid.css" />

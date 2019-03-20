@@ -11,12 +11,6 @@ namespace Lithnet.Laps.Web.Models
         string DisplayName { get; }
 
         Guid? Guid { get; }
-        /// <summary>
-        /// FIXME: Get rid of this.
-        ///
-        /// I think this is only used in reporting, and that nobody will use this in reporting.
-        /// </summary>
-        [Obsolete]
         SecurityIdentifier Sid { get; }
     }
 }

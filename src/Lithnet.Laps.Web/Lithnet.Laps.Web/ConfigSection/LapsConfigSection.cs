@@ -4,6 +4,10 @@ namespace Lithnet.Laps.Web
 {
     /// <summary>
     /// Singleton for the laps-web-section in the configuration file.
+    ///
+    /// FIXME: Something is wrong about this class.
+    /// For the moment, you have to access its properties via the Configuration property.
+    /// So: lapsConfigSection.Configuration.Targets, and not lapsConfigSection.Targets.
     /// </summary>
     public sealed class LapsConfigSection : ConfigurationSection
     {

@@ -2,6 +2,7 @@
 using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
+using System.Security.Principal;
 using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web.ActiveDirectory
@@ -60,22 +61,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory
 
         private bool IsPrincipalInGroup(Principal p, byte[] groupSid)
         {
-            SearchResult result = GetDirectoryEntry(p, "tokenGroups");
-
-            if (result == null)
-            {
-                return false;
-            }
-
-            foreach (byte[] value in result.Properties["tokenGroups"].OfType<byte[]>())
-            {
-                if (groupSid.SequenceEqual(value))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return IsPrincipalInGroup(p.DistinguishedName, groupSid);
         }
 
         internal SearchResult GetDirectoryEntry(Principal p, params string[] propertiesToLoad)
@@ -132,6 +118,64 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             var entry = new DirectoryEntry($"LDAP://{computer.DistinguishedName}");
             entry.Properties[ActiveDirectory.AttrMsMcsAdmPwdExpirationTime].Value = time.ToFileTimeUtc().ToString();
             entry.CommitChanges();
+        }
+
+        bool IDirectory.IsComputerInOu(IComputer computer, string ou)
+        {
+            DirectorySearcher d = new DirectorySearcher();
+            d.SearchRoot = new DirectoryEntry($"LDAP://{ou}");
+            d.SearchScope = SearchScope.Subtree;
+            d.Filter = $"objectGuid={ToOctetString(computer.Guid)}";
+
+            return d.FindOne() != null;
+        }
+
+        IGroup IDirectory.GetGroup(string groupName)
+        {
+            return new GroupAdapter(GetGroupPrincipal(groupName));
+        }
+
+        bool IDirectory.IsComputerInGroup(IComputer computer, IGroup group)
+        {
+            return IsPrincipalInGroup(computer.DistinguishedName, group.Sid);
+        }
+
+        bool IDirectory.IsUserInGroup(string userName, IGroup group)
+        {
+            return IsPrincipalInGroup(userName, group.Sid);
+        }
+
+        private bool IsPrincipalInGroup(string distinguishedName, byte[] groupSid)
+        {
+            SearchResult result = GetDirectoryEntry(distinguishedName, "tokenGroups");
+
+            if (result == null)
+            {
+                return false;
+            }
+
+            foreach (byte[] value in result.Properties["tokenGroups"].OfType<byte[]>())
+            {
+                if (groupSid.SequenceEqual(value))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool IsPrincipalInGroup(string distinguishedName, SecurityIdentifier groupSecurityIdentifier)
+        {
+            if (groupSecurityIdentifier == null || groupSecurityIdentifier.BinaryLength == 0)
+            {
+                return false;
+            }
+
+            byte[] groupSid = new byte[groupSecurityIdentifier.BinaryLength];
+            groupSecurityIdentifier.GetBinaryForm(groupSid, 0);
+
+            return IsPrincipalInGroup(distinguishedName, groupSid);
         }
     }
 }
