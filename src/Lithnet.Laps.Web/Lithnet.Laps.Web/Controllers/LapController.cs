@@ -90,16 +90,17 @@ namespace Lithnet.Laps.Web.Controllers
                     logMessage: string.Format(LogMessages.NoTargetsExist, user.SamAccountName,
                         model.ComputerName),
                     user: user,
-                    computer: computer);
+                    computer: computer
+                    );
                 }
 
                 // Do authorization check first.
 
                 var authResponse = authorizationService.CanAccessPassword(new UserAdapter(user), computer);
 
-                if (!authResponse.IsAuhtorized)
+                if (!authResponse.IsAuthorized)
                 {
-                    return getViewForFailedAuthorization(model, user, computer, authResponse);
+                    return getViewForFailedAuthorization(model, user, computer, authResponse, target);
                 }
 
                 // Do actual work only if authorized.
@@ -111,15 +112,15 @@ namespace Lithnet.Laps.Web.Controllers
                     return this.LogAndReturnErrorResponse(model, UIMessages.NoLapsPassword, EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.SamAccountName, user.SamAccountName));
                 }
 
-                if (!String.IsNullOrEmpty(authResponse.Target.ExpireAfter))
+                if (!String.IsNullOrEmpty(target.ExpireAfter))
                 {
-                    UpdateTargetPasswordExpiry(authResponse.Target, computer);
+                    UpdateTargetPasswordExpiry(target, computer);
 
                     // Get the password again with the updated expiracy date.
                     password = directory.GetPassword(computer);
                 }
 
-                reporting.PerformAuditSuccessActions(model, authResponse.Target, authResponse, user, computer, password);
+                reporting.PerformAuditSuccessActions(model, target, authResponse, user, computer, password);
 
                 return this.View("Show", new LapEntryModel(computer, password));
 
@@ -131,7 +132,7 @@ namespace Lithnet.Laps.Web.Controllers
         }
 
         private ViewResult getViewForFailedAuthorization(LapRequestModel model, UserPrincipal user, IComputer computer,
-            AuthorizationResponse authResponse)
+            AuthorizationResponse authResponse, ITarget target)
         {
             ViewResult viewResult;
 
@@ -142,7 +143,8 @@ namespace Lithnet.Laps.Web.Controllers
                 logMessage: string.Format(LogMessages.AuthorizationFailed, user.SamAccountName,
                     model.ComputerName),
                 user: user,
-                computer: computer);
+                computer: computer,
+                target: target);
 
             // Handle specific result codes of the ConfigurationFileAuthorizationService.
             // FIXME: This dependency on ConfigurationFileAuthorizationService is dodgy.
@@ -155,7 +157,7 @@ namespace Lithnet.Laps.Web.Controllers
                     eventID: EventIDs.AuthZFailedNoReaderPrincipalMatch,
                     logMessage: string.Format(LogMessages.AuthZFailedNoReaderPrincipalMatch,
                         user.SamAccountName, model.ComputerName),
-                    target: authResponse.Target,
+                    target: target,
                     user: user,
                     computer: computer);
             }

@@ -3,6 +3,7 @@ using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using System.Security.Principal;
+using Lithnet.Laps.Web.Directory;
 using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web.ActiveDirectory

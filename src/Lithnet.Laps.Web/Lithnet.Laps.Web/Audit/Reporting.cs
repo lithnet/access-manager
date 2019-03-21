@@ -128,7 +128,7 @@ namespace Lithnet.Laps.Web.Audit
                 // FIXME: The token {reader.Principal} actually contains the authorization details.
                 // This is the principal when the ConfigurationFileAuthorizationService is used, but it can be something
                 // else in case of other authorization services.
-                { "{reader.Principal}", authorizationResponse?.UserDetails},
+                { "{reader.Principal}", authorizationResponse?.ExtraInfo},
                 { "{reader.Notify}", string.Join(",", authorizationResponse?.UsersToNotify?.All ?? ImmutableHashSet<string>.Empty)},
                 { "{target.Notify}", string.Join(",", target?.UsersToNotify?.All ?? ImmutableHashSet<string>.Empty)},
                 { "{target.ID}", target?.TargetName},

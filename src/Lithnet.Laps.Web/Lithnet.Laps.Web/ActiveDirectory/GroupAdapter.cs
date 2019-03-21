@@ -3,7 +3,7 @@ using System.DirectoryServices.AccountManagement;
 using System.Security.Principal;
 using Lithnet.Laps.Web.Models;
 
-namespace Lithnet.Laps.Web.ActiveDirectory
+namespace Lithnet.Laps.Web.Directory
 {
     public sealed class GroupAdapter: IGroup
     {

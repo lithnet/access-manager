@@ -1,4 +1,5 @@
-﻿using Lithnet.Laps.Web.Audit;
+﻿using System;
+using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web.Authorization
@@ -10,48 +11,46 @@ namespace Lithnet.Laps.Web.Authorization
         /// </summary>
         public int ResultCode { get; private set; }
 
-        public bool IsAuhtorized => ResultCode == EventIDs.UserAuthorizedForComputer;
+        public bool IsAuthorized => ResultCode == EventIDs.UserAuthorizedForComputer;
 
-        public ITarget Target { get; private set; }
-
-        private AuthorizationResponse(int resultCode, UsersToNotify usersToNotify, ITarget target)
+        private AuthorizationResponse(int resultCode, UsersToNotify usersToNotify, string extraInfo)
         {
             ResultCode = resultCode;
-            UsersToNotify = usersToNotify;
-            Target = target;
+            UsersToNotify = usersToNotify ?? new UsersToNotify();
+            ExtraInfo = extraInfo;
         }
 
-        public static AuthorizationResponse Authorized(UsersToNotify usersToNotify, ITarget target)
+        public static AuthorizationResponse Authorized(UsersToNotify usersToNotify, string extraInfo)
         {
-            return new AuthorizationResponse(EventIDs.UserAuthorizedForComputer, usersToNotify, target);
+            return new AuthorizationResponse(EventIDs.UserAuthorizedForComputer, usersToNotify, extraInfo);
         }
 
-        public static AuthorizationResponse NoTarget(UsersToNotify usersToNotify)
+        public static AuthorizationResponse NoTarget()
         {
-            return new AuthorizationResponse(EventIDs.AuthZFailedNoTargetMatch, usersToNotify, null);
+            return new AuthorizationResponse(EventIDs.AuthZFailedNoTargetMatch, new UsersToNotify(), String.Empty);
         }
 
-        public static AuthorizationResponse NoReader(UsersToNotify usersToNotify, ITarget target)
+        public static AuthorizationResponse NoReader()
         {
-            return new AuthorizationResponse(EventIDs.AuthZFailedNoReaderPrincipalMatch, usersToNotify,
-                target);
+            return new AuthorizationResponse(EventIDs.AuthZFailedNoReaderPrincipalMatch, new UsersToNotify(), String.Empty);
         }
 
-        public static AuthorizationResponse Unauthorized(UsersToNotify usersToNotify)
+        public static AuthorizationResponse Unauthorized()
         {
-            return new AuthorizationResponse(EventIDs.AuthorizationFailed, usersToNotify, null);
+            return new AuthorizationResponse(EventIDs.AuthorizationFailed, new UsersToNotify(), String.Empty);
         }
 
         /// <summary>
-        /// Depending on the way the user is authorized, different people can be notified.
+        /// Depending on the kind of user that authenticates, other people might want to be notified.
         ///
-        /// Not sure whether this is a good idea. But it was like this initially.
+        /// Note that this should only contain the users that needs to be notified for the specified reader (user or group).
+        /// The users that needs notifications for the target (ou of the computer), are defined in <see cref="ITarget."/>
         /// </summary>
         public UsersToNotify UsersToNotify { get; private set; }
 
         /// <summary>
-        /// This can be anything, offering more information about the user.
+        /// This can be anything, offering more information about the user or the authentication.
         /// </summary>
-        public string UserDetails { get; private set; }
+        public string ExtraInfo { get; private set; }
     }
 }

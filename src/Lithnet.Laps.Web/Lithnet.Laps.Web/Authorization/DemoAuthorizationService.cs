@@ -9,10 +9,10 @@ namespace Lithnet.Laps.Web.Authorization
         {
             if (user.SamAccountName == "u0115389" && computer.SamAccountName.ToUpper() == "GBW-L-W0499")
             {
-                return AuthorizationResponse.Authorized(new UsersToNotify(), null);
+                return AuthorizationResponse.Authorized(new UsersToNotify(), "Demo authorization");
             }
 
-            return AuthorizationResponse.Unauthorized(new UsersToNotify());
+            return AuthorizationResponse.Unauthorized();
         }
     }
 }

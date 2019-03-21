@@ -28,7 +28,7 @@ namespace Lithnet.Laps.Web.Authorization
 
             if (target == null)
             {
-                return AuthorizationResponse.NoTarget(new UsersToNotify());
+                return AuthorizationResponse.NoTarget();
             }
 
             var readers = GetReadersForTarget(target);
@@ -39,11 +39,11 @@ namespace Lithnet.Laps.Web.Authorization
                 {
                     logger.Trace($"User {user.SamAccountName} matches reader principal {reader.Principal} is authorized to read passwords from target {target.TargetName}");
 
-                    return AuthorizationResponse.Authorized(((ITarget)target).UsersToNotify, target);
+                    return AuthorizationResponse.Authorized(reader.Audit.UsersToNotify, reader.Principal);
                 }
             }
 
-            return AuthorizationResponse.NoReader(((ITarget) target).UsersToNotify, target);
+            return AuthorizationResponse.NoReader();
         }
 
         private IEnumerable<ReaderElement> GetReadersForTarget(ITarget target)
