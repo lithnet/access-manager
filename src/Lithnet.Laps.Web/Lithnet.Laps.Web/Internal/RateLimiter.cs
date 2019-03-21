@@ -8,7 +8,7 @@ using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web
 {
-    public sealed class RateLimiter
+    public sealed class RateLimiter: IRateLimiter
     {
         private readonly LapsConfigSection configSection;
         private readonly Reporting reporting;

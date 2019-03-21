@@ -19,12 +19,12 @@ namespace Lithnet.Laps.Web.Controllers
         private readonly IAuthorizationService authorizationService;
         private readonly ILogger logger;
         private readonly IDirectory directory;
-        private readonly Reporting reporting;
-        private readonly RateLimiter rateLimiter;
-        private readonly AvailableTargets availableTargets;
+        private readonly IReporting reporting;
+        private readonly IRateLimiter rateLimiter;
+        private readonly IAvailableTargets availableTargets;
 
         public LapController(IAuthorizationService authorizationService, ILogger logger, IDirectory directory,
-            Reporting reporting, RateLimiter rateLimiter, AvailableTargets availableTargets)
+            IReporting reporting, IRateLimiter rateLimiter, IAvailableTargets availableTargets)
         {
             this.authorizationService = authorizationService;
             this.logger = logger;

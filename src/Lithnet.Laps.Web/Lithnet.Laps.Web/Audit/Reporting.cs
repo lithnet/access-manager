@@ -12,7 +12,7 @@ using NLog;
 
 namespace Lithnet.Laps.Web.Audit
 {
-    public sealed class Reporting
+    public sealed class Reporting: IReporting
     {
         private readonly ILogger logger;
         private readonly LapsConfigSection configSection;

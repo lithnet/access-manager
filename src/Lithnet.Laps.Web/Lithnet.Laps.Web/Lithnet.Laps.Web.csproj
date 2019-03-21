@@ -93,7 +93,6 @@
     <Reference Include="Microsoft.Owin.Security.WsFederation, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.Security.WsFederation.4.0.0\lib\net451\Microsoft.Owin.Security.WsFederation.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.4.5.11\lib\net45\NLog.dll</HintPath>
     </Reference>
@@ -268,6 +267,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
+    <Compile Include="Audit\IReporting.cs" />
     <Compile Include="Authorization\ConfigurationFileAuthorizationService.cs" />
     <Compile Include="Authorization\IAuthorizationService.cs" />
     <Compile Include="ActiveDirectory\ComputerAdapter.cs" />
@@ -275,6 +275,7 @@
     <Compile Include="ConfigSection\RateLimitIPElement.cs" />
     <Compile Include="ConfigSection\RateLimitUserElement.cs" />
     <Compile Include="ActiveDirectory\GroupAdapter.cs" />
+    <Compile Include="Internal\IRateLimiter.cs" />
     <Compile Include="Models\IComputer.cs" />
     <Compile Include="Models\IDirectory.cs" />
     <Compile Include="Internal\RateLimiter.cs" />
