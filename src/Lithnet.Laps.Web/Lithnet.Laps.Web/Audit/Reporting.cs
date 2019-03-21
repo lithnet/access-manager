@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.DirectoryServices.AccountManagement;
 using System.Globalization;
 using System.Net.Mail;
 using System.Web;
 using Lithnet.Laps.Web.App_LocalResources;
-using Lithnet.Laps.Web.Authorization;
+using Lithnet.Laps.Web.Security.Authorization;
 using Lithnet.Laps.Web.Models;
 using NLog;
 
@@ -55,7 +54,7 @@ namespace Lithnet.Laps.Web.Audit
             logger.Info(logEvent);
         }
 
-        public void PerformAuditSuccessActions(LapRequestModel model, ITarget target, AuthorizationResponse authorizationResponse, UserPrincipal user, IComputer computer, Password password)
+        public void PerformAuditSuccessActions(LapRequestModel model, ITarget target, AuthorizationResponse authorizationResponse, IUser user, IComputer computer, Password password)
         {
             Dictionary<string, string> tokens = BuildTokenDictionary(target, authorizationResponse, user, computer, password, model.ComputerName);
             string logSuccessMessage = _logSuccessTemplate ?? LogMessages.DefaultAuditSuccessText;
@@ -81,7 +80,7 @@ namespace Lithnet.Laps.Web.Audit
             }
         }
 
-        public void PerformAuditFailureActions(LapRequestModel model, string userMessage, int eventID, string logMessage, Exception ex, ITarget target, AuthorizationResponse authorizationResponse, UserPrincipal user, IComputer computer)
+        public void PerformAuditFailureActions(LapRequestModel model, string userMessage, int eventID, string logMessage, Exception ex, ITarget target, AuthorizationResponse authorizationResponse, IUser user, IComputer computer)
         {
             Dictionary<string, string> tokens = BuildTokenDictionary(target, authorizationResponse, user, computer, null, model.ComputerName, logMessage ?? userMessage);
             string logFailureMessage = _logFailureTemplate ?? LogMessages.DefaultAuditFailureText;
@@ -105,7 +104,7 @@ namespace Lithnet.Laps.Web.Audit
             }
         }
 
-        private Dictionary<string, string> BuildTokenDictionary(ITarget target = null, AuthorizationResponse authorizationResponse = null, UserPrincipal user = null, IComputer computer = null, Password password = null, string requestedComputerName = null, string detailMessage = null)
+        private Dictionary<string, string> BuildTokenDictionary(ITarget target = null, AuthorizationResponse authorizationResponse = null, IUser user = null, IComputer computer = null, Password password = null, string requestedComputerName = null, string detailMessage = null)
         {
             Dictionary<string, string> pairs = new Dictionary<string, string> {
                 { "{user.SamAccountName}", user?.SamAccountName},
@@ -189,7 +188,7 @@ namespace Lithnet.Laps.Web.Audit
             }
         }
 
-        private IImmutableSet<string> BuildRecipientList(ITarget target, AuthorizationResponse authorizationResponse, bool success, UserPrincipal user = null)
+        private IImmutableSet<string> BuildRecipientList(ITarget target, AuthorizationResponse authorizationResponse, bool success, IUser user = null)
         {
             // TODO: Make this testable.
             var usersToNotify = target?.UsersToNotify ?? new UsersToNotify();

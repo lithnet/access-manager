@@ -19,7 +19,7 @@ namespace Lithnet.Laps.Web
             this.reporting = reporting;
         }
 
-        public bool IsRateLimitExceeded(LapRequestModel model, UserPrincipal p, HttpRequestBase r)
+        public bool IsRateLimitExceeded(LapRequestModel model, IUser p, HttpRequestBase r)
         {
             if (configSection.Configuration.RateLimitIP.Enabled)
             {
@@ -43,7 +43,7 @@ namespace Lithnet.Laps.Web
             return false;
         }
 
-        private bool IsIpThresholdExceeded(LapRequestModel model, UserPrincipal p, HttpRequestBase r, int threshold, int duration)
+        private bool IsIpThresholdExceeded(LapRequestModel model, IUser p, HttpRequestBase r, int threshold, int duration)
         {
             if (IsThresholdExceeded(r, threshold, duration))
             {
@@ -55,7 +55,7 @@ namespace Lithnet.Laps.Web
             return false;
         }
 
-        private bool IsUserThresholdExceeded(LapRequestModel model, UserPrincipal p, HttpRequestBase r, int threshold, int duration)
+        private bool IsUserThresholdExceeded(LapRequestModel model, IUser p, HttpRequestBase r, int threshold, int duration)
         {
             if (IsThresholdExceeded(p, threshold, duration))
             {
@@ -74,7 +74,7 @@ namespace Lithnet.Laps.Web
             return IsThresholdExceeded(key1, threshold, duration);
         }
 
-        private bool IsThresholdExceeded(UserPrincipal p, int threshold, int duration)
+        private bool IsThresholdExceeded(IUser p, int threshold, int duration)
         {
             string key1 = string.Join(@"-", duration, threshold, p.Sid);
 

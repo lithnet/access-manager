@@ -268,8 +268,10 @@
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
     <Compile Include="Audit\IReporting.cs" />
-    <Compile Include="Authorization\ConfigurationFileAuthorizationService.cs" />
-    <Compile Include="Authorization\IAuthorizationService.cs" />
+    <Compile Include="Security\Authentication\AuthenticationService.cs" />
+    <Compile Include="Security\Authentication\IAuthenticationService.cs" />
+    <Compile Include="Security\Authorization\ConfigurationFileAuthorizationService.cs" />
+    <Compile Include="Security\Authorization\IAuthorizationService.cs" />
     <Compile Include="ActiveDirectory\ComputerAdapter.cs" />
     <Compile Include="ConfigSection\AuditElement.cs" />
     <Compile Include="ConfigSection\RateLimitIPElement.cs" />
@@ -312,10 +314,10 @@
       <DependentUpon>UIMessages.resx</DependentUpon>
     </Compile>
     <Compile Include="Audit\UsersToNotify.cs" />
-    <Compile Include="Authorization\AuthorizationResponse.cs" />
-    <Compile Include="Authorization\DemoAuthorizationService.cs" />
-    <Compile Include="Authorization\IAvailableTargets.cs" />
-    <Compile Include="Authorization\AvailableTargets.cs" />
+    <Compile Include="Security\Authorization\AuthorizationResponse.cs" />
+    <Compile Include="Security\Authorization\DemoAuthorizationService.cs" />
+    <Compile Include="Security\Authorization\IAvailableTargets.cs" />
+    <Compile Include="Security\Authorization\AvailableTargets.cs" />
     <Compile Include="Models\IGroup.cs" />
     <Compile Include="ActiveDirectory\UserAdapter.cs" />
   </ItemGroup>

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using System.DirectoryServices.AccountManagement;
-using System.Security.Claims;
 using System.Web.Mvc;
-using Lithnet.Laps.Web.ActiveDirectory;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.Audit;
-using Lithnet.Laps.Web.Authorization;
+using Lithnet.Laps.Web.Security.Authorization;
 using Lithnet.Laps.Web.Models;
+using Lithnet.Laps.Web.Security.Authentication;
 using NLog;
 
 namespace Lithnet.Laps.Web.Controllers
@@ -22,9 +21,11 @@ namespace Lithnet.Laps.Web.Controllers
         private readonly IReporting reporting;
         private readonly IRateLimiter rateLimiter;
         private readonly IAvailableTargets availableTargets;
+        private readonly IAuthenticationService authenticationService;
 
         public LapController(IAuthorizationService authorizationService, ILogger logger, IDirectory directory,
-            IReporting reporting, IRateLimiter rateLimiter, IAvailableTargets availableTargets)
+            IReporting reporting, IRateLimiter rateLimiter, IAvailableTargets availableTargets,
+            IAuthenticationService authenticationService)
         {
             this.authorizationService = authorizationService;
             this.logger = logger;
@@ -32,6 +33,7 @@ namespace Lithnet.Laps.Web.Controllers
             this.reporting = reporting;
             this.rateLimiter = rateLimiter;
             this.availableTargets = availableTargets;
+            this.authenticationService = authenticationService;
         }
 
         public ActionResult Get()
@@ -48,7 +50,7 @@ namespace Lithnet.Laps.Web.Controllers
                 return this.View();
             }
 
-            UserPrincipal user = null;
+            IUser user = null;
 
             try
             {
@@ -56,7 +58,7 @@ namespace Lithnet.Laps.Web.Controllers
 
                 try
                 {
-                    user = this.GetCurrentUser();
+                    user = authenticationService.GetLoggedInUser();
 
                     if (user == null)
                     {
@@ -96,7 +98,7 @@ namespace Lithnet.Laps.Web.Controllers
 
                 // Do authorization check first.
 
-                var authResponse = authorizationService.CanAccessPassword(new UserAdapter(user), computer, target);
+                var authResponse = authorizationService.CanAccessPassword(user, computer, target);
 
                 if (!authResponse.IsAuthorized)
                 {
@@ -131,7 +133,7 @@ namespace Lithnet.Laps.Web.Controllers
             }
         }
 
-        private ViewResult getViewForFailedAuthorization(LapRequestModel model, UserPrincipal user, IComputer computer,
+        private ViewResult getViewForFailedAuthorization(LapRequestModel model, IUser user, IComputer computer,
             AuthorizationResponse authResponse, ITarget target)
         {
             ViewResult viewResult;
@@ -165,7 +167,7 @@ namespace Lithnet.Laps.Web.Controllers
             return viewResult;
         }
 
-        private ViewResult AuditAndReturnErrorResponse(LapRequestModel model, string userMessage, int eventID, string logMessage = null, Exception ex = null, ITarget target = null, AuthorizationResponse authorizationResponse = null, UserPrincipal user = null, IComputer computer = null)
+        private ViewResult AuditAndReturnErrorResponse(LapRequestModel model, string userMessage, int eventID, string logMessage = null, Exception ex = null, ITarget target = null, AuthorizationResponse authorizationResponse = null, IUser user = null, IComputer computer = null)
         {
             reporting.PerformAuditFailureActions(model, userMessage, eventID, logMessage, ex, target, authorizationResponse, user, computer);
             model.FailureReason = userMessage;
@@ -177,24 +179,6 @@ namespace Lithnet.Laps.Web.Controllers
             reporting.LogErrorEvent(eventID, logMessage ?? userMessage, ex);
             model.FailureReason = userMessage;
             return this.View("Get", model);
-        }
-
-
-
-        private UserPrincipal GetCurrentUser()
-        {
-            ClaimsPrincipal p = (ClaimsPrincipal)this.User;
-
-            string sid = p.FindFirst(ClaimTypes.PrimarySid)?.Value;
-
-            UserPrincipal u = null;
-
-            if (sid != null)
-            {
-                u = UserPrincipal.FindByIdentity(new PrincipalContext(ContextType.Domain), IdentityType.Sid, sid);
-            }
-
-            return u ?? throw new NoMatchingPrincipalException(string.Format(LogMessages.UserNotFoundInDirectory, this.User.Identity.Name));
         }
 
         [Localizable(false)]
