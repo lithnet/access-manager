@@ -14,14 +14,14 @@ namespace Lithnet.Laps.Web.Audit
     public sealed class Reporting: IReporting
     {
         private readonly ILogger logger;
-        private readonly LapsConfigSection configSection;
+        private readonly ILapsConfig configSection;
 
         private static string _logSuccessTemplate = null;
         private static string _logFailureTemplate = null;
         private static string _emailSuccessTemplate = null;
         private static string _emailFailureTemplate = null;
 
-        public Reporting(ILogger logger, LapsConfigSection configSection)
+        public Reporting(ILogger logger, ILapsConfig configSection)
         {
             this.logger = logger;
             this.configSection = configSection;
@@ -198,9 +198,9 @@ namespace Lithnet.Laps.Web.Audit
                 usersToNotify = usersToNotify.Union(authorizationResponse.UsersToNotify);
             }
 
-            if (configSection.Configuration?.Audit?.UsersToNotify != null)
+            if (configSection.Audit?.UsersToNotify != null)
             {
-                usersToNotify = usersToNotify.Union(configSection.Configuration.Audit.UsersToNotify);
+                usersToNotify = usersToNotify.Union(configSection.Audit.UsersToNotify);
             }
 
             if (!string.IsNullOrWhiteSpace(user?.EmailAddress))

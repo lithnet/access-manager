@@ -268,6 +268,7 @@
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
     <Compile Include="Audit\IReporting.cs" />
+    <Compile Include="Models\ILapsConfig.cs" />
     <Compile Include="Security\Authentication\AuthenticationService.cs" />
     <Compile Include="Security\Authentication\IAuthenticationService.cs" />
     <Compile Include="Security\Authorization\ConfigurationFileAuthorizationService.cs" />
@@ -440,6 +441,7 @@
     <Content Include="Views\Home\LogOut.cshtml" />
     <None Include="Web.Dev.config">
       <DependentUpon>Web.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>

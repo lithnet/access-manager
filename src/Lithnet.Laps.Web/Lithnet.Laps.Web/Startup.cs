@@ -9,6 +9,7 @@ using System.Web.Helpers;
 using IdentityModel.Client;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.Audit;
+using Lithnet.Laps.Web.Models;
 using Microsoft.Ajax.Utilities;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -77,6 +78,9 @@ namespace Lithnet.Laps.Web
         public Startup()
         {
             var container = UnityConfig.Container;
+
+            container.RegisterInstance<ILapsConfig>(
+               (LapsConfigSection)ConfigurationManager.GetSection(LapsConfigSection.SectionName));
 
             reporting = (Reporting) container.Resolve(typeof(Reporting), String.Empty);
             // It seems I can't get a logger directly from the container; the following doesn't work:

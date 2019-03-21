@@ -7,11 +7,11 @@ namespace Lithnet.Laps.Web.Security.Authorization
 {
     public sealed class ConfigurationFileAuthorizationService : IAuthorizationService
     {
-        private readonly LapsConfigSection configSection;
+        private readonly ILapsConfig configSection;
         private readonly ILogger logger;
         private readonly IDirectory directory;
 
-        public ConfigurationFileAuthorizationService(LapsConfigSection configSection, ILogger logger,
+        public ConfigurationFileAuthorizationService(ILapsConfig configSection, ILogger logger,
             IDirectory directory)
         {
             this.configSection = configSection;
@@ -43,7 +43,7 @@ namespace Lithnet.Laps.Web.Security.Authorization
 
         private IEnumerable<ReaderElement> GetReadersForTarget(ITarget target)
         {
-            var targetElementCollection = configSection.Configuration.Targets;
+            var targetElementCollection = configSection.Targets;
             
             var query = from targetElement in targetElementCollection.OfType<TargetElement>()
                 where targetElement.Name == target.TargetName

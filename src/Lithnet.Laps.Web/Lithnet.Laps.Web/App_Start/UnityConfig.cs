@@ -1,9 +1,6 @@
-using Lithnet.Laps.Web.Security.Authorization;
 using Microsoft.Practices.Unity.Configuration;
 using System;
-
 using Unity;
-using Unity.Configuration;
 using Unity.NLog;
 
 namespace Lithnet.Laps.Web
