@@ -1,12 +1,12 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using System;
 
 namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile.Tests
 {
-    [TestClass()]
+    [TestFixture()]
     public class AuthorizationResponseTests
     {
-        [TestMethod()]
+        [Test()]
         public void UsersToNotifyOfAuthorizationResponseShouldNotBeNull()
         {
             // I would love to use Nullable References, but I think this is not possible for Asp.Net?

@@ -1,17 +1,16 @@
-﻿using System;
-using Lithnet.Laps.Web;
+﻿using NUnit.Framework;
+using System;
 using Lithnet.Laps.Web.Audit;
-using Lithnet.Laps.Web.Security.Authorization.ConfigurationFile;
-using Lithnet.Laps.Web.Controllers;
 using Lithnet.Laps.Web.Models;
 using Lithnet.Laps.Web.Security.Authentication;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Lithnet.Laps.Web.Security.Authorization;
+using Lithnet.Laps.Web.Security.Authorization.ConfigurationFile;
 using Moq;
 using NLog;
 
-namespace Lithnet.Laps.WebTests.Controllers
+namespace Lithnet.Laps.Web.Controllers.Tests
 {
-    [TestClass()]
+    [TestFixture()]
     public class LapControllerTests
     {
         private Mock<ILogger> dummyLogger;
@@ -20,7 +19,7 @@ namespace Lithnet.Laps.WebTests.Controllers
         private Mock<ITarget> dummyTarget;
         private Mock<IUser> dummyUser;
 
-        [TestInitialize]
+        [SetUp()]
         public void TestInitialize()
         {
             dummyLogger = new Mock<ILogger>();
@@ -30,7 +29,7 @@ namespace Lithnet.Laps.WebTests.Controllers
             dummyUser = new Mock<IUser>();
         }
 
-        [TestMethod()]
+        [Test()]
         public void GetPassesTargetToReportingWhenAuthorizationFails()
         {
             var authenticationServiceStub = new Mock<IAuthenticationService>();
@@ -58,11 +57,11 @@ namespace Lithnet.Laps.WebTests.Controllers
                 dummyDirectory.Object,
                 reportingMock.Object,
                 dummyRateLimiter.Object,
-                availableTargetsStub.Object, 
+                availableTargetsStub.Object,
                 authenticationServiceStub.Object
             );
 
-            controller.Get(new LapRequestModel {ComputerName = @"Computer"});
+            controller.Get(new LapRequestModel { ComputerName = @"Computer" });
 
             reportingMock
                 .Verify(svc => svc.PerformAuditFailureActions(

@@ -8,6 +8,7 @@ using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.Mail;
 using Lithnet.Laps.Web.Security.Authorization.ConfigurationFile;
 using Lithnet.Laps.Web.Models;
+using Lithnet.Laps.Web.Security.Authorization;
 using NLog;
 
 namespace Lithnet.Laps.Web.Audit
