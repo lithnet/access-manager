@@ -269,6 +269,8 @@
     <Compile Include="App_Start\UnityMvcActivator.cs" />
     <Compile Include="Audit\IReporting.cs" />
     <Compile Include="ConfigSection\IReaderElement.cs" />
+    <Compile Include="Mail\IMailer.cs" />
+    <Compile Include="Mail\SmtpMailer.cs" />
     <Compile Include="Models\ILapsConfig.cs" />
     <Compile Include="Security\Authentication\AuthenticationService.cs" />
     <Compile Include="Security\Authentication\IAuthenticationService.cs" />
@@ -475,7 +477,6 @@
       <LastGenOutput>UIMessages.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

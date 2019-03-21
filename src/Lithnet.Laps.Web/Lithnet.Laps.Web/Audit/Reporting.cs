@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Net.Mail;
 using System.Web;
 using Lithnet.Laps.Web.App_LocalResources;
+using Lithnet.Laps.Web.Mail;
 using Lithnet.Laps.Web.Security.Authorization.ConfigurationFile;
 using Lithnet.Laps.Web.Models;
 using NLog;
@@ -15,16 +16,18 @@ namespace Lithnet.Laps.Web.Audit
     {
         private readonly ILogger logger;
         private readonly ILapsConfig configSection;
+        private readonly IMailer mailer;
 
         private static string _logSuccessTemplate = null;
         private static string _logFailureTemplate = null;
         private static string _emailSuccessTemplate = null;
         private static string _emailFailureTemplate = null;
 
-        public Reporting(ILogger logger, ILapsConfig configSection)
+        public Reporting(ILogger logger, ILapsConfig configSection, IMailer mailer)
         {
             this.logger = logger;
             this.configSection = configSection;
+            this.mailer = mailer;
 
             MakeSureStaticTemplatesAreLoaded();
         }
@@ -71,7 +74,7 @@ namespace Lithnet.Laps.Web.Audit
                 if (recipients.Count > 0)
                 {
                     string subject = ReplaceTokens(tokens, LogMessages.AuditEmailSubjectSuccess, false);
-                    SendEmail(recipients, subject, ReplaceTokens(tokens, emailSuccessMessage, true));
+                    mailer.SendEmail(recipients, subject, ReplaceTokens(tokens, emailSuccessMessage, true));
                 }
             }
             catch (Exception iex)
@@ -95,7 +98,7 @@ namespace Lithnet.Laps.Web.Audit
                 if (recipients.Count > 0)
                 {
                     string subject = ReplaceTokens(tokens, LogMessages.AuditEmailSubjectFailure, false);
-                    SendEmail(recipients, subject, ReplaceTokens(tokens, emailFailureMessage, true));
+                    mailer.SendEmail(recipients, subject, ReplaceTokens(tokens, emailFailureMessage, true));
                 }
             }
             catch (Exception iex)
@@ -156,37 +159,7 @@ namespace Lithnet.Laps.Web.Audit
             return text;
         }
 
-        private void SendEmail(IEnumerable<string> recipients, string subject, string body)
-        {
-            if (!IsSmtpConfigured())
-            {
-                logger.Trace("SMTP is not configured, discarding mail message");
-                return;
-            }
 
-            using (SmtpClient client = new SmtpClient())
-            {
-                using (MailMessage message = new MailMessage())
-                {
-                    foreach (string recipient in recipients)
-                    {
-                        message.To.Add(recipient);
-                    }
-
-                    if (message.To.Count == 0)
-                    {
-                        logger.Trace($"Not sending notification email because there are no recipients");
-                        return;
-                    }
-
-                    message.IsBodyHtml = true;
-                    message.Subject = subject;
-                    message.Body = body;
-
-                    client.Send(message);
-                }
-            }
-        }
 
         private IImmutableSet<string> BuildRecipientList(ITarget target, AuthorizationResponse authorizationResponse, bool success, IUser user = null)
         {
@@ -225,11 +198,6 @@ namespace Lithnet.Laps.Web.Audit
                 LogErrorEvent(EventIDs.ErrorLoadingTemplateResource, $"Could not load template {templateName}", ex);
                 return null;
             }
-        }
-
-        private bool IsSmtpConfigured()
-        {
-            return !string.IsNullOrWhiteSpace(new SmtpClient().Host);
         }
     }
 }
