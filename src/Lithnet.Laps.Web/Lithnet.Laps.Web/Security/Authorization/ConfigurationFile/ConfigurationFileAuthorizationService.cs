@@ -1,22 +1,20 @@
-﻿using System.Collections.Generic;
-using NLog;
-using System.Linq;
+﻿using NLog;
 using Lithnet.Laps.Web.Models;
 
-namespace Lithnet.Laps.Web.Security.Authorization
+namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile
 {
     public sealed class ConfigurationFileAuthorizationService : IAuthorizationService
     {
-        private readonly ILapsConfig configSection;
         private readonly ILogger logger;
         private readonly IDirectory directory;
+        private readonly IAvailableReaders availableReaders;
 
-        public ConfigurationFileAuthorizationService(ILapsConfig configSection, ILogger logger,
-            IDirectory directory)
+        public ConfigurationFileAuthorizationService(ILogger logger,
+            IDirectory directory, IAvailableReaders availableReaders)
         {
-            this.configSection = configSection;
             this.logger = logger;
             this.directory = directory;
+            this.availableReaders = availableReaders;
         }
 
         public AuthorizationResponse CanAccessPassword(IUser user, IComputer computer, ITarget target)
@@ -26,40 +24,22 @@ namespace Lithnet.Laps.Web.Security.Authorization
                 return AuthorizationResponse.NoTarget();
             }
 
-            var readers = GetReadersForTarget(target);
+            var readers = availableReaders.GetReadersForTarget(target);
 
-            foreach (ReaderElement reader in readers)
+            foreach (var reader in readers)
             {
                 if (this.IsReaderAuthorized(reader, user))
                 {
                     logger.Trace($"User {user.SamAccountName} matches reader principal {reader.Principal} is authorized to read passwords from target {target.TargetName}");
 
-                    return AuthorizationResponse.Authorized(reader.Audit.UsersToNotify, reader.Principal);
+                    return AuthorizationResponse.Authorized(reader.Audit?.UsersToNotify, reader.Principal);
                 }
             }
 
             return AuthorizationResponse.NoReader();
         }
 
-        private IEnumerable<ReaderElement> GetReadersForTarget(ITarget target)
-        {
-            var targetElementCollection = configSection.Targets;
-            
-            var query = from targetElement in targetElementCollection.OfType<TargetElement>()
-                where targetElement.Name == target.TargetName
-                select targetElement.Readers;
-
-            var readerCollection = query.FirstOrDefault();
-
-            if (readerCollection == null)
-            {
-                return new ReaderElement[0];
-            }
-
-            return readerCollection.OfType<ReaderElement>();
-        }
-
-        private bool IsReaderAuthorized(ReaderElement reader, IUser user)
+        private bool IsReaderAuthorized(IReaderElement reader, IUser user)
         {
             var readerAsUser = directory.GetUser(reader.Principal);
 

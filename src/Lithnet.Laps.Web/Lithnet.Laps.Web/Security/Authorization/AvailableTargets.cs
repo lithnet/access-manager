@@ -4,7 +4,7 @@ using System.Linq;
 using Lithnet.Laps.Web.Models;
 using NLog;
 
-namespace Lithnet.Laps.Web.Security.Authorization
+namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile
 {
     public class AvailableTargets: IAvailableTargets
     {

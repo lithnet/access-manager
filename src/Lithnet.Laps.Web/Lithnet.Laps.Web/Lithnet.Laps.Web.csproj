@@ -268,10 +268,13 @@
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
     <Compile Include="Audit\IReporting.cs" />
+    <Compile Include="ConfigSection\IReaderElement.cs" />
     <Compile Include="Models\ILapsConfig.cs" />
     <Compile Include="Security\Authentication\AuthenticationService.cs" />
     <Compile Include="Security\Authentication\IAuthenticationService.cs" />
-    <Compile Include="Security\Authorization\ConfigurationFileAuthorizationService.cs" />
+    <Compile Include="Security\Authorization\ConfigurationFile\AvailableReaders.cs" />
+    <Compile Include="Security\Authorization\ConfigurationFile\ConfigurationFileAuthorizationService.cs" />
+    <Compile Include="Security\Authorization\ConfigurationFile\IAvailableReaders.cs" />
     <Compile Include="Security\Authorization\IAuthorizationService.cs" />
     <Compile Include="ActiveDirectory\ComputerAdapter.cs" />
     <Compile Include="ConfigSection\AuditElement.cs" />

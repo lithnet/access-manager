@@ -1,5 +1,5 @@
 ﻿using System;
-using Lithnet.Laps.Web.Security.Authorization;
+using Lithnet.Laps.Web.Security.Authorization.ConfigurationFile;
 using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web.Audit

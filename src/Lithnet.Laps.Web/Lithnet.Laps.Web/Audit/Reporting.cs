@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Net.Mail;
 using System.Web;
 using Lithnet.Laps.Web.App_LocalResources;
-using Lithnet.Laps.Web.Security.Authorization;
+using Lithnet.Laps.Web.Security.Authorization.ConfigurationFile;
 using Lithnet.Laps.Web.Models;
 using NLog;
 

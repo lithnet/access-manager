@@ -6,7 +6,7 @@ using System.Web;
 
 namespace Lithnet.Laps.Web
 {
-    public class ReaderElement : ConfigurationElement
+    public class ReaderElement : ConfigurationElement, IReaderElement
     {
         private const string PropAudit = "audit";
         private const string PropPrincipal = "principal";

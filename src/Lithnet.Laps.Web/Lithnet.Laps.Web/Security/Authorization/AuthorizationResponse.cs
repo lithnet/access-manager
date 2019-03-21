@@ -2,7 +2,7 @@
 using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Models;
 
-namespace Lithnet.Laps.Web.Security.Authorization
+namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile
 {
     public sealed class AuthorizationResponse
     {
