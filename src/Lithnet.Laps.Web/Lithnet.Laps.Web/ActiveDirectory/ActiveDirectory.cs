@@ -14,16 +14,6 @@ namespace Lithnet.Laps.Web.ActiveDirectory
         public const string AttrMsMcsAdmPwd = "ms-Mcs-AdmPwd";
         public const string AttrMsMcsAdmPwdExpirationTime = "ms-Mcs-AdmPwdExpirationTime";
 
-        internal bool IsPrincipalInOu(Principal p, string ou)
-        {
-            DirectorySearcher d = new DirectorySearcher();
-            d.SearchRoot = new DirectoryEntry($"LDAP://{ou}");
-            d.SearchScope = SearchScope.Subtree;
-            d.Filter = $"objectGuid={ToOctetString(p.Guid)}";
-
-            return d.FindOne() != null;
-        }
-
         internal ComputerPrincipal GetComputerPrincipal(string name)
         {
             PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
@@ -34,40 +24,6 @@ namespace Lithnet.Laps.Web.ActiveDirectory
         {
             PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
             return GroupPrincipal.FindByIdentity(ctx, name);
-        }
-
-        internal Principal GetPrincipal(string name)
-        {
-            PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
-            return Principal.FindByIdentity(ctx, name);
-        }
-
-        internal Principal GetPrincipal(IdentityType type, string name)
-        {
-            PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
-            return Principal.FindByIdentity(ctx, type, name);
-        }
-
-        internal bool IsPrincipalInGroup(Principal p, GroupPrincipal group)
-        {
-            if (group?.Sid == null || group.Sid.BinaryLength == 0)
-            {
-                return false;
-            }
-
-            byte[] groupSid = new byte[group.Sid.BinaryLength];
-            group.Sid.GetBinaryForm(groupSid, 0);
-            return IsPrincipalInGroup(p, groupSid);
-        }
-
-        private bool IsPrincipalInGroup(Principal p, byte[] groupSid)
-        {
-            return IsPrincipalInGroup(p.DistinguishedName, groupSid);
-        }
-
-        internal SearchResult GetDirectoryEntry(Principal p, params string[] propertiesToLoad)
-        {
-            return GetDirectoryEntry(p.DistinguishedName, propertiesToLoad);
         }
 
         internal SearchResult GetDirectoryEntry(string dn, params string[] propertiesToLoad)
@@ -94,14 +50,14 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             return $"\\{string.Join("\\", guid.Value.ToByteArray().Select(t => t.ToString("X2")))}";
         }
 
-        IComputer IDirectory.GetComputer(string computerName)
+        public IComputer GetComputer(string computerName)
         {
             var principal = GetComputerPrincipal(computerName);
 
             return principal == null ? null : new ComputerAdapter(principal);
         }
 
-        Password IDirectory.GetPassword(IComputer computer)
+        public Password GetPassword(IComputer computer)
         {
             SearchResult searchResult = GetDirectoryEntry(computer.DistinguishedName, ActiveDirectory.AttrSamAccountName, ActiveDirectory.AttrMsMcsAdmPwd, ActiveDirectory.AttrMsMcsAdmPwdExpirationTime);
 
@@ -116,14 +72,14 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             );
         }
 
-        void IDirectory.SetPasswordExpiryTime(IComputer computer, DateTime time)
+        public void SetPasswordExpiryTime(IComputer computer, DateTime time)
         {
             var entry = new DirectoryEntry($"LDAP://{computer.DistinguishedName}");
             entry.Properties[ActiveDirectory.AttrMsMcsAdmPwdExpirationTime].Value = time.ToFileTimeUtc().ToString();
             entry.CommitChanges();
         }
 
-        bool IDirectory.IsComputerInOu(IComputer computer, string ou)
+        public bool IsComputerInOu(IComputer computer, string ou)
         {
             DirectorySearcher d = new DirectorySearcher();
             d.SearchRoot = new DirectoryEntry($"LDAP://{ou}");
@@ -133,19 +89,19 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             return d.FindOne() != null;
         }
 
-        IGroup IDirectory.GetGroup(string groupName)
+        public IGroup GetGroup(string groupName)
         {
             var principal = GetGroupPrincipal(groupName);
 
             return principal == null ? null : new GroupAdapter(principal);
         }
 
-        bool IDirectory.IsComputerInGroup(IComputer computer, IGroup group)
+        public bool IsComputerInGroup(IComputer computer, IGroup group)
         {
             return IsPrincipalInGroup(computer.DistinguishedName, group.Sid);
         }
 
-        bool IDirectory.IsUserInGroup(IUser user, IGroup group)
+        public bool IsUserInGroup(IUser user, IGroup group)
         {
             return IsPrincipalInGroup(user.DistinguishedName, group.Sid);
         }
