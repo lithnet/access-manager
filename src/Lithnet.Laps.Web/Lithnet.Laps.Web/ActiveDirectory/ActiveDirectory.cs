@@ -149,6 +149,13 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             return IsPrincipalInGroup(user.DistinguishedName, group.Sid);
         }
 
+        public IUser GetUser(string userName)
+        {
+            var user = GetUserPrincipal(userName);
+
+            return user == null ? null : new UserAdapter(user);
+        }
+
         private bool IsPrincipalInGroup(string distinguishedName, byte[] groupSid)
         {
             SearchResult result = GetDirectoryEntry(distinguishedName, "tokenGroups");
@@ -180,6 +187,12 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             groupSecurityIdentifier.GetBinaryForm(groupSid, 0);
 
             return IsPrincipalInGroup(distinguishedName, groupSid);
+        }
+
+        internal UserPrincipal GetUserPrincipal(string name)
+        {
+            PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
+            return UserPrincipal.FindByIdentity(ctx, name);
         }
     }
 }

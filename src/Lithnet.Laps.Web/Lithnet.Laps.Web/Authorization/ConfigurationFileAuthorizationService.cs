@@ -66,15 +66,16 @@ namespace Lithnet.Laps.Web.Authorization
 
         private bool IsReaderAuthorized(ReaderElement reader, IUser user)
         {
-            // TODO: Is this correct? Does it distinguish e.g. local users and domain users?
-            if (reader.Principal == user.SamAccountName)
+            var readerAsUser = directory.GetUser(reader.Principal);
+
+            if (readerAsUser != null && readerAsUser.DistinguishedName == user.DistinguishedName)
             {
                 return true;
             }
 
-            var group = directory.GetGroup(reader.Principal);
+            var readerAsGroup = directory.GetGroup(reader.Principal);
 
-            return group != null && directory.IsUserInGroup(user, group);
+            return readerAsGroup != null && directory.IsUserInGroup(user, readerAsGroup);
         }
     }
 }
