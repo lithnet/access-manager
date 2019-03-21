@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using NLog;
 using System.Linq;
-using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web.Authorization
@@ -11,21 +10,17 @@ namespace Lithnet.Laps.Web.Authorization
         private readonly LapsConfigSection configSection;
         private readonly ILogger logger;
         private readonly IDirectory directory;
-        private readonly IAvailableTargets availableTargets;
 
         public ConfigurationFileAuthorizationService(LapsConfigSection configSection, ILogger logger,
-            IDirectory directory, IAvailableTargets availableTargets)
+            IDirectory directory)
         {
             this.configSection = configSection;
             this.logger = logger;
             this.directory = directory;
-            this.availableTargets = availableTargets;
         }
 
-        public AuthorizationResponse CanAccessPassword(IUser user, IComputer computer)
+        public AuthorizationResponse CanAccessPassword(IUser user, IComputer computer, ITarget target)
         {
-            var target = availableTargets.GetMatchingTargetOrNull(computer);
-
             if (target == null)
             {
                 return AuthorizationResponse.NoTarget();

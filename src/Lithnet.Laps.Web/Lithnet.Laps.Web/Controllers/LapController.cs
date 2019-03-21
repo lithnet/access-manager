@@ -96,7 +96,7 @@ namespace Lithnet.Laps.Web.Controllers
 
                 // Do authorization check first.
 
-                var authResponse = authorizationService.CanAccessPassword(new UserAdapter(user), computer);
+                var authResponse = authorizationService.CanAccessPassword(new UserAdapter(user), computer, target);
 
                 if (!authResponse.IsAuthorized)
                 {
