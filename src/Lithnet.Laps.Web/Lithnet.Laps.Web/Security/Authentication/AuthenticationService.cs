@@ -1,7 +1,5 @@
-﻿using System;
-using System.DirectoryServices.AccountManagement;
+﻿using System.DirectoryServices.AccountManagement;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Web;
 using Lithnet.Laps.Web.ActiveDirectory;
 using Lithnet.Laps.Web.App_LocalResources;

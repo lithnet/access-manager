@@ -10,7 +10,6 @@ using IdentityModel.Client;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Models;
-using Microsoft.Ajax.Utilities;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -23,7 +22,6 @@ using Microsoft.Owin.Security.WsFederation;
 using NLog;
 using Owin;
 using Unity;
-using Unity.NLog;
 
 namespace Lithnet.Laps.Web
 {

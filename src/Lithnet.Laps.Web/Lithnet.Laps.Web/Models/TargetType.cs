@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Web;
-
-namespace Lithnet.Laps.Web.Models
+﻿namespace Lithnet.Laps.Web.Models
 {
     public enum TargetType
     {
