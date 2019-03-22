@@ -14,33 +14,44 @@ namespace Lithnet.Laps.Web.Controllers.Tests
     public class LapControllerTests
     {
         private Mock<ILogger> dummyLogger;
-        private Mock<IDirectory> dummyDirectory;
+        private Mock<IComputer> dummyComputer;
         private Mock<IRateLimiter> dummyRateLimiter;
         private Mock<ITarget> dummyTarget;
         private Mock<IUser> dummyUser;
+        private Mock<IAuthorizationService> dummyAuthorizationService;
+        private Mock<IAvailableTargets> dummyAvailableTargets;
+
+        private Mock<IAuthenticationService> authenticationServiceStub;
 
         [SetUp()]
         public void TestInitialize()
         {
             dummyLogger = new Mock<ILogger>();
-            dummyDirectory = new Mock<IDirectory>();
+            dummyComputer = new Mock<IComputer>();
             dummyRateLimiter = new Mock<IRateLimiter>();
             dummyTarget = new Mock<ITarget>();
             dummyUser = new Mock<IUser>();
+            dummyAuthorizationService = new Mock<IAuthorizationService>();
+            dummyAvailableTargets = new Mock<IAvailableTargets>();
+
+            // Stub that always authenticates
+            authenticationServiceStub = new Mock<IAuthenticationService>();
+            authenticationServiceStub
+                .Setup(svc => svc.GetLoggedInUser())
+                .Returns(dummyUser.Object);
         }
 
         [Test()]
         public void GetPassesTargetToReportingWhenAuthorizationFails()
         {
-            var authenticationServiceStub = new Mock<IAuthenticationService>();
+            var directoryStub = new Mock<IDirectory>();
             var authorizationServiceStub = new Mock<IAuthorizationService>();
             var availableTargetsStub = new Mock<IAvailableTargets>();
 
             var reportingMock = new Mock<IReporting>();
 
-            authenticationServiceStub
-                .Setup(svc => svc.GetLoggedInUser())
-                .Returns(dummyUser.Object);
+            directoryStub.Setup(d => d.GetComputer(It.IsAny<string>()))
+                .Returns(dummyComputer.Object);
 
             authorizationServiceStub
                 .Setup(svc => svc.CanAccessPassword(It.IsAny<IUser>(), It.IsAny<IComputer>(), It.IsAny<ITarget>()))
@@ -54,7 +65,7 @@ namespace Lithnet.Laps.Web.Controllers.Tests
             var controller = new LapController(
                 authorizationServiceStub.Object,
                 dummyLogger.Object,
-                dummyDirectory.Object,
+                directoryStub.Object,
                 reportingMock.Object,
                 dummyRateLimiter.Object,
                 availableTargetsStub.Object,
@@ -74,6 +85,36 @@ namespace Lithnet.Laps.Web.Controllers.Tests
                     It.IsAny<AuthorizationResponse>(),
                     It.IsAny<IUser>(),
                     It.IsAny<IComputer>()));
+        }
+
+        [Test()]
+        public void GetLogsErrorWhenComputerNotFound()
+        {
+            var directoryStub = new Mock<IDirectory>();
+            var reportingMock = new Mock<IReporting>();
+
+            // Computer not found.
+            directoryStub.Setup(d => d.GetComputer(It.IsAny<string>()))
+                .Returns((IComputer)null);
+
+            var controller = new LapController(
+                dummyAuthorizationService.Object,
+                dummyLogger.Object,
+                directoryStub.Object,
+                reportingMock.Object,
+                dummyRateLimiter.Object,
+                dummyAvailableTargets.Object,
+                authenticationServiceStub.Object
+            );
+
+            controller.Get(new LapRequestModel { ComputerName = @"Computer" });
+
+            reportingMock
+                .Verify(svc => svc.LogErrorEvent(
+                    It.Is<int>(i => i == EventIDs.ComputerNotFound),
+                    It.IsAny<string>(),
+                    It.IsAny<Exception>()
+                ));
         }
     }
 }

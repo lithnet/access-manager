@@ -80,6 +80,11 @@ namespace Lithnet.Laps.Web.Controllers
 
                 var computer = directory.GetComputer(model.ComputerName);
 
+                if (computer == null)
+                {
+                    return this.LogAndReturnErrorResponse(model, UIMessages.ComputerNotFoundInDirectory, EventIDs.ComputerNotFound, string.Format(LogMessages.ComputerNotFoundInDirectory, user.SamAccountName, model.ComputerName));
+                }
+
                 // Is a target configured?
 
                 var target = availableTargets.GetMatchingTargetOrNull(computer);

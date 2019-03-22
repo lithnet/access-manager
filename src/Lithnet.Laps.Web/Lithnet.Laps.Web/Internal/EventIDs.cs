@@ -6,7 +6,7 @@
     /// FIXME: I think EventIDs is a bad name for this class.
     /// Can't we replace this by an enum?
     /// </summary>
-    internal static class EventIDs
+    public static class EventIDs
     {
         public const int PasswordAccessed = 200;
         public const int UserAuthenticated = 201;
