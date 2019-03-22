@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
-using System.Net.Mail;
 using System.Web;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.Mail;
-using Lithnet.Laps.Web.Security.Authorization.ConfigurationFile;
 using Lithnet.Laps.Web.Models;
 using Lithnet.Laps.Web.Security.Authorization;
 using NLog;
@@ -18,27 +16,14 @@ namespace Lithnet.Laps.Web.Audit
         private readonly ILogger logger;
         private readonly ILapsConfig configSection;
         private readonly IMailer mailer;
+        private readonly ITemplates templates;
 
-        private static string _logSuccessTemplate = null;
-        private static string _logFailureTemplate = null;
-        private static string _emailSuccessTemplate = null;
-        private static string _emailFailureTemplate = null;
-
-        public Reporting(ILogger logger, ILapsConfig configSection, IMailer mailer)
+        public Reporting(ILogger logger, ILapsConfig configSection, IMailer mailer, ITemplates templates)
         {
             this.logger = logger;
             this.configSection = configSection;
             this.mailer = mailer;
-
-            MakeSureStaticTemplatesAreLoaded();
-        }
-
-        private void MakeSureStaticTemplatesAreLoaded()
-        {
-            if (_logSuccessTemplate == null) _logSuccessTemplate = LoadTemplate("LogAuditSuccess.txt");
-            if (_logFailureTemplate == null) _logFailureTemplate = LoadTemplate("LogAuditFailure.txt");
-            if (_emailSuccessTemplate == null) _emailSuccessTemplate = LoadTemplate("EmailAuditSuccess.html");
-            if (_emailFailureTemplate == null) _emailFailureTemplate = LoadTemplate("EmailAuditFailure.html");
+            this.templates = templates;
         }
 
         public void LogErrorEvent(int eventID, string logMessage, Exception ex)
@@ -61,8 +46,8 @@ namespace Lithnet.Laps.Web.Audit
         public void PerformAuditSuccessActions(LapRequestModel model, ITarget target, AuthorizationResponse authorizationResponse, IUser user, IComputer computer, Password password)
         {
             Dictionary<string, string> tokens = BuildTokenDictionary(target, authorizationResponse, user, computer, password, model.ComputerName);
-            string logSuccessMessage = _logSuccessTemplate ?? LogMessages.DefaultAuditSuccessText;
-            string emailSuccessMessage = _emailSuccessTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditSuccessText}</pre></body></html>";
+            string logSuccessMessage = templates.LogSuccessTemplate ?? LogMessages.DefaultAuditSuccessText;
+            string emailSuccessMessage = templates.EmailSuccessTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditSuccessText}</pre></body></html>";
 
             LogEventInfo logEvent = new LogEventInfo(LogLevel.Info, logger.Name, ReplaceTokens(tokens, logSuccessMessage, false));
             logEvent.Properties.Add("EventID", EventIDs.PasswordAccessed);
@@ -87,8 +72,8 @@ namespace Lithnet.Laps.Web.Audit
         public void PerformAuditFailureActions(LapRequestModel model, string userMessage, int eventID, string logMessage, Exception ex, ITarget target, AuthorizationResponse authorizationResponse, IUser user, IComputer computer)
         {
             Dictionary<string, string> tokens = BuildTokenDictionary(target, authorizationResponse, user, computer, null, model.ComputerName, logMessage ?? userMessage);
-            string logFailureMessage = _logFailureTemplate ?? LogMessages.DefaultAuditFailureText;
-            string emailFailureMessage = _emailFailureTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditFailureText}</pre></body></html>";
+            string logFailureMessage = templates.LogFailureTemplate ?? LogMessages.DefaultAuditFailureText;
+            string emailFailureMessage = templates.EmailFailureTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditFailureText}</pre></body></html>";
 
             LogErrorEvent(eventID, ReplaceTokens(tokens, logFailureMessage, false), ex);
 
@@ -160,11 +145,8 @@ namespace Lithnet.Laps.Web.Audit
             return text;
         }
 
-
-
         private IImmutableSet<string> BuildRecipientList(ITarget target, AuthorizationResponse authorizationResponse, bool success, IUser user = null)
         {
-            // TODO: Make this testable.
             var usersToNotify = target?.UsersToNotify ?? new UsersToNotify();
 
             if (authorizationResponse != null)
@@ -172,9 +154,9 @@ namespace Lithnet.Laps.Web.Audit
                 usersToNotify = usersToNotify.Union(authorizationResponse.UsersToNotify);
             }
 
-            if (configSection.Audit?.UsersToNotify != null)
+            if (configSection.UsersToNotify != null)
             {
-                usersToNotify = usersToNotify.Union(configSection.Audit.UsersToNotify);
+                usersToNotify = usersToNotify.Union(configSection.UsersToNotify);
             }
 
             if (!string.IsNullOrWhiteSpace(user?.EmailAddress))
@@ -186,19 +168,6 @@ namespace Lithnet.Laps.Web.Audit
             return success ? usersToNotify.OnSuccess : usersToNotify.OnFailure;
         }
 
-        private string LoadTemplate(string templateName)
-        {
-            try
-            {
-                string text = System.IO.File.ReadAllText(System.Web.HttpContext.Current.Server.MapPath($"~\\App_Data\\Templates\\{templateName}"));
 
-                return string.IsNullOrWhiteSpace(text) ? null : text;
-            }
-            catch (Exception ex)
-            {
-                LogErrorEvent(EventIDs.ErrorLoadingTemplateResource, $"Could not load template {templateName}", ex);
-                return null;
-            }
-        }
     }
 }

@@ -72,4 +72,3 @@ namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile.Tests
         }
     }
 }
-}

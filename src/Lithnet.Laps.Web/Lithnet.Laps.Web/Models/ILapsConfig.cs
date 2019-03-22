@@ -1,10 +1,12 @@
-﻿namespace Lithnet.Laps.Web.Models
+﻿using Lithnet.Laps.Web.Audit;
+
+namespace Lithnet.Laps.Web.Models
 {
     public interface ILapsConfig
     {
         TargetCollection Targets { get; }
-        AuditElement Audit { get; }
         RateLimitIPElement RateLimitIP { get; }
         RateLimitUserElement RateLimitUser { get; }
+        UsersToNotify UsersToNotify { get; }
     }
 }

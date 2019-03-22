@@ -101,7 +101,7 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="ActiveDirectory\ActiveDirectoryTests.cs" />
+    <Compile Include="Audit\ReportingTests.cs" />
     <Compile Include="Audit\UsersToNotifyTests.cs" />
     <Compile Include="Controllers\LapControllerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

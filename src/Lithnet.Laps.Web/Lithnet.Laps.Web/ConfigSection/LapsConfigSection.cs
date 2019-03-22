@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web
@@ -24,5 +25,7 @@ namespace Lithnet.Laps.Web
 
         [ConfigurationProperty(PropRateLimitUser, IsRequired = false)]
         public RateLimitUserElement RateLimitUser => (RateLimitUserElement)this[PropRateLimitUser];
+
+        public UsersToNotify UsersToNotify => Audit?.UsersToNotify;
     }
 }
