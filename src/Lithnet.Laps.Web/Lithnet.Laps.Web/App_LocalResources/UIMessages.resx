@@ -148,7 +148,7 @@
     <value>Computer name</value>
   </data>
   <data name="HeadingPasswordDetails" xml:space="preserve">
-    <value>Password userDetails</value>
+    <value>Password details</value>
   </data>
   <data name="HeadingRequestPassword" xml:space="preserve">
     <value>Request password</value>
