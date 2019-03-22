@@ -18,6 +18,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory
         public string DistinguishedName => computerPrincipal.DistinguishedName;
         public string Description => computerPrincipal.Description;
         public string DisplayName => computerPrincipal.DisplayName;
+        public string Name => computerPrincipal.Name;
         public Guid? Guid => computerPrincipal.Guid;
         public SecurityIdentifier Sid => computerPrincipal.Sid;
     }

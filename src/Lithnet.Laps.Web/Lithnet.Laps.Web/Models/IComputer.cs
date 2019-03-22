@@ -9,6 +9,7 @@ namespace Lithnet.Laps.Web.Models
         string DistinguishedName { get; }
         string Description { get; }
         string DisplayName { get; }
+        string Name { get; }
 
         Guid? Guid { get; }
         SecurityIdentifier Sid { get; }
