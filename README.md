@@ -38,12 +38,10 @@ The web app supports traditional integrated windows authentication, as well as e
 ## Download the app
 Download the [current release](https://github.com/lithnet/laps-web/releases/)
 
-## How can I contribute to the project
-Found an issue?
-*   [Log it](https://github.com/lithnet/laps-web/issues)
-
-Want to fix an issue?
-*   Clone the project and submit a pull request
+## How can I contribute to the project?
+* Found an issue and want us to fix it? [Log it](https://github.com/lithnet/laps-web/issues)
+* Want to fix an issue yourself or add functionality? Clone the project and submit a pull request
+* Make a [donation](https://lithnet.io/donate) and help us cover our costs
 
 ## Keep up to date
 *   [Visit my blog](http://blog.lithiumblue.com)
