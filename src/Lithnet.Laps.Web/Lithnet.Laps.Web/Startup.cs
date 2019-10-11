@@ -43,6 +43,7 @@ namespace Lithnet.Laps.Web
         }
 
         internal static bool CanLogout = false;
+
         internal static string ClaimName { get; set; } = "upn";
 
         internal static IdentityType ClaimType { get; set; } = IdentityType.UserPrincipalName;
@@ -62,29 +63,32 @@ namespace Lithnet.Laps.Web
 
         private readonly Reporting reporting;
 
-        public Startup(ILogger logger, Reporting reporting)
+        private readonly IDirectory directory;
+
+        public Startup(ILogger logger, Reporting reporting, IDirectory directory)
         {
             this.logger = logger;
             this.reporting = reporting;
+            this.directory = directory;
         }
 
         /// <summary>
         /// Explicitly get the logger and the reporting from the DI-container.
-        ///
         /// Constructor injection doesn't work for this class.
         /// </summary>
         public Startup()
         {
-            var container = UnityConfig.Container;
+            IUnityContainer container = UnityConfig.Container;
 
             container.RegisterInstance<ILapsConfig>(
                (LapsConfigSection)ConfigurationManager.GetSection(LapsConfigSection.SectionName));
 
-            reporting = (Reporting) container.Resolve(typeof(Reporting), String.Empty);
+            this.reporting = (Reporting) container.Resolve(typeof(Reporting), String.Empty);
+            this.directory = (IDirectory) container.Resolve(typeof(ActiveDirectory.ActiveDirectory), String.Empty);
             // It seems I can't get a logger directly from the container; the following doesn't work:
             // logger = (ILogger)UnityConfig.Container.Resolve(typeof(ILogger), String.Empty);
             // So I hacked around this.
-            logger = ((StartupLoggerWrapper) container.Resolve(typeof(StartupLoggerWrapper), String.Empty)).Logger;
+            this.logger = ((StartupLoggerWrapper) container.Resolve(typeof(StartupLoggerWrapper), String.Empty)).Logger;
         }
 
         public void ConfigureOpenIDConnect(IAppBuilder app)
@@ -161,7 +165,7 @@ namespace Lithnet.Laps.Web
                         }
                         catch (Exception ex)
                         {
-                            reporting.LogErrorEvent(EventIDs.OidcAuthZCodeError, LogMessages.AuthZCodeFlowError, ex);
+                            this.reporting.LogErrorEvent(EventIDs.OidcAuthZCodeError, LogMessages.AuthZCodeFlowError, ex);
                             n.Response.Redirect($"/Home/AuthNError?message={HttpUtility.UrlEncode(ex.Message)}");
                         }
                     },
@@ -169,7 +173,7 @@ namespace Lithnet.Laps.Web
                     {
                         ClaimsIdentity user = n.AuthenticationTicket.Identity;
                         user.AddClaim(new Claim("id_token", n.ProtocolMessage.IdToken));
-                        return FindClaimIdentityInDirectoryOrFail(n);
+                        return this.FindClaimIdentityInDirectoryOrFail(n);
                     },
                     RedirectToIdentityProvider = n =>
                     {
@@ -184,10 +188,10 @@ namespace Lithnet.Laps.Web
                             }
                         }
 
-                        logger.Trace($"Redirecting to IdP for {n.ProtocolMessage.RequestType}");
+                        this.logger.Trace($"Redirecting to IdP for {n.ProtocolMessage.RequestType}");
                         return Task.CompletedTask;
                     },
-                    AuthenticationFailed = HandleAuthNFailed
+                    AuthenticationFailed = this.HandleAuthNFailed
                 },
             });
         }
@@ -196,8 +200,8 @@ namespace Lithnet.Laps.Web
         {
             Startup.CanLogout = false;
             AntiForgeryConfig.UniqueClaimTypeIdentifier = ConfigurationManager.AppSettings["ida:uniqueClaimTypeIdentifier"] ?? ClaimTypes.PrimarySid;
-            ClaimName = ClaimTypes.PrimarySid;
-            ClaimType = IdentityType.Sid;
+            Startup.ClaimName = ClaimTypes.PrimarySid;
+            Startup.ClaimType = IdentityType.Sid;
         }
 
         public void ConfigureWsFederation(IAppBuilder app)
@@ -234,15 +238,15 @@ namespace Lithnet.Laps.Web
                     SignOutWreply = this.signOutWreply ?? new Uri(new Uri(this.realm.Trim('/', '\\')), "Home/LogOut").ToString(),
                     Notifications = new WsFederationAuthenticationNotifications
                     {
-                        SecurityTokenValidated = FindClaimIdentityInDirectoryOrFail,
-                        AuthenticationFailed = HandleAuthNFailed
+                        SecurityTokenValidated = this.FindClaimIdentityInDirectoryOrFail,
+                        AuthenticationFailed = this.HandleAuthNFailed
                     }
                 });
         }
 
         private Task HandleAuthNFailed<TMessage, TOptions>(AuthenticationFailedNotification<TMessage, TOptions> context)
         {
-            reporting.LogErrorEvent(EventIDs.OwinAuthNError, LogMessages.AuthNProviderError, context.Exception);
+            this.reporting.LogErrorEvent(EventIDs.OwinAuthNError, LogMessages.AuthNProviderError, context.Exception);
             context.HandleResponse();
             context.Response.Redirect($"/Home/AuthNError?message={HttpUtility.UrlEncode(context.Exception?.Message ?? "Unknown error")}");
 
@@ -253,12 +257,12 @@ namespace Lithnet.Laps.Web
         {
             ClaimsIdentity user = context.AuthenticationTicket.Identity;
 
-            string sid = user.FindUserPrincipalByClaim(Startup.ClaimType, Startup.ClaimName)?.Sid?.Value;
+            string sid = this.FindUserByClaim(user, Startup.ClaimName)?.Sid?.Value;
 
             if (sid == null)
             {
                 string message = string.Format(LogMessages.UserNotFoundInDirectory, user.ToClaimList());
-                reporting.LogErrorEvent(EventIDs.SsoIdentityNotFound, message, null);
+                this.reporting.LogErrorEvent(EventIDs.SsoIdentityNotFound, message, null);
 
                 context.HandleResponse();
                 context.Response.Redirect($"/Home/AuthNError?message={HttpUtility.UrlEncode(UIMessages.SsoIdentityNotFound)}");
@@ -267,9 +271,21 @@ namespace Lithnet.Laps.Web
 
             user.AddClaim(new Claim(ClaimTypes.PrimarySid, sid));
 
-            reporting.LogSuccessEvent(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, user.ToClaimList()));
+            this.reporting.LogSuccessEvent(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, user.ToClaimList()));
 
             return Task.CompletedTask;
+        }
+
+        private IUser FindUserByClaim(ClaimsIdentity p, string claimName)
+        {
+            Claim c = p.FindFirst(claimName);
+
+            if (c != null)
+            {
+                return this.directory.GetUser(c.Value);
+            }
+
+            return null;
         }
     }
 }

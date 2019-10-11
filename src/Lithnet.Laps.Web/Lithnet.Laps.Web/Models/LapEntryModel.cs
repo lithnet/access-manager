@@ -12,7 +12,7 @@ namespace Lithnet.Laps.Web.Models
         public string Password { get; private set; }
 
         public string HtmlPassword { get; private set; }
-        
+
         public DateTime? ValidUntil { get; private set; }
 
         public string FailureReason { get; private set; }
@@ -20,14 +20,15 @@ namespace Lithnet.Laps.Web.Models
         private LapEntryModel(string computerName, string password, string htmlPassword, DateTime? validUntil,
             string failureReason)
         {
-            ComputerName = computerName;
-            Password = password;
-            HtmlPassword = htmlPassword;
-            ValidUntil = validUntil;
+            this.ComputerName = computerName;
+            this.Password = password;
+            this.HtmlPassword = htmlPassword;
+            this.ValidUntil = validUntil;
+            this.FailureReason = failureReason;
         }
 
         public LapEntryModel(IComputer computer, Password password) : this(computer.SamAccountName, password.Value,
-            BuildHtmlPassword(password.Value), password.ExpirationTime, String.Empty)
+            LapEntryModel.BuildHtmlPassword(password.Value), password.ExpirationTime, String.Empty)
         {
         }
 

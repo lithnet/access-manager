@@ -1,25 +1,31 @@
 ﻿using System;
-using System.DirectoryServices.AccountManagement;
+using System.DirectoryServices;
 using System.Security.Principal;
 using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web.ActiveDirectory
 {
-    public sealed class ComputerAdapter: IComputer
+    public sealed class ComputerAdapter : IComputer
     {
-        private readonly ComputerPrincipal computerPrincipal;
+        internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "description", "displayName", "objectGuid", "objectSid" };
 
-        public ComputerAdapter(ComputerPrincipal computerPrincipal)
+        private readonly SearchResult computer;
+
+        public ComputerAdapter(SearchResult computer)
         {
-            this.computerPrincipal = computerPrincipal;
+            this.computer = computer;
         }
 
-        public string SamAccountName => computerPrincipal.SamAccountName;
-        public string DistinguishedName => computerPrincipal.DistinguishedName;
-        public string Description => computerPrincipal.Description;
-        public string DisplayName => computerPrincipal.DisplayName;
-        public string Name => computerPrincipal.Name;
-        public Guid? Guid => computerPrincipal.Guid;
-        public SecurityIdentifier Sid => computerPrincipal.Sid;
+        public string SamAccountName => this.computer.GetPropertyString("samAccountName");
+
+        public string DistinguishedName => this.computer.GetPropertyString("distinguishedName");
+
+        public string Description => this.computer.GetPropertyString("description");
+
+        public string DisplayName => this.computer.GetPropertyString("displayName");
+
+        public Guid? Guid => this.computer.GetPropertyGuid("objectGuid");
+
+        public SecurityIdentifier Sid => this.computer.GetPropertySid("objectSid");
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.DirectoryServices.AccountManagement;
+using System.DirectoryServices;
 using System.Security.Principal;
 using Lithnet.Laps.Web.Models;
 
@@ -7,15 +7,17 @@ namespace Lithnet.Laps.Web.Directory
 {
     public sealed class GroupAdapter: IGroup
     {
-        private GroupPrincipal groupPrincipal;
+        private SearchResult groupPrincipal;
 
-        public GroupAdapter(GroupPrincipal groupPrincipal)
+        internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "tokenGroups", "displayName", "objectGuid", "objectSid" };
+
+        public GroupAdapter(SearchResult groupPrincipal)
         {
             this.groupPrincipal = groupPrincipal;
         }
 
-        public Guid? Guid => groupPrincipal.Guid;
+        public Guid? Guid => this.groupPrincipal.GetPropertyGuid("objectGuid");
 
-        public SecurityIdentifier Sid => groupPrincipal.Sid;
+        public SecurityIdentifier Sid => this.groupPrincipal.GetPropertySid("objectSid");
     }
 }

@@ -20,9 +20,9 @@ namespace Lithnet.Laps.Web.Mail
 
         public void SendEmail(IEnumerable<string> recipients, string subject, string body)
         {
-            if (!IsSmtpConfigured())
+            if (!this.IsSmtpConfigured())
             {
-                logger.Trace("SMTP is not configured, discarding mail message");
+                this.logger.Trace("SMTP is not configured, discarding mail message");
                 return;
             }
 
@@ -37,7 +37,7 @@ namespace Lithnet.Laps.Web.Mail
 
                     if (message.To.Count == 0)
                     {
-                        logger.Trace($"Not sending notification email because there are no recipients");
+                        this.logger.Trace($"Not sending notification email because there are no recipients");
                         return;
                     }
 

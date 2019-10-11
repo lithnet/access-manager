@@ -6,33 +6,34 @@ namespace Lithnet.Laps.Web
     public class AuditElement : ConfigurationElement
     {
         private const string PropNotifySuccess = "emailOnSuccess";
+
         private const string PropNotifyFailure = "emailOnFailure";
 
         private const string PropEmailAddresses = "emailAddresses";
 
-        [ConfigurationProperty(PropNotifySuccess, IsRequired = false, DefaultValue = true)]
-        public bool NotifySuccess => (bool) this[PropNotifySuccess];
+        [ConfigurationProperty(AuditElement.PropNotifySuccess, IsRequired = false, DefaultValue = true)]
+        public bool NotifySuccess => (bool) this[AuditElement.PropNotifySuccess];
 
-        [ConfigurationProperty(PropNotifyFailure, IsRequired = false, DefaultValue = true)]
-        public bool NotifyFailure => (bool)this[PropNotifyFailure];
+        [ConfigurationProperty(AuditElement.PropNotifyFailure, IsRequired = false, DefaultValue = true)]
+        public bool NotifyFailure => (bool)this[AuditElement.PropNotifyFailure];
  
-        [ConfigurationProperty(PropEmailAddresses, IsRequired = false)]
-        public string EmailAddresses => (string) this[PropEmailAddresses];
+        [ConfigurationProperty(AuditElement.PropEmailAddresses, IsRequired = false)]
+        public string EmailAddresses => (string) this[AuditElement.PropEmailAddresses];
 
         public UsersToNotify UsersToNotify
         {
             get
             {
-                var result = new UsersToNotify();
+                UsersToNotify result = new UsersToNotify();
 
-                if (NotifySuccess)
+                if (this.NotifySuccess)
                 {
-                    result = result.NotifyOnSuccess(EmailAddresses);
+                    result = result.NotifyOnSuccess(this.EmailAddresses);
                 }
 
-                if (NotifyFailure)
+                if (this.NotifyFailure)
                 {
-                    result = result.NotifyOnFailure(EmailAddresses);
+                    result = result.NotifyOnFailure(this.EmailAddresses);
                 }
 
                 return result;

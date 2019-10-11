@@ -1,65 +1,31 @@
 ﻿using System;
 using System.DirectoryServices;
-using System.DirectoryServices.AccountManagement;
+using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.Principal;
+using System.Text;
 using Lithnet.Laps.Web.Directory;
 using Lithnet.Laps.Web.Models;
+using Lithnet.Laps.Web.ActiveDirectory.Interop;
 
 namespace Lithnet.Laps.Web.ActiveDirectory
 {
-    public sealed class ActiveDirectory: IDirectory
+    public sealed class ActiveDirectory : IDirectory
     {
-        public const string AttrSamAccountName = "samAccountName";
-        public const string AttrMsMcsAdmPwd = "ms-Mcs-AdmPwd";
-        public const string AttrMsMcsAdmPwdExpirationTime = "ms-Mcs-AdmPwdExpirationTime";
+        private const string AttrMsMcsAdmPwd = "ms-Mcs-AdmPwd";
 
-        internal ComputerPrincipal GetComputerPrincipal(string name)
-        {
-            PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
-            return ComputerPrincipal.FindByIdentity(ctx, name);
-        }
-
-        internal GroupPrincipal GetGroupPrincipal(string name)
-        {
-            PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
-            return GroupPrincipal.FindByIdentity(ctx, name);
-        }
-
-        internal SearchResult GetDirectoryEntry(string dn, params string[] propertiesToLoad)
-        {
-            DirectorySearcher d = new DirectorySearcher();
-            d.SearchRoot = new DirectoryEntry($"LDAP://{dn}");
-            d.SearchScope = SearchScope.Base;
-            d.Filter = $"objectClass=*";
-            foreach (string prop in propertiesToLoad)
-            {
-                d.PropertiesToLoad.Add(prop);
-            }
-
-            return d.FindOne();
-        }
-
-        internal string ToOctetString(Guid? guid)
-        {
-            if (!guid.HasValue)
-            {
-                return null;
-            }
-
-            return $"\\{string.Join("\\", guid.Value.ToByteArray().Select(t => t.ToString("X2")))}";
-        }
+        private const string AttrMsMcsAdmPwdExpirationTime = "ms-Mcs-AdmPwdExpirationTime";
 
         public IComputer GetComputer(string computerName)
         {
-            var principal = GetComputerPrincipal(computerName);
+            SearchResult result = this.DoGcLookup(computerName, "computer", ComputerAdapter.PropertiesToGet);
 
-            return principal == null ? null : new ComputerAdapter(principal);
+            return result == null ? null : new ComputerAdapter(result);
         }
 
         public Password GetPassword(IComputer computer)
         {
-            SearchResult searchResult = GetDirectoryEntry(computer.DistinguishedName, ActiveDirectory.AttrSamAccountName, ActiveDirectory.AttrMsMcsAdmPwd, ActiveDirectory.AttrMsMcsAdmPwdExpirationTime);
+            SearchResult searchResult = this.GetDirectoryEntry(computer.DistinguishedName, ActiveDirectory.AttrMsMcsAdmPwd, ActiveDirectory.AttrMsMcsAdmPwdExpirationTime);
 
             if (!searchResult.Properties.Contains(ActiveDirectory.AttrMsMcsAdmPwd))
             {
@@ -67,14 +33,14 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             }
 
             return new Password(
-                searchResult.GetPropertyString(Web.ActiveDirectory.ActiveDirectory.AttrMsMcsAdmPwd),
+                searchResult.GetPropertyString(ActiveDirectory.AttrMsMcsAdmPwd),
                 searchResult.GetPropertyDateTimeFromLong(ActiveDirectory.AttrMsMcsAdmPwdExpirationTime)
             );
         }
 
         public void SetPasswordExpiryTime(IComputer computer, DateTime time)
         {
-            var entry = new DirectoryEntry($"LDAP://{computer.DistinguishedName}");
+            DirectoryEntry entry = new DirectoryEntry($"LDAP://{computer.DistinguishedName}");
             entry.Properties[ActiveDirectory.AttrMsMcsAdmPwdExpirationTime].Value = time.ToFileTimeUtc().ToString();
             entry.CommitChanges();
         }
@@ -82,40 +48,111 @@ namespace Lithnet.Laps.Web.ActiveDirectory
         public bool IsComputerInOu(IComputer computer, string ou)
         {
             DirectorySearcher d = new DirectorySearcher();
-            d.SearchRoot = new DirectoryEntry($"LDAP://{ou}");
+            d.SearchRoot = new DirectoryEntry($"GC://{ou}");
             d.SearchScope = SearchScope.Subtree;
-            d.Filter = $"objectGuid={ToOctetString(computer.Guid)}";
+            d.Filter = $"objectGuid={computer.Guid.ToOctetString()}";
 
             return d.FindOne() != null;
         }
 
         public IGroup GetGroup(string groupName)
         {
-            var principal = GetGroupPrincipal(groupName);
-
-            return principal == null ? null : new GroupAdapter(principal);
+            SearchResult result = this.DoGcLookup(groupName, "group", GroupAdapter.PropertiesToGet);
+            return result == null ? null : new GroupAdapter(result);
         }
 
         public bool IsComputerInGroup(IComputer computer, IGroup group)
         {
-            return IsPrincipalInGroup(computer.DistinguishedName, group.Sid);
+            return this.IsPrincipalInGroup(computer.DistinguishedName, group.Sid);
         }
 
         public bool IsUserInGroup(IUser user, IGroup group)
         {
-            return IsPrincipalInGroup(user.DistinguishedName, group.Sid);
+            return this.IsPrincipalInGroup(user.DistinguishedName, group.Sid);
         }
 
         public IUser GetUser(string userName)
         {
-            var user = GetUserPrincipal(userName);
-
+            SearchResult user = this.DoGcLookup(userName, "user", UserAdapter.PropertiesToGet);
             return user == null ? null : new UserAdapter(user);
+        }
+
+        private SearchResult DoGcLookup(string objectName, string objectClass, string[] propertiesToGet)
+        {
+            string dn;
+
+            if (objectName.Contains("\\") || objectName.Contains("@") || objectName.TryParseAsSid(out _))
+            {
+                dn = NativeMethods.GetDnFromGc(objectName);
+            }
+            else
+            {
+                dn = ActiveDirectory.DoGcLookupFromSimpleName(objectName, objectClass);
+            }
+
+            if (dn == null)
+            {
+                throw new NotFoundException($"The object {objectName} was not found in the global catalog");
+            }
+
+            DirectorySearcher d = new DirectorySearcher();
+
+            d.SearchRoot = new DirectoryEntry($"LDAP://{dn}");
+            d.SearchScope = SearchScope.Base;
+            d.Filter = $"(objectClass=*)";
+
+            foreach (string prop in propertiesToGet)
+            {
+                d.PropertiesToLoad.Add(prop);
+            }
+
+            return d.FindOne() ?? throw new NotFoundException($"The object {dn} was not found in the directory");
+        }
+
+        private static string DoGcLookupFromSimpleName(string name, string objectClass)
+        {
+            DirectorySearcher d = new DirectorySearcher();
+            d.SearchRoot = new DirectoryEntry($"GC://{Forest.GetCurrentForest().Name}");
+            d.SearchScope = SearchScope.Subtree;
+            d.Filter = $"(&(objectClass={objectClass})(name={ActiveDirectory.EscapeSearchFilterParameter(name)}))";
+            d.PropertiesToLoad.Add("distinguishedName");
+
+            SearchResultCollection result = d.FindAll();
+
+            if (result.Count > 1)
+            {
+                throw new AmbiguousNameException($"There was more than one value in the directory that matched the name {name}");
+            }
+
+            if (result.Count == 0)
+            {
+                return null;
+            }
+
+            return result[0].Properties["distinguishedName"][0].ToString();
+        }
+
+        private bool IsPrincipalInGroup(string distinguishedName, SecurityIdentifier groupSecurityIdentifier)
+        {
+            if (groupSecurityIdentifier == null || groupSecurityIdentifier.BinaryLength == 0)
+            {
+                return false;
+            }
+
+            byte[] groupSid = new byte[groupSecurityIdentifier.BinaryLength];
+            groupSecurityIdentifier.GetBinaryForm(groupSid, 0);
+
+            return this.IsPrincipalInGroup(distinguishedName, groupSid);
         }
 
         private bool IsPrincipalInGroup(string distinguishedName, byte[] groupSid)
         {
-            SearchResult result = GetDirectoryEntry(distinguishedName, "tokenGroups");
+            if (groupSid == null)
+            {
+                return false;
+            }
+
+            SearchResult result = this.GetDirectoryEntry(distinguishedName, "tokenGroups");
 
             if (result == null)
             {
@@ -133,23 +170,55 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             return false;
         }
 
-        private bool IsPrincipalInGroup(string distinguishedName, SecurityIdentifier groupSecurityIdentifier)
+        private SearchResult GetDirectoryEntry(string dn, params string[] propertiesToLoad)
         {
-            if (groupSecurityIdentifier == null || groupSecurityIdentifier.BinaryLength == 0)
+            DirectorySearcher d = new DirectorySearcher();
+            d.SearchRoot = new DirectoryEntry($"LDAP://{dn}");
+            d.SearchScope = SearchScope.Base;
+            d.Filter = $"objectClass=*";
+            foreach (string prop in propertiesToLoad)
             {
-                return false;
+                d.PropertiesToLoad.Add(prop);
             }
 
-            byte[] groupSid = new byte[groupSecurityIdentifier.BinaryLength];
-            groupSecurityIdentifier.GetBinaryForm(groupSid, 0);
-
-            return IsPrincipalInGroup(distinguishedName, groupSid);
+            return d.FindOne();
         }
 
-        internal UserPrincipal GetUserPrincipal(string name)
+        private static string EscapeSearchFilterParameter(string p)
         {
-            PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
-            return UserPrincipal.FindByIdentity(ctx, name);
+            StringBuilder escapedValue = new StringBuilder();
+
+            foreach (char c in p)
+            {
+                switch (c)
+                {
+                    case '\\':
+                        escapedValue.Append("\\5c");
+                        break;
+
+                    case '*':
+                        escapedValue.Append("\\2a");
+                        break;
+
+                    case '(':
+                        escapedValue.Append("\\28");
+                        break;
+
+                    case ')':
+                        escapedValue.Append("\\29");
+                        break;
+
+                    case '\0':
+                        escapedValue.Append("\\00");
+                        break;
+
+                    default:
+                        escapedValue.Append(c);
+                        break;
+                }
+            }
+
+            return escapedValue.ToString();
         }
     }
 }

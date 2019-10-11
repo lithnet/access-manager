@@ -257,6 +257,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActiveDirectory\ActiveDirectory.cs" />
+    <Compile Include="ActiveDirectory\Interop\DsNameError.cs" />
+    <Compile Include="ActiveDirectory\Interop\DsNameFlags.cs" />
+    <Compile Include="ActiveDirectory\Interop\DsNameFormat.cs" />
+    <Compile Include="ActiveDirectory\Interop\DsNameResult.cs" />
+    <Compile Include="ActiveDirectory\Interop\DsNameResultItem.cs" />
+    <Compile Include="ActiveDirectory\Interop\NativeMethods.cs" />
     <Compile Include="App_LocalResources\UIMessages.it.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -271,6 +277,8 @@
     <Compile Include="Audit\ITemplates.cs" />
     <Compile Include="Audit\TemplatesFromFiles.cs" />
     <Compile Include="ConfigSection\IReaderElement.cs" />
+    <Compile Include="Exceptions\NotFoundException.cs" />
+    <Compile Include="Exceptions\AmbiguousNameException.cs" />
     <Compile Include="Mail\IMailer.cs" />
     <Compile Include="Mail\SmtpMailer.cs" />
     <Compile Include="Models\ILapsConfig.cs" />

@@ -20,21 +20,21 @@ namespace Lithnet.Laps.Web
 
         public bool IsRateLimitExceeded(LapRequestModel model, IUser p, HttpRequestBase r)
         {
-            if (configSection.RateLimitIP.Enabled)
+            if (this.configSection.RateLimitIP.Enabled)
             {
-                if (IsIpThresholdExceeded(model, p, r, configSection.RateLimitIP.ReqPerMinute, 60)
-                    || IsIpThresholdExceeded(model, p, r, configSection.RateLimitIP.ReqPerHour, 3600)
-                    || IsIpThresholdExceeded(model, p, r, configSection.RateLimitIP.ReqPerDay, 86400))
+                if (this.IsIpThresholdExceeded(model, p, r, this.configSection.RateLimitIP.ReqPerMinute, 60)
+                    || this.IsIpThresholdExceeded(model, p, r, this.configSection.RateLimitIP.ReqPerHour, 3600)
+                    || this.IsIpThresholdExceeded(model, p, r, this.configSection.RateLimitIP.ReqPerDay, 86400))
                 {
                     return true;
                 }
             }
 
-            if (configSection.RateLimitUser.Enabled)
+            if (this.configSection.RateLimitUser.Enabled)
             {
-                if (IsUserThresholdExceeded(model, p, r, configSection.RateLimitUser.ReqPerMinute, 60)
-                    || IsUserThresholdExceeded(model, p, r, configSection.RateLimitUser.ReqPerHour, 3600)
-                    || IsUserThresholdExceeded(model, p, r, configSection.RateLimitUser.ReqPerDay, 86400))
+                if (this.IsUserThresholdExceeded(model, p, r, this.configSection.RateLimitUser.ReqPerMinute, 60)
+                    || this.IsUserThresholdExceeded(model, p, r, this.configSection.RateLimitUser.ReqPerHour, 3600)
+                    || this.IsUserThresholdExceeded(model, p, r, this.configSection.RateLimitUser.ReqPerDay, 86400))
                 {
                     return true;
                 }
@@ -44,9 +44,9 @@ namespace Lithnet.Laps.Web
 
         private bool IsIpThresholdExceeded(LapRequestModel model, IUser p, HttpRequestBase r, int threshold, int duration)
         {
-            if (IsThresholdExceeded(r, threshold, duration))
+            if (this.IsThresholdExceeded(r, threshold, duration))
             {
-                reporting.PerformAuditFailureActions(model, UIMessages.RateLimitError, EventIDs.RateLimitExceededIP,
+                this.reporting.PerformAuditFailureActions(model, UIMessages.RateLimitError, EventIDs.RateLimitExceededIP,
                     string.Format(LogMessages.RateLimitExceededIP, p.SamAccountName, r.UserHostAddress, threshold, duration), null, null, null, p, null);
                 return true;
             }
@@ -56,9 +56,9 @@ namespace Lithnet.Laps.Web
 
         private bool IsUserThresholdExceeded(LapRequestModel model, IUser p, HttpRequestBase r, int threshold, int duration)
         {
-            if (IsThresholdExceeded(p, threshold, duration))
+            if (this.IsThresholdExceeded(p, threshold, duration))
             {
-                reporting.PerformAuditFailureActions(model, UIMessages.RateLimitError, EventIDs.RateLimitExceededUser,
+                this.reporting.PerformAuditFailureActions(model, UIMessages.RateLimitError, EventIDs.RateLimitExceededUser,
                     string.Format(LogMessages.RateLimitExceededUser, p.SamAccountName, r.UserHostAddress, threshold, duration), null, null, null, p, null);
                 return true;
             }
@@ -68,16 +68,16 @@ namespace Lithnet.Laps.Web
 
         private bool IsThresholdExceeded(HttpRequestBase r, int threshold, int duration)
         {
-            string key1 = string.Join(@"-", duration, threshold, configSection.RateLimitIP.ThrottleOnXffIP ? r.GetUnmaskedIP() : r.UserHostAddress);
+            string key1 = string.Join(@"-", duration, threshold, this.configSection.RateLimitIP.ThrottleOnXffIP ? r.GetUnmaskedIP() : r.UserHostAddress);
 
-            return IsThresholdExceeded(key1, threshold, duration);
+            return this.IsThresholdExceeded(key1, threshold, duration);
         }
 
         private bool IsThresholdExceeded(IUser p, int threshold, int duration)
         {
             string key1 = string.Join(@"-", duration, threshold, p.Sid);
 
-            return IsThresholdExceeded(key1, threshold, duration);
+            return this.IsThresholdExceeded(key1, threshold, duration);
         }
 
         private bool IsThresholdExceeded(string key, int threshold, int duration)

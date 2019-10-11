@@ -10,7 +10,7 @@ namespace Lithnet.Laps.Web
         [ConfigurationProperty(ReaderElement.PropAudit, IsRequired = false)]
         public AuditElement Audit => (AuditElement)this[ReaderElement.PropAudit];
 
-        [ConfigurationProperty(PropPrincipal, IsRequired = true, IsKey = true)]
-        public string Principal => (string)this[PropPrincipal];
+        [ConfigurationProperty(ReaderElement.PropPrincipal, IsRequired = true, IsKey = true)]
+        public string Principal => (string)this[ReaderElement.PropPrincipal];
     }
 }

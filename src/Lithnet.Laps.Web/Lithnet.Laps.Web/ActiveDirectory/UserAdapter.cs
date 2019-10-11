@@ -1,28 +1,39 @@
 ﻿using System;
-using System.DirectoryServices.AccountManagement;
+using System.DirectoryServices;
 using System.Security.Principal;
 using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web.ActiveDirectory
 {
-    public sealed class UserAdapter: IUser
+    public sealed class UserAdapter : IUser
     {
-        private readonly UserPrincipal userPrincipal;
+        private readonly SearchResult user;
 
-        public UserAdapter(UserPrincipal userPrincipal)
+        internal static string[] PropertiesToGet = { "samAccountName", "distinguishedName", "description", "displayName", "userPrincipalName", "objectSid", "mail", "givenName", "sn" };
+
+        public UserAdapter(SearchResult user)
         {
-            this.userPrincipal = userPrincipal;
+            this.user = user;
         }
 
-        public string SamAccountName => userPrincipal.SamAccountName;
-        public string DistinguishedName => userPrincipal.DistinguishedName;
-        public SecurityIdentifier Sid => userPrincipal.Sid;
-        public string DisplayName => userPrincipal.DisplayName;
-        public string UserPrincipalName => userPrincipal.UserPrincipalName;
-        public string Description => userPrincipal.Description;
-        public string EmailAddress => userPrincipal.EmailAddress;
-        public Guid? Guid => userPrincipal.Guid;
-        public string GivenName => userPrincipal.GivenName;
-        public string Surname => userPrincipal.Surname;
+        public string SamAccountName => this.user.GetPropertyString("samAccountName");
+
+        public string DistinguishedName => this.user.GetPropertyString("distinguishedName");
+
+        public SecurityIdentifier Sid => this.user.GetPropertySid("objectSid");
+
+        public string DisplayName => this.user.GetPropertyString("displayName");
+
+        public string UserPrincipalName => this.user.GetPropertyString("userPrincipalName");
+
+        public string Description => this.user.GetPropertyString("description");
+
+        public string EmailAddress => this.user.GetPropertyString("mail");
+
+        public Guid? Guid => this.user.GetPropertyGuid("objectGuid");
+
+        public string GivenName => this.user.GetPropertyString("givenName");
+
+        public string Surname => this.user.GetPropertyString("sn");
     }
 }

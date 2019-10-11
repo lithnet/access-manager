@@ -5,25 +5,51 @@ namespace Lithnet.Laps.Web.Audit
 {
     public class TemplatesFromFiles: ITemplates
     {
-        private static string _logSuccessTemplate = null;
-        private static string _logFailureTemplate = null;
-        private static string _emailSuccessTemplate = null;
-        private static string _emailFailureTemplate = null;
+        private static string logSuccessTemplate = null;
+
+        private static string logFailureTemplate = null;
+
+        private static string emailSuccessTemplate = null;
+
+        private static string emailFailureTemplate = null;
+
+        public string LogSuccessTemplate => TemplatesFromFiles.logSuccessTemplate;
+
+        public string LogFailureTemplate => TemplatesFromFiles.logFailureTemplate;
+
+        public string EmailSuccessTemplate => TemplatesFromFiles.emailSuccessTemplate;
+
+        public string EmailFailureTemplate => TemplatesFromFiles.emailFailureTemplate;
 
         private readonly ILogger logger;
 
         public TemplatesFromFiles(ILogger logger)
         {
             this.logger = logger;
-            MakeSureTemplatesAreLoaded();
+            this.MakeSureTemplatesAreLoaded();
         }
 
         private void MakeSureTemplatesAreLoaded()
         {
-            if (_logSuccessTemplate == null) _logSuccessTemplate = LoadTemplate("LogAuditSuccess.txt");
-            if (_logFailureTemplate == null) _logFailureTemplate = LoadTemplate("LogAuditFailure.txt");
-            if (_emailSuccessTemplate == null) _emailSuccessTemplate = LoadTemplate("EmailAuditSuccess.html");
-            if (_emailFailureTemplate == null) _emailFailureTemplate = LoadTemplate("EmailAuditFailure.html");
+            if (TemplatesFromFiles.logSuccessTemplate == null)
+            {
+                TemplatesFromFiles.logSuccessTemplate = this.LoadTemplate("LogAuditSuccess.txt");
+            }
+
+            if (TemplatesFromFiles.logFailureTemplate == null)
+            {
+                TemplatesFromFiles.logFailureTemplate = this.LoadTemplate("LogAuditFailure.txt");
+            }
+
+            if (TemplatesFromFiles.emailSuccessTemplate == null)
+            {
+                TemplatesFromFiles.emailSuccessTemplate = this.LoadTemplate("EmailAuditSuccess.html");
+            }
+
+            if (TemplatesFromFiles.emailFailureTemplate == null)
+            {
+                TemplatesFromFiles.emailFailureTemplate = this.LoadTemplate("EmailAuditFailure.html");
+            }
         }
 
         private string LoadTemplate(string templateName)
@@ -36,7 +62,7 @@ namespace Lithnet.Laps.Web.Audit
             }
             catch (Exception ex)
             {
-                LogErrorEvent(EventIDs.ErrorLoadingTemplateResource, $"Could not load template {templateName}", ex);
+                this.LogErrorEvent(EventIDs.ErrorLoadingTemplateResource, $"Could not load template {templateName}", ex);
                 return null;
             }
         }
@@ -45,16 +71,11 @@ namespace Lithnet.Laps.Web.Audit
         {
             // FIXME: this is the same code as Reporting.LogErrorEvent.
             // We should create a service for logging, with only LogErrorEvent and LogSuccessEvent.
-            LogEventInfo logEvent = new LogEventInfo(LogLevel.Error, logger.Name, logMessage);
+            LogEventInfo logEvent = new LogEventInfo(LogLevel.Error, this.logger.Name, logMessage);
             logEvent.Properties.Add("EventID", eventID);
             logEvent.Exception = ex;
 
-            logger.Log(logEvent);
+            this.logger.Log(logEvent);
         }
-
-        public string LogSuccessTemplate => _logSuccessTemplate;
-        public string LogFailureTemplate => _logFailureTemplate;
-        public string EmailSuccessTemplate => _emailSuccessTemplate;
-        public string EmailFailureTemplate => _emailFailureTemplate;
     }
 }

@@ -28,68 +28,68 @@ namespace Lithnet.Laps.Web.Audit
 
         public void LogErrorEvent(int eventID, string logMessage, Exception ex)
         {
-            LogEventInfo logEvent = new LogEventInfo(LogLevel.Error, logger.Name, logMessage);
+            LogEventInfo logEvent = new LogEventInfo(LogLevel.Error, this.logger.Name, logMessage);
             logEvent.Properties.Add("EventID", eventID);
             logEvent.Exception = ex;
 
-            logger.Log(logEvent);
+            this.logger.Log(logEvent);
         }
 
         public void LogSuccessEvent(int eventID, string logMessage)
         {
-            LogEventInfo logEvent = new LogEventInfo(LogLevel.Error, logger.Name, logMessage);
+            LogEventInfo logEvent = new LogEventInfo(LogLevel.Error, this.logger.Name, logMessage);
             logEvent.Properties.Add("EventID", eventID);
 
-            logger.Info(logEvent);
+            this.logger.Info(logEvent);
         }
 
         public void PerformAuditSuccessActions(LapRequestModel model, ITarget target, AuthorizationResponse authorizationResponse, IUser user, IComputer computer, Password password)
         {
-            Dictionary<string, string> tokens = BuildTokenDictionary(target, authorizationResponse, user, computer, password, model.ComputerName);
-            string logSuccessMessage = templates.LogSuccessTemplate ?? LogMessages.DefaultAuditSuccessText;
-            string emailSuccessMessage = templates.EmailSuccessTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditSuccessText}</pre></body></html>";
+            Dictionary<string, string> tokens = this.BuildTokenDictionary(target, authorizationResponse, user, computer, password, model.ComputerName);
+            string logSuccessMessage = this.templates.LogSuccessTemplate ?? LogMessages.DefaultAuditSuccessText;
+            string emailSuccessMessage = this.templates.EmailSuccessTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditSuccessText}</pre></body></html>";
 
-            LogEventInfo logEvent = new LogEventInfo(LogLevel.Info, logger.Name, ReplaceTokens(tokens, logSuccessMessage, false));
+            LogEventInfo logEvent = new LogEventInfo(LogLevel.Info, this.logger.Name, this.ReplaceTokens(tokens, logSuccessMessage, false));
             logEvent.Properties.Add("EventID", EventIDs.PasswordAccessed);
-            logger.Log(logEvent);
+            this.logger.Log(logEvent);
 
             try
             {
-                var recipients = BuildRecipientList(target, authorizationResponse, true, user);
+                IImmutableSet<string> recipients = this.BuildRecipientList(target, authorizationResponse, true, user);
 
                 if (recipients.Count > 0)
                 {
-                    string subject = ReplaceTokens(tokens, LogMessages.AuditEmailSubjectSuccess, false);
-                    mailer.SendEmail(recipients, subject, ReplaceTokens(tokens, emailSuccessMessage, true));
+                    string subject = this.ReplaceTokens(tokens, LogMessages.AuditEmailSubjectSuccess, false);
+                    this.mailer.SendEmail(recipients, subject, this.ReplaceTokens(tokens, emailSuccessMessage, true));
                 }
             }
             catch (Exception iex)
             {
-                LogErrorEvent(EventIDs.AuditErrorCannotSendSuccessEmail, "An error occurred sending the success audit email", iex);
+                this.LogErrorEvent(EventIDs.AuditErrorCannotSendSuccessEmail, "An error occurred sending the success audit email", iex);
             }
         }
 
         public void PerformAuditFailureActions(LapRequestModel model, string userMessage, int eventID, string logMessage, Exception ex, ITarget target, AuthorizationResponse authorizationResponse, IUser user, IComputer computer)
         {
-            Dictionary<string, string> tokens = BuildTokenDictionary(target, authorizationResponse, user, computer, null, model.ComputerName, logMessage ?? userMessage);
-            string logFailureMessage = templates.LogFailureTemplate ?? LogMessages.DefaultAuditFailureText;
-            string emailFailureMessage = templates.EmailFailureTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditFailureText}</pre></body></html>";
+            Dictionary<string, string> tokens = this.BuildTokenDictionary(target, authorizationResponse, user, computer, null, model.ComputerName, logMessage ?? userMessage);
+            string logFailureMessage = this.templates.LogFailureTemplate ?? LogMessages.DefaultAuditFailureText;
+            string emailFailureMessage = this.templates.EmailFailureTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditFailureText}</pre></body></html>";
 
-            LogErrorEvent(eventID, ReplaceTokens(tokens, logFailureMessage, false), ex);
+            this.LogErrorEvent(eventID, this.ReplaceTokens(tokens, logFailureMessage, false), ex);
 
             try
             {
-                var recipients = BuildRecipientList(target, authorizationResponse, false);
+                IImmutableSet<string> recipients = this.BuildRecipientList(target, authorizationResponse, false);
 
                 if (recipients.Count > 0)
                 {
-                    string subject = ReplaceTokens(tokens, LogMessages.AuditEmailSubjectFailure, false);
-                    mailer.SendEmail(recipients, subject, ReplaceTokens(tokens, emailFailureMessage, true));
+                    string subject = this.ReplaceTokens(tokens, LogMessages.AuditEmailSubjectFailure, false);
+                    this.mailer.SendEmail(recipients, subject, this.ReplaceTokens(tokens, emailFailureMessage, true));
                 }
             }
             catch (Exception iex)
             {
-                LogErrorEvent(EventIDs.AuditErrorCannotSendFailureEmail, "An error occurred sending the failure audit email", iex);
+                this.LogErrorEvent(EventIDs.AuditErrorCannotSendFailureEmail, "An error occurred sending the failure audit email", iex);
             }
         }
 
@@ -113,9 +113,6 @@ namespace Lithnet.Laps.Web.Audit
                 { "{computer.Guid}", computer?.Guid?.ToString()},
                 { "{computer.Sid}", computer?.Sid?.ToString()},
                 { "{requestedComputerName}", requestedComputerName},
-                // FIXME: The token {reader.Principal} actually contains the authorization details.
-                // This is the principal when the ConfigurationFileAuthorizationService is used, but it can be something
-                // else in case of other authorization services.
                 { "{reader.Principal}", authorizationResponse?.ExtraInfo},
                 { "{reader.Notify}", string.Join(",", authorizationResponse?.UsersToNotify?.All ?? ImmutableHashSet<string>.Empty)},
                 { "{target.Notify}", string.Join(",", target?.UsersToNotify?.All ?? ImmutableHashSet<string>.Empty)},
@@ -147,27 +144,24 @@ namespace Lithnet.Laps.Web.Audit
 
         private IImmutableSet<string> BuildRecipientList(ITarget target, AuthorizationResponse authorizationResponse, bool success, IUser user = null)
         {
-            var usersToNotify = target?.UsersToNotify ?? new UsersToNotify();
+            UsersToNotify usersToNotify = target?.UsersToNotify ?? new UsersToNotify();
 
             if (authorizationResponse != null)
             {
                 usersToNotify = usersToNotify.Union(authorizationResponse.UsersToNotify);
             }
 
-            if (configSection.UsersToNotify != null)
+            if (this.configSection.UsersToNotify != null)
             {
-                usersToNotify = usersToNotify.Union(configSection.UsersToNotify);
+                usersToNotify = usersToNotify.Union(this.configSection.UsersToNotify);
             }
 
             if (!string.IsNullOrWhiteSpace(user?.EmailAddress))
             {
-                // FIXME: This seems to be an undocumented feature?
                 usersToNotify = usersToNotify.WithUserReplaced("{user.EmailAddress}", user?.EmailAddress);
             }
 
             return success ? usersToNotify.OnSuccess : usersToNotify.OnFailure;
         }
-
-
     }
 }

@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using System.Collections.Generic;
+using NLog;
 using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile
@@ -24,13 +25,11 @@ namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile
                 return AuthorizationResponse.NoTarget();
             }
 
-            var readers = availableReaders.GetReadersForTarget(target);
-
-            foreach (var reader in readers)
+            foreach (IReaderElement reader in this.availableReaders.GetReadersForTarget(target))
             {
                 if (this.IsReaderAuthorized(reader, user))
                 {
-                    logger.Trace($"User {user.SamAccountName} matches reader principal {reader.Principal} is authorized to read passwords from target {target.TargetName}");
+                    this.logger.Trace($"User {user.SamAccountName} matches reader principal {reader.Principal} is authorized to read passwords from target {target.TargetName}");
 
                     return AuthorizationResponse.Authorized(reader.Audit?.UsersToNotify, reader.Principal);
                 }
@@ -41,16 +40,16 @@ namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile
 
         private bool IsReaderAuthorized(IReaderElement reader, IUser user)
         {
-            var readerAsUser = directory.GetUser(reader.Principal);
+            IUser readerAsUser = this.directory.GetUser(reader.Principal);
 
             if (readerAsUser != null && readerAsUser.DistinguishedName == user.DistinguishedName)
             {
                 return true;
             }
 
-            var readerAsGroup = directory.GetGroup(reader.Principal);
+            IGroup readerAsGroup = this.directory.GetGroup(reader.Principal);
 
-            return readerAsGroup != null && directory.IsUserInGroup(user, readerAsGroup);
+            return readerAsGroup != null && this.directory.IsUserInGroup(user, readerAsGroup);
         }
     }
 }

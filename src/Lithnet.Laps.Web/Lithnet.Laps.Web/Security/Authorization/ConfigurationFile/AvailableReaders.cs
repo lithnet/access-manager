@@ -15,13 +15,13 @@ namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile
 
         public IEnumerable<IReaderElement> GetReadersForTarget(ITarget target)
         {
-            var targetElementCollection = configSection.Targets;
+            TargetCollection targetElementCollection = this.configSection.Targets;
 
-            var query = from targetElement in targetElementCollection.OfType<TargetElement>()
+            IEnumerable<ReaderCollection> query = from targetElement in targetElementCollection.OfType<TargetElement>()
                 where targetElement.Name == target.TargetName
                 select targetElement.Readers;
 
-            var readerCollection = query.FirstOrDefault();
+            ReaderCollection readerCollection = query.FirstOrDefault();
 
             if (readerCollection == null)
             {

@@ -1,6 +1,5 @@
 ﻿using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Models;
-using Lithnet.Laps.Web.Security.Authorization.ConfigurationFile;
 
 namespace Lithnet.Laps.Web.Security.Authorization
 {
@@ -13,7 +12,7 @@ namespace Lithnet.Laps.Web.Security.Authorization
     {
         public AuthorizationResponse CanAccessPassword(IUser user, IComputer computer, ITarget target)
         {
-            if (user.SamAccountName == "SomeUserName" && computer.SamAccountName.ToUpper() == "SomeComputerName")
+            if (user.SamAccountName == "SomeUserName" && string.Equals(computer.SamAccountName, "SomeComputerName", System.StringComparison.OrdinalIgnoreCase))
             {
                 return AuthorizationResponse.Authorized(new UsersToNotify(), "Demo authorization");
             }

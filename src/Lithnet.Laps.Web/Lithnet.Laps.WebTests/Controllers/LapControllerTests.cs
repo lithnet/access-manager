@@ -4,7 +4,6 @@ using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Models;
 using Lithnet.Laps.Web.Security.Authentication;
 using Lithnet.Laps.Web.Security.Authorization;
-using Lithnet.Laps.Web.Security.Authorization.ConfigurationFile;
 using Moq;
 using NLog;
 
@@ -20,6 +19,7 @@ namespace Lithnet.Laps.Web.Controllers.Tests
         private Mock<IUser> dummyUser;
         private Mock<IAuthorizationService> dummyAuthorizationService;
         private Mock<IAvailableTargets> dummyAvailableTargets;
+        private Mock<IDirectory> dummyDirectory;
 
         private Mock<IAuthenticationService> authenticationServiceStub;
 
@@ -33,11 +33,15 @@ namespace Lithnet.Laps.Web.Controllers.Tests
             dummyUser = new Mock<IUser>();
             dummyAuthorizationService = new Mock<IAuthorizationService>();
             dummyAvailableTargets = new Mock<IAvailableTargets>();
+            dummyDirectory = new Mock<IDirectory>();
+
+            dummyDirectory.Setup(d => d.GetUser(It.IsAny<string>()))
+                .Returns(dummyUser.Object);
 
             // Stub that always authenticates
             authenticationServiceStub = new Mock<IAuthenticationService>();
             authenticationServiceStub
-                .Setup(svc => svc.GetLoggedInUser())
+                .Setup(svc => svc.GetLoggedInUser(dummyDirectory.Object))
                 .Returns(dummyUser.Object);
         }
 

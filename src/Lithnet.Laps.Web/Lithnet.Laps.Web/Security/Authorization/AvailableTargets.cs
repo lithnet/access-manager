@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Lithnet.Laps.Web.Models;
-using Lithnet.Laps.Web.Security.Authorization.ConfigurationFile;
 using NLog;
 
 namespace Lithnet.Laps.Web.Security.Authorization
@@ -21,49 +20,47 @@ namespace Lithnet.Laps.Web.Security.Authorization
 
         public ITarget GetMatchingTargetOrNull(IComputer computer)
         {
-            var matchingTargets = new List<ITarget>();
+            List<ITarget> matchingTargets = new List<ITarget>();
 
-            foreach (TargetElement target in configSection.Targets.OfType<TargetElement>().OrderBy(t => t.Type == TargetType.Computer).ThenBy(t => t.Type == TargetType.Group))
+            foreach (TargetElement target in this.configSection.Targets.OfType<TargetElement>().OrderBy(t => t.Type == TargetType.Computer).ThenBy(t => t.Type == TargetType.Group))
             {
                 if (target.Type == TargetType.Container)
                 {
-                    if (directory.IsComputerInOu(computer, target.Name))
+                    if (this.directory.IsComputerInOu(computer, target.Name))
                     {
-                        logger.Trace($"Matched {computer.SamAccountName} to target OU {target.Name}");
+                        this.logger.Trace($"Matched {computer.SamAccountName} to target OU {target.Name}");
                         matchingTargets.Add(target);
                     }
-
-                    continue;
                 }
                 else if (target.Type == TargetType.Computer)
                 {
-                    var p = directory.GetComputer(target.Name);
+                    IComputer p = this.directory.GetComputer(target.Name);
 
                     if (p == null)
                     {
-                        logger.Trace($"Target computer {target.Name} was not found in the directory");
+                        this.logger.Trace($"Target computer {target.Name} was not found in the directory");
                         continue;
                     }
 
                     if (p.Equals(computer))
                     {
-                        logger.Trace($"Matched {computer.SamAccountName} to target computer {target.Name}");
-                        return target;
+                        this.logger.Trace($"Matched {computer.SamAccountName} to target computer {target.Name}");
+                        matchingTargets.Add(target);
                     }
                 }
                 else
                 {
-                    var g = directory.GetGroup(target.Name);
+                    IGroup g = this.directory.GetGroup(target.Name);
 
                     if (g == null)
                     {
-                        logger.Trace($"Target group {target.Name} was not found in the directory");
+                        this.logger.Trace($"Target group {target.Name} was not found in the directory");
                         continue;
                     }
 
-                    if (directory.IsComputerInGroup(computer, g))
+                    if (this.directory.IsComputerInGroup(computer, g))
                     {
-                        logger.Trace($"Matched {computer.SamAccountName} to target group {target.Name}");
+                        this.logger.Trace($"Matched {computer.SamAccountName} to target group {target.Name}");
                         matchingTargets.Add(target);
                     }
                 }

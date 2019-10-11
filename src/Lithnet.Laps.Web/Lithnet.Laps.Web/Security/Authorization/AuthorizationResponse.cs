@@ -11,13 +11,13 @@ namespace Lithnet.Laps.Web.Security.Authorization
         /// </summary>
         public int ResultCode { get; private set; }
 
-        public bool IsAuthorized => ResultCode == EventIDs.UserAuthorizedForComputer;
+        public bool IsAuthorized => this.ResultCode == EventIDs.UserAuthorizedForComputer;
 
         private AuthorizationResponse(int resultCode, UsersToNotify usersToNotify, string extraInfo)
         {
-            ResultCode = resultCode;
-            UsersToNotify = usersToNotify ?? new UsersToNotify();
-            ExtraInfo = extraInfo;
+            this.ResultCode = resultCode;
+            this.UsersToNotify = usersToNotify ?? new UsersToNotify();
+            this.ExtraInfo = extraInfo;
         }
 
         public static AuthorizationResponse Authorized(UsersToNotify usersToNotify, string extraInfo)

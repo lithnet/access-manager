@@ -13,19 +13,19 @@ namespace Lithnet.Laps.Web
         private const string PropRateLimitIP = "rate-limit-ip";
         private const string PropRateLimitUser = "rate-limit-user";
 
-        [ConfigurationProperty(PropTargets)]
-        [ConfigurationCollection(typeof(TargetCollection), AddItemName = PropTarget, CollectionType = ConfigurationElementCollectionType.BasicMap)]
-        public TargetCollection Targets => (TargetCollection)this[PropTargets];
+        [ConfigurationProperty(LapsConfigSection.PropTargets)]
+        [ConfigurationCollection(typeof(TargetCollection), AddItemName = LapsConfigSection.PropTarget, CollectionType = ConfigurationElementCollectionType.BasicMap)]
+        public TargetCollection Targets => (TargetCollection)this[LapsConfigSection.PropTargets];
 
         [ConfigurationProperty(LapsConfigSection.PropAudit, IsRequired = false)]
         public AuditElement Audit => (AuditElement)this[LapsConfigSection.PropAudit];
 
-        [ConfigurationProperty(PropRateLimitIP, IsRequired = false)]
-        public RateLimitIPElement RateLimitIP => (RateLimitIPElement)this[PropRateLimitIP];
+        [ConfigurationProperty(LapsConfigSection.PropRateLimitIP, IsRequired = false)]
+        public RateLimitIPElement RateLimitIP => (RateLimitIPElement)this[LapsConfigSection.PropRateLimitIP];
 
-        [ConfigurationProperty(PropRateLimitUser, IsRequired = false)]
-        public RateLimitUserElement RateLimitUser => (RateLimitUserElement)this[PropRateLimitUser];
+        [ConfigurationProperty(LapsConfigSection.PropRateLimitUser, IsRequired = false)]
+        public RateLimitUserElement RateLimitUser => (RateLimitUserElement)this[LapsConfigSection.PropRateLimitUser];
 
-        public UsersToNotify UsersToNotify => Audit?.UsersToNotify;
+        public UsersToNotify UsersToNotify => this.Audit?.UsersToNotify;
     }
 }
