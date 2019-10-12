@@ -24,7 +24,7 @@ namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile.Tests
             // that this is passed as an empty string. So let's emulate this.
             targetStub
                 .Setup(t => t.ExpireAfter)
-                .Returns(String.Empty);
+                .Returns(TimeSpan.Zero);
         }
 
         [Test()]

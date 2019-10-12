@@ -12,7 +12,7 @@ namespace Lithnet.Laps.Web
         private const string PropAudit = "audit";
         private const string PropRateLimitIP = "rate-limit-ip";
         private const string PropRateLimitUser = "rate-limit-user";
-
+        
         [ConfigurationProperty(LapsConfigSection.PropTargets)]
         [ConfigurationCollection(typeof(TargetCollection), AddItemName = LapsConfigSection.PropTarget, CollectionType = ConfigurationElementCollectionType.BasicMap)]
         public TargetCollection Targets => (TargetCollection)this[LapsConfigSection.PropTargets];

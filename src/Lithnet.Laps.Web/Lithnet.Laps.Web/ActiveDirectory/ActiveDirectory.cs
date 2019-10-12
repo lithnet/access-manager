@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
@@ -77,9 +78,14 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             return user == null ? null : new UserAdapter(user);
         }
 
-        private SearchResult DoGcLookup(string objectName, string objectClass, string[] propertiesToGet)
+        private SearchResult DoGcLookup(string objectName, string objectClass, IEnumerable<string> propertiesToGet)
         {
             string dn;
+
+            if (objectClass.Equals("computer", StringComparison.OrdinalIgnoreCase) && !objectName.EndsWith("$"))
+            {
+                objectName += "$";
+            }
 
             if (objectName.Contains("\\") || objectName.Contains("@") || objectName.TryParseAsSid(out _))
             {
@@ -92,21 +98,31 @@ namespace Lithnet.Laps.Web.ActiveDirectory
 
             if (dn == null)
             {
-                throw new NotFoundException($"The object {objectName} was not found in the global catalog");
+                throw new NotFoundException($"An object {objectName} of type {objectClass} was not found in the global catalog");
             }
 
-            DirectorySearcher d = new DirectorySearcher();
-
-            d.SearchRoot = new DirectoryEntry($"LDAP://{dn}");
-            d.SearchScope = SearchScope.Base;
-            d.Filter = $"(objectClass=*)";
+            DirectorySearcher d = new DirectorySearcher
+            {
+                SearchRoot = new DirectoryEntry($"LDAP://{dn}"),
+                SearchScope = SearchScope.Base,
+                Filter = $"(objectClass={objectClass})"
+            };
 
             foreach (string prop in propertiesToGet)
             {
                 d.PropertiesToLoad.Add(prop);
             }
 
-            return d.FindOne() ?? throw new NotFoundException($"The object {dn} was not found in the directory");
+            d.PropertiesToLoad.AddIfMissing("objectClass", StringComparer.OrdinalIgnoreCase);
+
+            SearchResult result = d.FindOne();
+
+            if (result == null)
+            {
+                throw new NotFoundException($"The object {dn} was not found in the directory or was not of the object class {objectClass}");
+            }
+
+            return result;
         }
 
         private static string DoGcLookupFromSimpleName(string name, string objectClass)
@@ -114,7 +130,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             DirectorySearcher d = new DirectorySearcher();
             d.SearchRoot = new DirectoryEntry($"GC://{Forest.GetCurrentForest().Name}");
             d.SearchScope = SearchScope.Subtree;
-            d.Filter = $"(&(objectClass={objectClass})(name={ActiveDirectory.EscapeSearchFilterParameter(name)}))";
+            d.Filter = $"(&(objectClass={objectClass})(samAccountName={ActiveDirectory.EscapeSearchFilterParameter(name)}))";
             d.PropertiesToLoad.Add("distinguishedName");
 
             SearchResultCollection result = d.FindAll();

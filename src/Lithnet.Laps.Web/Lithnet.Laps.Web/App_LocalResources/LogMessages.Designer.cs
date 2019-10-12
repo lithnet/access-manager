@@ -134,6 +134,15 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The user {0} requested the password for computer {1}, but multiple computers matching that name were found in the directory.
+        /// </summary>
+        internal static string ComputerNameAmbiguous {
+            get {
+                return ResourceManager.GetString("ComputerNameAmbiguous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The user {0} requested the password for computer {1} which was not found in the directory.
         /// </summary>
         internal static string ComputerNotFoundInDirectory {

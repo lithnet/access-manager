@@ -80,8 +80,7 @@ namespace Lithnet.Laps.Web
         {
             IUnityContainer container = UnityConfig.Container;
 
-            container.RegisterInstance<ILapsConfig>(
-               (LapsConfigSection)ConfigurationManager.GetSection(LapsConfigSection.SectionName));
+            container.RegisterInstance<ILapsConfig>((LapsConfigSection)ConfigurationManager.GetSection(LapsConfigSection.SectionName));
 
             this.reporting = (Reporting) container.Resolve(typeof(Reporting), String.Empty);
             this.directory = (IDirectory) container.Resolve(typeof(ActiveDirectory.ActiveDirectory), String.Empty);

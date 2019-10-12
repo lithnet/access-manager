@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NLog;
 using Lithnet.Laps.Web.Models;
 
@@ -10,8 +11,7 @@ namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile
         private readonly IDirectory directory;
         private readonly IAvailableReaders availableReaders;
 
-        public ConfigurationFileAuthorizationService(ILogger logger,
-            IDirectory directory, IAvailableReaders availableReaders)
+        public ConfigurationFileAuthorizationService(ILogger logger, IDirectory directory, IAvailableReaders availableReaders)
         {
             this.logger = logger;
             this.directory = directory;
@@ -40,16 +40,29 @@ namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile
 
         private bool IsReaderAuthorized(IReaderElement reader, IUser user)
         {
-            IUser readerAsUser = this.directory.GetUser(reader.Principal);
-
-            if (readerAsUser != null && readerAsUser.DistinguishedName == user.DistinguishedName)
+            try
             {
-                return true;
+                IUser readerAsUser = this.directory.GetUser(reader.Principal);
+
+                if (readerAsUser != null && readerAsUser.Sid == user.Sid)
+                {
+                    return true;
+                }
+            }
+            catch (NotFoundException)
+            {
             }
 
-            IGroup readerAsGroup = this.directory.GetGroup(reader.Principal);
+            try
+            {
+                IGroup readerAsGroup = this.directory.GetGroup(reader.Principal);
+                return readerAsGroup != null && this.directory.IsUserInGroup(user, readerAsGroup);
+            }
+            catch (NotFoundException)
+            {
+            }
 
-            return readerAsGroup != null && this.directory.IsUserInGroup(user, readerAsGroup);
+            return false;
         }
     }
 }

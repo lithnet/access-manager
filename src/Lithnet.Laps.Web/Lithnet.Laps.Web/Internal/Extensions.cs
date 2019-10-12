@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.DirectoryServices;
 using System.Linq;
 using System.Security.Claims;
@@ -90,6 +91,34 @@ namespace Lithnet.Laps.Web
             return result.Properties[propertyName][0]?.ToString();
         }
 
+        public static string GetPropertyCommaSeparatedString(this SearchResult result, string propertyName)
+        {
+            if (!result.Properties.Contains(propertyName))
+            {
+                return null;
+            }
+
+            return string.Join(", ", result.Properties[propertyName].OfType<object>().Select(t => t.ToString()));
+        }
+
+        public static bool HasPropertyValue(this SearchResult result, string propertyName, string value)
+        {
+            if (!result.Properties.Contains(propertyName))
+            {
+                return false;
+            }
+
+            foreach (object s in result.Properties[propertyName])
+            {
+                if (s.ToString().Equals(value, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static Guid? GetPropertyGuid(this SearchResult result, string propertyName)
         {
             if (!result.Properties.Contains(propertyName))
@@ -144,6 +173,14 @@ namespace Lithnet.Laps.Web
             }
 
             return $"\\{string.Join("\\", guid.Value.ToByteArray().Select(t => t.ToString("X2")))}";
+        }
+
+        internal static void AddIfMissing(this StringCollection c, string value, StringComparer comparer)
+        {
+            if (!c.OfType<string>().Contains(value, comparer))
+            {
+                c.Add(value);
+            }
         }
     }
 }

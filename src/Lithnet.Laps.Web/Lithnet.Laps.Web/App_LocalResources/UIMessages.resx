@@ -168,4 +168,7 @@
   <data name="LoggedOut" xml:space="preserve">
     <value>You have been logged out. Please close all browser windows.</value>
   </data>
+  <data name="ComputerNameAmbiguous" xml:space="preserve">
+    <value>There are multiple computers with that name in the directory. Try specfying the computer in DOMAIN\computername format</value>
+  </data>
 </root>

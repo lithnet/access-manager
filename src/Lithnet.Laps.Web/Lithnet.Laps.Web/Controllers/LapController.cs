@@ -77,11 +77,25 @@ namespace Lithnet.Laps.Web.Controllers
 
                 this.reporting.LogSuccessEvent(EventIDs.UserRequestedPassword, string.Format(LogMessages.UserHasRequestedPassword, user.SamAccountName, model.ComputerName));
 
-                IComputer computer = this.directory.GetComputer(model.ComputerName);
+                IComputer computer;
 
-                if (computer == null)
+                try
                 {
-                    return this.LogAndReturnErrorResponse(model, UIMessages.ComputerNotFoundInDirectory, EventIDs.ComputerNotFound, string.Format(LogMessages.ComputerNotFoundInDirectory, user.SamAccountName, model.ComputerName));
+                    computer = this.directory.GetComputer(model.ComputerName);
+
+                    if (computer == null)
+                    {
+                        throw new NotFoundException();
+                    }
+                }
+                catch (AmbiguousNameException ex)
+                {
+                    return this.LogAndReturnErrorResponse(model, UIMessages.ComputerNameAmbiguous, EventIDs.ComputerNameAmbiguous, string.Format(LogMessages.ComputerNameAmbiguous, user.SamAccountName, model.ComputerName), ex);
+                }
+                catch (NotFoundException ex)
+                {
+                    return this.LogAndReturnErrorResponse(model, UIMessages.ComputerNotFoundInDirectory, EventIDs.ComputerNotFound, string.Format(LogMessages.ComputerNotFoundInDirectory, user.SamAccountName, model.ComputerName), ex);
+
                 }
 
                 // Is a target configured?
@@ -90,15 +104,7 @@ namespace Lithnet.Laps.Web.Controllers
 
                 if (target == null)
                 {
-                    return this.AuditAndReturnErrorResponse(
-                    model: model,
-                    userMessage: UIMessages.NotAuthorized,
-                    eventID: EventIDs.AuthZFailedNoTargetMatch,
-                    logMessage: string.Format(LogMessages.NoTargetsExist, user.SamAccountName,
-                        model.ComputerName),
-                    user: user,
-                    computer: computer
-                    );
+                    return this.AuditAndReturnErrorResponse(model, UIMessages.NotAuthorized, EventIDs.AuthZFailedNoTargetMatch, string.Format(LogMessages.NoTargetsExist, user.SamAccountName, model.ComputerName), user: user, computer: computer);
                 }
 
                 // Do authorization check first.
@@ -107,7 +113,7 @@ namespace Lithnet.Laps.Web.Controllers
 
                 if (!authResponse.IsAuthorized)
                 {
-                    return this.GetViewForFailedAuthorization(model, user, computer, authResponse, target);
+                    return this.AuditAndReturnErrorResponse(model: model, userMessage: UIMessages.NotAuthorized, eventID: EventIDs.AuthorizationFailed, logMessage: string.Format(LogMessages.AuthorizationFailed, user.SamAccountName, model.ComputerName), user: user, computer: computer, target: target);
                 }
 
                 // Do actual work only if authorized.
@@ -119,7 +125,7 @@ namespace Lithnet.Laps.Web.Controllers
                     return this.LogAndReturnErrorResponse(model, UIMessages.NoLapsPassword, EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.SamAccountName, user.SamAccountName));
                 }
 
-                if (!String.IsNullOrEmpty(target.ExpireAfter))
+                if (target.ExpireAfter.Ticks > 0)
                 {
                     this.UpdateTargetPasswordExpiry(target, computer);
 
@@ -135,38 +141,6 @@ namespace Lithnet.Laps.Web.Controllers
             {
                 return this.LogAndReturnErrorResponse(model, UIMessages.UnexpectedError, EventIDs.UnexpectedError, string.Format(LogMessages.UnhandledError, model.ComputerName, user?.SamAccountName ?? LogMessages.UnknownComputerPlaceholder), ex);
             }
-        }
-
-        private ViewResult GetViewForFailedAuthorization(LapRequestModel model, IUser user, IComputer computer,
-            AuthorizationResponse authResponse, ITarget target)
-        {
-            ViewResult viewResult = this.AuditAndReturnErrorResponse(
-                model: model,
-                userMessage: UIMessages.NotAuthorized,
-                eventID: EventIDs.AuthorizationFailed,
-                logMessage: string.Format(LogMessages.AuthorizationFailed, user.SamAccountName,
-                    model.ComputerName),
-                user: user,
-                computer: computer,
-                target: target);
-
-            // Handle specific result codes of the ConfigurationFileAuthorizationService.
-            // FIXME: This dependency on ConfigurationFileAuthorizationService is dodgy.
-
-            if (authResponse.ResultCode == EventIDs.AuthZFailedNoReaderPrincipalMatch)
-            {
-                viewResult = this.AuditAndReturnErrorResponse(
-                    model: model,
-                    userMessage: UIMessages.NotAuthorized,
-                    eventID: EventIDs.AuthZFailedNoReaderPrincipalMatch,
-                    logMessage: string.Format(LogMessages.AuthZFailedNoReaderPrincipalMatch,
-                        user.SamAccountName, model.ComputerName),
-                    target: target,
-                    user: user,
-                    computer: computer);
-            }
-
-            return viewResult;
         }
 
         private ViewResult AuditAndReturnErrorResponse(LapRequestModel model, string userMessage, int eventID, string logMessage = null, Exception ex = null, ITarget target = null, AuthorizationResponse authorizationResponse = null, IUser user = null, IComputer computer = null)
@@ -186,9 +160,8 @@ namespace Lithnet.Laps.Web.Controllers
         [Localizable(false)]
         private void UpdateTargetPasswordExpiry(ITarget target, IComputer computer)
         {
-            TimeSpan t = TimeSpan.Parse(target.ExpireAfter);
-            this.logger.Trace($"Target rule requires password to change after {t}");
-            DateTime newDateTime = DateTime.UtcNow.Add(t);
+            this.logger.Trace($"Target rule requires password to change after {target.ExpireAfter}");
+            DateTime newDateTime = DateTime.UtcNow.Add(target.ExpireAfter);
             this.directory.SetPasswordExpiryTime(computer, newDateTime);
             this.logger.Trace($"Set expiry time for {computer.SamAccountName} to {newDateTime.ToLocalTime()}");
         }

@@ -1,11 +1,30 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Configuration;
 using System.Runtime.InteropServices;
 
 namespace Lithnet.Laps.Web.ActiveDirectory.Interop
 {
-    public static class NativeMethods
+    internal static class NativeMethods
     {
+        private static int directoryReferralLimit = -1;
+
+        private static int DirectoryReferralLimit
+        {
+            get
+            {
+                if (directoryReferralLimit < 0)
+                {
+                    if (!int.TryParse(ConfigurationManager.AppSettings["directory:referral-limit"] ?? "10", out directoryReferralLimit))
+                    {
+                        directoryReferralLimit = 10;
+                    }
+                }
+
+                return directoryReferralLimit;
+            }
+        }
+
         [DllImport("Ntdsapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern int DsBind(string domainControllerName, string dnsDomainName, out IntPtr hds);
 
@@ -20,24 +39,56 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
         [DllImport("ntdsapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern void DsFreeNameResult(IntPtr pResult);
 
-        public static string GetDnFromGc(string name
-            )
+        public static string GetDnFromGc(string nameToFind, string dnsDomainName = null, int referralLevel = 0)
         {
             IntPtr hds = IntPtr.Zero;
 
             try
             {
-                int result = DsBind(null, null, out hds);
+                int result = DsBind(null, dnsDomainName, out hds);
                 if (result != 0)
                 {
                     throw new Win32Exception(result);
                 }
 
-                DsNameResultItem nameResult = CrackNames(hds, DsNameFlags.DS_NAME_FLAG_TRUST_REFERRAL, DsNameFormat.DS_UNKNOWN_NAME, DsNameFormat.DS_FQDN_1779_NAME, name);
+                DsNameResultItem nameResult = CrackNames(hds, DsNameFlags.DS_NAME_FLAG_TRUST_REFERRAL, DsNameFormat.DS_UNKNOWN_NAME, DsNameFormat.DS_FQDN_1779_NAME, nameToFind);
 
-                string x = nameResult.Name;
+                switch (nameResult.Status)
+                {
+                    case DsNameError.None:
+                        return nameResult.Name;
 
-                return x;
+                    case DsNameError.NoMapping:
+                        throw new InvalidOperationException($"The object name {nameToFind} was found in the global catalog, but could not be mapped to a DN");
+
+                    case DsNameError.TrustReferral:
+                    case DsNameError.DomainOnly:
+                        if (!string.IsNullOrWhiteSpace(nameResult.Domain))
+                        {
+                            if (referralLevel < DirectoryReferralLimit)
+                            {
+                              return GetDnFromGc(nameToFind, nameResult.Domain, ++referralLevel);
+                            }
+
+                            throw new InvalidOperationException("The referral limit exceeded the maximum configured value");
+                        }
+
+                        throw new NotFoundException($"A referral to the object name {nameToFind} was received from the global catalog, but no referral information was provided. DsNameError: {nameResult.Status}");
+
+                    case DsNameError.NotFound:
+                        throw new NotFoundException($"The object name {nameToFind} was not found in the global catalog");
+
+                    case DsNameError.NotUnique:
+                        throw new InvalidOperationException($"There was more than one object with the name {nameToFind} in the global catalog");
+
+                    case DsNameError.Resolving:
+                        throw new InvalidOperationException($"The object name {nameToFind} was not able to be searched in the global catalog");
+
+                    case DsNameError.NoSyntacticalMapping:
+                        throw new ArgumentException($"DsCrackNames unexpectedly returned DS_NAME_ERROR_NO_SYNTACTICAL_MAPPING for name {nameToFind}");
+                }
+
+                return nameResult.Name;
             }
             finally
             {
@@ -50,56 +101,51 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
 
         private static DsNameResultItem CrackNames(IntPtr hds, DsNameFlags flags, DsNameFormat formatOffered, DsNameFormat formatDesired, string name)
         {
-            IntPtr pResult = IntPtr.Zero;
-            uint cNames = 1;
-            string[] rpNames = new[] { name };
+            var resultItems = CrackNames(hds, flags, formatOffered, formatDesired, new[] { name });
+            return resultItems[0];
+        }
 
-            int rc = DsCrackNames(
-                hds,
-                flags,
-                formatOffered,
-                formatDesired,
-                cNames,
-                rpNames,
-                out pResult
-            );
-
-            if (rc != 0)
-            {
-                throw new Win32Exception(rc);
-            }
-
-            DsNameResultItem[] dnri = null;
+        private static DsNameResultItem[] CrackNames(IntPtr hds, DsNameFlags flags, DsNameFormat formatOffered, DsNameFormat formatDesired, string[] namesToCrack)
+        {
+            IntPtr pDsNameResult = IntPtr.Zero;
+            DsNameResultItem[] resultItems;
 
             try
             {
-                DsNameResult dnr = (DsNameResult)Marshal.PtrToStructure(pResult, typeof(DsNameResult));
+                uint namesToCrackCount = (uint)namesToCrack.Length;
 
-                if (dnr.cItems == 0)
+                int result = DsCrackNames(hds, flags, formatOffered, formatDesired, namesToCrackCount, namesToCrack, out pDsNameResult);
+
+                if (result != 0)
                 {
-                    return default(DsNameResultItem);
+                    throw new Win32Exception(result);
                 }
 
-                //define the array with size to match				
-                dnri = new DsNameResultItem[dnr.cItems];
+                DsNameResult dsNameResult = (DsNameResult)Marshal.PtrToStructure(pDsNameResult, typeof(DsNameResult));
 
-                //point to our current DS_NAME_RESULT_ITEM structure
-                IntPtr pidx = dnr.rItems;
-
-                for (int idx = 0; idx < dnr.cItems; idx++)
+                if (dsNameResult.cItems == 0)
                 {
-                    //marshall back the structure
-                    dnri[idx] = (DsNameResultItem)Marshal.PtrToStructure(pidx, typeof(DsNameResultItem));
-                    //update the current pointer idx to next structure
-                    pidx = (IntPtr)(pidx.ToInt32() + Marshal.SizeOf(dnri[idx]));
+                    throw new InvalidOperationException("DsCrackNames returned an unexpected result");
+                }
+
+                resultItems = new DsNameResultItem[dsNameResult.cItems];
+                IntPtr pItem = dsNameResult.rItems;
+
+                for (int idx = 0; idx < dsNameResult.cItems; idx++)
+                {
+                    resultItems[idx] = (DsNameResultItem)Marshal.PtrToStructure(pItem, typeof(DsNameResultItem));
+                    pItem = IntPtr.Add(pItem, Marshal.SizeOf(resultItems[idx]));
                 }
             }
             finally
             {
-                DsFreeNameResult(pResult);
+                if (pDsNameResult != IntPtr.Zero)
+                {
+                    DsFreeNameResult(pDsNameResult);
+                }
             }
 
-            return dnri[0];
+            return resultItems;
         }
     }
 }

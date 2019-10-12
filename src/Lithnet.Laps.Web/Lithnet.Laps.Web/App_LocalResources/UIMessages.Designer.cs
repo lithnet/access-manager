@@ -97,6 +97,15 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There are multiple computers with that name in the directory. Try specfying the computer in DOMAIN\computername format.
+        /// </summary>
+        public static string ComputerNameAmbiguous {
+            get {
+                return ResourceManager.GetString("ComputerNameAmbiguous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Computer name is required.
         /// </summary>
         public static string ComputerNameIsRequired {
