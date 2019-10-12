@@ -24,7 +24,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             return result == null ? null : new ComputerAdapter(result);
         }
 
-        public Password GetPassword(IComputer computer)
+        public PasswordData GetPassword(IComputer computer)
         {
             SearchResult searchResult = this.GetDirectoryEntry(computer.DistinguishedName, ActiveDirectory.AttrMsMcsAdmPwd, ActiveDirectory.AttrMsMcsAdmPwdExpirationTime);
 
@@ -33,7 +33,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory
                 return null;
             }
 
-            return new Password(
+            return new PasswordData(
                 searchResult.GetPropertyString(ActiveDirectory.AttrMsMcsAdmPwd),
                 searchResult.GetPropertyDateTimeFromLong(ActiveDirectory.AttrMsMcsAdmPwdExpirationTime)
             );

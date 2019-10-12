@@ -22,10 +22,11 @@ namespace Lithnet.Laps.Web.Controllers
         private readonly IRateLimiter rateLimiter;
         private readonly IAvailableTargets availableTargets;
         private readonly IAuthenticationService authenticationService;
+        private readonly ILapsConfig config;
 
         public LapController(IAuthorizationService authorizationService, ILogger logger, IDirectory directory,
             IReporting reporting, IRateLimiter rateLimiter, IAvailableTargets availableTargets,
-            IAuthenticationService authenticationService)
+            IAuthenticationService authenticationService, ILapsConfig config)
         {
             this.authorizationService = authorizationService;
             this.logger = logger;
@@ -34,20 +35,23 @@ namespace Lithnet.Laps.Web.Controllers
             this.rateLimiter = rateLimiter;
             this.availableTargets = availableTargets;
             this.authenticationService = authenticationService;
+            this.config = config;
         }
 
         public ActionResult Get()
         {
-            return this.View();
+            return this.View(new LapRequestModel {ShowReason = this.config.Audit.Reason != ConfigSection.AuditReasonFieldState.NotRequired});
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Get(LapRequestModel model)
         {
+            model.ShowReason = this.config.Audit.Reason != ConfigSection.AuditReasonFieldState.NotRequired;
+
             if (!this.ModelState.IsValid)
             {
-                return this.View();
+                return this.View(model);
             }
 
             IUser user = null;
@@ -55,6 +59,11 @@ namespace Lithnet.Laps.Web.Controllers
             try
             {
                 model.FailureReason = null;
+
+                if (string.IsNullOrWhiteSpace(model.UserRequestReason) && this.config.Audit.Reason == ConfigSection.AuditReasonFieldState.Required)
+                {
+                    return this.LogAndReturnErrorResponse(model, UIMessages.ReasonRequired, EventIDs.ReasonRequired);
+                }
 
                 try
                 {
@@ -118,9 +127,9 @@ namespace Lithnet.Laps.Web.Controllers
 
                 // Do actual work only if authorized.
 
-                Password password = this.directory.GetPassword(computer);
+                PasswordData passwordData = this.directory.GetPassword(computer);
 
-                if (password == null)
+                if (passwordData == null)
                 {
                     return this.LogAndReturnErrorResponse(model, UIMessages.NoLapsPassword, EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.SamAccountName, user.SamAccountName));
                 }
@@ -130,12 +139,12 @@ namespace Lithnet.Laps.Web.Controllers
                     this.UpdateTargetPasswordExpiry(target, computer);
 
                     // Get the password again with the updated expiry date.
-                    password = this.directory.GetPassword(computer);
+                    passwordData = this.directory.GetPassword(computer);
                 }
 
-                this.reporting.PerformAuditSuccessActions(model, target, authResponse, user, computer, password);
+                this.reporting.PerformAuditSuccessActions(model, target, authResponse, user, computer, passwordData);
 
-                return this.View("Show", new LapEntryModel(computer, password));
+                return this.View("Show", new LapEntryModel(computer, passwordData));
             }
             catch (Exception ex)
             {

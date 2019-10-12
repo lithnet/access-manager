@@ -6,7 +6,7 @@ namespace Lithnet.Laps.Web.Models
     {
         IComputer GetComputer(string computerName);
 
-        Password GetPassword(IComputer computer);
+        PasswordData GetPassword(IComputer computer);
 
         void SetPasswordExpiryTime(IComputer computer, DateTime time);
 

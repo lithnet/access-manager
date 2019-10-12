@@ -10,6 +10,11 @@ namespace Lithnet.Laps.Web.Models
         [Required(ErrorMessageResourceType = typeof(UIMessages), ErrorMessageResourceName = "ComputerNameIsRequired")]
         public string ComputerName { get; set; }
 
+        [MaxLength(4096, ErrorMessageResourceType = typeof(UIMessages), ErrorMessageResourceName = "ReasonTooLong")]
+        public string UserRequestReason { get; set; }
+
+        public bool ShowReason { get; set; }
+
         public string FailureReason { get; set; }
     }
 }

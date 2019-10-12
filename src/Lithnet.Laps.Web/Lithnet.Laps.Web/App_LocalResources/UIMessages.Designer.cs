@@ -196,6 +196,24 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must provide the reason for requesting the LAPS password.
+        /// </summary>
+        public static string ReasonRequired {
+            get {
+                return ResourceManager.GetString("ReasonRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The size of the reason field is limited to 4096 characters.
+        /// </summary>
+        public static string ReasonTooLong {
+            get {
+                return ResourceManager.GetString("ReasonTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Your request could not be processed because your SSO identity could not be found in the directory.
         /// </summary>
         public static string SsoIdentityNotFound {
@@ -210,6 +228,15 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         public static string UnexpectedError {
             get {
                 return ResourceManager.GetString("UnexpectedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please provide the reason you require this password.
+        /// </summary>
+        public static string UserReasonPrompt {
+            get {
+                return ResourceManager.GetString("UserReasonPrompt", resourceCulture);
             }
         }
         

@@ -11,3 +11,4 @@ Computer DN:			{computer.DistinguishedName}
 Password expiry:			{computer.LapsExpiryDate}
 Target ID:			{target.ID}
 Reader principal:			{reader.Principal}
+Request reason:			{requestedReason}

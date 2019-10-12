@@ -2,13 +2,13 @@
 
 namespace Lithnet.Laps.Web.Models
 {
-    public class Password
+    public class PasswordData
     {
         public string Value { get; private set; }
 
         public DateTime? ExpirationTime { get; private set; }
 
-        public Password(string value, DateTime? expirationTime)
+        public PasswordData(string value, DateTime? expirationTime)
         {
             this.Value = value;
             this.ExpirationTime = expirationTime;

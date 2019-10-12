@@ -12,3 +12,4 @@ Computer DN:			{computer.DistinguishedName}
 Target ID:			{target.ID}
 Reader principal:			{reader.Principal}
 Detail:				{message}
+Request reason:	    	{requestedReason}

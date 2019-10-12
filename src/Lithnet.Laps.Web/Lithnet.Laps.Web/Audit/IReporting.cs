@@ -10,7 +10,7 @@ namespace Lithnet.Laps.Web.Audit
 
         void LogErrorEvent(int eventID, string logMessage, Exception ex);
 
-        void PerformAuditSuccessActions(LapRequestModel model, ITarget target, AuthorizationResponse authorizationResponse, IUser user, IComputer computer, Password password);
+        void PerformAuditSuccessActions(LapRequestModel model, ITarget target, AuthorizationResponse authorizationResponse, IUser user, IComputer computer, PasswordData passwordData);
 
         void PerformAuditFailureActions(LapRequestModel model, string userMessage, int eventID, string logMessage, Exception ex, ITarget target, AuthorizationResponse authorizationResponse, IUser user, IComputer computer);
     }

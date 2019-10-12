@@ -171,4 +171,13 @@
   <data name="ComputerNameAmbiguous" xml:space="preserve">
     <value>There are multiple computers with that name in the directory. Try specfying the computer in DOMAIN\computername format</value>
   </data>
+  <data name="ReasonRequired" xml:space="preserve">
+    <value>You must provide the reason for requesting the LAPS password</value>
+  </data>
+  <data name="ReasonTooLong" xml:space="preserve">
+    <value>The size of the reason field is limited to 4096 characters</value>
+  </data>
+  <data name="UserReasonPrompt" xml:space="preserve">
+    <value>Please provide the reason you require this password</value>
+  </data>
 </root>

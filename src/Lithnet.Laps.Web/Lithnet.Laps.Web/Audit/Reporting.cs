@@ -11,7 +11,7 @@ using NLog;
 
 namespace Lithnet.Laps.Web.Audit
 {
-    public sealed class Reporting: IReporting
+    public sealed class Reporting : IReporting
     {
         private readonly ILogger logger;
         private readonly ILapsConfig configSection;
@@ -43,9 +43,9 @@ namespace Lithnet.Laps.Web.Audit
             this.logger.Info(logEvent);
         }
 
-        public void PerformAuditSuccessActions(LapRequestModel model, ITarget target, AuthorizationResponse authorizationResponse, IUser user, IComputer computer, Password password)
+        public void PerformAuditSuccessActions(LapRequestModel model, ITarget target, AuthorizationResponse authorizationResponse, IUser user, IComputer computer, PasswordData passwordData)
         {
-            Dictionary<string, string> tokens = this.BuildTokenDictionary(target, authorizationResponse, user, computer, password, model.ComputerName);
+            Dictionary<string, string> tokens = this.BuildTokenDictionary(target, authorizationResponse, user, computer, passwordData, model.ComputerName, null, model.UserRequestReason);
             string logSuccessMessage = this.templates.LogSuccessTemplate ?? LogMessages.DefaultAuditSuccessText;
             string emailSuccessMessage = this.templates.EmailSuccessTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditSuccessText}</pre></body></html>";
 
@@ -71,7 +71,7 @@ namespace Lithnet.Laps.Web.Audit
 
         public void PerformAuditFailureActions(LapRequestModel model, string userMessage, int eventID, string logMessage, Exception ex, ITarget target, AuthorizationResponse authorizationResponse, IUser user, IComputer computer)
         {
-            Dictionary<string, string> tokens = this.BuildTokenDictionary(target, authorizationResponse, user, computer, null, model.ComputerName, logMessage ?? userMessage);
+            Dictionary<string, string> tokens = this.BuildTokenDictionary(target, authorizationResponse, user, computer, null, model.ComputerName, logMessage ?? userMessage, model.UserRequestReason);
             string logFailureMessage = this.templates.LogFailureTemplate ?? LogMessages.DefaultAuditFailureText;
             string emailFailureMessage = this.templates.EmailFailureTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditFailureText}</pre></body></html>";
 
@@ -93,7 +93,7 @@ namespace Lithnet.Laps.Web.Audit
             }
         }
 
-        private Dictionary<string, string> BuildTokenDictionary(ITarget target = null, AuthorizationResponse authorizationResponse = null, IUser user = null, IComputer computer = null, Password password = null, string requestedComputerName = null, string detailMessage = null)
+        private Dictionary<string, string> BuildTokenDictionary(ITarget target = null, AuthorizationResponse authorizationResponse = null, IUser user = null, IComputer computer = null, PasswordData passwordData = null, string requestedComputerName = null, string detailMessage = null, string requestedReason = null)
         {
             Dictionary<string, string> pairs = new Dictionary<string, string> {
                 { "{user.SamAccountName}", user?.SamAccountName},
@@ -113,6 +113,7 @@ namespace Lithnet.Laps.Web.Audit
                 { "{computer.Guid}", computer?.Guid?.ToString()},
                 { "{computer.Sid}", computer?.Sid?.ToString()},
                 { "{requestedComputerName}", requestedComputerName},
+                { "{requestedReason}", requestedReason},
                 { "{reader.Principal}", authorizationResponse?.ExtraInfo},
                 { "{reader.Notify}", string.Join(",", authorizationResponse?.UsersToNotify?.All ?? ImmutableHashSet<string>.Empty)},
                 { "{target.Notify}", string.Join(",", target?.UsersToNotify?.All ?? ImmutableHashSet<string>.Empty)},
@@ -126,7 +127,7 @@ namespace Lithnet.Laps.Web.Audit
                 { "{request.UnmaskedIPAddress}", HttpContext.Current?.Request?.GetUnmaskedIP()},
                 { "{datetime}", DateTime.Now.ToString(CultureInfo.CurrentCulture)},
                 { "{datetimeutc}", DateTime.UtcNow.ToString(CultureInfo.CurrentCulture)},
-                { "{computer.LapsExpiryDate}", password?.ExpirationTime?.ToString(CultureInfo.CurrentCulture)},
+                { "{computer.LapsExpiryDate}", passwordData?.ExpirationTime?.ToString(CultureInfo.CurrentCulture)},
             };
 
             return pairs;

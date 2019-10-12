@@ -27,8 +27,8 @@ namespace Lithnet.Laps.Web.Models
             this.FailureReason = failureReason;
         }
 
-        public LapEntryModel(IComputer computer, Password password) : this(computer.SamAccountName, password.Value,
-            LapEntryModel.BuildHtmlPassword(password.Value), password.ExpirationTime, String.Empty)
+        public LapEntryModel(IComputer computer, PasswordData passwordData) : this(computer.SamAccountName, passwordData.Value,
+            LapEntryModel.BuildHtmlPassword(passwordData.Value), passwordData.ExpirationTime, String.Empty)
         {
         }
 
