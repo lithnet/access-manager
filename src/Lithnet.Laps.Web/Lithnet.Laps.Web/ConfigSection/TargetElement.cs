@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Globalization;
 using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Models;
 
@@ -46,7 +47,7 @@ namespace Lithnet.Laps.Web
                     this.setTimeSpan = true;
                     this.expireAfter = new TimeSpan(0);
 
-                    if (TimeSpan.TryParse(this.ExpireAfter, out TimeSpan t))
+                    if (TimeSpan.TryParse(this.ExpireAfter, CultureInfo.InvariantCulture, out TimeSpan t))
                     {
                         this.expireAfter = t;
                     }
