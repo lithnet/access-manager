@@ -1,5 +1,8 @@
-using Microsoft.Practices.Unity.Configuration;
 using System;
+using System.Configuration;
+using Lithnet.Laps.Web.Models;
+using Microsoft.Practices.Unity.Configuration;
+using NLog;
 using Unity;
 using Unity.NLog;
 
@@ -38,7 +41,11 @@ namespace Lithnet.Laps.Web
         /// </remarks>
         public static void RegisterTypes(IUnityContainer container)
         {
+            // NOTE: To load from web.config uncomment the line below.
+            // Make sure to add a Unity.Configuration to the using statements.
             container.LoadConfiguration();
+
+            container.RegisterFactory<ILogger>(_ => LogManager.GetCurrentClassLogger());
         }
     }
 }

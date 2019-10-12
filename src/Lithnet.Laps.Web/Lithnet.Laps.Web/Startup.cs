@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.DirectoryServices.AccountManagement;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
@@ -22,26 +23,12 @@ using Microsoft.Owin.Security.WsFederation;
 using NLog;
 using Owin;
 using Unity;
+using Unity.Injection;
 
 namespace Lithnet.Laps.Web
 {
     public class Startup
     {
-        /// <summary>
-        /// Wrapper class for a logger.
-        ///
-        /// This is a hack. I need this one to get a logger via the dependency injection container.
-        /// </summary>
-        private class StartupLoggerWrapper
-        {
-            public StartupLoggerWrapper(ILogger logger)
-            {
-                this.Logger = logger;
-            }
-
-            public ILogger Logger { get; }
-        }
-
         internal static bool CanLogout = false;
 
         internal static string ClaimName { get; set; } = "upn";
@@ -61,16 +48,9 @@ namespace Lithnet.Laps.Web
 
         private readonly ILogger logger;
 
-        private readonly Reporting reporting;
+        private readonly IReporting reporting;
 
         private readonly IDirectory directory;
-
-        public Startup(ILogger logger, Reporting reporting, IDirectory directory)
-        {
-            this.logger = logger;
-            this.reporting = reporting;
-            this.directory = directory;
-        }
 
         /// <summary>
         /// Explicitly get the logger and the reporting from the DI-container.
@@ -79,15 +59,11 @@ namespace Lithnet.Laps.Web
         public Startup()
         {
             IUnityContainer container = UnityConfig.Container;
-
             container.RegisterInstance<ILapsConfig>((LapsConfigSection)ConfigurationManager.GetSection(LapsConfigSection.SectionName));
 
-            this.reporting = (Reporting) container.Resolve(typeof(Reporting), String.Empty);
-            this.directory = (IDirectory) container.Resolve(typeof(ActiveDirectory.ActiveDirectory), String.Empty);
-            // It seems I can't get a logger directly from the container; the following doesn't work:
-            // logger = (ILogger)UnityConfig.Container.Resolve(typeof(ILogger), String.Empty);
-            // So I hacked around this.
-            this.logger = ((StartupLoggerWrapper) container.Resolve(typeof(StartupLoggerWrapper), String.Empty)).Logger;
+            this.logger = container.Resolve<ILogger>();
+            this.reporting = container.Resolve<IReporting>();
+            this.directory = container.Resolve<IDirectory>();
         }
 
         public void ConfigureOpenIDConnect(IAppBuilder app)
@@ -140,16 +116,31 @@ namespace Lithnet.Laps.Web
                         {
                             OpenIdConnectConfiguration config = await n.Options.ConfigurationManager.GetConfigurationAsync(n.Request.CallCancelled).ConfigureAwait(false);
 
-                            TokenClient tokenClient = new TokenClient(config.TokenEndpoint, this.clientId, this.clientSecret);
-                            TokenResponse tokenResponse = await tokenClient.RequestAuthorizationCodeAsync(n.Code, this.redirectUri).ConfigureAwait(false);
+                            var client = new HttpClient();
+
+                            var tokenResponse = await client.RequestTokenAsync(new TokenRequest
+                            {
+                                Address = config.TokenEndpoint,
+                                ClientId = this.clientId,
+                                ClientSecret = this.clientSecret,
+                            });
 
                             if (tokenResponse.IsError)
                             {
                                 throw new Exception(tokenResponse.Error);
                             }
 
-                            UserInfoClient userInfoClient = new UserInfoClient(config.UserInfoEndpoint);
-                            UserInfoResponse userInfoResponse = await userInfoClient.GetAsync(tokenResponse.AccessToken);
+                            UserInfoResponse userInfoResponse = await client.GetUserInfoAsync(new UserInfoRequest
+                            {
+                                Address = config.UserInfoEndpoint,
+                                Token = tokenResponse.AccessToken
+                            });
+
+                            if (userInfoResponse.IsError)
+                            {
+                                throw new OpenIdConnectProtocolException(userInfoResponse.Error);
+                            }
+
                             List<Claim> claims = new List<Claim>();
                             claims.AddRange(userInfoResponse.Claims);
                             claims.Add(new Claim("id_token", tokenResponse.IdentityToken));
