@@ -2,8 +2,8 @@
 {
     public enum TargetType
     {
-        Computer,
-        Group,
-        Container
+        Computer = 0,
+        Group = 1,
+        Container = 2
     }
 }

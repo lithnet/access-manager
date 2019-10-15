@@ -23,7 +23,7 @@ namespace Lithnet.Laps.Web.Security.Authorization
         {
             List<ITarget> matchingTargets = new List<ITarget>();
 
-            foreach (TargetElement target in this.configSection.Targets.OfType<TargetElement>().OrderBy(t => t.Type == TargetType.Computer).ThenBy(t => t.Type == TargetType.Group))
+            foreach (TargetElement target in this.configSection.Targets.OfType<TargetElement>().OrderBy(t => (int)t.Type))
             {
                 try
                 {
@@ -80,7 +80,7 @@ namespace Lithnet.Laps.Web.Security.Authorization
                 }
             }
 
-            return matchingTargets.OrderBy(t => t.TargetType == TargetType.Computer).ThenBy(t => t.TargetType == TargetType.Group).FirstOrDefault();
+            return matchingTargets.FirstOrDefault();
         }
     }
 }
