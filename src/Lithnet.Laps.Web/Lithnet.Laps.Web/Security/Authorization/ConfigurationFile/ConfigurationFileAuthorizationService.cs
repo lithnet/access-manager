@@ -35,6 +35,8 @@ namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile
                 }
             }
 
+            this.logger.Trace($"User {user.SamAccountName} did not match any reader principal rules for target {target.TargetName}");
+
             return AuthorizationResponse.NoReader();
         }
 
@@ -43,10 +45,15 @@ namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile
             try
             {
                 IUser readerAsUser = this.directory.GetUser(reader.Principal);
+                this.logger.Trace($"Reader principal {reader.Principal} found in directory as user {readerAsUser.DistinguishedName}");
 
-                if (readerAsUser != null && readerAsUser.Sid == user.Sid)
+                if (readerAsUser.Sid == user.Sid)
                 {
                     return true;
+                }
+                else
+                {
+                    this.logger.Trace($"Reader principal {reader.Principal} does not match current user {user.SamAccountName}");
                 }
             }
             catch (NotFoundException)
@@ -56,12 +63,23 @@ namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile
             try
             {
                 IGroup readerAsGroup = this.directory.GetGroup(reader.Principal);
-                return readerAsGroup != null && this.directory.IsUserInGroup(user, readerAsGroup);
+                this.logger.Trace($"Reader principal {reader.Principal} found in directory as {readerAsGroup.DistinguishedName}");
+
+                if (this.directory.IsUserInGroup(user, readerAsGroup))
+                {
+                    return true;
+                }
+                else
+                {
+                    this.logger.Trace($"Current user {user.SamAccountName} is not a member of the group reader principal {reader.Principal}");
+                    return false;
+                }
             }
             catch (NotFoundException)
             {
             }
 
+            this.logger.Trace($"Could not translate reader principal {reader.Principal} to a directory object");
             return false;
         }
     }

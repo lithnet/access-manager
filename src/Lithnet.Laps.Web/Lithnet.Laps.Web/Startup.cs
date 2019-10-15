@@ -8,12 +8,14 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Helpers;
 using IdentityModel.Client;
+using Lithnet.Laps.Web;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Models;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Owin;
 using Microsoft.Owin.Host.SystemWeb;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
@@ -23,7 +25,8 @@ using Microsoft.Owin.Security.WsFederation;
 using NLog;
 using Owin;
 using Unity;
-using Unity.Injection;
+
+//[assembly: OwinStartup(typeof(Startup), "Configure")]
 
 namespace Lithnet.Laps.Web
 {
@@ -64,6 +67,24 @@ namespace Lithnet.Laps.Web
             this.logger = container.Resolve<ILogger>();
             this.reporting = container.Resolve<IReporting>();
             this.directory = container.Resolve<IDirectory>();
+        }
+
+        public void Configure(IAppBuilder app)
+        {
+            string mode = ConfigurationManager.AppSettings["authentication:mode"]?.ToLower();
+
+            if (mode == "wsfed")
+            {
+                this.ConfigureWsFederation(app);
+            }
+            else if (mode == "oidc")
+            {
+                this.ConfigureOpenIDConnect(app);
+            }
+            else
+            {
+                this.ConfigureWindowsAuth(app);
+            }
         }
 
         public void ConfigureOpenIDConnect(IAppBuilder app)

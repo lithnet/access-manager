@@ -19,5 +19,8 @@ namespace Lithnet.Laps.Web.Directory
         public Guid? Guid => this.groupPrincipal.GetPropertyGuid("objectGuid");
 
         public SecurityIdentifier Sid => this.groupPrincipal.GetPropertySid("objectSid");
+
+        public string DistinguishedName => this.groupPrincipal.GetPropertyString("distinguishedName");
+
     }
 }

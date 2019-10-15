@@ -6,6 +6,9 @@ namespace Lithnet.Laps.Web.Models
     public interface IGroup
     {
         Guid? Guid { get; }
+
         SecurityIdentifier Sid { get; }
+
+        string DistinguishedName { get; }
     }
 }
