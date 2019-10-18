@@ -151,6 +151,15 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Logout.
+        /// </summary>
+        public static string Logout {
+            get {
+                return ResourceManager.GetString("Logout", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The requested computer does not have a LAPS password.
         /// </summary>
         public static string NoLapsPassword {
@@ -232,7 +241,7 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please provide the reason you require this password.
+        ///   Looks up a localized string similar to Please provide the reason for requesting this password.
         /// </summary>
         public static string UserReasonPrompt {
             get {

@@ -20,7 +20,7 @@
     @if (MvcApplication.CanLogout)
     {
         <div class="center-content">
-            <a class="logout-link" href="@Url.Action("SignOut", "Home")">Logout</a>
+            <a class="logout-link" href="@Url.Action("SignOut", "Home")">@UIMessages.Logout</a>
         </div>
     }
 

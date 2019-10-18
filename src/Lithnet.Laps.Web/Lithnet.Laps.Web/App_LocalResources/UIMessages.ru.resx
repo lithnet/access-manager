@@ -118,55 +118,58 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ComputerNotFoundInDirectory" xml:space="preserve">
-    <value>The requested computer was not found in the directory</value>
+    <value>Запрашиваемый компьютер не найден</value>
   </data>
   <data name="NotAuthorized" xml:space="preserve">
-    <value>You are not authorized to access the password for this computer</value>
+    <value>У Вас нет прав для получения пароля к этому компьютеру</value>
   </data>
   <data name="SsoIdentityNotFound" xml:space="preserve">
-    <value>Your request could not be processed because your SSO identity could not be found in the directory</value>
+    <value>Ваш запрос не может быть выполнен. Ваши учетные данные не найдены</value>
   </data>
   <data name="NoLapsPassword" xml:space="preserve">
-    <value>The requested computer does not have a LAPS password</value>
+    <value>Запрашиваемый компьютер не имеет пароля LAPS</value>
   </data>
   <data name="UnexpectedError" xml:space="preserve">
-    <value>An unexpected error occurred</value>
+    <value>Произошла непредвиденная ошибка</value>
   </data>
   <data name="ComputerNameIsRequired" xml:space="preserve">
-    <value>Computer name is required</value>
+    <value>Имя компьютера обязательный параметр</value>
   </data>
   <data name="AuthNError" xml:space="preserve">
-    <value>An authentication error occurred</value>
+    <value>Ошибка аутентификации</value>
   </data>
   <data name="ButtonRequestAnotherPassword" xml:space="preserve">
-    <value>Request another password</value>
+    <value>Получить другой пароль</value>
   </data>
   <data name="ButtonRequestPassword" xml:space="preserve">
-    <value>Request password</value>
+    <value>Получить пароль</value>
   </data>
   <data name="ComputerName" xml:space="preserve">
-    <value>Computer name</value>
+    <value>Имя компьютера</value>
   </data>
   <data name="HeadingPasswordDetails" xml:space="preserve">
-    <value>Password details</value>
+    <value>Детальная информация</value>
   </data>
   <data name="HeadingRequestPassword" xml:space="preserve">
-    <value>Request password</value>
+    <value>Запрос пароля</value>
   </data>
   <data name="Password" xml:space="preserve">
-    <value>Password</value>
+    <value>Пароль</value>
   </data>
   <data name="ValidUntil" xml:space="preserve">
-    <value>Valid until</value>
+    <value>Действителен до</value>
   </data>
   <data name="NoLapsPasswordPlaceholder" xml:space="preserve">
-    <value>&lt;not set&gt;</value>
+    <value>&lt;не задан&gt;</value>
   </data>
   <data name="RateLimitError" xml:space="preserve">
-    <value>You have exceeded the maximum number of requests allowed in a specified period of time</value>
+    <value>Вы превысили максимальное количество запросов за указанный промежуток времени</value>
   </data>
   <data name="LoggedOut" xml:space="preserve">
-    <value>You have been logged out. Please close all browser windows.</value>
+    <value>Вы успешно вышли. Пожалуйста закройте все окна браузера.</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Выход</value>
   </data>
   <data name="ComputerNameAmbiguous" xml:space="preserve">
     <value>There are multiple computers with that name in the directory. Try specfying the computer in DOMAIN\computername format</value>
@@ -179,8 +182,5 @@
   </data>
   <data name="UserReasonPrompt" xml:space="preserve">
     <value>Please provide the reason for requesting this password</value>
-  </data>
-  <data name="Logout" xml:space="preserve">
-    <value>Logout</value>
   </data>
 </root>

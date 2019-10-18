@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ComputerNotFoundInDirectory" xml:space="preserve">
-    <value>The requested computer was not found in the directory</value>
+    <value>Il computer richiesto non è stato trovato nella directory</value>
   </data>
   <data name="NotAuthorized" xml:space="preserve">
     <value>Non sei autorizzato ad accedere alla password per questo computer</value>
@@ -158,5 +158,29 @@
   </data>
   <data name="ValidUntil" xml:space="preserve">
     <value>Valido fino a</value>
+  </data>
+  <data name="ComputerNameAmbiguous" xml:space="preserve">
+    <value>Esistono più computer con quel nome nella directory. Prova a specificare il computer nel formato DOMINIO\nomecomputer</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Disconnettersi</value>
+  </data>
+  <data name="ReasonRequired" xml:space="preserve">
+    <value>È necessario fornire il motivo per richiedere la password LAPS</value>
+  </data>
+  <data name="ReasonTooLong" xml:space="preserve">
+    <value>La dimensione del campo motivo è limitata a 4096 caratteri</value>
+  </data>
+  <data name="UserReasonPrompt" xml:space="preserve">
+    <value>Fornisci il motivo della richiesta di questa password</value>
+  </data>
+  <data name="LoggedOut" xml:space="preserve">
+    <value>Sei stato disconnesso. Chiudi tutte le finestre del browser.</value>
+  </data>
+  <data name="NoLapsPasswordPlaceholder" xml:space="preserve">
+    <value>&lt;non impostato&gt;</value>
+  </data>
+  <data name="RateLimitError" xml:space="preserve">
+    <value>Hai superato il numero massimo di richieste consentite in un determinato periodo di tempo</value>
   </data>
 </root>
