@@ -5,16 +5,27 @@ VisualStudioVersion = 15.0.27703.2000
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lithnet.Laps.Web", "Lithnet.Laps.Web\Lithnet.Laps.Web.csproj", "{AFF2B8F3-9BF2-4BDB-A841-F13AA9F4CEDC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lithnet.Laps.WebTests", "Lithnet.Laps.WebTests\Lithnet.Laps.WebTests.csproj", "{CF9A8FD1-D9D9-4DB7-9ED6-31300AD7DFF8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Dev|Any CPU = Dev|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{AFF2B8F3-9BF2-4BDB-A841-F13AA9F4CEDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AFF2B8F3-9BF2-4BDB-A841-F13AA9F4CEDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFF2B8F3-9BF2-4BDB-A841-F13AA9F4CEDC}.Dev|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFF2B8F3-9BF2-4BDB-A841-F13AA9F4CEDC}.Dev|Any CPU.Build.0 = Debug|Any CPU
 		{AFF2B8F3-9BF2-4BDB-A841-F13AA9F4CEDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFF2B8F3-9BF2-4BDB-A841-F13AA9F4CEDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF9A8FD1-D9D9-4DB7-9ED6-31300AD7DFF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF9A8FD1-D9D9-4DB7-9ED6-31300AD7DFF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF9A8FD1-D9D9-4DB7-9ED6-31300AD7DFF8}.Dev|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF9A8FD1-D9D9-4DB7-9ED6-31300AD7DFF8}.Dev|Any CPU.Build.0 = Debug|Any CPU
+		{CF9A8FD1-D9D9-4DB7-9ED6-31300AD7DFF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF9A8FD1-D9D9-4DB7-9ED6-31300AD7DFF8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

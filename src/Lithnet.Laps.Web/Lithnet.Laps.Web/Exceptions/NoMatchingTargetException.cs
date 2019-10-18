@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace Lithnet.Laps.Web
 {
-    [System.Serializable]
+    [Serializable]
     public class NoMatchingTargetException : Exception
     {
         public NoMatchingTargetException()
@@ -21,7 +18,6 @@ namespace Lithnet.Laps.Web
             : base(message, inner)
         {
         }
-
 
         protected NoMatchingTargetException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
             : base(info, context)

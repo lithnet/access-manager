@@ -97,6 +97,15 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There are multiple computers with that name in the directory. Try specfying the computer in DOMAIN\computername format.
+        /// </summary>
+        public static string ComputerNameAmbiguous {
+            get {
+                return ResourceManager.GetString("ComputerNameAmbiguous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Computer name is required.
         /// </summary>
         public static string ComputerNameIsRequired {
@@ -138,6 +147,15 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         public static string LoggedOut {
             get {
                 return ResourceManager.GetString("LoggedOut", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Logout.
+        /// </summary>
+        public static string Logout {
+            get {
+                return ResourceManager.GetString("Logout", resourceCulture);
             }
         }
         
@@ -187,6 +205,24 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must provide the reason for requesting the LAPS password.
+        /// </summary>
+        public static string ReasonRequired {
+            get {
+                return ResourceManager.GetString("ReasonRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The size of the reason field is limited to 4096 characters.
+        /// </summary>
+        public static string ReasonTooLong {
+            get {
+                return ResourceManager.GetString("ReasonTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Your request could not be processed because your SSO identity could not be found in the directory.
         /// </summary>
         public static string SsoIdentityNotFound {
@@ -201,6 +237,15 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         public static string UnexpectedError {
             get {
                 return ResourceManager.GetString("UnexpectedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please provide the reason for requesting this password.
+        /// </summary>
+        public static string UserReasonPrompt {
+            get {
+                return ResourceManager.GetString("UserReasonPrompt", resourceCulture);
             }
         }
         

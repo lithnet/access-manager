@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.DirectoryServices;
-using System.Linq;
-using System.Security.Principal;
-using System.Web;
-using System.DirectoryServices.AccountManagement;
+using System.Globalization;
+using Lithnet.Laps.Web.Audit;
+using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web
 {
-    public class TargetElement : ConfigurationElement
+    public class TargetElement : ConfigurationElement, ITarget
     {
-        private Principal principal;
+        private bool setTimeSpan;
+        private TimeSpan expireAfter;
 
         private const string PropAudit = "audit";
         private const string PropReaders = "readers";
@@ -21,33 +19,44 @@ namespace Lithnet.Laps.Web
         private const string PropIDType = "type";
 
         [ConfigurationProperty(TargetElement.PropAudit, IsRequired = false)]
-        public AuditElement Audit => (AuditElement) this[TargetElement.PropAudit];
+        public AuditElement Audit => (AuditElement)this[TargetElement.PropAudit];
 
-        [ConfigurationProperty(PropIDType, IsRequired = false)]
-        public TargetType Type => (TargetType) this[PropIDType];
+        [ConfigurationProperty(TargetElement.PropIDType, IsRequired = false)]
+        public TargetType Type => (TargetType)this[TargetElement.PropIDType];
 
-        [ConfigurationProperty(PropID, IsRequired = true, IsKey = true)]
-        public string Name => (string) this[PropID];
+        [ConfigurationProperty(TargetElement.PropID, IsRequired = true, IsKey = true)]
+        public string Name => (string)this[TargetElement.PropID];
 
         [ConfigurationProperty(TargetElement.PropExpireAfter, IsRequired = false)]
-        public string ExpireAfter => (string) this[TargetElement.PropExpireAfter];
+        public string ExpireAfter => (string)this[TargetElement.PropExpireAfter];
 
-        [ConfigurationProperty(PropReaders, IsRequired = true)]
-        [ConfigurationCollection(typeof(ReaderCollection), AddItemName = PropReader, CollectionType = ConfigurationElementCollectionType.BasicMap)]
-        public ReaderCollection Readers => (ReaderCollection) this[PropReaders];
+        [ConfigurationProperty(TargetElement.PropReaders, IsRequired = true)]
+        [ConfigurationCollection(typeof(ReaderCollection), AddItemName = TargetElement.PropReader, CollectionType = ConfigurationElementCollectionType.BasicMap)]
+        public ReaderCollection Readers => (ReaderCollection)this[TargetElement.PropReaders];
 
-        internal Principal PrincipalObject
+        TargetType ITarget.TargetType => this.Type;
+
+        string ITarget.TargetName => this.Name;
+
+        TimeSpan ITarget.ExpireAfter
         {
             get
             {
-                if (this.principal == null)
+                if (!this.setTimeSpan)
                 {
-                    PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
-                    this.principal = Principal.FindByIdentity(ctx, this.Name);
+                    this.setTimeSpan = true;
+                    this.expireAfter = new TimeSpan(0);
+
+                    if (TimeSpan.TryParse(this.ExpireAfter, CultureInfo.InvariantCulture, out TimeSpan t))
+                    {
+                        this.expireAfter = t;
+                    }
                 }
 
-                return this.principal;
+                return this.expireAfter;
             }
         }
+
+        UsersToNotify ITarget.UsersToNotify => this.Audit.UsersToNotify;
     }
 }

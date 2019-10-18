@@ -1,31 +1,40 @@
 ﻿using System;
-using System.DirectoryServices.AccountManagement;
 using System.Web;
 using System.Web.Caching;
 using Lithnet.Laps.Web.App_LocalResources;
+using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web
 {
-    internal static class RateLimiter
+    public sealed class RateLimiter: IRateLimiter
     {
-        public static bool IsRateLimitExceeded(LapRequestModel model, UserPrincipal p, HttpRequestBase r)
+        private readonly ILapsConfig configSection;
+        private readonly Reporting reporting;
+
+        public RateLimiter(ILapsConfig configSection, Reporting reporting)
         {
-            if (LapsConfigSection.Configuration.RateLimitIP.Enabled)
+            this.configSection = configSection;
+            this.reporting = reporting;
+        }
+
+        public bool IsRateLimitExceeded(LapRequestModel model, IUser p, HttpRequestBase r)
+        {
+            if (this.configSection.RateLimitIP.Enabled)
             {
-                if (RateLimiter.IsIpThresholdExceeded(model, p, r, LapsConfigSection.Configuration.RateLimitIP.ReqPerMinute, 60)
-                    || RateLimiter.IsIpThresholdExceeded(model, p, r, LapsConfigSection.Configuration.RateLimitIP.ReqPerHour, 3600)
-                    || RateLimiter.IsIpThresholdExceeded(model, p, r, LapsConfigSection.Configuration.RateLimitIP.ReqPerDay, 86400))
+                if (this.IsIpThresholdExceeded(model, p, r, this.configSection.RateLimitIP.ReqPerMinute, 60)
+                    || this.IsIpThresholdExceeded(model, p, r, this.configSection.RateLimitIP.ReqPerHour, 3600)
+                    || this.IsIpThresholdExceeded(model, p, r, this.configSection.RateLimitIP.ReqPerDay, 86400))
                 {
                     return true;
                 }
             }
 
-            if (LapsConfigSection.Configuration.RateLimitUser.Enabled)
+            if (this.configSection.RateLimitUser.Enabled)
             {
-                if (RateLimiter.IsUserThresholdExceeded(model, p, r, LapsConfigSection.Configuration.RateLimitUser.ReqPerMinute, 60)
-                    || RateLimiter.IsUserThresholdExceeded(model, p, r, LapsConfigSection.Configuration.RateLimitUser.ReqPerHour, 3600)
-                    || RateLimiter.IsUserThresholdExceeded(model, p, r, LapsConfigSection.Configuration.RateLimitUser.ReqPerDay, 86400))
+                if (this.IsUserThresholdExceeded(model, p, r, this.configSection.RateLimitUser.ReqPerMinute, 60)
+                    || this.IsUserThresholdExceeded(model, p, r, this.configSection.RateLimitUser.ReqPerHour, 3600)
+                    || this.IsUserThresholdExceeded(model, p, r, this.configSection.RateLimitUser.ReqPerDay, 86400))
                 {
                     return true;
                 }
@@ -33,11 +42,11 @@ namespace Lithnet.Laps.Web
             return false;
         }
 
-        private static bool IsIpThresholdExceeded(LapRequestModel model, UserPrincipal p, HttpRequestBase r, int threshold, int duration)
+        private bool IsIpThresholdExceeded(LapRequestModel model, IUser p, HttpRequestBase r, int threshold, int duration)
         {
-            if (RateLimiter.IsThresholdExceeded(r, threshold, duration))
+            if (this.IsThresholdExceeded(r, threshold, duration))
             {
-                Reporting.PerformAuditFailureActions(model, UIMessages.RateLimitError, EventIDs.RateLimitExceededIP,
+                this.reporting.PerformAuditFailureActions(model, UIMessages.RateLimitError, EventIDs.RateLimitExceededIP,
                     string.Format(LogMessages.RateLimitExceededIP, p.SamAccountName, r.UserHostAddress, threshold, duration), null, null, null, p, null);
                 return true;
             }
@@ -45,11 +54,11 @@ namespace Lithnet.Laps.Web
             return false;
         }
 
-        private static bool IsUserThresholdExceeded(LapRequestModel model, UserPrincipal p, HttpRequestBase r, int threshold, int duration)
+        private bool IsUserThresholdExceeded(LapRequestModel model, IUser p, HttpRequestBase r, int threshold, int duration)
         {
-            if (RateLimiter.IsThresholdExceeded(p, threshold, duration))
+            if (this.IsThresholdExceeded(p, threshold, duration))
             {
-                Reporting.PerformAuditFailureActions(model, UIMessages.RateLimitError, EventIDs.RateLimitExceededUser,
+                this.reporting.PerformAuditFailureActions(model, UIMessages.RateLimitError, EventIDs.RateLimitExceededUser,
                     string.Format(LogMessages.RateLimitExceededUser, p.SamAccountName, r.UserHostAddress, threshold, duration), null, null, null, p, null);
                 return true;
             }
@@ -57,21 +66,21 @@ namespace Lithnet.Laps.Web
             return false;
         }
 
-        private static bool IsThresholdExceeded(HttpRequestBase r, int threshold, int duration)
+        private bool IsThresholdExceeded(HttpRequestBase r, int threshold, int duration)
         {
-            string key1 = string.Join(@"-", duration, threshold, LapsConfigSection.Configuration.RateLimitIP.ThrottleOnXffIP ? r.GetUnmaskedIP() : r.UserHostAddress);
+            string key1 = string.Join(@"-", duration, threshold, this.configSection.RateLimitIP.ThrottleOnXffIP ? r.GetUnmaskedIP() : r.UserHostAddress);
 
-            return IsThresholdExceeded(key1, threshold, duration);
+            return this.IsThresholdExceeded(key1, threshold, duration);
         }
 
-        private static bool IsThresholdExceeded(UserPrincipal p, int threshold, int duration)
+        private bool IsThresholdExceeded(IUser p, int threshold, int duration)
         {
             string key1 = string.Join(@"-", duration, threshold, p.Sid);
 
-            return IsThresholdExceeded(key1, threshold, duration);
+            return this.IsThresholdExceeded(key1, threshold, duration);
         }
 
-        private static bool IsThresholdExceeded(string key, int threshold, int duration)
+        private bool IsThresholdExceeded(string key, int threshold, int duration)
         {
             int count = 1;
 

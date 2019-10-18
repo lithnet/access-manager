@@ -21,7 +21,19 @@
                 </label>
             </section>
 
-            @if (Model?.FailureReason != null)
+            @if (Model.ShowReason)
+            {
+                <section>
+                    <label class="title">@UIMessages.UserReasonPrompt</label>
+                    <label class="input">
+                        @*<i class="icon-append fa"></i>*@
+                        @Html.TextAreaFor(model => model.UserRequestReason, new {@class = "dataEntryLarge"})
+                        @Html.ValidationMessageFor(model => model.UserRequestReason)
+                    </label>
+                </section>
+            }
+
+            @if (Model != null && Model.FailureReason != null)
             {
                 <section>
                     <b class="error">
