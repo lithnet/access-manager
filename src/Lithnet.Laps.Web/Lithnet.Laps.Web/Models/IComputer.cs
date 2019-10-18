@@ -3,18 +3,10 @@ using System.Security.Principal;
 
 namespace Lithnet.Laps.Web.Models
 {
-    public interface IComputer
+    public interface IComputer : ISecurityPrincipal
     {
-        string SamAccountName { get; }
-
-        string DistinguishedName { get; }
-
         string Description { get; }
 
         string DisplayName { get; }
-
-        Guid? Guid { get; }
-
-        SecurityIdentifier Sid { get; }
     }
 }

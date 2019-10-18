@@ -22,14 +22,14 @@ namespace Lithnet.Laps.Web.Security.Authentication
 
             if (sid == null)
             {
-                throw new NoMatchingPrincipalException(string.Format(LogMessages.UserNotFoundInDirectory, httpContext.User.Identity.Name));
+                throw new NotFoundException(string.Format(LogMessages.UserNotFoundInDirectory, httpContext.User.Identity.Name));
             }
 
             IUser user = directory.GetUser(sid);
 
             if (user == null)
             {
-                throw new NoMatchingPrincipalException(string.Format(LogMessages.UserNotFoundInDirectory, httpContext.User.Identity.Name));
+                throw new NotFoundException(string.Format(LogMessages.UserNotFoundInDirectory, httpContext.User.Identity.Name));
             }
 
             return user;

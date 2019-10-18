@@ -259,12 +259,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActiveDirectory\ActiveDirectory.cs" />
+    <Compile Include="ActiveDirectory\Interop\AuthzContextInformationClass.cs" />
+    <Compile Include="ActiveDirectory\Interop\AuthzInitFlags.cs" />
+    <Compile Include="ActiveDirectory\Interop\AuthzResourceManagerFlags.cs" />
+    <Compile Include="ActiveDirectory\Interop\AuthzRpcClientVersion.cs" />
+    <Compile Include="ActiveDirectory\Interop\AuthzRpcInitInfoClient.cs" />
     <Compile Include="ActiveDirectory\Interop\DsNameError.cs" />
     <Compile Include="ActiveDirectory\Interop\DsNameFlags.cs" />
     <Compile Include="ActiveDirectory\Interop\DsNameFormat.cs" />
     <Compile Include="ActiveDirectory\Interop\DsNameResult.cs" />
     <Compile Include="ActiveDirectory\Interop\DsNameResultItem.cs" />
+    <Compile Include="ActiveDirectory\Interop\Luid.cs" />
     <Compile Include="ActiveDirectory\Interop\NativeMethods.cs" />
+    <Compile Include="ActiveDirectory\Interop\SidAndAttributes.cs" />
+    <Compile Include="ActiveDirectory\Interop\TokenGroups.cs" />
     <Compile Include="App_LocalResources\UIMessages.it.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -284,6 +292,7 @@
     <Compile Include="Exceptions\AmbiguousNameException.cs" />
     <Compile Include="Mail\IMailer.cs" />
     <Compile Include="Mail\SmtpMailer.cs" />
+    <Compile Include="Models\ISecurityPrincipal.cs" />
     <Compile Include="Models\ILapsConfig.cs" />
     <Compile Include="Security\Authentication\AuthenticationService.cs" />
     <Compile Include="Security\Authentication\IAuthenticationService.cs" />
@@ -291,11 +300,11 @@
     <Compile Include="Security\Authorization\ConfigurationFile\ConfigurationFileAuthorizationService.cs" />
     <Compile Include="Security\Authorization\ConfigurationFile\IAvailableReaders.cs" />
     <Compile Include="Security\Authorization\IAuthorizationService.cs" />
-    <Compile Include="ActiveDirectory\ComputerAdapter.cs" />
+    <Compile Include="ActiveDirectory\ActiveDirectoryComputer.cs" />
     <Compile Include="ConfigSection\AuditElement.cs" />
     <Compile Include="ConfigSection\RateLimitIPElement.cs" />
     <Compile Include="ConfigSection\RateLimitUserElement.cs" />
-    <Compile Include="ActiveDirectory\GroupAdapter.cs" />
+    <Compile Include="ActiveDirectory\ActiveDirectoryGroup.cs" />
     <Compile Include="Internal\IRateLimiter.cs" />
     <Compile Include="Models\IComputer.cs" />
     <Compile Include="Models\IDirectory.cs" />
@@ -338,7 +347,7 @@
     <Compile Include="Security\Authorization\IAvailableTargets.cs" />
     <Compile Include="Security\Authorization\AvailableTargets.cs" />
     <Compile Include="Models\IGroup.cs" />
-    <Compile Include="ActiveDirectory\UserAdapter.cs" />
+    <Compile Include="ActiveDirectory\ActiveDirectoryUser.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-grid.css" />
@@ -393,6 +402,8 @@
     <Content Include="Content\bootstrap-reboot.css.map" />
     <Content Include="Content\bootstrap-grid.min.css.map" />
     <Content Include="Content\bootstrap-grid.css.map" />
+    <Content Include="appsettings.json" />
+    <Content Include="appSettings.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

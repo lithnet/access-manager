@@ -67,7 +67,7 @@ namespace Lithnet.Laps.Web.Security.Authorization
                             continue;
                         }
 
-                        if (this.directory.IsComputerInGroup(computer, g))
+                        if (this.directory.IsSidInPrincipalToken(computer.Sid, computer, g.Sid))
                         {
                             this.logger.Trace($"Matched {computer.SamAccountName} to target group {target.Name}");
                             matchingTargets.Add(target);

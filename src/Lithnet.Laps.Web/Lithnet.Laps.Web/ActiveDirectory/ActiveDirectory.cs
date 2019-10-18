@@ -17,11 +17,39 @@ namespace Lithnet.Laps.Web.ActiveDirectory
 
         private const string AttrMsMcsAdmPwdExpirationTime = "ms-Mcs-AdmPwdExpirationTime";
 
+        public IUser GetUser(string userName)
+        {
+            SearchResult user = this.DoGcLookup(userName, "user", ActiveDirectoryUser.PropertiesToGet);
+            return user == null ? null : new ActiveDirectoryUser(user);
+        }
+
         public IComputer GetComputer(string computerName)
         {
-            SearchResult result = this.DoGcLookup(computerName, "computer", ComputerAdapter.PropertiesToGet);
+            SearchResult result = this.DoGcLookup(computerName, "computer", ActiveDirectoryComputer.PropertiesToGet);
 
-            return result == null ? null : new ComputerAdapter(result);
+            return result == null ? null : new ActiveDirectoryComputer(result);
+        }
+
+        public ISecurityPrincipal GetPrincipal(string principalName)
+        {
+            SearchResult result = this.DoGcLookup(principalName, "*", ActiveDirectoryComputer.PropertiesToGet);
+
+            if (result.HasPropertyValue("objectClass", "computer"))
+            {
+                return new ActiveDirectoryComputer(result);
+            }
+
+            if (result.HasPropertyValue("objectClass", "group"))
+            {
+                return new ActiveDirectoryGroup(result);
+            }
+
+            if (result.HasPropertyValue("objectClass", "user"))
+            {
+                return new ActiveDirectoryUser(result);
+            }
+
+            throw new InvalidOperationException($"The object '{principalName}' was of an unknown type");
         }
 
         public PasswordData GetPassword(IComputer computer)
@@ -33,10 +61,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory
                 return null;
             }
 
-            return new PasswordData(
-                searchResult.GetPropertyString(ActiveDirectory.AttrMsMcsAdmPwd),
-                searchResult.GetPropertyDateTimeFromLong(ActiveDirectory.AttrMsMcsAdmPwdExpirationTime)
-            );
+            return new PasswordData(searchResult.GetPropertyString(ActiveDirectory.AttrMsMcsAdmPwd), searchResult.GetPropertyDateTimeFromLong(ActiveDirectory.AttrMsMcsAdmPwdExpirationTime));
         }
 
         public void SetPasswordExpiryTime(IComputer computer, DateTime time)
@@ -58,24 +83,13 @@ namespace Lithnet.Laps.Web.ActiveDirectory
 
         public IGroup GetGroup(string groupName)
         {
-            SearchResult result = this.DoGcLookup(groupName, "group", GroupAdapter.PropertiesToGet);
-            return result == null ? null : new GroupAdapter(result);
+            SearchResult result = this.DoGcLookup(groupName, "group", ActiveDirectoryGroup.PropertiesToGet);
+            return result == null ? null : new ActiveDirectoryGroup(result);
         }
 
-        public bool IsComputerInGroup(IComputer computer, IGroup group)
+        public bool IsSidInPrincipalToken(SecurityIdentifier targetDomain, ISecurityPrincipal principal, SecurityIdentifier sidToCheck)
         {
-            return this.IsPrincipalInGroup(computer.DistinguishedName, group.Sid);
-        }
-
-        public bool IsUserInGroup(IUser user, IGroup group)
-        {
-            return this.IsPrincipalInGroup(user.DistinguishedName, group.Sid);
-        }
-
-        public IUser GetUser(string userName)
-        {
-            SearchResult user = this.DoGcLookup(userName, "user", UserAdapter.PropertiesToGet);
-            return user == null ? null : new UserAdapter(user);
+            return NativeMethods.CheckForSidInToken(principal.Sid, sidToCheck, targetDomain);
         }
 
         private SearchResult DoGcLookup(string objectName, string objectClass, IEnumerable<string> propertiesToGet)
@@ -146,44 +160,6 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             }
 
             return result[0].Properties["distinguishedName"][0].ToString();
-        }
-
-        private bool IsPrincipalInGroup(string distinguishedName, SecurityIdentifier groupSecurityIdentifier)
-        {
-            if (groupSecurityIdentifier == null || groupSecurityIdentifier.BinaryLength == 0)
-            {
-                return false;
-            }
-
-            byte[] groupSid = new byte[groupSecurityIdentifier.BinaryLength];
-            groupSecurityIdentifier.GetBinaryForm(groupSid, 0);
-
-            return this.IsPrincipalInGroup(distinguishedName, groupSid);
-        }
-
-        private bool IsPrincipalInGroup(string distinguishedName, byte[] groupSid)
-        {
-            if (groupSid == null)
-            {
-                return false;
-            }
-
-            SearchResult result = this.GetDirectoryEntry(distinguishedName, "tokenGroups");
-
-            if (result == null)
-            {
-                return false;
-            }
-
-            foreach (byte[] value in result.Properties["tokenGroups"].OfType<byte[]>())
-            {
-                if (groupSid.SequenceEqual(value))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private SearchResult GetDirectoryEntry(string dn, params string[] propertiesToLoad)

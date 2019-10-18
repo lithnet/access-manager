@@ -44,7 +44,7 @@ namespace Lithnet.Laps.Web.Security.Authorization
         /// Depending on the kind of user that authenticates, other people might want to be notified.
         ///
         /// Note that this should only contain the users that needs to be notified for the specified reader (user or group).
-        /// The users that needs notifications for the target (ou of the computer), are defined in <see cref="ITarget."/>
+        /// The users that needs notifications for the target (ou of the computer), are defined in <see cref="ITarget"/>
         /// </summary>
         public UsersToNotify UsersToNotify { get; private set; }
 

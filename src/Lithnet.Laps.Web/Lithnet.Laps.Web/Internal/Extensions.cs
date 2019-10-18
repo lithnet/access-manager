@@ -126,7 +126,7 @@ namespace Lithnet.Laps.Web
                 return null;
             }
 
-            byte[] r = GetPropertyBytes(result, propertyName);
+            byte[] r = Extensions.GetPropertyBytes(result, propertyName);
 
             if (r == null)
             {
@@ -143,7 +143,7 @@ namespace Lithnet.Laps.Web
                 return null;
             }
 
-            byte[] r = GetPropertyBytes(result, propertyName);
+            byte[] r = Extensions.GetPropertyBytes(result, propertyName);
 
             if (r == null)
             {

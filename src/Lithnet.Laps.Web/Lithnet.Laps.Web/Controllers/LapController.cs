@@ -67,14 +67,9 @@ namespace Lithnet.Laps.Web.Controllers
 
                 try
                 {
-                    user = this.authenticationService.GetLoggedInUser(this.directory);
-
-                    if (user == null)
-                    {
-                        throw new NoMatchingPrincipalException();
-                    }
+                    user = this.authenticationService.GetLoggedInUser(this.directory) ?? throw new NotFoundException();
                 }
-                catch (NoMatchingPrincipalException ex)
+                catch (NotFoundException ex)
                 {
                     return this.LogAndReturnErrorResponse(model, UIMessages.SsoIdentityNotFound, EventIDs.SsoIdentityNotFound, null, ex);
                 }
@@ -90,12 +85,7 @@ namespace Lithnet.Laps.Web.Controllers
 
                 try
                 {
-                    computer = this.directory.GetComputer(model.ComputerName);
-
-                    if (computer == null)
-                    {
-                        throw new NotFoundException();
-                    }
+                    computer = this.directory.GetComputer(model.ComputerName) ?? throw new NotFoundException();
                 }
                 catch (AmbiguousNameException ex)
                 {
@@ -104,7 +94,6 @@ namespace Lithnet.Laps.Web.Controllers
                 catch (NotFoundException ex)
                 {
                     return this.LogAndReturnErrorResponse(model, UIMessages.ComputerNotFoundInDirectory, EventIDs.ComputerNotFound, string.Format(LogMessages.ComputerNotFoundInDirectory, user.SamAccountName, model.ComputerName), ex);
-
                 }
 
                 // Is a target configured?

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Principal;
 
 namespace Lithnet.Laps.Web.Models
 {
@@ -14,10 +15,10 @@ namespace Lithnet.Laps.Web.Models
 
         IGroup GetGroup(string groupName);
 
-        bool IsComputerInGroup(IComputer computer, IGroup group);
-
-        bool IsUserInGroup(IUser user, IGroup group);
-
         IUser GetUser(string userName);
+
+        ISecurityPrincipal GetPrincipal(string principalName);
+
+        bool IsSidInPrincipalToken(SecurityIdentifier targetDomain, ISecurityPrincipal principal, SecurityIdentifier sidToCheck);
     }
 }

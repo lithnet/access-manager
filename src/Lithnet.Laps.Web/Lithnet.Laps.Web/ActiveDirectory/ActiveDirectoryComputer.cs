@@ -5,13 +5,13 @@ using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web.ActiveDirectory
 {
-    public sealed class ComputerAdapter : IComputer
+    public sealed class ActiveDirectoryComputer : IComputer
     {
         internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "description", "displayName", "objectGuid", "objectSid" };
 
         private readonly SearchResult computer;
 
-        public ComputerAdapter(SearchResult computer)
+        public ActiveDirectoryComputer(SearchResult computer)
         {
             this.computer = computer;
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Principal;
 using NLog;
 using Lithnet.Laps.Web.Models;
 
@@ -27,7 +28,7 @@ namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile
 
             foreach (IReaderElement reader in this.availableReaders.GetReadersForTarget(target))
             {
-                if (this.IsReaderAuthorized(reader, user))
+                if (this.IsReaderAuthorized(reader, computer, user))
                 {
                     this.logger.Trace($"User {user.SamAccountName} matches reader principal {reader.Principal} is authorized to read passwords from target {target.TargetName}");
 
@@ -40,38 +41,21 @@ namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile
             return AuthorizationResponse.NoReader();
         }
 
-        private bool IsReaderAuthorized(IReaderElement reader, IUser user)
+        private bool IsReaderAuthorized(IReaderElement reader, IComputer computer,  IUser user)
         {
             try
             {
-                IUser readerAsUser = this.directory.GetUser(reader.Principal);
-                this.logger.Trace($"Reader principal {reader.Principal} found in directory as user {readerAsUser.DistinguishedName}");
+                ISecurityPrincipal principal = this.directory.GetPrincipal(reader.Principal);
 
-                if (readerAsUser.Sid == user.Sid)
+                this.logger.Trace($"Reader principal {reader.Principal} found in directory as user {principal.DistinguishedName}");
+
+                if (this.directory.IsSidInPrincipalToken(computer.Sid.AccountDomainSid, user, principal.Sid))
                 {
                     return true;
                 }
                 else
                 {
                     this.logger.Trace($"Reader principal {reader.Principal} does not match current user {user.SamAccountName}");
-                }
-            }
-            catch (NotFoundException)
-            {
-            }
-
-            try
-            {
-                IGroup readerAsGroup = this.directory.GetGroup(reader.Principal);
-                this.logger.Trace($"Reader principal {reader.Principal} found in directory as {readerAsGroup.DistinguishedName}");
-
-                if (this.directory.IsUserInGroup(user, readerAsGroup))
-                {
-                    return true;
-                }
-                else
-                {
-                    this.logger.Trace($"Current user {user.SamAccountName} is not a member of the group reader principal {reader.Principal}");
                     return false;
                 }
             }
@@ -79,7 +63,7 @@ namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile
             {
             }
 
-            this.logger.Trace($"Could not translate reader principal {reader.Principal} to a directory object");
+            this.logger.Trace($"Could not match reader principal {reader.Principal} to a directory object");
             return false;
         }
     }

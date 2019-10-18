@@ -137,9 +137,9 @@ namespace Lithnet.Laps.Web
                         {
                             OpenIdConnectConfiguration config = await n.Options.ConfigurationManager.GetConfigurationAsync(n.Request.CallCancelled).ConfigureAwait(false);
 
-                            var client = new HttpClient();
+                            HttpClient client = new HttpClient();
 
-                            var tokenResponse = await client.RequestTokenAsync(new TokenRequest
+                            TokenResponse tokenResponse = await client.RequestTokenAsync(new TokenRequest
                             {
                                 Address = config.TokenEndpoint,
                                 ClientId = this.clientId,

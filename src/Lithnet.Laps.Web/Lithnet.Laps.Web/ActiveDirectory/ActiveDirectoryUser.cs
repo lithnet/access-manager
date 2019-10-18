@@ -5,13 +5,13 @@ using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web.ActiveDirectory
 {
-    public sealed class UserAdapter : IUser
+    public sealed class ActiveDirectoryUser : IUser
     {
         private readonly SearchResult user;
 
         internal static string[] PropertiesToGet = { "samAccountName", "distinguishedName", "description", "displayName", "userPrincipalName", "objectSid", "mail", "givenName", "sn" };
 
-        public UserAdapter(SearchResult user)
+        public ActiveDirectoryUser(SearchResult user)
         {
             this.user = user;
         }
