@@ -172,15 +172,15 @@
     <value>Выход</value>
   </data>
   <data name="ComputerNameAmbiguous" xml:space="preserve">
-    <value>There are multiple computers with that name in the directory. Try specfying the computer in DOMAIN\computername format</value>
+    <value>Найдено несколько компьютеров с таким именем. Попробуйте указать имя компьютера в формате DOMAIN\computername</value>
   </data>
   <data name="ReasonRequired" xml:space="preserve">
-    <value>You must provide the reason for requesting the LAPS password</value>
+    <value>Вы должны указать причину запроса пароля LAPS</value>
   </data>
   <data name="ReasonTooLong" xml:space="preserve">
-    <value>The size of the reason field is limited to 4096 characters</value>
+    <value>Размер поля причины ограничен 4096 символами</value>
   </data>
   <data name="UserReasonPrompt" xml:space="preserve">
-    <value>Please provide the reason for requesting this password</value>
+    <value>Пожалуйста, укажите причину запроса пароля</value>
   </data>
 </root>

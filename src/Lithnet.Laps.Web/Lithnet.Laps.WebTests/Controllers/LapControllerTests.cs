@@ -20,6 +20,7 @@ namespace Lithnet.Laps.Web.Controllers.Tests
         private Mock<IAuthorizationService> dummyAuthorizationService;
         private Mock<IAvailableTargets> dummyAvailableTargets;
         private Mock<IDirectory> dummyDirectory;
+        private Mock<ILapsConfig> dummyConfig;
 
         private Mock<IAuthenticationService> authenticationServiceStub;
 
@@ -34,6 +35,7 @@ namespace Lithnet.Laps.Web.Controllers.Tests
             dummyAuthorizationService = new Mock<IAuthorizationService>();
             dummyAvailableTargets = new Mock<IAvailableTargets>();
             dummyDirectory = new Mock<IDirectory>();
+            dummyConfig = new Mock<ILapsConfig>();
 
             dummyDirectory.Setup(d => d.GetUser(It.IsAny<string>()))
                 .Returns(dummyUser.Object);
@@ -73,7 +75,8 @@ namespace Lithnet.Laps.Web.Controllers.Tests
                 reportingMock.Object,
                 dummyRateLimiter.Object,
                 availableTargetsStub.Object,
-                authenticationServiceStub.Object
+                authenticationServiceStub.Object, 
+                dummyConfig.Object
             );
 
             controller.Get(new LapRequestModel { ComputerName = @"Computer" });
@@ -108,7 +111,8 @@ namespace Lithnet.Laps.Web.Controllers.Tests
                 reportingMock.Object,
                 dummyRateLimiter.Object,
                 dummyAvailableTargets.Object,
-                authenticationServiceStub.Object
+                authenticationServiceStub.Object,
+                dummyConfig.Object
             );
 
             controller.Get(new LapRequestModel { ComputerName = @"Computer" });
