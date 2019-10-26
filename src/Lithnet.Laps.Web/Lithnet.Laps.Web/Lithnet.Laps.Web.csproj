@@ -402,6 +402,9 @@
     <Content Include="Content\bootstrap-reboot.css.map" />
     <Content Include="Content\bootstrap-grid.min.css.map" />
     <Content Include="Content\bootstrap-grid.css.map" />
+    <Content Include="laps.config" />
+    <Content Include="NLog.config" />
+    <Content Include="mail.config" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

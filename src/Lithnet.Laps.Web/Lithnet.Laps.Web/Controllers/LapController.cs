@@ -36,6 +36,7 @@ namespace Lithnet.Laps.Web.Controllers
             this.availableTargets = availableTargets;
             this.authenticationService = authenticationService;
             this.config = config;
+            
         }
 
         public ActionResult Get()

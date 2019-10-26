@@ -71,6 +71,23 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             entry.CommitChanges();
         }
 
+        public bool IsContainer(string path)
+        {
+            try
+            {
+                SearchResult result = this.GetDirectoryEntry(path, "objectClass");
+
+                return result.HasPropertyValue("objectClass", "organizationalUnit") ||
+                       result.HasPropertyValue("objectClass", "domain") ||
+                       result.HasPropertyValue("objectClass", "domainDNS") ||
+                       result.HasPropertyValue("objectClass", "container");
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public bool IsComputerInOu(IComputer computer, string ou)
         {
             DirectorySearcher d = new DirectorySearcher();

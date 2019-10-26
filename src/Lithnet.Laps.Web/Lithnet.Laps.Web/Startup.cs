@@ -62,7 +62,8 @@ namespace Lithnet.Laps.Web
         public Startup()
         {
             IUnityContainer container = UnityConfig.Container;
-            container.RegisterInstance<ILapsConfig>((LapsConfigSection)ConfigurationManager.GetSection(LapsConfigSection.SectionName));
+            LapsConfigSection section = (LapsConfigSection)ConfigurationManager.GetSection(LapsConfigSection.SectionName);
+            container.RegisterInstance<ILapsConfig>(section);
 
             this.logger = container.Resolve<ILogger>();
             this.reporting = container.Resolve<IReporting>();
