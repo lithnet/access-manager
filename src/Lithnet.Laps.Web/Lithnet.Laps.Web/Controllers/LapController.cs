@@ -123,7 +123,7 @@ namespace Lithnet.Laps.Web.Controllers
                     return this.LogAndReturnErrorResponse(model, UIMessages.NoLapsPassword, EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.SamAccountName, user.SamAccountName));
                 }
 
-                if (target.ExpireAfter.Ticks >= 0)
+                if (target.ExpireAfter.Ticks > 0)
                 {
                     this.UpdateTargetPasswordExpiry(target, computer);
 

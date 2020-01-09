@@ -45,7 +45,7 @@ namespace Lithnet.Laps.Web
                 if (!this.setTimeSpan)
                 {
                     this.setTimeSpan = true;
-                    this.expireAfter = new TimeSpan(-1);
+                    this.expireAfter = new TimeSpan(0);
 
                     if (TimeSpan.TryParse(this.ExpireAfter, CultureInfo.InvariantCulture, out TimeSpan t))
                     {

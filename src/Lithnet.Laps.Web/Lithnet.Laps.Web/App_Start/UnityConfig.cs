@@ -1,6 +1,11 @@
 using System;
 using System.Configuration;
+using Lithnet.Laps.Web.Audit;
+using Lithnet.Laps.Web.Mail;
 using Lithnet.Laps.Web.Models;
+using Lithnet.Laps.Web.Security.Authentication;
+using Lithnet.Laps.Web.Security.Authorization;
+using Lithnet.Laps.Web.Security.Authorization.ConfigurationFile;
 using Microsoft.Practices.Unity.Configuration;
 using NLog;
 using Unity;
@@ -41,11 +46,58 @@ namespace Lithnet.Laps.Web
         /// </remarks>
         public static void RegisterTypes(IUnityContainer container)
         {
-            // NOTE: To load from web.config uncomment the line below.
-            // Make sure to add a Unity.Configuration to the using statements.
-            container.LoadConfiguration();
+            if (((UnityConfigurationSection)ConfigurationManager.GetSection("unity"))?.Containers.Count > 0)
+            {
+                container.LoadConfiguration();
+            }
 
             container.RegisterFactory<ILogger>(_ => LogManager.GetCurrentClassLogger());
+
+            // If no container registrations are found in the config file, then load the defaults here
+            if (!container.IsRegistered<IAuthorizationService>())
+            {
+                container.RegisterType<IAuthorizationService, ConfigurationFileAuthorizationService>();
+            }
+
+            if (!container.IsRegistered<IDirectory>())
+            {
+                container.RegisterType<IDirectory, ActiveDirectory.ActiveDirectory>();
+            }
+
+            if (!container.IsRegistered<IAuthenticationService>())
+            {
+                container.RegisterType<IAuthenticationService, AuthenticationService>();
+            }
+
+            if (!container.IsRegistered<IAvailableTargets>())
+            {
+                container.RegisterType<IAvailableTargets, AvailableTargets>();
+            }
+
+            if (!container.IsRegistered<IAvailableReaders>())
+            {
+                container.RegisterType<IAvailableReaders, AvailableReaders>();
+            }
+
+            if (!container.IsRegistered<IReporting>())
+            {
+                container.RegisterType<IReporting, Reporting>();
+            }
+
+            if (!container.IsRegistered<ITemplates>())
+            {
+                container.RegisterType<ITemplates, TemplatesFromFiles>();
+            }
+
+            if (!container.IsRegistered<IRateLimiter>())
+            {
+                container.RegisterType<IRateLimiter, RateLimiter>();
+            }
+
+            if (!container.IsRegistered<IMailer>())
+            {
+                container.RegisterType<IMailer, SmtpMailer>();
+            }
         }
     }
 }
