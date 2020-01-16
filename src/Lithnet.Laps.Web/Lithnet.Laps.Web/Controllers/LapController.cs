@@ -265,6 +265,12 @@ namespace Lithnet.Laps.Web.Controllers
         [Localizable(false)]
         private static void UpdateTargetPasswordExpiry(TargetElement target, ComputerPrincipal computer)
         {
+            if (string.IsNullOrWhiteSpace(target.ExpireAfter))
+            {
+                LapController.logger.Trace($"Target rule does not require password change on access");
+                return;
+            }
+
             TimeSpan t = TimeSpan.Parse(target.ExpireAfter);
             LapController.logger.Trace($"Target rule requires password to change after {t}");
             DateTime newDateTime = DateTime.UtcNow.Add(t);
