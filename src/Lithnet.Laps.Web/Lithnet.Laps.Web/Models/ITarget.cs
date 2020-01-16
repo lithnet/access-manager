@@ -8,7 +8,7 @@ namespace Lithnet.Laps.Web.Models
         TargetType TargetType { get; }
 
         string TargetName { get; }
-        
+
         TimeSpan ExpireAfter { get; }
 
         UsersToNotify UsersToNotify { get; }

@@ -8,8 +8,8 @@ namespace Lithnet.Laps.Web.ConfigSection
     [Flags]
     public enum AuditReasonFieldState
     {
-        NotRequired = 0,
-        Requested = 1,
+        Hidden = 0,
+        Optional = 1,
         Required = 2
     }
 }

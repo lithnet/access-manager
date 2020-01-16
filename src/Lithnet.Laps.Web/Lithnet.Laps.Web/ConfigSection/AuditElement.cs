@@ -20,7 +20,7 @@ namespace Lithnet.Laps.Web
         [ConfigurationProperty(AuditElement.PropNotifyFailure, IsRequired = false, DefaultValue = true)]
         public bool NotifyFailure => (bool)this[AuditElement.PropNotifyFailure];
 
-        [ConfigurationProperty(AuditElement.PropReason, IsRequired = false, DefaultValue = AuditReasonFieldState.NotRequired)]
+        [ConfigurationProperty(AuditElement.PropReason, IsRequired = false, DefaultValue = AuditReasonFieldState.Optional)]
         public AuditReasonFieldState Reason => (AuditReasonFieldState)this[AuditElement.PropReason];
 
         [ConfigurationProperty(AuditElement.PropEmailAddresses, IsRequired = false)]

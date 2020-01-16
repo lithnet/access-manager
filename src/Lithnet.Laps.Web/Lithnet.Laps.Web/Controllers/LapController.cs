@@ -41,14 +41,14 @@ namespace Lithnet.Laps.Web.Controllers
 
         public ActionResult Get()
         {
-            return this.View(new LapRequestModel {ShowReason = this.config.Audit.Reason != ConfigSection.AuditReasonFieldState.NotRequired});
+            return this.View(new LapRequestModel { ShowReason = this.config.Audit.Reason != ConfigSection.AuditReasonFieldState.Hidden });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Get(LapRequestModel model)
         {
-            model.ShowReason = this.config.Audit.Reason != ConfigSection.AuditReasonFieldState.NotRequired;
+            model.ShowReason = this.config.Audit.Reason != ConfigSection.AuditReasonFieldState.Hidden;
 
             if (!this.ModelState.IsValid)
             {
