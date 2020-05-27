@@ -286,14 +286,20 @@
     <Compile Include="Audit\IReporting.cs" />
     <Compile Include="Audit\ITemplates.cs" />
     <Compile Include="Audit\TemplatesFromFiles.cs" />
-    <Compile Include="ConfigSection\AuditReasonFieldState.cs" />
-    <Compile Include="ConfigSection\IReaderElement.cs" />
+    <Compile Include="Config\AuditReasonFieldState.cs" />
+    <Compile Include="Config\IRateLimitDetails.cs" />
+    <Compile Include="Config\IRateLimits.cs" />
+    <Compile Include="Config\IReaderElement.cs" />
+    <Compile Include="Config\AuditOptions.cs" />
+    <Compile Include="Config\IAuditOptions.cs" />
+    <Compile Include="Config\RateLimits.cs" />
+    <Compile Include="Config\RateLimitDetails.cs" />
     <Compile Include="Exceptions\NotFoundException.cs" />
     <Compile Include="Exceptions\AmbiguousNameException.cs" />
     <Compile Include="Mail\IMailer.cs" />
     <Compile Include="Mail\SmtpMailer.cs" />
-    <Compile Include="Models\ISecurityPrincipal.cs" />
-    <Compile Include="Models\ILapsConfig.cs" />
+    <Compile Include="Security\ISecurityPrincipal.cs" />
+    <Compile Include="Config\ILapsConfig.cs" />
     <Compile Include="Security\Authentication\AuthenticationService.cs" />
     <Compile Include="Security\Authentication\IAuthenticationService.cs" />
     <Compile Include="Security\Authorization\ConfigurationFile\AvailableReaders.cs" />
@@ -306,16 +312,16 @@
     <Compile Include="ConfigSection\RateLimitUserElement.cs" />
     <Compile Include="ActiveDirectory\ActiveDirectoryGroup.cs" />
     <Compile Include="Internal\IRateLimiter.cs" />
-    <Compile Include="Models\IComputer.cs" />
-    <Compile Include="Models\IDirectory.cs" />
+    <Compile Include="Security\IComputer.cs" />
+    <Compile Include="Security\IDirectory.cs" />
     <Compile Include="Internal\RateLimiter.cs" />
     <Compile Include="Audit\Reporting.cs" />
     <Compile Include="ConfigSection\ReaderCollection.cs" />
     <Compile Include="ConfigSection\TargetElement.cs" />
     <Compile Include="ConfigSection\ReaderElement.cs" />
-    <Compile Include="Models\IUser.cs" />
+    <Compile Include="Security\IUser.cs" />
     <Compile Include="Models\PasswordData.cs" />
-    <Compile Include="Models\TargetType.cs" />
+    <Compile Include="ConfigSection\TargetType.cs" />
     <Compile Include="ConfigSection\TargetCollection.cs" />
     <Compile Include="Controllers\LapController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -328,7 +334,7 @@
     <Compile Include="ConfigSection\LapsConfigSection.cs" />
     <Compile Include="Models\LapEntryModel.cs" />
     <Compile Include="Models\LapRequestModel.cs" />
-    <Compile Include="Models\ITarget.cs" />
+    <Compile Include="Config\ITarget.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="App_LocalResources\LogMessages.Designer.cs">
@@ -346,7 +352,7 @@
     <Compile Include="Security\Authorization\DemoAuthorizationService.cs" />
     <Compile Include="Security\Authorization\IAvailableTargets.cs" />
     <Compile Include="Security\Authorization\AvailableTargets.cs" />
-    <Compile Include="Models\IGroup.cs" />
+    <Compile Include="Security\IGroup.cs" />
     <Compile Include="ActiveDirectory\ActiveDirectoryUser.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -405,6 +411,7 @@
     <Content Include="laps.config" />
     <Content Include="NLog.config" />
     <Content Include="mail.config" />
+    <Content Include="App_Data\appsettings.json" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

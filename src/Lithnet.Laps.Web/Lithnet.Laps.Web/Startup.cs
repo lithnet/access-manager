@@ -11,6 +11,7 @@ using IdentityModel.Client;
 using Lithnet.Laps.Web;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.Audit;
+using Lithnet.Laps.Web.Config;
 using Lithnet.Laps.Web.Models;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;

@@ -3,6 +3,7 @@ using System.Web;
 using System.Web.Caching;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.Audit;
+using Lithnet.Laps.Web.Config;
 using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web

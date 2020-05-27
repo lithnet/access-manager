@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Globalization;
 using System.Web;
 using Lithnet.Laps.Web.App_LocalResources;
+using Lithnet.Laps.Web.Config;
 using Lithnet.Laps.Web.Mail;
 using Lithnet.Laps.Web.Models;
 using Lithnet.Laps.Web.Security.Authorization;

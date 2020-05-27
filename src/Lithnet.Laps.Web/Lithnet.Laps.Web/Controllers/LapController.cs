@@ -4,6 +4,7 @@ using System.DirectoryServices.AccountManagement;
 using System.Web.Mvc;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.Audit;
+using Lithnet.Laps.Web.Config;
 using Lithnet.Laps.Web.Models;
 using Lithnet.Laps.Web.Security.Authentication;
 using Lithnet.Laps.Web.Security.Authorization;
@@ -41,14 +42,14 @@ namespace Lithnet.Laps.Web.Controllers
 
         public ActionResult Get()
         {
-            return this.View(new LapRequestModel { ShowReason = this.config.Audit.Reason != ConfigSection.AuditReasonFieldState.Hidden });
+            return this.View(new LapRequestModel { ShowReason = this.config.Audit.Reason != Config.AuditReasonFieldState.Hidden });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Get(LapRequestModel model)
         {
-            model.ShowReason = this.config.Audit.Reason != ConfigSection.AuditReasonFieldState.Hidden;
+            model.ShowReason = this.config.Audit.Reason != Config.AuditReasonFieldState.Hidden;
 
             if (!this.ModelState.IsValid)
             {
@@ -61,7 +62,7 @@ namespace Lithnet.Laps.Web.Controllers
             {
                 model.FailureReason = null;
 
-                if (string.IsNullOrWhiteSpace(model.UserRequestReason) && this.config.Audit.Reason == ConfigSection.AuditReasonFieldState.Required)
+                if (string.IsNullOrWhiteSpace(model.UserRequestReason) && this.config.Audit.Reason == Config.AuditReasonFieldState.Required)
                 {
                     return this.LogAndReturnErrorResponse(model, UIMessages.ReasonRequired, EventIDs.ReasonRequired);
                 }

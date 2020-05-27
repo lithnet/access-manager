@@ -1,6 +1,6 @@
 ﻿using Lithnet.Laps.Web.Audit;
 
-namespace Lithnet.Laps.Web.Models
+namespace Lithnet.Laps.Web.Config
 {
     public interface ILapsConfig
     {

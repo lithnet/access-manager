@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+using Lithnet.Laps.Web.Config;
 
 namespace Lithnet.Laps.Web
 {

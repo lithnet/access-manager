@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
-namespace Lithnet.Laps.Web.ConfigSection
+namespace Lithnet.Laps.Web.Config
 {
     [Flags]
     public enum AuditReasonFieldState

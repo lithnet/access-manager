@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Principal;
+using Lithnet.Laps.Web.Config;
 using NLog;
 using Lithnet.Laps.Web.Models;
 

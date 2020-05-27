@@ -8,6 +8,7 @@ namespace Lithnet.Laps.Web.Audit
         public IImmutableSet<string> OnSuccess { get; private set; }
 
         public IImmutableSet<string> OnFailure { get; private set; }
+
         public IImmutableSet<string> All => this.OnSuccess.Union(this.OnFailure);
 
         public UsersToNotify()
