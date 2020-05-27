@@ -140,7 +140,7 @@ namespace Lithnet.Laps.Web.Controllers
         {
             List<TargetElement> matchingTargets = new List<TargetElement>();
 
-            foreach (TargetElement target in LapsConfigSection.Configuration.Targets.OfType<TargetElement>().OrderBy(t => t.Type == TargetType.Computer).ThenBy(t => t.Type == TargetType.Group))
+            foreach (TargetElement target in LapsConfigSection.Configuration.Targets.OfType<TargetElement>())
             {
                 if (target.Type == TargetType.Container)
                 {
@@ -186,7 +186,10 @@ namespace Lithnet.Laps.Web.Controllers
                 }
             }
 
-            return matchingTargets.OrderBy(t => t.Type == TargetType.Computer).ThenBy(t => t.Type == TargetType.Group).FirstOrDefault();
+            return 
+                matchingTargets.FirstOrDefault(t => t.Type == TargetType.Computer) ??
+                matchingTargets.FirstOrDefault(t => t.Type == TargetType.Group) ??
+                matchingTargets.FirstOrDefault();
         }
 
         private bool IsReaderAuthorized(ReaderElement reader, UserPrincipal currentUser)
