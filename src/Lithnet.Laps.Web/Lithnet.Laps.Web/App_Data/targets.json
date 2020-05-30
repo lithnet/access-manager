@@ -6,11 +6,11 @@
       "expire-after": "02:00:00",
       "acl": [
         {
-          "name": "dev1\\domain admins",
+          "name": "fim-dev1\\domain admins",
           "type": "allow"
         },
         {
-          "name": "dev1\\ryan",
+          "name": "fim-dev1\\ryan",
           "type": "deny"
         }
       ],
@@ -20,17 +20,21 @@
       }
     },
     {
-      "name": "DC=dev1,dc=local",
+      "name": "DC=fim-dev1,dc=local",
       "type": "Container",
       "expire-after": "03:00:00",
       "acl": [
         {
-          "name": "dev1\\domain admins",
+          "name": "Test-Laps-Group-12",
           "type": "allow"
         },
         {
-          "name": "dev1\\ryan",
-          "type": "deny"
+          "name": "fim-dev1\\Test-Laps-Group-2",
+          "type": "allow"
+        },
+        {
+          "name": "fim-dev1\\mgr-rnewing",
+          "type": "allow"
         }
       ],
       "email-auditing": {

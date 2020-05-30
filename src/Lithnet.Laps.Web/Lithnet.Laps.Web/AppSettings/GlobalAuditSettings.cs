@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace Lithnet.Laps.Web.AppSettings
 {
-    public class GlobalAuditSettings : IAuditSettings
+    public class GlobalAuditSettings
     {
         private IConfigurationRoot configuration;
 
@@ -17,38 +17,25 @@ namespace Lithnet.Laps.Web.AppSettings
             this.configuration = configuration;
         }
 
-        public bool NotifySuccess => this.configuration.GetValue<bool>("auditing:emailOnSuccess");
-
-        public bool NotifyFailure => this.configuration.GetValue<bool>("auditing:emailOnFailure");
-
-        public IEnumerable<string> EmailAddresses
+        public IEnumerable<string> SuccessRecipients
         {
             get
             {
-                foreach (var item in this.configuration.GetSection("auditing:emailAddresses")?.GetChildren())
+                foreach (var item in this.configuration.GetSection("email-auditing:on-success")?.GetChildren())
                 {
                     yield return item.Value;
                 }
             }
         }
 
-        public UsersToNotify UsersToNotify
+        public IEnumerable<string> FailureRecipients
         {
             get
             {
-                UsersToNotify result = new UsersToNotify();
-
-                if (this.NotifySuccess)
+                foreach (var item in this.configuration.GetSection("email-auditing:on-failure")?.GetChildren())
                 {
-                    result = result.NotifyOnSuccess(this.EmailAddresses.ToImmutableHashSet());
+                    yield return item.Value;
                 }
-
-                if (this.NotifyFailure)
-                {
-                    result = result.NotifyOnFailure(this.EmailAddresses.ToImmutableHashSet());
-                }
-
-                return result;
             }
         }
     }

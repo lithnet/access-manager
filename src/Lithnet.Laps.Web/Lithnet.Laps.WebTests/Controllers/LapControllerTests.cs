@@ -8,6 +8,7 @@ using Lithnet.Laps.Web.Security.Authorization;
 using Moq;
 using NLog;
 using Lithnet.Laps.Web.AppSettings;
+using Lithnet.Laps.Web.JsonTargets;
 
 namespace Lithnet.Laps.Web.Controllers.Tests
 {
@@ -17,12 +18,9 @@ namespace Lithnet.Laps.Web.Controllers.Tests
         private Mock<ILogger> dummyLogger;
         private Mock<IComputer> dummyComputer;
         private Mock<IRateLimiter> dummyRateLimiter;
-        private Mock<ITarget> dummyTarget;
         private Mock<IUser> dummyUser;
         private Mock<IAuthorizationService> dummyAuthorizationService;
-        private Mock<IAvailableTargets> dummyAvailableTargets;
         private Mock<IDirectory> dummyDirectory;
-        private Mock<ILapsConfig> dummyConfig;
         private Mock<IUserInterfaceSettings> dummyUiSettings;
 
         private Mock<IAuthenticationService> authenticationServiceStub;
@@ -33,12 +31,9 @@ namespace Lithnet.Laps.Web.Controllers.Tests
             dummyLogger = new Mock<ILogger>();
             dummyComputer = new Mock<IComputer>();
             dummyRateLimiter = new Mock<IRateLimiter>();
-            dummyTarget = new Mock<ITarget>();
             dummyUser = new Mock<IUser>();
             dummyAuthorizationService = new Mock<IAuthorizationService>();
-            dummyAvailableTargets = new Mock<IAvailableTargets>();
             dummyDirectory = new Mock<IDirectory>();
-            dummyConfig = new Mock<ILapsConfig>();
             dummyUiSettings = new Mock<IUserInterfaceSettings>();
 
             dummyDirectory.Setup(d => d.GetUser(It.IsAny<string>()))
@@ -56,7 +51,6 @@ namespace Lithnet.Laps.Web.Controllers.Tests
         {
             var directoryStub = new Mock<IDirectory>();
             var authorizationServiceStub = new Mock<IAuthorizationService>();
-            var availableTargetsStub = new Mock<IAvailableTargets>();
 
             var reportingMock = new Mock<IReporting>();
 
@@ -64,12 +58,9 @@ namespace Lithnet.Laps.Web.Controllers.Tests
                 .Returns(dummyComputer.Object);
 
             authorizationServiceStub
-                .Setup(svc => svc.CanAccessPassword(It.IsAny<IUser>(), It.IsAny<IComputer>(), It.IsAny<ITarget>()))
-                .Returns(AuthorizationResponse.Unauthorized());
+                .Setup(svc => svc.GetAuthorizationResponse(It.IsAny<IUser>(), It.IsAny<IComputer>()))
+                .Returns(new AuthorizationResponse() { ResponseCode = AuthorizationResponseCode.NoMatchingRuleForUser });
 
-            availableTargetsStub
-                .Setup(svc => svc.GetMatchingTargetOrNull(It.IsAny<IComputer>()))
-                .Returns(dummyTarget.Object);
 
             // Hmmm... this controller has a lot of dependencies.
             var controller = new LapController(
@@ -78,7 +69,6 @@ namespace Lithnet.Laps.Web.Controllers.Tests
                 directoryStub.Object,
                 reportingMock.Object,
                 dummyRateLimiter.Object,
-                availableTargetsStub.Object,
                 authenticationServiceStub.Object, dummyUiSettings.Object
             );
 
@@ -91,7 +81,6 @@ namespace Lithnet.Laps.Web.Controllers.Tests
                     It.IsAny<int>(),
                     It.IsAny<string>(),
                     It.IsAny<Exception>(),
-                    dummyTarget.Object,
                     It.IsAny<AuthorizationResponse>(),
                     It.IsAny<IUser>(),
                     It.IsAny<IComputer>()));
@@ -113,7 +102,6 @@ namespace Lithnet.Laps.Web.Controllers.Tests
                 directoryStub.Object,
                 reportingMock.Object,
                 dummyRateLimiter.Object,
-                dummyAvailableTargets.Object,
                 authenticationServiceStub.Object, dummyUiSettings.Object
             );
 

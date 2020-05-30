@@ -351,9 +351,6 @@
     <Compile Include="AppSettings\AuditReasonFieldState.cs" />
     <Compile Include="AppSettings\Interfaces\IRateLimitDetails.cs" />
     <Compile Include="AppSettings\Interfaces\IRateLimits.cs" />
-    <Compile Include="Config\IReaderElement.cs" />
-    <Compile Include="Config\AuditOptions.cs" />
-    <Compile Include="Config\IAuditSettings.cs" />
     <Compile Include="AppSettings\RateLimitSettings.cs" />
     <Compile Include="AppSettings\RateLimitDetails.cs" />
     <Compile Include="Exceptions\NotFoundException.cs" />
@@ -364,35 +361,28 @@
     <Compile Include="JsonTargets\AuthorizationResponse.cs" />
     <Compile Include="JsonTargets\AuthorizationResponseCode.cs" />
     <Compile Include="JsonTargets\IAuthorizationService.cs" />
+    <Compile Include="JsonTargets\IJsonTargetsProvider.cs" />
+    <Compile Include="JsonTargets\JsonFileTargetsProvider.cs" />
     <Compile Include="JsonTargets\JsonEmailAuditRecipients.cs" />
     <Compile Include="JsonTargets\JsonAce.cs" />
     <Compile Include="JsonTargets\JsonTarget.cs" />
     <Compile Include="JsonTargets\JsonTargetAuthorizationService.cs" />
+    <Compile Include="JsonTargets\JsonTargets.cs" />
     <Compile Include="Mail\IMailer.cs" />
     <Compile Include="Mail\SmtpMailer.cs" />
     <Compile Include="ActiveDirectory\Interfaces\ISecurityPrincipal.cs" />
-    <Compile Include="Config\ILapsConfig.cs" />
     <Compile Include="Security\Authentication\AuthenticationService.cs" />
     <Compile Include="Security\Authentication\IAuthenticationService.cs" />
-    <Compile Include="Security\Authorization\ConfigurationFile\AvailableReaders.cs" />
-    <Compile Include="Security\Authorization\ConfigurationFile\ConfigurationFileAuthorizationService.cs" />
-    <Compile Include="Security\Authorization\ConfigurationFile\IAvailableReaders.cs" />
-    <Compile Include="Security\Authorization\IAuthorizationService.cs" />
     <Compile Include="ActiveDirectory\ActiveDirectoryComputer.cs" />
-    <Compile Include="ConfigSection\AuditElement.cs" />
     <Compile Include="ActiveDirectory\ActiveDirectoryGroup.cs" />
     <Compile Include="Internal\Interfaces\IRateLimiter.cs" />
     <Compile Include="ActiveDirectory\Interfaces\IComputer.cs" />
     <Compile Include="ActiveDirectory\Interfaces\IDirectory.cs" />
     <Compile Include="Internal\RateLimiter.cs" />
     <Compile Include="Internal\Reporting.cs" />
-    <Compile Include="ConfigSection\ReaderCollection.cs" />
-    <Compile Include="ConfigSection\TargetElement.cs" />
-    <Compile Include="ConfigSection\ReaderElement.cs" />
     <Compile Include="ActiveDirectory\Interfaces\IUser.cs" />
     <Compile Include="Models\PasswordData.cs" />
-    <Compile Include="ConfigSection\TargetType.cs" />
-    <Compile Include="ConfigSection\TargetCollection.cs" />
+    <Compile Include="JsonTargets\TargetType.cs" />
     <Compile Include="Controllers\LapController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Internal\EventIDs.cs" />
@@ -401,10 +391,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="ConfigSection\LapsConfigSection.cs" />
     <Compile Include="Models\LapEntryModel.cs" />
     <Compile Include="Models\LapRequestModel.cs" />
-    <Compile Include="Config\ITarget.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="App_LocalResources\LogMessages.Designer.cs">
@@ -418,10 +406,6 @@
       <DependentUpon>UIMessages.resx</DependentUpon>
     </Compile>
     <Compile Include="Internal\UsersToNotify.cs" />
-    <Compile Include="Security\Authorization\AuthorizationResponse.cs" />
-    <Compile Include="Security\Authorization\DemoAuthorizationService.cs" />
-    <Compile Include="Security\Authorization\IAvailableTargets.cs" />
-    <Compile Include="Security\Authorization\AvailableTargets.cs" />
     <Compile Include="ActiveDirectory\Interfaces\IGroup.cs" />
     <Compile Include="ActiveDirectory\ActiveDirectoryUser.cs" />
   </ItemGroup>

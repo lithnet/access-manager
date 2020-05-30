@@ -4,8 +4,6 @@ using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Mail;
 using Lithnet.Laps.Web.Models;
 using Lithnet.Laps.Web.Security.Authentication;
-using Lithnet.Laps.Web.Security.Authorization;
-using Lithnet.Laps.Web.Security.Authorization.ConfigurationFile;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Practices.Unity.Configuration;
 using NLog;
@@ -15,6 +13,7 @@ using ConfigurationBuilder = Microsoft.Extensions.Configuration.ConfigurationBui
 using Lithnet.Laps.Web.AppSettings;
 using Lithnet.Laps.Web.Internal;
 using Lithnet.Laps.Web.Config;
+using Lithnet.Laps.Web.JsonTargets;
 
 namespace Lithnet.Laps.Web
 {
@@ -74,12 +73,10 @@ namespace Lithnet.Laps.Web
             container.RegisterType<IIpResolverSettings, IpResolverSettings>();
             container.RegisterType<IIpAddressResolver, IpAddressResolver>();
             container.RegisterType<GlobalAuditSettings, GlobalAuditSettings>();
+            container.RegisterType<IJsonTargetsProvider, JsonFileTargetsProvider>();
+            container.RegisterType<IAuthorizationService, JsonTargetAuthorizationService>();
 
-            // If no container registrations are found in the config file, then load the defaults here
-            if (!container.IsRegistered<IAuthorizationService>())
-            {
-                container.RegisterType<IAuthorizationService, ConfigurationFileAuthorizationService>();
-            }
+            // If no container registrations are found in the config file, then load 
 
             if (!container.IsRegistered<IDirectory>())
             {
@@ -89,16 +86,6 @@ namespace Lithnet.Laps.Web
             if (!container.IsRegistered<IAuthenticationService>())
             {
                 container.RegisterType<IAuthenticationService, AuthenticationService>();
-            }
-
-            if (!container.IsRegistered<IAvailableTargets>())
-            {
-                container.RegisterType<IAvailableTargets, AvailableTargets>();
-            }
-
-            if (!container.IsRegistered<IAvailableReaders>())
-            {
-                container.RegisterType<IAvailableReaders, AvailableReaders>();
             }
 
             if (!container.IsRegistered<IReporting>())

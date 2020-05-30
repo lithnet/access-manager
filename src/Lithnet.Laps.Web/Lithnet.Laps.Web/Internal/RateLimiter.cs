@@ -52,7 +52,7 @@ namespace Lithnet.Laps.Web
             if (this.IsThresholdExceeded(r, ip, threshold, duration))
             {
                 this.reporting.PerformAuditFailureActions(model, UIMessages.RateLimitError, EventIDs.RateLimitExceededIP,
-                    string.Format(LogMessages.RateLimitExceededIP, p.SamAccountName, ip, threshold, duration), null, null, null, p, null);
+                    string.Format(LogMessages.RateLimitExceededIP, p.SamAccountName, ip, threshold, duration), null, null, p, null);
                 return true;
             }
 
@@ -66,7 +66,7 @@ namespace Lithnet.Laps.Web
             if (this.IsThresholdExceeded(p, threshold, duration))
             {
                 this.reporting.PerformAuditFailureActions(model, UIMessages.RateLimitError, EventIDs.RateLimitExceededUser,
-                    string.Format(LogMessages.RateLimitExceededUser, p.SamAccountName, ip, threshold, duration), null, null, null, p, null);
+                    string.Format(LogMessages.RateLimitExceededUser, p.SamAccountName, ip, threshold, duration), null, null, p, null);
                 return true;
             }
 

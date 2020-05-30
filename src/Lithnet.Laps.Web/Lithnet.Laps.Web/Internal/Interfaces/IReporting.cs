@@ -1,7 +1,7 @@
 ﻿using System;
 using Lithnet.Laps.Web.Config;
+using Lithnet.Laps.Web.JsonTargets;
 using Lithnet.Laps.Web.Models;
-using Lithnet.Laps.Web.Security.Authorization;
 
 namespace Lithnet.Laps.Web.Audit
 {
@@ -11,8 +11,8 @@ namespace Lithnet.Laps.Web.Audit
 
         void LogErrorEvent(int eventID, string logMessage, Exception ex);
 
-        void PerformAuditSuccessActions(LapRequestModel model, ITarget target, AuthorizationResponse authorizationResponse, IUser user, IComputer computer, PasswordData passwordData);
+        void PerformAuditSuccessActions(LapRequestModel model, AuthorizationResponse authorizationResponse, IUser user, IComputer computer, PasswordData passwordData);
 
-        void PerformAuditFailureActions(LapRequestModel model, string userMessage, int eventID, string logMessage, Exception ex, ITarget target, AuthorizationResponse authorizationResponse, IUser user, IComputer computer);
+        void PerformAuditFailureActions(LapRequestModel model, string userMessage, int eventID, string logMessage, Exception ex, AuthorizationResponse authorizationResponse, IUser user, IComputer computer);
     }
 }

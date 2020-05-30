@@ -13,12 +13,13 @@ namespace Lithnet.Laps.Web.JsonTargets
 
         private readonly ILogger logger;
 
-        private readonly JsonTarget[] targets;
+        private readonly IList<JsonTarget> targets;
 
-        public JsonTargetAuthorizationService(IDirectory directory, ILogger logger)
+        public JsonTargetAuthorizationService(IDirectory directory, ILogger logger, IJsonTargetsProvider provider)
         {
             this.directory = directory;
             this.logger = logger;
+            this.targets = provider.Targets;
         }
 
         public AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer)
@@ -27,6 +28,8 @@ namespace Lithnet.Laps.Web.JsonTargets
 
             if (targets.Count == 0)
             {
+                this.logger.Trace($"User {user.SamAccountName} is denied access to the password for computer {computer.SamAccountName} because the computer did not match any of the configured targets");
+
                 return new AuthorizationResponse()
                 {
                     ResponseCode = AuthorizationResponseCode.NoMatchingRuleForComputer,
@@ -37,21 +40,22 @@ namespace Lithnet.Laps.Web.JsonTargets
             {
                 foreach (var ace in j.Acl.Where(t => t.Type == AceType.Deny))
                 {
-                    ISecurityPrincipal principal = this.directory.GetPrincipal(ace.Sid ?? ace.Name);
-
-                    this.logger.Trace($"Reader principal {ace.Sid ?? ace.Name} found in directory as user {principal.DistinguishedName}");
-
-                    if (this.directory.IsSidInPrincipalToken(computer.Sid.AccountDomainSid, user, principal.Sid))
+                    if (this.IsMatchingAce(ace, computer, user))
                     {
-                        this.logger.Trace($"User {user.SamAccountName} matches reader principal {ace.Sid ?? ace.Name} denied fromreading passwords from target {j.Name}");
+                        this.logger.Trace($"User {user.SamAccountName} matches deny ACE {ace.Sid ?? ace.Name} and is denied from reading passwords for computer {computer.SamAccountName} from target {j.Name}");
 
                         return new AuthorizationResponse()
                         {
-                            MatchedAceID = j.Name,
+                            MatchedTargetName = j.Name,
+                            MatchedAcePrincipal = ace.Sid ?? ace.Name,
                             ResponseCode = AuthorizationResponseCode.UserDeniedByAce,
-                            NotificationRecipients = j.EmailAuditing.FailureRecipients
+                            NotificationRecipients = j.EmailAuditing.FailureRecipients,
                         };
-                    };
+                    }
+                    else
+                    {
+                        this.logger.Trace($"Denied principal {ace.Sid ?? ace.Name} does not match current user {user.SamAccountName}");
+                    }
                 }
             }
 
@@ -59,29 +63,51 @@ namespace Lithnet.Laps.Web.JsonTargets
             {
                 foreach (var ace in j.Acl.Where(t => t.Type == AceType.Allow))
                 {
-                    ISecurityPrincipal principal = this.directory.GetPrincipal(ace.Sid ?? ace.Name);
-
-                    this.logger.Trace($"Reader principal {ace.Sid ?? ace.Name} found in directory as user {principal.DistinguishedName}");
-
-                    if (this.directory.IsSidInPrincipalToken(computer.Sid.AccountDomainSid, user, principal.Sid))
+                    if (this.IsMatchingAce(ace, computer, user))
                     {
-                        this.logger.Trace($"User {user.SamAccountName} matches ACE {ace.Sid ?? ace.Name} is authorized to read passwords from target {j.Name}");
+                        this.logger.Trace($"User {user.SamAccountName} matches allow ACE {ace.Sid ?? ace.Name} and is authorized to read passwords for computer {computer.SamAccountName} from target {j.Name}");
 
                         return new AuthorizationResponse()
                         {
-                            MatchedAceID = j.Name,
-                            ExpireAfter = j.ExpireAfter,
+                            MatchedTargetName = j.Name,
+                            MatchedAcePrincipal = ace.Sid ?? ace.Name,
+                            ResponseCode = AuthorizationResponseCode.Success,
                             NotificationRecipients = j.EmailAuditing.SuccessRecipients,
-                            ResponseCode = AuthorizationResponseCode.Success
+                            ExpireAfter = j.ExpireAfter,
                         };
-                    };
+                    }
+                    else
+                    {
+                        this.logger.Trace($"Allowed principal {ace.Sid ?? ace.Name} does not match current user {user.SamAccountName}");
+                    }
                 }
             }
+
+            this.logger.Trace($"User {user.SamAccountName} does not match any target access control lists and is denied access to the password for computer {computer.SamAccountName}");
 
             return new AuthorizationResponse()
             {
                 ResponseCode = AuthorizationResponseCode.NoMatchingRuleForUser
             };
+        }
+
+        private bool IsMatchingAce(JsonAce ace, IComputer computer, IUser user)
+        {
+            ISecurityPrincipal principal;
+
+            try
+            {
+                principal = this.directory.GetPrincipal(ace.Sid ?? ace.Name);
+            }
+            catch (NotFoundException)
+            {
+                this.logger.Warn($"Could not match reader principal {ace.Sid ?? ace.Name} to a directory object");
+                return false;
+            }
+
+            this.logger.Trace($"Ace principal {ace.Sid ?? ace.Name} found in directory as  {principal.DistinguishedName}");
+
+            return this.directory.IsSidInPrincipalToken(computer.Sid.AccountDomainSid, user, principal.Sid);
         }
 
         private IList<JsonTarget> GetMatchingTargetsForComputer(IComputer computer)

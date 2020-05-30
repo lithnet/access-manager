@@ -23,6 +23,7 @@ namespace Lithnet.Laps.Web
         [JsonProperty("email-auditing")]
         public JsonEmailAuditRecipients EmailAuditing { get; private set; }
 
+        [JsonProperty("acl")]
         public List<JsonAce> Acl { get; private set; }
     }
 }

@@ -7,9 +7,10 @@ using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.AppSettings;
 using Lithnet.Laps.Web.Config;
 using Lithnet.Laps.Web.Internal;
+using Lithnet.Laps.Web.JsonTargets;
 using Lithnet.Laps.Web.Mail;
 using Lithnet.Laps.Web.Models;
-using Lithnet.Laps.Web.Security.Authorization;
+using Microsoft.Ajax.Utilities;
 using NLog;
 
 namespace Lithnet.Laps.Web.Audit
@@ -48,9 +49,9 @@ namespace Lithnet.Laps.Web.Audit
             this.logger.Info(logEvent);
         }
 
-        public void PerformAuditSuccessActions(LapRequestModel model, ITarget target, AuthorizationResponse authorizationResponse, IUser user, IComputer computer, PasswordData passwordData)
+        public void PerformAuditSuccessActions(LapRequestModel model, AuthorizationResponse authorizationResponse, IUser user, IComputer computer, PasswordData passwordData)
         {
-            Dictionary<string, string> tokens = this.BuildTokenDictionary(target, authorizationResponse, user, computer, passwordData, model.ComputerName, null, model.UserRequestReason);
+            Dictionary<string, string> tokens = this.BuildTokenDictionary(authorizationResponse, user, computer, passwordData, model.ComputerName, null, model.UserRequestReason);
             string logSuccessMessage = this.templates.LogSuccessTemplate ?? LogMessages.DefaultAuditSuccessText;
             string emailSuccessMessage = this.templates.EmailSuccessTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditSuccessText}</pre></body></html>";
 
@@ -60,7 +61,7 @@ namespace Lithnet.Laps.Web.Audit
 
             try
             {
-                IImmutableSet<string> recipients = this.BuildRecipientList(target, authorizationResponse, true, user);
+                IImmutableSet<string> recipients = this.BuildRecipientList(authorizationResponse, true, user);
 
                 if (recipients.Count > 0)
                 {
@@ -74,9 +75,9 @@ namespace Lithnet.Laps.Web.Audit
             }
         }
 
-        public void PerformAuditFailureActions(LapRequestModel model, string userMessage, int eventID, string logMessage, Exception ex, ITarget target, AuthorizationResponse authorizationResponse, IUser user, IComputer computer)
+        public void PerformAuditFailureActions(LapRequestModel model, string userMessage, int eventID, string logMessage, Exception ex, AuthorizationResponse authorizationResponse, IUser user, IComputer computer)
         {
-            Dictionary<string, string> tokens = this.BuildTokenDictionary(target, authorizationResponse, user, computer, null, model.ComputerName, logMessage ?? userMessage, model.UserRequestReason);
+            Dictionary<string, string> tokens = this.BuildTokenDictionary(authorizationResponse, user, computer, null, model.ComputerName, logMessage ?? userMessage, model.UserRequestReason);
             string logFailureMessage = this.templates.LogFailureTemplate ?? LogMessages.DefaultAuditFailureText;
             string emailFailureMessage = this.templates.EmailFailureTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditFailureText}</pre></body></html>";
 
@@ -84,7 +85,7 @@ namespace Lithnet.Laps.Web.Audit
 
             try
             {
-                IImmutableSet<string> recipients = this.BuildRecipientList(target, authorizationResponse, false);
+                IImmutableSet<string> recipients = this.BuildRecipientList(authorizationResponse, false);
 
                 if (recipients.Count > 0)
                 {
@@ -98,7 +99,7 @@ namespace Lithnet.Laps.Web.Audit
             }
         }
 
-        private Dictionary<string, string> BuildTokenDictionary(ITarget target = null, AuthorizationResponse authorizationResponse = null, IUser user = null, IComputer computer = null, PasswordData passwordData = null, string requestedComputerName = null, string detailMessage = null, string requestedReason = null)
+        private Dictionary<string, string> BuildTokenDictionary(AuthorizationResponse authorizationResponse = null, IUser user = null, IComputer computer = null, PasswordData passwordData = null, string requestedComputerName = null, string detailMessage = null, string requestedReason = null)
         {
             Dictionary<string, string> pairs = new Dictionary<string, string> {
                 { "{user.SamAccountName}", user?.SamAccountName},
@@ -119,11 +120,10 @@ namespace Lithnet.Laps.Web.Audit
                 { "{computer.Sid}", computer?.Sid?.ToString()},
                 { "{requestedComputerName}", requestedComputerName},
                 { "{requestedReason}", requestedReason},
-                { "{reader.Principal}", authorizationResponse?.ExtraInfo},
-                { "{reader.Notify}", string.Join(",", authorizationResponse?.UsersToNotify?.All ?? ImmutableHashSet<string>.Empty)},
-                { "{target.Notify}", string.Join(",", target?.UsersToNotify?.All ?? ImmutableHashSet<string>.Empty)},
-                { "{target.ID}", target?.TargetName},
-                { "{target.IDType}", target?.TargetType.ToString()},
+                { "{ace.Principal}", authorizationResponse?.MatchedAcePrincipal},
+                { "{target.Notify}", string.Join(",", authorizationResponse?.NotificationRecipients ?? new List<string>())},
+                { "{target.ID}", authorizationResponse?.MatchedTargetName},
+                { "{target.IDType}", authorizationResponse?.MatchedTargetType},
                 { "{message}", detailMessage},
                 { "{request.IPAddress}", HttpContext.Current?.Request?.UserHostAddress},
                 { "{request.HostName}", HttpContext.Current?.Request?.UserHostName},
@@ -146,26 +146,33 @@ namespace Lithnet.Laps.Web.Audit
             return text;
         }
 
-        private IImmutableSet<string> BuildRecipientList(ITarget target, AuthorizationResponse authorizationResponse, bool success, IUser user = null)
+        private IImmutableSet<string> BuildRecipientList(AuthorizationResponse authorizationResponse, bool success, IUser user = null)
         {
-            UsersToNotify usersToNotify = target?.UsersToNotify ?? new UsersToNotify();
+            HashSet<string> usersToNotify = new HashSet<string>();
 
             if (authorizationResponse != null)
             {
-                usersToNotify = usersToNotify.Union(authorizationResponse.UsersToNotify);
+                authorizationResponse.NotificationRecipients?.ForEach(t => usersToNotify.Add(t));
             }
-
-            if (this.globalAuditSettings.UsersToNotify != null)
+            
+            if (success)
             {
-                usersToNotify = usersToNotify.Union(this.globalAuditSettings.UsersToNotify);
+                this.globalAuditSettings.SuccessRecipients?.ForEach( t => usersToNotify.Add(t));
             }
-
+            else
+            {
+                this.globalAuditSettings.FailureRecipients?.ForEach(t => usersToNotify.Add(t));
+            }
+            
             if (!string.IsNullOrWhiteSpace(user?.EmailAddress))
             {
-                usersToNotify = usersToNotify.WithUserReplaced("{user.EmailAddress}", user?.EmailAddress);
+                if (usersToNotify.Remove("{user.EmailAddress}"))
+                {
+                    usersToNotify.Add(user.EmailAddress);
+                }
             }
 
-            return success ? usersToNotify.OnSuccess : usersToNotify.OnFailure;
+            return usersToNotify.ToImmutableHashSet();
         }
     }
 }
