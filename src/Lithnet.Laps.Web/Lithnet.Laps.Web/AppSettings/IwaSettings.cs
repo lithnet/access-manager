@@ -13,7 +13,7 @@ namespace Lithnet.Laps.Web.AppSettings
             this.configuration = configuration;
         }
 
-        public string UniqueClaimTypeIdentifier => this.configuration["authentication:iwa:uniqueClaimTypeIdentifier"] ?? ClaimTypes.PrimarySid;
+        public string UniqueClaimTypeIdentifier => this.configuration["authentication:iwa:unique-claim-type-identifier"] ?? ClaimTypes.PrimarySid;
 
         public string ClaimName => ClaimTypes.PrimarySid;
 

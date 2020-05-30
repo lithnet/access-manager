@@ -71,6 +71,7 @@ namespace Lithnet.Laps.Web
             container.RegisterType<IRateLimitSettings, RateLimitSettings>();
             container.RegisterType<IAuthenticationSettings, AuthenticationSettings>();
             container.RegisterType<IIpResolverSettings, IpResolverSettings>();
+            container.RegisterType<IEmailSettings, EmailSettings>();
             container.RegisterType<IIpAddressResolver, IpAddressResolver>();
             container.RegisterType<GlobalAuditSettings, GlobalAuditSettings>();
             container.RegisterType<IJsonTargetsProvider, JsonFileTargetsProvider>();

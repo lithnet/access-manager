@@ -20,5 +20,8 @@ namespace Lithnet.Laps.Web
 
         [JsonProperty("type")]
         public AceType Type { get; set; }
+
+        [JsonProperty("email-auditing")]
+        public JsonEmailAuditRecipients EmailAuditing { get; private set; }
     }
 }

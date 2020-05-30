@@ -4,12 +4,13 @@ Name:				{user.DisplayName}
 UPN:				{user.UserPrincipalName}
 SID:				{user.Sid}
 User DN:				{user.DistinguishedName}
-Requestor IP:			{request.UnmaskedIPAddress}
+Requestor IP:			{request.ResolvedIPAddress}
 Requestor Hostname:		{request.HostName}
 Requested computer:		{requestedComputerName}
 Computer name:			{computer.SamAccountName}
 Computer DN:			{computer.DistinguishedName}
-Target ID:			{target.ID}
-Reader principal:			{reader.Principal}
+Matched rule:			{authzresult.MatchedRuleDescription}
+Matched principal:		{authzresult.MatchedAcePrincipal}
+AuthZ response:			{authzresult.ResponseCode}
 Detail:				{message}
 Request reason:	    	{requestedReason}

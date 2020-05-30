@@ -316,7 +316,9 @@
     <Compile Include="ActiveDirectory\Interop\SidAndAttributes.cs" />
     <Compile Include="ActiveDirectory\Interop\TokenGroups.cs" />
     <Compile Include="AppSettings\AuthenticationSettings.cs" />
+    <Compile Include="AppSettings\EmailSettings.cs" />
     <Compile Include="AppSettings\GlobalAuditSettings.cs" />
+    <Compile Include="AppSettings\Interfaces\IEmailSettings.cs" />
     <Compile Include="AppSettings\IpResolverSettings.cs" />
     <Compile Include="AppSettings\ClientIpHandling.cs" />
     <Compile Include="AppSettings\Interfaces\IIPResolverSettings.cs" />
@@ -368,11 +370,11 @@
     <Compile Include="JsonTargets\JsonTarget.cs" />
     <Compile Include="JsonTargets\JsonTargetAuthorizationService.cs" />
     <Compile Include="JsonTargets\JsonTargets.cs" />
-    <Compile Include="Mail\IMailer.cs" />
-    <Compile Include="Mail\SmtpMailer.cs" />
+    <Compile Include="Internal\Interfaces\IMailer.cs" />
+    <Compile Include="Internal\SmtpMailer.cs" />
     <Compile Include="ActiveDirectory\Interfaces\ISecurityPrincipal.cs" />
-    <Compile Include="Security\Authentication\AuthenticationService.cs" />
-    <Compile Include="Security\Authentication\IAuthenticationService.cs" />
+    <Compile Include="Internal\AuthenticationService.cs" />
+    <Compile Include="Internal\Interfaces\IAuthenticationService.cs" />
     <Compile Include="ActiveDirectory\ActiveDirectoryComputer.cs" />
     <Compile Include="ActiveDirectory\ActiveDirectoryGroup.cs" />
     <Compile Include="Internal\Interfaces\IRateLimiter.cs" />
@@ -464,7 +466,6 @@
     <Content Include="Content\bootstrap-grid.css.map" />
     <Content Include="laps.config" />
     <Content Include="NLog.config" />
-    <Content Include="mail.config" />
     <Content Include="App_Data\appsettings.json" />
     <Content Include="App_Data\appsecrets.json" />
     <Content Include="App_Data\targets.json" />
@@ -602,7 +603,7 @@
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
-      <UserProperties app_3data_4targets_1json__JsonSchema="https://json.schemastore.org/appsettings" app_3data_4appsecrets_1json__JsonSchema="https://json.schemastore.org/appsettings" />
+      <UserProperties app_3data_4appsecrets_1json__JsonSchema="https://json.schemastore.org/appsettings" app_3data_4targets_1json__JsonSchema="https://json.schemastore.org/appsettings" />
     </VisualStudio>
     <MonoDevelop>
       <Properties>

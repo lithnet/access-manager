@@ -19,7 +19,7 @@ namespace Lithnet.Laps.Web.AppSettings
         {
             get
             {
-                string value = this.configuration["user-interface:userSuppliedReason"];
+                string value = this.configuration["user-interface:user-supplied-reason"];
 
                 if (Enum.TryParse(value, true, out AuditReasonFieldState auditReasonFieldState))
                 {

@@ -8,9 +8,7 @@ namespace Lithnet.Laps.Web.JsonTargets
 {
     public class AuthorizationResponse
     {
-        public string MatchedTargetName { get; set; }
-
-        public string MatchedTargetType { get; set; }
+        public string MatchedRuleDescription { get; set; }
 
         public TimeSpan ExpireAfter { get; set; }
 

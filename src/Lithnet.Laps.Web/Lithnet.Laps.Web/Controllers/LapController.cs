@@ -102,7 +102,7 @@ namespace Lithnet.Laps.Web.Controllers
 
                 if (!authResponse.IsAuthorized())
                 {
-                    return this.AuditAndReturnErrorResponse(model: model, userMessage: UIMessages.NotAuthorized, eventID: EventIDs.AuthorizationFailed, logMessage: string.Format(LogMessages.AuthorizationFailed, user.SamAccountName, model.ComputerName), user: user, computer: computer);
+                    return this.LogAndResponseToAuthZFailure(model, authResponse, user, computer);
                 }
 
                 // Do actual work only if authorized.
@@ -130,6 +130,29 @@ namespace Lithnet.Laps.Web.Controllers
             {
                 return this.LogAndReturnErrorResponse(model, UIMessages.UnexpectedError, EventIDs.UnexpectedError, string.Format(LogMessages.UnhandledError, model.ComputerName, user?.SamAccountName ?? LogMessages.UnknownComputerPlaceholder), ex);
             }
+        }
+
+        private ViewResult LogAndResponseToAuthZFailure(LapRequestModel model, AuthorizationResponse authorizationResponse, IUser user, IComputer computer)
+        {
+            int eventID;
+
+            switch (authorizationResponse.ResponseCode)
+            {
+                case AuthorizationResponseCode.NoMatchingRuleForComputer:
+                    eventID = EventIDs.AuthZFailedNoTargetMatch;
+                    break;
+                case AuthorizationResponseCode.NoMatchingRuleForUser:
+                    eventID = EventIDs.AuthZFailedNoReaderPrincipalMatch;
+                    break;
+                case AuthorizationResponseCode.UserDeniedByAce:
+                    eventID = EventIDs.AuthZExplicitlyDenied;
+                    break;
+                default:
+                    eventID = EventIDs.AuthorizationFailed;
+                    break;
+            }
+
+            return this.AuditAndReturnErrorResponse(model: model, userMessage: UIMessages.NotAuthorized, eventID: eventID, logMessage: string.Format(LogMessages.AuthorizationFailed, user.SamAccountName, model.ComputerName), user: user, computer: computer, authorizationResponse: authorizationResponse);
         }
 
         private ViewResult AuditAndReturnErrorResponse(LapRequestModel model, string userMessage, int eventID, string logMessage = null, Exception ex = null, AuthorizationResponse authorizationResponse = null, IUser user = null, IComputer computer = null)

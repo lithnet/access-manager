@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Lithnet.Laps.Web.Models;
+using Microsoft.Ajax.Utilities;
 using NLog;
 
 namespace Lithnet.Laps.Web.JsonTargets
@@ -46,10 +47,10 @@ namespace Lithnet.Laps.Web.JsonTargets
 
                         return new AuthorizationResponse()
                         {
-                            MatchedTargetName = j.Name,
+                            MatchedRuleDescription = $"{j.Type}: {j.Name}",
                             MatchedAcePrincipal = ace.Sid ?? ace.Name,
                             ResponseCode = AuthorizationResponseCode.UserDeniedByAce,
-                            NotificationRecipients = j.EmailAuditing.FailureRecipients,
+                            NotificationRecipients = this.GetNotificationRecipients(j, ace, false),
                         };
                     }
                     else
@@ -58,6 +59,8 @@ namespace Lithnet.Laps.Web.JsonTargets
                     }
                 }
             }
+
+            List<string> failureNotificationRecipients = new List<string>();
 
             foreach (JsonTarget j in targets)
             {
@@ -69,17 +72,16 @@ namespace Lithnet.Laps.Web.JsonTargets
 
                         return new AuthorizationResponse()
                         {
-                            MatchedTargetName = j.Name,
+                            MatchedRuleDescription = $"{j.Type}: {j.Name}",
                             MatchedAcePrincipal = ace.Sid ?? ace.Name,
                             ResponseCode = AuthorizationResponseCode.Success,
-                            NotificationRecipients = j.EmailAuditing.SuccessRecipients,
+                            NotificationRecipients = this.GetNotificationRecipients(j, ace, true),
                             ExpireAfter = j.ExpireAfter,
                         };
                     }
-                    else
-                    {
-                        this.logger.Trace($"Allowed principal {ace.Sid ?? ace.Name} does not match current user {user.SamAccountName}");
-                    }
+
+                    this.logger.Trace($"Allowed principal {ace.Sid ?? ace.Name} does not match current user {user.SamAccountName}");
+                    j.EmailAuditing?.FailureRecipients?.ForEach(u => failureNotificationRecipients.Add(u));
                 }
             }
 
@@ -87,8 +89,27 @@ namespace Lithnet.Laps.Web.JsonTargets
 
             return new AuthorizationResponse()
             {
-                ResponseCode = AuthorizationResponseCode.NoMatchingRuleForUser
+                ResponseCode = AuthorizationResponseCode.NoMatchingRuleForUser,
+                NotificationRecipients = failureNotificationRecipients
             };
+        }
+
+        private IList<string> GetNotificationRecipients(JsonTarget t, JsonAce a, bool success)
+        {
+            List<string> list = new List<string>();
+
+            if (success)
+            {
+                t.EmailAuditing?.SuccessRecipients?.ForEach(u => list.Add(u));
+                a.EmailAuditing?.SuccessRecipients?.ForEach(u => list.Add(u));
+            }
+            else
+            {
+                t.EmailAuditing?.FailureRecipients?.ForEach(u => list.Add(u));
+                a.EmailAuditing?.FailureRecipients?.ForEach(u => list.Add(u));
+            }
+
+            return list;
         }
 
         private bool IsMatchingAce(JsonAce ace, IComputer computer, IUser user)

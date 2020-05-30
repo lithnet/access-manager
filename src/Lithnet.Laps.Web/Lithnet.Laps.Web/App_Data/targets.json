@@ -20,6 +20,28 @@
       }
     },
     {
+      "name": "DS-SR-01",
+      "type": "computer",
+      "expire-after": "02:00:00",
+      "acl": [
+        {
+          "name": "fim-dev1\\domain admins",
+          "type": "deny",
+          "email-auditing": {
+            "on-failure": [ "ryan@lithnet.io" ]
+          }
+        },
+        {
+          "name": "fim-dev1\\ryan",
+          "type": "deny"
+        }
+      ],
+      "email-auditing": {
+        "on-success": [ "laps-admin@lithnet.local" ],
+        "on-failure": [ "laps-admin@lithnet.local" ]
+      }
+    },
+    {
       "name": "DC=fim-dev1,dc=local",
       "type": "Container",
       "expire-after": "03:00:00",

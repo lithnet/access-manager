@@ -18,13 +18,13 @@ namespace Lithnet.Laps.Web.AppSettings
 
         public string Metadata => this.configuration["authentication:wsfed:metadata"];
 
-        public string ClaimName => this.configuration["authentication:wsfed:claimName"] ?? ClaimTypes.Upn;
+        public string ClaimName => this.configuration["authentication:wsfed:claim-name"] ?? ClaimTypes.Upn;
 
         public IdentityType ClaimType
         {
             get
             {
-                if (Enum.TryParse(this.configuration["authentication:wsfed:claimType"], out IdentityType claimType))
+                if (Enum.TryParse(this.configuration["authentication:wsfed:claim-type"], out IdentityType claimType))
                 {
                     return claimType;
                 }
@@ -35,13 +35,13 @@ namespace Lithnet.Laps.Web.AppSettings
             }
         }
 
-        public string UniqueClaimTypeIdentifier => this.configuration["authentication:oidc:uniqueClaimTypeIdentifier"] ?? ClaimTypes.PrimarySid;
+        public string UniqueClaimTypeIdentifier => this.configuration["authentication:oidc:unique-claim-type-identifier"] ?? ClaimTypes.PrimarySid;
 
         public string SignOutWReply
         {
             get
             {
-                return this.configuration["authentication:wsfed:signoutwreply"] ?? new Uri(new Uri(this.configuration["authentication:wsfed:realm"]?.Trim('/', '\\')), "Home/LogOut").ToString();
+                return this.configuration["authentication:wsfed:signout-wreply"] ?? new Uri(new Uri(this.configuration["authentication:wsfed:realm"]?.Trim('/', '\\')), "Home/LogOut").ToString();
             }
         }
     }

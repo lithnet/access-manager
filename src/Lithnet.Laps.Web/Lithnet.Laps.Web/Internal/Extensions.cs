@@ -6,11 +6,53 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using System.Web;
+using Microsoft.Extensions.Configuration;
 
 namespace Lithnet.Laps.Web
 {
     internal static class Extensions
     {
+        public static bool GetValueOrDefault(this IConfigurationRoot config, string key, bool defaultValue)
+        {
+            string value = config[key];
+
+            if (bool.TryParse(value, out bool result))
+            {
+                return result;
+            }
+
+            return defaultValue;
+        }
+
+        public static int GetValueOrDefault(this IConfigurationRoot config, string key, int defaultValue)
+        {
+            string value = config[key];
+
+            if (int.TryParse(value, out int result))
+            {
+                return result;
+            }
+
+            return defaultValue;
+        }
+
+        public static int GetValueOrDefault(this IConfigurationRoot config, string key, int minimumValue, int defaultValue)
+        {
+            string value = config[key];
+
+            if (int.TryParse(value, out int result))
+            {
+                if (result < minimumValue)
+                {
+                    return defaultValue;
+                }
+
+                return result;
+            }
+
+            return defaultValue;
+        }
+
         public static bool TryParseAsSid(this string s, out SecurityIdentifier sid)
         {
             try

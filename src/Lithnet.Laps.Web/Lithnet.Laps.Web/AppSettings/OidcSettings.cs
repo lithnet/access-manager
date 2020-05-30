@@ -15,21 +15,21 @@ namespace Lithnet.Laps.Web.AppSettings
             this.configuration = configuration;
         }
 
-        public string ClientID => this.configuration["authentication:oidc:clientid"];
+        public string ClientID => this.configuration["authentication:oidc:client-id"];
 
         public string Secret => this.configuration["authentication:oidc:secret"];
 
-        public string RedirectUri => this.configuration["authentication:oidc:redirecturi"];
+        public string RedirectUri => this.configuration["authentication:oidc:redirect-uri"];
 
         public string Authority => this.configuration["authentication:oidc:authority"].TrimEnd('/');
 
-        public string ClaimName => this.configuration["authentication:oidc:claimName"] ?? ClaimTypes.Upn;
+        public string ClaimName => this.configuration["authentication:oidc:claim-name"] ?? ClaimTypes.Upn;
 
         public IdentityType ClaimType
         {
             get
             {
-                if (Enum.TryParse(this.configuration["authentication:oidc:claimType"], out IdentityType claimType))
+                if (Enum.TryParse(this.configuration["authentication:oidc:claim-type"], out IdentityType claimType))
                 {
                     return claimType;
                 }
@@ -40,15 +40,15 @@ namespace Lithnet.Laps.Web.AppSettings
             }
         }
 
-        public string UniqueClaimTypeIdentifier => this.configuration["authentication:oidc:uniqueClaimTypeIdentifier"] ?? ClaimTypes.PrimarySid;
+        public string UniqueClaimTypeIdentifier => this.configuration["authentication:oidc:unique-claim-type-identifier"] ?? ClaimTypes.PrimarySid;
 
-        public string ResponseType => this.configuration["authentication:oidc:responseType"] ?? OpenIdConnectResponseType.IdToken;
+        public string ResponseType => this.configuration["authentication:oidc:response-type"] ?? OpenIdConnectResponseType.IdToken;
 
         public string PostLogourRedirectUri
         {
             get
             {
-                return this.configuration["authentication:oidc:postLogoutRedirectUri"] ?? new Uri(new Uri(this.configuration["authentication:oidc:redirecturi"]?.Trim('/', '\\')), "Home/LogOut").ToString();
+                return this.configuration["authentication:oidc:post-logout-redirect-uri"] ?? new Uri(new Uri(this.configuration["authentication:oidc:redirect-uri"]?.Trim('/', '\\')), "Home/LogOut").ToString();
             }
         }
     }

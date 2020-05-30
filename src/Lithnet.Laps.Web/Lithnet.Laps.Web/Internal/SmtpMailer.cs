@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Mail;
+using Lithnet.Laps.Web.AppSettings;
 using NLog;
 
 namespace Lithnet.Laps.Web.Mail
@@ -8,28 +10,37 @@ namespace Lithnet.Laps.Web.Mail
     {
         private readonly ILogger logger;
 
-        public SmtpMailer(ILogger logger)
+        private readonly IEmailSettings emailSettings;
+
+        public SmtpMailer(ILogger logger, IEmailSettings emailSettings)
         {
             this.logger = logger;
-        }
-
-        private bool IsSmtpConfigured()
-        {
-            return !string.IsNullOrWhiteSpace(new SmtpClient().Host);
+            this.emailSettings = emailSettings;
         }
 
         public void SendEmail(IEnumerable<string> recipients, string subject, string body)
         {
-            if (!this.IsSmtpConfigured())
+            if (!this.emailSettings.IsConfigured)
             {
                 this.logger.Trace("SMTP is not configured, discarding mail message");
                 return;
             }
 
-            using (SmtpClient client = new SmtpClient())
+            using (SmtpClient client = new SmtpClient(this.emailSettings.Host, this.emailSettings.Port))
             {
+                client.UseDefaultCredentials = this.emailSettings.UseDefaultCredentials;
+                client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                client.EnableSsl = this.emailSettings.UseSsl;
+                
+                if (!this.emailSettings.UseDefaultCredentials && !string.IsNullOrWhiteSpace(this.emailSettings.Username))
+                {
+                    client.Credentials = new NetworkCredential(this.emailSettings.Username, this.emailSettings.Password);
+                }
+                
                 using (MailMessage message = new MailMessage())
                 {
+                    message.From = new MailAddress(this.emailSettings.FromAddress);
+
                     foreach (string recipient in recipients)
                     {
                         message.To.Add(recipient);

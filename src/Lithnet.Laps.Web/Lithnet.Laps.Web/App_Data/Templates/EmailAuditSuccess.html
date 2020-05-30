@@ -57,7 +57,7 @@
                     User IP
                 </th>
                 <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
-                    {request.UnmaskedIPAddress}
+                    {request.ResolvedIPAddress}
                 </td>
             </tr>
 
@@ -98,18 +98,18 @@
 
             <tr>
                 <th style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; text-align: left; background: #eaebec">
-                    Matched target ID
+                    Matched rule
                 </th>
                 <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
-                    {target.ID}
+                    {authzresult.MatchedRuleDescription}
                 </td>
             </tr>
             <tr>
                 <th style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; text-align: left; background: #eaebec">
-                    Matched reader principal
+                    Matched principal
                 </th>
                 <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
-                    {reader.Principal}
+                    {authzresult.MatchedAcePrincipal}
                 </td>
             </tr>
             <tr>
