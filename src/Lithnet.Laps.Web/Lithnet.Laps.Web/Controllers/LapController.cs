@@ -1,8 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
-using System.DirectoryServices.AccountManagement;
 using System.Web.Mvc;
 using Lithnet.Laps.Web.App_LocalResources;
+using Lithnet.Laps.Web.AppSettings;
 using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Config;
 using Lithnet.Laps.Web.Models;
@@ -23,11 +23,11 @@ namespace Lithnet.Laps.Web.Controllers
         private readonly IRateLimiter rateLimiter;
         private readonly IAvailableTargets availableTargets;
         private readonly IAuthenticationService authenticationService;
-        private readonly ILapsConfig config;
+        private readonly IUserInterfaceSettings userInterfaceSettings;
 
         public LapController(IAuthorizationService authorizationService, ILogger logger, IDirectory directory,
             IReporting reporting, IRateLimiter rateLimiter, IAvailableTargets availableTargets,
-            IAuthenticationService authenticationService, ILapsConfig config)
+            IAuthenticationService authenticationService, IUserInterfaceSettings userInterfaceSettings)
         {
             this.authorizationService = authorizationService;
             this.logger = logger;
@@ -36,20 +36,19 @@ namespace Lithnet.Laps.Web.Controllers
             this.rateLimiter = rateLimiter;
             this.availableTargets = availableTargets;
             this.authenticationService = authenticationService;
-            this.config = config;
-            
+            this.userInterfaceSettings = userInterfaceSettings;
         }
 
         public ActionResult Get()
         {
-            return this.View(new LapRequestModel { ShowReason = this.config.Audit.Reason != Config.AuditReasonFieldState.Hidden });
+            return this.View(new LapRequestModel { ShowReason = this.userInterfaceSettings.UserSuppliedReason != AuditReasonFieldState.Hidden });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Get(LapRequestModel model)
         {
-            model.ShowReason = this.config.Audit.Reason != Config.AuditReasonFieldState.Hidden;
+            model.ShowReason = this.userInterfaceSettings.UserSuppliedReason != AuditReasonFieldState.Hidden;
 
             if (!this.ModelState.IsValid)
             {
@@ -62,7 +61,7 @@ namespace Lithnet.Laps.Web.Controllers
             {
                 model.FailureReason = null;
 
-                if (string.IsNullOrWhiteSpace(model.UserRequestReason) && this.config.Audit.Reason == Config.AuditReasonFieldState.Required)
+                if (string.IsNullOrWhiteSpace(model.UserRequestReason) && this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required)
                 {
                     return this.LogAndReturnErrorResponse(model, UIMessages.ReasonRequired, EventIDs.ReasonRequired);
                 }

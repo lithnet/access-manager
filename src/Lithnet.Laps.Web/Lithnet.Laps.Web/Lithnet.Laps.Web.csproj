@@ -54,10 +54,49 @@
     <Reference Include="IdentityModel, Version=4.0.0.0, Culture=neutral, PublicKeyToken=e7877f4675df049f, processorArchitecture=MSIL">
       <HintPath>..\packages\IdentityModel.4.0.0\lib\net461\IdentityModel.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.1.1.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Configuration.ConfigurationBuilders.Base, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Configuration.ConfigurationBuilders.Base.2.0.0\lib\Net471\Microsoft.Configuration.ConfigurationBuilders.Base.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Configuration.ConfigurationBuilders.UserSecrets, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Configuration.ConfigurationBuilders.UserSecrets.2.0.0\lib\Net471\Microsoft.Configuration.ConfigurationBuilders.UserSecrets.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Extensions.Configuration, Version=3.1.4.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Configuration.3.1.4\lib\netstandard2.0\Microsoft.Extensions.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Configuration.Abstractions, Version=3.1.4.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Configuration.Abstractions.3.1.4\lib\netstandard2.0\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Configuration.Binder, Version=3.1.4.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Configuration.Binder.3.1.4\lib\netstandard2.0\Microsoft.Extensions.Configuration.Binder.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Configuration.EnvironmentVariables, Version=3.1.4.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Configuration.EnvironmentVariables.3.1.4\lib\netstandard2.0\Microsoft.Extensions.Configuration.EnvironmentVariables.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Configuration.FileExtensions, Version=3.1.4.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Configuration.FileExtensions.3.1.4\lib\netstandard2.0\Microsoft.Extensions.Configuration.FileExtensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Configuration.Json, Version=3.1.4.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Configuration.Json.3.1.4\lib\netstandard2.0\Microsoft.Extensions.Configuration.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.FileProviders.Abstractions, Version=3.1.4.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.FileProviders.Abstractions.3.1.4\lib\netstandard2.0\Microsoft.Extensions.FileProviders.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.FileProviders.Physical, Version=3.1.4.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.FileProviders.Physical.3.1.4\lib\netstandard2.0\Microsoft.Extensions.FileProviders.Physical.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.FileSystemGlobbing, Version=3.1.4.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.FileSystemGlobbing.3.1.4\lib\netstandard2.0\Microsoft.Extensions.FileSystemGlobbing.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Primitives, Version=3.1.4.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Primitives.3.1.4\lib\netstandard2.0\Microsoft.Extensions.Primitives.dll</HintPath>
+    </Reference>
     <Reference Include="microsoft.identitymodel, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.IdentityModel.7.0.0\lib\net35\microsoft.identitymodel.dll</HintPath>
     </Reference>
@@ -117,7 +156,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Buffers.4.5.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
     </Reference>
     <Reference Include="System.Collections.Immutable, Version=1.2.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Collections.Immutable.1.6.0\lib\netstandard2.0\System.Collections.Immutable.dll</HintPath>
@@ -144,7 +183,7 @@
     <Reference Include="System.IO.Compression, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
     <Reference Include="System.Management" />
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Memory.4.5.3\lib\netstandard2.0\System.Memory.dll</HintPath>
+      <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http, Version=4.1.1.3, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Net.Http.4.3.4\lib\net46\System.Net.Http.dll</HintPath>
@@ -161,8 +200,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.5.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.6.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.7.1\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.InteropServices" />
     <Reference Include="System.Runtime.Serialization" />
@@ -188,11 +227,14 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Text.Encodings.Web, Version=4.0.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encodings.Web.4.6.0\lib\netstandard2.0\System.Text.Encodings.Web.dll</HintPath>
+    <Reference Include="System.Text.Encodings.Web, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.4.7.1\lib\net461\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.4.7.2\lib\net461\System.Text.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.3\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="System.Threading.Thread" />
     <Reference Include="System.Transactions" />
@@ -273,6 +315,26 @@
     <Compile Include="ActiveDirectory\Interop\NativeMethods.cs" />
     <Compile Include="ActiveDirectory\Interop\SidAndAttributes.cs" />
     <Compile Include="ActiveDirectory\Interop\TokenGroups.cs" />
+    <Compile Include="AppSettings\AuthenticationSettings.cs" />
+    <Compile Include="AppSettings\GlobalAuditSettings.cs" />
+    <Compile Include="AppSettings\IpResolverSettings.cs" />
+    <Compile Include="AppSettings\ClientIpHandling.cs" />
+    <Compile Include="AppSettings\Interfaces\IIPResolverSettings.cs" />
+    <Compile Include="AppSettings\Interfaces\IClientIPHandling.cs" />
+    <Compile Include="AppSettings\XffResolverMode.cs" />
+    <Compile Include="AppSettings\ClientIpResolverMode.cs" />
+    <Compile Include="AppSettings\Interfaces\IAuthenticationSettings.cs" />
+    <Compile Include="AppSettings\Interfaces\IIwaSettings.cs" />
+    <Compile Include="AppSettings\Interfaces\IExternalAuthenticationProvider.cs" />
+    <Compile Include="AppSettings\Interfaces\IOidcSettings.cs" />
+    <Compile Include="AppSettings\IwaSettings.cs" />
+    <Compile Include="AppSettings\Interfaces\IUserInterfaceSettings.cs" />
+    <Compile Include="AppSettings\Interfaces\IWsFedSettings.cs" />
+    <Compile Include="AppSettings\Interfaces\IXffHandling.cs" />
+    <Compile Include="AppSettings\OidcSettings.cs" />
+    <Compile Include="AppSettings\XffHandling.cs" />
+    <Compile Include="AppSettings\UserInterfaceSettings.cs" />
+    <Compile Include="AppSettings\WsFedSettings.cs" />
     <Compile Include="App_LocalResources\UIMessages.it.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -283,22 +345,32 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
-    <Compile Include="Audit\IReporting.cs" />
-    <Compile Include="Audit\ITemplates.cs" />
-    <Compile Include="Audit\TemplatesFromFiles.cs" />
-    <Compile Include="Config\AuditReasonFieldState.cs" />
-    <Compile Include="Config\IRateLimitDetails.cs" />
-    <Compile Include="Config\IRateLimits.cs" />
+    <Compile Include="Internal\Interfaces\IReporting.cs" />
+    <Compile Include="Internal\Interfaces\ITemplates.cs" />
+    <Compile Include="Internal\TemplatesFromFiles.cs" />
+    <Compile Include="AppSettings\AuditReasonFieldState.cs" />
+    <Compile Include="AppSettings\Interfaces\IRateLimitDetails.cs" />
+    <Compile Include="AppSettings\Interfaces\IRateLimits.cs" />
     <Compile Include="Config\IReaderElement.cs" />
     <Compile Include="Config\AuditOptions.cs" />
-    <Compile Include="Config\IAuditOptions.cs" />
-    <Compile Include="Config\RateLimits.cs" />
-    <Compile Include="Config\RateLimitDetails.cs" />
+    <Compile Include="Config\IAuditSettings.cs" />
+    <Compile Include="AppSettings\RateLimitSettings.cs" />
+    <Compile Include="AppSettings\RateLimitDetails.cs" />
     <Compile Include="Exceptions\NotFoundException.cs" />
     <Compile Include="Exceptions\AmbiguousNameException.cs" />
+    <Compile Include="Internal\Interfaces\IIpAddressResolver.cs" />
+    <Compile Include="Internal\IpAddressResolver.cs" />
+    <Compile Include="JsonTargets\AceType.cs" />
+    <Compile Include="JsonTargets\AuthorizationResponse.cs" />
+    <Compile Include="JsonTargets\AuthorizationResponseCode.cs" />
+    <Compile Include="JsonTargets\IAuthorizationService.cs" />
+    <Compile Include="JsonTargets\JsonEmailAuditRecipients.cs" />
+    <Compile Include="JsonTargets\JsonAce.cs" />
+    <Compile Include="JsonTargets\JsonTarget.cs" />
+    <Compile Include="JsonTargets\JsonTargetAuthorizationService.cs" />
     <Compile Include="Mail\IMailer.cs" />
     <Compile Include="Mail\SmtpMailer.cs" />
-    <Compile Include="Security\ISecurityPrincipal.cs" />
+    <Compile Include="ActiveDirectory\Interfaces\ISecurityPrincipal.cs" />
     <Compile Include="Config\ILapsConfig.cs" />
     <Compile Include="Security\Authentication\AuthenticationService.cs" />
     <Compile Include="Security\Authentication\IAuthenticationService.cs" />
@@ -308,18 +380,16 @@
     <Compile Include="Security\Authorization\IAuthorizationService.cs" />
     <Compile Include="ActiveDirectory\ActiveDirectoryComputer.cs" />
     <Compile Include="ConfigSection\AuditElement.cs" />
-    <Compile Include="ConfigSection\RateLimitIPElement.cs" />
-    <Compile Include="ConfigSection\RateLimitUserElement.cs" />
     <Compile Include="ActiveDirectory\ActiveDirectoryGroup.cs" />
-    <Compile Include="Internal\IRateLimiter.cs" />
-    <Compile Include="Security\IComputer.cs" />
-    <Compile Include="Security\IDirectory.cs" />
+    <Compile Include="Internal\Interfaces\IRateLimiter.cs" />
+    <Compile Include="ActiveDirectory\Interfaces\IComputer.cs" />
+    <Compile Include="ActiveDirectory\Interfaces\IDirectory.cs" />
     <Compile Include="Internal\RateLimiter.cs" />
-    <Compile Include="Audit\Reporting.cs" />
+    <Compile Include="Internal\Reporting.cs" />
     <Compile Include="ConfigSection\ReaderCollection.cs" />
     <Compile Include="ConfigSection\TargetElement.cs" />
     <Compile Include="ConfigSection\ReaderElement.cs" />
-    <Compile Include="Security\IUser.cs" />
+    <Compile Include="ActiveDirectory\Interfaces\IUser.cs" />
     <Compile Include="Models\PasswordData.cs" />
     <Compile Include="ConfigSection\TargetType.cs" />
     <Compile Include="ConfigSection\TargetCollection.cs" />
@@ -347,12 +417,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>UIMessages.resx</DependentUpon>
     </Compile>
-    <Compile Include="Audit\UsersToNotify.cs" />
+    <Compile Include="Internal\UsersToNotify.cs" />
     <Compile Include="Security\Authorization\AuthorizationResponse.cs" />
     <Compile Include="Security\Authorization\DemoAuthorizationService.cs" />
     <Compile Include="Security\Authorization\IAvailableTargets.cs" />
     <Compile Include="Security\Authorization\AvailableTargets.cs" />
-    <Compile Include="Security\IGroup.cs" />
+    <Compile Include="ActiveDirectory\Interfaces\IGroup.cs" />
     <Compile Include="ActiveDirectory\ActiveDirectoryUser.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -412,6 +482,8 @@
     <Content Include="NLog.config" />
     <Content Include="mail.config" />
     <Content Include="App_Data\appsettings.json" />
+    <Content Include="App_Data\appsecrets.json" />
+    <Content Include="App_Data\targets.json" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -475,7 +547,6 @@
     <Content Include="Scripts\popper.js.map" />
     <Content Include="Scripts\popper-utils.min.js.map" />
     <Content Include="Scripts\popper-utils.js.map" />
-    <None Include="secrets.config" />
     <Content Include="Views\Lap\RateLimitExceeded.cshtml" />
     <Content Include="Views\Lap\Get.cshtml" />
     <Content Include="Views\Lap\Show.cshtml" />
@@ -539,7 +610,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>64630</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:64630/</IISUrl>
+          <IISUrl>https://localhost:44338/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
@@ -547,6 +618,7 @@
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
+      <UserProperties app_3data_4targets_1json__JsonSchema="https://json.schemastore.org/appsettings" app_3data_4appsecrets_1json__JsonSchema="https://json.schemastore.org/appsettings" />
     </VisualStudio>
     <MonoDevelop>
       <Properties>

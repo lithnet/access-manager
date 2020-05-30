@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace Lithnet.Laps.Web.Config
 {
-    public class AuditOptions : IAuditOptions
+    public class AuditOptions : IAuditSettings
     {
         [JsonProperty("emailOnSuccess")]
         public bool NotifySuccess { get; set; }
@@ -14,12 +14,8 @@ namespace Lithnet.Laps.Web.Config
         [JsonProperty("emailOnFailure")]
         public bool NotifyFailure { get; set; }
 
-        [JsonProperty("userSuppliedReason", DefaultValueHandling = DefaultValueHandling.Populate)]
-        [DefaultValue(AuditReasonFieldState.Optional)]
-        public AuditReasonFieldState UserSuppliedReason { get; set; }
-
         [JsonProperty("emailAddresses")]
-        public IList<string> EmailAddresses { get; } = new List<string>();
+        public IEnumerable<string> EmailAddresses { get; } = new List<string>();
 
         [JsonIgnore]
         public UsersToNotify UsersToNotify

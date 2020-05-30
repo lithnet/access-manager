@@ -1,10 +1,17 @@
 ﻿@using System.Configuration
+@using Lithnet.Laps.Web
+@using Lithnet.Laps.Web.AppSettings
+@using Unity
+
+@{
+    var uiSettings = UnityConfig.Container.Resolve<IUserInterfaceSettings>();
+}
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ConfigurationManager.AppSettings["app:Title"]</title>
+    <title>@uiSettings.Title</title>
     @Styles.Render("~/Content/css")
     <script src="@Url.Content("~/Scripts/clipboard.min.js")"></script>
     <link href="@Url.Content("~/Content/fontawesome/fontawesome-all.css")" type="text/css" rel="stylesheet" />
@@ -12,8 +19,8 @@
 <body>
     <div class="content">
         <div class="app-header">
-            <img class="app-logo" alt="@ConfigurationManager.AppSettings["app:Title"]" src="~/images/logo.png" />
-            <div class="app-title">@ConfigurationManager.AppSettings["app:Title"]</div>
+            <img class="app-logo" alt="@uiSettings.Title" src="~/images/logo.png" />
+            <div class="app-title">@uiSettings.Title</div>
         </div>
         @RenderBody()
     </div>

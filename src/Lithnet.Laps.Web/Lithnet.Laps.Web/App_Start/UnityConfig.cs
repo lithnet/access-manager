@@ -6,10 +6,15 @@ using Lithnet.Laps.Web.Models;
 using Lithnet.Laps.Web.Security.Authentication;
 using Lithnet.Laps.Web.Security.Authorization;
 using Lithnet.Laps.Web.Security.Authorization.ConfigurationFile;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Practices.Unity.Configuration;
 using NLog;
 using Unity;
 using Unity.NLog;
+using ConfigurationBuilder = Microsoft.Extensions.Configuration.ConfigurationBuilder;
+using Lithnet.Laps.Web.AppSettings;
+using Lithnet.Laps.Web.Internal;
+using Lithnet.Laps.Web.Config;
 
 namespace Lithnet.Laps.Web
 {
@@ -51,7 +56,24 @@ namespace Lithnet.Laps.Web
                 container.LoadConfiguration();
             }
 
+            var configRoot = new ConfigurationBuilder()
+                .AddJsonFile("app_data/appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("app_data/appsecrets.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables("laps")
+                .Build();
+
+            container.RegisterInstance(configRoot);
+
             container.RegisterFactory<ILogger>(_ => LogManager.GetCurrentClassLogger());
+            container.RegisterType<IOidcSettings, OidcSettings>();
+            container.RegisterType<IIwaSettings, IwaSettings>();
+            container.RegisterType<IWsFedSettings, WsFedSettings>();
+            container.RegisterType<IUserInterfaceSettings, UserInterfaceSettings>();
+            container.RegisterType<IRateLimitSettings, RateLimitSettings>();
+            container.RegisterType<IAuthenticationSettings, AuthenticationSettings>();
+            container.RegisterType<IIpResolverSettings, IpResolverSettings>();
+            container.RegisterType<IIpAddressResolver, IpAddressResolver>();
+            container.RegisterType<GlobalAuditSettings, GlobalAuditSettings>();
 
             // If no container registrations are found in the config file, then load the defaults here
             if (!container.IsRegistered<IAuthorizationService>())

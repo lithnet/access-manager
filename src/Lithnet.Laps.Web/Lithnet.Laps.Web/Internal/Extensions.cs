@@ -11,40 +11,6 @@ namespace Lithnet.Laps.Web
 {
     internal static class Extensions
     {
-        public static string GetXffList(this HttpRequest request)
-        {
-            return request.ServerVariables["HTTP_X_FORWARDED_FOR"];
-        }
-
-        public static string GetXffIP(this HttpRequest request)
-        {
-            return request.GetXffList()?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)?.FirstOrDefault();
-        }
-
-        public static string GetUnmaskedIP(this HttpRequest request)
-        {
-            string ip = request.GetXffIP();
-
-            return string.IsNullOrWhiteSpace(ip) ? request.UserHostAddress : ip;
-        }
-
-        public static string GetXffList(this HttpRequestBase request)
-        {
-            return request.ServerVariables["HTTP_X_FORWARDED_FOR"];
-        }
-
-        public static string GetXffIP(this HttpRequestBase request)
-        {
-            return request.GetXffList()?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)?.FirstOrDefault();
-        }
-
-        public static string GetUnmaskedIP(this HttpRequestBase request)
-        {
-            string ip = request.GetXffIP();
-
-            return string.IsNullOrWhiteSpace(ip) ? request.UserHostAddress : ip;
-        }
-        
         public static bool TryParseAsSid(this string s, out SecurityIdentifier sid)
         {
             try

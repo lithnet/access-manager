@@ -4,7 +4,9 @@ using System.Collections.Immutable;
 using System.Globalization;
 using System.Web;
 using Lithnet.Laps.Web.App_LocalResources;
+using Lithnet.Laps.Web.AppSettings;
 using Lithnet.Laps.Web.Config;
+using Lithnet.Laps.Web.Internal;
 using Lithnet.Laps.Web.Mail;
 using Lithnet.Laps.Web.Models;
 using Lithnet.Laps.Web.Security.Authorization;
@@ -15,16 +17,18 @@ namespace Lithnet.Laps.Web.Audit
     public sealed class Reporting : IReporting
     {
         private readonly ILogger logger;
-        private readonly ILapsConfig configSection;
         private readonly IMailer mailer;
         private readonly ITemplates templates;
+        private readonly IIpAddressResolver ipResolver;
+        private readonly GlobalAuditSettings globalAuditSettings;
 
-        public Reporting(ILogger logger, ILapsConfig configSection, IMailer mailer, ITemplates templates)
+        public Reporting(ILogger logger, IMailer mailer, ITemplates templates, GlobalAuditSettings globalAuditSettings, IIpAddressResolver ipResolver)
         {
             this.logger = logger;
-            this.configSection = configSection;
             this.mailer = mailer;
             this.templates = templates;
+            this.ipResolver = ipResolver;
+            this.globalAuditSettings = globalAuditSettings;
         }
 
         public void LogErrorEvent(int eventID, string logMessage, Exception ex)
@@ -123,9 +127,7 @@ namespace Lithnet.Laps.Web.Audit
                 { "{message}", detailMessage},
                 { "{request.IPAddress}", HttpContext.Current?.Request?.UserHostAddress},
                 { "{request.HostName}", HttpContext.Current?.Request?.UserHostName},
-                { "{request.Xff}", HttpContext.Current?.Request?.GetXffIP()},
-                { "{request.XffAll}", HttpContext.Current?.Request?.GetXffList()},
-                { "{request.UnmaskedIPAddress}", HttpContext.Current?.Request?.GetUnmaskedIP()},
+                { "{request.ResolvedIPAddress}", this.ipResolver.GetRequestIP(HttpContext.Current?.Request)},
                 { "{datetime}", DateTime.Now.ToString(CultureInfo.CurrentCulture)},
                 { "{datetimeutc}", DateTime.UtcNow.ToString(CultureInfo.CurrentCulture)},
                 { "{computer.LapsExpiryDate}", passwordData?.ExpirationTime?.ToString(CultureInfo.CurrentCulture)},
@@ -153,9 +155,9 @@ namespace Lithnet.Laps.Web.Audit
                 usersToNotify = usersToNotify.Union(authorizationResponse.UsersToNotify);
             }
 
-            if (this.configSection.UsersToNotify != null)
+            if (this.globalAuditSettings.UsersToNotify != null)
             {
-                usersToNotify = usersToNotify.Union(this.configSection.UsersToNotify);
+                usersToNotify = usersToNotify.Union(this.globalAuditSettings.UsersToNotify);
             }
 
             if (!string.IsNullOrWhiteSpace(user?.EmailAddress))

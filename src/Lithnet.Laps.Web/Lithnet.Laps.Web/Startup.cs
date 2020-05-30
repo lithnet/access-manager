@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.DirectoryServices.AccountManagement;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Helpers;
 using IdentityModel.Client;
-using Lithnet.Laps.Web;
 using Lithnet.Laps.Web.App_LocalResources;
+using Lithnet.Laps.Web.AppSettings;
 using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Config;
 using Lithnet.Laps.Web.Models;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Owin;
 using Microsoft.Owin.Host.SystemWeb;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
@@ -35,20 +33,7 @@ namespace Lithnet.Laps.Web
     {
         internal static bool CanLogout = false;
 
-        internal static string ClaimName { get; set; } = "upn";
-
-        internal static IdentityType ClaimType { get; set; } = IdentityType.UserPrincipalName;
-
-        // These values are stored in Web.config. Make sure you update them!
-        private readonly string clientId = ConfigurationManager.AppSettings["oidc:ClientId"];
-        private readonly string redirectUri = ConfigurationManager.AppSettings["oidc:RedirectUri"];
-        private readonly string authority = ConfigurationManager.AppSettings["oidc:Authority"]?.TrimEnd('/');
-        private readonly string clientSecret = ConfigurationManager.AppSettings["oidc:ClientSecret"];
-        private readonly string postLogoutRedirectUri = ConfigurationManager.AppSettings["oidc:PostLogoutRedirectUri"];
-
-        private readonly string realm = ConfigurationManager.AppSettings["ida:wtrealm"];
-        private readonly string signOutWreply = ConfigurationManager.AppSettings["ida:signOutWreply"];
-        private readonly string metadata = ConfigurationManager.AppSettings["ida:metadata"];
+        private static IExternalAuthenticationProvider authProvider;
 
         private readonly ILogger logger;
 
@@ -73,13 +58,17 @@ namespace Lithnet.Laps.Web
 
         public void Configure(IAppBuilder app)
         {
-            string mode = ConfigurationManager.AppSettings["authentication:mode"]?.ToLower();
+            var authSettings = UnityConfig.Container.Resolve<IAuthenticationSettings>();
 
-            if (mode == "wsfed")
+            //var x = UnityConfig.Container.Resolve<IRateLimits>();
+
+            IdentityModelEventSource.ShowPII = authSettings.ShowPii;
+
+            if (authSettings.Mode == "wsfed")
             {
                 this.ConfigureWsFederation(app);
             }
-            else if (mode == "oidc")
+            else if (authSettings.Mode == "oidc")
             {
                 this.ConfigureOpenIDConnect(app);
             }
@@ -92,21 +81,10 @@ namespace Lithnet.Laps.Web
         public void ConfigureOpenIDConnect(IAppBuilder app)
         {
             Startup.CanLogout = true;
+            var oidcSettings = UnityConfig.Container.Resolve<IOidcSettings>();
 
-            Startup.ClaimName = ConfigurationManager.AppSettings["oidc:claimName"] ?? ClaimTypes.Upn;
-
-            if (Enum.TryParse(ConfigurationManager.AppSettings["oidc:claimType"], out IdentityType claimType))
-            {
-                Startup.ClaimType = claimType;
-            }
-            else
-            {
-                Startup.ClaimType = IdentityType.UserPrincipalName;
-            }
-
-            AntiForgeryConfig.UniqueClaimTypeIdentifier = ConfigurationManager.AppSettings["oidc:uniqueClaimTypeIdentifier"] ?? ClaimTypes.PrimarySid;
-
-            string responseType = ConfigurationManager.AppSettings["oidc:responseType"] ?? OpenIdConnectResponseType.IdToken;
+            Startup.authProvider = oidcSettings;
+            AntiForgeryConfig.UniqueClaimTypeIdentifier = oidcSettings.UniqueClaimTypeIdentifier;
 
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
 
@@ -118,13 +96,13 @@ namespace Lithnet.Laps.Web
 
             app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
             {
-                ClientId = this.clientId,
-                ClientSecret = this.clientSecret,
-                Authority = this.authority,
-                RedirectUri = this.redirectUri,
-                ResponseType = responseType,
+                ClientId = oidcSettings.ClientID,
+                ClientSecret = oidcSettings.Secret,
+                Authority = oidcSettings.Authority,
+                RedirectUri = oidcSettings.RedirectUri,
+                ResponseType = oidcSettings.ResponseType,
                 Scope = OpenIdConnectScope.OpenIdProfile,
-                PostLogoutRedirectUri = this.postLogoutRedirectUri ?? new Uri(new Uri(this.redirectUri.Trim('/', '\\')), "Home/LogOut").ToString(),
+                PostLogoutRedirectUri = oidcSettings.PostLogourRedirectUri,
                 TokenValidationParameters = new TokenValidationParameters
                 {
                     NameClaimType = "name",
@@ -144,8 +122,8 @@ namespace Lithnet.Laps.Web
                             TokenResponse tokenResponse = await client.RequestTokenAsync(new TokenRequest
                             {
                                 Address = config.TokenEndpoint,
-                                ClientId = this.clientId,
-                                ClientSecret = this.clientSecret,
+                                ClientId = oidcSettings.ClientID,
+                                ClientSecret = oidcSettings.Secret,
                             });
 
                             if (tokenResponse.IsError)
@@ -212,28 +190,21 @@ namespace Lithnet.Laps.Web
         public void ConfigureWindowsAuth(IAppBuilder app)
         {
             Startup.CanLogout = false;
-            AntiForgeryConfig.UniqueClaimTypeIdentifier = ConfigurationManager.AppSettings["ida:uniqueClaimTypeIdentifier"] ?? ClaimTypes.PrimarySid;
-            Startup.ClaimName = ClaimTypes.PrimarySid;
-            Startup.ClaimType = IdentityType.Sid;
+            var iwaSettings = UnityConfig.Container.Resolve<IIwaSettings>();
+
+            AntiForgeryConfig.UniqueClaimTypeIdentifier = iwaSettings.UniqueClaimTypeIdentifier;
+            Startup.authProvider = iwaSettings;
         }
 
         public void ConfigureWsFederation(IAppBuilder app)
         {
             Startup.CanLogout = true;
-            Startup.ClaimName = ConfigurationManager.AppSettings["ida:claimName"] ?? ClaimTypes.Upn;
+            var wsfSettings = UnityConfig.Container.Resolve<IWsFedSettings>();
 
-            if (Enum.TryParse(ConfigurationManager.AppSettings["ida:claimType"], out IdentityType claimType))
-            {
-                Startup.ClaimType = claimType;
-            }
-            else
-            {
-                Startup.ClaimType = IdentityType.UserPrincipalName;
-            }
+            Startup.authProvider = wsfSettings;
+            AntiForgeryConfig.UniqueClaimTypeIdentifier = wsfSettings.UniqueClaimTypeIdentifier;
 
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
-
-            AntiForgeryConfig.UniqueClaimTypeIdentifier = ConfigurationManager.AppSettings["ida:uniqueClaimTypeIdentifier"] ?? ClaimTypes.PrimarySid;
 
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
@@ -241,14 +212,12 @@ namespace Lithnet.Laps.Web
                 AuthenticationType = "Cookies"
             });
 
-            IdentityModelEventSource.ShowPII = true;
-
             app.UseWsFederationAuthentication(
                 new WsFederationAuthenticationOptions
                 {
-                    Wtrealm = this.realm,
-                    MetadataAddress = this.metadata,
-                    SignOutWreply = this.signOutWreply ?? new Uri(new Uri(this.realm.Trim('/', '\\')), "Home/LogOut").ToString(),
+                    Wtrealm = wsfSettings.Realm,
+                    MetadataAddress = wsfSettings.Metadata,
+                    SignOutWreply = wsfSettings.SignOutWReply,
                     Notifications = new WsFederationAuthenticationNotifications
                     {
                         SecurityTokenValidated = this.FindClaimIdentityInDirectoryOrFail,
@@ -270,7 +239,7 @@ namespace Lithnet.Laps.Web
         {
             ClaimsIdentity user = context.AuthenticationTicket.Identity;
 
-            string sid = this.FindUserByClaim(user, Startup.ClaimName)?.Sid?.Value;
+            string sid = this.FindUserByClaim(user, Startup.authProvider.ClaimName)?.Sid?.Value;
 
             if (sid == null)
             {

@@ -260,5 +260,6 @@ paket-files/
 __pycache__/
 *.pyc
 
+appsecrets.json
 secrets.config
 *.dev.config

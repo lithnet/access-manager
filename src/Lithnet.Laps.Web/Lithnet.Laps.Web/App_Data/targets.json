@@ -1,0 +1,42 @@
+﻿{
+  "targets": [
+    {
+      "name": "idm-d1nps1-v02",
+      "type": "computer",
+      "expire-after": "02:00:00",
+      "acl": [
+        {
+          "name": "dev1\\domain admins",
+          "type": "allow"
+        },
+        {
+          "name": "dev1\\ryan",
+          "type": "deny"
+        }
+      ],
+      "email-auditing": {
+        "on-success": [ "laps-admin@lithnet.local" ],
+        "on-failure": [ "laps-admin@lithnet.local" ]
+      }
+    },
+    {
+      "name": "DC=dev1,dc=local",
+      "type": "Container",
+      "expire-after": "03:00:00",
+      "acl": [
+        {
+          "name": "dev1\\domain admins",
+          "type": "allow"
+        },
+        {
+          "name": "dev1\\ryan",
+          "type": "deny"
+        }
+      ],
+      "email-auditing": {
+        "on-success": [ "laps-admin@lithnet.local" ],
+        "on-failure": [ "laps-admin@lithnet.local" ]
+      }
+    }
+  ]
+}
