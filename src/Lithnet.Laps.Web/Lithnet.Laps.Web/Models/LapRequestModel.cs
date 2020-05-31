@@ -15,6 +15,8 @@ namespace Lithnet.Laps.Web.Models
 
         public bool ShowReason { get; set; }
 
+        public bool ReasonRequired { get; set; }
+
         public string FailureReason { get; set; }
     }
 }

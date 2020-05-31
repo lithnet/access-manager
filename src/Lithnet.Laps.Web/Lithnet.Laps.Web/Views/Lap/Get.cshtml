@@ -13,7 +13,7 @@
         <fieldset>
 
             <section>
-                <label class="title">@UIMessages.ComputerName</label>
+                <label class="title">@UIMessages.ComputerName*</label>
                 <label class="input">
                     <i class="icon-append fa fa-desktop"></i>
                     @Html.TextBoxFor(model => model.ComputerName, new { @class = "dataEntry" })
@@ -24,10 +24,18 @@
             @if (Model.ShowReason)
             {
                 <section>
-                    <label class="title">@UIMessages.UserReasonPrompt</label>
+                    <label class="title">@($"{UIMessages.UserReasonPrompt}{(Model.ReasonRequired ? "*" : string.Empty)}")</label>
                     <label class="input">
-                        @*<i class="icon-append fa"></i>*@
-                        @Html.TextAreaFor(model => model.UserRequestReason, new {@class = "dataEntryLarge"})
+
+                        @if (Model.ReasonRequired)
+                        {
+                            @Html.TextAreaFor(model => model.UserRequestReason, new { @class = "dataEntryLarge", @required="required" })
+                        }
+                        else
+                        {
+                            @Html.TextAreaFor(model => model.UserRequestReason, new { @class = "dataEntryLarge" })
+                        }
+
                         @Html.ValidationMessageFor(model => model.UserRequestReason)
                     </label>
                 </section>

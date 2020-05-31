@@ -40,7 +40,10 @@ namespace Lithnet.Laps.Web.Controllers
 
         public ActionResult Get()
         {
-            return this.View(new LapRequestModel { ShowReason = this.userInterfaceSettings.UserSuppliedReason != AuditReasonFieldState.Hidden });
+            return this.View(new LapRequestModel {
+                ShowReason = this.userInterfaceSettings.UserSuppliedReason != AuditReasonFieldState.Hidden,
+                ReasonRequired = this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required
+            });
         }
 
         [HttpPost]
@@ -48,6 +51,7 @@ namespace Lithnet.Laps.Web.Controllers
         public ActionResult Get(LapRequestModel model)
         {
             model.ShowReason = this.userInterfaceSettings.UserSuppliedReason != AuditReasonFieldState.Hidden;
+            model.ReasonRequired = this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required;
 
             if (!this.ModelState.IsValid)
             {
@@ -148,7 +152,7 @@ namespace Lithnet.Laps.Web.Controllers
                     eventID = EventIDs.AuthZExplicitlyDenied;
                     break;
                 default:
-                    eventID = EventIDs.AuthorizationFailed;
+                    eventID = EventIDs.AuthZFailed;
                     break;
             }
 

@@ -20,7 +20,7 @@ namespace Lithnet.Laps.Web.JsonTargets
         {
             this.directory = directory;
             this.logger = logger;
-            this.targets = provider.Targets;
+            this.targets = provider.Targets ?? new List<JsonTarget>();
         }
 
         public AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer)
@@ -39,7 +39,7 @@ namespace Lithnet.Laps.Web.JsonTargets
 
             foreach (JsonTarget j in targets)
             {
-                foreach (var ace in j.Acl.Where(t => t.Type == AceType.Deny))
+                foreach (var ace in j.Acl?.Where(t => t.Type == AceType.Deny))
                 {
                     if (this.IsMatchingAce(ace, computer, user))
                     {
@@ -64,7 +64,7 @@ namespace Lithnet.Laps.Web.JsonTargets
 
             foreach (JsonTarget j in targets)
             {
-                foreach (var ace in j.Acl.Where(t => t.Type == AceType.Allow))
+                foreach (var ace in j.Acl?.Where(t => t.Type == AceType.Allow))
                 {
                     if (this.IsMatchingAce(ace, computer, user))
                     {
