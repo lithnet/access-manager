@@ -1,5 +1,5 @@
 ﻿using System;
-using Lithnet.Laps.Web.Config;
+using Lithnet.Laps.Web.Internal;
 using Microsoft.Extensions.Configuration;
 
 namespace Lithnet.Laps.Web.AppSettings
@@ -15,19 +15,6 @@ namespace Lithnet.Laps.Web.AppSettings
 
         public string Title => this.configuration["user-interface:title"] ?? "Lithnet LAPS Web App";
 
-        public AuditReasonFieldState UserSuppliedReason
-        {
-            get
-            {
-                string value = this.configuration["user-interface:user-supplied-reason"];
-
-                if (Enum.TryParse(value, true, out AuditReasonFieldState auditReasonFieldState))
-                {
-                    return auditReasonFieldState;
-                }
-
-                return AuditReasonFieldState.Optional;
-            }
-        }
+        public AuditReasonFieldState UserSuppliedReason => this.configuration.GetValueOrDefault("user-interface:user-supplied-reason", AuditReasonFieldState.Optional);
     }
 }

@@ -1,8 +1,6 @@
-﻿using System.DirectoryServices.AccountManagement;
-
-namespace Lithnet.Laps.Web.AppSettings
+﻿namespace Lithnet.Laps.Web.AppSettings
 {
-    public interface IOidcSettings : IExternalAuthenticationProvider
+    public interface IOidcSettings : IExternalAuthProviderSettings
     {
         string Authority { get; }
 

@@ -1,6 +1,6 @@
-﻿using Lithnet.Laps.Web.Models;
+﻿using Lithnet.Laps.Web.ActiveDirectory;
 
-namespace Lithnet.Laps.Web.JsonTargets
+namespace Lithnet.Laps.Web.Authorization
 {
     public interface IAuthorizationService
     {

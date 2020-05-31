@@ -1,4 +1,4 @@
-﻿namespace Lithnet.Laps.Web.ActiveDirectory
+﻿namespace Lithnet.Laps.Web.ActiveDirectory.Interop
 {
     public enum DsNameError
     {

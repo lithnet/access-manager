@@ -4,7 +4,7 @@ using System.Net.Mail;
 using Lithnet.Laps.Web.AppSettings;
 using NLog;
 
-namespace Lithnet.Laps.Web.Mail
+namespace Lithnet.Laps.Web.Internal
 {
     public class SmtpMailer : IMailer
     {

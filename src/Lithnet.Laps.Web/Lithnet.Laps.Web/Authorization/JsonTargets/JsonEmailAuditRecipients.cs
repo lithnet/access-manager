@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Web;
-using Lithnet.Laps.Web.Audit;
-using Lithnet.Laps.Web.Config;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Lithnet.Laps.Web.JsonTargets
+namespace Lithnet.Laps.Web.Authorization
 {
     public class JsonEmailAuditRecipients
     {

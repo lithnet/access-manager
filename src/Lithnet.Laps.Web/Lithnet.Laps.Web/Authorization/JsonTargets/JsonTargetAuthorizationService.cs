@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using Lithnet.Laps.Web.ActiveDirectory;
 using Lithnet.Laps.Web.Models;
 using Microsoft.Ajax.Utilities;
 using NLog;
 
-namespace Lithnet.Laps.Web.JsonTargets
+namespace Lithnet.Laps.Web.Authorization
 {
     public class JsonTargetAuthorizationService : IAuthorizationService
     {
@@ -33,7 +33,7 @@ namespace Lithnet.Laps.Web.JsonTargets
 
                 return new AuthorizationResponse()
                 {
-                    ResponseCode = AuthorizationResponseCode.NoMatchingRuleForComputer,
+                    Code = AuthorizationResponseCode.NoMatchingRuleForComputer,
                 };
             }
 
@@ -49,7 +49,7 @@ namespace Lithnet.Laps.Web.JsonTargets
                         {
                             MatchedRuleDescription = $"{j.Type}: {j.Name}",
                             MatchedAcePrincipal = ace.Sid ?? ace.Name,
-                            ResponseCode = AuthorizationResponseCode.UserDeniedByAce,
+                            Code = AuthorizationResponseCode.ExplicitlyDenied,
                             NotificationRecipients = this.GetNotificationRecipients(j, ace, false),
                         };
                     }
@@ -74,7 +74,7 @@ namespace Lithnet.Laps.Web.JsonTargets
                         {
                             MatchedRuleDescription = $"{j.Type}: {j.Name}",
                             MatchedAcePrincipal = ace.Sid ?? ace.Name,
-                            ResponseCode = AuthorizationResponseCode.Success,
+                            Code = AuthorizationResponseCode.Success,
                             NotificationRecipients = this.GetNotificationRecipients(j, ace, true),
                             ExpireAfter = j.ExpireAfter,
                         };
@@ -89,7 +89,7 @@ namespace Lithnet.Laps.Web.JsonTargets
 
             return new AuthorizationResponse()
             {
-                ResponseCode = AuthorizationResponseCode.NoMatchingRuleForUser,
+                Code = AuthorizationResponseCode.NoMatchingRuleForUser,
                 NotificationRecipients = failureNotificationRecipients
             };
         }

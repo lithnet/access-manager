@@ -5,15 +5,13 @@ using System.Globalization;
 using System.Web;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.AppSettings;
-using Lithnet.Laps.Web.Config;
-using Lithnet.Laps.Web.Internal;
-using Lithnet.Laps.Web.JsonTargets;
-using Lithnet.Laps.Web.Mail;
+using Lithnet.Laps.Web.ActiveDirectory;
+using Lithnet.Laps.Web.Authorization;
 using Lithnet.Laps.Web.Models;
 using Microsoft.Ajax.Utilities;
 using NLog;
 
-namespace Lithnet.Laps.Web.Audit
+namespace Lithnet.Laps.Web.Internal
 {
     public sealed class Reporting : IReporting
     {
@@ -125,7 +123,7 @@ namespace Lithnet.Laps.Web.Audit
                 { "{authzresult.MatchedRuleDescription}", authorizationResponse?.MatchedRuleDescription},
                 { "{authzresult.AdditionalInformation}", authorizationResponse?.AdditionalInformation},
                 { "{authzresult.ExpireAfter}", authorizationResponse?.ExpireAfter.ToString()},
-                { "{authzresult.ResponseCode}", authorizationResponse?.ResponseCode.ToString()},
+                { "{authzresult.ResponseCode}", authorizationResponse?.Code.ToString()},
                 { "{message}", detailMessage},
                 { "{request.IPAddress}", HttpContext.Current?.Request?.UserHostAddress},
                 { "{request.HostName}", HttpContext.Current?.Request?.UserHostName},

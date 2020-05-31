@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using System;
 
 namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile.Tests
 {

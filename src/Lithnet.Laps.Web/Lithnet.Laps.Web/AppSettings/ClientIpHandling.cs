@@ -1,9 +1,8 @@
-﻿using System;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
-namespace Lithnet.Laps.Web
+namespace Lithnet.Laps.Web.AppSettings
 {
-    public class ClientIpHandling : IClientIpHandling
+    public class ClientIpHandling : IClientIpHandlingSettings
     {
         private IConfigurationRoot configuration;
 

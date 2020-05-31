@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lithnet.Laps.Web.Config
+namespace Lithnet.Laps.Web.AppSettings
 {
     [Flags]
     public enum AuditReasonFieldState

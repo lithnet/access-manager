@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace Lithnet.Laps.Web.ActiveDirectory.Interop
+﻿namespace Lithnet.Laps.Web.ActiveDirectory.Interop
 {
-   public enum AuthzContextInformationClass
+    public enum AuthzContextInformationClass
    {
        AuthzContextInfoUserSid = 1,
        AuthzContextInfoGroupsSids = 2,

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Lithnet.Laps.Web.Internal;
+using Microsoft.Extensions.Configuration;
 
 namespace Lithnet.Laps.Web.AppSettings
 {
@@ -13,19 +14,6 @@ namespace Lithnet.Laps.Web.AppSettings
 
         public string Mode => this.configuration["authentication:mode"] ?? "iwa";
 
-        public bool ShowPii
-        {
-            get
-            {
-                string value = this.configuration["authentication:debug:showpii"];
-
-                if (bool.TryParse(value, out bool b))
-                {
-                    return b;
-                }
-
-                return false;
-            }
-        }
+        public bool ShowPii => this.configuration.GetValueOrDefault("authentication:debug:showpii", false);
     }
 }

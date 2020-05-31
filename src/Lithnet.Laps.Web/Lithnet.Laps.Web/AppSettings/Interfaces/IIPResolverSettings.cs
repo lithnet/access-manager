@@ -1,13 +1,11 @@
-﻿using Lithnet.Laps.Web.AppSettings;
-
-namespace Lithnet.Laps.Web
+﻿namespace Lithnet.Laps.Web.AppSettings
 {
     public interface IIpResolverSettings
     {
-        IClientIpHandling ClientIP { get; }
+        IClientIpHandlingSettings ClientIP { get; }
 
         IpResolverMode Mode { get; }
 
-        IXffHandling Xff { get; }
+        IXffHandlerSettings Xff { get; }
     }
 }

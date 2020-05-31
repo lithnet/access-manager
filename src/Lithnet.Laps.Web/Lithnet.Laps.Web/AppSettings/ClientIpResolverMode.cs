@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Lithnet.Laps.Web.AppSettings
+﻿namespace Lithnet.Laps.Web.AppSettings
 {
     public enum IpResolverMode
     {

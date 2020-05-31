@@ -1,10 +1,9 @@
-﻿using System.DirectoryServices.AccountManagement;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Web;
 using Lithnet.Laps.Web.App_LocalResources;
-using Lithnet.Laps.Web.Models;
+using Lithnet.Laps.Web.ActiveDirectory;
 
-namespace Lithnet.Laps.Web.Security.Authentication
+namespace Lithnet.Laps.Web.Internal
 {
     public class AuthenticationService : IAuthenticationService
     {

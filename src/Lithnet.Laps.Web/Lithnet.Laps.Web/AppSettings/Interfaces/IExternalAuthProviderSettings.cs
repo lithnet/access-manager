@@ -2,7 +2,7 @@
 
 namespace Lithnet.Laps.Web.AppSettings
 {
-    public interface IExternalAuthenticationProvider
+    public interface IExternalAuthProviderSettings
     {
         string ClaimName { get; }
 

@@ -1,4 +1,4 @@
-﻿namespace Lithnet.Laps.Web.Audit
+﻿namespace Lithnet.Laps.Web.Internal
 {
     public interface ITemplates
     {

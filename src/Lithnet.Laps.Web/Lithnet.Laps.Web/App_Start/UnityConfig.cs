@@ -1,9 +1,6 @@
 using System;
 using System.Configuration;
-using Lithnet.Laps.Web.Audit;
-using Lithnet.Laps.Web.Mail;
-using Lithnet.Laps.Web.Models;
-using Lithnet.Laps.Web.Security.Authentication;
+using Lithnet.Laps.Web.ActiveDirectory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Practices.Unity.Configuration;
 using NLog;
@@ -12,8 +9,7 @@ using Unity.NLog;
 using ConfigurationBuilder = Microsoft.Extensions.Configuration.ConfigurationBuilder;
 using Lithnet.Laps.Web.AppSettings;
 using Lithnet.Laps.Web.Internal;
-using Lithnet.Laps.Web.Config;
-using Lithnet.Laps.Web.JsonTargets;
+using Lithnet.Laps.Web.Authorization;
 
 namespace Lithnet.Laps.Web
 {
@@ -64,49 +60,37 @@ namespace Lithnet.Laps.Web
             container.RegisterInstance(configRoot);
 
             container.RegisterFactory<ILogger>(_ => LogManager.GetCurrentClassLogger());
-            container.RegisterType<IOidcSettings, OidcSettings>();
-            container.RegisterType<IIwaSettings, IwaSettings>();
-            container.RegisterType<IWsFedSettings, WsFedSettings>();
-            container.RegisterType<IUserInterfaceSettings, UserInterfaceSettings>();
-            container.RegisterType<IRateLimitSettings, RateLimitSettings>();
-            container.RegisterType<IAuthenticationSettings, AuthenticationSettings>();
-            container.RegisterType<IIpResolverSettings, IpResolverSettings>();
-            container.RegisterType<IEmailSettings, EmailSettings>();
-            container.RegisterType<IIpAddressResolver, IpAddressResolver>();
-            container.RegisterType<GlobalAuditSettings, GlobalAuditSettings>();
-            container.RegisterType<IJsonTargetsProvider, JsonFileTargetsProvider>();
-            container.RegisterType<IAuthorizationService, JsonTargetAuthorizationService>();
 
             // If no container registrations are found in the config file, then load 
 
-            if (!container.IsRegistered<IDirectory>())
-            {
-                container.RegisterType<IDirectory, ActiveDirectory.ActiveDirectory>();
-            }
+            container.RegisterTypeIfMissing<IIwaSettings, IwaSettings>();
+            container.RegisterTypeIfMissing<IOidcSettings, OidcSettings>();
+            container.RegisterTypeIfMissing<IWsFedSettings, WsFedSettings>();
+            container.RegisterTypeIfMissing<IUserInterfaceSettings, UserInterfaceSettings>();
+            container.RegisterTypeIfMissing<IRateLimitSettings, RateLimitSettings>();
+            container.RegisterTypeIfMissing<IAuthenticationSettings, AuthenticationSettings>();
+            container.RegisterTypeIfMissing<IIpResolverSettings, IpResolverSettings>();
+            container.RegisterTypeIfMissing<IEmailSettings, EmailSettings>();
+            container.RegisterTypeIfMissing<IIpAddressResolver, IpAddressResolver>();
+            container.RegisterTypeIfMissing<GlobalAuditSettings, GlobalAuditSettings>();
+            container.RegisterTypeIfMissing<IJsonTargetsProvider, JsonFileTargetsProvider>();
+            container.RegisterTypeIfMissing<IAuthorizationService, BuiltInAuthorizationService>();
+            container.RegisterTypeIfMissing<IAuthorizationSettings, AuthorizationSettings>();
+            container.RegisterTypeIfMissing<JsonTargetAuthorizationService, JsonTargetAuthorizationService>();
+            container.RegisterTypeIfMissing<PowershellAuthorizationService, PowershellAuthorizationService>();
+            container.RegisterTypeIfMissing<IDirectory, ActiveDirectory.ActiveDirectory>();
+            container.RegisterTypeIfMissing<IAuthenticationService, AuthenticationService>();
+            container.RegisterTypeIfMissing<IReporting, Reporting>();
+            container.RegisterTypeIfMissing<ITemplates, TemplatesFromFiles>();
+            container.RegisterTypeIfMissing<IRateLimiter, RateLimiter>();
+            container.RegisterTypeIfMissing<IMailer, SmtpMailer>();
+        }
 
-            if (!container.IsRegistered<IAuthenticationService>())
+        private static void RegisterTypeIfMissing<T1,T2>(this IUnityContainer container) where T2 : T1
+        {
+            if (!container.IsRegistered<T1>())
             {
-                container.RegisterType<IAuthenticationService, AuthenticationService>();
-            }
-
-            if (!container.IsRegistered<IReporting>())
-            {
-                container.RegisterType<IReporting, Reporting>();
-            }
-
-            if (!container.IsRegistered<ITemplates>())
-            {
-                container.RegisterType<ITemplates, TemplatesFromFiles>();
-            }
-
-            if (!container.IsRegistered<IRateLimiter>())
-            {
-                container.RegisterType<IRateLimiter, RateLimiter>();
-            }
-
-            if (!container.IsRegistered<IMailer>())
-            {
-                container.RegisterType<IMailer, SmtpMailer>();
+                container.RegisterType<T1, T2>();
             }
         }
     }

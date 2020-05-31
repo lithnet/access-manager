@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Principal;
 
-namespace Lithnet.Laps.Web.Models
+namespace Lithnet.Laps.Web.ActiveDirectory
 {
     public interface ISecurityPrincipal
     {

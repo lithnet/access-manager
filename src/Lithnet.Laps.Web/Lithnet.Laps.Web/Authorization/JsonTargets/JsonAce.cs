@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Lithnet.Laps.Web.Audit;
-using Lithnet.Laps.Web.Config;
-using Lithnet.Laps.Web.JsonTargets;
-using Lithnet.Laps.Web.Models;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
-namespace Lithnet.Laps.Web
+namespace Lithnet.Laps.Web.Authorization
 {
     public class JsonAce
     {

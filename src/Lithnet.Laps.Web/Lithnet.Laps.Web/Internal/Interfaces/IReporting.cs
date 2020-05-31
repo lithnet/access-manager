@@ -1,9 +1,9 @@
 ﻿using System;
-using Lithnet.Laps.Web.Config;
-using Lithnet.Laps.Web.JsonTargets;
+using Lithnet.Laps.Web.ActiveDirectory;
+using Lithnet.Laps.Web.Authorization;
 using Lithnet.Laps.Web.Models;
 
-namespace Lithnet.Laps.Web.Audit
+namespace Lithnet.Laps.Web.Internal
 {
     public interface IReporting
     {

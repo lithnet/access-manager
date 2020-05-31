@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Lithnet.Laps.Web.Mail
+namespace Lithnet.Laps.Web.Internal
 {
     public interface IMailer
     {

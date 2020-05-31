@@ -182,6 +182,9 @@
     </Reference>
     <Reference Include="System.IO.Compression, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.PowerShell.5.ReferenceAssemblies.1.1.0\lib\net4\System.Management.Automation.dll</HintPath>
+    </Reference>
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
     </Reference>
@@ -316,25 +319,27 @@
     <Compile Include="ActiveDirectory\Interop\SidAndAttributes.cs" />
     <Compile Include="ActiveDirectory\Interop\TokenGroups.cs" />
     <Compile Include="AppSettings\AuthenticationSettings.cs" />
+    <Compile Include="AppSettings\AuthorizationSettings.cs" />
     <Compile Include="AppSettings\EmailSettings.cs" />
     <Compile Include="AppSettings\GlobalAuditSettings.cs" />
+    <Compile Include="AppSettings\Interfaces\IAuthorizationSettings.cs" />
     <Compile Include="AppSettings\Interfaces\IEmailSettings.cs" />
     <Compile Include="AppSettings\IpResolverSettings.cs" />
     <Compile Include="AppSettings\ClientIpHandling.cs" />
     <Compile Include="AppSettings\Interfaces\IIPResolverSettings.cs" />
-    <Compile Include="AppSettings\Interfaces\IClientIPHandling.cs" />
+    <Compile Include="AppSettings\Interfaces\IClientIpHandlingSettings.cs" />
     <Compile Include="AppSettings\XffResolverMode.cs" />
     <Compile Include="AppSettings\ClientIpResolverMode.cs" />
     <Compile Include="AppSettings\Interfaces\IAuthenticationSettings.cs" />
     <Compile Include="AppSettings\Interfaces\IIwaSettings.cs" />
-    <Compile Include="AppSettings\Interfaces\IExternalAuthenticationProvider.cs" />
+    <Compile Include="AppSettings\Interfaces\IExternalAuthProviderSettings.cs" />
     <Compile Include="AppSettings\Interfaces\IOidcSettings.cs" />
     <Compile Include="AppSettings\IwaSettings.cs" />
     <Compile Include="AppSettings\Interfaces\IUserInterfaceSettings.cs" />
     <Compile Include="AppSettings\Interfaces\IWsFedSettings.cs" />
-    <Compile Include="AppSettings\Interfaces\IXffHandling.cs" />
+    <Compile Include="AppSettings\Interfaces\IXffHandlerSettings.cs" />
     <Compile Include="AppSettings\OidcSettings.cs" />
-    <Compile Include="AppSettings\XffHandling.cs" />
+    <Compile Include="AppSettings\XffHandlerSettings.cs" />
     <Compile Include="AppSettings\UserInterfaceSettings.cs" />
     <Compile Include="AppSettings\WsFedSettings.cs" />
     <Compile Include="App_LocalResources\UIMessages.it.Designer.cs">
@@ -347,29 +352,33 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
+    <Compile Include="Authorization\BuiltInAuthorizationService.cs" />
+    <Compile Include="Authorization\PowerShell\PowerShellAuthorizationService.cs" />
+    <Compile Include="Exceptions\PowerShellScriptException.cs" />
     <Compile Include="Internal\Interfaces\IReporting.cs" />
     <Compile Include="Internal\Interfaces\ITemplates.cs" />
+    <Compile Include="Internal\RateLimitResult.cs" />
     <Compile Include="Internal\TemplatesFromFiles.cs" />
     <Compile Include="AppSettings\AuditReasonFieldState.cs" />
-    <Compile Include="AppSettings\Interfaces\IRateLimitDetails.cs" />
-    <Compile Include="AppSettings\Interfaces\IRateLimits.cs" />
+    <Compile Include="AppSettings\Interfaces\IRateLimitThresholds.cs" />
+    <Compile Include="AppSettings\Interfaces\IRateLimitSettings.cs" />
     <Compile Include="AppSettings\RateLimitSettings.cs" />
-    <Compile Include="AppSettings\RateLimitDetails.cs" />
+    <Compile Include="AppSettings\RateLimitThresholds.cs" />
     <Compile Include="Exceptions\NotFoundException.cs" />
     <Compile Include="Exceptions\AmbiguousNameException.cs" />
     <Compile Include="Internal\Interfaces\IIpAddressResolver.cs" />
     <Compile Include="Internal\IpAddressResolver.cs" />
-    <Compile Include="JsonTargets\AceType.cs" />
-    <Compile Include="JsonTargets\AuthorizationResponse.cs" />
-    <Compile Include="JsonTargets\AuthorizationResponseCode.cs" />
-    <Compile Include="JsonTargets\IAuthorizationService.cs" />
-    <Compile Include="JsonTargets\IJsonTargetsProvider.cs" />
-    <Compile Include="JsonTargets\JsonFileTargetsProvider.cs" />
-    <Compile Include="JsonTargets\JsonEmailAuditRecipients.cs" />
-    <Compile Include="JsonTargets\JsonAce.cs" />
-    <Compile Include="JsonTargets\JsonTarget.cs" />
-    <Compile Include="JsonTargets\JsonTargetAuthorizationService.cs" />
-    <Compile Include="JsonTargets\JsonTargets.cs" />
+    <Compile Include="Authorization\AceType.cs" />
+    <Compile Include="Authorization\AuthorizationResponse.cs" />
+    <Compile Include="Authorization\AuthorizationResponseCode.cs" />
+    <Compile Include="Authorization\Interfaces\IAuthorizationService.cs" />
+    <Compile Include="Authorization\Interfaces\IJsonTargetsProvider.cs" />
+    <Compile Include="Authorization\JsonTargets\JsonFileTargetsProvider.cs" />
+    <Compile Include="Authorization\JsonTargets\JsonEmailAuditRecipients.cs" />
+    <Compile Include="Authorization\JsonTargets\JsonAce.cs" />
+    <Compile Include="Authorization\JsonTargets\JsonTarget.cs" />
+    <Compile Include="Authorization\JsonTargets\JsonTargetAuthorizationService.cs" />
+    <Compile Include="Authorization\JsonTargets\JsonTargets.cs" />
     <Compile Include="Internal\Interfaces\IMailer.cs" />
     <Compile Include="Internal\SmtpMailer.cs" />
     <Compile Include="ActiveDirectory\Interfaces\ISecurityPrincipal.cs" />
@@ -384,7 +393,7 @@
     <Compile Include="Internal\Reporting.cs" />
     <Compile Include="ActiveDirectory\Interfaces\IUser.cs" />
     <Compile Include="Models\PasswordData.cs" />
-    <Compile Include="JsonTargets\TargetType.cs" />
+    <Compile Include="Authorization\TargetType.cs" />
     <Compile Include="Controllers\LapController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Internal\EventIDs.cs" />
@@ -407,7 +416,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>UIMessages.resx</DependentUpon>
     </Compile>
-    <Compile Include="Internal\UsersToNotify.cs" />
     <Compile Include="ActiveDirectory\Interfaces\IGroup.cs" />
     <Compile Include="ActiveDirectory\ActiveDirectoryUser.cs" />
   </ItemGroup>
@@ -469,6 +477,7 @@
     <Content Include="App_Data\appsettings.json" />
     <Content Include="App_Data\appsecrets.json" />
     <Content Include="App_Data\targets.json" />
+    <Content Include="App_Data\AuthZSample.ps1" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

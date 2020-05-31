@@ -1,7 +1,4 @@
 ﻿using NUnit.Framework;
-using System;
-using Lithnet.Laps.Web.Config;
-using Lithnet.Laps.Web.Models;
 using Moq;
 using NLog;
 

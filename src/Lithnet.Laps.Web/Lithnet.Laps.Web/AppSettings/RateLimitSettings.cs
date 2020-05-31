@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace Lithnet.Laps.Web
+namespace Lithnet.Laps.Web.AppSettings
 {
     public class RateLimitSettings : IRateLimitSettings
     {
@@ -9,15 +9,15 @@ namespace Lithnet.Laps.Web
         public RateLimitSettings(IConfigurationRoot configuration)
         {
             this.configuration = configuration;
-            this.PerIP = new RateLimitDetails(this.configuration.GetSection("rate-limit:per-ip"));
-            this.PerUser = new RateLimitDetails(this.configuration.GetSection("rate-limit:per-user"));
-            this.XffHandling = new XffHandling(this.configuration);
+            this.PerIP = new RateLimitThresholds(this.configuration.GetSection("rate-limit:per-ip"));
+            this.PerUser = new RateLimitThresholds(this.configuration.GetSection("rate-limit:per-user"));
+            this.XffHandling = new XffHandlerSettings(this.configuration);
         }
 
-        public IRateLimitDetails PerIP { get; }
+        public IRateLimitThresholds PerIP { get; }
 
-        public IRateLimitDetails PerUser { get; }
+        public IRateLimitThresholds PerUser { get; }
 
-        public IXffHandling XffHandling { get; }
+        public IXffHandlerSettings XffHandling { get; }
     }
 }

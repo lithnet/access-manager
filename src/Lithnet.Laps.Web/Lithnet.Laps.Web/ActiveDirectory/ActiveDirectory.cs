@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
-using System.Linq;
 using System.Security.Principal;
 using System.Text;
-using Lithnet.Laps.Web.Directory;
 using Lithnet.Laps.Web.Models;
 using Lithnet.Laps.Web.ActiveDirectory.Interop;
+using Lithnet.Laps.Web.Internal;
 
 namespace Lithnet.Laps.Web.ActiveDirectory
 {

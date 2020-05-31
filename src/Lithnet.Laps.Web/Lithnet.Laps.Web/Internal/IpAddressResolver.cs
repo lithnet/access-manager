@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Collections.Specialized;
+using Lithnet.Laps.Web.AppSettings;
 
 namespace Lithnet.Laps.Web.Internal
 {

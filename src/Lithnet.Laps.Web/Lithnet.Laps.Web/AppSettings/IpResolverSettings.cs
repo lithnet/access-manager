@@ -1,8 +1,8 @@
 ﻿using System;
-using Lithnet.Laps.Web.AppSettings;
+using Lithnet.Laps.Web.Internal;
 using Microsoft.Extensions.Configuration;
 
-namespace Lithnet.Laps.Web
+namespace Lithnet.Laps.Web.AppSettings
 {
     public class IpResolverSettings : IIpResolverSettings
     {
@@ -13,23 +13,10 @@ namespace Lithnet.Laps.Web
             this.configuration = configuration;
         }
 
-        public IpResolverMode Mode
-        {
-            get
-            {
-                string value = this.configuration["rate-limit:ip-resolver:mode"];
+        public IpResolverMode Mode  => this.configuration.GetValueOrDefault("rate-limit:ip-resolver:mode", IpResolverMode.Default);
 
-                if (Enum.TryParse(value, true, out IpResolverMode result))
-                {
-                    return result;
-                }
+        public IXffHandlerSettings Xff => new XffHandlerSettings(this.configuration);
 
-                return IpResolverMode.Default;
-            }
-        }
-
-        public IXffHandling Xff => new XffHandling(this.configuration);
-
-        public IClientIpHandling ClientIP => new ClientIpHandling(this.configuration);
+        public IClientIpHandlingSettings ClientIP => new ClientIpHandling(this.configuration);
     }
 }

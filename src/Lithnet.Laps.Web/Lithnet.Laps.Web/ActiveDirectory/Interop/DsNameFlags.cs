@@ -1,7 +1,7 @@
 ﻿
 // ReSharper disable InconsistentNaming
 
-namespace Lithnet.Laps.Web.ActiveDirectory
+namespace Lithnet.Laps.Web.ActiveDirectory.Interop
 {
     /// <summary>
     /// The DS_NAME_FLAGS enumeration is used to define how the name syntax will be cracked. These flags are used by the DsCrackNames function.

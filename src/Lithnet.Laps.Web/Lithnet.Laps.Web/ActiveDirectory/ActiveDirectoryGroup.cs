@@ -1,9 +1,9 @@
 ﻿using System;
 using System.DirectoryServices;
 using System.Security.Principal;
-using Lithnet.Laps.Web.Models;
+using Lithnet.Laps.Web.Internal;
 
-namespace Lithnet.Laps.Web.Directory
+namespace Lithnet.Laps.Web.ActiveDirectory
 {
     public sealed class ActiveDirectoryGroup: IGroup
     {

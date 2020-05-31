@@ -5,14 +5,25 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
-using System.Web;
 using Microsoft.Extensions.Configuration;
 
-namespace Lithnet.Laps.Web
+namespace Lithnet.Laps.Web.Internal
 {
     internal static class Extensions
     {
-        public static bool GetValueOrDefault(this IConfigurationRoot config, string key, bool defaultValue)
+        public static TEnum GetValueOrDefault<TEnum>(this IConfiguration config, string key, TEnum defaultValue) where TEnum : struct, Enum
+        {
+            string value = config[key];
+
+            if (Enum.TryParse(value, true, out TEnum result))
+            {
+                return result;
+            }
+
+            return defaultValue;
+        }
+
+        public static bool GetValueOrDefault(this IConfiguration config, string key, bool defaultValue)
         {
             string value = config[key];
 
@@ -24,7 +35,7 @@ namespace Lithnet.Laps.Web
             return defaultValue;
         }
 
-        public static int GetValueOrDefault(this IConfigurationRoot config, string key, int defaultValue)
+        public static int GetValueOrDefault(this IConfiguration config, string key, int defaultValue)
         {
             string value = config[key];
 
@@ -36,7 +47,7 @@ namespace Lithnet.Laps.Web
             return defaultValue;
         }
 
-        public static int GetValueOrDefault(this IConfigurationRoot config, string key, int minimumValue, int defaultValue)
+        public static int GetValueOrDefault(this IConfiguration config, string key, int minimumValue, int defaultValue)
         {
             string value = config[key];
 

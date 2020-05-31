@@ -1,6 +1,7 @@
 ﻿using System;
 using System.DirectoryServices.AccountManagement;
 using System.Security.Claims;
+using Lithnet.Laps.Web.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
@@ -25,20 +26,7 @@ namespace Lithnet.Laps.Web.AppSettings
 
         public string ClaimName => this.configuration["authentication:oidc:claim-name"] ?? ClaimTypes.Upn;
 
-        public IdentityType ClaimType
-        {
-            get
-            {
-                if (Enum.TryParse(this.configuration["authentication:oidc:claim-type"], out IdentityType claimType))
-                {
-                    return claimType;
-                }
-                else
-                {
-                    return IdentityType.UserPrincipalName;
-                }
-            }
-        }
+        public IdentityType ClaimType => this.configuration.GetValueOrDefault("authentication:oidc:claim-type", IdentityType.UserPrincipalName);
 
         public string UniqueClaimTypeIdentifier => this.configuration["authentication:oidc:unique-claim-type-identifier"] ?? ClaimTypes.PrimarySid;
 

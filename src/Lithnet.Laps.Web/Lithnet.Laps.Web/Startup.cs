@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Helpers;
 using IdentityModel.Client;
+using Lithnet.Laps.Web.ActiveDirectory;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.AppSettings;
-using Lithnet.Laps.Web.Audit;
-using Lithnet.Laps.Web.Config;
-using Lithnet.Laps.Web.Models;
+using Lithnet.Laps.Web.Internal;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -33,7 +31,7 @@ namespace Lithnet.Laps.Web
     {
         internal static bool CanLogout = false;
 
-        private static IExternalAuthenticationProvider authProvider;
+        private static IExternalAuthProviderSettings authProvider;
 
         private readonly ILogger logger;
 

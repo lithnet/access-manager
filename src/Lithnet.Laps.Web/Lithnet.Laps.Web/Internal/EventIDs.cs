@@ -1,4 +1,4 @@
-﻿namespace Lithnet.Laps.Web
+﻿namespace Lithnet.Laps.Web.Internal
 {
     public static class EventIDs
     {

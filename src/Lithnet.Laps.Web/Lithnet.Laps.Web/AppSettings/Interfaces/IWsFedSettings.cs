@@ -1,8 +1,6 @@
-﻿using System.DirectoryServices.AccountManagement;
-
-namespace Lithnet.Laps.Web.AppSettings
+﻿namespace Lithnet.Laps.Web.AppSettings
 {
-    public interface IWsFedSettings : IExternalAuthenticationProvider
+    public interface IWsFedSettings : IExternalAuthProviderSettings
     {
         string Metadata { get; }
 

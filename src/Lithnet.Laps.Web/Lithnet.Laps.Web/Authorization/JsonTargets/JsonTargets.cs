@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Lithnet.Laps.Web.JsonTargets
+namespace Lithnet.Laps.Web.Authorization
 {
     public class JsonTargets
     {

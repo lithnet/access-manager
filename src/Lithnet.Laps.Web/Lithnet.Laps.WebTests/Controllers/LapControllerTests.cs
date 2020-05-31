@@ -1,10 +1,8 @@
 ﻿using NUnit.Framework;
 using System;
 using Lithnet.Laps.Web.Audit;
-using Lithnet.Laps.Web.Config;
 using Lithnet.Laps.Web.Models;
 using Lithnet.Laps.Web.Security.Authentication;
-using Lithnet.Laps.Web.Security.Authorization;
 using Moq;
 using NLog;
 using Lithnet.Laps.Web.AppSettings;
@@ -59,7 +57,7 @@ namespace Lithnet.Laps.Web.Controllers.Tests
 
             authorizationServiceStub
                 .Setup(svc => svc.GetAuthorizationResponse(It.IsAny<IUser>(), It.IsAny<IComputer>()))
-                .Returns(new AuthorizationResponse() { ResponseCode = AuthorizationResponseCode.NoMatchingRuleForUser });
+                .Returns(new AuthorizationResponse() { Code = AuthorizationResponseCode.NoMatchingRuleForUser });
 
 
             // Hmmm... this controller has a lot of dependencies.

@@ -1,4 +1,4 @@
-﻿namespace Lithnet.Laps.Web.Models
+﻿namespace Lithnet.Laps.Web.Authorization
 {
     public enum TargetType
     {

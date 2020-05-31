@@ -1,6 +1,6 @@
-﻿using Lithnet.Laps.Web.Models;
+﻿using Lithnet.Laps.Web.ActiveDirectory;
 
-namespace Lithnet.Laps.Web.Security.Authentication
+namespace Lithnet.Laps.Web.Internal
 {
     public interface IAuthenticationService
     {

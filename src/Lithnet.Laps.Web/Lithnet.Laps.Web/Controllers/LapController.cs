@@ -3,13 +3,11 @@ using System.ComponentModel;
 using System.Web.Mvc;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.AppSettings;
-using Lithnet.Laps.Web.Audit;
-using Lithnet.Laps.Web.Config;
+using Lithnet.Laps.Web.Authorization;
 using Lithnet.Laps.Web.Models;
-using Lithnet.Laps.Web.Security.Authentication;
 using NLog;
-using Lithnet.Laps.Web.JsonTargets;
-
+using Lithnet.Laps.Web.ActiveDirectory;
+using Lithnet.Laps.Web.Internal;
 
 namespace Lithnet.Laps.Web.Controllers
 {
@@ -40,7 +38,8 @@ namespace Lithnet.Laps.Web.Controllers
 
         public ActionResult Get()
         {
-            return this.View(new LapRequestModel {
+            return this.View(new LapRequestModel
+            {
                 ShowReason = this.userInterfaceSettings.UserSuppliedReason != AuditReasonFieldState.Hidden,
                 ReasonRequired = this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required
             });
@@ -78,8 +77,11 @@ namespace Lithnet.Laps.Web.Controllers
                     return this.LogAndReturnErrorResponse(model, UIMessages.SsoIdentityNotFound, EventIDs.SsoIdentityNotFound, null, ex);
                 }
 
-                if (this.rateLimiter.IsRateLimitExceeded(model, user, this.Request))
+                var rateLimitResult = this.rateLimiter.GetRateLimitResult(user.Sid.ToString(), this.Request);
+
+                if (rateLimitResult.IsRateLimitExceeded)
                 {
+                    this.LogRateLimitEvent(model, user, rateLimitResult);
                     return this.View("RateLimitExceeded");
                 }
 
@@ -136,11 +138,25 @@ namespace Lithnet.Laps.Web.Controllers
             }
         }
 
+        private void LogRateLimitEvent(LapRequestModel model, IUser user, RateLimitResult rateLimitResult)
+        {
+            if (rateLimitResult.IsUserRateLimit)
+            {
+                this.reporting.PerformAuditFailureActions(model, UIMessages.RateLimitError, EventIDs.RateLimitExceededUser,
+               string.Format(LogMessages.RateLimitExceededUser, user.SamAccountName, rateLimitResult.IPAddress, rateLimitResult.Threshold, rateLimitResult.Duration), null, null, user, null);
+            }
+            else
+            {
+                this.reporting.PerformAuditFailureActions(model, UIMessages.RateLimitError, EventIDs.RateLimitExceededIP,
+           string.Format(LogMessages.RateLimitExceededIP, user.SamAccountName, rateLimitResult.IPAddress, rateLimitResult.Threshold, rateLimitResult.Duration), null, null, user, null);
+            }
+        }
+
         private ViewResult LogAndResponseToAuthZFailure(LapRequestModel model, AuthorizationResponse authorizationResponse, IUser user, IComputer computer)
         {
             int eventID;
 
-            switch (authorizationResponse.ResponseCode)
+            switch (authorizationResponse.Code)
             {
                 case AuthorizationResponseCode.NoMatchingRuleForComputer:
                     eventID = EventIDs.AuthZFailedNoTargetMatch;
@@ -148,7 +164,7 @@ namespace Lithnet.Laps.Web.Controllers
                 case AuthorizationResponseCode.NoMatchingRuleForUser:
                     eventID = EventIDs.AuthZFailedNoReaderPrincipalMatch;
                     break;
-                case AuthorizationResponseCode.UserDeniedByAce:
+                case AuthorizationResponseCode.ExplicitlyDenied:
                     eventID = EventIDs.AuthZExplicitlyDenied;
                     break;
                 default:

@@ -1,10 +1,9 @@
 ﻿using System.Web;
-using Lithnet.Laps.Web.Models;
 
-namespace Lithnet.Laps.Web
+namespace Lithnet.Laps.Web.Internal
 {
     public interface IRateLimiter
     {
-        bool IsRateLimitExceeded(LapRequestModel model, IUser p, HttpRequestBase r);
+        RateLimitResult GetRateLimitResult(string userid, HttpRequestBase r);
     }
 }

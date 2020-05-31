@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using Lithnet.Laps.Web.AppSettings;
 
-namespace Lithnet.Laps.Web
+namespace Lithnet.Laps.Web.AppSettings
 {
-    public interface IXffHandling
+    public interface IXffHandlerSettings
     {
         int ProxyDepth { get; }
 
