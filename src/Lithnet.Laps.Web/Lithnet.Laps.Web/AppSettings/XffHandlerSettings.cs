@@ -8,7 +8,7 @@ namespace Lithnet.Laps.Web.AppSettings
 {
     public class XffHandlerSettings : IXffHandlerSettings
     {
-        private IConfigurationRoot configuration;
+        private readonly IConfigurationRoot configuration;
 
         public XffHandlerSettings(IConfigurationRoot configuration)
         {

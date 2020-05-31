@@ -9,7 +9,7 @@ namespace Lithnet.Laps.Web.Internal
 {
     public class IpAddressResolver : IIpAddressResolver
     {
-        private IIpResolverSettings config;
+        private readonly IIpResolverSettings config;
 
         public IpAddressResolver(IIpResolverSettings config)
         {

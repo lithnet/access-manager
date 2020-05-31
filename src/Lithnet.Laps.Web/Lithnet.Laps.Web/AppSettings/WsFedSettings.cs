@@ -8,7 +8,7 @@ namespace Lithnet.Laps.Web.AppSettings
 {
     public class WsFedSettings : IWsFedSettings
     {
-        private IConfigurationRoot configuration;
+        private readonly IConfigurationRoot configuration;
 
         public WsFedSettings(IConfigurationRoot configuration)
         {

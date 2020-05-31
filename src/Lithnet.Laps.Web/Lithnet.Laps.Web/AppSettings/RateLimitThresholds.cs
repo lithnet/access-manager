@@ -5,7 +5,7 @@ namespace Lithnet.Laps.Web.AppSettings
 {
     public class RateLimitThresholds : IRateLimitThresholds
     {
-        private IConfigurationSection configuration;
+        private readonly IConfigurationSection configuration;
 
         public RateLimitThresholds(IConfigurationSection configuration)
         {

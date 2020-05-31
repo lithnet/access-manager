@@ -5,7 +5,7 @@ namespace Lithnet.Laps.Web.AppSettings
 {
     public class AuthenticationSettings : IAuthenticationSettings
     {
-        private IConfigurationRoot configuration;
+        private readonly IConfigurationRoot configuration;
 
         public AuthenticationSettings(IConfigurationRoot configuration)
         {

@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
 using Moq;
 using NLog;
+using Lithnet.Laps.Web.ActiveDirectory;
+using Lithnet.Laps.Web.Internal;
 
 namespace Lithnet.Laps.Web.Audit.Tests
 {

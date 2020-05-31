@@ -11,7 +11,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
 {
     internal static class NativeMethods
     {
-        private static Logger logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         private const int InsufficientBuffer = 122;
 
@@ -318,11 +318,13 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
                 {
                     if (!string.IsNullOrWhiteSpace(authzServerName))
                     {
-                        AuthzRpcInitInfoClient client = new AuthzRpcInitInfoClient();
-                        client.Version = AuthzRpcClientVersion.V1;
-                        client.ObjectUuid = NativeMethods.AuthzObjectUuidWithcap;
-                        client.Protocol = NativeMethods.RcpOverTcpProtocol;
-                        client.Server = authzServerName;
+                        AuthzRpcInitInfoClient client = new AuthzRpcInitInfoClient
+                        {
+                            Version = AuthzRpcClientVersion.V1,
+                            ObjectUuid = NativeMethods.AuthzObjectUuidWithcap,
+                            Protocol = NativeMethods.RcpOverTcpProtocol,
+                            Server = authzServerName
+                        };
 
                         pClientInfo = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(AuthzRpcInitInfoClient)));
                         Marshal.StructureToPtr(client, pClientInfo, false);

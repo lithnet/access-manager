@@ -7,7 +7,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory
 {
     public sealed class ActiveDirectoryGroup: IGroup
     {
-        private SearchResult groupPrincipal;
+        private readonly SearchResult groupPrincipal;
 
         internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "tokenGroups", "displayName", "objectGuid", "objectSid", "samAccountName" };
 

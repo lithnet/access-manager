@@ -5,7 +5,7 @@ namespace Lithnet.Laps.Web.AppSettings
 {
     public class GlobalAuditSettings
     {
-        private IConfigurationRoot configuration;
+        private readonly IConfigurationRoot configuration;
 
         public GlobalAuditSettings(IConfigurationRoot configuration)
         {

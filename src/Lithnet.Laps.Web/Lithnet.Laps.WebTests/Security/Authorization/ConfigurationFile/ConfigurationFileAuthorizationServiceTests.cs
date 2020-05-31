@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using Moq;
 using NLog;
+using Lithnet.Laps.Web.ActiveDirectory;
 
 namespace Lithnet.Laps.Web.Security.Authorization.ConfigurationFile.Tests
 {

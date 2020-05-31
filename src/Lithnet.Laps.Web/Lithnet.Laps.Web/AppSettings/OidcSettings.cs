@@ -9,7 +9,7 @@ namespace Lithnet.Laps.Web.AppSettings
 {
     public class OidcSettings : IOidcSettings
     {
-        private IConfigurationRoot configuration;
+        private readonly IConfigurationRoot configuration;
 
         public OidcSettings(IConfigurationRoot configuration)
         {

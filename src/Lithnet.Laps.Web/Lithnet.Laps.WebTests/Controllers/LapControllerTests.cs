@@ -1,12 +1,12 @@
 ﻿using NUnit.Framework;
 using System;
-using Lithnet.Laps.Web.Audit;
 using Lithnet.Laps.Web.Models;
-using Lithnet.Laps.Web.Security.Authentication;
 using Moq;
 using NLog;
 using Lithnet.Laps.Web.AppSettings;
-using Lithnet.Laps.Web.JsonTargets;
+using Lithnet.Laps.Web.ActiveDirectory;
+using Lithnet.Laps.Web.Internal;
+using Lithnet.Laps.Web.Authorization;
 
 namespace Lithnet.Laps.Web.Controllers.Tests
 {

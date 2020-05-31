@@ -6,7 +6,7 @@ namespace Lithnet.Laps.Web.AppSettings
 {
     public class IwaSettings : IIwaSettings
     {
-        private IConfigurationRoot configuration;
+        private readonly IConfigurationRoot configuration;
 
         public IwaSettings(IConfigurationRoot configuration)
         {

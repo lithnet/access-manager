@@ -54,9 +54,6 @@ namespace Lithnet.Laps.Web
         public void Configure(IAppBuilder app)
         {
             var authSettings = UnityConfig.Container.Resolve<IAuthenticationSettings>();
-
-            //var x = UnityConfig.Container.Resolve<IRateLimits>();
-
             IdentityModelEventSource.ShowPII = authSettings.ShowPii;
 
             if (authSettings.Mode == "wsfed")
@@ -69,11 +66,11 @@ namespace Lithnet.Laps.Web
             }
             else
             {
-                this.ConfigureWindowsAuth(app);
+                this.ConfigureWindowsAuth();
             }
         }
 
-        public void ConfigureOpenIDConnect(IAppBuilder app)
+        private void ConfigureOpenIDConnect(IAppBuilder app)
         {
             Startup.CanLogout = true;
             var oidcSettings = UnityConfig.Container.Resolve<IOidcSettings>();
@@ -182,7 +179,7 @@ namespace Lithnet.Laps.Web
             });
         }
 
-        public void ConfigureWindowsAuth(IAppBuilder app)
+        private void ConfigureWindowsAuth()
         {
             Startup.CanLogout = false;
             var iwaSettings = UnityConfig.Container.Resolve<IIwaSettings>();
@@ -191,7 +188,7 @@ namespace Lithnet.Laps.Web
             Startup.authProvider = iwaSettings;
         }
 
-        public void ConfigureWsFederation(IAppBuilder app)
+        private void ConfigureWsFederation(IAppBuilder app)
         {
             Startup.CanLogout = true;
             var wsfSettings = UnityConfig.Container.Resolve<IWsFedSettings>();

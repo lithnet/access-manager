@@ -89,10 +89,12 @@ namespace Lithnet.Laps.Web.ActiveDirectory
 
         public bool IsComputerInOu(IComputer computer, string ou)
         {
-            DirectorySearcher d = new DirectorySearcher();
-            d.SearchRoot = new DirectoryEntry($"GC://{ou}");
-            d.SearchScope = SearchScope.Subtree;
-            d.Filter = $"objectGuid={computer.Guid.ToOctetString()}";
+            DirectorySearcher d = new DirectorySearcher
+            {
+                SearchRoot = new DirectoryEntry($"GC://{ou}"),
+                SearchScope = SearchScope.Subtree,
+                Filter = $"objectGuid={computer.Guid.ToOctetString()}"
+            };
 
             return d.FindOne() != null;
         }
@@ -157,10 +159,13 @@ namespace Lithnet.Laps.Web.ActiveDirectory
 
         private static string DoGcLookupFromSimpleName(string name, string objectClass)
         {
-            DirectorySearcher d = new DirectorySearcher();
-            d.SearchRoot = new DirectoryEntry($"GC://{Forest.GetCurrentForest().Name}");
-            d.SearchScope = SearchScope.Subtree;
-            d.Filter = $"(&(objectClass={objectClass})(samAccountName={ActiveDirectory.EscapeSearchFilterParameter(name)}))";
+            DirectorySearcher d = new DirectorySearcher
+            {
+                SearchRoot = new DirectoryEntry($"GC://{Forest.GetCurrentForest().Name}"),
+                SearchScope = SearchScope.Subtree,
+                Filter = $"(&(objectClass={objectClass})(samAccountName={ActiveDirectory.EscapeSearchFilterParameter(name)}))"
+            };
+
             d.PropertiesToLoad.Add("distinguishedName");
 
             SearchResultCollection result = d.FindAll();
@@ -180,10 +185,12 @@ namespace Lithnet.Laps.Web.ActiveDirectory
 
         private SearchResult GetDirectoryEntry(string dn, params string[] propertiesToLoad)
         {
-            DirectorySearcher d = new DirectorySearcher();
-            d.SearchRoot = new DirectoryEntry($"LDAP://{dn}");
-            d.SearchScope = SearchScope.Base;
-            d.Filter = $"objectClass=*";
+            DirectorySearcher d = new DirectorySearcher
+            {
+                SearchRoot = new DirectoryEntry($"LDAP://{dn}"),
+                SearchScope = SearchScope.Base,
+                Filter = $"objectClass=*"
+            };
             foreach (string prop in propertiesToLoad)
             {
                 d.PropertiesToLoad.Add(prop);

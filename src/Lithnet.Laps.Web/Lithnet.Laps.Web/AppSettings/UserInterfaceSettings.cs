@@ -6,7 +6,7 @@ namespace Lithnet.Laps.Web.AppSettings
 {
     public class UserInterfaceSettings : IUserInterfaceSettings
     {
-        private IConfigurationRoot configuration;
+        private readonly IConfigurationRoot configuration;
 
         public UserInterfaceSettings(IConfigurationRoot configuration)
         {

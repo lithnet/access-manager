@@ -7,7 +7,7 @@ namespace Lithnet.Laps.Web.Authorization
 {
     public class JsonFileTargetsProvider : IJsonTargetsProvider
     {
-        private IAuthorizationSettings config;
+        private readonly IAuthorizationSettings config;
 
         public JsonFileTargetsProvider(IAuthorizationSettings config)
         {

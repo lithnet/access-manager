@@ -19,7 +19,7 @@ namespace Lithnet.Laps.Web
     public static class UnityConfig
     {
         #region Unity Container
-        private static Lazy<IUnityContainer> container =
+        private static readonly Lazy<IUnityContainer> container =
           new Lazy<IUnityContainer>(() =>
           {
               var container = new UnityContainer();

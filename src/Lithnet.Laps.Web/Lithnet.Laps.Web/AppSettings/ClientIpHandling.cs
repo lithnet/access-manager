@@ -4,7 +4,7 @@ namespace Lithnet.Laps.Web.AppSettings
 {
     public class ClientIpHandling : IClientIpHandlingSettings
     {
-        private IConfigurationRoot configuration;
+        private readonly IConfigurationRoot configuration;
 
         public ClientIpHandling(IConfigurationRoot configuration)
         {

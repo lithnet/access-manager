@@ -45,9 +45,7 @@ namespace Lithnet.Laps.Web.Authorization
 
                 foreach (PSObject result in results)
                 {
-                    AuthorizationResponse res = result.BaseObject as AuthorizationResponse;
-
-                    if (res != null)
+                    if (result.BaseObject is AuthorizationResponse res)
                     {
                         return res;
                     }
