@@ -8,7 +8,7 @@ function Get-LapsAuthorizationResponse{
 	$logger.Trace("We're in PowerShell!");
 	$logger.Trace("Checking if $($user.SamAccountName) has access to $($computer.SamAccountName)");
 	
-	$response = New-Object -TypeName "Lithnet.Laps.Web.AuthorizationResponse"
+	$response = New-Object -TypeName "Lithnet.Laps.Web.Authorization.AuthorizationResponse"
 	
 	$response.Code = "ExplicitlyDenied";
 	$response.MatchedRuleDescription = "nah mate";
