@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using Lithnet.Laps.Web.Core.App_LocalResources;
+using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.AppSettings;
 using Lithnet.Laps.Web.Authorization;
 using Lithnet.Laps.Web.Models;

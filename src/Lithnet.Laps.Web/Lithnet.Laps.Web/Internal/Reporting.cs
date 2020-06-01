@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
-using Lithnet.Laps.Web.Core.App_LocalResources;
+using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.AppSettings;
 using Lithnet.Laps.Web.ActiveDirectory;
 using Lithnet.Laps.Web.Authorization;

@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Web;
-using Lithnet.Laps.Web.Core.App_LocalResources;
+using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.ActiveDirectory;
 using Microsoft.AspNetCore.Http;
 

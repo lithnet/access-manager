@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Lithnet.Laps.Web.ActiveDirectory;
 using Lithnet.Laps.Web.AppSettings;
 using Lithnet.Laps.Web.Authorization;
-using Lithnet.Laps.Web.Core.App_LocalResources;
+using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.Internal;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -23,7 +23,7 @@ using NLog;
 using AuthenticationService = Lithnet.Laps.Web.Internal.AuthenticationService;
 using IAuthenticationService = Lithnet.Laps.Web.Internal.IAuthenticationService;
 
-namespace Lithnet.Laps.Web.Core
+namespace Lithnet.Laps.Web
 {
     public class Startup
     {
@@ -206,13 +206,13 @@ namespace Lithnet.Laps.Web.Core
 
         private void ConfigureWindowsAuth(IServiceCollection services, IIwaSettings iwaSettings)
         {
-            Startup.CanLogout = false;
+            CanLogout = false;
         }
 
         private void ConfigureWsFederation(IServiceCollection services, IWsFedSettings wsfSettings)
         {
             CanLogout = true;
-         
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 options.CheckConsentNeeded = context => false;
@@ -260,7 +260,7 @@ namespace Lithnet.Laps.Web.Core
         {
             ClaimsIdentity user = context.Principal.Identity as ClaimsIdentity;
 
-            string sid = this.FindUserByClaim(user, Startup.authProvider.ClaimName)?.Sid?.Value;
+            string sid = this.FindUserByClaim(user, authProvider.ClaimName)?.Sid?.Value;
 
             if (sid == null)
             {
