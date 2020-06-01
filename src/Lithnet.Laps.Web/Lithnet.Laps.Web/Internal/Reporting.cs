@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
-using System.Web;
-using Lithnet.Laps.Web.App_LocalResources;
+using Lithnet.Laps.Web.Core.App_LocalResources;
 using Lithnet.Laps.Web.AppSettings;
 using Lithnet.Laps.Web.ActiveDirectory;
 using Lithnet.Laps.Web.Authorization;
 using Lithnet.Laps.Web.Models;
-using Microsoft.Ajax.Utilities;
 using NLog;
+using Microsoft.AspNetCore.Http;
+using System.Net;
 
 namespace Lithnet.Laps.Web.Internal
 {
@@ -97,7 +97,7 @@ namespace Lithnet.Laps.Web.Internal
             }
         }
 
-        private Dictionary<string, string> BuildTokenDictionary(AuthorizationResponse authorizationResponse = null, IUser user = null, IComputer computer = null, PasswordData passwordData = null, string requestedComputerName = null, string detailMessage = null, string requestedReason = null)
+        private Dictionary<string, string> BuildTokenDictionary(AuthorizationResponse authorizationResponse = null, IUser user = null, IComputer computer = null, PasswordData passwordData = null, string requestedComputerName = null, string detailMessage = null, string requestedReason = null, HttpRequest request = null)
         {
             Dictionary<string, string> pairs = new Dictionary<string, string> {
                 { "{user.SamAccountName}", user?.SamAccountName},
@@ -125,9 +125,8 @@ namespace Lithnet.Laps.Web.Internal
                 { "{authzresult.ExpireAfter}", authorizationResponse?.ExpireAfter.ToString()},
                 { "{authzresult.ResponseCode}", authorizationResponse?.Code.ToString()},
                 { "{message}", detailMessage},
-                { "{request.IPAddress}", HttpContext.Current?.Request?.UserHostAddress},
-                { "{request.HostName}", HttpContext.Current?.Request?.UserHostName},
-                { "{request.ResolvedIPAddress}", this.ipResolver.GetRequestIP(HttpContext.Current?.Request)},
+                { "{request.IPAddress}", request?.HttpContext?.Connection?.RemoteIpAddress?.ToString()},
+                { "{request.ResolvedIPAddress}", request == null ? null : this.ipResolver.GetRequestIP(request)},
                 { "{datetime}", DateTime.Now.ToString(CultureInfo.CurrentCulture)},
                 { "{datetimeutc}", DateTime.UtcNow.ToString(CultureInfo.CurrentCulture)},
                 { "{computer.LapsExpiryDate}", passwordData?.ExpirationTime?.ToString(CultureInfo.CurrentCulture)},
@@ -140,7 +139,7 @@ namespace Lithnet.Laps.Web.Internal
         {
             foreach (KeyValuePair<string, string> token in tokens)
             {
-                text = text.Replace(token.Key, isHtml ? HttpUtility.HtmlEncode(token.Value) : token.Value);
+                text = text.Replace(token.Key, isHtml ? WebUtility.HtmlEncode(token.Value) : token.Value);
             }
 
             return text;

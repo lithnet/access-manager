@@ -1,235 +1,264 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
+using System;
+using System.Configuration;
+using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System.Web;
-using System.Web.Helpers;
-using IdentityModel.Client;
 using Lithnet.Laps.Web.ActiveDirectory;
-using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.AppSettings;
+using Lithnet.Laps.Web.Authorization;
+using Lithnet.Laps.Web.Core.App_LocalResources;
 using Lithnet.Laps.Web.Internal;
-using Microsoft.IdentityModel.Logging;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Owin.Host.SystemWeb;
-using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.Cookies;
-using Microsoft.Owin.Security.Notifications;
-using Microsoft.Owin.Security.OpenIdConnect;
-using Microsoft.Owin.Security.WsFederation;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication.WsFederation;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using NLog;
-using Owin;
-using Unity;
+using AuthenticationService = Lithnet.Laps.Web.Internal.AuthenticationService;
+using IAuthenticationService = Lithnet.Laps.Web.Internal.IAuthenticationService;
 
-//[assembly: OwinStartup(typeof(Startup), "Configure")]
-
-namespace Lithnet.Laps.Web
+namespace Lithnet.Laps.Web.Core
 {
     public class Startup
     {
-        internal static bool CanLogout = false;
+        public static bool CanLogout = false;
 
         private static IExternalAuthProviderSettings authProvider;
 
-        private readonly ILogger logger;
+        private ILogger logger;
 
-        private readonly IReporting reporting;
+        private IReporting reporting;
 
-        private readonly IDirectory directory;
+        private IDirectory directory;
 
-        /// <summary>
-        /// Explicitly get the logger and the reporting from the DI-container.
-        /// Constructor injection doesn't work for this class.
-        /// </summary>
         public Startup()
         {
-            IUnityContainer container = UnityConfig.Container;
-            this.logger = container.Resolve<ILogger>();
-            this.reporting = container.Resolve<IReporting>();
-            this.directory = container.Resolve<IDirectory>();
         }
 
-        public void Configure(IAppBuilder app)
-        {
-            var authSettings = UnityConfig.Container.Resolve<IAuthenticationSettings>();
-            IdentityModelEventSource.ShowPII = authSettings.ShowPii;
+        public IConfiguration Configuration { get; }
 
-            if (authSettings.Mode == "wsfed")
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddControllersWithViews();
+            services.AddHttpContextAccessor();
+
+            services.TryAddTransient<ILogger>(_ => LogManager.GetCurrentClassLogger());
+            services.TryAddScoped<IIwaSettings, IwaSettings>();
+            services.TryAddScoped<IOidcSettings, OidcSettings>();
+            services.TryAddScoped<IWsFedSettings, WsFedSettings>();
+            services.TryAddScoped<IUserInterfaceSettings, UserInterfaceSettings>();
+            services.TryAddScoped<IRateLimitSettings, RateLimitSettings>();
+            services.TryAddScoped<IAuthenticationSettings, AuthenticationSettings>();
+            services.TryAddScoped<IIpResolverSettings, IpResolverSettings>();
+            services.TryAddScoped<IEmailSettings, EmailSettings>();
+            services.TryAddScoped<IIpAddressResolver, IpAddressResolver>();
+            services.TryAddScoped<GlobalAuditSettings, GlobalAuditSettings>();
+            services.TryAddScoped<IJsonTargetsProvider, JsonFileTargetsProvider>();
+            services.TryAddScoped<IAuthorizationService, BuiltInAuthorizationService>();
+            services.TryAddScoped<IAuthorizationSettings, AuthorizationSettings>();
+            services.TryAddScoped<JsonTargetAuthorizationService, JsonTargetAuthorizationService>();
+            services.TryAddScoped<PowershellAuthorizationService, PowershellAuthorizationService>();
+            services.TryAddScoped<IDirectory, ActiveDirectory.ActiveDirectory>();
+            services.TryAddScoped<IAuthenticationService, AuthenticationService>();
+            services.TryAddScoped<IReporting, Reporting>();
+            services.TryAddScoped<ITemplates, TemplatesFromFiles>();
+            services.TryAddScoped<IRateLimiter, RateLimiter>();
+            services.TryAddScoped<IMailer, SmtpMailer>();
+            this.ConfigureAuthentication(services);
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IReporting reporting, IDirectory directory, ILogger logger)
+        {
+            this.reporting = reporting;
+            this.directory = directory;
+            this.logger = logger;
+
+            if (env.IsDevelopment())
             {
-                this.ConfigureWsFederation(app);
-            }
-            else if (authSettings.Mode == "oidc")
-            {
-                this.ConfigureOpenIDConnect(app);
+                app.UseDeveloperExceptionPage();
             }
             else
             {
-                this.ConfigureWindowsAuth();
+                app.UseExceptionHandler("/Home/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+            });
+        }
+
+
+        private void ConfigureAuthentication(IServiceCollection services)
+        {
+            var provider = services.BuildServiceProvider();
+
+            var authSettings = provider.GetService<IAuthenticationSettings>();
+
+            switch (authSettings.Mode)
+            {
+                case "oidc":
+                    authProvider = provider.GetService<IOidcSettings>();
+                    this.ConfigureOpenIDConnect(services, (IOidcSettings)authProvider);
+                    break;
+
+                case "wsfed":
+                    authProvider = provider.GetService<IWsFedSettings>();
+                    this.ConfigureWsFederation(services, (IWsFedSettings)authProvider);
+                    break;
+
+                case "iwa":
+                    authProvider = provider.GetService<IIwaSettings>();
+                    this.ConfigureWindowsAuth(services, (IIwaSettings)authProvider);
+                    break;
+
+                default:
+                    throw new ConfigurationErrorsException("The authentication mode setting in the configuration file was unknown");
             }
         }
 
-        private void ConfigureOpenIDConnect(IAppBuilder app)
+        private void ConfigureOpenIDConnect(IServiceCollection services, IOidcSettings oidcSettings)
         {
-            Startup.CanLogout = true;
-            var oidcSettings = UnityConfig.Container.Resolve<IOidcSettings>();
+            CanLogout = true;
 
-            Startup.authProvider = oidcSettings;
-            AntiForgeryConfig.UniqueClaimTypeIdentifier = oidcSettings.UniqueClaimTypeIdentifier;
-
-            app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
-
-            app.UseCookieAuthentication(new CookieAuthenticationOptions
+            services.AddAuthentication(options =>
             {
-                CookieManager = new SystemWebCookieManager(),
-                AuthenticationType = "Cookies"
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            })
+
+            .AddOpenIdConnect("laps", options =>
+            {
+                options.Authority = oidcSettings.Authority;
+                options.ClientId = oidcSettings.ClientID;
+                options.ClientSecret = oidcSettings.Secret;
+                options.SignedOutRedirectUri = oidcSettings.PostLogourRedirectUri;
+                options.CallbackPath = "/oidc";
+                options.ResponseType = oidcSettings.ResponseType;
+                options.Scope.Clear();
+                options.Scope.Add("openid");
+                options.Scope.Add("profile");
+                options.AccessDeniedPath = new PathString("/Home/AuthNError");
+                options.SaveTokens = true;
+                options.GetClaimsFromUserInfoEndpoint = true;
+                options.UseTokenLifetime = true;
+
+                options.Events = new OpenIdConnectEvents()
+                {
+                    OnTokenValidated = FindClaimIdentityInDirectoryOrFail,
+                    OnAccessDenied = HandleAuthNFailed
+                };
+            })
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Home/Login";
+                options.LogoutPath = "/Home/SignOut";
+                //options.Cookie.SameSite = SameSiteMode.None;
+                // options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             });
 
-            app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
-            {
-                ClientId = oidcSettings.ClientID,
-                ClientSecret = oidcSettings.Secret,
-                Authority = oidcSettings.Authority,
-                RedirectUri = oidcSettings.RedirectUri,
-                ResponseType = oidcSettings.ResponseType,
-                Scope = OpenIdConnectScope.OpenIdProfile,
-                PostLogoutRedirectUri = oidcSettings.PostLogourRedirectUri,
-                TokenValidationParameters = new TokenValidationParameters
-                {
-                    NameClaimType = "name",
-                    SaveSigninToken = true
-                },
+            //services.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
+            //{
 
-                Notifications = new OpenIdConnectAuthenticationNotifications
-                {
-                    AuthorizationCodeReceived = async n =>
-                    {
-                        try
-                        {
-                            OpenIdConnectConfiguration config = await n.Options.ConfigurationManager.GetConfigurationAsync(n.Request.CallCancelled).ConfigureAwait(false);
 
-                            HttpClient client = new HttpClient();
+            //    Notifications = new OpenIdConnectAuthenticationNotifications
+            //    {
+            //        RedirectToIdentityProvider = n =>
+            //        {
+            //            // If signing out, add the id_token_hint
+            //            if (n.ProtocolMessage.RequestType == OpenIdConnectRequestType.Logout)
+            //            {
+            //                Claim idTokenClaim = n.OwinContext.Authentication.User.FindFirst("id_token");
 
-                            TokenResponse tokenResponse = await client.RequestTokenAsync(new TokenRequest
-                            {
-                                Address = config.TokenEndpoint,
-                                ClientId = oidcSettings.ClientID,
-                                ClientSecret = oidcSettings.Secret,
-                            });
+            //                if (idTokenClaim != null)
+            //                {
+            //                    n.ProtocolMessage.IdTokenHint = idTokenClaim.Value;
+            //                }
+            //            }
 
-                            if (tokenResponse.IsError)
-                            {
-                                throw new Exception(tokenResponse.Error);
-                            }
-
-                            UserInfoResponse userInfoResponse = await client.GetUserInfoAsync(new UserInfoRequest
-                            {
-                                Address = config.UserInfoEndpoint,
-                                Token = tokenResponse.AccessToken
-                            });
-
-                            if (userInfoResponse.IsError)
-                            {
-                                throw new OpenIdConnectProtocolException(userInfoResponse.Error);
-                            }
-
-                            List<Claim> claims = new List<Claim>();
-                            claims.AddRange(userInfoResponse.Claims);
-                            claims.Add(new Claim("id_token", tokenResponse.IdentityToken));
-                            claims.Add(new Claim("access_token", tokenResponse.AccessToken));
-
-                            if (!string.IsNullOrEmpty(tokenResponse.RefreshToken))
-                            {
-                                claims.Add(new Claim("refresh_token", tokenResponse.RefreshToken));
-                            }
-
-                            n.AuthenticationTicket.Identity.AddClaims(claims);
-                        }
-                        catch (Exception ex)
-                        {
-                            this.reporting.LogErrorEvent(EventIDs.OidcAuthZCodeError, LogMessages.AuthZCodeFlowError, ex);
-                            n.Response.Redirect($"/Home/AuthNError?message={HttpUtility.UrlEncode(ex.Message)}");
-                        }
-                    },
-                    SecurityTokenValidated = n =>
-                    {
-                        ClaimsIdentity user = n.AuthenticationTicket.Identity;
-                        user.AddClaim(new Claim("id_token", n.ProtocolMessage.IdToken));
-                        return this.FindClaimIdentityInDirectoryOrFail(n);
-                    },
-                    RedirectToIdentityProvider = n =>
-                    {
-                        // If signing out, add the id_token_hint
-                        if (n.ProtocolMessage.RequestType == OpenIdConnectRequestType.Logout)
-                        {
-                            Claim idTokenClaim = n.OwinContext.Authentication.User.FindFirst("id_token");
-
-                            if (idTokenClaim != null)
-                            {
-                                n.ProtocolMessage.IdTokenHint = idTokenClaim.Value;
-                            }
-                        }
-
-                        this.logger.Trace($"Redirecting to IdP for {n.ProtocolMessage.RequestType}");
-                        return Task.CompletedTask;
-                    },
-                    AuthenticationFailed = this.HandleAuthNFailed
-                },
-            });
+            //            this.logger.Trace($"Redirecting to IdP for {n.ProtocolMessage.RequestType}");
+            //            return Task.CompletedTask;
+            //        },
+            //        AuthenticationFailed = this.HandleAuthNFailed
+            //    },
+            //});
         }
 
-        private void ConfigureWindowsAuth()
+        private void ConfigureWindowsAuth(IServiceCollection services, IIwaSettings iwaSettings)
         {
             Startup.CanLogout = false;
-            var iwaSettings = UnityConfig.Container.Resolve<IIwaSettings>();
-
-            AntiForgeryConfig.UniqueClaimTypeIdentifier = iwaSettings.UniqueClaimTypeIdentifier;
-            Startup.authProvider = iwaSettings;
         }
 
-        private void ConfigureWsFederation(IAppBuilder app)
+        private void ConfigureWsFederation(IServiceCollection services, IWsFedSettings wsfSettings)
         {
-            Startup.CanLogout = true;
-            var wsfSettings = UnityConfig.Container.Resolve<IWsFedSettings>();
-
-            Startup.authProvider = wsfSettings;
-            AntiForgeryConfig.UniqueClaimTypeIdentifier = wsfSettings.UniqueClaimTypeIdentifier;
-
-            app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
-
-            app.UseCookieAuthentication(new CookieAuthenticationOptions
+            CanLogout = true;
+         
+            services.Configure<CookiePolicyOptions>(options =>
             {
-                CookieManager = new SystemWebCookieManager(),
-                AuthenticationType = "Cookies"
+                options.CheckConsentNeeded = context => false;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            app.UseWsFederationAuthentication(
-                new WsFederationAuthenticationOptions
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = WsFederationDefaults.AuthenticationScheme;
+            })
+
+            .AddWsFederation("laps", options =>
+            {
+                options.CallbackPath = "/callback";
+                options.MetadataAddress = wsfSettings.Metadata;
+                options.SignOutWreply = wsfSettings.SignOutWReply;
+                options.Wtrealm = wsfSettings.Realm;
+                options.AccessDeniedPath = "/Home/AuthNError";
+                options.Events = new WsFederationEvents()
                 {
-                    Wtrealm = wsfSettings.Realm,
-                    MetadataAddress = wsfSettings.Metadata,
-                    SignOutWreply = wsfSettings.SignOutWReply,
-                    Notifications = new WsFederationAuthenticationNotifications
-                    {
-                        SecurityTokenValidated = this.FindClaimIdentityInDirectoryOrFail,
-                        AuthenticationFailed = this.HandleAuthNFailed
-                    }
-                });
+                    OnSecurityTokenValidated = FindClaimIdentityInDirectoryOrFail,
+                    OnAccessDenied = HandleAuthNFailed
+                };
+            })
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Home/Login";
+                options.LogoutPath = "/Home/SignOut";
+                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            });
         }
 
-        private Task HandleAuthNFailed<TMessage, TOptions>(AuthenticationFailedNotification<TMessage, TOptions> context)
+        private Task HandleAuthNFailed(AccessDeniedContext context)
         {
-            this.reporting.LogErrorEvent(EventIDs.OwinAuthNError, LogMessages.AuthNProviderError, context.Exception);
+            this.reporting.LogErrorEvent(EventIDs.OwinAuthNError, LogMessages.AuthNProviderError, context.Result.Failure);
             context.HandleResponse();
-            context.Response.Redirect($"/Home/AuthNError?message={HttpUtility.UrlEncode(context.Exception?.Message ?? "Unknown error")}");
+            context.Response.Redirect($"/Home/AuthNError?message={WebUtility.UrlEncode(context.Result.Failure?.Message ?? "Unknown error")}");
 
-            return Task.FromResult(0);
+            return Task.CompletedTask;
         }
 
-        private Task FindClaimIdentityInDirectoryOrFail<TMessage, TOptions>(SecurityTokenValidatedNotification<TMessage, TOptions> context)
+        private Task FindClaimIdentityInDirectoryOrFail<T>(RemoteAuthenticationContext<T> context) where T : AuthenticationSchemeOptions
         {
-            ClaimsIdentity user = context.AuthenticationTicket.Identity;
+            ClaimsIdentity user = context.Principal.Identity as ClaimsIdentity;
 
             string sid = this.FindUserByClaim(user, Startup.authProvider.ClaimName)?.Sid?.Value;
 
@@ -239,7 +268,7 @@ namespace Lithnet.Laps.Web
                 this.reporting.LogErrorEvent(EventIDs.SsoIdentityNotFound, message, null);
 
                 context.HandleResponse();
-                context.Response.Redirect($"/Home/AuthNError?message={HttpUtility.UrlEncode(UIMessages.SsoIdentityNotFound)}");
+                context.Response.Redirect($"/Home/AuthNError?message={WebUtility.UrlEncode(UIMessages.SsoIdentityNotFound)}");
                 return Task.CompletedTask;
             }
 

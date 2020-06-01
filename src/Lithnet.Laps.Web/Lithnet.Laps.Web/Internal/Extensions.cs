@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.DirectoryServices;
 using System.Linq;
@@ -6,11 +7,20 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 
 namespace Lithnet.Laps.Web.Internal
 {
     internal static class Extensions
     {
+        public static void ForEach<T>(this IEnumerable<T> e, Action<T> action)
+        {
+            foreach(T item in e)
+            {
+                action(item);
+            }
+        }
+
         public static TEnum GetValueOrDefault<TEnum>(this IConfiguration config, string key, TEnum defaultValue) where TEnum : struct, Enum
         {
             string value = config[key];

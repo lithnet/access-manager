@@ -4,9 +4,9 @@ namespace Lithnet.Laps.Web.AppSettings
 {
     public class RateLimitSettings : IRateLimitSettings
     {
-        private readonly IConfigurationRoot configuration;
+        private readonly IConfiguration configuration;
 
-        public RateLimitSettings(IConfigurationRoot configuration)
+        public RateLimitSettings(IConfiguration configuration)
         {
             this.configuration = configuration;
             this.PerIP = new RateLimitThresholds(this.configuration.GetSection("rate-limit:per-ip"));

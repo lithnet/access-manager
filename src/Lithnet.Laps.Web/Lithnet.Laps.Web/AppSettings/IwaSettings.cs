@@ -1,14 +1,13 @@
-﻿using System.DirectoryServices.AccountManagement;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Microsoft.Extensions.Configuration;
 
 namespace Lithnet.Laps.Web.AppSettings
 {
     public class IwaSettings : IIwaSettings
     {
-        private readonly IConfigurationRoot configuration;
+        private readonly IConfiguration configuration;
 
-        public IwaSettings(IConfigurationRoot configuration)
+        public IwaSettings(IConfiguration configuration)
         {
             this.configuration = configuration;
         }
@@ -16,7 +15,5 @@ namespace Lithnet.Laps.Web.AppSettings
         public string UniqueClaimTypeIdentifier => this.configuration["authentication:iwa:unique-claim-type-identifier"] ?? ClaimTypes.PrimarySid;
 
         public string ClaimName => ClaimTypes.PrimarySid;
-
-        public IdentityType ClaimType => IdentityType.Sid;
     }
 }

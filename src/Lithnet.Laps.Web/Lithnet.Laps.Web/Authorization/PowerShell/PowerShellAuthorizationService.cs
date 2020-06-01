@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Lithnet.Laps.Web.ActiveDirectory;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Lithnet.Laps.Web.Authorization
 {
@@ -15,13 +16,16 @@ namespace Lithnet.Laps.Web.Authorization
         private readonly ILogger logger;
 
         private readonly IAuthorizationSettings config;
-
+        
+        private readonly IWebHostEnvironment env;
+        
         private PowerShell powershell;
 
-        public PowershellAuthorizationService(ILogger logger, IAuthorizationSettings config)
+        public PowershellAuthorizationService(ILogger logger, IAuthorizationSettings config, IWebHostEnvironment env)
         {
             this.logger = logger;
             this.config = config;
+            this.env = env;
         }
 
         public AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer)
@@ -85,7 +89,7 @@ namespace Lithnet.Laps.Web.Authorization
 
         private void InitializePowerShellSession()
         {
-            string path = System.Web.Hosting.HostingEnvironment.MapPath(this.config.PowershellScriptFile);
+            string path = Path.Combine(this.env.ContentRootPath, this.config.PowershellScriptFile);
 
             if (!File.Exists(path))
             {

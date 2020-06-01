@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Lithnet.Laps.Web.Internal;
-
 
 namespace Lithnet.Laps.Web.AppSettings
 {
     public class XffHandlerSettings : IXffHandlerSettings
     {
-        private readonly IConfigurationRoot configuration;
+        private readonly IConfiguration configuration;
 
-        public XffHandlerSettings(IConfigurationRoot configuration)
+        public XffHandlerSettings(IConfiguration configuration)
         {
             this.configuration = configuration;
         }

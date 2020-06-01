@@ -1,13 +1,15 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Web.Mvc;
-using Lithnet.Laps.Web.App_LocalResources;
+using Lithnet.Laps.Web.Core.App_LocalResources;
 using Lithnet.Laps.Web.AppSettings;
 using Lithnet.Laps.Web.Authorization;
 using Lithnet.Laps.Web.Models;
 using NLog;
 using Lithnet.Laps.Web.ActiveDirectory;
 using Lithnet.Laps.Web.Internal;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using IAuthorizationService = Lithnet.Laps.Web.Authorization.IAuthorizationService;
 
 namespace Lithnet.Laps.Web.Controllers
 {
@@ -36,7 +38,7 @@ namespace Lithnet.Laps.Web.Controllers
             this.userInterfaceSettings = userInterfaceSettings;
         }
 
-        public ActionResult Get()
+        public IActionResult Get()
         {
             return this.View(new LapRequestModel
             {
@@ -47,7 +49,7 @@ namespace Lithnet.Laps.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Get(LapRequestModel model)
+        public IActionResult Get(LapRequestModel model)
         {
             model.ShowReason = this.userInterfaceSettings.UserSuppliedReason != AuditReasonFieldState.Hidden;
             model.ReasonRequired = this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required;

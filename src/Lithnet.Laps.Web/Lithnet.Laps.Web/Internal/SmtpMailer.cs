@@ -26,38 +26,34 @@ namespace Lithnet.Laps.Web.Internal
                 return;
             }
 
-            using (SmtpClient client = new SmtpClient(this.emailSettings.Host, this.emailSettings.Port))
+            using SmtpClient client = new SmtpClient(this.emailSettings.Host, this.emailSettings.Port);
+            client.UseDefaultCredentials = this.emailSettings.UseDefaultCredentials;
+            client.DeliveryMethod = SmtpDeliveryMethod.Network;
+            client.EnableSsl = this.emailSettings.UseSsl;
+
+            if (!this.emailSettings.UseDefaultCredentials && !string.IsNullOrWhiteSpace(this.emailSettings.Username))
             {
-                client.UseDefaultCredentials = this.emailSettings.UseDefaultCredentials;
-                client.DeliveryMethod = SmtpDeliveryMethod.Network;
-                client.EnableSsl = this.emailSettings.UseSsl;
-                
-                if (!this.emailSettings.UseDefaultCredentials && !string.IsNullOrWhiteSpace(this.emailSettings.Username))
-                {
-                    client.Credentials = new NetworkCredential(this.emailSettings.Username, this.emailSettings.Password);
-                }
-                
-                using (MailMessage message = new MailMessage())
-                {
-                    message.From = new MailAddress(this.emailSettings.FromAddress);
-
-                    foreach (string recipient in recipients)
-                    {
-                        message.To.Add(recipient);
-                    }
-
-                    if (message.To.Count == 0)
-                    {
-                        this.logger.Trace($"Not sending notification email because there are no recipients");
-                        return;
-                    }
-
-                    message.IsBodyHtml = true;
-                    message.Subject = subject;
-                    message.Body = body;
-                    client.Send(message);
-                }
+                client.Credentials = new NetworkCredential(this.emailSettings.Username, this.emailSettings.Password);
             }
+
+            using MailMessage message = new MailMessage();
+            message.From = new MailAddress(this.emailSettings.FromAddress);
+
+            foreach (string recipient in recipients)
+            {
+                message.To.Add(recipient);
+            }
+
+            if (message.To.Count == 0)
+            {
+                this.logger.Trace($"Not sending notification email because there are no recipients");
+                return;
+            }
+
+            message.IsBodyHtml = true;
+            message.Subject = subject;
+            message.Body = body;
+            client.Send(message);
         }
     }
 }

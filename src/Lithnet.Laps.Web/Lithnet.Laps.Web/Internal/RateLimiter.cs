@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Web;
-using System.Web.Caching;
 using Lithnet.Laps.Web.AppSettings;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Lithnet.Laps.Web.Internal
 {
@@ -9,14 +9,16 @@ namespace Lithnet.Laps.Web.Internal
     {
         private readonly IRateLimitSettings rateLimits;
         private readonly IIpAddressResolver ipResolver;
+        private readonly IMemoryCache memoryCache;
 
-        public RateLimiter(IRateLimitSettings rateLimits, IIpAddressResolver ipResolver)
+        public RateLimiter(IRateLimitSettings rateLimits, IIpAddressResolver ipResolver, IMemoryCache memoryCache)
         {
             this.rateLimits = rateLimits;
             this.ipResolver = ipResolver;
+            this.memoryCache = memoryCache;
         }
 
-        public RateLimitResult GetRateLimitResult(string userid, HttpRequestBase r)
+        public RateLimitResult GetRateLimitResult(string userid, HttpRequest r)
         {
             if (this.rateLimits.PerIP.Enabled)
             {
@@ -51,11 +53,11 @@ namespace Lithnet.Laps.Web.Internal
             return new RateLimitResult() { IsRateLimitExceeded = false };
         }
 
-        private RateLimitResult IsIpThresholdExceeded(HttpRequestBase r, int threshold, int duration)
+        private RateLimitResult IsIpThresholdExceeded(HttpRequest r, int threshold, int duration)
         {
             string ip = this.ipResolver.GetRequestIP(r);
 
-            if (this.IsThresholdExceededIP(ip, threshold, duration))
+            if (this.IsThresholdExceeded(ip, threshold, duration))
             {
                 return new RateLimitResult { Duration = duration, IPAddress = ip, IsRateLimitExceeded = true, IsUserRateLimit = false, Threshold = threshold };
             }
@@ -65,7 +67,7 @@ namespace Lithnet.Laps.Web.Internal
 
         private RateLimitResult IsUserThresholdExceeded(string userid, int threshold, int duration)
         {
-            if (this.IsThresholdExceededUserID(userid, threshold, duration))
+            if (this.IsThresholdExceeded(userid, threshold, duration))
             {
                 return new RateLimitResult { Duration = duration, IsRateLimitExceeded = true, IsUserRateLimit = true, Threshold = threshold };
             }
@@ -73,36 +75,32 @@ namespace Lithnet.Laps.Web.Internal
             return null;
         }
 
-        private bool IsThresholdExceededIP(string ip, int threshold, int duration)
+        private bool IsThresholdExceeded(string usernameOrIP, int threshold, int duration)
         {
-            string key1 = string.Join(@"-", duration, threshold, ip);
-            return this.IsThresholdExceeded(key1, threshold, duration);
+            string key1 = string.Join(@"-", duration, threshold, usernameOrIP);
+            return this.IsThresholdExceededForKey(key1, threshold, duration);
         }
 
-        private bool IsThresholdExceededUserID(string userid, int threshold, int duration)
+        private bool IsThresholdExceededForKey(string key, int threshold, int duration)
         {
-            string key1 = string.Join(@"-", duration, threshold, userid);
-
-            return this.IsThresholdExceeded(key1, threshold, duration);
-        }
-
-        private bool IsThresholdExceeded(string key, int threshold, int duration)
-        {
-            int count = 1;
-
-            if (HttpRuntime.Cache[key] != null)
+            if (threshold <= 0)
             {
-                count = (int)HttpRuntime.Cache[key] + 1;
+                return false;
             }
 
-            HttpRuntime.Cache.Insert(
+            if (!this.memoryCache.TryGetValue<int>(key, out int count))
+            {
+                count = 1;
+            }
+            else
+            {
+                count++;
+            }
+
+            this.memoryCache.Set<int>(
                 key,
                 count,
-                null,
-                DateTime.UtcNow.AddSeconds(duration),
-                Cache.NoSlidingExpiration,
-                CacheItemPriority.Low,
-                null
+                DateTime.UtcNow.AddSeconds(duration)
             );
 
             return count > threshold;

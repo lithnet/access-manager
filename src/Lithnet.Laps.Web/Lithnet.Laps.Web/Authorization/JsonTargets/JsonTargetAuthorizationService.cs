@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Lithnet.Laps.Web.ActiveDirectory;
-using Lithnet.Laps.Web.Models;
-using Microsoft.Ajax.Utilities;
+using Lithnet.Laps.Web.Internal;
 using NLog;
 
 namespace Lithnet.Laps.Web.Authorization

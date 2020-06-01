@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Collections.Specialized;
 using Lithnet.Laps.Web.AppSettings;
+using Microsoft.AspNetCore.Http;
 
 namespace Lithnet.Laps.Web.Internal
 {
@@ -23,32 +23,22 @@ namespace Lithnet.Laps.Web.Internal
                 return null;
             }
 
-            return this.GetRequestIP(request.UserHostAddress, request.Headers);
+            return this.GetRequestIP(request.HttpContext.Connection.RemoteIpAddress.ToString(), request.Headers);
         }
 
-        public string GetRequestIP(HttpRequestBase request)
+        private string GetRequestIP(string originalIP, IHeaderDictionary headers)
         {
-            if (request == null)
-            {
-                return null;
-            }
-
-            return this.GetRequestIP(request.UserHostAddress, request.Headers);
-        }
-
-        private string GetRequestIP(string originalIP, NameValueCollection headers)
-        {
-            if (this.config.Mode == AppSettings.IpResolverMode.Default)
+            if (this.config.Mode == IpResolverMode.Default)
             {
                 return originalIP;
             }
 
             switch (this.config.Mode)
             {
-                case AppSettings.IpResolverMode.Xff:
+                case IpResolverMode.Xff:
                     return this.GetXffIp(originalIP, headers);
 
-                case AppSettings.IpResolverMode.ClientIP:
+                case IpResolverMode.ClientIP:
                     return this.GetClientIp(originalIP, headers);
 
                 default:
@@ -91,7 +81,7 @@ namespace Lithnet.Laps.Web.Internal
             }
         }
 
-        private string GetXffIp(string originalIP, NameValueCollection headers)
+        private string GetXffIp(string originalIP, IHeaderDictionary headers)
         {
             if (string.IsNullOrWhiteSpace(this.config.Xff.HeaderName))
             {
@@ -122,7 +112,7 @@ namespace Lithnet.Laps.Web.Internal
             }
         }
 
-        private string GetClientIp(string originalIP, NameValueCollection headers)
+        private string GetClientIp(string originalIP, IHeaderDictionary headers)
         {
             if (this.config.ClientIP.HeaderName == null)
             {

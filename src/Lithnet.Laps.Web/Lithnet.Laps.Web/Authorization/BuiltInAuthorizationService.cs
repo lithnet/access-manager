@@ -1,6 +1,6 @@
 ﻿using Lithnet.Laps.Web.ActiveDirectory;
 using Lithnet.Laps.Web.AppSettings;
-using Microsoft.Ajax.Utilities;
+using Lithnet.Laps.Web.Internal;
 
 namespace Lithnet.Laps.Web.Authorization
 {

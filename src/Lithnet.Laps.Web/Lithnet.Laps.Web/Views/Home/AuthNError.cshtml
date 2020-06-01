@@ -10,7 +10,7 @@
             </b>
         </section>
         <section>
-            <p class="text-center">@Request.Params["message"]</p>
+            <p class="text-center">@ViewContext.HttpContext.Request.Query["message"]</p>
         </section>
     </fieldset>
 </div>

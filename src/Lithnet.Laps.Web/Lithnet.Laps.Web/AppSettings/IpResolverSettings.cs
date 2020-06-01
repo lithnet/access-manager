@@ -6,9 +6,9 @@ namespace Lithnet.Laps.Web.AppSettings
 {
     public class IpResolverSettings : IIpResolverSettings
     {
-        private readonly IConfigurationRoot configuration;
+        private readonly IConfiguration configuration;
 
-        public IpResolverSettings(IConfigurationRoot configuration)
+        public IpResolverSettings(IConfiguration configuration)
         {
             this.configuration = configuration;
         }

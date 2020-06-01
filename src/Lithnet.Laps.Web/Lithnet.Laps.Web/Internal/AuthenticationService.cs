@@ -1,15 +1,23 @@
 ﻿using System.Security.Claims;
 using System.Web;
-using Lithnet.Laps.Web.App_LocalResources;
+using Lithnet.Laps.Web.Core.App_LocalResources;
 using Lithnet.Laps.Web.ActiveDirectory;
+using Microsoft.AspNetCore.Http;
 
 namespace Lithnet.Laps.Web.Internal
 {
     public class AuthenticationService : IAuthenticationService
     {
+        private readonly IHttpContextAccessor httpContextAccessor;
+
+        public AuthenticationService (IHttpContextAccessor httpContextAccessor)
+        {
+            this.httpContextAccessor = httpContextAccessor;
+        }
+
         public IUser GetLoggedInUser(IDirectory directory)
         {
-            HttpContext httpContext = HttpContext.Current;
+            HttpContext httpContext = httpContextAccessor.HttpContext;
 
             if (httpContext?.User == null)
             {

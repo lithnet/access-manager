@@ -1,36 +1,52 @@
 ﻿using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace Lithnet.Laps.Web.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
+        public IActionResult Index()
         {
             return this.RedirectToAction("Get", "Lap");
         }
 
-        public ActionResult AuthNError()
+        public IActionResult AuthNError()
         {
             return this.View();
         }
 
-        public ActionResult SignOut()
+        public async Task Login(string returnUrl = "/")
         {
-            if (this.Request.GetOwinContext().Authentication.User.Identity.IsAuthenticated)
-            {
-                this.Request.GetOwinContext()
-                    .Authentication
-                    .SignOut(this.HttpContext.GetOwinContext()
-                        .Authentication.GetAuthenticationTypes()
-                        .Select(o => o.AuthenticationType).ToArray());
-            }
-
-            return this.View("LogOut");
+            // specifying the scheme here "oidc"
+            await HttpContext.ChallengeAsync("laps", new AuthenticationProperties() { RedirectUri = returnUrl });
         }
 
-        public ActionResult LogOut()
+        public async Task SignOut()
+        {
+            await HttpContext.SignOutAsync("laps", new AuthenticationProperties
+            {
+                RedirectUri = Url.Action("SignOut", "Home")
+            });
+
+            //if (this.Request.GetOwinContext().Authentication.User.Identity.IsAuthenticated)
+            //{
+            //    this.Request.GetOwinContext()
+            //        .Authentication
+            //        .SignOut(this.HttpContext.GetOwinContext()
+            //            .Authentication.GetAuthenticationTypes()
+            //            .Select(o => o.AuthenticationType).ToArray());
+            //}
+
+            //return this.View("LogOut");
+
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        }
+
+        public IActionResult LogOut()
         {
             return this.View();
         }

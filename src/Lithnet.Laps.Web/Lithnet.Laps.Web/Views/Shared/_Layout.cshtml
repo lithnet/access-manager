@@ -1,20 +1,17 @@
 ﻿@using System.Configuration
 @using Lithnet.Laps.Web
 @using Lithnet.Laps.Web.AppSettings
-@using Unity
+@inject IUserInterfaceSettings uiSettings
 
-@{
-    var uiSettings = UnityConfig.Container.Resolve<IUserInterfaceSettings>();
-}
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@uiSettings.Title</title>
-    @Styles.Render("~/Content/css")
-    <script src="@Url.Content("~/Scripts/clipboard.min.js")"></script>
-    <link href="@Url.Content("~/Content/fontawesome/fontawesome-all.css")" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
 </head>
 <body>
     <div class="content">
@@ -24,15 +21,17 @@
         </div>
         @RenderBody()
     </div>
-    @if (MvcApplication.CanLogout)
+    @if (Startup.CanLogout)
     {
         <div class="center-content">
             <a class="logout-link" href="@Url.Action("SignOut", "Home")">@UIMessages.Logout</a>
         </div>
     }
 
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
-    @RenderSection("scripts", required: false)
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/clipboard.js"></script>
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

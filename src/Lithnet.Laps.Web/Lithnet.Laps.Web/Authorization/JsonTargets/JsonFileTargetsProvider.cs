@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Lithnet.Laps.Web.AppSettings;
+using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 
 namespace Lithnet.Laps.Web.Authorization
@@ -9,9 +10,12 @@ namespace Lithnet.Laps.Web.Authorization
     {
         private readonly IAuthorizationSettings config;
 
-        public JsonFileTargetsProvider(IAuthorizationSettings config)
+        private readonly IWebHostEnvironment env;
+
+        public JsonFileTargetsProvider(IAuthorizationSettings config, IWebHostEnvironment env)
         {
             this.config = config;
+            this.env = env;
         }
 
         private IList<JsonTarget> targets;
@@ -24,7 +28,7 @@ namespace Lithnet.Laps.Web.Authorization
                 {
                     if (this.config.JsonProviderEnabled)
                     {
-                        string path = System.Web.Hosting.HostingEnvironment.MapPath(this.config.JsonAuthorizationFile);
+                        string path = Path.Combine(this.env.ContentRootPath, this.config.JsonAuthorizationFile); 
                         if (!File.Exists(path))
                         {
                             throw new FileNotFoundException($"The JSON authorization file was not found: {path}");

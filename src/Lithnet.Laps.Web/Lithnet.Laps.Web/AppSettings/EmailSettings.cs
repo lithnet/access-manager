@@ -5,9 +5,9 @@ namespace Lithnet.Laps.Web.AppSettings
 {
     public class EmailSettings : IEmailSettings
     {
-        private readonly IConfigurationRoot configuration;
+        private readonly IConfiguration configuration;
 
-        public EmailSettings(IConfigurationRoot configuration)
+        public EmailSettings(IConfiguration configuration)
         {
             this.configuration = configuration;
         }

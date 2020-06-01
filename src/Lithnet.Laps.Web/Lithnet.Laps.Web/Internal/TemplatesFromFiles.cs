@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
 using NLog;
 
 namespace Lithnet.Laps.Web.Internal
@@ -23,9 +25,13 @@ namespace Lithnet.Laps.Web.Internal
 
         private readonly ILogger logger;
 
-        public TemplatesFromFiles(ILogger logger)
+        private readonly IWebHostEnvironment env;
+
+        public TemplatesFromFiles(ILogger logger, IWebHostEnvironment env)
         {
+            this.env = env;
             this.logger = logger;
+
             this.MakeSureTemplatesAreLoaded();
         }
 
@@ -56,7 +62,7 @@ namespace Lithnet.Laps.Web.Internal
         {
             try
             {
-                string text = System.IO.File.ReadAllText(System.Web.HttpContext.Current.Server.MapPath($"~\\App_Data\\Templates\\{templateName}"));
+                string text = File.ReadAllText(Path.Combine(this.env.ContentRootPath, $"App_Data\\Templates\\{templateName}"));
 
                 return string.IsNullOrWhiteSpace(text) ? null : text;
             }
