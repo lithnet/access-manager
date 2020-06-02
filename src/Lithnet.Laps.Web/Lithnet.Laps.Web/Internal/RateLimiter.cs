@@ -8,13 +8,11 @@ namespace Lithnet.Laps.Web.Internal
     public sealed class RateLimiter : IRateLimiter
     {
         private readonly IRateLimitSettings rateLimits;
-        private readonly IIpAddressResolver ipResolver;
         private readonly IMemoryCache memoryCache;
 
-        public RateLimiter(IRateLimitSettings rateLimits, IIpAddressResolver ipResolver, IMemoryCache memoryCache)
+        public RateLimiter(IRateLimitSettings rateLimits, IMemoryCache memoryCache)
         {
             this.rateLimits = rateLimits;
-            this.ipResolver = ipResolver;
             this.memoryCache = memoryCache;
         }
 
@@ -30,7 +28,7 @@ namespace Lithnet.Laps.Web.Internal
                 if (result != null)
                 {
                     result.UserID = userid;
-                    result.IPAddress = this.ipResolver.GetRequestIP(r);
+                    result.IPAddress = r.HttpContext.Connection.RemoteIpAddress.ToString();
                     return result;
                 }
             }
@@ -45,7 +43,7 @@ namespace Lithnet.Laps.Web.Internal
                 if (result != null)
                 {
                     result.UserID = userid;
-                    result.IPAddress = this.ipResolver.GetRequestIP(r);
+                    result.IPAddress = r.HttpContext.Connection.RemoteIpAddress.ToString();
                     return result;
                 }
             }
@@ -55,7 +53,7 @@ namespace Lithnet.Laps.Web.Internal
 
         private RateLimitResult IsIpThresholdExceeded(HttpRequest r, int threshold, int duration)
         {
-            string ip = this.ipResolver.GetRequestIP(r);
+            string ip = r.HttpContext.Connection.RemoteIpAddress.ToString();
 
             if (this.IsThresholdExceeded(ip, threshold, duration))
             {

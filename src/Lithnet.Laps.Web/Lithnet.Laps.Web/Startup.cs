@@ -21,6 +21,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using NLog;
 using Microsoft.AspNetCore.Server.HttpSys;
+using Microsoft.AspNetCore.HttpOverrides;
+using System.Linq;
 
 namespace Lithnet.Laps.Web
 {
@@ -46,7 +48,6 @@ namespace Lithnet.Laps.Web
             services.AddControllersWithViews();
             services.AddHttpContextAccessor();
 
-
             services.TryAddTransient<ILogger>(_ => LogManager.GetCurrentClassLogger());
             services.TryAddScoped<IIwaSettings, IwaSettings>();
             services.TryAddScoped<IOidcSettings, OidcSettings>();
@@ -54,9 +55,7 @@ namespace Lithnet.Laps.Web
             services.TryAddScoped<IUserInterfaceSettings, UserInterfaceSettings>();
             services.TryAddScoped<IRateLimitSettings, RateLimitSettings>();
             services.TryAddScoped<IAuthenticationSettings, AuthenticationSettings>();
-            services.TryAddScoped<IIpResolverSettings, IpResolverSettings>();
             services.TryAddScoped<IEmailSettings, EmailSettings>();
-            services.TryAddScoped<IIpAddressResolver, IpAddressResolver>();
             services.TryAddScoped<GlobalAuditSettings, GlobalAuditSettings>();
             services.TryAddScoped<IJsonTargetsProvider, JsonFileTargetsProvider>();
             services.TryAddScoped<IAuthorizationService, BuiltInAuthorizationService>();
@@ -68,7 +67,10 @@ namespace Lithnet.Laps.Web
             services.TryAddScoped<ITemplates, TemplatesFromFiles>();
             services.TryAddScoped<IRateLimiter, RateLimiter>();
             services.TryAddScoped<IMailer, SmtpMailer>();
+            services.TryAddScoped<IXffHandlerSettings, XffHandlerSettings>();
             this.ConfigureAuthentication(services);
+            this.ConfigureXff(services);
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -77,6 +79,8 @@ namespace Lithnet.Laps.Web
             this.reporting = reporting;
             this.directory = directory;
             this.logger = logger;
+
+            app.UseForwardedHeaders();
 
             if (env.IsDevelopment())
             {
@@ -104,6 +108,27 @@ namespace Lithnet.Laps.Web
             });
         }
 
+        private void ConfigureXff(IServiceCollection services)
+        {
+            var provider = services.BuildServiceProvider();
+            var settings = provider.GetService<IXffHandlerSettings>();
+            
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                options.ForwardedForHeaderName = settings.ForwardedForHeaderName;
+                options.ForwardedProtoHeaderName = settings.ForwardedProtoHeaderName;
+                options.ForwardedHostHeaderName = settings.ForwardedHostHeaderName;
+                options.ForwardLimit = settings.ForwardLimit < 0 ? (int?)null : settings.ForwardLimit;
+
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+                
+                settings.TrustedProxies.ForEach(t => options.KnownProxies.Add(t));
+                settings.TrustedNetworks.ForEach(t => options.KnownNetworks.Add(t));
+            });
+
+        }
 
         private void ConfigureAuthentication(IServiceCollection services)
         {
@@ -161,9 +186,9 @@ namespace Lithnet.Laps.Web
 
                 options.Events = new OpenIdConnectEvents()
                 {
-                    OnTokenValidated = FindClaimIdentityInDirectoryOrFail, 
-                    OnRemoteFailure = HandleRemoteFailure, 
-                    OnAccessDenied = HandleAuthNFailed, 
+                    OnTokenValidated = FindClaimIdentityInDirectoryOrFail,
+                    OnRemoteFailure = HandleRemoteFailure,
+                    OnAccessDenied = HandleAuthNFailed,
                 };
             })
             .AddCookie(options =>
@@ -194,8 +219,8 @@ namespace Lithnet.Laps.Web
                 options.Events = new WsFederationEvents()
                 {
                     OnSecurityTokenValidated = FindClaimIdentityInDirectoryOrFail,
-                    OnAccessDenied = HandleAuthNFailed, 
-                    OnRemoteFailure = HandleRemoteFailure 
+                    OnAccessDenied = HandleAuthNFailed,
+                    OnRemoteFailure = HandleRemoteFailure
                 };
             })
             .AddCookie(options =>
@@ -212,7 +237,7 @@ namespace Lithnet.Laps.Web
             this.reporting.LogErrorEvent(EventIDs.ExternalAuthNAccessDenied, LogMessages.AuthNAccessDenied, context.Result?.Failure);
             context.HandleResponse();
             context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.ExternalAuthNProviderDenied}");
-            
+
             return Task.CompletedTask;
         }
 

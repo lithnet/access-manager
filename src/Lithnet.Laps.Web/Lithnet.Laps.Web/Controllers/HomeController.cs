@@ -6,6 +6,7 @@ using Lithnet.Laps.Web.AppSettings;
 using Lithnet.Laps.Web.Internal;
 using Lithnet.Laps.Web.Models;
 using Lithnet.Laps.Web.App_LocalResources;
+using NLog;
 
 namespace Lithnet.Laps.Web.Controllers
 {
@@ -13,9 +14,12 @@ namespace Lithnet.Laps.Web.Controllers
     {
         private readonly IExternalAuthProviderSettings authSettings;
 
-        public HomeController(IExternalAuthProviderSettings authSettings)
+        private readonly ILogger logger;
+
+        public HomeController(IExternalAuthProviderSettings authSettings, ILogger logger)
         {
             this.authSettings = authSettings;
+            this.logger = logger;
         }
 
         public IActionResult Index()
@@ -26,7 +30,9 @@ namespace Lithnet.Laps.Web.Controllers
         public IActionResult AuthNError(AuthNFailureMessageID messageID)
         {
             ErrorModel model = new ErrorModel();
-         
+
+            logger.Trace($"AuthN error from {this.Request.HttpContext.Connection.RemoteIpAddress}");
+
             switch (messageID)
             {
                 case AuthNFailureMessageID.SsoIdentityNotFound:

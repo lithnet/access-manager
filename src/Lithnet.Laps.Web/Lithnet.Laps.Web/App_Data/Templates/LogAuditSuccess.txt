@@ -4,7 +4,7 @@ Name:				{user.DisplayName}
 UPN:				{user.UserPrincipalName}
 SID:				{user.Sid}
 User DN:				{user.DistinguishedName}
-Requestor IP:			{request.ResolvedIPAddress}
+Requestor IP:			{request.IPAddress}
 Requestor Hostname:		{request.HostName}
 Computer name:			{computer.SamAccountName}
 Computer DN:			{computer.DistinguishedName}

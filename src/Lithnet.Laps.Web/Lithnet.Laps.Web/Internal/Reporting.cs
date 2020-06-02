@@ -18,16 +18,16 @@ namespace Lithnet.Laps.Web.Internal
         private readonly ILogger logger;
         private readonly IMailer mailer;
         private readonly ITemplates templates;
-        private readonly IIpAddressResolver ipResolver;
         private readonly GlobalAuditSettings globalAuditSettings;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public Reporting(ILogger logger, IMailer mailer, ITemplates templates, GlobalAuditSettings globalAuditSettings, IIpAddressResolver ipResolver)
+        public Reporting(ILogger logger, IMailer mailer, ITemplates templates, GlobalAuditSettings globalAuditSettings, IHttpContextAccessor httpContextAccessor)
         {
             this.logger = logger;
             this.mailer = mailer;
             this.templates = templates;
-            this.ipResolver = ipResolver;
             this.globalAuditSettings = globalAuditSettings;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         public void LogErrorEvent(int eventID, string logMessage, Exception ex)
@@ -97,7 +97,7 @@ namespace Lithnet.Laps.Web.Internal
             }
         }
 
-        private Dictionary<string, string> BuildTokenDictionary(AuthorizationResponse authorizationResponse = null, IUser user = null, IComputer computer = null, PasswordData passwordData = null, string requestedComputerName = null, string detailMessage = null, string requestedReason = null, HttpRequest request = null)
+        private Dictionary<string, string> BuildTokenDictionary(AuthorizationResponse authorizationResponse = null, IUser user = null, IComputer computer = null, PasswordData passwordData = null, string requestedComputerName = null, string detailMessage = null, string requestedReason = null)
         {
             Dictionary<string, string> pairs = new Dictionary<string, string> {
                 { "{user.SamAccountName}", user?.SamAccountName},
@@ -125,8 +125,8 @@ namespace Lithnet.Laps.Web.Internal
                 { "{authzresult.ExpireAfter}", authorizationResponse?.ExpireAfter.ToString()},
                 { "{authzresult.ResponseCode}", authorizationResponse?.Code.ToString()},
                 { "{message}", detailMessage},
-                { "{request.IPAddress}", request?.HttpContext?.Connection?.RemoteIpAddress?.ToString()},
-                { "{request.ResolvedIPAddress}", request == null ? null : this.ipResolver.GetRequestIP(request)},
+                { "{request.IPAddress}", httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString()},
+                { "{request.Hostname}", this.TryResolveHostName(httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress)},
                 { "{datetime}", DateTime.Now.ToString(CultureInfo.CurrentCulture)},
                 { "{datetimeutc}", DateTime.UtcNow.ToString(CultureInfo.CurrentCulture)},
                 { "{computer.LapsExpiryDate}", passwordData?.ExpirationTime?.ToString(CultureInfo.CurrentCulture)},
@@ -139,7 +139,7 @@ namespace Lithnet.Laps.Web.Internal
         {
             foreach (KeyValuePair<string, string> token in tokens)
             {
-                text = text.Replace(token.Key, isHtml ? WebUtility.HtmlEncode(token.Value) : token.Value);
+                text = text.Replace(token.Key, isHtml ? WebUtility.HtmlEncode(token.Value) : token.Value, StringComparison.OrdinalIgnoreCase);
             }
 
             return text;
@@ -153,16 +153,16 @@ namespace Lithnet.Laps.Web.Internal
             {
                 authorizationResponse.NotificationRecipients?.ForEach(t => usersToNotify.Add(t));
             }
-            
+
             if (success)
             {
-                this.globalAuditSettings.SuccessRecipients?.ForEach( t => usersToNotify.Add(t));
+                this.globalAuditSettings.SuccessRecipients?.ForEach(t => usersToNotify.Add(t));
             }
             else
             {
                 this.globalAuditSettings.FailureRecipients?.ForEach(t => usersToNotify.Add(t));
             }
-            
+
             if (!string.IsNullOrWhiteSpace(user?.EmailAddress))
             {
                 if (usersToNotify.Remove("{user.EmailAddress}"))
@@ -172,6 +172,23 @@ namespace Lithnet.Laps.Web.Internal
             }
 
             return usersToNotify.ToImmutableHashSet();
+        }
+
+        private string TryResolveHostName(IPAddress address)
+        {
+            if (address == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return Dns.GetHostEntry(address)?.HostName;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

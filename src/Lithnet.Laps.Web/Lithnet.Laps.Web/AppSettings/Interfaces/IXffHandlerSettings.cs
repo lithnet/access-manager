@@ -1,15 +1,21 @@
 ﻿using System.Collections.Generic;
+using System.Net;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace Lithnet.Laps.Web.AppSettings
 {
     public interface IXffHandlerSettings
     {
-        int ProxyDepth { get; }
+        string ForwardedForHeaderName { get; }
 
-        IEnumerable<string> TrustedProxies { get; }
+        string ForwardedHostHeaderName { get; }
 
-        string HeaderName { get; }
+        string ForwardedProtoHeaderName { get; }
 
-        XffResolverMode Mode { get; }
+        int ForwardLimit { get; }
+
+        IEnumerable<IPNetwork> TrustedNetworks { get; }
+
+        IEnumerable<IPAddress> TrustedProxies { get; }
     }
 }
