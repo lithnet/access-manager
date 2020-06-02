@@ -32,8 +32,8 @@
           }
         },
         {
-          "name": "fim-dev1\\ryan",
-          "type": "deny"
+          "name": "fim-dev1\\ryan2",
+          "type": "allow"
         }
       ],
       "email-auditing": {

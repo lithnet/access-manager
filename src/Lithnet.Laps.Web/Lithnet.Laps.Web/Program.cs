@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
+using Lithnet.Laps.Web.Internal;
 
 namespace Lithnet.Laps.Web
 {
@@ -17,17 +18,30 @@ namespace Lithnet.Laps.Web
             CreateHostBuilder(args).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-            .ConfigureAppConfiguration(builder =>
-            {
-                builder.AddJsonFile("appsecrets.json");
-                builder.AddEnvironmentVariables("laps");
-            })
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                })
-            .UseNLog();
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            var config = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables("laps")
+                .AddCommandLine(args)
+                .Build();
+
+            var host = Host.CreateDefaultBuilder(args)
+                 .ConfigureAppConfiguration(builder =>
+                 {
+                     builder.AddJsonFile("appsecrets.json");
+                     builder.AddEnvironmentVariables("laps");
+                     config = builder.Build();
+                 }).ConfigureWebHostDefaults(webBuilder =>
+                 {
+                     webBuilder.UseStartup<Startup>();
+                     webBuilder.UseConfiguration(config);
+                     webBuilder.UseHttpSysOrIISIntegration();
+                 })
+                 .UseNLog();
+
+            
+            return host;
+        }
     }
 }

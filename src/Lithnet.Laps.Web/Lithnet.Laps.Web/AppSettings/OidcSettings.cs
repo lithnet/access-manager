@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Claims;
+using Lithnet.Laps.Web.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
@@ -28,12 +29,10 @@ namespace Lithnet.Laps.Web.AppSettings
 
         public string ResponseType => this.configuration["authentication:oidc:response-type"] ?? OpenIdConnectResponseType.CodeIdToken;
 
-        public string PostLogourRedirectUri
-        {
-            get
-            {
-                return this.configuration["authentication:oidc:post-logout-redirect-uri"] ?? new Uri(new Uri(this.configuration["authentication:oidc:redirect-uri"]?.Trim('/', '\\')), "Home/LogOut").ToString();
-            }
-        }
+        public string PostLogoutRedirectUri => this.configuration["authentication:oidc:post-logout-redirect-uri"] ?? "/Home/LoggedOut";
+
+        public bool CanLogout => true;
+
+        public bool IdpLogout => this.configuration.GetValueOrDefault("authentication:oidc:idp-logout", false);
     }
 }

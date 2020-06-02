@@ -2,6 +2,7 @@
 @using Lithnet.Laps.Web
 @using Lithnet.Laps.Web.AppSettings
 @inject IUserInterfaceSettings uiSettings
+@inject IExternalAuthProviderSettings authSettings
 
 <!DOCTYPE html>
 <html>
@@ -21,10 +22,10 @@
         </div>
         @RenderBody()
     </div>
-    @if (Startup.CanLogout)
+    @if (authSettings.CanLogout && User.Identity.IsAuthenticated)
     {
         <div class="center-content">
-            <a class="logout-link" href="@Url.Action("SignOut", "Home")">@UIMessages.Logout</a>
+            <a class="logout-link" href="@Url.Action("Logout", "Home")">@UIMessages.Logout</a>
         </div>
     }
 

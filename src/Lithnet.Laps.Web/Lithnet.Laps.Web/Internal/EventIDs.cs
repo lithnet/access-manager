@@ -27,6 +27,10 @@
         public const int ErrorLoadingTemplateResource = 603;
 
         public const int OidcAuthZCodeError = 700;
-        public const int OwinAuthNError = 701;
+        public const int ExternalAuthNProviderError = 701;
+        public const int AuthNResponseProcessingError = 702;
+        public const int AuthNDirectoryLookupError = 703;
+        public const int ExternalAuthNAccessDenied = 704;
+
     }
 }

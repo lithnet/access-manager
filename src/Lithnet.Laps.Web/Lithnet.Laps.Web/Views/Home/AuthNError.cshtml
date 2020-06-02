@@ -2,15 +2,17 @@
     ViewBag.Title = "Authentication failed";
 }
 
+@model Lithnet.Laps.Web.Models.ErrorModel
+
 <div class="form-container">
     <fieldset>
         <section>
             <b class="error">
-                <i class="fas fa-exclamation-circle"></i> @UIMessages.AuthNError
+                <i class="fas fa-exclamation-circle"></i> @Model.Heading
             </b>
         </section>
         <section>
-            <p class="text-center">@ViewContext.HttpContext.Request.Query["message"]</p>
+            <p class="text-center">@Model.Message</p>
         </section>
     </fieldset>
 </div>

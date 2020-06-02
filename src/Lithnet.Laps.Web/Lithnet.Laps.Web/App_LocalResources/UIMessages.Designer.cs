@@ -61,6 +61,15 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Access denied.
+        /// </summary>
+        public static string AccessDenied {
+            get {
+                return ResourceManager.GetString("AccessDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An authentication error occurred.
         /// </summary>
         public static string AuthNError {
@@ -120,6 +129,15 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         public static string ComputerNotFoundInDirectory {
             get {
                 return ResourceManager.GetString("ComputerNotFoundInDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You do not have access to use this application. The logon attempt was denied by the authentication provider.
+        /// </summary>
+        public static string ExternalAuthNAccessDenied {
+            get {
+                return ResourceManager.GetString("ExternalAuthNAccessDenied", resourceCulture);
             }
         }
         

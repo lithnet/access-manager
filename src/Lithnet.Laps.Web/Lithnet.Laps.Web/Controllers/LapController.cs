@@ -22,19 +22,16 @@ namespace Lithnet.Laps.Web.Controllers
         private readonly IDirectory directory;
         private readonly IReporting reporting;
         private readonly IRateLimiter rateLimiter;
-        private readonly IAuthenticationService authenticationService;
         private readonly IUserInterfaceSettings userInterfaceSettings;
 
         public LapController(IAuthorizationService authorizationService, ILogger logger, IDirectory directory,
-            IReporting reporting, IRateLimiter rateLimiter,
-            IAuthenticationService authenticationService, IUserInterfaceSettings userInterfaceSettings)
+            IReporting reporting, IRateLimiter rateLimiter, IUserInterfaceSettings userInterfaceSettings)
         {
             this.authorizationService = authorizationService;
             this.logger = logger;
             this.directory = directory;
             this.reporting = reporting;
             this.rateLimiter = rateLimiter;
-            this.authenticationService = authenticationService;
             this.userInterfaceSettings = userInterfaceSettings;
         }
 
@@ -72,7 +69,7 @@ namespace Lithnet.Laps.Web.Controllers
 
                 try
                 {
-                    user = this.authenticationService.GetLoggedInUser(this.directory) ?? throw new NotFoundException();
+                    user = this.HttpContext.GetLoggedInUser(this.directory) ?? throw new NotFoundException();
                 }
                 catch (NotFoundException ex)
                 {
@@ -156,23 +153,13 @@ namespace Lithnet.Laps.Web.Controllers
 
         private ViewResult LogAndResponseToAuthZFailure(LapRequestModel model, AuthorizationResponse authorizationResponse, IUser user, IComputer computer)
         {
-            int eventID;
-
-            switch (authorizationResponse.Code)
+            var eventID = authorizationResponse.Code switch
             {
-                case AuthorizationResponseCode.NoMatchingRuleForComputer:
-                    eventID = EventIDs.AuthZFailedNoTargetMatch;
-                    break;
-                case AuthorizationResponseCode.NoMatchingRuleForUser:
-                    eventID = EventIDs.AuthZFailedNoReaderPrincipalMatch;
-                    break;
-                case AuthorizationResponseCode.ExplicitlyDenied:
-                    eventID = EventIDs.AuthZExplicitlyDenied;
-                    break;
-                default:
-                    eventID = EventIDs.AuthZFailed;
-                    break;
-            }
+                AuthorizationResponseCode.NoMatchingRuleForComputer => EventIDs.AuthZFailedNoTargetMatch,
+                AuthorizationResponseCode.NoMatchingRuleForUser => EventIDs.AuthZFailedNoReaderPrincipalMatch,
+                AuthorizationResponseCode.ExplicitlyDenied => EventIDs.AuthZExplicitlyDenied,
+                _ => EventIDs.AuthZFailed,
+            };
 
             return this.AuditAndReturnErrorResponse(model: model, userMessage: UIMessages.NotAuthorized, eventID: eventID, logMessage: string.Format(LogMessages.AuthorizationFailed, user.SamAccountName, model.ComputerName), user: user, computer: computer, authorizationResponse: authorizationResponse);
         }

@@ -89,11 +89,38 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The external authentication provider denied the logon request.
+        /// </summary>
+        internal static string AuthNAccessDenied {
+            get {
+                return ResourceManager.GetString("AuthNAccessDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred looking up the claim value in the directory {0}:{1}.
+        /// </summary>
+        internal static string AuthNDirectoryLookupError {
+            get {
+                return ResourceManager.GetString("AuthNDirectoryLookupError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The authentication provider returned an error.
         /// </summary>
         internal static string AuthNProviderError {
             get {
                 return ResourceManager.GetString("AuthNProviderError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There was an exception processing the response from the external identity provider.
+        /// </summary>
+        internal static string AuthNResponseProcessingError {
+            get {
+                return ResourceManager.GetString("AuthNResponseProcessingError", resourceCulture);
             }
         }
         

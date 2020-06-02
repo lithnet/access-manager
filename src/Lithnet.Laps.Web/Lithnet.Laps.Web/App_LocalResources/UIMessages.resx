@@ -183,4 +183,10 @@
   <data name="Logout" xml:space="preserve">
     <value>Logout</value>
   </data>
+  <data name="AccessDenied" xml:space="preserve">
+    <value>Access denied</value>
+  </data>
+  <data name="ExternalAuthNAccessDenied" xml:space="preserve">
+    <value>You do not have access to use this application. The logon attempt was denied by the authentication provider</value>
+  </data>
 </root>

@@ -6,7 +6,7 @@
 
         string ClientID { get; }
 
-        string PostLogourRedirectUri { get; }
+        string PostLogoutRedirectUri { get; }
 
         string RedirectUri { get; }
 

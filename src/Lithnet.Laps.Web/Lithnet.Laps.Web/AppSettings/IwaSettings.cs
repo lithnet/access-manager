@@ -15,5 +15,9 @@ namespace Lithnet.Laps.Web.AppSettings
         public string UniqueClaimTypeIdentifier => this.configuration["authentication:iwa:unique-claim-type-identifier"] ?? ClaimTypes.PrimarySid;
 
         public string ClaimName => ClaimTypes.PrimarySid;
+
+        public bool CanLogout => false;
+
+        public bool IdpLogout => false;
     }
 }

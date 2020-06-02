@@ -6,16 +6,41 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
+using Lithnet.Laps.Web.ActiveDirectory;
+using Lithnet.Laps.Web.App_LocalResources;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Linq;
 
 namespace Lithnet.Laps.Web.Internal
 {
     internal static class Extensions
     {
+        public static string GetLoggedInUserSid(this HttpContext httpContext)
+        {
+            if (httpContext?.User == null)
+            {
+                return null;
+            }
+
+            ClaimsPrincipal principal = httpContext.User;
+
+            return principal.FindFirst(ClaimTypes.PrimarySid)?.Value ??
+                throw new NotFoundException(string.Format(LogMessages.UserNotFoundInDirectory, httpContext.User.Identity.Name));
+        }
+
+        public static IUser GetLoggedInUser(this HttpContext httpContext, IDirectory directory)
+        {
+            string sid = httpContext.GetLoggedInUserSid();
+
+            return directory.GetUser(sid) ??
+                throw new NotFoundException(string.Format(LogMessages.UserNotFoundInDirectory, httpContext.User.Identity.Name));
+        }
+
         public static void ForEach<T>(this IEnumerable<T> e, Action<T> action)
         {
-            foreach(T item in e)
+            foreach (T item in e)
             {
                 action(item);
             }
@@ -210,6 +235,33 @@ namespace Lithnet.Laps.Web.Internal
             {
                 c.Add(value);
             }
+        }
+
+        public static IWebHostBuilder UseHttpSysOrIISIntegration(this IWebHostBuilder builder)
+        {
+            if (builder.GetSetting("hosting:environment") != "iis")
+            {
+                builder.UseHttpSys(options =>
+                {
+                    if (builder.GetSetting("authentication:mode") == "iwa")
+                    {
+                        options.Authentication.Schemes = AuthenticationSchemes.NTLM | AuthenticationSchemes.Negotiate;
+                        options.Authentication.AllowAnonymous = false;
+                    }
+                    else
+                    {
+                        options.Authentication.AllowAnonymous = true;
+                        options.Authentication.Schemes = AuthenticationSchemes.None;
+                    }
+
+                    options.MaxConnections = 100;
+                    options.MaxRequestBodySize = 2048000;
+                    //options.UrlPrefixes.Add("http://localhost:5000");
+                    //options.UrlPrefixes.Add("https://localhost:5001");
+                });
+            }
+
+            return builder;
         }
     }
 }

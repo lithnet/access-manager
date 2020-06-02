@@ -20,15 +20,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using NLog;
-using AuthenticationService = Lithnet.Laps.Web.Internal.AuthenticationService;
-using IAuthenticationService = Lithnet.Laps.Web.Internal.IAuthenticationService;
+using Microsoft.AspNetCore.Server.HttpSys;
 
 namespace Lithnet.Laps.Web
 {
     public class Startup
     {
-        public static bool CanLogout = false;
-
         private static IExternalAuthProviderSettings authProvider;
 
         private ILogger logger;
@@ -49,6 +46,7 @@ namespace Lithnet.Laps.Web
             services.AddControllersWithViews();
             services.AddHttpContextAccessor();
 
+
             services.TryAddTransient<ILogger>(_ => LogManager.GetCurrentClassLogger());
             services.TryAddScoped<IIwaSettings, IwaSettings>();
             services.TryAddScoped<IOidcSettings, OidcSettings>();
@@ -66,7 +64,6 @@ namespace Lithnet.Laps.Web
             services.TryAddScoped<JsonTargetAuthorizationService, JsonTargetAuthorizationService>();
             services.TryAddScoped<PowershellAuthorizationService, PowershellAuthorizationService>();
             services.TryAddScoped<IDirectory, ActiveDirectory.ActiveDirectory>();
-            services.TryAddScoped<IAuthenticationService, AuthenticationService>();
             services.TryAddScoped<IReporting, Reporting>();
             services.TryAddScoped<ITemplates, TemplatesFromFiles>();
             services.TryAddScoped<IRateLimiter, RateLimiter>();
@@ -111,23 +108,25 @@ namespace Lithnet.Laps.Web
         private void ConfigureAuthentication(IServiceCollection services)
         {
             var provider = services.BuildServiceProvider();
-
             var authSettings = provider.GetService<IAuthenticationSettings>();
 
             switch (authSettings.Mode)
             {
                 case "oidc":
                     authProvider = provider.GetService<IOidcSettings>();
+                    services.TryAddSingleton(authProvider);
                     this.ConfigureOpenIDConnect(services, (IOidcSettings)authProvider);
                     break;
 
                 case "wsfed":
                     authProvider = provider.GetService<IWsFedSettings>();
+                    services.TryAddSingleton(authProvider);
                     this.ConfigureWsFederation(services, (IWsFedSettings)authProvider);
                     break;
 
                 case "iwa":
                     authProvider = provider.GetService<IIwaSettings>();
+                    services.TryAddSingleton(authProvider);
                     this.ConfigureWindowsAuth(services, (IIwaSettings)authProvider);
                     break;
 
@@ -138,104 +137,65 @@ namespace Lithnet.Laps.Web
 
         private void ConfigureOpenIDConnect(IServiceCollection services, IOidcSettings oidcSettings)
         {
-            CanLogout = true;
-
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
-
             .AddOpenIdConnect("laps", options =>
             {
                 options.Authority = oidcSettings.Authority;
                 options.ClientId = oidcSettings.ClientID;
                 options.ClientSecret = oidcSettings.Secret;
-                options.SignedOutRedirectUri = oidcSettings.PostLogourRedirectUri;
-                options.CallbackPath = "/oidc";
+                options.CallbackPath = "/auth";
+                options.SignedOutCallbackPath = "/auth/logout";
+                options.SignedOutRedirectUri = "/Home/LoggedOut";
                 options.ResponseType = oidcSettings.ResponseType;
                 options.Scope.Clear();
                 options.Scope.Add("openid");
                 options.Scope.Add("profile");
-                options.AccessDeniedPath = new PathString("/Home/AuthNError");
                 options.SaveTokens = true;
                 options.GetClaimsFromUserInfoEndpoint = true;
                 options.UseTokenLifetime = true;
 
                 options.Events = new OpenIdConnectEvents()
                 {
-                    OnTokenValidated = FindClaimIdentityInDirectoryOrFail,
-                    OnAccessDenied = HandleAuthNFailed
+                    OnTokenValidated = FindClaimIdentityInDirectoryOrFail, 
+                    OnRemoteFailure = HandleRemoteFailure, 
+                    OnAccessDenied = HandleAuthNFailed, 
                 };
             })
             .AddCookie(options =>
             {
                 options.LoginPath = "/Home/Login";
-                options.LogoutPath = "/Home/SignOut";
-                //options.Cookie.SameSite = SameSiteMode.None;
-                // options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.LogoutPath = "/Home/Logout";
             });
-
-            //services.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
-            //{
-
-
-            //    Notifications = new OpenIdConnectAuthenticationNotifications
-            //    {
-            //        RedirectToIdentityProvider = n =>
-            //        {
-            //            // If signing out, add the id_token_hint
-            //            if (n.ProtocolMessage.RequestType == OpenIdConnectRequestType.Logout)
-            //            {
-            //                Claim idTokenClaim = n.OwinContext.Authentication.User.FindFirst("id_token");
-
-            //                if (idTokenClaim != null)
-            //                {
-            //                    n.ProtocolMessage.IdTokenHint = idTokenClaim.Value;
-            //                }
-            //            }
-
-            //            this.logger.Trace($"Redirecting to IdP for {n.ProtocolMessage.RequestType}");
-            //            return Task.CompletedTask;
-            //        },
-            //        AuthenticationFailed = this.HandleAuthNFailed
-            //    },
-            //});
         }
 
         private void ConfigureWindowsAuth(IServiceCollection services, IIwaSettings iwaSettings)
         {
-            CanLogout = false;
+            services.AddAuthentication(HttpSysDefaults.AuthenticationScheme);
         }
 
         private void ConfigureWsFederation(IServiceCollection services, IWsFedSettings wsfSettings)
         {
-            CanLogout = true;
-
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                options.CheckConsentNeeded = context => false;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
-
             services.AddAuthentication(options =>
             {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = WsFederationDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
-
             .AddWsFederation("laps", options =>
             {
-                options.CallbackPath = "/callback";
+                options.CallbackPath = "/auth";
                 options.MetadataAddress = wsfSettings.Metadata;
-                options.SignOutWreply = wsfSettings.SignOutWReply;
                 options.Wtrealm = wsfSettings.Realm;
-                options.AccessDeniedPath = "/Home/AuthNError";
                 options.Events = new WsFederationEvents()
                 {
                     OnSecurityTokenValidated = FindClaimIdentityInDirectoryOrFail,
-                    OnAccessDenied = HandleAuthNFailed
+                    OnAccessDenied = HandleAuthNFailed, 
+                    OnRemoteFailure = HandleRemoteFailure 
                 };
             })
             .AddCookie(options =>
@@ -249,34 +209,50 @@ namespace Lithnet.Laps.Web
 
         private Task HandleAuthNFailed(AccessDeniedContext context)
         {
-            this.reporting.LogErrorEvent(EventIDs.OwinAuthNError, LogMessages.AuthNProviderError, context.Result.Failure);
+            this.reporting.LogErrorEvent(EventIDs.ExternalAuthNAccessDenied, LogMessages.AuthNAccessDenied, context.Result?.Failure);
             context.HandleResponse();
-            context.Response.Redirect($"/Home/AuthNError?message={WebUtility.UrlEncode(context.Result.Failure?.Message ?? "Unknown error")}");
+            context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.ExternalAuthNProviderDenied}");
+            
+            return Task.CompletedTask;
+        }
+
+
+        private Task HandleRemoteFailure(RemoteFailureContext context)
+        {
+            this.reporting.LogErrorEvent(EventIDs.ExternalAuthNProviderError, LogMessages.AuthNProviderError, context.Failure);
+            context.HandleResponse();
+            context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.ExternalAuthNProviderError}");
 
             return Task.CompletedTask;
         }
 
         private Task FindClaimIdentityInDirectoryOrFail<T>(RemoteAuthenticationContext<T> context) where T : AuthenticationSchemeOptions
         {
-            ClaimsIdentity user = context.Principal.Identity as ClaimsIdentity;
-
-            string sid = this.FindUserByClaim(user, authProvider.ClaimName)?.Sid?.Value;
-
-            if (sid == null)
+            try
             {
-                string message = string.Format(LogMessages.UserNotFoundInDirectory, user.ToClaimList());
-                this.reporting.LogErrorEvent(EventIDs.SsoIdentityNotFound, message, null);
+                ClaimsIdentity user = context.Principal.Identity as ClaimsIdentity;
+                string sid = this.FindUserByClaim(user, authProvider.ClaimName)?.Sid?.Value;
 
-                context.HandleResponse();
-                context.Response.Redirect($"/Home/AuthNError?message={WebUtility.UrlEncode(UIMessages.SsoIdentityNotFound)}");
+                if (sid == null)
+                {
+                    string message = string.Format(LogMessages.UserNotFoundInDirectory, user.ToClaimList());
+                    this.reporting.LogErrorEvent(EventIDs.SsoIdentityNotFound, message, null);
+                    context.HandleResponse();
+                    context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.SsoIdentityNotFound}");
+                    return Task.CompletedTask;
+                }
+
+                user.AddClaim(new Claim(ClaimTypes.PrimarySid, sid));
+                this.reporting.LogSuccessEvent(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, user.ToClaimList()));
                 return Task.CompletedTask;
             }
-
-            user.AddClaim(new Claim(ClaimTypes.PrimarySid, sid));
-
-            this.reporting.LogSuccessEvent(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, user.ToClaimList()));
-
-            return Task.CompletedTask;
+            catch (Exception ex)
+            {
+                this.reporting.LogErrorEvent(EventIDs.AuthNResponseProcessingError, LogMessages.AuthNResponseProcessingError, ex);
+                context.HandleResponse();
+                context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.SsoIdentityNotFound}");
+                return Task.CompletedTask;
+            }
         }
 
         private IUser FindUserByClaim(ClaimsIdentity p, string claimName)
@@ -285,7 +261,16 @@ namespace Lithnet.Laps.Web
 
             if (c != null)
             {
-                return this.directory.GetUser(c.Value);
+                this.logger.Trace($"Attempting to find a match in the directory for externally provided claim {c.Type}:{c.Value}");
+
+                try
+                {
+                    return this.directory.GetUser(c.Value);
+                }
+                catch (Exception ex)
+                {
+                    this.reporting.LogErrorEvent(EventIDs.AuthNDirectoryLookupError, string.Format(LogMessages.AuthNDirectoryLookupError, c.Type, c.Value), ex);
+                }
             }
 
             return null;

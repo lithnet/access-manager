@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Claims;
+using Lithnet.Laps.Web.Internal;
 using Microsoft.Extensions.Configuration;
 
 namespace Lithnet.Laps.Web.AppSettings
@@ -21,12 +22,10 @@ namespace Lithnet.Laps.Web.AppSettings
 
         public string UniqueClaimTypeIdentifier => this.configuration["authentication:oidc:unique-claim-type-identifier"] ?? ClaimTypes.PrimarySid;
 
-        public string SignOutWReply
-        {
-            get
-            {
-                return this.configuration["authentication:wsfed:signout-wreply"] ?? new Uri(new Uri(this.configuration["authentication:wsfed:realm"]?.Trim('/', '\\')), "Home/LogOut").ToString();
-            }
-        }
+        public string SignOutWReply => this.configuration["authentication:wsfed:signout-wreply"] ?? "/Home/LogOut";
+
+        public bool CanLogout => true;
+
+        public bool IdpLogout => this.configuration.GetValueOrDefault("authentication:wsfed:idp-logout", false);
     }
 }
