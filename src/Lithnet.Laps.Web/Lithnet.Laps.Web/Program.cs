@@ -38,9 +38,9 @@ namespace Lithnet.Laps.Web
                      webBuilder.UseConfiguration(config);
                      webBuilder.UseHttpSysOrIISIntegration();
                  })
-                 .UseNLog();
+                 .UseNLog()
+                 .UseWindowsService();
 
-            
             return host;
         }
     }

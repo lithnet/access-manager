@@ -256,8 +256,8 @@ namespace Lithnet.Laps.Web.Internal
 
                     options.MaxConnections = 100;
                     options.MaxRequestBodySize = 2048000;
-                    //options.UrlPrefixes.Add("http://localhost:5000");
-                    //options.UrlPrefixes.Add("https://localhost:5001");
+                    options.UrlPrefixes.Add("http://localhost:5000");
+                    options.UrlPrefixes.Add("https://localhost:5001");
                 });
             }
 

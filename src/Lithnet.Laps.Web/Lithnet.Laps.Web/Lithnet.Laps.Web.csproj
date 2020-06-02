@@ -13,11 +13,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="app_data\AuthZSample.ps1" />
-    <Content Include="app_data\Templates\EmailAuditFailure.html" />
-    <Content Include="app_data\Templates\EmailAuditSuccess.html" />
-    <Content Include="app_data\Templates\LogAuditFailure.txt" />
-    <Content Include="app_data\Templates\LogAuditSuccess.txt" />
+    <Content Include="app_data\AuthZSample.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="app_data\Templates\EmailAuditFailure.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="app_data\Templates\EmailAuditSuccess.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="app_data\Templates\LogAuditFailure.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="app_data\Templates\LogAuditSuccess.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -25,6 +35,7 @@
     <PackageReference Include="microsoft.aspnetcore.authentication.jwtbearer" Version="3.1.4" />
     <PackageReference Include="microsoft.aspnetcore.authentication.openidconnect" Version="3.1.4" />
     <PackageReference Include="microsoft.aspnetcore.authentication.WsFederation" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.4" />
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.0.1" />
     <PackageReference Include="nlog" Version="4.7.2" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.9.2" />
