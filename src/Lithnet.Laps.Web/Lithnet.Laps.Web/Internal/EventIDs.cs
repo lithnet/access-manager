@@ -25,6 +25,7 @@
         public const int AuditErrorCannotSendSuccessEmail = 601;
         public const int AuditErrorCannotSendFailureEmail = 602;
         public const int ErrorLoadingTemplateResource = 603;
+        public const int NotificationChannelError = 604;
 
         public const int OidcAuthZCodeError = 700;
         public const int ExternalAuthNProviderError = 701;

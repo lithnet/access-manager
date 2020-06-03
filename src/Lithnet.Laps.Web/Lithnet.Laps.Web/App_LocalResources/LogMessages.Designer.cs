@@ -234,6 +234,15 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The notification channel &apos;{0}&apos; failed to process the audit message.
+        /// </summary>
+        internal static string NotificationChannelError {
+            get {
+                return ResourceManager.GetString("NotificationChannelError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The user {0} on IP {1} has exceeded the maximum allowed number of requests per IP ({2} per {3} seconds).
         /// </summary>
         internal static string RateLimitExceededIP {
@@ -248,6 +257,15 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         internal static string RateLimitExceededUser {
             get {
                 return ResourceManager.GetString("RateLimitExceededUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user {0} did not fill out the mandatory request reason field.
+        /// </summary>
+        internal static string ReasonRequired {
+            get {
+                return ResourceManager.GetString("ReasonRequired", resourceCulture);
             }
         }
         

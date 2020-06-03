@@ -6,12 +6,15 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Markup;
 using Lithnet.Laps.Web.ActiveDirectory;
 using Lithnet.Laps.Web.App_LocalResources;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.Configuration;
+using Microsoft.PowerShell.Commands;
 
 namespace Lithnet.Laps.Web.Internal
 {
@@ -46,13 +49,48 @@ namespace Lithnet.Laps.Web.Internal
             }
         }
 
+        public static IEnumerable<string> GetValuesOrDefault(this IConfiguration config, string key, params string[] defaultValues)
+        {
+            string value = config[key];
+
+            if (value == null)
+            {
+                var values = config.GetSection(key)?.GetChildren()?.ToList();
+                if (values != null && values.Count > 0)
+                {
+                    foreach (var item in values)
+                    {
+                        yield return item.Value;
+                    }
+
+                    yield break;
+                }
+            }
+
+            foreach (string dv in defaultValues ?? new string[] { })
+            {
+                yield return dv;
+            }
+        }
+
         public static TEnum GetValueOrDefault<TEnum>(this IConfiguration config, string key, TEnum defaultValue) where TEnum : struct, Enum
         {
             string value = config[key];
 
-            if (Enum.TryParse(value, true, out TEnum result))
+            if (value == null)
             {
-                return result;
+                var values = config.GetSection(key)?.GetChildren();
+                value = string.Join(',', values.Select(t => t.Value));
+            }
+
+            if (Enum.TryParse(typeof(TEnum), value, true, out object result))
+            {
+                if (result == null)
+                {
+                    return defaultValue;
+                }
+
+                return (TEnum)result;
             }
 
             return defaultValue;
@@ -237,15 +275,15 @@ namespace Lithnet.Laps.Web.Internal
             }
         }
 
-        public static IWebHostBuilder UseHttpSysOrIISIntegration(this IWebHostBuilder builder)
+        public static IWebHostBuilder UseHttpSys(this IWebHostBuilder builder, IConfiguration config)
         {
-            if (builder.GetSetting("hosting:environment") != "iis")
+            if (config["hosting:environment"] != "iis")
             {
                 builder.UseHttpSys(options =>
                 {
-                    if (builder.GetSetting("authentication:mode") == "iwa")
+                    if (config["authentication:mode"] == "iwa")
                     {
-                        options.Authentication.Schemes = AuthenticationSchemes.NTLM | AuthenticationSchemes.Negotiate;
+                        options.Authentication.Schemes = config.GetValueOrDefault("authentication:iwa:authentication-schemes", AuthenticationSchemes.Negotiate);
                         options.Authentication.AllowAnonymous = false;
                     }
                     else
@@ -254,10 +292,17 @@ namespace Lithnet.Laps.Web.Internal
                         options.Authentication.Schemes = AuthenticationSchemes.None;
                     }
 
+                    options.ClientCertificateMethod = ClientCertificateMethod.AllowRenegotation;
+                    options.EnableResponseCaching = false;
+                    options.Http503Verbosity = Http503VerbosityLevel.Limited;
                     options.MaxConnections = 100;
-                    options.MaxRequestBodySize = 2048000;
-                    options.UrlPrefixes.Add("http://localhost:5000");
-                    options.UrlPrefixes.Add("https://localhost:5001");
+                    options.MaxRequestBodySize = 2_048_000;
+                    options.MaxAccepts = 0;
+                    
+                    foreach (string url in config.GetValuesOrDefault("hosting:httpsys:urls"))
+                    {
+                        options.UrlPrefixes.Add(url);
+                    }
                 });
             }
 

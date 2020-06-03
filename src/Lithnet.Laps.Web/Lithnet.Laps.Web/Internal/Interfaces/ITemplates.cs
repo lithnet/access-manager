@@ -9,5 +9,9 @@
         string EmailSuccessTemplate { get; }
 
         string EmailFailureTemplate { get; }
+
+        string SlackSuccessTemplate { get; }
+
+        string SlackFailureTemplate { get; }
     }
 }

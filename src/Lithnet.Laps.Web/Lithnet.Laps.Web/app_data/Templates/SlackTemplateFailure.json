@@ -1,0 +1,41 @@
+
+{
+  "blocks": [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": ":heavy_multiplication_x:\n*Access to a LAPS password was denied*"
+      }
+    },
+    {
+      "type": "section",
+      "fields": [
+        {
+          "type": "mrkdwn",
+          "text": "*Name:*\n{user.DisplayName}"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*User name:*\n{user.SamAccountName}"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Computer:*\n{computer.SamAccountName}"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Matched rule:*\n{authzresult.MatchedRuleDescription}"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Matched principal:*\n{authzresult.MatchedAcePrincipal}"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Request reason:*\n{requestedReason}"
+        }
+      ]
+    }
+  ]
+}

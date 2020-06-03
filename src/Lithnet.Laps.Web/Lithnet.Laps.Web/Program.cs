@@ -36,7 +36,7 @@ namespace Lithnet.Laps.Web
                  {
                      webBuilder.UseStartup<Startup>();
                      webBuilder.UseConfiguration(config);
-                     webBuilder.UseHttpSysOrIISIntegration();
+                     webBuilder.UseHttpSys(config);
                  })
                  .UseNLog()
                  .UseWindowsService();

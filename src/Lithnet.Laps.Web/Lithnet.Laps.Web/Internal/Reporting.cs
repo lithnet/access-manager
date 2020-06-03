@@ -4,132 +4,123 @@ using System.Collections.Immutable;
 using System.Globalization;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.AppSettings;
-using Lithnet.Laps.Web.ActiveDirectory;
-using Lithnet.Laps.Web.Authorization;
-using Lithnet.Laps.Web.Models;
 using NLog;
 using Microsoft.AspNetCore.Http;
 using System.Net;
+using System.Threading.Tasks.Dataflow;
+using System.Diagnostics;
 
 namespace Lithnet.Laps.Web.Internal
 {
     public sealed class Reporting : IReporting
     {
         private readonly ILogger logger;
-        private readonly IMailer mailer;
         private readonly ITemplates templates;
-        private readonly GlobalAuditSettings globalAuditSettings;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IEnumerable<INotificationChannel> notificationChannels;
 
-        public Reporting(ILogger logger, IMailer mailer, ITemplates templates, GlobalAuditSettings globalAuditSettings, IHttpContextAccessor httpContextAccessor)
+        public Reporting(ILogger logger, ITemplates templates, IEnumerable<INotificationChannel> notificationChannels, IHttpContextAccessor httpContextAccessor)
         {
             this.logger = logger;
-            this.mailer = mailer;
             this.templates = templates;
-            this.globalAuditSettings = globalAuditSettings;
             this.httpContextAccessor = httpContextAccessor;
+            this.notificationChannels = notificationChannels;
         }
 
-        public void LogErrorEvent(int eventID, string logMessage, Exception ex)
+        public void LogEventError(int eventId, string logMessage)
         {
-            LogEventInfo logEvent = new LogEventInfo(LogLevel.Error, this.logger.Name, logMessage);
-            logEvent.Properties.Add("EventID", eventID);
+            this.LogEventError(eventId, logMessage, null);
+        }
+
+        public void LogEventError(int eventId, string message, Exception ex)
+        {
+            this.LogEvent(eventId, LogLevel.Error, message, ex);
+        }
+
+        public void LogEventSuccess(int eventId, string message)
+        {
+            this.LogEvent(eventId, LogLevel.Info, message, null);
+        }
+
+        public void LogEvent(int eventId, LogLevel logLevel, string message, Exception ex)
+        {
+            LogEventInfo logEvent = new LogEventInfo(logLevel, this.logger.Name, message);
+            logEvent.Properties.Add("EventID", eventId);
             logEvent.Exception = ex;
-
-            this.logger.Log(logEvent);
-        }
-
-        public void LogSuccessEvent(int eventID, string logMessage)
-        {
-            LogEventInfo logEvent = new LogEventInfo(LogLevel.Error, this.logger.Name, logMessage);
-            logEvent.Properties.Add("EventID", eventID);
 
             this.logger.Info(logEvent);
         }
 
-        public void PerformAuditSuccessActions(LapRequestModel model, AuthorizationResponse authorizationResponse, IUser user, IComputer computer, PasswordData passwordData)
+        public void GenerateAuditEvent(AuditableAction action)
         {
-            Dictionary<string, string> tokens = this.BuildTokenDictionary(authorizationResponse, user, computer, passwordData, model.ComputerName, null, model.UserRequestReason);
-            string logSuccessMessage = this.templates.LogSuccessTemplate ?? LogMessages.DefaultAuditSuccessText;
-            string emailSuccessMessage = this.templates.EmailSuccessTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditSuccessText}</pre></body></html>";
+            Dictionary<string, string> tokens = this.BuildTokenDictionary(action);
 
-            LogEventInfo logEvent = new LogEventInfo(LogLevel.Info, this.logger.Name, this.ReplaceTokens(tokens, logSuccessMessage, false));
-            logEvent.Properties.Add("EventID", EventIDs.PasswordAccessed);
-            this.logger.Log(logEvent);
+            this.GenerateAuditEventLog(action, tokens);
 
-            try
+            foreach (INotificationChannel channel in this.notificationChannels)
             {
-                IImmutableSet<string> recipients = this.BuildRecipientList(authorizationResponse, true, user);
-
-                if (recipients.Count > 0)
+                try
                 {
-                    string subject = this.ReplaceTokens(tokens, LogMessages.AuditEmailSubjectSuccess, false);
-                    this.mailer.SendEmail(recipients, subject, this.ReplaceTokens(tokens, emailSuccessMessage, true));
+                    channel.ProcessNotification(action, tokens);
                 }
-            }
-            catch (Exception iex)
-            {
-                this.LogErrorEvent(EventIDs.AuditErrorCannotSendSuccessEmail, "An error occurred sending the success audit email", iex);
+                catch (Exception ex)
+                {
+                    this.LogEventError(EventIDs.NotificationChannelError, string.Format(LogMessages.NotificationChannelError, channel.Name), ex);
+                }
             }
         }
 
-        public void PerformAuditFailureActions(LapRequestModel model, string userMessage, int eventID, string logMessage, Exception ex, AuthorizationResponse authorizationResponse, IUser user, IComputer computer)
+        private void GenerateAuditEventLog(AuditableAction action, Dictionary<string, string> tokens)
         {
-            Dictionary<string, string> tokens = this.BuildTokenDictionary(authorizationResponse, user, computer, null, model.ComputerName, logMessage ?? userMessage, model.UserRequestReason);
-            string logFailureMessage = this.templates.LogFailureTemplate ?? LogMessages.DefaultAuditFailureText;
-            string emailFailureMessage = this.templates.EmailFailureTemplate ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditFailureText}</pre></body></html>";
+            string message;
 
-            this.LogErrorEvent(eventID, this.ReplaceTokens(tokens, logFailureMessage, false), ex);
-
-            try
+            if (action.IsSuccess)
             {
-                IImmutableSet<string> recipients = this.BuildRecipientList(authorizationResponse, false);
-
-                if (recipients.Count > 0)
-                {
-                    string subject = this.ReplaceTokens(tokens, LogMessages.AuditEmailSubjectFailure, false);
-                    this.mailer.SendEmail(recipients, subject, this.ReplaceTokens(tokens, emailFailureMessage, true));
-                }
+                message = this.templates.LogSuccessTemplate ?? LogMessages.DefaultAuditSuccessText;
             }
-            catch (Exception iex)
+            else
             {
-                this.LogErrorEvent(EventIDs.AuditErrorCannotSendFailureEmail, "An error occurred sending the failure audit email", iex);
+                message = this.templates.LogFailureTemplate ?? LogMessages.DefaultAuditFailureText;
             }
+
+            message = this.ReplaceTokens(tokens, message, false);
+
+            this.LogEvent(action.EventID, action.IsSuccess ? LogLevel.Info : LogLevel.Error, message, null);
         }
 
-        private Dictionary<string, string> BuildTokenDictionary(AuthorizationResponse authorizationResponse = null, IUser user = null, IComputer computer = null, PasswordData passwordData = null, string requestedComputerName = null, string detailMessage = null, string requestedReason = null)
+        private Dictionary<string, string> BuildTokenDictionary(AuditableAction action)
         {
             Dictionary<string, string> pairs = new Dictionary<string, string> {
-                { "{user.SamAccountName}", user?.SamAccountName},
-                { "{user.DisplayName}", user?.DisplayName},
-                { "{user.UserPrincipalName}", user?.UserPrincipalName},
-                { "{user.Sid}", user?.Sid?.ToString()},
-                { "{user.DistinguishedName}", user?.DistinguishedName},
-                { "{user.Description}", user?.Description},
-                { "{user.EmailAddress}", user?.EmailAddress},
-                { "{user.Guid}", user?.Guid?.ToString()},
-                { "{user.GivenName}", user?.GivenName},
-                { "{user.Surname}", user?.Surname},
-                { "{computer.SamAccountName}", computer?.SamAccountName},
-                { "{computer.DistinguishedName}", computer?.DistinguishedName},
-                { "{computer.Description}", computer?.Description},
-                { "{computer.DisplayName}", computer?.DisplayName},
-                { "{computer.Guid}", computer?.Guid?.ToString()},
-                { "{computer.Sid}", computer?.Sid?.ToString()},
-                { "{requestedComputerName}", requestedComputerName},
-                { "{requestedReason}", requestedReason},
-                { "{authzresult.MatchedAcePrincipal}", authorizationResponse?.MatchedAcePrincipal},
-                { "{authzresult.NotificationRecipients}", string.Join(",", authorizationResponse?.NotificationRecipients ?? new List<string>())},
-                { "{authzresult.MatchedRuleDescription}", authorizationResponse?.MatchedRuleDescription},
-                { "{authzresult.AdditionalInformation}", authorizationResponse?.AdditionalInformation},
-                { "{authzresult.ExpireAfter}", authorizationResponse?.ExpireAfter.ToString()},
-                { "{authzresult.ResponseCode}", authorizationResponse?.Code.ToString()},
-                { "{message}", detailMessage},
+                { "{user.SamAccountName}", action.User?.SamAccountName},
+                { "{user.DisplayName}", action.User?.DisplayName},
+                { "{user.UserPrincipalName}", action.User?.UserPrincipalName},
+                { "{user.Sid}", action.User?.Sid?.ToString()},
+                { "{user.DistinguishedName}", action.User?.DistinguishedName},
+                { "{user.Description}", action.User?.Description},
+                { "{user.EmailAddress}", action.User?.EmailAddress},
+                { "{user.Guid}", action.User?.Guid?.ToString()},
+                { "{user.GivenName}", action.User?.GivenName},
+                { "{user.Surname}", action.User?.Surname},
+                { "{computer.SamAccountName}", action.Computer?.SamAccountName},
+                { "{computer.DistinguishedName}", action.Computer?.DistinguishedName},
+                { "{computer.Description}", action.Computer?.Description},
+                { "{computer.DisplayName}", action.Computer?.DisplayName},
+                { "{computer.Guid}", action.Computer?.Guid?.ToString()},
+                { "{computer.Sid}", action.Computer?.Sid?.ToString()},
+                { "{requestedComputerName}", action.RequestModel?.ComputerName},
+                { "{requestedReason}", action.RequestModel?.UserRequestReason},
+                { "{authzresult.MatchedAcePrincipal}", action.AuthzResponse?.MatchedAcePrincipal},
+                { "{authzresult.NotificationRecipients}", string.Join(",", action.AuthzResponse?.NotificationRecipients ?? new List<string>())},
+                { "{authzresult.MatchedRuleDescription}", action.AuthzResponse?.MatchedRuleDescription},
+                { "{authzresult.AdditionalInformation}", action.AuthzResponse?.AdditionalInformation},
+                { "{authzresult.ExpireAfter}", action.AuthzResponse?.ExpireAfter.ToString()},
+                { "{authzresult.ResponseCode}", action.AuthzResponse?.Code.ToString()},
+                { "{message}", action.Message},
                 { "{request.IPAddress}", httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString()},
                 { "{request.Hostname}", this.TryResolveHostName(httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress)},
                 { "{datetime}", DateTime.Now.ToString(CultureInfo.CurrentCulture)},
                 { "{datetimeutc}", DateTime.UtcNow.ToString(CultureInfo.CurrentCulture)},
-                { "{computer.LapsExpiryDate}", passwordData?.ExpirationTime?.ToString(CultureInfo.CurrentCulture)},
+                { "{computer.LapsExpiryDate}", action.ComputerExpiryDate},
             };
 
             return pairs;
@@ -143,35 +134,6 @@ namespace Lithnet.Laps.Web.Internal
             }
 
             return text;
-        }
-
-        private IImmutableSet<string> BuildRecipientList(AuthorizationResponse authorizationResponse, bool success, IUser user = null)
-        {
-            HashSet<string> usersToNotify = new HashSet<string>();
-
-            if (authorizationResponse != null)
-            {
-                authorizationResponse.NotificationRecipients?.ForEach(t => usersToNotify.Add(t));
-            }
-
-            if (success)
-            {
-                this.globalAuditSettings.SuccessRecipients?.ForEach(t => usersToNotify.Add(t));
-            }
-            else
-            {
-                this.globalAuditSettings.FailureRecipients?.ForEach(t => usersToNotify.Add(t));
-            }
-
-            if (!string.IsNullOrWhiteSpace(user?.EmailAddress))
-            {
-                if (usersToNotify.Remove("{user.EmailAddress}"))
-                {
-                    usersToNotify.Add(user.EmailAddress);
-                }
-            }
-
-            return usersToNotify.ToImmutableHashSet();
         }
 
         private string TryResolveHostName(IPAddress address)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Lithnet.Laps.Web.App_LocalResources;
 using Microsoft.AspNetCore.Hosting;
 using NLog;
 
@@ -15,6 +16,10 @@ namespace Lithnet.Laps.Web.Internal
 
         private static string emailFailureTemplate = null;
 
+        private static string slackFailureTemplate = null;
+
+        private static string slackSuccessTemplate = null;
+
         public string LogSuccessTemplate => TemplatesFromFiles.logSuccessTemplate;
 
         public string LogFailureTemplate => TemplatesFromFiles.logFailureTemplate;
@@ -22,6 +27,10 @@ namespace Lithnet.Laps.Web.Internal
         public string EmailSuccessTemplate => TemplatesFromFiles.emailSuccessTemplate;
 
         public string EmailFailureTemplate => TemplatesFromFiles.emailFailureTemplate;
+
+        public string SlackSuccessTemplate => TemplatesFromFiles.slackSuccessTemplate;
+
+        public string SlackFailureTemplate => TemplatesFromFiles.slackFailureTemplate;
 
         private readonly ILogger logger;
 
@@ -47,14 +56,24 @@ namespace Lithnet.Laps.Web.Internal
                 TemplatesFromFiles.logFailureTemplate = this.LoadTemplate("LogAuditFailure.txt");
             }
 
+            if (slackSuccessTemplate == null)
+            {
+                slackSuccessTemplate = this.LoadTemplate("SlackTemplateSuccess.json");
+            }
+
+            if (slackFailureTemplate == null)
+            {
+                slackFailureTemplate = this.LoadTemplate("SlackTemplateFailure.json");
+            }
+
             if (TemplatesFromFiles.emailSuccessTemplate == null)
             {
-                TemplatesFromFiles.emailSuccessTemplate = this.LoadTemplate("EmailAuditSuccess.html");
+                TemplatesFromFiles.emailSuccessTemplate = this.LoadTemplate("EmailAuditSuccess.html") ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditSuccessText}</pre></body></html>";
             }
 
             if (TemplatesFromFiles.emailFailureTemplate == null)
             {
-                TemplatesFromFiles.emailFailureTemplate = this.LoadTemplate("EmailAuditFailure.html");
+                TemplatesFromFiles.emailFailureTemplate = this.LoadTemplate("EmailAuditFailure.html") ?? $"<html><head/><body><pre>{LogMessages.DefaultAuditFailureText}</pre></body></html>";
             }
         }
 

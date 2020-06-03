@@ -1,18 +1,14 @@
 ﻿using System;
-using Lithnet.Laps.Web.ActiveDirectory;
-using Lithnet.Laps.Web.Authorization;
-using Lithnet.Laps.Web.Models;
+using NLog;
 
 namespace Lithnet.Laps.Web.Internal
 {
     public interface IReporting
     {
-        void LogSuccessEvent(int eventID, string logMessage);
-
-        void LogErrorEvent(int eventID, string logMessage, Exception ex);
-
-        void PerformAuditSuccessActions(LapRequestModel model, AuthorizationResponse authorizationResponse, IUser user, IComputer computer, PasswordData passwordData);
-
-        void PerformAuditFailureActions(LapRequestModel model, string userMessage, int eventID, string logMessage, Exception ex, AuthorizationResponse authorizationResponse, IUser user, IComputer computer);
+        void GenerateAuditEvent(AuditableAction action);
+        void LogEvent(int eventId, LogLevel logLevel, string message, Exception ex);
+        void LogEventError(int eventId, string logMessage);
+        void LogEventError(int eventId, string message, Exception ex);
+        void LogEventSuccess(int eventId, string message);
     }
 }

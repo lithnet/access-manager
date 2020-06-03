@@ -10,6 +10,7 @@ using Lithnet.Laps.Web.Internal;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using IAuthorizationService = Lithnet.Laps.Web.Authorization.IAuthorizationService;
+using System.Globalization;
 
 namespace Lithnet.Laps.Web.Controllers
 {
@@ -64,7 +65,10 @@ namespace Lithnet.Laps.Web.Controllers
 
                 if (string.IsNullOrWhiteSpace(model.UserRequestReason) && this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required)
                 {
-                    return this.LogAndReturnErrorResponse(model, UIMessages.ReasonRequired, EventIDs.ReasonRequired);
+                    this.reporting.LogEventError(EventIDs.ReasonRequired, string.Format(LogMessages.ReasonRequired, user.SamAccountName));
+
+                    model.FailureReason = UIMessages.ReasonRequired;
+                    return this.View("Get", model);
                 }
 
                 try
@@ -73,7 +77,10 @@ namespace Lithnet.Laps.Web.Controllers
                 }
                 catch (NotFoundException ex)
                 {
-                    return this.LogAndReturnErrorResponse(model, UIMessages.SsoIdentityNotFound, EventIDs.SsoIdentityNotFound, null, ex);
+                    this.reporting.LogEventError(EventIDs.SsoIdentityNotFound, null, ex);
+
+                    model.FailureReason = UIMessages.SsoIdentityNotFound;
+                    return this.View("Get", model);
                 }
 
                 var rateLimitResult = this.rateLimiter.GetRateLimitResult(user.Sid.ToString(), this.Request);
@@ -84,7 +91,7 @@ namespace Lithnet.Laps.Web.Controllers
                     return this.View("RateLimitExceeded");
                 }
 
-                this.reporting.LogSuccessEvent(EventIDs.UserRequestedPassword, string.Format(LogMessages.UserHasRequestedPassword, user.SamAccountName, model.ComputerName));
+                this.reporting.LogEventSuccess(EventIDs.UserRequestedPassword, string.Format(LogMessages.UserHasRequestedPassword, user.SamAccountName, model.ComputerName));
 
                 IComputer computer;
 
@@ -94,11 +101,17 @@ namespace Lithnet.Laps.Web.Controllers
                 }
                 catch (AmbiguousNameException ex)
                 {
-                    return this.LogAndReturnErrorResponse(model, UIMessages.ComputerNameAmbiguous, EventIDs.ComputerNameAmbiguous, string.Format(LogMessages.ComputerNameAmbiguous, user.SamAccountName, model.ComputerName), ex);
+                    this.reporting.LogEventError(EventIDs.ComputerNameAmbiguous, string.Format(LogMessages.ComputerNameAmbiguous, user.SamAccountName, model.ComputerName), ex);
+
+                    model.FailureReason = UIMessages.ComputerNameAmbiguous;
+                    return this.View("Get", model);
                 }
                 catch (NotFoundException ex)
                 {
-                    return this.LogAndReturnErrorResponse(model, UIMessages.ComputerNotFoundInDirectory, EventIDs.ComputerNotFound, string.Format(LogMessages.ComputerNotFoundInDirectory, user.SamAccountName, model.ComputerName), ex);
+                    this.reporting.LogEventError(EventIDs.ComputerNotFound, string.Format(LogMessages.ComputerNotFoundInDirectory, user.SamAccountName, model.ComputerName), ex);
+
+                    model.FailureReason = UIMessages.ComputerNotFoundInDirectory;
+                    return this.View("Get", model);
                 }
 
                 // Do authorization check first.
@@ -107,7 +120,9 @@ namespace Lithnet.Laps.Web.Controllers
 
                 if (!authResponse.IsAuthorized())
                 {
-                    return this.LogAndResponseToAuthZFailure(model, authResponse, user, computer);
+                    this.AuditAuthZFailure(model, authResponse, user, computer);
+                    model.FailureReason = UIMessages.NotAuthorized;
+                    return this.View("Get", model);
                 }
 
                 // Do actual work only if authorized.
@@ -116,7 +131,10 @@ namespace Lithnet.Laps.Web.Controllers
 
                 if (passwordData == null)
                 {
-                    return this.LogAndReturnErrorResponse(model, UIMessages.NoLapsPassword, EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.SamAccountName, user.SamAccountName));
+                    this.reporting.LogEventError(EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.SamAccountName, user.SamAccountName));
+
+                    model.FailureReason = UIMessages.NoLapsPassword;
+                    return this.View("Get", model);
                 }
 
                 if (authResponse.ExpireAfter.Ticks > 0)
@@ -127,33 +145,64 @@ namespace Lithnet.Laps.Web.Controllers
                     passwordData = this.directory.GetPassword(computer);
                 }
 
-                this.reporting.PerformAuditSuccessActions(model, authResponse, user, computer, passwordData);
+                this.reporting.GenerateAuditEvent(new AuditableAction
+                {
+                    AuthzResponse = authResponse,
+                    RequestModel = model,
+                    IsSuccess = true,
+                    User = user,
+                    Computer = computer,
+                    EventID = EventIDs.PasswordAccessed,
+                    ComputerExpiryDate = passwordData.ExpirationTime?.ToString(CultureInfo.CurrentUICulture)
+                });
 
                 return this.View("Show", new LapEntryModel(computer, passwordData));
             }
             catch (Exception ex)
             {
-                return this.LogAndReturnErrorResponse(model, UIMessages.UnexpectedError, EventIDs.UnexpectedError, string.Format(LogMessages.UnhandledError, model.ComputerName, user?.SamAccountName ?? LogMessages.UnknownComputerPlaceholder), ex);
+                this.reporting.LogEventError(EventIDs.UnexpectedError, string.Format(LogMessages.UnhandledError, model.ComputerName, user?.SamAccountName ?? LogMessages.UnknownComputerPlaceholder), ex);
+
+                model.FailureReason = UIMessages.UnexpectedError;
+                return this.View("Get", model);
             }
         }
 
         private void LogRateLimitEvent(LapRequestModel model, IUser user, RateLimitResult rateLimitResult)
         {
+            AuditableAction action = new AuditableAction
+            {
+                User = user,
+                IsSuccess = false,
+                RequestModel = model,
+            };
+
             if (rateLimitResult.IsUserRateLimit)
             {
-                this.reporting.PerformAuditFailureActions(model, UIMessages.RateLimitError, EventIDs.RateLimitExceededUser,
-               string.Format(LogMessages.RateLimitExceededUser, user.SamAccountName, rateLimitResult.IPAddress, rateLimitResult.Threshold, rateLimitResult.Duration), null, null, user, null);
+                action.EventID = EventIDs.RateLimitExceededUser;
+                action.Message = string.Format(LogMessages.RateLimitExceededUser, user.SamAccountName, rateLimitResult.IPAddress, rateLimitResult.Threshold, rateLimitResult.Duration);
             }
             else
             {
-                this.reporting.PerformAuditFailureActions(model, UIMessages.RateLimitError, EventIDs.RateLimitExceededIP,
-           string.Format(LogMessages.RateLimitExceededIP, user.SamAccountName, rateLimitResult.IPAddress, rateLimitResult.Threshold, rateLimitResult.Duration), null, null, user, null);
+                action.EventID = EventIDs.RateLimitExceededIP;
+                action.Message = string.Format(LogMessages.RateLimitExceededIP, user.SamAccountName, rateLimitResult.IPAddress, rateLimitResult.Threshold, rateLimitResult.Duration);
             }
+
+            this.reporting.GenerateAuditEvent(action);
         }
 
-        private ViewResult LogAndResponseToAuthZFailure(LapRequestModel model, AuthorizationResponse authorizationResponse, IUser user, IComputer computer)
+        private void AuditAuthZFailure(LapRequestModel model, AuthorizationResponse authorizationResponse, IUser user, IComputer computer)
         {
-            var eventID = authorizationResponse.Code switch
+            AuditableAction action = new AuditableAction
+            {
+                AuthzResponse = authorizationResponse,
+                User = user,
+                Computer = computer,
+                IsSuccess = false,
+                RequestModel = model,
+                Message = string.Format(LogMessages.AuthorizationFailed, user.SamAccountName, model.ComputerName)
+            };
+
+            action.EventID = authorizationResponse.Code switch
             {
                 AuthorizationResponseCode.NoMatchingRuleForComputer => EventIDs.AuthZFailedNoTargetMatch,
                 AuthorizationResponseCode.NoMatchingRuleForUser => EventIDs.AuthZFailedNoReaderPrincipalMatch,
@@ -161,21 +210,7 @@ namespace Lithnet.Laps.Web.Controllers
                 _ => EventIDs.AuthZFailed,
             };
 
-            return this.AuditAndReturnErrorResponse(model: model, userMessage: UIMessages.NotAuthorized, eventID: eventID, logMessage: string.Format(LogMessages.AuthorizationFailed, user.SamAccountName, model.ComputerName), user: user, computer: computer, authorizationResponse: authorizationResponse);
-        }
-
-        private ViewResult AuditAndReturnErrorResponse(LapRequestModel model, string userMessage, int eventID, string logMessage = null, Exception ex = null, AuthorizationResponse authorizationResponse = null, IUser user = null, IComputer computer = null)
-        {
-            this.reporting.PerformAuditFailureActions(model, userMessage, eventID, logMessage, ex, authorizationResponse, user, computer);
-            model.FailureReason = userMessage;
-            return this.View("Get", model);
-        }
-
-        private ViewResult LogAndReturnErrorResponse(LapRequestModel model, string userMessage, int eventID, string logMessage = null, Exception ex = null)
-        {
-            this.reporting.LogErrorEvent(eventID, logMessage ?? userMessage, ex);
-            model.FailureReason = userMessage;
-            return this.View("Get", model);
+            this.reporting.GenerateAuditEvent(action);
         }
 
         [Localizable(false)]

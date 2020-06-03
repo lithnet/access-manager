@@ -66,11 +66,13 @@ namespace Lithnet.Laps.Web
             services.TryAddScoped<IReporting, Reporting>();
             services.TryAddScoped<ITemplates, TemplatesFromFiles>();
             services.TryAddScoped<IRateLimiter, RateLimiter>();
-            services.TryAddScoped<IMailer, SmtpMailer>();
+            
+            services.AddTransient<INotificationChannel, SmtpNotificationChannel>();
+            services.AddTransient<INotificationChannel, WebhookNotificationChannel>();
+
             services.TryAddScoped<IXffHandlerSettings, XffHandlerSettings>();
             this.ConfigureAuthentication(services);
             this.ConfigureXff(services);
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -234,7 +236,7 @@ namespace Lithnet.Laps.Web
 
         private Task HandleAuthNFailed(AccessDeniedContext context)
         {
-            this.reporting.LogErrorEvent(EventIDs.ExternalAuthNAccessDenied, LogMessages.AuthNAccessDenied, context.Result?.Failure);
+            this.reporting.LogEventError(EventIDs.ExternalAuthNAccessDenied, LogMessages.AuthNAccessDenied, context.Result?.Failure);
             context.HandleResponse();
             context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.ExternalAuthNProviderDenied}");
 
@@ -244,7 +246,7 @@ namespace Lithnet.Laps.Web
 
         private Task HandleRemoteFailure(RemoteFailureContext context)
         {
-            this.reporting.LogErrorEvent(EventIDs.ExternalAuthNProviderError, LogMessages.AuthNProviderError, context.Failure);
+            this.reporting.LogEventError(EventIDs.ExternalAuthNProviderError, LogMessages.AuthNProviderError, context.Failure);
             context.HandleResponse();
             context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.ExternalAuthNProviderError}");
 
@@ -261,19 +263,19 @@ namespace Lithnet.Laps.Web
                 if (sid == null)
                 {
                     string message = string.Format(LogMessages.UserNotFoundInDirectory, user.ToClaimList());
-                    this.reporting.LogErrorEvent(EventIDs.SsoIdentityNotFound, message, null);
+                    this.reporting.LogEventError(EventIDs.SsoIdentityNotFound, message, null);
                     context.HandleResponse();
                     context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.SsoIdentityNotFound}");
                     return Task.CompletedTask;
                 }
 
                 user.AddClaim(new Claim(ClaimTypes.PrimarySid, sid));
-                this.reporting.LogSuccessEvent(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, user.ToClaimList()));
+                this.reporting.LogEventSuccess(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, user.ToClaimList()));
                 return Task.CompletedTask;
             }
             catch (Exception ex)
             {
-                this.reporting.LogErrorEvent(EventIDs.AuthNResponseProcessingError, LogMessages.AuthNResponseProcessingError, ex);
+                this.reporting.LogEventError(EventIDs.AuthNResponseProcessingError, LogMessages.AuthNResponseProcessingError, ex);
                 context.HandleResponse();
                 context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.SsoIdentityNotFound}");
                 return Task.CompletedTask;
@@ -294,7 +296,7 @@ namespace Lithnet.Laps.Web
                 }
                 catch (Exception ex)
                 {
-                    this.reporting.LogErrorEvent(EventIDs.AuthNDirectoryLookupError, string.Format(LogMessages.AuthNDirectoryLookupError, c.Type, c.Value), ex);
+                    this.reporting.LogEventError(EventIDs.AuthNDirectoryLookupError, string.Format(LogMessages.AuthNDirectoryLookupError, c.Type, c.Value), ex);
                 }
             }
 

@@ -1,4 +1,6 @@
 ﻿using System.Security.Claims;
+using Lithnet.Laps.Web.Internal;
+using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.Configuration;
 
 namespace Lithnet.Laps.Web.AppSettings
@@ -19,5 +21,7 @@ namespace Lithnet.Laps.Web.AppSettings
         public bool CanLogout => false;
 
         public bool IdpLogout => false;
+
+        public AuthenticationSchemes AuthenticationSchemes => this.configuration.GetValueOrDefault("authentication:iwa:authentication-schemes", AuthenticationSchemes.Negotiate);
     }
 }

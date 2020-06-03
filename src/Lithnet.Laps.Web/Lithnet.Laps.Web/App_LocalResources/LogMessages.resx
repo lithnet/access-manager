@@ -210,4 +210,10 @@ Reader principal:			{reader.Principal}</value>
   <data name="AuthNAccessDenied" xml:space="preserve">
     <value>The external authentication provider denied the logon request</value>
   </data>
+  <data name="NotificationChannelError" xml:space="preserve">
+    <value>The notification channel '{0}' failed to process the audit message</value>
+  </data>
+  <data name="ReasonRequired" xml:space="preserve">
+    <value>The user {0} did not fill out the mandatory request reason field</value>
+  </data>
 </root>
