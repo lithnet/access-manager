@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.DirectoryServices;
+using System.IO;
 using System.Linq;
+using System.Management.Automation;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
@@ -20,6 +22,73 @@ namespace Lithnet.Laps.Web.Internal
 {
     internal static class Extensions
     {
+        public static string ResolvePath(this IWebHostEnvironment env, string path, params string[] searchSegments)
+        {
+            if (Path.IsPathFullyQualified(path))
+            {
+                return path;
+            }
+            else
+            {
+                string mappedpath = Path.Combine(env.ContentRootPath, $"{path}");
+
+                if (File.Exists(mappedpath))
+                {
+                    return mappedpath;
+                }
+
+                if (searchSegments != null)
+                {
+                    foreach (string segment in searchSegments)
+                    {
+
+                        mappedpath = Path.Combine(env.ContentRootPath, segment, $"{path}");
+
+                        if (File.Exists(mappedpath))
+                        {
+                            return mappedpath;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public static void ThrowOnPipelineError(this PowerShell powershell)
+        {
+            if (!powershell.HadErrors)
+            {
+                return;
+            }
+
+            StringBuilder b = new StringBuilder();
+
+            foreach (ErrorRecord error in powershell.Streams.Error)
+            {
+                if (error.ErrorDetails != null)
+                {
+                    b.AppendLine(error.ErrorDetails.Message);
+                    b.AppendLine(error.ErrorDetails.RecommendedAction);
+                }
+
+                b.AppendLine(error.ScriptStackTrace);
+
+                if (error.Exception != null)
+                {
+                    b.AppendLine(error.Exception.ToString());
+                }
+            }
+
+            throw new PowerShellScriptException("The PowerShell script encountered an error\n" + b.ToString());
+        }
+
+        public static void ResetState(this PowerShell powershell)
+        {
+            powershell.Streams.ClearStreams();
+            powershell.Commands.Clear();
+        }
+
         public static string GetLoggedInUserSid(this HttpContext httpContext)
         {
             if (httpContext?.User == null)

@@ -17,6 +17,7 @@
         public const int AuthZFailedNoTargetMatch = 501;
         public const int AuthZFailed = 504;
         public const int AuthZExplicitlyDenied = 505;
+        public const int AuthZFailedAuditError = 506;
 
         public const int RateLimitExceededIP = 502;
         public const int RateLimitExceededUser = 503;

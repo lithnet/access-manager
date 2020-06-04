@@ -47,9 +47,9 @@ namespace Lithnet.Laps.Web.Authorization
                         return new AuthorizationResponse()
                         {
                             MatchedRuleDescription = $"{j.Type}: {j.Name}",
-                            MatchedAcePrincipal = ace.Sid ?? ace.Name,
+                            MatchedPrincipal = ace.Sid ?? ace.Name,
                             Code = AuthorizationResponseCode.ExplicitlyDenied,
-                            NotificationRecipients = this.GetNotificationRecipients(j, ace, false),
+                            NotificationChannels = this.GetNotificationRecipients(j, ace, false),
                         };
                     }
                     else
@@ -72,9 +72,9 @@ namespace Lithnet.Laps.Web.Authorization
                         return new AuthorizationResponse()
                         {
                             MatchedRuleDescription = $"{j.Type}: {j.Name}",
-                            MatchedAcePrincipal = ace.Sid ?? ace.Name,
+                            MatchedPrincipal = ace.Sid ?? ace.Name,
                             Code = AuthorizationResponseCode.Success,
-                            NotificationRecipients = this.GetNotificationRecipients(j, ace, true),
+                            NotificationChannels = this.GetNotificationRecipients(j, ace, true),
                             ExpireAfter = j.ExpireAfter,
                         };
                     }
@@ -89,7 +89,7 @@ namespace Lithnet.Laps.Web.Authorization
             return new AuthorizationResponse()
             {
                 Code = AuthorizationResponseCode.NoMatchingRuleForUser,
-                NotificationRecipients = failureNotificationRecipients
+                NotificationChannels = failureNotificationRecipients
             };
         }
 

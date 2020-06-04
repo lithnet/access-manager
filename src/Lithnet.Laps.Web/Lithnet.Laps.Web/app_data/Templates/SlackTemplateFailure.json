@@ -25,15 +25,15 @@
         },
         {
           "type": "mrkdwn",
-          "text": "*Matched rule:*\n{authzresult.MatchedRuleDescription}"
+          "text": "*Matched rule:*\n{AuthzResult.MatchedRuleDescription}"
         },
         {
           "type": "mrkdwn",
-          "text": "*Matched principal:*\n{authzresult.MatchedAcePrincipal}"
+          "text": "*Matched principal:*\n{AuthzResult.MatchedPrincipal}"
         },
         {
           "type": "mrkdwn",
-          "text": "*Request reason:*\n{requestedReason}"
+          "text": "*Request reason:*\n{request.Reason}"
         }
       ]
     }

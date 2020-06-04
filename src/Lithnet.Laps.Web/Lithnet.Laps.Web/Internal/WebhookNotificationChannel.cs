@@ -1,55 +1,51 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Net;
+using System.Linq;
 using System.Net.Http;
-using System.Net.Mail;
 using System.Text;
-using Lithnet.Laps.Web.App_LocalResources;
+using System.Threading.Channels;
 using Lithnet.Laps.Web.AppSettings;
 using NLog;
 
 namespace Lithnet.Laps.Web.Internal
 {
-    public class WebhookNotificationChannel : INotificationChannel
+    public class WebhookNotificationChannel : NotificationChannel<IWebhookChannelSettings>
     {
-        private readonly ILogger logger;
+        private readonly IAuditSettings auditSettings;
 
-        private readonly ITemplates templates;
+        private readonly ITemplateProvider templates;
 
-        private readonly GlobalAuditSettings globalAuditSettings;
+        public override string Name => "webhook";
 
-        public string Name => "webhook";
-
-        public WebhookNotificationChannel(ILogger logger, ITemplates templates, GlobalAuditSettings globalAuditSettings)
+        public WebhookNotificationChannel(ILogger logger, IAuditSettings auditSettings, ITemplateProvider templates, ChannelWriter<Action> queue)
+            : base(logger, queue)
         {
-            this.logger = logger;
+            this.auditSettings = auditSettings;
             this.templates = templates;
-            this.globalAuditSettings = globalAuditSettings;
         }
 
-        public void ProcessNotification(AuditableAction action, Dictionary<string, string> tokens)
+        public override void ProcessNotification(AuditableAction action, Dictionary<string, string> tokens, IImmutableSet<string> notificationChannels)
+        {
+            this.ProcessNotification(action, tokens, notificationChannels, this.auditSettings.Channels.Webhooks);
+        }
+
+        protected override void Send(AuditableAction action, Dictionary<string, string> tokens, IWebhookChannelSettings settings)
         {
             HttpClient client = new HttpClient();
             HttpRequestMessage message = new HttpRequestMessage();
 
-            string content;
-
-            if (action.IsSuccess)
-            {
-                content = templates.SlackSuccessTemplate;
-            }
-            else
-            {
-                content = templates.SlackFailureTemplate;
-            }
+            string content = action.IsSuccess ? templates.GetTemplate(settings.TemplateSuccess) : templates.GetTemplate(settings.TemplateFailure);
 
             content = TokenReplacer.ReplaceAsJson(tokens, content);
 
-            message.Content = new StringContent(content, Encoding.UTF8, "application/json");
-            message.RequestUri = new Uri("");
-            message.Method = HttpMethod.Post;
-            client.SendAsync(message).GetAwaiter().GetResult();
+            message.Content = new StringContent(content, Encoding.UTF8, settings.ContentType);
+            message.RequestUri = new Uri(settings.Url);
+            message.Method = new HttpMethod(settings.HttpMethod);
+
+            var response = client.SendAsync(message).GetAwaiter().GetResult();
+
+            response.EnsureSuccessStatusCode();
         }
     }
 }

@@ -6,11 +6,11 @@ SID:				{user.Sid}
 User DN:				{user.DistinguishedName}
 Requestor IP:			{request.IPAddress}
 Requestor Hostname:		{request.HostName}
-Requested computer:		{requestedComputerName}
+Requested computer:		{request.ComputerName}
 Computer name:			{computer.SamAccountName}
 Computer DN:			{computer.DistinguishedName}
-Matched rule:			{authzresult.MatchedRuleDescription}
-Matched principal:		{authzresult.MatchedAcePrincipal}
-AuthZ response:			{authzresult.ResponseCode}
+Matched rule:			{AuthzResult.MatchedRuleDescription}
+Matched principal:		{AuthzResult.MatchedPrincipal}
+AuthZ response:			{AuthzResult.ResponseCode}
 Detail:				{message}
-Request reason:	    	{requestedReason}
+Request reason:	    	{request.Reason}

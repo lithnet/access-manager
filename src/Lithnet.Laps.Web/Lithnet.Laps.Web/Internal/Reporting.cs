@@ -9,22 +9,32 @@ using Microsoft.AspNetCore.Http;
 using System.Net;
 using System.Threading.Tasks.Dataflow;
 using System.Diagnostics;
+using System.Threading.Channels;
+using Lithnet.Laps.Web.Exceptions;
+using NLog.LayoutRenderers;
 
 namespace Lithnet.Laps.Web.Internal
 {
     public sealed class Reporting : IReporting
     {
         private readonly ILogger logger;
-        private readonly ITemplates templates;
+
+        private readonly ITemplateProvider templates;
+
         private readonly IHttpContextAccessor httpContextAccessor;
+
         private readonly IEnumerable<INotificationChannel> notificationChannels;
 
-        public Reporting(ILogger logger, ITemplates templates, IEnumerable<INotificationChannel> notificationChannels, IHttpContextAccessor httpContextAccessor)
+        private readonly IAuditSettings auditSettings;
+
+
+        public Reporting(ILogger logger, ITemplateProvider templates, IEnumerable<INotificationChannel> notificationChannels, IHttpContextAccessor httpContextAccessor, IAuditSettings auditSettings)
         {
             this.logger = logger;
             this.templates = templates;
             this.httpContextAccessor = httpContextAccessor;
             this.notificationChannels = notificationChannels;
+            this.auditSettings = auditSettings;
         }
 
         public void LogEventError(int eventId, string logMessage)
@@ -55,19 +65,36 @@ namespace Lithnet.Laps.Web.Internal
         {
             Dictionary<string, string> tokens = this.BuildTokenDictionary(action);
 
-            this.GenerateAuditEventLog(action, tokens);
+            List<Exception> exceptions = new List<Exception>();
 
             foreach (INotificationChannel channel in this.notificationChannels)
             {
                 try
                 {
-                    channel.ProcessNotification(action, tokens);
+                    channel.ProcessNotification(action, tokens, this.BuildChannelList(action));
                 }
                 catch (Exception ex)
                 {
                     this.LogEventError(EventIDs.NotificationChannelError, string.Format(LogMessages.NotificationChannelError, channel.Name), ex);
+                    exceptions.Add(ex);
                 }
             }
+
+            if (exceptions.Count > 0)
+            {
+                AuditLogFailureException ex = new AuditLogFailureException("The audit message could not be delivered to all notification channels", exceptions);
+
+                if (action.IsSuccess)
+                {
+                    throw ex;
+                }
+                else
+                {
+                    this.logger.Error(ex);
+                }
+            }
+
+            this.GenerateAuditEventLog(action, tokens);
         }
 
         private void GenerateAuditEventLog(AuditableAction action, Dictionary<string, string> tokens)
@@ -76,11 +103,11 @@ namespace Lithnet.Laps.Web.Internal
 
             if (action.IsSuccess)
             {
-                message = this.templates.LogSuccessTemplate ?? LogMessages.DefaultAuditSuccessText;
+                message = this.templates.GetTemplate("LogAuditSuccess.txt") ?? LogMessages.DefaultAuditSuccessText;
             }
             else
             {
-                message = this.templates.LogFailureTemplate ?? LogMessages.DefaultAuditFailureText;
+                message = this.templates.GetTemplate("LogAuditFailure.txt") ?? LogMessages.DefaultAuditFailureText;
             }
 
             message = this.ReplaceTokens(tokens, message, false);
@@ -107,14 +134,14 @@ namespace Lithnet.Laps.Web.Internal
                 { "{computer.DisplayName}", action.Computer?.DisplayName},
                 { "{computer.Guid}", action.Computer?.Guid?.ToString()},
                 { "{computer.Sid}", action.Computer?.Sid?.ToString()},
-                { "{requestedComputerName}", action.RequestModel?.ComputerName},
-                { "{requestedReason}", action.RequestModel?.UserRequestReason},
-                { "{authzresult.MatchedAcePrincipal}", action.AuthzResponse?.MatchedAcePrincipal},
-                { "{authzresult.NotificationRecipients}", string.Join(",", action.AuthzResponse?.NotificationRecipients ?? new List<string>())},
-                { "{authzresult.MatchedRuleDescription}", action.AuthzResponse?.MatchedRuleDescription},
-                { "{authzresult.AdditionalInformation}", action.AuthzResponse?.AdditionalInformation},
-                { "{authzresult.ExpireAfter}", action.AuthzResponse?.ExpireAfter.ToString()},
-                { "{authzresult.ResponseCode}", action.AuthzResponse?.Code.ToString()},
+                { "{request.ComputerName}", action.RequestModel?.ComputerName},
+                { "{request.Reason}", action.RequestModel?.UserRequestReason ?? "(not provided)"},
+                { "{AuthzResult.MatchedPrincipal}", action.AuthzResponse?.MatchedPrincipal},
+                { "{AuthzResult.NotificationChannels}", string.Join(",", action.AuthzResponse?.NotificationChannels ?? new List<string>())},
+                { "{AuthzResult.MatchedRuleDescription}", action.AuthzResponse?.MatchedRuleDescription},
+                { "{AuthzResult.AdditionalInformation}", action.AuthzResponse?.AdditionalInformation},
+                { "{AuthzResult.ExpireAfter}", action.AuthzResponse?.ExpireAfter.ToString()},
+                { "{AuthzResult.ResponseCode}", action.AuthzResponse?.Code.ToString()},
                 { "{message}", action.Message},
                 { "{request.IPAddress}", httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString()},
                 { "{request.Hostname}", this.TryResolveHostName(httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress)},
@@ -151,6 +178,27 @@ namespace Lithnet.Laps.Web.Internal
             {
                 return null;
             }
+        }
+
+        private IImmutableSet<string> BuildChannelList(AuditableAction action)
+        {
+            HashSet<string> channelsToNotify = new HashSet<string>();
+
+            if (action.AuthzResponse != null)
+            {
+                action.AuthzResponse.NotificationChannels?.ForEach(t => channelsToNotify.Add(t));
+            }
+
+            if (action.IsSuccess)
+            {
+                this.auditSettings.SuccessChannels?.ForEach(t => channelsToNotify.Add(t));
+            }
+            else
+            {
+                this.auditSettings.FailureChannels?.ForEach(t => channelsToNotify.Add(t));
+            }
+
+            return channelsToNotify.ToImmutableHashSet();
         }
     }
 }

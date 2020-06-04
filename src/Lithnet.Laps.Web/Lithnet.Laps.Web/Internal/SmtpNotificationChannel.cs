@@ -1,59 +1,60 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Threading.Channels;
 using Lithnet.Laps.Web.App_LocalResources;
 using Lithnet.Laps.Web.AppSettings;
 using NLog;
 
 namespace Lithnet.Laps.Web.Internal
 {
-    public class SmtpNotificationChannel : INotificationChannel
+    public class SmtpNotificationChannel : NotificationChannel<ISmtpChannelSettings>
     {
         private readonly ILogger logger;
 
         private readonly IEmailSettings emailSettings;
 
-        private readonly ITemplates templates;
+        private readonly ITemplateProvider templates;
 
-        private readonly GlobalAuditSettings globalAuditSettings;
+        private readonly IAuditSettings auditSettings;
 
-        public string Name => "smtp";
+        public override string Name => "smtp";
 
-        public SmtpNotificationChannel(ILogger logger, IEmailSettings emailSettings, ITemplates templates, GlobalAuditSettings globalAuditSettings)
+        public SmtpNotificationChannel(ILogger logger, IEmailSettings emailSettings, ITemplateProvider templates, IAuditSettings auditSettings, ChannelWriter<Action> queue)
+            :base (logger, queue)
         {
             this.logger = logger;
             this.emailSettings = emailSettings;
             this.templates = templates;
-            this.globalAuditSettings = globalAuditSettings;
+            this.auditSettings = auditSettings;
         }
 
-        public void ProcessNotification(AuditableAction action, Dictionary<string, string> tokens)
+        public override void ProcessNotification(AuditableAction action, Dictionary<string, string> tokens, IImmutableSet<string> notificationChannels)
         {
-            IImmutableSet<string> recipients = this.BuildRecipientList(action);
+            this.ProcessNotification(action, tokens, notificationChannels, this.auditSettings.Channels.Smtp);
+        }
 
-            if (recipients.Count <= 0)
-            {
-                return;
-            }
-
-            string message;
-            string subject;
-
-            if (action.IsSuccess)
-            {
-                message = this.templates.EmailSuccessTemplate;
-                subject = LogMessages.AuditEmailSubjectSuccess;
-            }
-            else
-            {
-                message = this.templates.EmailFailureTemplate;
-                subject = LogMessages.AuditEmailSubjectFailure;
-            }
+        protected override void Send(AuditableAction action, Dictionary<string, string> tokens, ISmtpChannelSettings settings)
+        {
+            string message = action.IsSuccess ? templates.GetTemplate(settings.TemplateSuccess) : templates.GetTemplate(settings.TemplateFailure);
+            string subject = action.IsSuccess ? LogMessages.AuditEmailSubjectSuccess : LogMessages.AuditEmailSubjectFailure;
 
             message = TokenReplacer.ReplaceAsHtml(tokens, message);
             subject = TokenReplacer.ReplaceAsPlainText(tokens, subject);
+            HashSet<string> recipients = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            settings.EmailAddresses.ForEach(t => recipients.Add(t));
+
+            if (recipients.Remove("{user.EmailAddress}"))
+            {
+                if (action?.User?.EmailAddress != null)
+                {
+                    recipients.Add(action.User.EmailAddress);
+                }
+            }
 
             this.SendEmail(recipients, subject, message);
         }
@@ -99,35 +100,5 @@ namespace Lithnet.Laps.Web.Internal
             message.Body = body;
             client.Send(message);
         }
-
-        private IImmutableSet<string> BuildRecipientList(AuditableAction action)
-        {
-            HashSet<string> usersToNotify = new HashSet<string>();
-
-            if (action.AuthzResponse != null)
-            {
-                action.AuthzResponse.NotificationRecipients?.ForEach(t => usersToNotify.Add(t));
-            }
-
-            if (action.IsSuccess)
-            {
-                this.globalAuditSettings.SuccessRecipients?.ForEach(t => usersToNotify.Add(t));
-            }
-            else
-            {
-                this.globalAuditSettings.FailureRecipients?.ForEach(t => usersToNotify.Add(t));
-            }
-
-            if (!string.IsNullOrWhiteSpace(action.User?.EmailAddress))
-            {
-                if (usersToNotify.Remove("{user.EmailAddress}"))
-                {
-                    usersToNotify.Add(action.User.EmailAddress);
-                }
-            }
-
-            return usersToNotify.ToImmutableHashSet();
-        }
-
     }
 }

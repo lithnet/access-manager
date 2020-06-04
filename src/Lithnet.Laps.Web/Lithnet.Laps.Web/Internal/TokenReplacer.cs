@@ -11,7 +11,7 @@ namespace Lithnet.Laps.Web.Internal
         {
             foreach (KeyValuePair<string, string> token in tokens)
             {
-                text = text.Replace(token.Key, token.Value ?? string.Empty, StringComparison.OrdinalIgnoreCase);
+                text = text?.Replace(token.Key, token.Value ?? string.Empty, StringComparison.OrdinalIgnoreCase);
             }
 
             return text;
@@ -21,7 +21,7 @@ namespace Lithnet.Laps.Web.Internal
         {
             foreach (KeyValuePair<string, string> token in tokens)
             {
-                text = text.Replace(token.Key, WebUtility.HtmlEncode(token.Value ?? string.Empty), StringComparison.OrdinalIgnoreCase);
+                text = text?.Replace(token.Key, WebUtility.HtmlEncode(token.Value ?? string.Empty), StringComparison.OrdinalIgnoreCase);
             }
 
             return text;
@@ -31,7 +31,7 @@ namespace Lithnet.Laps.Web.Internal
         {
             foreach (KeyValuePair<string, string> token in tokens)
             {
-                text = text.Replace(token.Key, HttpUtility.JavaScriptStringEncode(token.Value ?? string.Empty), StringComparison.OrdinalIgnoreCase);
+                text = text?.Replace(token.Key, HttpUtility.JavaScriptStringEncode(token.Value ?? string.Empty), StringComparison.OrdinalIgnoreCase);
             }
 
             return text;

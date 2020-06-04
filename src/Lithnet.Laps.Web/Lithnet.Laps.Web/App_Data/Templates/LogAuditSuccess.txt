@@ -9,7 +9,7 @@ Requestor Hostname:		{request.HostName}
 Computer name:			{computer.SamAccountName}
 Computer DN:			{computer.DistinguishedName}
 Password expiry:			{computer.LapsExpiryDate}
-Matched rule:			{authzresult.MatchedRuleDescription}
-Matched principal:		{authzresult.MatchedAcePrincipal}
-AuthZ response:			{authzresult.ResponseCode}
-Request reason:			{requestedReason}
+Matched rule:			{AuthzResult.MatchedRuleDescription}
+Matched principal:		{AuthzResult.MatchedPrincipal}
+AuthZ response:			{AuthzResult.ResponseCode}
+Request reason:			{request.Reason}

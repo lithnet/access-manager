@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Lithnet.Laps.Web.ActiveDirectory;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Hosting;
+using Lithnet.Laps.Web.Internal;
 
 namespace Lithnet.Laps.Web.Authorization
 {
@@ -35,7 +36,7 @@ namespace Lithnet.Laps.Web.Authorization
                 this.InitializePowerShellSession();
             }
 
-            this.ResetState();
+            this.powershell.ResetState();
             this.powershell
                 .AddCommand("Get-LapsAuthorizationResponse")
                     .AddParameter("user", user)
@@ -45,7 +46,7 @@ namespace Lithnet.Laps.Web.Authorization
             Task<AuthorizationResponse> task = new Task<AuthorizationResponse>(() =>
             {
                 var results = this.powershell.Invoke();
-                this.ThrowOnPipelineError();
+                this.powershell.ThrowOnPipelineError();
 
                 foreach (PSObject result in results)
                 {
@@ -89,9 +90,9 @@ namespace Lithnet.Laps.Web.Authorization
 
         private void InitializePowerShellSession()
         {
-            string path = Path.Combine(this.env.ContentRootPath, this.config.PowershellScriptFile);
+            string path = this.env.ResolvePath(this.config.PowershellScriptFile);
 
-            if (!File.Exists(path))
+            if (path == null || !File.Exists(path))
             {
                 throw new FileNotFoundException($"The PowerShell script was not found: {path}");
             }
@@ -106,40 +107,6 @@ namespace Lithnet.Laps.Web.Authorization
             }
 
             this.logger.Trace($"The PowerShell script was successfully initialized");
-        }
-
-        private void ThrowOnPipelineError()
-        {
-            if (!powershell.HadErrors)
-            {
-                return;
-            }
-
-            StringBuilder b = new StringBuilder();
-
-            foreach (ErrorRecord error in powershell.Streams.Error)
-            {
-                if (error.ErrorDetails != null)
-                {
-                    b.AppendLine(error.ErrorDetails.Message);
-                    b.AppendLine(error.ErrorDetails.RecommendedAction);
-                }
-
-                b.AppendLine(error.ScriptStackTrace);
-
-                if (error.Exception != null)
-                {
-                    b.AppendLine(error.Exception.ToString());
-                }
-            }
-
-            throw new PowerShellScriptException("The PowerShell script encountered an error\n" + b.ToString());
-        }
-
-        private void ResetState()
-        {
-            powershell.Streams.ClearStreams();
-            powershell.Commands.Clear();
         }
     }
 }

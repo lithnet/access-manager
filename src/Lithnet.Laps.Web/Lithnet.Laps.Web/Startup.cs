@@ -23,6 +23,8 @@ using NLog;
 using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Linq;
+using System.Threading.Channels;
+using System.ServiceModel.Channels;
 
 namespace Lithnet.Laps.Web
 {
@@ -56,7 +58,7 @@ namespace Lithnet.Laps.Web
             services.TryAddScoped<IRateLimitSettings, RateLimitSettings>();
             services.TryAddScoped<IAuthenticationSettings, AuthenticationSettings>();
             services.TryAddScoped<IEmailSettings, EmailSettings>();
-            services.TryAddScoped<GlobalAuditSettings, GlobalAuditSettings>();
+            services.TryAddScoped<IAuditSettings, AuditSettings>();
             services.TryAddScoped<IJsonTargetsProvider, JsonFileTargetsProvider>();
             services.TryAddScoped<IAuthorizationService, BuiltInAuthorizationService>();
             services.TryAddScoped<IAuthorizationSettings, AuthorizationSettings>();
@@ -64,13 +66,21 @@ namespace Lithnet.Laps.Web
             services.TryAddScoped<PowershellAuthorizationService, PowershellAuthorizationService>();
             services.TryAddScoped<IDirectory, ActiveDirectory.ActiveDirectory>();
             services.TryAddScoped<IReporting, Reporting>();
-            services.TryAddScoped<ITemplates, TemplatesFromFiles>();
+            services.TryAddScoped<ITemplateProvider, TemplateProvider>();
             services.TryAddScoped<IRateLimiter, RateLimiter>();
-            
-            services.AddTransient<INotificationChannel, SmtpNotificationChannel>();
-            services.AddTransient<INotificationChannel, WebhookNotificationChannel>();
+
+            services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
+            services.AddScoped<INotificationChannel, WebhookNotificationChannel>();
+            services.AddScoped<INotificationChannel, PowershellNotificationChannel>();
 
             services.TryAddScoped<IXffHandlerSettings, XffHandlerSettings>();
+
+            var backgroundProcessingChannel = Channel.CreateUnbounded<Action>();
+
+            services.AddSingleton(backgroundProcessingChannel.Reader);
+            services.AddSingleton(backgroundProcessingChannel.Writer);
+            services.AddHostedService<AuditWorker>();
+
             this.ConfigureAuthentication(services);
             this.ConfigureXff(services);
         }
@@ -114,7 +124,7 @@ namespace Lithnet.Laps.Web
         {
             var provider = services.BuildServiceProvider();
             var settings = provider.GetService<IXffHandlerSettings>();
-            
+
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -125,7 +135,7 @@ namespace Lithnet.Laps.Web
 
                 options.KnownNetworks.Clear();
                 options.KnownProxies.Clear();
-                
+
                 settings.TrustedProxies.ForEach(t => options.KnownProxies.Add(t));
                 settings.TrustedNetworks.ForEach(t => options.KnownNetworks.Add(t));
             });

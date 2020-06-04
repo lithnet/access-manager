@@ -14,9 +14,9 @@
           "type": "deny"
         }
       ],
-      "email-auditing": {
-        "on-success": [ "laps-admin@lithnet.local" ],
-        "on-failure": [ "laps-admin@lithnet.local" ]
+      "auditing": {
+        "on-success": [ "email-domain-admins" ],
+        "on-failure": [ "email-domain-admins" ]
       }
     },
     {
@@ -27,8 +27,8 @@
         {
           "name": "fim-dev1\\domain admins",
           "type": "deny",
-          "email-auditing": {
-            "on-failure": [ "ryan@lithnet.io" ]
+          "auditing": {
+            "on-failure": [ "email-domain-admins" ]
           }
         },
         {
@@ -36,9 +36,9 @@
           "type": "allow"
         }
       ],
-      "email-auditing": {
-        "on-success": [ "laps-admin@lithnet.local" ],
-        "on-failure": [ "laps-admin@lithnet.local" ]
+      "auditing": {
+        "on-success": [ "email-domain-admins" ],
+        "on-failure": [ "email-domain-admins" ]
       }
     },
     {
@@ -59,9 +59,9 @@
           "type": "allow"
         }
       ],
-      "email-auditing": {
-        "on-success": [ "laps-admin@lithnet.local" ],
-        "on-failure": [ "laps-admin@lithnet.local" ]
+      "auditing": {
+        "on-success": [ "email-domain-admins" ],
+        "on-failure": [ "email-domain-admins" ]
       }
     }
   ]

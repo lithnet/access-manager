@@ -43,8 +43,8 @@ namespace Lithnet.Laps.Web.Authorization
             }
 
             AuthorizationResponse summaryResponse = new AuthorizationResponse();
-            jsonResponse?.NotificationRecipients?.ForEach(t => summaryResponse.NotificationRecipients.Add(t));
-            psResponse?.NotificationRecipients?.ForEach(t => summaryResponse.NotificationRecipients.Add(t));
+            jsonResponse?.NotificationChannels?.ForEach(t => summaryResponse.NotificationChannels.Add(t));
+            psResponse?.NotificationChannels?.ForEach(t => summaryResponse.NotificationChannels.Add(t));
             summaryResponse.Code = psResponse?.Code ?? jsonResponse?.Code ?? AuthorizationResponseCode.NoMatchingRuleForComputer;
 
             return summaryResponse;

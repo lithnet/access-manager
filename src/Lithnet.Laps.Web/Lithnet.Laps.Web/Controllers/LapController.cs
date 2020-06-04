@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using IAuthorizationService = Lithnet.Laps.Web.Authorization.IAuthorizationService;
 using System.Globalization;
+using Lithnet.Laps.Web.Exceptions;
 
 namespace Lithnet.Laps.Web.Controllers
 {
@@ -157,6 +158,13 @@ namespace Lithnet.Laps.Web.Controllers
                 });
 
                 return this.View("Show", new LapEntryModel(computer, passwordData));
+            }
+            catch (AuditLogFailureException ex)
+            {
+                this.reporting.LogEventError(EventIDs.AuthZFailedAuditError, string.Format(LogMessages.AuthZFailedAuditError, user?.SamAccountName ?? LogMessages.UnknownComputerPlaceholder, model.ComputerName), ex);
+
+                model.FailureReason = UIMessages.AccessDenied;
+                return this.View("Get", model);
             }
             catch (Exception ex)
             {

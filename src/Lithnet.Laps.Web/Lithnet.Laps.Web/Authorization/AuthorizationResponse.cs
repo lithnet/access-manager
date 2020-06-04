@@ -18,7 +18,7 @@ namespace Lithnet.Laps.Web.Authorization
         /// <summary>
         /// A list of email addresses that should be notified of this success or failure event
         /// </summary>
-        public IList<string> NotificationRecipients { get; set; }
+        public IList<string> NotificationChannels { get; set; }
 
         /// <summary>
         /// Additional information about the authorization decision that can be included in audit messages
@@ -28,7 +28,7 @@ namespace Lithnet.Laps.Web.Authorization
         /// <summary>
         /// An identifier that provides context as to the principal (user or group) that was used to make the authorization decision, if one was made
         /// </summary>
-        public string MatchedAcePrincipal { get; set; }
+        public string MatchedPrincipal { get; set; }
 
         /// <summary>
         /// An AuthorizationResponseCode value that indicates the status of the authorization request

@@ -216,4 +216,7 @@ Reader principal:			{reader.Principal}</value>
   <data name="ReasonRequired" xml:space="preserve">
     <value>The user {0} did not fill out the mandatory request reason field</value>
   </data>
+  <data name="AuthZFailedAuditError" xml:space="preserve">
+    <value>The user {0} requested access to computer {1} which was authorized, but one or more audit notification channels failed to deliver the audit response, and were configured to deny access to the password when auditing fails</value>
+  </data>
 </root>

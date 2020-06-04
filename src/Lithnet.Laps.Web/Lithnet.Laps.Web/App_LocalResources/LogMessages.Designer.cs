@@ -143,6 +143,15 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The user {0} requested access to computer {1} which was authorized, but one or more audit notification channels failed to deliver the audit response, and were configured to deny access to the password when auditing fails.
+        /// </summary>
+        internal static string AuthZFailedAuditError {
+            get {
+                return ResourceManager.GetString("AuthZFailedAuditError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The user {0} requested access to computer {1} but does not match any of the reader principals that are allowed access to this computer.
         /// </summary>
         internal static string AuthZFailedNoReaderPrincipalMatch {
