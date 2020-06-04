@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration.Internal;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Lithnet.Laps.Web.Internal;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Configuration;
 
 namespace Lithnet.Laps.Web.AppSettings

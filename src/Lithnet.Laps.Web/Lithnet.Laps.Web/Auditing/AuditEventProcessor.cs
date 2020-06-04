@@ -7,15 +7,11 @@ using Lithnet.Laps.Web.AppSettings;
 using NLog;
 using Microsoft.AspNetCore.Http;
 using System.Net;
-using System.Threading.Tasks.Dataflow;
-using System.Diagnostics;
-using System.Threading.Channels;
 using Lithnet.Laps.Web.Exceptions;
-using NLog.LayoutRenderers;
 
 namespace Lithnet.Laps.Web.Internal
 {
-    public sealed class Reporting : IReporting
+    public sealed class AuditEventProcessor : IAuditEventProcessor
     {
         private readonly ILogger logger;
 
@@ -27,38 +23,13 @@ namespace Lithnet.Laps.Web.Internal
 
         private readonly IAuditSettings auditSettings;
 
-
-        public Reporting(ILogger logger, ITemplateProvider templates, IEnumerable<INotificationChannel> notificationChannels, IHttpContextAccessor httpContextAccessor, IAuditSettings auditSettings)
+        public AuditEventProcessor(ILogger logger, ITemplateProvider templates, IEnumerable<INotificationChannel> notificationChannels, IHttpContextAccessor httpContextAccessor, IAuditSettings auditSettings)
         {
             this.logger = logger;
             this.templates = templates;
             this.httpContextAccessor = httpContextAccessor;
             this.notificationChannels = notificationChannels;
             this.auditSettings = auditSettings;
-        }
-
-        public void LogEventError(int eventId, string logMessage)
-        {
-            this.LogEventError(eventId, logMessage, null);
-        }
-
-        public void LogEventError(int eventId, string message, Exception ex)
-        {
-            this.LogEvent(eventId, LogLevel.Error, message, ex);
-        }
-
-        public void LogEventSuccess(int eventId, string message)
-        {
-            this.LogEvent(eventId, LogLevel.Info, message, null);
-        }
-
-        public void LogEvent(int eventId, LogLevel logLevel, string message, Exception ex)
-        {
-            LogEventInfo logEvent = new LogEventInfo(logLevel, this.logger.Name, message);
-            logEvent.Properties.Add("EventID", eventId);
-            logEvent.Exception = ex;
-
-            this.logger.Info(logEvent);
         }
 
         public void GenerateAuditEvent(AuditableAction action)
@@ -75,7 +46,7 @@ namespace Lithnet.Laps.Web.Internal
                 }
                 catch (Exception ex)
                 {
-                    this.LogEventError(EventIDs.NotificationChannelError, string.Format(LogMessages.NotificationChannelError, channel.Name), ex);
+                    this.logger.LogEventError(EventIDs.NotificationChannelError, string.Format(LogMessages.NotificationChannelError, channel.Name), ex);
                     exceptions.Add(ex);
                 }
             }
@@ -90,7 +61,7 @@ namespace Lithnet.Laps.Web.Internal
                 }
                 else
                 {
-                    this.logger.Error(ex);
+                    this.logger.LogEventError(EventIDs.NotificationChannelError, ex.Message, ex);
                 }
             }
 
@@ -112,7 +83,7 @@ namespace Lithnet.Laps.Web.Internal
 
             message = this.ReplaceTokens(tokens, message, false);
 
-            this.LogEvent(action.EventID, action.IsSuccess ? LogLevel.Info : LogLevel.Error, message, null);
+            this.logger.LogEvent(action.EventID, action.IsSuccess ? LogLevel.Info : LogLevel.Error, message, null);
         }
 
         private Dictionary<string, string> BuildTokenDictionary(AuditableAction action)

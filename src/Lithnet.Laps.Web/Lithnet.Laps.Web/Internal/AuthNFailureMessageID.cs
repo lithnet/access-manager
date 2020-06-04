@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Lithnet.Laps.Web.Internal
+﻿namespace Lithnet.Laps.Web.Internal
 {
     public enum AuthNFailureMessageID
     {

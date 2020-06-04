@@ -3,7 +3,6 @@ using NLog;
 using System.Management.Automation;
 using System.IO;
 using Lithnet.Laps.Web.AppSettings;
-using System.Text;
 using System.Threading.Tasks;
 using Lithnet.Laps.Web.ActiveDirectory;
 using Newtonsoft.Json;

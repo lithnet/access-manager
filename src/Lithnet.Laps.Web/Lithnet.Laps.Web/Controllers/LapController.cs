@@ -22,12 +22,12 @@ namespace Lithnet.Laps.Web.Controllers
         private readonly IAuthorizationService authorizationService;
         private readonly ILogger logger;
         private readonly IDirectory directory;
-        private readonly IReporting reporting;
+        private readonly IAuditEventProcessor reporting;
         private readonly IRateLimiter rateLimiter;
         private readonly IUserInterfaceSettings userInterfaceSettings;
 
         public LapController(IAuthorizationService authorizationService, ILogger logger, IDirectory directory,
-            IReporting reporting, IRateLimiter rateLimiter, IUserInterfaceSettings userInterfaceSettings)
+            IAuditEventProcessor reporting, IRateLimiter rateLimiter, IUserInterfaceSettings userInterfaceSettings)
         {
             this.authorizationService = authorizationService;
             this.logger = logger;
@@ -66,7 +66,7 @@ namespace Lithnet.Laps.Web.Controllers
 
                 if (string.IsNullOrWhiteSpace(model.UserRequestReason) && this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required)
                 {
-                    this.reporting.LogEventError(EventIDs.ReasonRequired, string.Format(LogMessages.ReasonRequired, user.SamAccountName));
+                    logger.LogEventError(EventIDs.ReasonRequired, string.Format(LogMessages.ReasonRequired, user.SamAccountName));
 
                     model.FailureReason = UIMessages.ReasonRequired;
                     return this.View("Get", model);
@@ -78,7 +78,7 @@ namespace Lithnet.Laps.Web.Controllers
                 }
                 catch (NotFoundException ex)
                 {
-                    this.reporting.LogEventError(EventIDs.SsoIdentityNotFound, null, ex);
+                    this.logger.LogEventError(EventIDs.SsoIdentityNotFound, null, ex);
 
                     model.FailureReason = UIMessages.SsoIdentityNotFound;
                     return this.View("Get", model);
@@ -92,7 +92,7 @@ namespace Lithnet.Laps.Web.Controllers
                     return this.View("RateLimitExceeded");
                 }
 
-                this.reporting.LogEventSuccess(EventIDs.UserRequestedPassword, string.Format(LogMessages.UserHasRequestedPassword, user.SamAccountName, model.ComputerName));
+                this.logger.LogEventSuccess(EventIDs.UserRequestedPassword, string.Format(LogMessages.UserHasRequestedPassword, user.SamAccountName, model.ComputerName));
 
                 IComputer computer;
 
@@ -102,14 +102,14 @@ namespace Lithnet.Laps.Web.Controllers
                 }
                 catch (AmbiguousNameException ex)
                 {
-                    this.reporting.LogEventError(EventIDs.ComputerNameAmbiguous, string.Format(LogMessages.ComputerNameAmbiguous, user.SamAccountName, model.ComputerName), ex);
+                    this.logger.LogEventError(EventIDs.ComputerNameAmbiguous, string.Format(LogMessages.ComputerNameAmbiguous, user.SamAccountName, model.ComputerName), ex);
 
                     model.FailureReason = UIMessages.ComputerNameAmbiguous;
                     return this.View("Get", model);
                 }
                 catch (NotFoundException ex)
                 {
-                    this.reporting.LogEventError(EventIDs.ComputerNotFound, string.Format(LogMessages.ComputerNotFoundInDirectory, user.SamAccountName, model.ComputerName), ex);
+                    this.logger.LogEventError(EventIDs.ComputerNotFound, string.Format(LogMessages.ComputerNotFoundInDirectory, user.SamAccountName, model.ComputerName), ex);
 
                     model.FailureReason = UIMessages.ComputerNotFoundInDirectory;
                     return this.View("Get", model);
@@ -132,7 +132,7 @@ namespace Lithnet.Laps.Web.Controllers
 
                 if (passwordData == null)
                 {
-                    this.reporting.LogEventError(EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.SamAccountName, user.SamAccountName));
+                    this.logger.LogEventError(EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.SamAccountName, user.SamAccountName));
 
                     model.FailureReason = UIMessages.NoLapsPassword;
                     return this.View("Get", model);
@@ -161,14 +161,14 @@ namespace Lithnet.Laps.Web.Controllers
             }
             catch (AuditLogFailureException ex)
             {
-                this.reporting.LogEventError(EventIDs.AuthZFailedAuditError, string.Format(LogMessages.AuthZFailedAuditError, user?.SamAccountName ?? LogMessages.UnknownComputerPlaceholder, model.ComputerName), ex);
+                this.logger.LogEventError(EventIDs.AuthZFailedAuditError, string.Format(LogMessages.AuthZFailedAuditError, user?.SamAccountName ?? LogMessages.UnknownComputerPlaceholder, model.ComputerName), ex);
 
                 model.FailureReason = UIMessages.AccessDenied;
                 return this.View("Get", model);
             }
             catch (Exception ex)
             {
-                this.reporting.LogEventError(EventIDs.UnexpectedError, string.Format(LogMessages.UnhandledError, model.ComputerName, user?.SamAccountName ?? LogMessages.UnknownComputerPlaceholder), ex);
+                this.logger.LogEventError(EventIDs.UnexpectedError, string.Format(LogMessages.UnhandledError, model.ComputerName, user?.SamAccountName ?? LogMessages.UnknownComputerPlaceholder), ex);
 
                 model.FailureReason = UIMessages.UnexpectedError;
                 return this.View("Get", model);

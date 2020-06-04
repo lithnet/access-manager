@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -44,7 +42,7 @@ namespace Lithnet.Laps.Web.Internal
                 }
                 catch (Exception e)
                 {
-                    logger.Error(e, "An unhandled exception occured");
+                    logger.LogEventError(EventIDs.BackgroundTaskUnhandledError, "An unhandled exception occured in a background task", e);
                 }
             }
         }

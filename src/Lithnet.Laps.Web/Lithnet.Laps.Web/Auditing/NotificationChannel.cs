@@ -1,16 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using System.Linq;
-using System.Management.Automation;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Channels;
-using System.Threading.Tasks;
 using Lithnet.Laps.Web.AppSettings;
 using Lithnet.Laps.Web.Exceptions;
-using Microsoft.AspNetCore.Hosting;
 using NLog;
 
 namespace Lithnet.Laps.Web.Internal
@@ -81,7 +75,7 @@ namespace Lithnet.Laps.Web.Internal
             }
             catch (Exception ex)
             {
-                this.logger.Error(ex, $"Delivery of audit notification to {channel.ID} failed");
+                this.logger.LogEventError(EventIDs.NotificationChannelError, $"Delivery of audit notification to {channel.ID} failed", ex);
 
                 if (rethrowExceptions)
                 {

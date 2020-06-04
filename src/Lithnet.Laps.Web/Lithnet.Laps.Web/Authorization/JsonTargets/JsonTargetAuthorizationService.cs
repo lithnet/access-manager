@@ -187,7 +187,7 @@ namespace Lithnet.Laps.Web.Authorization
                 }
                 catch (Exception ex)
                 {
-                    this.logger.Error(ex, $"An error occurred processing the target {target.Type}:{target.Name}");
+                    this.logger.LogEventError(EventIDs.TargetRuleProcessingError, $"An error occurred processing the target {target.Type}:{target.Name}", ex);
                 }
             }
 

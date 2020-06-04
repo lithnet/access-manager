@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
-using Lithnet.Laps.Web.App_LocalResources;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration.UserSecrets;
 using NLog;
 
 namespace Lithnet.Laps.Web.Internal
@@ -36,7 +34,7 @@ namespace Lithnet.Laps.Web.Internal
             }
             catch (Exception ex)
             {
-                this.logger.Error(ex, "Could not load template file");
+                this.logger.LogEventError(EventIDs.ErrorLoadingTemplateResource, "Could not load template file", ex);
                 throw;
             }
         }

@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using Lithnet.Laps.Web.App_LocalResources;
 
 namespace Lithnet.Laps.Web.Models

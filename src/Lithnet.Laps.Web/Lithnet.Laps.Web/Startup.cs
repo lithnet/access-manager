@@ -1,6 +1,5 @@
 using System;
 using System.Configuration;
-using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Lithnet.Laps.Web.ActiveDirectory;
@@ -22,9 +21,7 @@ using Microsoft.Extensions.Hosting;
 using NLog;
 using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.AspNetCore.HttpOverrides;
-using System.Linq;
 using System.Threading.Channels;
-using System.ServiceModel.Channels;
 
 namespace Lithnet.Laps.Web
 {
@@ -33,8 +30,6 @@ namespace Lithnet.Laps.Web
         private static IExternalAuthProviderSettings authProvider;
 
         private ILogger logger;
-
-        private IReporting reporting;
 
         private IDirectory directory;
 
@@ -65,7 +60,7 @@ namespace Lithnet.Laps.Web
             services.TryAddScoped<JsonTargetAuthorizationService, JsonTargetAuthorizationService>();
             services.TryAddScoped<PowershellAuthorizationService, PowershellAuthorizationService>();
             services.TryAddScoped<IDirectory, ActiveDirectory.ActiveDirectory>();
-            services.TryAddScoped<IReporting, Reporting>();
+            services.TryAddScoped<IAuditEventProcessor, AuditEventProcessor>();
             services.TryAddScoped<ITemplateProvider, TemplateProvider>();
             services.TryAddScoped<IRateLimiter, RateLimiter>();
 
@@ -86,9 +81,8 @@ namespace Lithnet.Laps.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IReporting reporting, IDirectory directory, ILogger logger)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDirectory directory, ILogger logger)
         {
-            this.reporting = reporting;
             this.directory = directory;
             this.logger = logger;
 
@@ -246,7 +240,7 @@ namespace Lithnet.Laps.Web
 
         private Task HandleAuthNFailed(AccessDeniedContext context)
         {
-            this.reporting.LogEventError(EventIDs.ExternalAuthNAccessDenied, LogMessages.AuthNAccessDenied, context.Result?.Failure);
+            this.logger.LogEventError(EventIDs.ExternalAuthNAccessDenied, LogMessages.AuthNAccessDenied, context.Result?.Failure);
             context.HandleResponse();
             context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.ExternalAuthNProviderDenied}");
 
@@ -256,7 +250,7 @@ namespace Lithnet.Laps.Web
 
         private Task HandleRemoteFailure(RemoteFailureContext context)
         {
-            this.reporting.LogEventError(EventIDs.ExternalAuthNProviderError, LogMessages.AuthNProviderError, context.Failure);
+            this.logger.LogEventError(EventIDs.ExternalAuthNProviderError, LogMessages.AuthNProviderError, context.Failure);
             context.HandleResponse();
             context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.ExternalAuthNProviderError}");
 
@@ -273,19 +267,19 @@ namespace Lithnet.Laps.Web
                 if (sid == null)
                 {
                     string message = string.Format(LogMessages.UserNotFoundInDirectory, user.ToClaimList());
-                    this.reporting.LogEventError(EventIDs.SsoIdentityNotFound, message, null);
+                    this.logger.LogEventError(EventIDs.SsoIdentityNotFound, message, null);
                     context.HandleResponse();
                     context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.SsoIdentityNotFound}");
                     return Task.CompletedTask;
                 }
 
                 user.AddClaim(new Claim(ClaimTypes.PrimarySid, sid));
-                this.reporting.LogEventSuccess(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, user.ToClaimList()));
+                this.logger.LogEventSuccess(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, user.ToClaimList()));
                 return Task.CompletedTask;
             }
             catch (Exception ex)
             {
-                this.reporting.LogEventError(EventIDs.AuthNResponseProcessingError, LogMessages.AuthNResponseProcessingError, ex);
+                this.logger.LogEventError(EventIDs.AuthNResponseProcessingError, LogMessages.AuthNResponseProcessingError, ex);
                 context.HandleResponse();
                 context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.SsoIdentityNotFound}");
                 return Task.CompletedTask;
@@ -306,7 +300,7 @@ namespace Lithnet.Laps.Web
                 }
                 catch (Exception ex)
                 {
-                    this.reporting.LogEventError(EventIDs.AuthNDirectoryLookupError, string.Format(LogMessages.AuthNDirectoryLookupError, c.Type, c.Value), ex);
+                    this.logger.LogEventError(EventIDs.AuthNDirectoryLookupError, string.Format(LogMessages.AuthNDirectoryLookupError, c.Type, c.Value), ex);
                 }
             }
 

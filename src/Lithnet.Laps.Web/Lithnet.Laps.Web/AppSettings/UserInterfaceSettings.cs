@@ -1,5 +1,4 @@
-﻿using System;
-using Lithnet.Laps.Web.Internal;
+﻿using Lithnet.Laps.Web.Internal;
 using Microsoft.Extensions.Configuration;
 
 namespace Lithnet.Laps.Web.AppSettings
