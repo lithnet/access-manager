@@ -71,7 +71,7 @@ namespace Lithnet.Laps.Web.Internal
 
         private void InitializePowerShellSession(IPowershellChannelSettings settings)
         {
-            string path = env.ResolvePath(settings.Script, "app_data");
+            string path = env.ResolvePath(settings.Script, "Scripts");
 
             if (path == null || !File.Exists(path))
             {

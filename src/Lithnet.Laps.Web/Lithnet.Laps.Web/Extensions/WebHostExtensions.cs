@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.Configuration;
@@ -56,14 +58,22 @@ namespace Lithnet.Laps.Web.Internal
                         options.Authentication.Schemes = AuthenticationSchemes.None;
                     }
 
-                    options.ClientCertificateMethod = ClientCertificateMethod.AllowRenegotation;
-                    options.EnableResponseCaching = false;
-                    options.Http503Verbosity = Http503VerbosityLevel.Limited;
-                    options.MaxConnections = 100;
-                    options.MaxRequestBodySize = 2_048_000;
-                    options.MaxAccepts = 0;
-                    
-                    foreach (string url in config.GetValuesOrDefault("hosting:httpsys:urls"))
+                    //options.ClientCertificateMethod = ClientCertificateMethod.AllowRenegotation;
+                    //options.EnableResponseCaching = false;
+                    //options.Http503Verbosity = Http503VerbosityLevel.Limited;
+                    //options.MaxConnections = 100;
+                    //options.MaxRequestBodySize = 2_048_000;
+                    //options.MaxAccepts = 0;
+
+                    var urls = config.GetValuesOrDefault("hosting:httpsys:urls")?.ToList() ?? new List<string>();
+
+                    if (urls.Count == 0)
+                    {
+                        options.UrlPrefixes.Add("http://+:80");
+                        options.UrlPrefixes.Add("https://+:443");
+                    }
+
+                    foreach (string url in urls)
                     {
                         options.UrlPrefixes.Add(url);
                     }

@@ -1,35 +1,38 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <FileVersion>1.0.$([System.DateTime]::UtcNow.Date.Subtract($([System.DateTime]::Parse("2000-01-01"))).TotalDays).$([System.Math]::Floor($([MSBuild]::Divide($([System.DateTime]::UtcNow.TimeOfDay.TotalSeconds), 1.32))))</FileVersion>
+    <Version>1.0.$([System.DateTime]::UtcNow.Date.Subtract($([System.DateTime]::Parse("2000-01-01"))).TotalDays)</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="app_data\AuditingSample.ps1" />
-    <None Remove="app_data\AuthZSample.ps1" />
-    <None Remove="app_data\Templates\EmailAuditFailure.html" />
-    <None Remove="app_data\Templates\EmailAuditSuccess.html" />
-    <None Remove="app_data\Templates\LogAuditFailure.txt" />
-    <None Remove="app_data\Templates\LogAuditSuccess.txt" />
+    <None Remove="NotificationTemplates\EmailAuditFailure.html" />
+    <None Remove="NotificationTemplates\EmailAuditSuccess.html" />
+    <None Remove="NotificationTemplates\LogAuditFailure.txt" />
+    <None Remove="NotificationTemplates\LogAuditSuccess.txt" />
+    <None Remove="Scripts\AuditingSample.ps1" />
+    <None Remove="Scripts\AuthZSample.ps1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="app_data\AuditingSample.ps1">
+    <Content Include="NotificationTemplates\EmailAuditFailure.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="app_data\AuthZSample.ps1">
+    <Content Include="NotificationTemplates\EmailAuditSuccess.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="app_data\Templates\EmailAuditFailure.html">
+    <Content Include="NotificationTemplates\LogAuditFailure.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="app_data\Templates\EmailAuditSuccess.html">
+    <Content Include="NotificationTemplates\LogAuditSuccess.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="app_data\Templates\LogAuditFailure.txt">
+    <Content Include="Scripts\AuditingSample.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="app_data\Templates\LogAuditSuccess.txt">
+    <Content Include="Scripts\AuthZSample.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -74,7 +77,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="app_data\logs\" />
+    <Content Update="appsecrets.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
+    <Content Update="libman.json" CopyToPublishDirectory="Never" CopyToOutputDirectory="Never">
+    </Content>
+    <Content Update="appsettings.*.json" CopyToPublishDirectory="Never" />
   </ItemGroup>
 
 </Project>

@@ -21,7 +21,7 @@ namespace Lithnet.Laps.Web.Internal
         {
             try
             {
-                string path = env.ResolvePath(templateNameOrPath, "app_data\\templates");
+                string path = env.ResolvePath(templateNameOrPath, "NotificationTemplates");
 
                 if (path == null || !File.Exists(path))
                 {

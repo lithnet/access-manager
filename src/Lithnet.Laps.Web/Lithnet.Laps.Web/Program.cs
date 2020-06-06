@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using NLog.Web;
 using Lithnet.Laps.Web.Internal;
+using System.Reflection;
 
 namespace Lithnet.Laps.Web
 {
@@ -24,7 +25,7 @@ namespace Lithnet.Laps.Web
             var host = Host.CreateDefaultBuilder(args)
                  .ConfigureAppConfiguration(builder =>
                  {
-                     builder.AddJsonFile("appsecrets.json");
+                     builder.AddJsonFile("appsecrets.json", true);
                      builder.AddEnvironmentVariables("laps");
                      config = builder.Build();
                  }).ConfigureWebHostDefaults(webBuilder =>
@@ -33,7 +34,8 @@ namespace Lithnet.Laps.Web
                      webBuilder.UseConfiguration(config);
                      webBuilder.UseHttpSys(config);
                  })
-                 .UseNLog();
+                 .UseNLog()
+                 .UseWindowsService();
             
             return host;
         }

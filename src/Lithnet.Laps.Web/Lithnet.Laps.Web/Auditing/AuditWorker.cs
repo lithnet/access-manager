@@ -40,6 +40,9 @@ namespace Lithnet.Laps.Web.Internal
                     this.logger.Trace("Processing action from background queue");
                     item.Invoke();
                 }
+                catch(OperationCanceledException)
+                {
+                }
                 catch (Exception e)
                 {
                     logger.LogEventError(EventIDs.BackgroundTaskUnhandledError, "An unhandled exception occured in a background task", e);
