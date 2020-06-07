@@ -25,9 +25,10 @@ namespace Lithnet.Laps.Web.Controllers
         private readonly IAuditEventProcessor reporting;
         private readonly IRateLimiter rateLimiter;
         private readonly IUserInterfaceSettings userInterfaceSettings;
+        private readonly IAuthenticationProvider authenticationProvider;
 
         public LapController(IAuthorizationService authorizationService, ILogger logger, IDirectory directory,
-            IAuditEventProcessor reporting, IRateLimiter rateLimiter, IUserInterfaceSettings userInterfaceSettings)
+            IAuditEventProcessor reporting, IRateLimiter rateLimiter, IUserInterfaceSettings userInterfaceSettings, IAuthenticationProvider authenticationProvider)
         {
             this.authorizationService = authorizationService;
             this.logger = logger;
@@ -35,6 +36,7 @@ namespace Lithnet.Laps.Web.Controllers
             this.reporting = reporting;
             this.rateLimiter = rateLimiter;
             this.userInterfaceSettings = userInterfaceSettings;
+            this.authenticationProvider = authenticationProvider;
         }
 
         public IActionResult Get()
@@ -74,7 +76,7 @@ namespace Lithnet.Laps.Web.Controllers
 
                 try
                 {
-                    user = this.HttpContext.GetLoggedInUser(this.directory) ?? throw new NotFoundException();
+                    user = this.authenticationProvider.GetLoggedInUser() ?? throw new NotFoundException();
                 }
                 catch (NotFoundException ex)
                 {

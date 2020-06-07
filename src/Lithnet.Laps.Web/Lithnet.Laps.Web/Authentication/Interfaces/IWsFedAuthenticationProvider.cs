@@ -1,6 +1,6 @@
 ﻿namespace Lithnet.Laps.Web.AppSettings
 {
-    public interface IWsFedSettings : IExternalAuthProviderSettings
+    public interface IWsFedAuthenticationProvider : IIdpAuthenticationProvider
     {
         string Metadata { get; }
 

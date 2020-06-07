@@ -1,15 +1,19 @@
 ﻿using System.Security.Claims;
+using Lithnet.Laps.Web.ActiveDirectory;
 using Lithnet.Laps.Web.Internal;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using NLog;
 
 namespace Lithnet.Laps.Web.AppSettings
 {
-    public class OidcSettings : IOidcSettings
+    public class OidcAuthenticationProvider : IdpAuthenticationProvider, IOidcAuthenticationProvider
     {
         private readonly IConfiguration configuration;
 
-        public OidcSettings(IConfiguration configuration)
+        public OidcAuthenticationProvider(IConfiguration configuration, ILogger logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
+            : base(logger, directory, httpContextAccessor)
         {
             this.configuration = configuration;
         }
@@ -22,16 +26,16 @@ namespace Lithnet.Laps.Web.AppSettings
 
         public string Authority => this.configuration["authentication:oidc:authority"].TrimEnd('/');
 
-        public string ClaimName => this.configuration["authentication:oidc:claim-name"] ?? ClaimTypes.Upn;
+        public override string ClaimName => this.configuration["authentication:oidc:claim-name"] ?? ClaimTypes.Upn;
 
-        public string UniqueClaimTypeIdentifier => this.configuration["authentication:oidc:unique-claim-type-identifier"] ?? ClaimTypes.PrimarySid;
+        public override string UniqueClaimTypeIdentifier => this.configuration["authentication:oidc:unique-claim-type-identifier"] ?? ClaimTypes.PrimarySid;
 
         public string ResponseType => this.configuration["authentication:oidc:response-type"] ?? OpenIdConnectResponseType.CodeIdToken;
 
         public string PostLogoutRedirectUri => this.configuration["authentication:oidc:post-logout-redirect-uri"] ?? "/Home/LoggedOut";
 
-        public bool CanLogout => true;
+        public override bool CanLogout => true;
 
-        public bool IdpLogout => this.configuration.GetValueOrDefault("authentication:oidc:idp-logout", false);
+        public override bool IdpLogout => this.configuration.GetValueOrDefault("authentication:oidc:idp-logout", false);
     }
 }

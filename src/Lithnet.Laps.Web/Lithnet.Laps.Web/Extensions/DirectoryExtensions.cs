@@ -13,27 +13,6 @@ namespace Lithnet.Laps.Web.Internal
 {
     internal static class DirectoryExtensions
     {
-        public static string GetLoggedInUserSid(this HttpContext httpContext)
-        {
-            if (httpContext?.User == null)
-            {
-                return null;
-            }
-
-            ClaimsPrincipal principal = httpContext.User;
-
-            return principal.FindFirst(ClaimTypes.PrimarySid)?.Value ??
-                throw new NotFoundException(string.Format(LogMessages.UserNotFoundInDirectory, httpContext.User.Identity.Name));
-        }
-
-        public static IUser GetLoggedInUser(this HttpContext httpContext, IDirectory directory)
-        {
-            string sid = httpContext.GetLoggedInUserSid();
-
-            return directory.GetUser(sid) ??
-                throw new NotFoundException(string.Format(LogMessages.UserNotFoundInDirectory, httpContext.User.Identity.Name));
-        }
-
         public static bool TryParseAsSid(this string s, out SecurityIdentifier sid)
         {
             try

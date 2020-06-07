@@ -12,11 +12,11 @@ namespace Lithnet.Laps.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IExternalAuthProviderSettings authSettings;
+        private readonly IAuthenticationProvider authSettings;
 
         private readonly ILogger logger;
 
-        public HomeController(IExternalAuthProviderSettings authSettings, ILogger logger)
+        public HomeController(IAuthenticationProvider authSettings, ILogger logger)
         {
             this.authSettings = authSettings;
             this.logger = logger;

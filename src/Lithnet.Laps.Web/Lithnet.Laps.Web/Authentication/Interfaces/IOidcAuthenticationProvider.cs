@@ -1,6 +1,6 @@
 ﻿namespace Lithnet.Laps.Web.AppSettings
 {
-    public interface IOidcSettings : IExternalAuthProviderSettings
+    public interface IOidcAuthenticationProvider : IIdpAuthenticationProvider
     {
         string Authority { get; }
 

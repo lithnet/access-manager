@@ -1,6 +1,8 @@
-﻿namespace Lithnet.Laps.Web.AppSettings
+﻿using Lithnet.Laps.Web.ActiveDirectory;
+
+namespace Lithnet.Laps.Web.AppSettings
 {
-    public interface IExternalAuthProviderSettings
+    public interface IAuthenticationProvider
     {
         string ClaimName { get; }
 
@@ -9,5 +11,7 @@
         bool CanLogout { get;  }
 
         bool IdpLogout { get; }
+
+        IUser GetLoggedInUser();
     }
 }
