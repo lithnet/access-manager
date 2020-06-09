@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace Lithnet.Laps.Web.Authorization
 {
-    public class JsonTarget 
+    public class JsonTarget : IJsonTarget
     {
+        public JsonTarget (JsonAuditNotificationChannels channels, IList<JsonAce> acl)
+        {
+            this.NotificationChannels = channels;
+            this.Acl = acl?.Cast<IAce>()?.ToList();
+        }
+
         [JsonProperty("type")]
         public TargetType Type { get; private set; }
 
@@ -18,10 +25,10 @@ namespace Lithnet.Laps.Web.Authorization
         [JsonProperty("expire-after")]
         public TimeSpan ExpireAfter { get; private set; }
 
-        [JsonProperty("email-auditing")]
-        public JsonEmailAuditRecipients EmailAuditing { get; private set; }
+        [JsonProperty("notifications")]
+        public IAuditNotificationChannels NotificationChannels { get; private set; }
 
         [JsonProperty("acl")]
-        public List<JsonAce> Acl { get; private set; }
+        public IList<IAce> Acl { get; private set; }
     }
 }

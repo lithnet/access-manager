@@ -2,8 +2,13 @@
 
 namespace Lithnet.Laps.Web.Authorization
 {
-    public class JsonAce
+    public class JsonAce : IAce
     {
+        public JsonAce(JsonAuditNotificationChannels recipients)
+        {
+            this.NotificationChannels = recipients;
+        }
+
         [JsonProperty("name")]
         public string Name { get; set; }
 
@@ -13,7 +18,7 @@ namespace Lithnet.Laps.Web.Authorization
         [JsonProperty("type")]
         public AceType Type { get; set; }
 
-        [JsonProperty("email-auditing")]
-        public JsonEmailAuditRecipients EmailAuditing { get; private set; }
+        [JsonProperty("notifications")]
+        public IAuditNotificationChannels NotificationChannels { get; private set; }
     }
 }

@@ -4,6 +4,6 @@ namespace Lithnet.Laps.Web.Authorization
 {
     public interface IJsonTargetsProvider
     {
-        IList<JsonTarget> Targets { get; }
+        IList<IJsonTarget> Targets { get; }
     }
 }

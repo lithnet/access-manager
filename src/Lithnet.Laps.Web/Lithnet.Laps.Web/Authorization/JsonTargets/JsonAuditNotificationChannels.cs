@@ -3,12 +3,12 @@ using Newtonsoft.Json;
 
 namespace Lithnet.Laps.Web.Authorization
 {
-    public class JsonEmailAuditRecipients
+    public class JsonAuditNotificationChannels : IAuditNotificationChannels
     {
         [JsonProperty("on-success")]
-        public IList<string> SuccessRecipients { get; set; }
+        public IList<string> OnSuccess { get; set; }
 
         [JsonProperty("on-failure")]
-        public IList<string> FailureRecipients { get; set; }
+        public IList<string> OnFailure { get; set; }
     }
 }

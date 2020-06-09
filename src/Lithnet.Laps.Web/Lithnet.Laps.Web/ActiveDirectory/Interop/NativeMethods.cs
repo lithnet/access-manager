@@ -65,6 +65,12 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
         [DllImport("ntdsapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern void DsFreeNameResult(IntPtr pResult);
 
+        [DllImport("NetApi32.dll", CharSet = CharSet.Unicode, SetLastError =true)]
+        private static extern int DsGetDcName(string computerName, string domainName, IntPtr domainGuid, string siteName, DsGetDcNameFlags flags, out IntPtr domainControllerInfo);
+
+        [DllImport("NetApi32.dll", EntryPoint = "NetApiBufferFree")]
+        private static extern int NetApiFreeBuffer(IntPtr buffer);
+
         [DllImport("authz.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool AuthzInitializeRemoteResourceManager(IntPtr rpcInitInfo, out IntPtr authRm);
@@ -170,13 +176,46 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
             }
             else
             {
-                server = NativeMethods.GetDomainNameFromSid(requestContext.AccountDomainSid);
+                string dnsDomain = NativeMethods.GetDnsDomainNameFromSid(requestContext.AccountDomainSid);
+                server = NativeMethods.GetDomainControllerForDnsDomain(dnsDomain);
             }
 
             return NativeMethods.CheckForSidInToken(principalSid, sidToCheck, server);
         }
 
-        private static string GetDomainNameFromSid(SecurityIdentifier sid, int referralLevel = 0)
+        private static string GetDomainControllerForDnsDomain(string dnsDomain, bool forceRediscovery = false)
+        {
+            IntPtr pdcInfo = IntPtr.Zero;
+
+            try
+            {
+                int result = DsGetDcName(
+                    null,
+                    dnsDomain,
+                    IntPtr.Zero,
+                    null, 
+                    DsGetDcNameFlags.DS_DIRECTORY_SERVICE_8_REQUIRED | (forceRediscovery ? DsGetDcNameFlags.DS_FORCE_REDISCOVERY : 0),
+                    out pdcInfo);
+
+                if (result != 0)
+                {
+                    throw new Win32Exception(result);
+                }
+
+                DomainControllerInfo info = Marshal.PtrToStructure<DomainControllerInfo>(pdcInfo);
+
+                return info.DomainControllerName.TrimStart('\\');
+            }
+            finally
+            {
+                if (pdcInfo != IntPtr.Zero)
+                {
+                    NetApiFreeBuffer(pdcInfo);
+                }
+            }
+        }
+
+        private static string GetDnsDomainNameFromSid(SecurityIdentifier sid, int referralLevel = 0)
         {
             IntPtr hds = IntPtr.Zero;
 
@@ -353,7 +392,14 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
 
                 if (!NativeMethods.AuthzInitializeContextFromSid(AuthzInitFlags.Default, sidBytes, authzRm, IntPtr.Zero, Luid.NullLuid, IntPtr.Zero, out userClientCtxt))
                 {
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                    int errorCode = Marshal.GetLastWin32Error();
+
+                    if (errorCode == 5)
+                    {
+                        throw new Win32Exception(errorCode, "Access was denied. Please ensure that \r\n1) The service account is a member of the built-in group called 'Windows Authorization Access Group' in the domain where the computer object is located\r\n2) The service account is a member of the built-in group called 'Access Control Assistance Operators' in the domain where the computer object is located");
+                    }
+
+                    throw new Win32Exception(errorCode);
                 }
 
                 uint sizeRequired = 0;

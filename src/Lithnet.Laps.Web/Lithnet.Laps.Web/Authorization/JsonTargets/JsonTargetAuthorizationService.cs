@@ -13,13 +13,16 @@ namespace Lithnet.Laps.Web.Authorization
 
         private readonly ILogger logger;
 
-        private readonly IList<JsonTarget> targets;
+        private readonly IList<IJsonTarget> targets;
 
-        public JsonTargetAuthorizationService(IDirectory directory, ILogger logger, IJsonTargetsProvider provider)
+        private readonly IAceEvaluator aceEvaluator;
+
+        public JsonTargetAuthorizationService(IDirectory directory, ILogger logger, IJsonTargetsProvider provider, IAceEvaluator aceEvaluator)
         {
             this.directory = directory;
             this.logger = logger;
-            this.targets = provider.Targets ?? new List<JsonTarget>();
+            this.targets = provider.Targets ?? new List<IJsonTarget>();
+            this.aceEvaluator = aceEvaluator;
         }
 
         public AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer)
@@ -36,11 +39,11 @@ namespace Lithnet.Laps.Web.Authorization
                 };
             }
 
-            foreach (JsonTarget j in targets)
+            foreach (IJsonTarget j in targets)
             {
                 foreach (var ace in j.Acl?.Where(t => t.Type == AceType.Deny))
                 {
-                    if (this.IsMatchingAce(ace, computer, user))
+                    if (this.aceEvaluator.IsMatchingAce(ace, computer, user))
                     {
                         this.logger.Trace($"User {user.SamAccountName} matches deny ACE {ace.Sid ?? ace.Name} and is denied from reading passwords for computer {computer.SamAccountName} from target {j.Name}");
 
@@ -61,11 +64,11 @@ namespace Lithnet.Laps.Web.Authorization
 
             List<string> failureNotificationRecipients = new List<string>();
 
-            foreach (JsonTarget j in targets)
+            foreach (IJsonTarget j in targets)
             {
                 foreach (var ace in j.Acl?.Where(t => t.Type == AceType.Allow))
                 {
-                    if (this.IsMatchingAce(ace, computer, user))
+                    if (this.aceEvaluator.IsMatchingAce(ace, computer, user))
                     {
                         this.logger.Trace($"User {user.SamAccountName} matches allow ACE {ace.Sid ?? ace.Name} and is authorized to read passwords for computer {computer.SamAccountName} from target {j.Name}");
 
@@ -80,7 +83,7 @@ namespace Lithnet.Laps.Web.Authorization
                     }
 
                     this.logger.Trace($"Allowed principal {ace.Sid ?? ace.Name} does not match current user {user.SamAccountName}");
-                    j.EmailAuditing?.FailureRecipients?.ForEach(u => failureNotificationRecipients.Add(u));
+                    j.NotificationChannels?.OnFailure?.ForEach(u => failureNotificationRecipients.Add(u));
                 }
             }
 
@@ -93,46 +96,28 @@ namespace Lithnet.Laps.Web.Authorization
             };
         }
 
-        private IList<string> GetNotificationRecipients(JsonTarget t, JsonAce a, bool success)
+        private IList<string> GetNotificationRecipients(IJsonTarget t, IAce a, bool success)
         {
             List<string> list = new List<string>();
 
             if (success)
             {
-                t.EmailAuditing?.SuccessRecipients?.ForEach(u => list.Add(u));
-                a.EmailAuditing?.SuccessRecipients?.ForEach(u => list.Add(u));
+                t.NotificationChannels?.OnSuccess?.ForEach(u => list.Add(u));
+                a.NotificationChannels?.OnSuccess?.ForEach(u => list.Add(u));
             }
             else
             {
-                t.EmailAuditing?.FailureRecipients?.ForEach(u => list.Add(u));
-                a.EmailAuditing?.FailureRecipients?.ForEach(u => list.Add(u));
+                t.NotificationChannels?.OnFailure?.ForEach(u => list.Add(u));
+                a.NotificationChannels?.OnFailure?.ForEach(u => list.Add(u));
             }
 
             return list;
         }
 
-        private bool IsMatchingAce(JsonAce ace, IComputer computer, IUser user)
+
+        private IList<IJsonTarget> GetMatchingTargetsForComputer(IComputer computer)
         {
-            ISecurityPrincipal principal;
-
-            try
-            {
-                principal = this.directory.GetPrincipal(ace.Sid ?? ace.Name);
-            }
-            catch (NotFoundException)
-            {
-                this.logger.Warn($"Could not match reader principal {ace.Sid ?? ace.Name} to a directory object");
-                return false;
-            }
-
-            this.logger.Trace($"Ace principal {ace.Sid ?? ace.Name} found in directory as  {principal.DistinguishedName}");
-
-            return this.directory.IsSidInPrincipalToken(computer.Sid.AccountDomainSid, user, principal.Sid);
-        }
-
-        private IList<JsonTarget> GetMatchingTargetsForComputer(IComputer computer)
-        {
-            List<JsonTarget> matchingTargets = new List<JsonTarget>();
+            List<IJsonTarget> matchingTargets = new List<IJsonTarget>();
 
             foreach (var target in this.targets.OrderBy(t => (int)t.Type))
             {

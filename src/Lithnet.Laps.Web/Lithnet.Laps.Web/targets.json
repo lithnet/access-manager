@@ -3,7 +3,7 @@
     {
       "name": "idm-d1nps1-v02",
       "type": "computer",
-     // "expire-after": "02:00:00",
+      // "expire-after": "02:00:00",
       "acl": [
         {
           "name": "fim-dev1\\domain admins",
@@ -14,7 +14,7 @@
           "type": "deny"
         }
       ],
-      "auditing": {
+      "notifications": {
         "on-success": [ "email-domain-admins" ],
         "on-failure": [ "email-domain-admins" ]
       }
@@ -36,7 +36,7 @@
           "type": "allow"
         }
       ],
-      "auditing": {
+      "notifications": {
         "on-success": [ "email-domain-admins" ],
         "on-failure": [ "email-domain-admins" ]
       }
@@ -59,7 +59,7 @@
           "type": "allow"
         }
       ],
-      "auditing": {
+      "notifications": {
         "on-success": [ "email-domain-admins" ],
         "on-failure": [ "email-domain-admins" ]
       }

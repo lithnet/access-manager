@@ -18,9 +18,9 @@ namespace Lithnet.Laps.Web.Authorization
             this.env = env;
         }
 
-        private IList<JsonTarget> targets;
+        private IList<IJsonTarget> targets;
 
-        public IList<JsonTarget> Targets
+        public IList<IJsonTarget> Targets
         {
             get
             {
@@ -28,7 +28,7 @@ namespace Lithnet.Laps.Web.Authorization
                 {
                     if (this.config.JsonProviderEnabled)
                     {
-                        string path = Path.Combine(this.env.ContentRootPath, this.config.JsonAuthorizationFile); 
+                        string path = Path.Combine(this.env.ContentRootPath, this.config.JsonAuthorizationFile);
                         if (!File.Exists(path))
                         {
                             throw new FileNotFoundException($"The JSON authorization file was not found: {path}");
@@ -36,11 +36,11 @@ namespace Lithnet.Laps.Web.Authorization
 
                         var targetFile = JsonConvert.DeserializeObject<JsonTargets>(File.ReadAllText(path));
 
-                        this.targets = targetFile?.Targets ?? new List<JsonTarget>();
+                        this.targets = targetFile?.Targets ?? new List<IJsonTarget>();
                     }
                     else
                     {
-                        this.targets = new List<JsonTarget>();
+                        this.targets = new List<IJsonTarget>();
                     }
                 }
 
