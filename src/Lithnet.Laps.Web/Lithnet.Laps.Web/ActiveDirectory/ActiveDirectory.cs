@@ -105,9 +105,9 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             return result == null ? null : new ActiveDirectoryGroup(result);
         }
 
-        public bool IsSidInPrincipalToken(SecurityIdentifier targetDomain, ISecurityPrincipal principal, SecurityIdentifier sidToCheck)
+        public bool IsSidInPrincipalToken(SecurityIdentifier targetDomain, ISecurityPrincipal principal, SecurityIdentifier sidToFindInToken)
         {
-            return NativeMethods.CheckForSidInToken(principal.Sid, sidToCheck, targetDomain);
+            return NativeMethods.CheckForSidInToken(principal.Sid, sidToFindInToken, targetDomain);
         }
 
         private SearchResult DoGcLookup(string objectName, string objectClass, IEnumerable<string> propertiesToGet)

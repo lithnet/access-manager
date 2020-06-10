@@ -65,7 +65,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
         [DllImport("ntdsapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern void DsFreeNameResult(IntPtr pResult);
 
-        [DllImport("NetApi32.dll", CharSet = CharSet.Unicode, SetLastError =true)]
+        [DllImport("NetApi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern int DsGetDcName(string computerName, string domainName, IntPtr domainGuid, string siteName, DsGetDcNameFlags flags, out IntPtr domainControllerInfo);
 
         [DllImport("NetApi32.dll", EntryPoint = "NetApiBufferFree")]
@@ -96,64 +96,15 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool AuthzGetInformationFromContext(IntPtr hAuthzClientContext, AuthzContextInformationClass infoClass, uint bufferSize, out uint pSizeRequired, IntPtr buffer);
 
-        public static string GetDnFromGc(string nameToFind, string dnsDomainName = null, int referralLevel = 0)
+        public static string GetDnFromGc(string nameToFind)
         {
-            IntPtr hds = IntPtr.Zero;
+            return GetDnFromGc(nameToFind, DsNameFormat.DS_UNKNOWN_NAME);
+        }
 
-            try
-            {
-                int result = NativeMethods.DsBind(null, dnsDomainName, out hds);
-                if (result != 0)
-                {
-                    throw new Win32Exception(result);
-                }
-
-                DsNameResultItem nameResult = NativeMethods.CrackNames(hds, DsNameFlags.DS_NAME_FLAG_TRUST_REFERRAL, DsNameFormat.DS_UNKNOWN_NAME, DsNameFormat.DS_FQDN_1779_NAME, nameToFind);
-
-                switch (nameResult.Status)
-                {
-                    case DsNameError.None:
-                        return nameResult.Name;
-
-                    case DsNameError.NoMapping:
-                        throw new InvalidOperationException($"The object name {nameToFind} was found in the global catalog, but could not be mapped to a DN");
-
-                    case DsNameError.TrustReferral:
-                    case DsNameError.DomainOnly:
-                        if (!string.IsNullOrWhiteSpace(nameResult.Domain))
-                        {
-                            if (referralLevel < NativeMethods.DirectoryReferralLimit)
-                            {
-                                return NativeMethods.GetDnFromGc(nameToFind, nameResult.Domain, ++referralLevel);
-                            }
-
-                            throw new InvalidOperationException("The referral limit exceeded the maximum configured value");
-                        }
-
-                        throw new NotFoundException($"A referral to the object name {nameToFind} was received from the global catalog, but no referral information was provided. DsNameError: {nameResult.Status}");
-
-                    case DsNameError.NotFound:
-                        throw new NotFoundException($"The object name {nameToFind} was not found in the global catalog");
-
-                    case DsNameError.NotUnique:
-                        throw new InvalidOperationException($"There was more than one object with the name {nameToFind} in the global catalog");
-
-                    case DsNameError.Resolving:
-                        throw new InvalidOperationException($"The object name {nameToFind} was not able to be searched in the global catalog");
-
-                    case DsNameError.NoSyntacticalMapping:
-                        throw new ArgumentException($"DsCrackNames unexpectedly returned DS_NAME_ERROR_NO_SYNTACTICAL_MAPPING for name {nameToFind}");
-                }
-
-                return nameResult.Name;
-            }
-            finally
-            {
-                if (hds != IntPtr.Zero)
-                {
-                    NativeMethods.DsUnBind(hds);
-                }
-            }
+        public static string GetDnFromGc(string nameToFind, DsNameFormat nameFormat)
+        {
+            var result = CrackNames(nameFormat, DsNameFormat.DS_FQDN_1779_NAME, nameToFind);
+            return result.Name;
         }
 
         public static bool CheckForSidInToken(SecurityIdentifier principalSid, SecurityIdentifier sidToCheck, SecurityIdentifier requestContext = null)
@@ -193,7 +144,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
                     null,
                     dnsDomain,
                     IntPtr.Zero,
-                    null, 
+                    null,
                     DsGetDcNameFlags.DS_DIRECTORY_SERVICE_8_REQUIRED | (forceRediscovery ? DsGetDcNameFlags.DS_FORCE_REDISCOVERY : 0),
                     out pdcInfo);
 
@@ -215,29 +166,33 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
             }
         }
 
-        private static string GetDnsDomainNameFromSid(SecurityIdentifier sid, int referralLevel = 0)
+        private static string GetDnsDomainNameFromSid(SecurityIdentifier sid)
+        {
+            var result = CrackNames(DsNameFormat.DS_SID_OR_SID_HISTORY_NAME, DsNameFormat.DS_NT4_ACCOUNT_NAME, sid.Value);
+            return result.Domain;
+        }
+
+        private static DsNameResultItem CrackNames(DsNameFormat formatOffered, DsNameFormat formatDesired, string name, string dnsDomainName = null, int referralLevel = 0)
         {
             IntPtr hds = IntPtr.Zero;
 
             try
             {
-                int result = NativeMethods.DsBind(null, null, out hds);
+                int result = NativeMethods.DsBind(null, dnsDomainName, out hds);
                 if (result != 0)
                 {
                     throw new Win32Exception(result);
                 }
 
-                string nameToFind = sid.Value;
-
-                DsNameResultItem nameResult = NativeMethods.CrackNames(hds, DsNameFlags.DS_NAME_FLAG_TRUST_REFERRAL, DsNameFormat.DS_SID_OR_SID_HISTORY_NAME, DsNameFormat.DS_NT4_ACCOUNT_NAME, nameToFind);
+                DsNameResultItem nameResult = NativeMethods.CrackNames(hds, DsNameFlags.DS_NAME_FLAG_TRUST_REFERRAL, formatOffered, formatDesired, name);
 
                 switch (nameResult.Status)
                 {
                     case DsNameError.None:
-                        return nameResult.Domain;
+                        return nameResult;
 
                     case DsNameError.NoMapping:
-                        throw new InvalidOperationException($"The object name {nameToFind} was found in the global catalog, but could not be mapped to a DN");
+                        throw new InvalidOperationException($"The object name {name} was found in the global catalog, but could not be mapped to a DN");
 
                     case DsNameError.TrustReferral:
                     case DsNameError.DomainOnly:
@@ -245,28 +200,29 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
                         {
                             if (referralLevel < NativeMethods.DirectoryReferralLimit)
                             {
-                                return NativeMethods.GetDnFromGc(nameToFind, nameResult.Domain, ++referralLevel);
+                                return NativeMethods.CrackNames(formatOffered, formatDesired, name, nameResult.Domain, ++referralLevel);
                             }
 
                             throw new InvalidOperationException("The referral limit exceeded the maximum configured value");
                         }
 
-                        throw new NotFoundException($"A referral to the object name {nameToFind} was received from the global catalog, but no referral information was provided. DsNameError: {nameResult.Status}");
+                        throw new NotFoundException($"A referral to the object name {name} was received from the global catalog, but no referral information was provided. DsNameError: {nameResult.Status}");
 
                     case DsNameError.NotFound:
-                        throw new NotFoundException($"The object name {nameToFind} was not found in the global catalog");
+                        throw new NotFoundException($"The object name {name} was not found in the global catalog");
 
                     case DsNameError.NotUnique:
-                        throw new InvalidOperationException($"There was more than one object with the name {nameToFind} in the global catalog");
+                        throw new InvalidOperationException($"There was more than one object with the name {name} in the global catalog");
 
                     case DsNameError.Resolving:
-                        throw new InvalidOperationException($"The object name {nameToFind} was not able to be searched in the global catalog");
+                        throw new InvalidOperationException($"The object name {name} was not able to be resolved in the global catalog");
 
                     case DsNameError.NoSyntacticalMapping:
-                        throw new ArgumentException($"DsCrackNames unexpectedly returned DS_NAME_ERROR_NO_SYNTACTICAL_MAPPING for name {nameToFind}");
-                }
+                        throw new ArgumentException($"DsCrackNames unexpectedly returned DS_NAME_ERROR_NO_SYNTACTICAL_MAPPING for name {name}");
 
-                return nameResult.Name;
+                    default:
+                        throw new InvalidOperationException($"An unexpected status was returned from DsCrackNames {nameResult.Status}");
+                }
             }
             finally
             {
