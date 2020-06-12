@@ -4,9 +4,9 @@ using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
 using System.Security.Principal;
 using System.Text;
-using Lithnet.Laps.Web.Models;
 using Lithnet.Laps.Web.ActiveDirectory.Interop;
 using Lithnet.Laps.Web.Internal;
+using Lithnet.Laps.Web.Models;
 
 namespace Lithnet.Laps.Web.ActiveDirectory
 {
@@ -48,7 +48,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory
                 return new ActiveDirectoryUser(result);
             }
 
-            throw new InvalidOperationException($"The object '{principalName}' was of an unknown type");
+            throw new UnsupportedPrincipalTypeException($"The object '{principalName}' was of an unknown type: {result.GetPropertyCommaSeparatedString("objectClass")}");
         }
 
         public PasswordData GetPassword(IComputer computer)
@@ -105,9 +105,14 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             return result == null ? null : new ActiveDirectoryGroup(result);
         }
 
-        public bool IsSidInPrincipalToken(SecurityIdentifier targetDomain, ISecurityPrincipal principal, SecurityIdentifier sidToFindInToken)
+        public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, ISecurityPrincipal principal)
         {
-            return NativeMethods.CheckForSidInToken(principal.Sid, sidToFindInToken, targetDomain);
+            return this.IsSidInPrincipalToken(sidToFindInToken, principal, principal.Sid.AccountDomainSid);
+        }
+
+        public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, ISecurityPrincipal principal, SecurityIdentifier targetDomainSid)
+        {
+            return NativeMethods.CheckForSidInToken(principal.Sid, sidToFindInToken, targetDomainSid);
         }
 
         private SearchResult DoGcLookup(string objectName, string objectClass, IEnumerable<string> propertiesToGet)
@@ -130,7 +135,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory
 
             if (dn == null)
             {
-                throw new NotFoundException($"An object {objectName} of type {objectClass} was not found in the global catalog");
+                throw new ObjectNotFoundException($"An object {objectName} of type {objectClass} was not found in the global catalog");
             }
 
             DirectorySearcher d = new DirectorySearcher
@@ -151,7 +156,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory
 
             if (result == null)
             {
-                throw new NotFoundException($"The object {dn} was not found in the directory or was not of the object class {objectClass}");
+                throw new ObjectNotFoundException($"The object {dn} was not found in the directory or was not of the object class {objectClass}");
             }
 
             return result;

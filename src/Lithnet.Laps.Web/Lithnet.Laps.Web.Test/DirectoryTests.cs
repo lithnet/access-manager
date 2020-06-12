@@ -55,7 +55,7 @@ namespace Lithnet.Laps.Web.Test
             ISecurityPrincipal userPrincipal = this.directory.GetPrincipal(targetToFind);
             ISecurityPrincipal userOrGroupPrincipal = this.directory.GetPrincipal(targetTokensToCheck);
 
-            Assert.IsTrue(this.directory.IsSidInPrincipalToken(userOrGroupPrincipal.Sid.AccountDomainSid, userPrincipal, userOrGroupPrincipal.Sid));
+            Assert.IsTrue(this.directory.IsSidInPrincipalToken(userOrGroupPrincipal.Sid, userPrincipal, userOrGroupPrincipal.Sid.AccountDomainSid));
         }
 
         [TestCase("SUBDEV1\\user1", "IDMDEV1\\G-GG-1"), TestCase("SUBDEV1\\user2", "IDMDEV1\\G-GG-2"), TestCase("SUBDEV1\\user3", "IDMDEV1\\G-GG-3")]
@@ -67,7 +67,7 @@ namespace Lithnet.Laps.Web.Test
             ISecurityPrincipal userPrincipal = this.directory.GetPrincipal(targetToFind);
             ISecurityPrincipal userOrGroupPrincipal = this.directory.GetPrincipal(targetTokensToCheck);
 
-            Assert.IsFalse(this.directory.IsSidInPrincipalToken(userOrGroupPrincipal.Sid.AccountDomainSid, userPrincipal, userOrGroupPrincipal.Sid));
+            Assert.IsFalse(this.directory.IsSidInPrincipalToken(userOrGroupPrincipal.Sid, userPrincipal, userOrGroupPrincipal.Sid.AccountDomainSid));
         }
 
         [TestCase("IDMDEV1\\PC1", "DC=IDMDEV1,DC=LOCAL")]
@@ -192,7 +192,7 @@ namespace Lithnet.Laps.Web.Test
         [TestCase("G-DG-1")]
         public void TestUnqualifiedDomainLocalGroupNotFound(string group)
         {
-            Assert.Throws<NotFoundException>(() => this.directory.GetGroup(group));
+            Assert.Throws<ObjectNotFoundException>(() => this.directory.GetGroup(group));
         }
 
         [TestCase("user1")]

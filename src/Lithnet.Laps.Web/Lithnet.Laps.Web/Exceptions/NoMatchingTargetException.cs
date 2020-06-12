@@ -3,7 +3,7 @@
 namespace Lithnet.Laps.Web
 {
     [Serializable]
-    public class NoMatchingTargetException : Exception
+    public class NoMatchingTargetException : LapsWebAppException
     {
         public NoMatchingTargetException()
         {

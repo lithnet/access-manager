@@ -20,6 +20,6 @@ namespace Lithnet.Laps.Web.ActiveDirectory
 
         ISecurityPrincipal GetPrincipal(string principalName);
 
-        bool IsSidInPrincipalToken(SecurityIdentifier targetDomain, ISecurityPrincipal principal, SecurityIdentifier sidToCheck);
+        bool IsSidInPrincipalToken(SecurityIdentifier sidToCheck, ISecurityPrincipal principal, SecurityIdentifier targetDomain);
     }
 }

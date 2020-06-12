@@ -3,7 +3,7 @@
 namespace Lithnet.Laps.Web
 {
     [Serializable]
-    public class PowerShellScriptException : Exception
+    public class PowerShellScriptException : LapsWebAppException
     {
         public PowerShellScriptException()
         {

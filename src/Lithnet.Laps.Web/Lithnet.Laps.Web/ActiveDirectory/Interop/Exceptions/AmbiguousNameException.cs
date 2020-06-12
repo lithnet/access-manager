@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 
 namespace Lithnet.Laps.Web
 {
     [Serializable]
-    public class AmbiguousNameException : Exception
+    public class AmbiguousNameException : DirectoryException
     {
         public AmbiguousNameException()
         {

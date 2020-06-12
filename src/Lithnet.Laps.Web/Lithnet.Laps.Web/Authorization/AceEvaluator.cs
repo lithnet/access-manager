@@ -1,9 +1,6 @@
 ﻿using Lithnet.Laps.Web.ActiveDirectory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using NLog;
+using System;
 
 namespace Lithnet.Laps.Web.Authorization
 {
@@ -18,23 +15,28 @@ namespace Lithnet.Laps.Web.Authorization
             this.logger = logger;
         }
 
-        public bool IsMatchingAce(IAce ace, IComputer computer, IUser user)
+        public bool IsMatchingAce(IAce ace, ISecurityPrincipal user)
         {
-            ISecurityPrincipal principal;
-
+            ISecurityPrincipal trustee;
             try
             {
-                principal = this.directory.GetPrincipal(ace.Sid ?? ace.Name);
+                trustee = this.directory.GetPrincipal(ace.Sid ?? ace.Name);
+
+                this.logger.Trace($"Ace trustee {ace.Sid ?? ace.Name} found in directory as {trustee.DistinguishedName}");
+
+                return this.directory.IsSidInPrincipalToken(trustee.Sid, user, trustee.Sid.AccountDomainSid);
             }
-            catch (NotFoundException)
+            catch (Exception ex)
             {
-                this.logger.Warn($"Could not match reader principal {ace.Sid ?? ace.Name} to a directory object");
-                return false;
+                this.logger.Error(ex, "An error occurred matching the ACE");
+
+                if (ace.Type == AceType.Deny)
+                {
+                    throw;
+                }
             }
 
-            this.logger.Trace($"Ace principal {ace.Sid ?? ace.Name} found in directory as  {principal.DistinguishedName}");
-
-            return this.directory.IsSidInPrincipalToken(computer.Sid.AccountDomainSid, user, principal.Sid);
+            return false;
         }
     }
 }

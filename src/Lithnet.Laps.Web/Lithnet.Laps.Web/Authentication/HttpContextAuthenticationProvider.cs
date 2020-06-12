@@ -36,7 +36,7 @@ namespace Lithnet.Laps.Web.AppSettings
             string sid = this.GetLoggedInUserSid();
 
             return directory.GetUser(sid) ??
-                throw new NotFoundException(string.Format(LogMessages.UserNotFoundInDirectory, this.httpContextAccessor.HttpContext.User?.Identity?.Name ?? "<unknown user>"));
+                throw new ObjectNotFoundException(string.Format(LogMessages.UserNotFoundInDirectory, this.httpContextAccessor.HttpContext.User?.Identity?.Name ?? "<unknown user>"));
         }
 
         private string GetLoggedInUserSid()
@@ -49,7 +49,7 @@ namespace Lithnet.Laps.Web.AppSettings
             ClaimsPrincipal principal = this.httpContextAccessor.HttpContext.User;
 
             return principal.FindFirst(ClaimTypes.PrimarySid)?.Value ??
-                throw new NotFoundException(string.Format(LogMessages.UserNotFoundInDirectory, this.httpContextAccessor.HttpContext.User?.Identity?.Name ?? "<unknown user>"));
+                throw new ObjectNotFoundException(string.Format(LogMessages.UserNotFoundInDirectory, this.httpContextAccessor.HttpContext.User?.Identity?.Name ?? "<unknown user>"));
         }
     }
 }

@@ -43,7 +43,7 @@ namespace Lithnet.Laps.Web.Authorization
             {
                 foreach (var ace in j.Acl?.Where(t => t.Type == AceType.Deny))
                 {
-                    if (this.aceEvaluator.IsMatchingAce(ace, computer, user))
+                    if (this.aceEvaluator.IsMatchingAce(ace, user))
                     {
                         this.logger.Trace($"User {user.SamAccountName} matches deny ACE {ace.Sid ?? ace.Name} and is denied from reading passwords for computer {computer.SamAccountName} from target {j.Name}");
 
@@ -68,7 +68,7 @@ namespace Lithnet.Laps.Web.Authorization
             {
                 foreach (var ace in j.Acl?.Where(t => t.Type == AceType.Allow))
                 {
-                    if (this.aceEvaluator.IsMatchingAce(ace, computer, user))
+                    if (this.aceEvaluator.IsMatchingAce(ace, user))
                     {
                         this.logger.Trace($"User {user.SamAccountName} matches allow ACE {ace.Sid ?? ace.Name} and is authorized to read passwords for computer {computer.SamAccountName} from target {j.Name}");
 
@@ -138,7 +138,7 @@ namespace Lithnet.Laps.Web.Authorization
                         {
                             p = this.directory.GetComputer(target.Name);
                         }
-                        catch (NotFoundException ex)
+                        catch (ObjectNotFoundException ex)
                         {
                             this.logger.Trace(ex, $"Target computer {target.Name} was not found in the directory");
                             continue;
@@ -157,13 +157,13 @@ namespace Lithnet.Laps.Web.Authorization
                         {
                             g = this.directory.GetGroup(target.Name);
                         }
-                        catch (NotFoundException ex)
+                        catch (ObjectNotFoundException ex)
                         {
                             this.logger.Trace(ex, $"Target group {target.Name} was not found in the directory");
                             continue;
                         }
 
-                        if (this.directory.IsSidInPrincipalToken(computer.Sid, computer, g.Sid))
+                        if (this.directory.IsSidInPrincipalToken(g.Sid, computer, computer.Sid))
                         {
                             this.logger.Trace($"Matched {computer.SamAccountName} to target group {target.Name}");
                             matchingTargets.Add(target);

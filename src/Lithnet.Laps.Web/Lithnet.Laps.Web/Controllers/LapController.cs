@@ -76,9 +76,9 @@ namespace Lithnet.Laps.Web.Controllers
 
                 try
                 {
-                    user = this.authenticationProvider.GetLoggedInUser() ?? throw new NotFoundException();
+                    user = this.authenticationProvider.GetLoggedInUser() ?? throw new ObjectNotFoundException();
                 }
-                catch (NotFoundException ex)
+                catch (ObjectNotFoundException ex)
                 {
                     this.logger.LogEventError(EventIDs.SsoIdentityNotFound, null, ex);
 
@@ -100,7 +100,7 @@ namespace Lithnet.Laps.Web.Controllers
 
                 try
                 {
-                    computer = this.directory.GetComputer(model.ComputerName) ?? throw new NotFoundException();
+                    computer = this.directory.GetComputer(model.ComputerName) ?? throw new ObjectNotFoundException();
                 }
                 catch (AmbiguousNameException ex)
                 {
@@ -109,7 +109,7 @@ namespace Lithnet.Laps.Web.Controllers
                     model.FailureReason = UIMessages.ComputerNameAmbiguous;
                     return this.View("Get", model);
                 }
-                catch (NotFoundException ex)
+                catch (ObjectNotFoundException ex)
                 {
                     this.logger.LogEventError(EventIDs.ComputerNotFound, string.Format(LogMessages.ComputerNotFoundInDirectory, user.SamAccountName, model.ComputerName), ex);
 

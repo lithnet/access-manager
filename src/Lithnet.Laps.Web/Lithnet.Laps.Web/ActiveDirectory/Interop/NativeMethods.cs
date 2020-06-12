@@ -150,7 +150,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
 
                 if (result != 0)
                 {
-                    throw new Win32Exception(result);
+                    throw new DirectoryException("DsGetDcName failed", new Win32Exception(result));
                 }
 
                 DomainControllerInfo info = Marshal.PtrToStructure<DomainControllerInfo>(pdcInfo);
@@ -181,7 +181,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
                 int result = NativeMethods.DsBind(null, dnsDomainName, out hds);
                 if (result != 0)
                 {
-                    throw new Win32Exception(result);
+                    throw new DirectoryException("DsBind failed", new Win32Exception(result));
                 }
 
                 DsNameResultItem nameResult = NativeMethods.CrackNames(hds, DsNameFlags.DS_NAME_FLAG_TRUST_REFERRAL, formatOffered, formatDesired, name);
@@ -192,7 +192,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
                         return nameResult;
 
                     case DsNameError.NoMapping:
-                        throw new InvalidOperationException($"The object name {name} was found in the global catalog, but could not be mapped to a DN");
+                        throw new NameMappingException($"The object name {name} was found in the global catalog, but could not be mapped to a DN. DsCrackNames returned NO_MAPPING");
 
                     case DsNameError.TrustReferral:
                     case DsNameError.DomainOnly:
@@ -203,25 +203,25 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
                                 return NativeMethods.CrackNames(formatOffered, formatDesired, name, nameResult.Domain, ++referralLevel);
                             }
 
-                            throw new InvalidOperationException("The referral limit exceeded the maximum configured value");
+                            throw new ReferralLimitExceededException("The referral limit exceeded the maximum configured value");
                         }
 
-                        throw new NotFoundException($"A referral to the object name {name} was received from the global catalog, but no referral information was provided. DsNameError: {nameResult.Status}");
+                        throw new ReferralFailedException($"A referral to the object name {name} was received from the global catalog, but no referral information was provided. DsNameError: {nameResult.Status}");
 
                     case DsNameError.NotFound:
-                        throw new NotFoundException($"The object name {name} was not found in the global catalog");
+                        throw new ObjectNotFoundException($"The object name {name} was not found in the global catalog");
 
                     case DsNameError.NotUnique:
-                        throw new InvalidOperationException($"There was more than one object with the name {name} in the global catalog");
+                        throw new AmbiguousNameException($"There was more than one object with the name {name} in the global catalog");
 
                     case DsNameError.Resolving:
-                        throw new InvalidOperationException($"The object name {name} was not able to be resolved in the global catalog");
+                        throw new NameMappingException($"The object name {name} was not able to be resolved in the global catalog. DsCrackNames returned RESOLVING");
 
                     case DsNameError.NoSyntacticalMapping:
-                        throw new ArgumentException($"DsCrackNames unexpectedly returned DS_NAME_ERROR_NO_SYNTACTICAL_MAPPING for name {name}");
+                        throw new NameMappingException($"DsCrackNames unexpectedly returned DS_NAME_ERROR_NO_SYNTACTICAL_MAPPING for name {name}");
 
                     default:
-                        throw new InvalidOperationException($"An unexpected status was returned from DsCrackNames {nameResult.Status}");
+                        throw new NameMappingException($"An unexpected status was returned from DsCrackNames {nameResult.Status}");
                 }
             }
             finally
@@ -252,14 +252,14 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
 
                 if (result != 0)
                 {
-                    throw new Win32Exception(result);
+                    throw new DirectoryException("DsCrackNames failed", new Win32Exception(result));
                 }
 
                 DsNameResult dsNameResult = (DsNameResult)Marshal.PtrToStructure(pDsNameResult, typeof(DsNameResult));
 
                 if (dsNameResult.cItems == 0)
                 {
-                    throw new InvalidOperationException("DsCrackNames returned an unexpected result");
+                    throw new DirectoryException("DsCrackNames returned an unexpected result");
                 }
 
                 resultItems = new DsNameResultItem[dsNameResult.cItems];
@@ -326,7 +326,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
 
                         if (!NativeMethods.AuthzInitializeRemoteResourceManager(pClientInfo, out authzRm))
                         {
-                            throw new Win32Exception(Marshal.GetLastWin32Error());
+                            throw new DirectoryException("AuthzInitializeRemoteResourceManager failed", new Win32Exception(Marshal.GetLastWin32Error()));
                         }
                     }
                 }
@@ -339,7 +339,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
                 {
                     if (!NativeMethods.AuthzInitializeResourceManager(AuthzResourceManagerFlags.NO_AUDIT, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, null, out authzRm))
                     {
-                        throw new Win32Exception(Marshal.GetLastWin32Error());
+                        throw new DirectoryException("AuthzInitializeResourceManager failed", new Win32Exception(Marshal.GetLastWin32Error()));
                     }
                 }
 
@@ -352,10 +352,10 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
 
                     if (errorCode == 5)
                     {
-                        throw new Win32Exception(errorCode, "Access was denied. Please ensure that \r\n1) The service account is a member of the built-in group called 'Windows Authorization Access Group' in the domain where the computer object is located\r\n2) The service account is a member of the built-in group called 'Access Control Assistance Operators' in the domain where the computer object is located");
+                        throw new DirectoryException("AuthzInitializeContextFromSid failed", new Win32Exception(errorCode, "Access was denied. Please ensure that \r\n1) The service account is a member of the built-in group called 'Windows Authorization Access Group' in the domain where the computer object is located\r\n2) The service account is a member of the built-in group called 'Access Control Assistance Operators' in the domain where the computer object is located"));
                     }
 
-                    throw new Win32Exception(errorCode);
+                    throw new DirectoryException("AuthzInitializeContextFromSid failed", new Win32Exception(errorCode));
                 }
 
                 uint sizeRequired = 0;
@@ -366,7 +366,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
 
                     if (e.NativeErrorCode != NativeMethods.InsufficientBuffer)
                     {
-                        throw e;
+                        throw new DirectoryException("AuthzGetInformationFromContext failed", e);
                     }
                 }
 
@@ -374,7 +374,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
 
                 if (!NativeMethods.AuthzGetInformationFromContext(userClientCtxt, AuthzContextInformationClass.AuthzContextInfoGroupsSids, sizeRequired, out sizeRequired, pstructure))
                 {
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                    throw new DirectoryException("AuthzGetInformationFromContext failed", new Win32Exception(Marshal.GetLastWin32Error()));
                 }
 
                 TokenGroups groups = Marshal.PtrToStructure<TokenGroups>(pstructure);
