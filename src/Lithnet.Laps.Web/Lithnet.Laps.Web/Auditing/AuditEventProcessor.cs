@@ -8,6 +8,7 @@ using NLog;
 using Microsoft.AspNetCore.Http;
 using System.Net;
 using Lithnet.Laps.Web.Exceptions;
+using Lithnet.Laps.Web.Authorization;
 
 namespace Lithnet.Laps.Web.Internal
 {
@@ -88,6 +89,9 @@ namespace Lithnet.Laps.Web.Internal
 
         private Dictionary<string, string> BuildTokenDictionary(AuditableAction action)
         {
+            LapsAuthorizationResponse lapsAuthZResponse = action.AuthzResponse as LapsAuthorizationResponse;
+            JitAuthorizationResponse jitAuthZResponse = action.AuthzResponse as JitAuthorizationResponse;
+
             Dictionary<string, string> pairs = new Dictionary<string, string> {
                 { "{user.SamAccountName}", action.User?.SamAccountName},
                 { "{user.DisplayName}", action.User?.DisplayName},
@@ -107,11 +111,11 @@ namespace Lithnet.Laps.Web.Internal
                 { "{computer.Sid}", action.Computer?.Sid?.ToString()},
                 { "{request.ComputerName}", action.RequestModel?.ComputerName},
                 { "{request.Reason}", action.RequestModel?.UserRequestReason ?? "(not provided)"},
-                { "{AuthzResult.MatchedPrincipal}", action.AuthzResponse?.MatchedPrincipal},
+                { "{AuthzResult.MatchedPrincipal}", action.AuthzResponse?.Trustee},
                 { "{AuthzResult.NotificationChannels}", string.Join(",", action.AuthzResponse?.NotificationChannels ?? new List<string>())},
                 { "{AuthzResult.MatchedRuleDescription}", action.AuthzResponse?.MatchedRuleDescription},
                 { "{AuthzResult.AdditionalInformation}", action.AuthzResponse?.AdditionalInformation},
-                { "{AuthzResult.ExpireAfter}", action.AuthzResponse?.ExpireAfter.ToString()},
+                { "{AuthzResult.ExpireAfter}", (lapsAuthZResponse?.ExpireAfter ?? jitAuthZResponse?.ExpireAfter)?.ToString()},
                 { "{AuthzResult.ResponseCode}", action.AuthzResponse?.Code.ToString()},
                 { "{message}", action.Message},
                 { "{request.IPAddress}", httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString()},

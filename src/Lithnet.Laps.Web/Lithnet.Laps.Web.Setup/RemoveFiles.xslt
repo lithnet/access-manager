@@ -19,4 +19,13 @@ xmlns:wix="http://schemas.microsoft.com/wix/2006/wi">
   <xsl:key name="scripts-search" match="wix:Component[contains(wix:File/@Source, 'Scripts')]" use="@Id"/>
   <xsl:template match="wix:Component[key('scripts-search', @Id)]"/>
   <xsl:template match="wix:ComponentRef[key('scripts-search', @Id)]"/>
+
+  <xsl:key name="appsettings-search" match="wix:Component[contains(wix:File/@Source, 'appsettings.json')]" use="@Id"/>
+  <xsl:template match="wix:Component[key('appsettings-search', @Id)]"/>
+  <xsl:template match="wix:ComponentRef[key('appsettings-search', @Id)]"/>
+
+  <xsl:key name="targets-search" match="wix:Component[contains(wix:File/@Source, 'targets.json')]" use="@Id"/>
+  <xsl:template match="wix:Component[key('targets-search', @Id)]"/>
+  <xsl:template match="wix:ComponentRef[key('targets-search', @Id)]"/>
+
 </xsl:stylesheet>

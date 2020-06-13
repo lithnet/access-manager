@@ -25,18 +25,38 @@ namespace Lithnet.Laps.Web.Authorization
             this.aceEvaluator = aceEvaluator;
         }
 
-        public AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer)
+        public JitAuthorizationResponse GetJitAuthorizationResponse(IUser user, IComputer computer)
         {
-            var targets = this.GetMatchingTargetsForComputer(computer);
+            return (JitAuthorizationResponse)this.GetAuthorizationResponse(user, computer, AuthorizationRequestType.JitAccess);
+        }
+
+        public LapsAuthorizationResponse GetLapsAuthorizationResponse(IUser user, IComputer computer)
+        {
+            return (LapsAuthorizationResponse)this.GetAuthorizationResponse(user, computer, AuthorizationRequestType.LocalAdminPassword);
+        }
+
+        private AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer, AuthorizationRequestType requestType)
+        {
+            var targets = this.GetMatchingTargetsForComputer(computer, requestType);
 
             if (targets.Count == 0)
             {
                 this.logger.Trace($"User {user.SamAccountName} is denied access to the password for computer {computer.SamAccountName} because the computer did not match any of the configured targets");
 
-                return new AuthorizationResponse()
+                if (requestType == AuthorizationRequestType.LocalAdminPassword)
                 {
-                    Code = AuthorizationResponseCode.NoMatchingRuleForComputer,
-                };
+                    return new LapsAuthorizationResponse()
+                    {
+                        Code = AuthorizationResponseCode.NoMatchingRuleForComputer,
+                    };
+                }
+                else
+                {
+                    return new JitAuthorizationResponse()
+                    {
+                        Code = AuthorizationResponseCode.NoMatchingRuleForComputer,
+                    };
+                }
             }
 
             foreach (IJsonTarget j in targets)
@@ -47,13 +67,23 @@ namespace Lithnet.Laps.Web.Authorization
                     {
                         this.logger.Trace($"User {user.SamAccountName} matches deny ACE {ace.Sid ?? ace.Name} and is denied from reading passwords for computer {computer.SamAccountName} from target {j.Name}");
 
-                        return new AuthorizationResponse()
+                        AuthorizationResponse response;
+
+                        if (requestType == AuthorizationRequestType.LocalAdminPassword)
                         {
-                            MatchedRuleDescription = $"{j.Type}: {j.Name}",
-                            MatchedPrincipal = ace.Sid ?? ace.Name,
-                            Code = AuthorizationResponseCode.ExplicitlyDenied,
-                            NotificationChannels = this.GetNotificationRecipients(j, ace, false),
-                        };
+                            response = new LapsAuthorizationResponse();
+                        }
+                        else
+                        {
+                            response = new JitAuthorizationResponse();
+                        }
+
+                        response.MatchedRuleDescription = $"{j.Type}: {j.Name}";
+                        response.Trustee = ace.Sid ?? ace.Name;
+                        response.Code = AuthorizationResponseCode.ExplicitlyDenied;
+                        response.NotificationChannels = this.GetNotificationRecipients(j, ace, false);
+
+                        return response;
                     }
                     else
                     {
@@ -72,14 +102,29 @@ namespace Lithnet.Laps.Web.Authorization
                     {
                         this.logger.Trace($"User {user.SamAccountName} matches allow ACE {ace.Sid ?? ace.Name} and is authorized to read passwords for computer {computer.SamAccountName} from target {j.Name}");
 
-                        return new AuthorizationResponse()
+                        AuthorizationResponse response;
+
+                        if (requestType == AuthorizationRequestType.LocalAdminPassword)
                         {
-                            MatchedRuleDescription = $"{j.Type}: {j.Name}",
-                            MatchedPrincipal = ace.Sid ?? ace.Name,
-                            Code = AuthorizationResponseCode.Success,
-                            NotificationChannels = this.GetNotificationRecipients(j, ace, true),
-                            ExpireAfter = j.ExpireAfter,
-                        };
+                            response = new LapsAuthorizationResponse()
+                            {
+                                ExpireAfter = j.Laps.ExpireAfter
+                            };
+                        }
+                        else
+                        {
+                            response = new JitAuthorizationResponse()
+                            {
+                                ExpireAfter = j.Jit.ExpireAfter,
+                                AuthorizingGroup = j.Jit.Trustee
+                            };
+                        }
+
+                        response.MatchedRuleDescription = $"{j.Type}: {j.Name}";
+                        response.Trustee = ace.Sid ?? ace.Name;
+                        response.Code = AuthorizationResponseCode.Success;
+                        response.NotificationChannels = this.GetNotificationRecipients(j, ace, true);
+                        return response;
                     }
 
                     this.logger.Trace($"Allowed principal {ace.Sid ?? ace.Name} does not match current user {user.SamAccountName}");
@@ -89,7 +134,7 @@ namespace Lithnet.Laps.Web.Authorization
 
             this.logger.Trace($"User {user.SamAccountName} does not match any target access control lists and is denied access to the password for computer {computer.SamAccountName}");
 
-            return new AuthorizationResponse()
+            return new LapsAuthorizationResponse()
             {
                 Code = AuthorizationResponseCode.NoMatchingRuleForUser,
                 NotificationChannels = failureNotificationRecipients
@@ -115,7 +160,7 @@ namespace Lithnet.Laps.Web.Authorization
         }
 
 
-        private IList<IJsonTarget> GetMatchingTargetsForComputer(IComputer computer)
+        private IList<IJsonTarget> GetMatchingTargetsForComputer(IComputer computer, AuthorizationRequestType type)
         {
             List<IJsonTarget> matchingTargets = new List<IJsonTarget>();
 
@@ -123,6 +168,16 @@ namespace Lithnet.Laps.Web.Authorization
             {
                 try
                 {
+                    if (type == AuthorizationRequestType.JitAccess && !target.Jit.Enabled)
+                    {
+                        continue;
+                    }
+
+                    if (type == AuthorizationRequestType.LocalAdminPassword && !target.Laps.Enabled)
+                    {
+                        continue;
+                    }
+
                     if (target.Type == TargetType.Container)
                     {
                         if (this.directory.IsComputerInOu(computer, target.Name))

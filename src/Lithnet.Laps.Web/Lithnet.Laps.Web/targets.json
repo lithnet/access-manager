@@ -1,38 +1,47 @@
 ﻿{
   "targets": [
     {
-      "name": "idm-d1nps1-v02",
+      "name": "IDMDEV1\\PC1",
       "type": "computer",
-      // "expire-after": "02:00:00",
+      "expire-after": "02:00:00",
       "acl": [
         {
-          "name": "fim-dev1\\domain admins",
+          "name": "idmdev1\\zb-mgr-rnewing",
           "type": "allow"
         },
         {
-          "name": "fim-dev1\\ryan",
+          "name": "idmdev1\\user1",
           "type": "deny"
         }
       ],
       "notifications": {
         "on-success": [ "email-domain-admins" ],
         "on-failure": [ "email-domain-admins" ]
+      },
+      "jit": {
+        "enabled": true,
+        "trustee": "idmdev1\\JIT-PC1",
+        "expire-after": "00:00:10"
+      },
+      "laps": {
+        "enabled": true,
+        "expire-after": "02:00:00"
       }
     },
     {
-      "name": "DS-SR-01",
+      "name": "IDMDEV1\\PC2",
       "type": "computer",
       "expire-after": "02:00:00",
       "acl": [
         {
-          "name": "fim-dev1\\domain admins",
+          "name": "idmdev1\\domain admins",
           "type": "deny",
           "auditing": {
             "on-failure": [ "email-domain-admins" ]
           }
         },
         {
-          "name": "fim-dev1\\ryan2",
+          "name": "idmdev1\\ryan",
           "type": "allow"
         }
       ],
@@ -42,20 +51,20 @@
       }
     },
     {
-      "name": "DC=fim-dev1,dc=local",
+      "name": "DC=idmdev1,dc=local",
       "type": "Container",
       "expire-after": "03:00:00",
       "acl": [
         {
-          "name": "Test-Laps-Group-12",
+          "name": "idmdev1\\g-dl-1",
           "type": "allow"
         },
         {
-          "name": "fim-dev1\\Test-Laps-Group-2",
+          "name": "idmdev1\\g-dl-2",
           "type": "allow"
         },
         {
-          "name": "fim-dev1\\mgr-rnewing",
+          "name": "idmdev1\\zb-mgr-rnewing",
           "type": "allow"
         }
       ],

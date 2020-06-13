@@ -1,51 +1,67 @@
 ﻿using Lithnet.Laps.Web.ActiveDirectory;
 using Lithnet.Laps.Web.AppSettings;
 using Lithnet.Laps.Web.Internal;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Management.Automation.Language;
 
 namespace Lithnet.Laps.Web.Authorization
 {
     public class BuiltInAuthorizationService : IAuthorizationService
     {
-        private readonly IAuthorizationSettings config;
-        private readonly JsonTargetAuthorizationService jsonService;
-        private readonly PowershellAuthorizationService psService;
+        private readonly List<IAuthorizationService> enabledProviders;
 
         public BuiltInAuthorizationService(IAuthorizationSettings config, JsonTargetAuthorizationService jsonService, PowershellAuthorizationService psService)
         {
-            this.config = config;
-            this.jsonService = jsonService;
-            this.psService = psService;
-        }
-
-        public AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer)
-        {
-            AuthorizationResponse jsonResponse = null;
-            AuthorizationResponse psResponse = null;
+            this.enabledProviders = new List<IAuthorizationService>();
 
             if (config.JsonProviderEnabled)
             {
-                jsonResponse = this.jsonService.GetAuthorizationResponse(user, computer);
-
-                if (jsonResponse.IsExplicitResult())
-                {
-                    return jsonResponse;
-                }
+                this.enabledProviders.Add(jsonService);
             }
 
             if (config.PowershellProviderEnabled)
             {
-                psResponse = this.psService.GetAuthorizationResponse(user, computer);
+                this.enabledProviders.Add(psService);
+            }
+        }
 
-                if (psResponse.IsExplicitResult())
+        public JitAuthorizationResponse GetJitAuthorizationResponse(IUser user, IComputer computer)
+        {
+            return this.GetAuthorizationResponse(user, computer, this.enabledProviders.Select<IAuthorizationService, Func<IUser, IComputer, JitAuthorizationResponse>>(t => t.GetJitAuthorizationResponse).ToArray());
+        }
+
+        public LapsAuthorizationResponse GetLapsAuthorizationResponse(IUser user, IComputer computer)
+        {
+            return this.GetAuthorizationResponse(user, computer, this.enabledProviders.Select<IAuthorizationService, Func<IUser, IComputer, LapsAuthorizationResponse>>(t => t.GetLapsAuthorizationResponse).ToArray());
+        }
+
+        public T GetAuthorizationResponse<T>(IUser user, IComputer computer, params Func<IUser, IComputer, T>[] providers) where T : AuthorizationResponse, new()
+        {
+            T response = null;
+            T summaryResponse = new T();
+
+            foreach (var provider in providers)
+            {
+                response = provider(user, computer);
+
+                if (response.IsExplicitResult())
                 {
-                    return psResponse;
+                    return response;
+                }
+
+                response?.NotificationChannels?.ForEach(t => summaryResponse.NotificationChannels.Add(t));
+                if (summaryResponse.Code == AuthorizationResponseCode.Undefined && response != null)
+                {
+                    summaryResponse.Code = response.Code;
                 }
             }
 
-            AuthorizationResponse summaryResponse = new AuthorizationResponse();
-            jsonResponse?.NotificationChannels?.ForEach(t => summaryResponse.NotificationChannels.Add(t));
-            psResponse?.NotificationChannels?.ForEach(t => summaryResponse.NotificationChannels.Add(t));
-            summaryResponse.Code = psResponse?.Code ?? jsonResponse?.Code ?? AuthorizationResponseCode.NoMatchingRuleForComputer;
+            if (summaryResponse.Code == AuthorizationResponseCode.Undefined)
+            {
+                summaryResponse.Code = AuthorizationResponseCode.NoMatchingRuleForComputer;
+            }
 
             return summaryResponse;
         }

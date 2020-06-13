@@ -6,14 +6,15 @@ using AD = Lithnet.Laps.Web.ActiveDirectory.ActiveDirectory;
 using Lithnet.Laps.Web.Models;
 using Lithnet.Laps.Web.ActiveDirectory;
 using System.Security.Principal;
+using System.Threading;
 
 namespace Lithnet.Laps.Web.Test
 {
     /// <summary>
     /// These test cases require two computers in each domain called 'PC1' and PC2' located in an OU called OU=Computers,OU=LAPS Testing at the root of the domain.
-    /// This computers should have a LAPS password with the value "{domain}\{ComputerName} Password" (eg "IDMDEV1\PC1 Password") 
+    /// This computers should have a LAPS password with the value "{domain}\{ComputerName} Password" (eg "IDMDEV1\PC1 Password")
     /// The computers named PC1 should have an expiry date of 9999999999999
-    /// 
+    ///
     /// These test cases also depend on the users and group structure defined in the AceTests class
     /// </summary>
     class DirectoryTests
@@ -215,6 +216,68 @@ namespace Lithnet.Laps.Web.Test
             var password = this.directory.GetPassword(computer);
 
             Assert.AreEqual(now, password.ExpirationTime);
+        }
+
+        [Test]
+        public void CreateTtlTestGroup()
+        {
+            this.directory.CreateTtlGroup("G-DL-Test-TTL", "G-DL-Test-TTL", "TTL test group", "OU=Computers,OU=Laps Testing,DC=idmdev1,DC=local", TimeSpan.FromMinutes(1));
+        }
+
+        [Test]
+        public void TestPamIsEnabled()
+        {
+            Assert.IsTrue(this.directory.IsPamFeatureEnabled(this.directory.GetUser("idmdev1\\user1").Sid));
+        }
+
+        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
+        [TestCase("IDMDEV1\\JIT-PC1", "SUBDEV1\\user1")]
+        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
+        public void TestTimeBasedMembershipIntraForest(string groupName, string memberName)
+        {
+            IGroup group = this.directory.GetGroup(groupName);
+            ISecurityPrincipal p = this.directory.GetUser(memberName);
+
+            this.directory.AddGroupMember(group, p, TimeSpan.FromSeconds(10));
+
+            Thread.Sleep(TimeSpan.FromSeconds(5));
+
+            CollectionAssert.Contains(this.directory.GetMemberDNsFromGroup(group), p.DistinguishedName);
+
+            Thread.Sleep(TimeSpan.FromSeconds(15));
+
+            CollectionAssert.DoesNotContain(this.directory.GetMemberDNsFromGroup(group), p.DistinguishedName);
+        }
+
+        [TestCase("EXTDEV1\\JIT-PC1", "IDMDEV1\\user1")]
+        [TestCase("EXTDEV1\\JIT-PC1", "SUBDEV1\\user1")]
+        public void TestTimeBasedMembershipCrossForest(string groupName, string memberName)
+        {
+            IGroup group = this.directory.GetGroup(groupName);
+            ISecurityPrincipal p = this.directory.GetUser(memberName);
+
+            this.directory.AddGroupMember(group, p, TimeSpan.FromSeconds(10));
+
+            Thread.Sleep(TimeSpan.FromSeconds(5));
+
+            Assert.IsTrue(IsSidDnInGroup(group, p), "The user was not found in the group");
+
+            Thread.Sleep(TimeSpan.FromSeconds(15));
+
+            Assert.IsFalse(IsSidDnInGroup(group, p), "The user was still in the group");
+        }
+
+        private bool IsSidDnInGroup(IGroup group, ISecurityPrincipal p)
+        {
+            foreach (string dn in this.directory.GetMemberDNsFromGroup(group))
+            {
+                if (dn.StartsWith($"CN={p.Sid},", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private PasswordData GetLapsPassword(string computerName)

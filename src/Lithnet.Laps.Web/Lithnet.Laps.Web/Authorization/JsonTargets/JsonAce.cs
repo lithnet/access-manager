@@ -1,14 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using Lithnet.Laps.Web.Internal;
+using Newtonsoft.Json;
 
 namespace Lithnet.Laps.Web.Authorization
 {
     public class JsonAce : IAce
     {
-        public JsonAce(JsonAuditNotificationChannels recipients)
-        {
-            this.NotificationChannels = recipients;
-        }
-
         [JsonProperty("name")]
         public string Name { get; set; }
 
@@ -19,6 +15,7 @@ namespace Lithnet.Laps.Web.Authorization
         public AceType Type { get; set; }
 
         [JsonProperty("notifications")]
+        [JsonConverter(typeof(JsonInterfaceConverter<JsonAuditNotificationChannels, IAuditNotificationChannels>))]
         public IAuditNotificationChannels NotificationChannels { get; private set; }
     }
 }

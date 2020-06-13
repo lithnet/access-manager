@@ -79,11 +79,29 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to New request.
+        /// </summary>
+        public static string ButtonRequestAnotherJit {
+            get {
+                return ResourceManager.GetString("ButtonRequestAnotherJit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Request another password.
         /// </summary>
         public static string ButtonRequestAnotherPassword {
             get {
                 return ResourceManager.GetString("ButtonRequestAnotherPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request access.
+        /// </summary>
+        public static string ButtonRequestJit {
+            get {
+                return ResourceManager.GetString("ButtonRequestJit", resourceCulture);
             }
         }
         
@@ -142,11 +160,29 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your access has been approved.
+        /// </summary>
+        public static string HeadingJitDetails {
+            get {
+                return ResourceManager.GetString("HeadingJitDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Password details.
         /// </summary>
         public static string HeadingPasswordDetails {
             get {
                 return ResourceManager.GetString("HeadingPasswordDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request access.
+        /// </summary>
+        public static string HeadingRequestJit {
+            get {
+                return ResourceManager.GetString("HeadingRequestJit", resourceCulture);
             }
         }
         
@@ -223,7 +259,7 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must provide the reason for requesting the LAPS password.
+        ///   Looks up a localized string similar to You must provide the reason for your request.
         /// </summary>
         public static string ReasonRequired {
             get {
@@ -259,7 +295,7 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please provide the reason for requesting this password.
+        ///   Looks up a localized string similar to Please provide the reason for this request.
         /// </summary>
         public static string UserReasonPrompt {
             get {

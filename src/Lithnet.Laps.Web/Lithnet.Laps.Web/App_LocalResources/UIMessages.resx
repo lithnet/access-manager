@@ -172,13 +172,13 @@
     <value>There are multiple computers with that name in the directory. Try specfying the computer in DOMAIN\computername format</value>
   </data>
   <data name="ReasonRequired" xml:space="preserve">
-    <value>You must provide the reason for requesting the LAPS password</value>
+    <value>You must provide the reason for your request</value>
   </data>
   <data name="ReasonTooLong" xml:space="preserve">
     <value>The size of the reason field is limited to 4096 characters</value>
   </data>
   <data name="UserReasonPrompt" xml:space="preserve">
-    <value>Please provide the reason for requesting this password</value>
+    <value>Please provide the reason for this request</value>
   </data>
   <data name="Logout" xml:space="preserve">
     <value>Logout</value>
@@ -188,5 +188,17 @@
   </data>
   <data name="ExternalAuthNAccessDenied" xml:space="preserve">
     <value>You do not have access to use this application. The logon attempt was denied by the authentication provider</value>
+  </data>
+  <data name="ButtonRequestAnotherJit" xml:space="preserve">
+    <value>New request</value>
+  </data>
+  <data name="ButtonRequestJit" xml:space="preserve">
+    <value>Request access</value>
+  </data>
+  <data name="HeadingJitDetails" xml:space="preserve">
+    <value>Your access has been approved</value>
+  </data>
+  <data name="HeadingRequestJit" xml:space="preserve">
+    <value>Request access</value>
   </data>
 </root>

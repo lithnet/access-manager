@@ -79,36 +79,22 @@
       <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
     </UI>
 
-
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
       <ComponentGroupRef Id="SourceComponentGroup" />
       <ComponentGroupRef Id="ScriptsGroup" />
       <ComponentGroupRef Id="NotificationTemplatesGroup" />
+      <ComponentGroupRef Id="UserConfigFiles" />
       <ComponentRef Id="cmpA0F023B64412A450A343CCF424488552" />
     </ComponentGroup>
 
-    <Component Id="cmpA0F023B64412A450A343CCF424488552" Guid="*" Directory="INSTALLFOLDER">
-      <File Id="fil179C3B100958A078E36F6F46BBBEF740" KeyPath="yes" Source="SourceDir\Lithnet.Laps.Web.exe" />
-      <ServiceInstall Id="svcB928E06C6F1445829E0B2EC5DDB85B1E"
-                             DisplayName="Lithnet LAPS Web App"
-                             Account="[SERVICE_USERNAME]"
-                             Password="[SERVICE_PASSWORD]"
-                             Name="[SERVICE_NAME]"
-                             ErrorControl="normal"
-                             Start="auto"
-                             Arguments="/service"
-                             Type="ownProcess"
-                             Description="A web-based application for accessing LAPS passwords"
-                             Vital="yes"
-                             Interactive="no">
-      </ServiceInstall>
-
-      <ServiceControl Id="ServiceControlEvents" Name="[SERVICE_NAME]" Stop="both" Remove="uninstall" Wait="yes" Start="install"/>
-      <util:User Id="ServiceUser" Name="[SERVICE_USERNAME]" Password="[SERVICE_PASSWORD]" CreateUser="no" LogonAsService="yes" UpdateIfExists="yes"/>
-      <CreateFolder Directory="INSTALLFOLDER">
-        <util:PermissionEx User="[SERVICE_USERNAME]" GenericAll="yes" />
-      </CreateFolder>
-    </Component>
+    <ComponentGroup Id="UserConfigFiles">
+      <Component Id="cmp58AE1F27D4DDB080F3961825CDC860CA" Guid="*"  NeverOverwrite="yes">
+        <File Id="fil30CBBAF63158674FF13F750BAB90791D" KeyPath="yes" Source="SourceDir\targets.json" />
+      </Component>
+      <Component Id="cmpF82FCA80BBAF44D285C97F10993DEEE6" Guid="*"  NeverOverwrite="yes">
+        <File Id="fil840B80AC19861C7F9F04FBDCFAE331CE" KeyPath="yes" Source="SourceDir\appsettings.json" />
+      </Component>
+    </ComponentGroup>
 
     <ComponentGroup Id="ScriptsGroup" Directory="SCRIPTSDIR">
       <Component Id="cmp8D88BEC0FB9A220840ACA5BCCFE5F05A" Guid="*"  NeverOverwrite="yes">
@@ -118,6 +104,7 @@
         <File Id="fil8F07E648FE4AAAFFD44EC97FADA4970D" KeyPath="yes" Source="SourceDir\Scripts\AuthZSample.ps1" />
       </Component>
     </ComponentGroup>
+
     <ComponentGroup Id="NotificationTemplatesGroup" Directory="NOTIFICATIONTEMPLATESDIR">
       <Component Id="cmp1BA6EDFC5EC4E1E4AA1C5FCC0F107EB3" Guid="*" NeverOverwrite="yes">
         <File Id="fil19FBFA8BEF03F53E6ED097445C1F8979" KeyPath="yes" Source="SourceDir\NotificationTemplates\EmailAuditFailure.html" />
@@ -145,7 +132,28 @@
       </Component>
     </ComponentGroup>
 
+    <Component Id="cmpA0F023B64412A450A343CCF424488552" Guid="*" Directory="INSTALLFOLDER">
+      <File Id="fil179C3B100958A078E36F6F46BBBEF740" KeyPath="yes" Source="SourceDir\Lithnet.Laps.Web.exe" />
+      <ServiceInstall Id="svcB928E06C6F1445829E0B2EC5DDB85B1E"
+                             DisplayName="Lithnet LAPS Web App"
+                             Account="[SERVICE_USERNAME]"
+                             Password="[SERVICE_PASSWORD]"
+                             Name="[SERVICE_NAME]"
+                             ErrorControl="normal"
+                             Start="auto"
+                             Arguments="/service"
+                             Type="ownProcess"
+                             Description="A web-based application for accessing LAPS passwords"
+                             Vital="yes"
+                             Interactive="no">
+      </ServiceInstall>
 
+      <ServiceControl Id="ServiceControlEvents" Name="[SERVICE_NAME]" Stop="both" Remove="uninstall" Wait="yes" Start="install"/>
+      <util:User Id="ServiceUser" Name="[SERVICE_USERNAME]" Password="[SERVICE_PASSWORD]" CreateUser="no" LogonAsService="yes" UpdateIfExists="yes"/>
+      <CreateFolder Directory="INSTALLFOLDER">
+        <util:PermissionEx User="[SERVICE_USERNAME]" GenericAll="yes" />
+      </CreateFolder>
+    </Component>
 
-  </Product>
+</Product>
 </Wix>

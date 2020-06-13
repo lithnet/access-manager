@@ -96,12 +96,12 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool AuthzGetInformationFromContext(IntPtr hAuthzClientContext, AuthzContextInformationClass infoClass, uint bufferSize, out uint pSizeRequired, IntPtr buffer);
 
-        public static string GetDnFromGc(string nameToFind)
+        public static string GetDn(string nameToFind)
         {
-            return GetDnFromGc(nameToFind, DsNameFormat.DS_UNKNOWN_NAME);
+            return GetDn(nameToFind, DsNameFormat.DS_UNKNOWN_NAME);
         }
 
-        public static string GetDnFromGc(string nameToFind, DsNameFormat nameFormat)
+        public static string GetDn(string nameToFind, DsNameFormat nameFormat)
         {
             var result = CrackNames(nameFormat, DsNameFormat.DS_FQDN_1779_NAME, nameToFind);
             return result.Name;
@@ -166,7 +166,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
             }
         }
 
-        private static string GetDnsDomainNameFromSid(SecurityIdentifier sid)
+        public static string GetDnsDomainNameFromSid(SecurityIdentifier sid)
         {
             var result = CrackNames(DsNameFormat.DS_SID_OR_SID_HISTORY_NAME, DsNameFormat.DS_NT4_ACCOUNT_NAME, sid.Value);
             return result.Domain;

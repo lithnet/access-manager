@@ -119,7 +119,15 @@ namespace Lithnet.Laps.Web.Controllers
 
                 // Do authorization check first.
 
-                AuthorizationResponse authResponse = this.authorizationService.GetAuthorizationResponse(user, computer);
+                AuthorizationResponse authResponse;
+                if (model.RequestType == AuthorizationRequestType.LocalAdminPassword)
+                {
+                    authResponse = this.authorizationService.GetLapsAuthorizationResponse(user, computer);
+                }
+                else
+                {
+                    authResponse = this.authorizationService.GetJitAuthorizationResponse(user, computer);
+                }
 
                 if (!authResponse.IsAuthorized())
                 {
@@ -130,36 +138,14 @@ namespace Lithnet.Laps.Web.Controllers
 
                 // Do actual work only if authorized.
 
-                PasswordData passwordData = this.directory.GetPassword(computer);
-
-                if (passwordData == null)
+                if (model.RequestType == AuthorizationRequestType.LocalAdminPassword)
                 {
-                    this.logger.LogEventError(EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.SamAccountName, user.SamAccountName));
-
-                    model.FailureReason = UIMessages.NoLapsPassword;
-                    return this.View("Get", model);
+                    return this.GetLapsPassword(model, user, computer, (LapsAuthorizationResponse)authResponse);
                 }
-
-                if (authResponse.ExpireAfter.Ticks > 0)
+                else
                 {
-                    this.UpdateTargetPasswordExpiry(authResponse.ExpireAfter, computer);
-
-                    // Get the password again with the updated expiry date.
-                    passwordData = this.directory.GetPassword(computer);
+                    return this.GetJitAccess(model, user, computer, (JitAuthorizationResponse)authResponse);
                 }
-
-                this.reporting.GenerateAuditEvent(new AuditableAction
-                {
-                    AuthzResponse = authResponse,
-                    RequestModel = model,
-                    IsSuccess = true,
-                    User = user,
-                    Computer = computer,
-                    EventID = EventIDs.PasswordAccessed,
-                    ComputerExpiryDate = passwordData.ExpirationTime?.ToString(CultureInfo.CurrentUICulture)
-                });
-
-                return this.View("Show", new LapEntryModel(computer, passwordData));
             }
             catch (AuditLogFailureException ex)
             {
@@ -175,6 +161,60 @@ namespace Lithnet.Laps.Web.Controllers
                 model.FailureReason = UIMessages.UnexpectedError;
                 return this.View("Get", model);
             }
+        }
+
+        private IActionResult GetJitAccess(LapRequestModel model, IUser user, IComputer computer, JitAuthorizationResponse authResponse)
+        {
+            this.directory.AddGroupMember(this.directory.GetGroup(authResponse.AuthorizingGroup), user, authResponse.ExpireAfter);
+
+            this.reporting.GenerateAuditEvent(new AuditableAction
+            {
+                AuthzResponse = authResponse,
+                RequestModel = model,
+                IsSuccess = true,
+                User = user,
+                Computer = computer,
+                EventID = EventIDs.PasswordAccessed,
+                ComputerExpiryDate = DateTime.Now.Add(authResponse.ExpireAfter).ToString()
+            });
+
+            var passwordData = new PasswordData("Added you to JIT", null);
+
+            return this.View("Show", new LapEntryModel(computer, passwordData));
+        }
+
+        private IActionResult GetLapsPassword(LapRequestModel model, IUser user, IComputer computer, LapsAuthorizationResponse authResponse)
+        {
+            PasswordData passwordData = this.directory.GetPassword(computer);
+
+            if (passwordData == null)
+            {
+                this.logger.LogEventError(EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.SamAccountName, user.SamAccountName));
+
+                model.FailureReason = UIMessages.NoLapsPassword;
+                return this.View("Get", model);
+            }
+
+            if (authResponse.ExpireAfter.Ticks > 0)
+            {
+                this.UpdateTargetPasswordExpiry(authResponse.ExpireAfter, computer);
+
+                // Get the password again with the updated expiry date.
+                passwordData = this.directory.GetPassword(computer);
+            }
+
+            this.reporting.GenerateAuditEvent(new AuditableAction
+            {
+                AuthzResponse = authResponse,
+                RequestModel = model,
+                IsSuccess = true,
+                User = user,
+                Computer = computer,
+                EventID = EventIDs.PasswordAccessed,
+                ComputerExpiryDate = passwordData.ExpirationTime?.ToString(CultureInfo.CurrentUICulture)
+            });
+
+            return this.View("Show", new LapEntryModel(computer, passwordData));
         }
 
         private void LogRateLimitEvent(LapRequestModel model, IUser user, RateLimitResult rateLimitResult)

@@ -4,6 +4,8 @@ namespace Lithnet.Laps.Web.Authorization
 {
     public interface IAuthorizationService
     {
-        AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer);
+        LapsAuthorizationResponse GetLapsAuthorizationResponse(IUser user, IComputer computer);
+
+        JitAuthorizationResponse GetJitAuthorizationResponse(IUser user, IComputer computer);
     }
 }

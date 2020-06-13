@@ -8,6 +8,7 @@ using System.Text;
 using Lithnet.Laps.Web.ActiveDirectory;
 using Lithnet.Laps.Web.App_LocalResources;
 using Microsoft.AspNetCore.Http;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Lithnet.Laps.Web.Internal
 {
@@ -131,6 +132,11 @@ namespace Lithnet.Laps.Web.Internal
             object r = result.Properties[propertyName][0];
 
             return r as byte[];
+        }
+
+        internal static string ToOctetString(this Guid guid)
+        {
+            return ToOctetString((Guid?)guid);
         }
 
         internal static string ToOctetString(this Guid? guid)

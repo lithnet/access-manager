@@ -16,9 +16,9 @@ namespace Lithnet.Laps.Web.Authorization
         private readonly ILogger logger;
 
         private readonly IAuthorizationSettings config;
-        
+
         private readonly IWebHostEnvironment env;
-        
+
         private PowerShell powershell;
 
         public PowershellAuthorizationService(ILogger logger, IAuthorizationSettings config, IWebHostEnvironment env)
@@ -28,7 +28,7 @@ namespace Lithnet.Laps.Web.Authorization
             this.env = env;
         }
 
-        public AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer)
+        public JitAuthorizationResponse GetJitAuthorizationResponse(IUser user, IComputer computer)
         {
             if (powershell == null)
             {
@@ -37,19 +37,19 @@ namespace Lithnet.Laps.Web.Authorization
 
             this.powershell.ResetState();
             this.powershell
-                .AddCommand("Get-LapsAuthorizationResponse")
+                .AddCommand("Get-JitAuthorizationResponse")
                     .AddParameter("user", user)
                     .AddParameter("computer", computer)
                     .AddParameter("logger", logger);
 
-            Task<AuthorizationResponse> task = new Task<AuthorizationResponse>(() =>
+            Task<JitAuthorizationResponse> task = new Task<JitAuthorizationResponse>(() =>
             {
                 var results = this.powershell.Invoke();
                 this.powershell.ThrowOnPipelineError();
 
                 foreach (PSObject result in results)
                 {
-                    if (result.BaseObject is AuthorizationResponse res)
+                    if (result.BaseObject is JitAuthorizationResponse res)
                     {
                         return res;
                     }
@@ -63,11 +63,11 @@ namespace Lithnet.Laps.Web.Authorization
             });
 
             task.Start();
-            if(!task.Wait(TimeSpan.FromSeconds(this.config.PowershellScriptTimeout)))
+            if (!task.Wait(TimeSpan.FromSeconds(this.config.PowershellScriptTimeout)))
             {
                 throw new TimeoutException("The PowerShell script did not complete within the configured time");
             }
-            
+
             if (task.IsFaulted)
             {
                 throw task.Exception;
@@ -81,7 +81,66 @@ namespace Lithnet.Laps.Web.Authorization
 
             this.logger.Warn($"The PowerShell script did not return an AuthorizationResponse");
 
-            return new AuthorizationResponse()
+            return new JitAuthorizationResponse()
+            {
+                Code = AuthorizationResponseCode.NoMatchingRuleForComputer,
+            };
+        }
+
+        public LapsAuthorizationResponse GetLapsAuthorizationResponse(IUser user, IComputer computer)
+        {
+            if (powershell == null)
+            {
+                this.InitializePowerShellSession();
+            }
+
+            this.powershell.ResetState();
+            this.powershell
+                .AddCommand("Get-LapsAuthorizationResponse")
+                    .AddParameter("user", user)
+                    .AddParameter("computer", computer)
+                    .AddParameter("logger", logger);
+
+            Task<LapsAuthorizationResponse> task = new Task<LapsAuthorizationResponse>(() =>
+            {
+                var results = this.powershell.Invoke();
+                this.powershell.ThrowOnPipelineError();
+
+                foreach (PSObject result in results)
+                {
+                    if (result.BaseObject is LapsAuthorizationResponse res)
+                    {
+                        return res;
+                    }
+                    else
+                    {
+                        this.logger.Warn($"The powerShell script returned an unsupported object of type {result.BaseObject?.GetType().FullName} to the pipeline");
+                    }
+                }
+
+                return null;
+            });
+
+            task.Start();
+            if (!task.Wait(TimeSpan.FromSeconds(this.config.PowershellScriptTimeout)))
+            {
+                throw new TimeoutException("The PowerShell script did not complete within the configured time");
+            }
+
+            if (task.IsFaulted)
+            {
+                throw task.Exception;
+            }
+
+            if (task.Result != null)
+            {
+                this.logger.Trace($"PowerShell script returned the following AuthorizationResponse: {JsonConvert.SerializeObject(task.Result)}");
+                return task.Result;
+            }
+
+            this.logger.Warn($"The PowerShell script did not return an AuthorizationResponse");
+
+            return new LapsAuthorizationResponse()
             {
                 Code = AuthorizationResponseCode.NoMatchingRuleForComputer,
             };

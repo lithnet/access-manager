@@ -6,14 +6,9 @@ namespace Lithnet.Laps.Web.Authorization
     public class AuthorizationResponse
     {
         /// <summary>
-        /// An identifer that provides context as to the rule that was used to make the authorization decision, if one was made
+        /// An identifier that provides context as to the rule that was used to make the authorization decision, if one was made
         /// </summary>
         public string MatchedRuleDescription { get; set; }
-
-        /// <summary>
-        /// If the user was successfully authorized, then this TimeSpan will be used to determine the new expiry date of the LAPS password. If it is set to zero, then no alternation to the LAPS password expiry date will be made.
-        /// </summary>
-        public TimeSpan ExpireAfter { get; set; }
 
         /// <summary>
         /// A list of email addresses that should be notified of this success or failure event
@@ -28,7 +23,7 @@ namespace Lithnet.Laps.Web.Authorization
         /// <summary>
         /// An identifier that provides context as to the principal (user or group) that was used to make the authorization decision, if one was made
         /// </summary>
-        public string MatchedPrincipal { get; set; }
+        public string Trustee { get; set; }
 
         /// <summary>
         /// An AuthorizationResponseCode value that indicates the status of the authorization request
