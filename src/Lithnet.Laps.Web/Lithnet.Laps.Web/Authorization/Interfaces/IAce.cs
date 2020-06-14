@@ -4,10 +4,12 @@
     {
         IAuditNotificationChannels NotificationChannels { get; }
 
-        string Name { get; set; }
+        string Trustee { get; }
 
-        string Sid { get; set; }
+        string Sid { get; }
 
-        AceType Type { get; set; }
+        AceType Type { get; }
+
+        AccessMask Access { get; }
     }
 }

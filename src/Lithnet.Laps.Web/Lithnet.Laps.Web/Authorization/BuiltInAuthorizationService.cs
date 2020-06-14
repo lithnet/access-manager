@@ -27,24 +27,14 @@ namespace Lithnet.Laps.Web.Authorization
             }
         }
 
-        public JitAuthorizationResponse GetJitAuthorizationResponse(IUser user, IComputer computer)
+        public AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer, AccessMask requestedAccess)
         {
-            return this.GetAuthorizationResponse(user, computer, this.enabledProviders.Select<IAuthorizationService, Func<IUser, IComputer, JitAuthorizationResponse>>(t => t.GetJitAuthorizationResponse).ToArray());
-        }
+            AuthorizationResponse response = null;
+            AuthorizationResponse summaryResponse = AuthorizationResponse.CreateAuthorizationResponse(requestedAccess);
 
-        public LapsAuthorizationResponse GetLapsAuthorizationResponse(IUser user, IComputer computer)
-        {
-            return this.GetAuthorizationResponse(user, computer, this.enabledProviders.Select<IAuthorizationService, Func<IUser, IComputer, LapsAuthorizationResponse>>(t => t.GetLapsAuthorizationResponse).ToArray());
-        }
-
-        public T GetAuthorizationResponse<T>(IUser user, IComputer computer, params Func<IUser, IComputer, T>[] providers) where T : AuthorizationResponse, new()
-        {
-            T response = null;
-            T summaryResponse = new T();
-
-            foreach (var provider in providers)
+            foreach (var provider in this.enabledProviders)
             {
-                response = provider(user, computer);
+                response = provider.GetAuthorizationResponse(user, computer, requestedAccess);
 
                 if (response.IsExplicitResult())
                 {

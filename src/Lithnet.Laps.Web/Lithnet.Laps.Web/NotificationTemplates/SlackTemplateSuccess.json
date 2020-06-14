@@ -4,7 +4,7 @@
       "type": "section",
       "text": {
         "type": "mrkdwn",
-        "text": ":heavy_check_mark:\n*Access to a LAPS password was granted*"
+        "text": ":heavy_check_mark: *Access to a computer was granted*"
       }
     },
     {
@@ -12,15 +12,19 @@
       "fields": [
         {
           "type": "mrkdwn",
+          "text": "*Access type:*\n{authZResult.AccessType}"
+        },
+        {
+          "type": "mrkdwn",
           "text": "*Name:*\n{user.DisplayName}"
         },
         {
           "type": "mrkdwn",
-          "text": "*User name:*\n{user.SamAccountName}"
+          "text": "*User name:*\n{user.MsDsPrincipalName}"
         },
         {
           "type": "mrkdwn",
-          "text": "*Computer:*\n{computer.SamAccountName}"
+          "text": "*Computer:*\n{computer.MsDsPrincipalName}"
         },
         {
           "type": "mrkdwn",

@@ -1,5 +1,8 @@
-﻿@{
-    ViewBag.Title = "Request Password";
+﻿@using Lithnet.Laps.Web.AppSettings;
+@inject IUserInterfaceSettings uiSettings
+
+@{
+    ViewBag.Title = UIMessages.HeadingRequestAccess;
 }
 
 @model Lithnet.Laps.Web.Models.LapRequestModel
@@ -8,15 +11,25 @@
     @using (Html.BeginForm("Get", "Lap", FormMethod.Post))
     {
         <header>
-            @UIMessages.HeadingRequestPassword
+            @UIMessages.HeadingRequestAccess
         </header>
         <fieldset>
             <section>
                 <label class="title">Request type</label>
-                @foreach (var r in Model.AllowedRequestTypes)
-                {
-                    @Html.RadioButtonFor(m => m.RequestType, r.Key) @r.Value<br />
-                }
+                <div class="form-check">
+                    @if (uiSettings.AllowLaps)
+                    {
+                        @Html.RadioButtonFor(m => m.RequestType, "Laps", new { @class = "form-check-input", @checked = "checked", @id = "lapscheck" })
+                        <label class="form-check-label" for="lapscheck">Local admin password</label>
+                    }
+                </div>
+                <div class="form-check">
+                    @if (uiSettings.AllowJit)
+                    {
+                        @Html.RadioButtonFor(m => m.RequestType, "Jit", new { @class = "form-check-input", @id = "jitcheck" })
+                        <label class="form-check-label" for="jitcheck">Just-in-time access</label>
+                    }
+                </div>
             </section>
 
             <section>
@@ -64,7 +77,7 @@
         <footer>
             <div class="center-content">
                 @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-primary">@UIMessages.ButtonRequestPassword</button>
+                <button type="submit" class="btn btn-primary">@UIMessages.ButtonRequestAccess</button>
             </div>
         </footer>
     }

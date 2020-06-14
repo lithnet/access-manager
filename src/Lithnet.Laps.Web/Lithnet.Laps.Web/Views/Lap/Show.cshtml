@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "Password";
+    ViewBag.Title = UIMessages.HeadingPasswordDetails;
 }
 
 @model Lithnet.Laps.Web.Models.LapEntryModel
@@ -45,7 +45,7 @@
         <div class="center-content">
             @using (Html.BeginForm("Get", "Lap", FormMethod.Get))
             {
-                <button type="submit" class="btn btn-primary">@UIMessages.ButtonRequestAnotherPassword</button>
+                <button type="submit" class="btn btn-primary">@UIMessages.ButtonNewRequest</button>
             }
         </div>
     </footer>

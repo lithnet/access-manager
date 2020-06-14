@@ -6,7 +6,7 @@ function Get-LapsAuthorizationResponse{
 )
 
 	$logger.Trace("We're in PowerShell!");
-	$logger.Trace("Checking if $($user.SamAccountName) has access to LAPS for $($computer.SamAccountName)");
+	$logger.Trace("Checking if $($user.MsDsPrincipalName) has access to LAPS for $($computer.MsDsPrincipalName)");
 
 	$response = New-Object -TypeName "Lithnet.Laps.Web.Authorization.LapsAuthorizationResponse"
 
@@ -27,7 +27,7 @@ function Get-JitAuthorizationResponse{
 )
 
 	$logger.Trace("We're in PowerShell!");
-	$logger.Trace("Checking if $($user.SamAccountName) can request JIT access to $($computer.SamAccountName)");
+	$logger.Trace("Checking if $($user.MsDsPrincipalName) can request JIT access to $($computer.MsDsPrincipalName)");
 
 	$response = New-Object -TypeName "Lithnet.Laps.Web.Authorization.JitAuthorizationResponse"
 

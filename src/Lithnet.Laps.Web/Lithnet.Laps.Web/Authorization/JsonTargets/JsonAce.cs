@@ -5,14 +5,17 @@ namespace Lithnet.Laps.Web.Authorization
 {
     public class JsonAce : IAce
     {
-        [JsonProperty("name")]
-        public string Name { get; set; }
+        [JsonProperty("trustee")]
+        public string Trustee { get; set; }
 
         [JsonProperty("sid")]
         public string Sid { get; set; }
 
         [JsonProperty("type")]
         public AceType Type { get; set; }
+
+        [JsonProperty("access")]
+        public AccessMask Access { get; set; }
 
         [JsonProperty("notifications")]
         [JsonConverter(typeof(JsonInterfaceConverter<JsonAuditNotificationChannels, IAuditNotificationChannels>))]

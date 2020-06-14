@@ -15,5 +15,9 @@ namespace Lithnet.Laps.Web.AppSettings
         public string Title => this.configuration["user-interface:title"] ?? "Lithnet LAPS Web App";
 
         public AuditReasonFieldState UserSuppliedReason => this.configuration.GetValueOrDefault("user-interface:user-supplied-reason", AuditReasonFieldState.Optional);
+
+        public bool AllowLaps => this.configuration.GetValueOrDefault("user-interface:allow-laps", true);
+
+        public bool AllowJit => this.configuration.GetValueOrDefault("user-interface:allow-jit", true);
     }
 }

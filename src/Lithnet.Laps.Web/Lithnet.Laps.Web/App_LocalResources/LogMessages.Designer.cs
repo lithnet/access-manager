@@ -61,7 +61,7 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to LAP access denied for {user.SamAccountName} to {computer.SamAccountName}.
+        ///   Looks up a localized string similar to Access to {computer.MsDsPrincipalName} was denied for {user.MsDsPrincipalName}.
         /// </summary>
         internal static string AuditEmailSubjectFailure {
             get {
@@ -70,7 +70,7 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to LAP for {computer.SamAccountName} accessed by {user.SamAccountName}.
+        ///   Looks up a localized string similar to Access to {computer.MsDsPrincipalName} was granted for {user.MsDsPrincipalName}.
         /// </summary>
         internal static string AuditEmailSubjectSuccess {
             get {
@@ -189,12 +189,12 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         
         /// <summary>
         ///   Looks up a localized string similar to AUDIT: FAILURE          
-        ///Username:			{user.SamAccountName}
+        ///Username:			{user.MsDsPrincipalName}
         ///Name:				{user.DisplayName}
         ///UPN:				{user.UserPrincipalName}
         ///SID:				{user.Sid}
         ///User DN:				{user.DistinguishedName}
-        ///Computer Name:			{computer.SamAccountName}
+        ///Computer name:			{computer.MsDsPrincipalName}
         ///Computer DN:			{computer.DistinguishedName}
         ///Target ID:			{target.ID}
         ///Reader principal:			{reader.Principal}
@@ -208,12 +208,12 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         
         /// <summary>
         ///   Looks up a localized string similar to AUDIT: SUCCESS       
-        ///Username:			{user.SamAccountName}
+        ///Username:			{user.MsDsPrincipalName}
         ///Name:				{user.DisplayName}
         ///UPN:				{user.UserPrincipalName}
         ///SID:				{user.Sid}
         ///User DN:				{user.DistinguishedName}
-        ///Computer Name:			{computer.SamAccountName}
+        ///Computer name:			{computer.MsDsPrincipalName}
         ///Computer DN:			{computer.DistinguishedName}
         ///Target ID:			{target.ID}
         ///Reader principal:			{reader.Principal}.

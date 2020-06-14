@@ -9,7 +9,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory
     {
         private readonly SearchResult user;
 
-        internal static string[] PropertiesToGet = { "samAccountName", "distinguishedName", "description", "displayName", "userPrincipalName", "objectSid", "mail", "givenName", "sn" };
+        internal static string[] PropertiesToGet = { "samAccountName", "distinguishedName", "description", "displayName", "userPrincipalName", "objectSid", "mail", "givenName", "sn", "msDS-PrincipalName" };
 
         public ActiveDirectoryUser(SearchResult user)
         {
@@ -17,6 +17,8 @@ namespace Lithnet.Laps.Web.ActiveDirectory
         }
 
         public string SamAccountName => this.user.GetPropertyString("samAccountName");
+
+        public string MsDsPrincipalName => this.user.GetPropertyString("msDS-PrincipalName");
 
         public string DistinguishedName => this.user.GetPropertyString("distinguishedName");
 

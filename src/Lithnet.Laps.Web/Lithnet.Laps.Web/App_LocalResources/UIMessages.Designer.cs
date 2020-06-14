@@ -81,36 +81,18 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         /// <summary>
         ///   Looks up a localized string similar to New request.
         /// </summary>
-        public static string ButtonRequestAnotherJit {
+        public static string ButtonNewRequest {
             get {
-                return ResourceManager.GetString("ButtonRequestAnotherJit", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Request another password.
-        /// </summary>
-        public static string ButtonRequestAnotherPassword {
-            get {
-                return ResourceManager.GetString("ButtonRequestAnotherPassword", resourceCulture);
+                return ResourceManager.GetString("ButtonNewRequest", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Request access.
         /// </summary>
-        public static string ButtonRequestJit {
+        public static string ButtonRequestAccess {
             get {
-                return ResourceManager.GetString("ButtonRequestJit", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Request password.
-        /// </summary>
-        public static string ButtonRequestPassword {
-            get {
-                return ResourceManager.GetString("ButtonRequestPassword", resourceCulture);
+                return ResourceManager.GetString("ButtonRequestAccess", resourceCulture);
             }
         }
         
@@ -162,9 +144,18 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         /// <summary>
         ///   Looks up a localized string similar to Your access has been approved.
         /// </summary>
-        public static string HeadingJitDetails {
+        public static string HeadingAccessApproved {
             get {
-                return ResourceManager.GetString("HeadingJitDetails", resourceCulture);
+                return ResourceManager.GetString("HeadingAccessApproved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Just-in-time access request.
+        /// </summary>
+        public static string HeadingJitRequest {
+            get {
+                return ResourceManager.GetString("HeadingJitRequest", resourceCulture);
             }
         }
         
@@ -180,18 +171,9 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         /// <summary>
         ///   Looks up a localized string similar to Request access.
         /// </summary>
-        public static string HeadingRequestJit {
+        public static string HeadingRequestAccess {
             get {
-                return ResourceManager.GetString("HeadingRequestJit", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Request password.
-        /// </summary>
-        public static string HeadingRequestPassword {
-            get {
-                return ResourceManager.GetString("HeadingRequestPassword", resourceCulture);
+                return ResourceManager.GetString("HeadingRequestAccess", resourceCulture);
             }
         }
         
@@ -232,7 +214,7 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You are not authorized to access the password for this computer.
+        ///   Looks up a localized string similar to You are not authorized to access this computer.
         /// </summary>
         public static string NotAuthorized {
             get {
@@ -291,6 +273,15 @@ namespace Lithnet.Laps.Web.App_LocalResources {
         public static string UnexpectedError {
             get {
                 return ResourceManager.GetString("UnexpectedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User name.
+        /// </summary>
+        public static string Username {
+            get {
+                return ResourceManager.GetString("Username", resourceCulture);
             }
         }
         

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Lithnet.Laps.Web.Authorization
 {
-    public class AuthorizationResponse
+    public abstract class AuthorizationResponse
     {
         /// <summary>
         /// An identifier that provides context as to the rule that was used to make the authorization decision, if one was made
@@ -26,9 +26,18 @@ namespace Lithnet.Laps.Web.Authorization
         public string Trustee { get; set; }
 
         /// <summary>
+        /// The access type that was approved or denied in this response
+        /// </summary>
+        internal abstract AccessMask EvaluatedAccess { get; }
+
+        /// <summary>
         /// An AuthorizationResponseCode value that indicates the status of the authorization request
         /// </summary>
         public AuthorizationResponseCode Code { get; set; }
+
+        internal AuthorizationResponse()
+        {
+        }
 
         /// <summary>
         /// Gets a value indicating if the AuthorizationResponseCode indicates that the user is authorized to read the password
@@ -46,6 +55,21 @@ namespace Lithnet.Laps.Web.Authorization
         internal bool IsExplicitResult()
         {
             return this.Code == AuthorizationResponseCode.Success || this.Code == AuthorizationResponseCode.ExplicitlyDenied;
+        }
+
+        internal static AuthorizationResponse CreateAuthorizationResponse (AccessMask mask)
+        {
+            if (mask == AccessMask.Laps)
+            {
+                return new LapsAuthorizationResponse();
+            }
+
+            if (mask == AccessMask.Jit)
+            {
+                return new JitAuthorizationResponse();
+            }
+
+            throw new ArgumentException($"Invalid value for mask: {mask}");
         }
     }
 }

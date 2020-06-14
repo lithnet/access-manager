@@ -166,14 +166,15 @@ namespace Lithnet.Laps.Web.Test
         private bool IsMatch(string trustee, string requestor, AceType aceType = AceType.Allow)
         {
             Mock<IAce> ace = new Mock<IAce>();
-            ace.SetupGet(a => a.Name).Returns(trustee);
+            ace.SetupGet(a => a.Trustee).Returns(trustee);
             ace.SetupGet(x => x.Type).Returns(aceType);
+            ace.SetupGet(x => x.Access).Returns(AccessMask.Laps);
 
             ActiveDirectory.ActiveDirectory d = new ActiveDirectory.ActiveDirectory();
 
             AceEvaluator evaluator = new AceEvaluator(d, dummyLogger.Object);
 
-            return evaluator.IsMatchingAce(ace.Object, d.GetUser(requestor));
+            return evaluator.IsMatchingAce(ace.Object, d.GetUser(requestor), AccessMask.Laps);
         }
     }
 }

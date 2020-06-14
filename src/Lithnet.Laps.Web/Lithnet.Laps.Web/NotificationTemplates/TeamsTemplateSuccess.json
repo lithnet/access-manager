@@ -1,23 +1,27 @@
 ﻿{
   "@type": "MessageCard",
   "@context": "http://schema.org/extensions",
-  "summary": "✅ Access to a LAPS password was granted",
-  "title": "✅ Access to a LAPS password was granted",
+  "summary": "✅ Access to a computer was granted",
+  "title": "✅ Access to a computer was granted",
   "sections": [
     {
       "title": "Details",
       "facts": [
+        {
+          "name": "Access type",
+          "value": "{AuthZResult.AccessType}"
+        },
         {
           "name": "Name",
           "value": "{user.DisplayName}"
         },
         {
           "name": "User name",
-          "value": "{user.SamAccountName}"
+          "value": "{user.MsDsPrincipalName}"
         },
         {
           "name": "Computer",
-          "value": "{computer.SamAccountName}"
+          "value": "{computer.MsDsPrincipalName}"
         },
         {
           "name": "Password expiry",

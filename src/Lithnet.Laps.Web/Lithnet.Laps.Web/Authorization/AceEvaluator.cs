@@ -15,14 +15,19 @@ namespace Lithnet.Laps.Web.Authorization
             this.logger = logger;
         }
 
-        public bool IsMatchingAce(IAce ace, ISecurityPrincipal user)
+        public bool IsMatchingAce(IAce ace, ISecurityPrincipal user, AccessMask requestedAccess)
         {
             ISecurityPrincipal trustee;
             try
             {
-                trustee = this.directory.GetPrincipal(ace.Sid ?? ace.Name);
+                if (!ace.Access.HasFlag(requestedAccess))
+                {
+                    return false;
+                }
 
-                this.logger.Trace($"Ace trustee {ace.Sid ?? ace.Name} found in directory as {trustee.DistinguishedName}");
+                trustee = this.directory.GetPrincipal(ace.Sid ?? ace.Trustee);
+
+                this.logger.Trace($"Ace trustee {ace.Sid ?? ace.Trustee} found in directory as {trustee.DistinguishedName}");
 
                 return this.directory.IsSidInPrincipalToken(trustee.Sid, user, trustee.Sid.AccountDomainSid);
             }

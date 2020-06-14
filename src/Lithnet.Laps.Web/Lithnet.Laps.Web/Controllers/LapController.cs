@@ -68,11 +68,13 @@ namespace Lithnet.Laps.Web.Controllers
 
                 if (string.IsNullOrWhiteSpace(model.UserRequestReason) && this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required)
                 {
-                    logger.LogEventError(EventIDs.ReasonRequired, string.Format(LogMessages.ReasonRequired, user.SamAccountName));
+                    logger.LogEventError(EventIDs.ReasonRequired, string.Format(LogMessages.ReasonRequired, user.MsDsPrincipalName));
 
                     model.FailureReason = UIMessages.ReasonRequired;
                     return this.View("Get", model);
                 }
+
+                this.ThrowOnInvalidRequestType(model.RequestType);
 
                 try
                 {
@@ -94,7 +96,7 @@ namespace Lithnet.Laps.Web.Controllers
                     return this.View("RateLimitExceeded");
                 }
 
-                this.logger.LogEventSuccess(EventIDs.UserRequestedPassword, string.Format(LogMessages.UserHasRequestedPassword, user.SamAccountName, model.ComputerName));
+                this.logger.LogEventSuccess(EventIDs.UserRequestedPassword, string.Format(LogMessages.UserHasRequestedPassword, user.MsDsPrincipalName, model.ComputerName));
 
                 IComputer computer;
 
@@ -104,14 +106,14 @@ namespace Lithnet.Laps.Web.Controllers
                 }
                 catch (AmbiguousNameException ex)
                 {
-                    this.logger.LogEventError(EventIDs.ComputerNameAmbiguous, string.Format(LogMessages.ComputerNameAmbiguous, user.SamAccountName, model.ComputerName), ex);
+                    this.logger.LogEventError(EventIDs.ComputerNameAmbiguous, string.Format(LogMessages.ComputerNameAmbiguous, user.MsDsPrincipalName, model.ComputerName), ex);
 
                     model.FailureReason = UIMessages.ComputerNameAmbiguous;
                     return this.View("Get", model);
                 }
                 catch (ObjectNotFoundException ex)
                 {
-                    this.logger.LogEventError(EventIDs.ComputerNotFound, string.Format(LogMessages.ComputerNotFoundInDirectory, user.SamAccountName, model.ComputerName), ex);
+                    this.logger.LogEventError(EventIDs.ComputerNotFound, string.Format(LogMessages.ComputerNotFoundInDirectory, user.MsDsPrincipalName, model.ComputerName), ex);
 
                     model.FailureReason = UIMessages.ComputerNotFoundInDirectory;
                     return this.View("Get", model);
@@ -119,15 +121,7 @@ namespace Lithnet.Laps.Web.Controllers
 
                 // Do authorization check first.
 
-                AuthorizationResponse authResponse;
-                if (model.RequestType == AuthorizationRequestType.LocalAdminPassword)
-                {
-                    authResponse = this.authorizationService.GetLapsAuthorizationResponse(user, computer);
-                }
-                else
-                {
-                    authResponse = this.authorizationService.GetJitAuthorizationResponse(user, computer);
-                }
+                AuthorizationResponse authResponse = this.authorizationService.GetAuthorizationResponse(user, computer, model.RequestType);
 
                 if (!authResponse.IsAuthorized())
                 {
@@ -137,8 +131,7 @@ namespace Lithnet.Laps.Web.Controllers
                 }
 
                 // Do actual work only if authorized.
-
-                if (model.RequestType == AuthorizationRequestType.LocalAdminPassword)
+                if (authResponse.EvaluatedAccess == AccessMask.Laps)
                 {
                     return this.GetLapsPassword(model, user, computer, (LapsAuthorizationResponse)authResponse);
                 }
@@ -149,23 +142,39 @@ namespace Lithnet.Laps.Web.Controllers
             }
             catch (AuditLogFailureException ex)
             {
-                this.logger.LogEventError(EventIDs.AuthZFailedAuditError, string.Format(LogMessages.AuthZFailedAuditError, user?.SamAccountName ?? LogMessages.UnknownComputerPlaceholder, model.ComputerName), ex);
+                this.logger.LogEventError(EventIDs.AuthZFailedAuditError, string.Format(LogMessages.AuthZFailedAuditError, user?.MsDsPrincipalName ?? LogMessages.UnknownComputerPlaceholder, model.ComputerName), ex);
 
                 model.FailureReason = UIMessages.AccessDenied;
                 return this.View("Get", model);
             }
             catch (Exception ex)
             {
-                this.logger.LogEventError(EventIDs.UnexpectedError, string.Format(LogMessages.UnhandledError, model.ComputerName, user?.SamAccountName ?? LogMessages.UnknownComputerPlaceholder), ex);
+                this.logger.LogEventError(EventIDs.UnexpectedError, string.Format(LogMessages.UnhandledError, model.ComputerName, user?.MsDsPrincipalName ?? LogMessages.UnknownComputerPlaceholder), ex);
 
                 model.FailureReason = UIMessages.UnexpectedError;
                 return this.View("Get", model);
             }
         }
 
+        private void ThrowOnInvalidRequestType(AccessMask requestType)
+        {
+            if ((!userInterfaceSettings.AllowJit && requestType.HasFlag(AccessMask.Jit)) ||
+                !userInterfaceSettings.AllowLaps && requestType.HasFlag(AccessMask.Laps))
+            {
+                throw new ArgumentException("The user requested an access type that was not allowed by the application configuration");
+            }
+
+            if (requestType != AccessMask.Jit && requestType != AccessMask.Laps)
+            {
+                throw new ArgumentException($"The user requested an access type that was not supported: {requestType}");
+            }
+        }
+
         private IActionResult GetJitAccess(LapRequestModel model, IUser user, IComputer computer, JitAuthorizationResponse authResponse)
         {
             this.directory.AddGroupMember(this.directory.GetGroup(authResponse.AuthorizingGroup), user, authResponse.ExpireAfter);
+
+            DateTime expiryDate = DateTime.Now.Add(authResponse.ExpireAfter);
 
             this.reporting.GenerateAuditEvent(new AuditableAction
             {
@@ -174,13 +183,13 @@ namespace Lithnet.Laps.Web.Controllers
                 IsSuccess = true,
                 User = user,
                 Computer = computer,
-                EventID = EventIDs.PasswordAccessed,
-                ComputerExpiryDate = DateTime.Now.Add(authResponse.ExpireAfter).ToString()
+                EventID = EventIDs.JitGranted,
+                ComputerExpiryDate = expiryDate.ToString()
             });
 
-            var passwordData = new PasswordData("Added you to JIT", null);
+            var jitDetails = new JitDetailsModel(computer.MsDsPrincipalName, user.MsDsPrincipalName, expiryDate);
 
-            return this.View("Show", new LapEntryModel(computer, passwordData));
+            return this.View("Jit", jitDetails);
         }
 
         private IActionResult GetLapsPassword(LapRequestModel model, IUser user, IComputer computer, LapsAuthorizationResponse authResponse)
@@ -189,7 +198,7 @@ namespace Lithnet.Laps.Web.Controllers
 
             if (passwordData == null)
             {
-                this.logger.LogEventError(EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.SamAccountName, user.SamAccountName));
+                this.logger.LogEventError(EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.MsDsPrincipalName, user.MsDsPrincipalName));
 
                 model.FailureReason = UIMessages.NoLapsPassword;
                 return this.View("Get", model);
@@ -229,12 +238,12 @@ namespace Lithnet.Laps.Web.Controllers
             if (rateLimitResult.IsUserRateLimit)
             {
                 action.EventID = EventIDs.RateLimitExceededUser;
-                action.Message = string.Format(LogMessages.RateLimitExceededUser, user.SamAccountName, rateLimitResult.IPAddress, rateLimitResult.Threshold, rateLimitResult.Duration);
+                action.Message = string.Format(LogMessages.RateLimitExceededUser, user.MsDsPrincipalName, rateLimitResult.IPAddress, rateLimitResult.Threshold, rateLimitResult.Duration);
             }
             else
             {
                 action.EventID = EventIDs.RateLimitExceededIP;
-                action.Message = string.Format(LogMessages.RateLimitExceededIP, user.SamAccountName, rateLimitResult.IPAddress, rateLimitResult.Threshold, rateLimitResult.Duration);
+                action.Message = string.Format(LogMessages.RateLimitExceededIP, user.MsDsPrincipalName, rateLimitResult.IPAddress, rateLimitResult.Threshold, rateLimitResult.Duration);
             }
 
             this.reporting.GenerateAuditEvent(action);
@@ -249,7 +258,7 @@ namespace Lithnet.Laps.Web.Controllers
                 Computer = computer,
                 IsSuccess = false,
                 RequestModel = model,
-                Message = string.Format(LogMessages.AuthorizationFailed, user.SamAccountName, model.ComputerName)
+                Message = string.Format(LogMessages.AuthorizationFailed, user.MsDsPrincipalName, model.ComputerName)
             };
 
             action.EventID = authorizationResponse.Code switch
@@ -269,7 +278,7 @@ namespace Lithnet.Laps.Web.Controllers
             this.logger.Trace($"Target rule requires password to change after {expireAfter}");
             DateTime newDateTime = DateTime.UtcNow.Add(expireAfter);
             this.directory.SetPasswordExpiryTime(computer, newDateTime);
-            this.logger.Trace($"Set expiry time for {computer.SamAccountName} to {newDateTime.ToLocalTime()}");
+            this.logger.Trace($"Set expiry time for {computer.MsDsPrincipalName} to {newDateTime.ToLocalTime()}");
         }
     }
 }

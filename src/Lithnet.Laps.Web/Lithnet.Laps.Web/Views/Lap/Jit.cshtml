@@ -1,0 +1,50 @@
+﻿@{
+    ViewBag.Title = "JIT Details";
+}
+
+@model Lithnet.Laps.Web.Models.JitDetailsModel
+
+<div class="form-container">
+
+    <header>
+        @UIMessages.HeadingJitRequest
+    </header>
+    <fieldset>
+        <section>
+            <label class="title">@UIMessages.HeadingAccessApproved</label>
+            <div class="input-group">
+                <label>You've been granted just-in-time access to this machine.</label>
+            </div>
+        </section>
+
+        <section>
+            <label class="title">@UIMessages.Username</label>
+            <div class="input-group">
+                <input class="resultsText" id="Username" type="text" value="@Html.DisplayFor(m => m.Username)" readonly="readonly" />
+            </div>
+        </section>
+
+        <section>
+            <label class="title">@UIMessages.ComputerName</label>
+            <div class="input-group">
+                <input class="resultsText" id="ComputerName" type="text" value="@Html.DisplayFor(m => m.ComputerName)" readonly="readonly" />
+            </div>
+        </section>
+
+        <section>
+            <label class="title">@UIMessages.ValidUntil</label>
+            <div class="input-group">
+                <input class="resultsText" id="ValidDate" type="text" value="@Html.DisplayFor(m => m.ValidUntil)" readonly="readonly" />
+            </div>
+        </section>
+    </fieldset>
+
+    <footer>
+        <div class="center-content">
+            @using (Html.BeginForm("Get", "Lap", FormMethod.Get))
+            {
+                <button type="submit" class="btn btn-primary">@UIMessages.ButtonNewRequest</button>
+            }
+        </div>
+    </footer>
+</div>

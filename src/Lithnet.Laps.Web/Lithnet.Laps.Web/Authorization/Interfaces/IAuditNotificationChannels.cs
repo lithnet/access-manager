@@ -4,8 +4,8 @@ namespace Lithnet.Laps.Web.Authorization
 {
     public interface IAuditNotificationChannels
     {
-        IList<string> OnFailure { get; set; }
+        IList<string> OnFailure { get; }
 
-        IList<string> OnSuccess { get; set; }
+        IList<string> OnSuccess { get; }
     }
 }

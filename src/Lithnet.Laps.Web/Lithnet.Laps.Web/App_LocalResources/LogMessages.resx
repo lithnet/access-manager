@@ -149,19 +149,19 @@
     <value>unknown</value>
   </data>
   <data name="AuditEmailSubjectFailure" xml:space="preserve">
-    <value>LAP access denied for {user.SamAccountName} to {computer.SamAccountName}</value>
+    <value>Access to {computer.MsDsPrincipalName} was denied for {user.MsDsPrincipalName}</value>
   </data>
   <data name="AuditEmailSubjectSuccess" xml:space="preserve">
-    <value>LAP for {computer.SamAccountName} accessed by {user.SamAccountName}</value>
+    <value>Access to {computer.MsDsPrincipalName} was granted for {user.MsDsPrincipalName}</value>
   </data>
   <data name="DefaultAuditFailureText" xml:space="preserve">
     <value>AUDIT: FAILURE          
-Username:			{user.SamAccountName}
+Username:			{user.MsDsPrincipalName}
 Name:				{user.DisplayName}
 UPN:				{user.UserPrincipalName}
 SID:				{user.Sid}
 User DN:				{user.DistinguishedName}
-Computer Name:			{computer.SamAccountName}
+Computer name:			{computer.MsDsPrincipalName}
 Computer DN:			{computer.DistinguishedName}
 Target ID:			{target.ID}
 Reader principal:			{reader.Principal}
@@ -169,12 +169,12 @@ Detail:				{message}</value>
   </data>
   <data name="DefaultAuditSuccessText" xml:space="preserve">
     <value>AUDIT: SUCCESS       
-Username:			{user.SamAccountName}
+Username:			{user.MsDsPrincipalName}
 Name:				{user.DisplayName}
 UPN:				{user.UserPrincipalName}
 SID:				{user.Sid}
 User DN:				{user.DistinguishedName}
-Computer Name:			{computer.SamAccountName}
+Computer name:			{computer.MsDsPrincipalName}
 Computer DN:			{computer.DistinguishedName}
 Target ID:			{target.ID}
 Reader principal:			{reader.Principal}</value>

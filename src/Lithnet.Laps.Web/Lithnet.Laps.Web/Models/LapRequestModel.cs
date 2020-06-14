@@ -18,29 +18,12 @@ namespace Lithnet.Laps.Web.Models
         [MaxLength(4096, ErrorMessageResourceType = typeof(UIMessages), ErrorMessageResourceName = "ReasonTooLong")]
         public string UserRequestReason { get; set; }
 
-        public AuthorizationRequestType RequestType { get; set; } = AuthorizationRequestType.LocalAdminPassword;
+        public AccessMask RequestType { get; set; } = AccessMask.Laps;
 
         public bool ShowReason { get; set; }
 
         public bool ReasonRequired { get; set; }
 
         public string FailureReason { get; set; }
-
-        public Dictionary<string, string> AllowedRequestTypes
-        {
-            get
-            {
-                var items = new Dictionary<string, string>();
-
-                foreach (var item in Enum.GetValues(typeof(AuthorizationRequestType)))
-                {
-                    AuthorizationRequestType value = ((AuthorizationRequestType)item);
-
-                    items.Add(value.ToString(), value.ToDescription());
-                }
-
-                return items;
-            }
-        }
     }
 }

@@ -7,7 +7,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory
 {
     public sealed class ActiveDirectoryComputer : IComputer
     {
-        internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "description", "displayName", "objectGuid", "objectSid" };
+        internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "description", "displayName", "objectGuid", "objectSid" , "msDS-PrincipalName" };
 
         private readonly SearchResult computer;
 
@@ -19,6 +19,8 @@ namespace Lithnet.Laps.Web.ActiveDirectory
         public string SamAccountName => this.computer.GetPropertyString("samAccountName");
 
         public string DistinguishedName => this.computer.GetPropertyString("distinguishedName");
+
+        public string MsDsPrincipalName => this.computer.GetPropertyString("msDS-PrincipalName");
 
         public string Description => this.computer.GetPropertyString("description");
 

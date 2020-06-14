@@ -121,7 +121,7 @@
     <value>The requested computer was not found in the directory</value>
   </data>
   <data name="NotAuthorized" xml:space="preserve">
-    <value>You are not authorized to access the password for this computer</value>
+    <value>You are not authorized to access this computer</value>
   </data>
   <data name="SsoIdentityNotFound" xml:space="preserve">
     <value>Your request could not be processed because your SSO identity could not be found in the directory</value>
@@ -138,20 +138,11 @@
   <data name="AuthNError" xml:space="preserve">
     <value>An authentication error occurred</value>
   </data>
-  <data name="ButtonRequestAnotherPassword" xml:space="preserve">
-    <value>Request another password</value>
-  </data>
-  <data name="ButtonRequestPassword" xml:space="preserve">
-    <value>Request password</value>
-  </data>
   <data name="ComputerName" xml:space="preserve">
     <value>Computer name</value>
   </data>
   <data name="HeadingPasswordDetails" xml:space="preserve">
     <value>Password details</value>
-  </data>
-  <data name="HeadingRequestPassword" xml:space="preserve">
-    <value>Request password</value>
   </data>
   <data name="Password" xml:space="preserve">
     <value>Password</value>
@@ -189,16 +180,22 @@
   <data name="ExternalAuthNAccessDenied" xml:space="preserve">
     <value>You do not have access to use this application. The logon attempt was denied by the authentication provider</value>
   </data>
-  <data name="ButtonRequestAnotherJit" xml:space="preserve">
+  <data name="ButtonNewRequest" xml:space="preserve">
     <value>New request</value>
   </data>
-  <data name="ButtonRequestJit" xml:space="preserve">
+  <data name="ButtonRequestAccess" xml:space="preserve">
     <value>Request access</value>
   </data>
-  <data name="HeadingJitDetails" xml:space="preserve">
+  <data name="HeadingAccessApproved" xml:space="preserve">
     <value>Your access has been approved</value>
   </data>
-  <data name="HeadingRequestJit" xml:space="preserve">
+  <data name="HeadingRequestAccess" xml:space="preserve">
     <value>Request access</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>User name</value>
+  </data>
+  <data name="HeadingJitRequest" xml:space="preserve">
+    <value>Just-in-time access request</value>
   </data>
 </root>

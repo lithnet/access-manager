@@ -8,9 +8,6 @@ namespace Lithnet.Laps.Web.Authorization
 {
     public class JsonTargetLapsDetails
     {
-        [JsonProperty("enabled")]
-        public bool Enabled { get; set; }
-
         [JsonProperty("expire-after")]
         public TimeSpan ExpireAfter { get; set; }
     }

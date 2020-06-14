@@ -7,21 +7,23 @@ namespace Lithnet.Laps.Web.ActiveDirectory
 {
     public sealed class ActiveDirectoryGroup: IGroup
     {
-        private readonly SearchResult groupPrincipal;
+        private readonly SearchResult group;
 
-        internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "tokenGroups", "displayName", "objectGuid", "objectSid", "samAccountName" };
+        internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "tokenGroups", "displayName", "objectGuid", "objectSid", "samAccountName", "msDS-PrincipalName" };
 
         public ActiveDirectoryGroup(SearchResult groupPrincipal)
         {
-            this.groupPrincipal = groupPrincipal;
+            this.group = groupPrincipal;
         }
 
-        public Guid? Guid => this.groupPrincipal.GetPropertyGuid("objectGuid");
+        public Guid? Guid => this.group.GetPropertyGuid("objectGuid");
 
-        public SecurityIdentifier Sid => this.groupPrincipal.GetPropertySid("objectSid");
+        public string MsDsPrincipalName => this.group.GetPropertyString("msDS-PrincipalName");
 
-        public string SamAccountName => this.groupPrincipal.GetPropertyString("samAccountName");
+        public SecurityIdentifier Sid => this.group.GetPropertySid("objectSid");
 
-        public string DistinguishedName => this.groupPrincipal.GetPropertyString("distinguishedName");
+        public string SamAccountName => this.group.GetPropertyString("samAccountName");
+
+        public string DistinguishedName => this.group.GetPropertyString("distinguishedName");
     }
 }

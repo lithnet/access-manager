@@ -3,11 +3,11 @@
     {
       "name": "IDMDEV1\\PC1",
       "type": "computer",
-      "expire-after": "02:00:00",
       "acl": [
         {
-          "name": "idmdev1\\zb-mgr-rnewing",
-          "type": "allow"
+          "trustee": "idmdev1\\zb-mgr-rnewing",
+          "type": "allow",
+          "access": "jit,laps"
         },
         {
           "name": "idmdev1\\user1",
@@ -19,12 +19,10 @@
         "on-failure": [ "email-domain-admins" ]
       },
       "jit": {
-        "enabled": true,
         "trustee": "idmdev1\\JIT-PC1",
         "expire-after": "00:00:10"
       },
       "laps": {
-        "enabled": true,
         "expire-after": "02:00:00"
       }
     },
@@ -34,14 +32,15 @@
       "expire-after": "02:00:00",
       "acl": [
         {
-          "name": "idmdev1\\domain admins",
+          "trustee": "idmdev1\\domain admins",
           "type": "deny",
+          "access": "jit,laps",
           "auditing": {
             "on-failure": [ "email-domain-admins" ]
           }
         },
         {
-          "name": "idmdev1\\ryan",
+          "trustee": "idmdev1\\ryan",
           "type": "allow"
         }
       ],
@@ -56,15 +55,15 @@
       "expire-after": "03:00:00",
       "acl": [
         {
-          "name": "idmdev1\\g-dl-1",
+          "trustee": "idmdev1\\g-dl-1",
           "type": "allow"
         },
         {
-          "name": "idmdev1\\g-dl-2",
+          "trustee": "idmdev1\\g-dl-2",
           "type": "allow"
         },
         {
-          "name": "idmdev1\\zb-mgr-rnewing",
+          "trustee": "idmdev1\\zb-mgr-rnewing",
           "type": "allow"
         }
       ],

@@ -6,6 +6,7 @@
         public const int UserAuthenticated = 201;
         public const int UserRequestedPassword = 202;
         public const int UserAuthorizedForComputer = 203;
+        public const int JitGranted = 204;
 
         public const int SsoIdentityNotFound = 400;
         public const int ComputerNotFound = 401;

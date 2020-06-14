@@ -28,7 +28,21 @@ namespace Lithnet.Laps.Web.Authorization
             this.env = env;
         }
 
-        public JitAuthorizationResponse GetJitAuthorizationResponse(IUser user, IComputer computer)
+        public AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer, AccessMask requestedAccess)
+        {
+            if (requestedAccess == AccessMask.Laps)
+            {
+                return this.GetLapsAuthorizationResponse(user, computer);
+            }
+            else if (requestedAccess == AccessMask.Jit)
+            {
+                return this.GetJitAuthorizationResponse(user, computer);
+            }
+
+            throw new ArgumentException("The requested access type was unknown");
+        }
+
+        private JitAuthorizationResponse GetJitAuthorizationResponse(IUser user, IComputer computer)
         {
             if (powershell == null)
             {
@@ -87,7 +101,7 @@ namespace Lithnet.Laps.Web.Authorization
             };
         }
 
-        public LapsAuthorizationResponse GetLapsAuthorizationResponse(IUser user, IComputer computer)
+        private LapsAuthorizationResponse GetLapsAuthorizationResponse(IUser user, IComputer computer)
         {
             if (powershell == null)
             {

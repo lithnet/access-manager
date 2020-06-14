@@ -94,6 +94,7 @@ namespace Lithnet.Laps.Web.Internal
 
             Dictionary<string, string> pairs = new Dictionary<string, string> {
                 { "{user.SamAccountName}", action.User?.SamAccountName},
+                { "{user.MsDsPrincipalName}", action.User?.MsDsPrincipalName},
                 { "{user.DisplayName}", action.User?.DisplayName},
                 { "{user.UserPrincipalName}", action.User?.UserPrincipalName},
                 { "{user.Sid}", action.User?.Sid?.ToString()},
@@ -104,6 +105,7 @@ namespace Lithnet.Laps.Web.Internal
                 { "{user.GivenName}", action.User?.GivenName},
                 { "{user.Surname}", action.User?.Surname},
                 { "{computer.SamAccountName}", action.Computer?.SamAccountName},
+                { "{computer.MsDsPrincipalName}", action.Computer?.MsDsPrincipalName},
                 { "{computer.DistinguishedName}", action.Computer?.DistinguishedName},
                 { "{computer.Description}", action.Computer?.Description},
                 { "{computer.DisplayName}", action.Computer?.DisplayName},
@@ -117,6 +119,7 @@ namespace Lithnet.Laps.Web.Internal
                 { "{AuthzResult.AdditionalInformation}", action.AuthzResponse?.AdditionalInformation},
                 { "{AuthzResult.ExpireAfter}", (lapsAuthZResponse?.ExpireAfter ?? jitAuthZResponse?.ExpireAfter)?.ToString()},
                 { "{AuthzResult.ResponseCode}", action.AuthzResponse?.Code.ToString()},
+                { "{AuthzResult.AccessType}", action.AuthzResponse?.EvaluatedAccess.ToDescription()},
                 { "{message}", action.Message},
                 { "{request.IPAddress}", httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString()},
                 { "{request.Hostname}", this.TryResolveHostName(httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress)},

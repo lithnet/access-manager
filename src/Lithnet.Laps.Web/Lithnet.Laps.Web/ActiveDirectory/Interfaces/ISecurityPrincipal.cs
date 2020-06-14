@@ -12,5 +12,7 @@ namespace Lithnet.Laps.Web.ActiveDirectory
         Guid? Guid { get; }
 
         SecurityIdentifier Sid { get; }
+
+        string MsDsPrincipalName { get; }
     }
 }

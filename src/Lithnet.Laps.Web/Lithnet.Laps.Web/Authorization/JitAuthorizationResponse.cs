@@ -15,5 +15,7 @@ namespace Lithnet.Laps.Web.Authorization
         /// A fully qualified group name that the user must be added to in order to grant the JIT access
         /// </summary>
         public string AuthorizingGroup { get; set; }
+
+        internal override AccessMask EvaluatedAccess { get => AccessMask.Jit; }
     }
 }
