@@ -68,6 +68,12 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
         [DllImport("NetApi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern int DsGetDcName(string computerName, string domainName, IntPtr domainGuid, string siteName, DsGetDcNameFlags flags, out IntPtr domainControllerInfo);
 
+        [DllImport("Netapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern int NetServerGetInfo(string serverName, int level, out IntPtr pServerInfo);
+
+        [DllImport("Netapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern int NetWkstaGetInfo(string serverName, int level, out IntPtr pWorkstationInfo);
+
         [DllImport("NetApi32.dll", EntryPoint = "NetApiBufferFree")]
         private static extern int NetApiFreeBuffer(IntPtr buffer);
 
@@ -95,6 +101,58 @@ namespace Lithnet.Laps.Web.ActiveDirectory.Interop
         [DllImport("authz.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool AuthzGetInformationFromContext(IntPtr hAuthzClientContext, AuthzContextInformationClass infoClass, uint bufferSize, out uint pSizeRequired, IntPtr buffer);
+
+        public static ServerInfo101 GetServerInfo(string server)
+        {
+            IntPtr pServerInfo = IntPtr.Zero;
+
+            try
+            {
+              int result =  NetServerGetInfo(server, 101, out pServerInfo);
+
+                if (result != 0)
+                {
+                    throw new DirectoryException("NetServerGetInfo failed", new Win32Exception(result));
+                }
+
+                var info = Marshal.PtrToStructure<ServerInfo101>(pServerInfo);
+
+                return info;
+            }
+            finally
+            {
+                if (pServerInfo != IntPtr.Zero)
+                {
+                    NetApiFreeBuffer(pServerInfo);
+                }
+            }
+        }
+
+        public static WorkstationInfo100 GetWorkstationInfo(string server)
+        {
+            IntPtr pServerInfo = IntPtr.Zero;
+
+            try
+            {
+                int result = NetWkstaGetInfo(server, 100, out pServerInfo);
+
+                if (result != 0)
+                {
+                    throw new DirectoryException("NetWkstaGetInfo failed", new Win32Exception(result));
+                }
+
+                var info = Marshal.PtrToStructure<WorkstationInfo100>(pServerInfo);
+
+                return info;
+            }
+            finally
+            {
+                if (pServerInfo != IntPtr.Zero)
+                {
+                    NetApiFreeBuffer(pServerInfo);
+                }
+            }
+        }
 
         public static string GetDn(string nameToFind)
         {

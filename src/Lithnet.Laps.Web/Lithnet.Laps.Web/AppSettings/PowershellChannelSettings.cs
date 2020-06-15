@@ -21,6 +21,6 @@ namespace Lithnet.Laps.Web.AppSettings
 
         public int TimeOut => this.config.GetValueOrDefault("script-timeout", 10);
 
-        public bool DenyOnAuditError => this.config.GetValueOrDefault("deny-on-error", false);
+        public bool DenyOnAuditError => this.config.GetValueOrDefault("mandatory", false);
     }
 }

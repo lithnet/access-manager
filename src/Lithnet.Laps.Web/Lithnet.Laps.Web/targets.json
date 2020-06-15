@@ -19,8 +19,8 @@
         "on-failure": [ "email-domain-admins" ]
       },
       "jit": {
-        "trustee": "idmdev1\\JIT-PC1",
-        "expire-after": "00:00:10"
+        "trustee": null,//"prop:managedBy",
+        "expire-after": "00:00:15"
       },
       "laps": {
         "expire-after": "02:00:00"

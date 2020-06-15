@@ -18,6 +18,7 @@ using NLog;
 using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Threading.Channels;
+using Lithnet.Laps.Web.ActionProviders;
 
 namespace Lithnet.Laps.Web
 {
@@ -54,11 +55,14 @@ namespace Lithnet.Laps.Web
             services.TryAddScoped<ITemplateProvider, TemplateProvider>();
             services.TryAddScoped<IRateLimiter, RateLimiter>();
             services.TryAddScoped<IAceEvaluator, AceEvaluator>();
+            services.TryAddScoped<IPasswordProvider, MsMcsAdmPwdProvider>();
+            services.TryAddScoped<IJitAccessGroupResolver, JitAccessGroupResolver>();
+            services.TryAddScoped<IJitProvider, AdGroupJitProvider>();
 
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();
             services.AddScoped<INotificationChannel, PowershellNotificationChannel>();
-
+            
             services.TryAddScoped<IXffHandlerSettings, XffHandlerSettings>();
 
             var backgroundProcessingChannel = Channel.CreateUnbounded<Action>();

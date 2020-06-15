@@ -1,4 +1,5 @@
 ﻿using System;
+using System.DirectoryServices;
 using System.Security.Principal;
 
 namespace Lithnet.Laps.Web.ActiveDirectory

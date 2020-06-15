@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Authorization;
 using IAuthorizationService = Lithnet.Laps.Web.Authorization.IAuthorizationService;
 using System.Globalization;
 using Lithnet.Laps.Web.Exceptions;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Lithnet.Laps.Web.Controllers
 {
@@ -26,9 +28,11 @@ namespace Lithnet.Laps.Web.Controllers
         private readonly IRateLimiter rateLimiter;
         private readonly IUserInterfaceSettings userInterfaceSettings;
         private readonly IAuthenticationProvider authenticationProvider;
+        private readonly IPasswordProvider passwordProvider;
+        private readonly IJitProvider jitProvider;
 
         public LapController(IAuthorizationService authorizationService, ILogger logger, IDirectory directory,
-            IAuditEventProcessor reporting, IRateLimiter rateLimiter, IUserInterfaceSettings userInterfaceSettings, IAuthenticationProvider authenticationProvider)
+            IAuditEventProcessor reporting, IRateLimiter rateLimiter, IUserInterfaceSettings userInterfaceSettings, IAuthenticationProvider authenticationProvider, IPasswordProvider passwordProvider, IJitProvider jitProvider)
         {
             this.authorizationService = authorizationService;
             this.logger = logger;
@@ -37,6 +41,8 @@ namespace Lithnet.Laps.Web.Controllers
             this.rateLimiter = rateLimiter;
             this.userInterfaceSettings = userInterfaceSettings;
             this.authenticationProvider = authenticationProvider;
+            this.passwordProvider = passwordProvider;
+            this.jitProvider = jitProvider;
         }
 
         public IActionResult Get()
@@ -137,7 +143,7 @@ namespace Lithnet.Laps.Web.Controllers
                 }
                 else
                 {
-                    return this.GetJitAccess(model, user, computer, (JitAuthorizationResponse)authResponse);
+                    return this.GrantJitAccess(model, user, computer, (JitAuthorizationResponse)authResponse);
                 }
             }
             catch (AuditLogFailureException ex)
@@ -170,9 +176,9 @@ namespace Lithnet.Laps.Web.Controllers
             }
         }
 
-        private IActionResult GetJitAccess(LapRequestModel model, IUser user, IComputer computer, JitAuthorizationResponse authResponse)
+        private IActionResult GrantJitAccess(LapRequestModel model, IUser user, IComputer computer, JitAuthorizationResponse authResponse)
         {
-            this.directory.AddGroupMember(this.directory.GetGroup(authResponse.AuthorizingGroup), user, authResponse.ExpireAfter);
+            this.jitProvider.GrantJitAccess(computer, this.directory.GetGroup(authResponse.AuthorizingGroup), user, authResponse.ExpireAfter);
 
             DateTime expiryDate = DateTime.Now.Add(authResponse.ExpireAfter);
 
@@ -194,22 +200,18 @@ namespace Lithnet.Laps.Web.Controllers
 
         private IActionResult GetLapsPassword(LapRequestModel model, IUser user, IComputer computer, LapsAuthorizationResponse authResponse)
         {
-            PasswordData passwordData = this.directory.GetPassword(computer);
-
-            if (passwordData == null)
+            IList<PasswordEntry> entries;
+            
+            try
+            {
+                entries = this.passwordProvider.GetPasswordEntries(computer, authResponse.ExpireAfter);
+            }
+            catch (NoPasswordException)
             {
                 this.logger.LogEventError(EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.MsDsPrincipalName, user.MsDsPrincipalName));
 
                 model.FailureReason = UIMessages.NoLapsPassword;
                 return this.View("Get", model);
-            }
-
-            if (authResponse.ExpireAfter.Ticks > 0)
-            {
-                this.UpdateTargetPasswordExpiry(authResponse.ExpireAfter, computer);
-
-                // Get the password again with the updated expiry date.
-                passwordData = this.directory.GetPassword(computer);
             }
 
             this.reporting.GenerateAuditEvent(new AuditableAction
@@ -220,10 +222,10 @@ namespace Lithnet.Laps.Web.Controllers
                 User = user,
                 Computer = computer,
                 EventID = EventIDs.PasswordAccessed,
-                ComputerExpiryDate = passwordData.ExpirationTime?.ToString(CultureInfo.CurrentUICulture)
+                ComputerExpiryDate = entries.First().ExpiryDate?.ToString(CultureInfo.CurrentUICulture)
             });
 
-            return this.View("Show", new LapEntryModel(computer, passwordData));
+            return this.View("Show", new LapEntryModel(computer, entries));
         }
 
         private void LogRateLimitEvent(LapRequestModel model, IUser user, RateLimitResult rateLimitResult)
@@ -270,15 +272,6 @@ namespace Lithnet.Laps.Web.Controllers
             };
 
             this.reporting.GenerateAuditEvent(action);
-        }
-
-        [Localizable(false)]
-        private void UpdateTargetPasswordExpiry(TimeSpan expireAfter, IComputer computer)
-        {
-            this.logger.Trace($"Target rule requires password to change after {expireAfter}");
-            DateTime newDateTime = DateTime.UtcNow.Add(expireAfter);
-            this.directory.SetPasswordExpiryTime(computer, newDateTime);
-            this.logger.Trace($"Set expiry time for {computer.MsDsPrincipalName} to {newDateTime.ToLocalTime()}");
         }
     }
 }

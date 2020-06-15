@@ -27,6 +27,6 @@ namespace Lithnet.Laps.Web.AppSettings
 
         public string ContentType => this.config["content-type"] ?? "application/json";
 
-        public bool DenyOnAuditError => this.config.GetValueOrDefault("deny-on-error", false);
+        public bool DenyOnAuditError => this.config.GetValueOrDefault("mandatory", false);
     }
 }

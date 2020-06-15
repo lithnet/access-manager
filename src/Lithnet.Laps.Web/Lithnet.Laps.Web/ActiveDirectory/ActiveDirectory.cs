@@ -8,15 +8,14 @@ using System.Text;
 using Lithnet.Laps.Web.ActiveDirectory.Interop;
 using Lithnet.Laps.Web.Internal;
 using Lithnet.Laps.Web.Models;
+using System.Text.RegularExpressions;
+using Microsoft.Extensions.DependencyInjection;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Lithnet.Laps.Web.ActiveDirectory
 {
     public sealed class ActiveDirectory : IDirectory
     {
-        private const string AttrMsMcsAdmPwd = "ms-Mcs-AdmPwd";
-
-        private const string AttrMsMcsAdmPwdExpirationTime = "ms-Mcs-AdmPwdExpirationTime";
-
         private static Guid PamFeatureGuid = new Guid("ec43e873-cce8-4640-b4ab-07ffe4ab5bcd");
 
         private Dictionary<SecurityIdentifier, bool> PamEnabledDomainCache = new Dictionary<SecurityIdentifier, bool>();
@@ -56,25 +55,6 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             throw new UnsupportedPrincipalTypeException($"The object '{principalName}' was of an unknown type: {result.GetPropertyCommaSeparatedString("objectClass")}");
         }
 
-        public PasswordData GetPassword(IComputer computer)
-        {
-            SearchResult searchResult = this.GetDirectoryEntry(computer.DistinguishedName, "computer", ActiveDirectory.AttrMsMcsAdmPwd, ActiveDirectory.AttrMsMcsAdmPwdExpirationTime);
-
-            if (!searchResult.Properties.Contains(ActiveDirectory.AttrMsMcsAdmPwd))
-            {
-                return null;
-            }
-
-            return new PasswordData(searchResult.GetPropertyString(ActiveDirectory.AttrMsMcsAdmPwd), searchResult.GetPropertyDateTimeFromLong(ActiveDirectory.AttrMsMcsAdmPwdExpirationTime));
-        }
-
-        public void SetPasswordExpiryTime(IComputer computer, DateTime time)
-        {
-            DirectoryEntry entry = new DirectoryEntry($"LDAP://{computer.DistinguishedName}");
-            entry.Properties[ActiveDirectory.AttrMsMcsAdmPwdExpirationTime].Value = time.ToFileTimeUtc().ToString();
-            entry.CommitChanges();
-        }
-
         public bool IsContainer(string path)
         {
             try
@@ -110,6 +90,12 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             return result == null ? null : new ActiveDirectoryGroup(result);
         }
 
+        public IGroup GetGroup(SecurityIdentifier sid)
+        {
+            SearchResult result = this.DoGcLookup(sid.ToString(), "group", ActiveDirectoryGroup.PropertiesToGet);
+            return result == null ? null : new ActiveDirectoryGroup(result);
+        }
+
         public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, ISecurityPrincipal principal)
         {
             return this.IsSidInPrincipalToken(sidToFindInToken, principal, principal.Sid.AccountDomainSid);
@@ -118,6 +104,23 @@ namespace Lithnet.Laps.Web.ActiveDirectory
         public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, ISecurityPrincipal principal, SecurityIdentifier targetDomainSid)
         {
             return NativeMethods.CheckForSidInToken(principal.Sid, sidToFindInToken, targetDomainSid);
+        }
+
+        public IComputer GetComputer()
+        {
+            return this.GetComputer(this.GetMachineNetbiosFullyQualifiedName());
+        }
+
+        public string GetMachineNetbiosDomainName()
+        {
+            var result = NativeMethods.GetWorkstationInfo(null);
+            return result.LanGroup;
+        }
+
+        public string GetMachineNetbiosFullyQualifiedName()
+        {
+            var result = NativeMethods.GetWorkstationInfo(null);
+            return $"{result.LanGroup}\\{result.ComputerName}";
         }
 
         //public IList<ISecurityPrincipal> GetGroupMembers(IGroup group)
@@ -149,7 +152,6 @@ namespace Lithnet.Laps.Web.ActiveDirectory
         {
             return this.GetMemberDNsFromGroup(group.DistinguishedName);
         }
-
         private IEnumerable<string> GetMemberDNsFromGroup(string dn)
         {
             HashSet<string> memberDNs = new HashSet<string>();
@@ -221,6 +223,132 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             group.CommitChanges();
         }
 
+        public void UpdateComputerLamAppData(SecurityIdentifier groupSid)
+        {
+            IComputer computer = this.GetComputer();
+            DirectoryEntry de;
+            IGroup group = this.GetGroup(groupSid);
+
+            try
+            {
+                string dn = GetJitAccessGroupDn(computer);
+                de = new DirectoryEntry(dn);
+                var referencedObject = de.Properties["msDS-ObjectReference"].Value as string;
+                if (!string.Equals(referencedObject, group.DistinguishedName))
+                {
+                    de.Properties["msDS-ObjectReference"].Clear();
+                    de.Properties["msDS-ObjectReference"].Add(group.DistinguishedName);
+                }
+            }
+            catch (ObjectNotFoundException)
+            {
+                var parent = new DirectoryEntry($"LDAP://{computer.DistinguishedName}");
+
+                de = parent.Children.Add("CN=LithnetAccessManagerConfig", "msDs-App-Configuration");
+                de.Properties["applicationName"].Add("Lithnet Access Manager");
+                de.Properties["description"].Add("Application configuration for Lithnet Access Manager");
+                de.Properties["msDS-ObjectReference"].Add(group.DistinguishedName);
+                de.Properties["ntSecurityDescriptor"].Add(this.GetDefaultSecurityDescriptorForLamObject());
+                de.CommitChanges();
+            }
+        }
+
+        public void GetComputerLamAppData(IComputer computer)
+        {
+            //DirectoryEntry de;
+
+            //try
+            //{
+            //    string dn = GetJitAccessGroupDn(computer);
+            //    de = new DirectoryEntry(dn);
+            //    var referencedObject = de.Properties["msDS-ObjectReference"].Value as string;
+            //    if (!string.Equals(referencedObject, group.DistinguishedName))
+            //    {
+            //        de.Properties["msDS-ObjectReference"].Clear();
+            //        de.Properties["msDS-ObjectReference"].Add(group.DistinguishedName);
+            //    }
+            //}
+            //catch (ObjectNotFoundException)
+            //{
+            //    var parent = new DirectoryEntry($"LDAP://{computer.DistinguishedName}");
+
+            //    de = parent.Children.Add("CN=LithnetAccessManagerConfig", "msDs-App-Configuration");
+            //    de.Properties["applicationName"].Add("Lithnet Access Manager");
+            //    de.Properties["description"].Add("Application configuration for Lithnet Access Manager");
+            //    de.Properties["msDS-ObjectReference"].Add(group.DistinguishedName);
+            //    de.Properties["ntSecurityDescriptor"].Add(this.GetDefaultSecurityDescriptorForLamObject());
+            //    de.CommitChanges();
+            //}
+        }
+
+        private byte[] GetDefaultSecurityDescriptorForLamObject()
+        {
+            ActiveDirectorySecurity gf = new ActiveDirectorySecurity();
+            gf.SetSecurityDescriptorSddlForm("D:AI(A;;FA;;;CO)");
+            return gf.GetSecurityDescriptorBinaryForm();
+        }
+
+        public IGroup GetJitAccessGroup(IComputer computer)
+        {
+            string dn = GetJitAccessGroupDn(computer);
+
+            if (string.IsNullOrWhiteSpace(dn))
+            {
+                throw new ObjectNotFoundException($"The JIT access group for the computer {computer.MsDsPrincipalName} was not found");
+            }
+
+            var result = GetDirectoryEntry(dn, "group", ActiveDirectoryGroup.PropertiesToGet);
+
+            if (result == null)
+            {
+                throw new ObjectNotFoundException($"The JIT access group for the computer {computer.MsDsPrincipalName} was not found");
+            }
+
+            return new ActiveDirectoryGroup(result);
+        }
+
+        public string GetJitAccessGroupDn(IComputer computer)
+        {
+            DirectorySearcher d = new DirectorySearcher
+            {
+                SearchRoot = new DirectoryEntry($"LDAP://{computer.DistinguishedName}"),
+                SearchScope = SearchScope.OneLevel,
+                Filter = $"(&(objectClass=msDs-App-Configuration)(applicationName=Lithnet Access Manager))"
+            };
+
+            d.PropertiesToLoad.Add("msDS-ObjectReference");
+
+            var result = d.FindOne();
+
+            if (result == null)
+            {
+                throw new ObjectNotFoundException();
+            }
+
+            return result.GetPropertyString("msDS-ObjectReference");
+        }
+
+        private SearchResult GetLamObjject(IComputer computer)
+        {
+            DirectorySearcher d = new DirectorySearcher
+            {
+                SearchRoot = new DirectoryEntry($"LDAP://{computer.DistinguishedName}"),
+                SearchScope = SearchScope.OneLevel,
+                Filter = $"(&(objectClass=msDs-App-Configuration)(applicationName=Lithnet Access Manager))"
+            };
+
+            d.PropertiesToLoad.Add("msDS-ObjectReference");
+
+            var result = d.FindOne();
+
+            if (result == null)
+            {
+                throw new ObjectNotFoundException();
+            }
+
+            return result;
+        }
+
         public bool IsPamFeatureEnabled(SecurityIdentifier domainSid)
         {
             SecurityIdentifier sid = domainSid.AccountDomainSid;
@@ -255,6 +383,13 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             return result;
         }
 
+        public bool IsDomainController()
+        {
+            var info = NativeMethods.GetServerInfo(null);
+
+            return (info.Type & ServerTypes.DomainCtrl) == ServerTypes.DomainCtrl || (info.Type & ServerTypes.BackupDomainCtrl) == ServerTypes.BackupDomainCtrl;
+        }
+
         private SearchResult DoGcLookup(string objectName, string objectClass, IEnumerable<string> propertiesToGet)
         {
             string dn;
@@ -264,9 +399,17 @@ namespace Lithnet.Laps.Web.ActiveDirectory
                 objectName += "$";
             }
 
-            if (objectName.Contains("\\") || objectName.Contains("@") || objectName.TryParseAsSid(out _))
+            if (objectName.Contains("\\") || objectName.Contains("@"))
             {
                 dn = NativeMethods.GetDn(objectName);
+            }
+            else if (objectName.TryParseAsSid(out SecurityIdentifier sid))
+            {
+                dn = $"<SID={sid}>";
+            }
+            else if (this.IsDistinguishedName(objectName))
+            {
+                dn = objectName;
             }
             else
             {
@@ -328,13 +471,18 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             return result[0].Properties["distinguishedName"][0].ToString();
         }
 
-        private SearchResult GetDirectoryEntry(string dn, string objectClass, params string[] propertiesToLoad)
+        public SearchResult GetDirectoryEntry(ISecurityPrincipal principal, params string[] propertiesToLoad)
+        {
+            return this.GetDirectoryEntry(principal.DistinguishedName, "*", propertiesToLoad);
+        }
+
+        public SearchResult SearchDirectoryEntry(string basedn, string filter, SearchScope scope, params string[] propertiesToLoad)
         {
             DirectorySearcher d = new DirectorySearcher
             {
-                SearchRoot = new DirectoryEntry($"LDAP://{dn}"),
-                SearchScope = SearchScope.Base,
-                Filter = $"objectClass={objectClass}"
+                SearchRoot = new DirectoryEntry($"LDAP://{basedn}"),
+                SearchScope = scope,
+                Filter = filter
             };
 
             foreach (string prop in propertiesToLoad)
@@ -343,6 +491,11 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             }
 
             return d.FindOne();
+        }
+
+        public SearchResult GetDirectoryEntry(string dn, string objectClass, params string[] propertiesToLoad)
+        {
+            return this.SearchDirectoryEntry(dn, $"objectClass={objectClass}", SearchScope.Base, propertiesToLoad);
         }
 
         private static string EscapeSearchFilterParameter(string p)
@@ -380,6 +533,24 @@ namespace Lithnet.Laps.Web.ActiveDirectory
             }
 
             return escapedValue.ToString();
+        }
+
+        private bool IsDistinguishedName(string name)
+        {
+            if (!name.Contains('='))
+            {
+                return false;
+            }
+
+            try
+            {
+                X500DistinguishedName d2 = new X500DistinguishedName(name);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

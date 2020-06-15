@@ -23,6 +23,6 @@ namespace Lithnet.Laps.Web.AppSettings
 
         public IEnumerable<string> EmailAddresses => this.config.GetValuesOrDefault("email-addresses");
 
-        public bool DenyOnAuditError => this.config.GetValueOrDefault("deny-on-error", false);
+        public bool DenyOnAuditError => this.config.GetValueOrDefault("mandatory", false);
     }
 }

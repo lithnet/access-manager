@@ -5,25 +5,27 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
-using Lithnet.Laps.Web.ActiveDirectory;
-using Lithnet.Laps.Web.App_LocalResources;
-using Microsoft.AspNetCore.Http;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Lithnet.Laps.Web.Internal
 {
-    internal static class DirectoryExtensions
+    public static class DirectoryExtensions
     {
         public static bool TryParseAsSid(this string s, out SecurityIdentifier sid)
         {
+            sid = null;
+
             try
             {
+                if (s == null)
+                {
+                    return false;
+                }
+
                 sid = new SecurityIdentifier(s);
                 return true;
             }
             catch
             {
-                sid = null;
                 return false;
             }
         }
@@ -60,6 +62,17 @@ namespace Lithnet.Laps.Web.Internal
             return result.Properties[propertyName][0]?.ToString();
         }
 
+        public static string GetPropertyString(this DirectoryEntry result, string propertyName)
+        {
+            if (!result.Properties.Contains(propertyName))
+            {
+                return null;
+            }
+
+            return result.Properties[propertyName][0]?.ToString();
+        }
+
+
         public static string GetPropertyCommaSeparatedString(this SearchResult result, string propertyName)
         {
             if (!result.Properties.Contains(propertyName))
@@ -71,6 +84,24 @@ namespace Lithnet.Laps.Web.Internal
         }
 
         public static bool HasPropertyValue(this SearchResult result, string propertyName, string value)
+        {
+            if (!result.Properties.Contains(propertyName))
+            {
+                return false;
+            }
+
+            foreach (object s in result.Properties[propertyName])
+            {
+                if (s.ToString().Equals(value, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool HasPropertyValue(this DirectoryEntry result, string propertyName, string value)
         {
             if (!result.Properties.Contains(propertyName))
             {
@@ -105,6 +136,24 @@ namespace Lithnet.Laps.Web.Internal
             return new Guid(r);
         }
 
+        public static Guid? GetPropertyGuid(this DirectoryEntry result, string propertyName)
+        {
+            if (!result.Properties.Contains(propertyName))
+            {
+                return null;
+            }
+
+            byte[] r = GetPropertyBytes(result, propertyName);
+
+            if (r == null)
+            {
+                return null;
+            }
+
+            return new Guid(r);
+        }
+
+
         public static SecurityIdentifier GetPropertySid(this SearchResult result, string propertyName)
         {
             if (!result.Properties.Contains(propertyName))
@@ -123,6 +172,36 @@ namespace Lithnet.Laps.Web.Internal
         }
 
         public static byte[] GetPropertyBytes(this SearchResult result, string propertyName)
+        {
+            if (!result.Properties.Contains(propertyName))
+            {
+                return null;
+            }
+
+            object r = result.Properties[propertyName][0];
+
+            return r as byte[];
+        }
+
+
+        public static SecurityIdentifier GetPropertySid(this DirectoryEntry result, string propertyName)
+        {
+            if (!result.Properties.Contains(propertyName))
+            {
+                return null;
+            }
+
+            byte[] r = GetPropertyBytes(result, propertyName);
+
+            if (r == null)
+            {
+                return null;
+            }
+
+            return new SecurityIdentifier(r, 0);
+        }
+
+        public static byte[] GetPropertyBytes(this DirectoryEntry result, string propertyName)
         {
             if (!result.Properties.Contains(propertyName))
             {

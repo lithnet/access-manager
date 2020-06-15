@@ -1,0 +1,27 @@
+﻿using System;
+
+namespace Lithnet.Laps.Web
+{
+    [Serializable]
+    public class NoPasswordException : LapsWebAppException
+    {
+        public NoPasswordException()
+        {
+        }
+
+        public NoPasswordException(string message)
+            : base(message)
+        {
+        }
+
+        public NoPasswordException(string message, Exception inner)
+            : base(message, inner)
+        {
+        }
+
+        protected NoPasswordException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+            : base(info, context)
+        {
+        }
+    }
+}

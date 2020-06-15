@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Lithnet.Laps.Web.ActionProviders;
 using Lithnet.Laps.Web.ActiveDirectory;
 using Lithnet.Laps.Web.Internal;
 using NLog;
@@ -17,12 +18,15 @@ namespace Lithnet.Laps.Web.Authorization
 
         private readonly IAceEvaluator aceEvaluator;
 
-        public JsonTargetAuthorizationService(IDirectory directory, ILogger logger, IJsonTargetsProvider provider, IAceEvaluator aceEvaluator)
+        private readonly IJitAccessGroupResolver jitResolver;
+
+        public JsonTargetAuthorizationService(IDirectory directory, ILogger logger, IJsonTargetsProvider provider, IAceEvaluator aceEvaluator, IJitAccessGroupResolver jitResolver)
         {
             this.directory = directory;
             this.logger = logger;
             this.targets = provider.Targets ?? new List<IJsonTarget>();
             this.aceEvaluator = aceEvaluator;
+            this.jitResolver = jitResolver;
         }
 
         public AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer, AccessMask requestedAccess)
@@ -62,7 +66,7 @@ namespace Lithnet.Laps.Web.Authorization
                     {
                         this.logger.Trace($"User {user.MsDsPrincipalName} matches allow ACE {ace.Sid ?? ace.Trustee} and is authorized to read passwords for computer {computer.MsDsPrincipalName} from target {j.Name}");
 
-                        return BuildAuthZResponseSuccess(requestedAccess, j, ace);
+                        return BuildAuthZResponseSuccess(requestedAccess, j, ace, computer);
                     }
 
                     this.logger.Trace($"Allowed principal {ace.Sid ?? ace.Trustee} does not match current user {user.MsDsPrincipalName}");
@@ -96,7 +100,7 @@ namespace Lithnet.Laps.Web.Authorization
             return response;
         }
 
-        private AuthorizationResponse BuildAuthZResponseSuccess(AccessMask requestedAccess, IJsonTarget j, IAce ace)
+        private AuthorizationResponse BuildAuthZResponseSuccess(AccessMask requestedAccess, IJsonTarget j, IAce ace, IComputer computer)
         {
             AuthorizationResponse response;
 
@@ -112,7 +116,7 @@ namespace Lithnet.Laps.Web.Authorization
                 response = new JitAuthorizationResponse()
                 {
                     ExpireAfter = j.Jit.ExpireAfter,
-                    AuthorizingGroup = j.Jit.AuthorizingGroup
+                    AuthorizingGroup = this.jitResolver.GetJitAccessGroup(computer, j).MsDsPrincipalName
                 };
             }
 
