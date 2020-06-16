@@ -3,7 +3,7 @@
 namespace Lithnet.AccessManager.Web
 {
     [Serializable]
-    public class NoPasswordException : LapsWebAppException
+    public class NoPasswordException : AccessManagerException
     {
         public NoPasswordException()
         {

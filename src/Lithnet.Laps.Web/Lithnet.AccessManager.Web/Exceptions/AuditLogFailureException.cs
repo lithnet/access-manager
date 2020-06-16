@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace Lithnet.AccessManager.Web.Exceptions
 {
-    public class AuditLogFailureException : LapsWebAppAggregateException
+    public class AuditLogFailureException : AccessManagerAggregateException
     {
         public AuditLogFailureException()
         {

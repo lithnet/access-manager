@@ -3,7 +3,7 @@
 namespace Lithnet.AccessManager.Web
 {
     [Serializable]
-    public class PowerShellScriptException : LapsWebAppException
+    public class PowerShellScriptException : AccessManagerException
     {
         public PowerShellScriptException()
         {

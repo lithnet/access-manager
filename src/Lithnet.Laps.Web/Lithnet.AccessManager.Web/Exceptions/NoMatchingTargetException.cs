@@ -3,7 +3,7 @@
 namespace Lithnet.AccessManager.Web
 {
     [Serializable]
-    public class NoMatchingTargetException : LapsWebAppException
+    public class NoMatchingTargetException : AccessManagerException
     {
         public NoMatchingTargetException()
         {

@@ -1,11 +1,11 @@
-﻿@using Lithnet.Laps.Web.AppSettings;
+﻿@using Lithnet.AccessManager.Web.AppSettings;
 @inject IUserInterfaceSettings uiSettings
 
 @{
     ViewBag.Title = UIMessages.HeadingRequestAccess;
 }
 
-@model Lithnet.Laps.Web.Models.LapRequestModel
+@model Lithnet.AccessManager.Web.Models.LapRequestModel
 
 <div class="form-container">
     @using (Html.BeginForm("Get", "Lap", FormMethod.Post))

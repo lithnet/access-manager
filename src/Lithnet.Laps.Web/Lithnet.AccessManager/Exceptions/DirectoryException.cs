@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Lithnet.AccessManager
 {
     [Serializable]
-    public class DirectoryException : LithnetAccessManagerException
+    public class DirectoryException : AccessManagerException
     {
         public DirectoryException()
         {

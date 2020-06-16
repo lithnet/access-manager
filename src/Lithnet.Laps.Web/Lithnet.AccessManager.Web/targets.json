@@ -19,7 +19,7 @@
         "on-failure": [ "email-domain-admins" ]
       },
       "jit": {
-        "trustee": "IDMDEV1\\JIT-ACCESS_FIM-{computerName}",//"prop:managedBy",
+        "trustee": null,//"IDMDEV1\\JIT-ACCESS_FIM-{computerName}",//"prop:managedBy",
         "expire-after": "00:00:15"
       },
       "laps": {

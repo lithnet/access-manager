@@ -5,8 +5,8 @@ namespace Lithnet.AccessManager.Agent
 {
     internal class RegistrySettingsProvider : ISettingsProvider
     {
-        private const string policyKeyName = "SOFTWARE\\Policies\\Lithnet\\AccessManager\\JitAgent";
-        private const string settingsKeyName = "SOFTWARE\\Lithnet\\AccessManager\\JitAgent";
+        private const string policyKeyName = "SOFTWARE\\Policies\\Lithnet\\AccessManager\\Agent";
+        private const string settingsKeyName = "SOFTWARE\\Lithnet\\AccessManager\\Agent";
 
         private RegistryKey policyKey;
 
