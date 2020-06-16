@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util='http://schemas.microsoft.com/wix/UtilExtension'>
+  <Product Id="*"
+           Name="Lithnet LAPS Web App"
+           Language="1033"
+           Version="!(bind.FileVersion.fil179C3B100958A078E36F6F46BBBEF740)"
+           Manufacturer="Lithnet"
+           UpgradeCode="6d4a0c22-ec7d-437e-ab4a-2d00d724cac8">
+
+    <Package
+      InstallerVersion="200"
+      Compressed="yes"
+      InstallScope="perMachine"
+      InstallPrivileges="elevated"
+      Manufacturer="Lithnet"
+      Platform="x64" />
+
+    <Media Id="1" Cabinet="Cab1.cab" EmbedCab="yes" />
+    <MajorUpgrade Schedule="afterInstallExecute" DowngradeErrorMessage="A later version of [ProductName] is already installed" AllowSameVersionUpgrades="yes" />
+
+    <Property Id="SERVICE_NAME" Secure="yes" Value="lapsweb"/>
+    <Property Id="SERVICE_PASSWORD" Hidden="yes" Secure="yes"/>
+    <Property Id="SERVICE_USERNAME" Secure="yes">
+      <RegistrySearch Id="ExistingServiceAccount"
+                      Root="HKLM"
+                      Key="SYSTEM\CurrentControlSet\services\[SERVICE_NAME]"
+                      Name="ObjectName"
+                      Type="raw"
+                      Win64="yes"/>
+    </Property>
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+
+    <Feature Id="ProductFeature" Title="Laps Web App" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFiles64Folder">
+        <Directory Id="LithnetFolder" Name="Lithnet">
+          <Directory Id="INSTALLFOLDER" Name="Laps Web App" >
+            <Directory Id="NOTIFICATIONTEMPLATESDIR" Name ="NotificationTemplates"/>
+            <Directory Id="LOGSDIR" Name ="Logs"/>
+            <Directory Id="SCRIPTSDIR" Name ="Scripts"/>
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+
+    <UI>
+      <UIRef Id="WixUI_Common" />
+      <Property Id="WixUI_Mode" Value="Custom" />
+
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="9" Bold="yes" />
+      <TextStyle Id="WixUI_Font_Title"  FaceName="Tahoma" Size="9" Bold="yes" />
+
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+      <DialogRef Id="ProgressDlg" />
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="InstallDirDlg" />
+      <DialogRef Id="UserExit" />
+
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">NOT Installed</Publish>
+
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="ServiceDetailsDialog">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="10">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="20">1</Publish>
+
+      <Publish Dialog="ServiceDetailsDialog" Control="Back" Event="NewDialog" Value="InstallDirDlg" Order="1"></Publish>
+      <Publish Dialog="ServiceDetailsDialog" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4">PASSWORD_COMPARE = "1"</Publish>
+
+
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ServiceDetailsDialog" Order="1"></Publish>
+
+      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+    </UI>
+
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <ComponentGroupRef Id="SourceComponentGroup" />
+      <ComponentGroupRef Id="ScriptsGroup" />
+      <ComponentGroupRef Id="NotificationTemplatesGroup" />
+      <ComponentGroupRef Id="UserConfigFiles" />
+      <ComponentRef Id="cmpA0F023B64412A450A343CCF424488552" />
+    </ComponentGroup>
+
+    <ComponentGroup Id="UserConfigFiles">
+      <Component Id="cmp58AE1F27D4DDB080F3961825CDC860CA" Guid="*"  NeverOverwrite="yes">
+        <File Id="fil30CBBAF63158674FF13F750BAB90791D" KeyPath="yes" Source="SourceDir\targets.json" />
+      </Component>
+      <Component Id="cmpF82FCA80BBAF44D285C97F10993DEEE6" Guid="*"  NeverOverwrite="yes">
+        <File Id="fil840B80AC19861C7F9F04FBDCFAE331CE" KeyPath="yes" Source="SourceDir\appsettings.json" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="ScriptsGroup" Directory="SCRIPTSDIR">
+      <Component Id="cmp8D88BEC0FB9A220840ACA5BCCFE5F05A" Guid="*"  NeverOverwrite="yes">
+        <File Id="fil957C454F0E7CAB0F495B4D0D74A43BDE" KeyPath="yes" Source="SourceDir\Scripts\AuditingSample.ps1" />
+      </Component>
+      <Component Id="cmpFE2075F090EBFE61E86FEB9D593199C6" Guid="*"  NeverOverwrite="yes">
+        <File Id="fil8F07E648FE4AAAFFD44EC97FADA4970D" KeyPath="yes" Source="SourceDir\Scripts\AuthZSample.ps1" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="NotificationTemplatesGroup" Directory="NOTIFICATIONTEMPLATESDIR">
+      <Component Id="cmp1BA6EDFC5EC4E1E4AA1C5FCC0F107EB3" Guid="*" NeverOverwrite="yes">
+        <File Id="fil19FBFA8BEF03F53E6ED097445C1F8979" KeyPath="yes" Source="SourceDir\NotificationTemplates\EmailAuditFailure.html" />
+      </Component>
+      <Component Id="cmpADD1885443C6EAA7B0D79759291022D8" Guid="*" NeverOverwrite="yes">
+        <File Id="fil320E89B0D2B96982C96CE6186F215EDC" KeyPath="yes" Source="SourceDir\NotificationTemplates\EmailAuditSuccess.html" />
+      </Component>
+      <Component Id="cmpA68BAD8E3AB728C687E0BAE851ED8118" Guid="*" NeverOverwrite="yes">
+        <File Id="filF6DEF50F2F303CC94B0D61B2767E741A" KeyPath="yes" Source="SourceDir\NotificationTemplates\LogAuditFailure.txt" />
+      </Component>
+      <Component Id="cmpA5CFDEBB4F3DABB485F6EFED9739655B" Guid="*" NeverOverwrite="yes">
+        <File Id="filD679CB3CAC5CA0FE24CE0E760D2AEB0D" KeyPath="yes" Source="SourceDir\NotificationTemplates\LogAuditSuccess.txt" />
+      </Component>
+      <Component Id="cmpFD8908EE64258CB07D5711F6071E72B0" Guid="*" NeverOverwrite="yes">
+        <File Id="fil1BE9B70E1E9D16AE3AC500FB82EC4F19" KeyPath="yes" Source="SourceDir\NotificationTemplates\SlackTemplateFailure.json" />
+      </Component>
+      <Component Id="cmp44891CFA0848DFCD02B345404CE02AAD" Guid="*" NeverOverwrite="yes">
+        <File Id="fil0418F7716116501E4CD3EEF84C6BA18D" KeyPath="yes" Source="SourceDir\NotificationTemplates\SlackTemplateSuccess.json" />
+      </Component>
+      <Component Id="cmp5E18A29397918DF1062131CD69C6B2AE" Guid="*" NeverOverwrite="yes">
+        <File Id="filD40737A3FC80CEEA077078D76F0A530D" KeyPath="yes" Source="SourceDir\NotificationTemplates\TeamsTemplateFailure.json" />
+      </Component>
+      <Component Id="cmpA36869514D03311C68FC11CAAAE95E3B" Guid="*" NeverOverwrite="yes">
+        <File Id="fil0C66CB100FF6725B6D08154568A65FB8" KeyPath="yes" Source="SourceDir\NotificationTemplates\TeamsTemplateSuccess.json" />
+      </Component>
+    </ComponentGroup>
+
+    <Component Id="cmpA0F023B64412A450A343CCF424488552" Guid="*" Directory="INSTALLFOLDER">
+      <File Id="fil179C3B100958A078E36F6F46BBBEF740" KeyPath="yes" Source="SourceDir\Lithnet.Laps.Web.exe" />
+      <ServiceInstall Id="svcB928E06C6F1445829E0B2EC5DDB85B1E"
+                             DisplayName="Lithnet LAPS Web App"
+                             Account="[SERVICE_USERNAME]"
+                             Password="[SERVICE_PASSWORD]"
+                             Name="[SERVICE_NAME]"
+                             ErrorControl="normal"
+                             Start="auto"
+                             Arguments="/service"
+                             Type="ownProcess"
+                             Description="A web-based application for accessing LAPS passwords"
+                             Vital="yes"
+                             Interactive="no">
+      </ServiceInstall>
+
+      <ServiceControl Id="ServiceControlEvents" Name="[SERVICE_NAME]" Stop="both" Remove="uninstall" Wait="yes" Start="install"/>
+      <util:User Id="ServiceUser" Name="[SERVICE_USERNAME]" Password="[SERVICE_PASSWORD]" CreateUser="no" LogonAsService="yes" UpdateIfExists="yes"/>
+      <CreateFolder Directory="INSTALLFOLDER">
+        <util:PermissionEx User="[SERVICE_USERNAME]" GenericAll="yes" />
+      </CreateFolder>
+    </Component>
+
+  </Product>
+</Wix>
