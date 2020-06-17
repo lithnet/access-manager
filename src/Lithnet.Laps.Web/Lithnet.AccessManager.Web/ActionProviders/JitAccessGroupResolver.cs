@@ -4,10 +4,6 @@ namespace Lithnet.AccessManager.Web
 {
     public class JitAccessGroupResolver : IJitAccessGroupResolver
     {
-        private const string MsDsAppConfiguration = "msDs-App-Configuration";
-        private const string MsDsObjectReference = "msDS-ObjectReference";
-        private const string ApplicationName = "Lithnet Access Manager";
-
         private readonly IDirectory directory;
 
         public JitAccessGroupResolver(IDirectory directory)
@@ -42,22 +38,17 @@ namespace Lithnet.AccessManager.Web
                 }
             }
 
-            string filter = $"(&(objectClass={MsDsAppConfiguration})(applicationName={ApplicationName}))";
-            var appData = this.directory.SearchDirectoryEntry(computer.DistinguishedName, filter, System.DirectoryServices.SearchScope.OneLevel, MsDsObjectReference);
-
-            if (appData == null)
+            if (!this.directory.TryGetLamSettings(computer, out ILamSettings lamSettings))
             {
-                throw new ObjectNotFoundException($"The JIT access object for computer {computer.MsDsPrincipalName} was not found");
+                throw new ObjectNotFoundException($"The Lithnet Access  Manager object for computer {computer.MsDsPrincipalName} was not found in the directory");
             }
 
-            string groupRef = appData.GetPropertyString(MsDsObjectReference);
-
-            if (groupRef == null)
+            if (lamSettings.JitGroupReference == null)
             {
-                throw new ObjectNotFoundException($"The JIT access object for computer {computer.MsDsPrincipalName} did not contain a group");
+                throw new ObjectNotFoundException($"The Lithnet Access Manager object for computer {computer.MsDsPrincipalName} was found, but it did not contain a group entry");
             }
 
-            return this.directory.GetGroup(groupRef);
+            return this.directory.GetGroup(lamSettings.JitGroupReference);
         }
     }
 }

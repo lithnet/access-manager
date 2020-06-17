@@ -8,7 +8,7 @@ namespace Lithnet.AccessManager
     {
         private readonly SearchResult user;
 
-        internal static string[] PropertiesToGet = { "samAccountName", "distinguishedName", "description", "displayName", "userPrincipalName", "objectSid", "mail", "givenName", "sn", "msDS-PrincipalName" };
+        internal static string[] PropertiesToGet = { "samAccountName", "distinguishedName", "description", "displayName", "userPrincipalName", "objectSid", "mail", "givenName", "sn", "msDS-PrincipalName", "objectClass" };
 
         public ActiveDirectoryUser(SearchResult user)
         {

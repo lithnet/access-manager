@@ -55,7 +55,7 @@ namespace Lithnet.AccessManager
             }
 
             long value = (long)result.Properties[propertyName][0];
-            return DateTime.FromFileTimeUtc(value).ToLocalTime();
+            return DateTime.FromFileTimeUtc(value);
         }
 
         public static string GetPropertyString(this SearchResult result, string propertyName)

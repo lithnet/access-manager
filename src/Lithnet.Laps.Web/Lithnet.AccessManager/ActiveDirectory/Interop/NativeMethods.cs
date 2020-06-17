@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
 using System.Runtime.InteropServices;
+using System.Security.Policy;
 using System.Security.Principal;
 using NLog;
 
@@ -96,12 +98,130 @@ namespace Lithnet.AccessManager.Interop
 
         [DllImport("netapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         private extern static int NetLocalGroupDelMember(string server, string groupName, IntPtr sid);
-        
+
+        [DllImport("advapi32.dll", SetLastError = true)]
+        private extern static bool CreateWellKnownSid(WellKnownSidType wellKnownSidType, IntPtr domainSid, IntPtr pSid, ref int cbSid);
+
+        [DllImport("Advapi32.dll", SetLastError = true, PreserveSig = true)]
+        private static extern int LsaQueryInformationPolicy(IntPtr pPolicyHandle, PolicyInformationClass informationClass, out IntPtr pData);
+
+        [DllImport("advapi32.dll", SetLastError = true, PreserveSig = true)]
+        private static extern int LsaOpenPolicy(IntPtr pSystemName, ref LsaObjectAttributes objectAttributes, LsaAccessPolicy desiredAccess, out IntPtr pPolicyHandle);
+
+        [DllImport("advapi32.dll", CharSet = CharSet.Unicode)]
+        private static extern int LsaClose(IntPtr hPolicy);
+
+        [DllImport("advapi32.dll", SetLastError = true)]
+        private static extern int LsaNtStatusToWinError(int status);
+
+        [DllImport("advapi32.dll", SetLastError = true)]
+        private static extern int LsaFreeMemory(IntPtr buffer);
+
+        public static SecurityIdentifier GetLocalMachineAuthoritySid()
+        {
+            IntPtr pPolicyHandle = IntPtr.Zero;
+            IntPtr pPolicyData = IntPtr.Zero;
+
+            try
+            {
+                LsaObjectAttributes lsaObjectAttributes = new LsaObjectAttributes();
+
+                var result = LsaOpenPolicy(IntPtr.Zero, ref lsaObjectAttributes, LsaAccessPolicy.PolicyViewLocalInformation, out pPolicyHandle);
+
+                if (result != 0)
+                {
+                    result = LsaNtStatusToWinError(result);
+                    throw new DirectoryException("LsaOpenPolicy failed", new Win32Exception(result));
+                }
+
+                result = LsaQueryInformationPolicy(pPolicyHandle, PolicyInformationClass.PolicyAccountDomainInformation, out pPolicyData);
+
+                if (result != 0)
+                {
+                    result = LsaNtStatusToWinError(result);
+                    throw new DirectoryException("LsaQueryInformationPolicy failed", new Win32Exception(result));
+                }
+
+                PolicyAccountDomainInfo info = Marshal.PtrToStructure<PolicyAccountDomainInfo>(pPolicyData);
+
+                return new SecurityIdentifier(info.DomainSid);
+            }
+            finally 
+            {
+                if (pPolicyData != IntPtr.Zero)
+                {
+                    LsaFreeMemory(pPolicyData);
+                }
+
+                if (pPolicyHandle != IntPtr.Zero)
+                {
+                    LsaClose(pPolicyHandle);
+                }
+            }
+        }
+
+        public static SecurityIdentifier CreateWellKnownSid(WellKnownSidType sidType)
+        {
+            return CreateWellKnownSid(sidType, GetLocalMachineAuthoritySid());
+        }
+
+        public static SecurityIdentifier CreateWellKnownSid(WellKnownSidType sidType, SecurityIdentifier domainSid)
+        {
+            IntPtr pSid = IntPtr.Zero;
+            IntPtr pDomainSid = IntPtr.Zero;
+
+            try
+            {
+                int pSidLength = 0;
+                string sidString = string.Empty;
+
+                pDomainSid = Marshal.AllocHGlobal(domainSid.BinaryLength);
+                byte[] bDomainSid = new byte[domainSid.BinaryLength];
+                domainSid.GetBinaryForm(bDomainSid, 0);
+                Marshal.Copy(bDomainSid, 0, pDomainSid, bDomainSid.Length);
+
+                if (!CreateWellKnownSid(sidType, pDomainSid, pSid, ref pSidLength))
+                {
+                    var result = Marshal.GetLastWin32Error();
+
+                    if (result != InsufficientBuffer)
+                    {
+                        throw new DirectoryException("CreateWellKnownSid failed", new Win32Exception(result));
+                    }
+                }
+                else
+                {
+                    throw new DirectoryException("CreateWellKnownSid should have failed");
+                }
+
+                pSid = Marshal.AllocHGlobal(pSidLength);
+                if (!NativeMethods.CreateWellKnownSid(sidType, pDomainSid, pSid, ref pSidLength))
+                {
+                    throw new DirectoryException("CreateWellKnownSid failed", new Win32Exception(Marshal.GetLastWin32Error()));
+                }
+
+                return new SecurityIdentifier(pSid);
+            }
+            finally
+            {
+                if (pDomainSid != IntPtr.Zero)
+                {
+                    Marshal.FreeHGlobal(pDomainSid);
+                }
+
+                if (pSid != IntPtr.Zero)
+                {
+                    Marshal.FreeHGlobal(pSid);
+                }
+            }
+
+        }
+
         public static void AddLocalGroupMember(string groupName, SecurityIdentifier sid)
         {
             var sidBytes = new byte[sid.BinaryLength];
             sid.GetBinaryForm(sidBytes, 0);
-            
+
             IntPtr pSid = Marshal.AllocHGlobal(sidBytes.Length);
 
             try
@@ -163,7 +283,7 @@ namespace Lithnet.AccessManager.Interop
                 {
                     result = NetLocalGroupGetMembers(null, groupName, 0, out pLocalGroupMemberInfo, -1, out entriesRead, out totalEntries, resume);
 
-                    if (result != 0 && result != ErrorMoreData)
+                    if (result != 0 && result != InsufficientBuffer)
                     {
                         throw new DirectoryException("NetLocalGroupGetMembers returned an error", new Win32Exception(result));
                     }

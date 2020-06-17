@@ -7,29 +7,45 @@ namespace Lithnet.AccessManager
 {
     public interface IDirectory
     {
+        SecurityIdentifier GetWellKnownSid(WellKnownSidType sidType, SecurityIdentifier domainSid);
+
+        SecurityIdentifier GetWellKnownSid(WellKnownSidType sidType);
+
         void AddGroupMember(IGroup group, ISecurityPrincipal principal);
 
         void AddGroupMember(IGroup group, ISecurityPrincipal principal, TimeSpan ttl);
 
         void CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl);
 
-        IComputer GetComputer(string computerName);
+        IComputer GetComputer(string name);
+
+        bool TryGetComputer(string name, out IComputer computer);
 
         IComputer GetComputer();
 
         ILamSettings GetLamSettings(IComputer computer);
 
-        void UpdateLamSettings(IComputer computer, IGroup group, IList<string> settings);
+        void DeleteLamSettings(ILamSettings settings);
+
+        byte[] TryGetLamPublicKey(SecurityIdentifier sid);
+
+        bool TryGetLamSettings(IComputer computer, out ILamSettings lamSettings);
+
+        void UpdateLamSettings(IComputer computer, IGroup group, IList<PasswordHistoryEntry> settings);
 
         void UpdateLamSettings(IComputer computer, IGroup group);
 
         string GetMachineNetbiosDomainName();
 
-        void UpdateLamSettings(IComputer computer, IList<string> settings);
+        void UpdateLamSettings(IComputer computer, IList<PasswordHistoryEntry> settings);
 
         IGroup GetGroup(string groupName);
 
         IGroup GetGroup(SecurityIdentifier sid);
+
+        bool TryGetGroup(SecurityIdentifier sid, out IGroup group);
+
+        bool TryGetGroup(string name, out IGroup group);
 
         IList<SecurityIdentifier> GetLocalGroupMembers(string name);
 
@@ -41,7 +57,11 @@ namespace Lithnet.AccessManager
 
         ISecurityPrincipal GetPrincipal(string principalName);
 
+        bool TryGetPrincipal(string name, out ISecurityPrincipal principal);
+
         IUser GetUser(string userName);
+
+        bool TryGetUser(string name, out IUser user);
 
         bool IsObjectInOu(IDirectoryObject computer, string ou);
 

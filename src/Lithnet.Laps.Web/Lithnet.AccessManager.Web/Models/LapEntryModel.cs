@@ -22,7 +22,7 @@ namespace Lithnet.AccessManager.Web.Models
             this.ComputerName = computerName;
             this.Password = password;
             this.HtmlPassword = htmlPassword;
-            this.ValidUntil = validUntil;
+            this.ValidUntil = validUntil?.ToLocalTime();
         }
 
         public LapEntryModel(IComputer computer, PasswordData passwordData) : this(computer.MsDsPrincipalName, passwordData.Value,

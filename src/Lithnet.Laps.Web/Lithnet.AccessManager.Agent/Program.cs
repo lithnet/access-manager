@@ -20,9 +20,10 @@ namespace Lithnet.AccessManager.Agent
                     services.AddHostedService<Worker>();
                     services.AddTransient<IDirectory, ActiveDirectory>();
                     services.AddTransient<ISettingsProvider, RegistrySettingsProvider>();
+                    services.AddTransient<IJitWorker, JitWorker>();
                     services.AddLogging(builder =>
                     {
-                        builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information);
+                        builder.SetMinimumLevel(LogLevel.Information);
                         builder.AddNLog("nlog.config");
                     });
                 }

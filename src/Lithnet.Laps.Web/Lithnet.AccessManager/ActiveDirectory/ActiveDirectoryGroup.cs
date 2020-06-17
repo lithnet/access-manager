@@ -8,7 +8,7 @@ namespace Lithnet.AccessManager
     {
         private readonly SearchResult group;
 
-        internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "tokenGroups", "displayName", "objectGuid", "objectSid", "samAccountName", "msDS-PrincipalName" };
+        internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "tokenGroups", "displayName", "objectGuid", "objectSid", "samAccountName", "msDS-PrincipalName", "objectClass" };
 
         public ActiveDirectoryGroup(SearchResult groupPrincipal)
         {

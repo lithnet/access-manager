@@ -27,5 +27,9 @@ namespace Lithnet.AccessManager.Agent
         int CheckInterval { get; }
 
         bool PublishLamObject { get; }
+
+        bool PublishJitGroup { get; }
+
+        bool LapsEnabled { get; }
     }
 }

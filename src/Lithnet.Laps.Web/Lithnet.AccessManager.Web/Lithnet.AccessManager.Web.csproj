@@ -50,6 +50,7 @@
     <PackageReference Include="nlog.WindowsEventLog" Version="4.7.2" />
     <PackageReference Include="system.directoryservices" Version="4.7.0" />
     <PackageReference Include="system.management.automation" Version="7.0.1" />
+    <PackageReference Include="system.security.Cryptography.Cng" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>

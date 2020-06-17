@@ -1,15 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Lithnet.AccessManager
 {
     public interface ILamSettings : IDirectoryObject
     {
-        string ApplicationName { get; }
+        string JitGroupReference { get; }
 
-        string Description { get; }
-
-        string MsDsObjectReference { get; }
-
-        IEnumerable<string> MsDsSettings { get; }
+        DateTime? PasswordExpiry { get; }
+        IReadOnlyList<PasswordHistoryEntry> PasswordHistory { get; }
     }
 }

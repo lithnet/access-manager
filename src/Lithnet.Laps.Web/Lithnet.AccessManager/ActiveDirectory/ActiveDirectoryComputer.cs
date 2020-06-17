@@ -6,7 +6,7 @@ namespace Lithnet.AccessManager
 {
     public sealed class ActiveDirectoryComputer : IComputer
     {
-        internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "description", "displayName", "objectGuid", "objectSid" , "msDS-PrincipalName" };
+        internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "description", "displayName", "objectGuid", "objectSid" , "msDS-PrincipalName", "objectClass" };
 
         private readonly SearchResult computer;
 
