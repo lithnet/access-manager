@@ -62,7 +62,7 @@ namespace Lithnet.AccessManager.Web
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();
             services.AddScoped<INotificationChannel, PowershellNotificationChannel>();
-            
+
             services.TryAddScoped<IXffHandlerSettings, XffHandlerSettings>();
 
             var backgroundProcessingChannel = Channel.CreateUnbounded<Action>();
@@ -97,6 +97,16 @@ namespace Lithnet.AccessManager.Web
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            //Feature-Policy
+            app.Use(async (context, next) =>
+            {
+                context.Response.Headers.Add("Feature-Policy", "geolocation 'none';midi 'none';notifications 'none';push 'none';sync-xhr 'none';microphone 'none';camera 'none';magnetometer 'none';gyroscope 'none';speaker 'self';vibrate 'none';fullscreen 'self';payment 'none';");
+                context.Response.Headers.Add("Content-Security-Policy", "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self'; font-src 'self';");
+                context.Response.Headers.Add("Referrer-Policy", "strict-origin-when-cross-origin");
+                context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
+                await next.Invoke();
+            });
 
             app.UseEndpoints(endpoints =>
             {

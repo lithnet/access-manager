@@ -6,8 +6,6 @@
 @inject Lithnet.AccessManager.Web.Internal.IPhoneticPasswordTextProvider textProvider;
 @inject Lithnet.AccessManager.Web.Internal.IHtmlPasswordProvider htmlProvider;
 
-<script src="@Url.Content("~/Scripts/init-clip.js")"></script>
-
 <div class="form-container">
 
     <header>
@@ -35,10 +33,10 @@
             </div>
 
             <div>
-                <button id="show-phonetic-button" type="button" onclick="javascript:BtnOnclick();">
-                    <i class="fa fa-comment"></i>
+                <button id="buttonShowPhonetic" type="button" data-toggle="collapse" data-target="#panelPhonetic">
+                    <i class="fa fa-bullhorn"></i>
                 </button>
-                <div id="phonetic" style="display: none">
+                <div id="panelPhonetic" class="collapse">
                     @foreach (string w in textProvider.GetPhoneticText(Model.Password))
                     {
                         <div>
@@ -51,10 +49,10 @@
             @if (Model.PasswordHistory.Count > 0)
             {
                 <div>
-                    <button id="show-history-button" type="button" onclick="javascript:HistoryBtnOnclick();">
+                    <button id="buttonShowHistory" type="button" data-toggle="collapse" data-target="#panelHistory">
                         <i class="fa fa-history"></i>
                     </button>
-                    <div id="history" style="display: none">
+                    <div id="panelHistory" class="collapse">
                         @foreach (PasswordEntry e in Model.PasswordHistory)
                         {
                             <div class="input-group">
@@ -91,13 +89,7 @@
     </footer>
 </div>
 
-<script type="text/javascript">
-    function BtnOnclick() {
-        $('#phonetic').css("display", "block");
-    }
-
-    function HistoryBtnOnclick() {
-        $('#history').css("display", "block");
-    }
-
-</script>
+@section Scripts {
+    <script src="~/js/clipboard.js"></script>
+    <script src="@Url.Content("~/js/show.js")"></script>
+}

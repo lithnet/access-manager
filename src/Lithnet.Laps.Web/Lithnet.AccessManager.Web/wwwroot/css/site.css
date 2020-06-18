@@ -1,6 +1,6 @@
 ﻿@font-face {
     font-family: Inconsolata;
-    src: url('webfonts/Inconsolata-Regular.ttf');
+    src: url('/fonts/Inconsolata-Regular.ttf');
 }
 
 body {
@@ -276,4 +276,8 @@ body {
 
 .logout-link {
     color: #777;
+}
+
+.hidden {
+    display: none;
 }

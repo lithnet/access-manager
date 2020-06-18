@@ -1,0 +1,1 @@
+﻿new ClipboardJS('#copy-button');
