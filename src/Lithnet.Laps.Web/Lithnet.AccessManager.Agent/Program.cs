@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -19,8 +20,10 @@ namespace Lithnet.AccessManager.Agent
                 {
                     services.AddHostedService<Worker>();
                     services.AddTransient<IDirectory, ActiveDirectory>();
-                    services.AddTransient<ISettingsProvider, RegistrySettingsProvider>();
+                    services.AddTransient<IJitSettingsProvider, RegistrySettingsProvider>();
                     services.AddTransient<IJitWorker, JitWorker>();
+                    services.AddTransient<IPasswordGenerator, RandomPasswordGenerator>();
+                    services.AddSingleton<RNGCryptoServiceProvider>();
                     services.AddLogging(builder =>
                     {
                         builder.SetMinimumLevel(LogLevel.Information);

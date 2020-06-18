@@ -23,7 +23,11 @@ namespace Lithnet.AccessManager
 
         IComputer GetComputer();
 
+        void UpdateMsMcsAdmPwdAttribute(IComputer computer, string password, DateTime expiryDate);
+
         ILamSettings GetLamSettings(IComputer computer);
+
+        ILamSettings GetOrCreateLamSettings(IComputer computer);
 
         void DeleteLamSettings(ILamSettings settings);
 
@@ -31,13 +35,7 @@ namespace Lithnet.AccessManager
 
         bool TryGetLamSettings(IComputer computer, out ILamSettings lamSettings);
 
-        void UpdateLamSettings(IComputer computer, IGroup group, IList<PasswordHistoryEntry> settings);
-
-        void UpdateLamSettings(IComputer computer, IGroup group);
-
         string GetMachineNetbiosDomainName();
-
-        void UpdateLamSettings(IComputer computer, IList<PasswordHistoryEntry> settings);
 
         IGroup GetGroup(string groupName);
 

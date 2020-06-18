@@ -106,7 +106,8 @@ namespace Lithnet.AccessManager.Web.Authorization
             {
                 response = new LapsAuthorizationResponse()
                 {
-                    ExpireAfter = j.Laps.ExpireAfter
+                    ExpireAfter = j.Laps.ExpireAfter,
+                    AllowHistory = j.Laps.AllowHistory
                 };
             }
             else

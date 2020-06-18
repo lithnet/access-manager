@@ -200,10 +200,19 @@ namespace Lithnet.AccessManager.Web.Controllers
         private IActionResult GetLapsPassword(LapRequestModel model, IUser user, IComputer computer, LapsAuthorizationResponse authResponse)
         {
             IList<PasswordEntry> entries;
-            
+            PasswordEntry current;
+
             try
             {
-                entries = this.passwordProvider.GetPasswordEntries(computer, authResponse.ExpireAfter);
+                entries = this.passwordProvider.GetPasswordEntries(computer, authResponse.ExpireAfter, authResponse.AllowHistory);
+                current = entries.SingleOrDefault(t => t.IsCurrent);
+                entries = entries.Where(t => !t.IsCurrent)?.ToList() ?? new List<PasswordEntry>();
+                entries.Add(new PasswordEntry() { Password = "My test history", });
+
+                if (current == null)
+                {
+                    throw new NoPasswordException();
+                }
             }
             catch (NoPasswordException)
             {
@@ -221,10 +230,16 @@ namespace Lithnet.AccessManager.Web.Controllers
                 User = user,
                 Computer = computer,
                 EventID = EventIDs.PasswordAccessed,
-                ComputerExpiryDate = entries.First().ExpiryDate?.ToString(CultureInfo.CurrentUICulture)
+                ComputerExpiryDate = current.ExpiryDate?.ToLocalTime().ToString(CultureInfo.CurrentUICulture)
             });
 
-            return this.View("Show", new LapEntryModel(computer, entries));
+            return this.View("Show", new LapEntryModel()
+            {
+                ComputerName = computer.MsDsPrincipalName,
+                Password = current.Password,
+                ValidUntil = current.ExpiryDate?.ToLocalTime(),
+                PasswordHistory = entries
+            });
         }
 
         private void LogRateLimitEvent(LapRequestModel model, IUser user, RateLimitResult rateLimitResult)

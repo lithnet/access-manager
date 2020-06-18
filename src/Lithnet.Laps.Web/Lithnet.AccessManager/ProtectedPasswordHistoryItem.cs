@@ -6,12 +6,15 @@ using Newtonsoft.Json;
 
 namespace Lithnet.AccessManager
 {
-    public class PasswordHistoryEntry
+    public class ProtectedPasswordHistoryItem
     {
         [JsonProperty("data")]
         public string EncryptedData { get; set; }
 
-        [JsonProperty("effectiveFrom")]
-        public DateTime EffectiveFrom { get; set; }
+        [JsonProperty("created")]
+        public DateTime Created { get; set; }
+
+        [JsonProperty("retired")]
+        public DateTime? Retired { get; set; }
     }
 }

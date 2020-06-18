@@ -15,9 +15,9 @@ namespace Lithnet.AccessManager.Agent
 
         private readonly IDirectory directory;
 
-        private readonly ISettingsProvider settings;
+        private readonly IJitSettingsProvider settings;
 
-        public JitWorker(ILogger<JitWorker> logger, IDirectory directory, ISettingsProvider settings)
+        public JitWorker(ILogger<JitWorker> logger, IDirectory directory, IJitSettingsProvider settings)
         {
             this.logger = logger;
             this.directory = directory;
@@ -47,7 +47,7 @@ namespace Lithnet.AccessManager.Agent
             {
                 if (!string.IsNullOrWhiteSpace(lamSettings?.JitGroupReference))
                 {
-                    this.directory.UpdateLamSettings(computer, (IGroup)null);
+                    lamSettings.UpdateJitGroup(null);
                 }
             }
             else
@@ -58,13 +58,13 @@ namespace Lithnet.AccessManager.Agent
                     {
                         if (lamGroup.Sid != group.Sid)
                         {
-                            this.directory.UpdateLamSettings(computer, group);
+                            lamSettings.UpdateJitGroup(group);
                         }
                     }
                 }
                 else
                 {
-                    this.directory.UpdateLamSettings(computer, group);
+                    lamSettings.UpdateJitGroup(group);
                 }
             }
 

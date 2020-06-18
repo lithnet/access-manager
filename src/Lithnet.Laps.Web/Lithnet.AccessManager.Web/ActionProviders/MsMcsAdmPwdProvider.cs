@@ -21,7 +21,7 @@ namespace Lithnet.AccessManager.Web
             this.logger = logger;
         }
 
-        public IList<PasswordEntry> GetPasswordEntries(IComputer computer, TimeSpan? expireAfter)
+        public IList<PasswordEntry> GetPasswordEntries(IComputer computer, TimeSpan? expireAfter, bool getHistory)
         {
             SearchResult searchResult = this.directory.GetDirectoryEntry(computer.DistinguishedName, "computer", AttrMsMcsAdmPwd, AttrMsMcsAdmPwdExpirationTime);
 
@@ -48,6 +48,8 @@ namespace Lithnet.AccessManager.Web
             {
                 p.ExpiryDate = searchResult.GetPropertyDateTimeFromLong(AttrMsMcsAdmPwdExpirationTime);
             }
+
+            p.IsCurrent = true;
 
             return new List<PasswordEntry> { p };
         }

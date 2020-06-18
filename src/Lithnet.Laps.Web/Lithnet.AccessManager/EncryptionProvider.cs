@@ -9,28 +9,8 @@ using Microsoft.Win32.SafeHandles;
 
 namespace Lithnet.AccessManager
 {
-    public class EncryptionProvider
+    public class EncryptionProvider : IEncryptionProvider
     {
-        public void Test()
-        {
-
-            var cert = ResolveCertificate("241ca0a2c329b2419d4053d87115d8d2af3fd8b7");
-            //var cert = this.CreateSelfSignedCert();
-            byte[] certData = cert.Export(X509ContentType.Cert);
-            string certb64 = ToHexString(certData, 0, certData.Length);
-
-            string myData = "This is my data to encrypt";
-
-            var bytes = this.Encrypt(cert, myData);
-
-            var result = this.Decrypt(bytes, _ => { return cert; });
-
-            if (myData != result)
-            {
-                throw new Exception();
-            }
-        }
-
         public X509Certificate2 CreateSelfSignedCert()
         {
             CertificateRequest request = new CertificateRequest("CN=Lithnet Access Manager", RSA.Create(4096), HashAlgorithmName.SHA384, RSASignaturePadding.Pkcs1);
@@ -136,7 +116,7 @@ namespace Lithnet.AccessManager
 
         private static X509Certificate2 ResolveCertificate(string thumbprint)
         {
-            return  GetCertificateFromStore(thumbprint, StoreLocation.CurrentUser) ??
+            return GetCertificateFromStore(thumbprint, StoreLocation.CurrentUser) ??
                     GetCertificateFromStore(thumbprint, StoreLocation.LocalMachine) ??
                     throw new CertificateNotFoundException($"A certificate with the thumbprint {thumbprint} could not be found");
         }

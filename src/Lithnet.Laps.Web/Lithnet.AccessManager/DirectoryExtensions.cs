@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.DirectoryServices;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
 
@@ -11,6 +12,21 @@ namespace Lithnet.AccessManager
 {
     public static class DirectoryExtensions
     {
+        public static bool IsDnMatch(string dn1, string dn2)
+        {
+            try
+            {
+                X500DistinguishedName x1 = new X500DistinguishedName(dn1);
+                X500DistinguishedName x2 = new X500DistinguishedName(dn2);
+
+                return (string.Equals(x1.Decode(X500DistinguishedNameFlags.UseUTF8Encoding), x2.Decode(X500DistinguishedNameFlags.UseUTF8Encoding), StringComparison.InvariantCultureIgnoreCase));
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static DirectoryEntry GetDirectoryEntry(this IDirectoryObject o)
         {
             return new DirectoryEntry($"LDAP://{o.DistinguishedName}");

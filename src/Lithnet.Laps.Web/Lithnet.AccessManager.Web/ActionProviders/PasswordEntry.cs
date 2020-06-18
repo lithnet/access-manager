@@ -7,5 +7,9 @@ namespace Lithnet.AccessManager.Web
         public string Password { get; set; }
 
         public DateTime? ExpiryDate { get; set; }
+
+        public DateTime? EffectiveFrom { get; private set; }
+        
+        public bool IsCurrent { get; set; }
     }
 }

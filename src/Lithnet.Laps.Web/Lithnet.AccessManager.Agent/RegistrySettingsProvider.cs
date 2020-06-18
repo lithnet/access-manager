@@ -3,7 +3,7 @@ using Microsoft.Win32;
 
 namespace Lithnet.AccessManager.Agent
 {
-    internal class RegistrySettingsProvider : ISettingsProvider
+    internal class RegistrySettingsProvider : IJitSettingsProvider
     {
         private const string policyKeyName = "SOFTWARE\\Policies\\Lithnet\\AccessManager\\Agent";
         private const string settingsKeyName = "SOFTWARE\\Lithnet\\AccessManager\\Agent";

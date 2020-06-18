@@ -8,6 +8,11 @@ namespace Lithnet.AccessManager
         string JitGroupReference { get; }
 
         DateTime? PasswordExpiry { get; }
-        IReadOnlyList<PasswordHistoryEntry> PasswordHistory { get; }
+
+        IReadOnlyList<ProtectedPasswordHistoryItem> PasswordHistory { get; }
+
+        void ReplacePasswordHistory(IList<ProtectedPasswordHistoryItem> items);
+
+        void UpdateJitGroup(IGroup group);
     }
 }

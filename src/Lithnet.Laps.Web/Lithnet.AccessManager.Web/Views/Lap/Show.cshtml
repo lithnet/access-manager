@@ -3,6 +3,8 @@
 }
 
 @model Lithnet.AccessManager.Web.Models.LapEntryModel
+@inject Lithnet.AccessManager.Web.Internal.IPhoneticPasswordTextProvider textProvider;
+@inject Lithnet.AccessManager.Web.Internal.IHtmlPasswordProvider htmlProvider;
 
 <script src="@Url.Content("~/Scripts/init-clip.js")"></script>
 
@@ -23,7 +25,7 @@
             <label class="title">@UIMessages.Password</label>
             <div class="input-group">
                 <div class="resultsText password-field" id="pwd">
-                    @Html.Raw(Model.HtmlPassword)
+                    @Html.Raw(htmlProvider.GetHtmlPassword(Model.Password))
                 </div>
                 <span id="inputGroupAppend" class="input-group-append">
                     <button id="copy-button" type="button" data-clipboard-text="@Model.Password">
@@ -31,6 +33,44 @@
                     </button>
                 </span>
             </div>
+
+            <div>
+                <button id="show-phonetic-button" type="button" onclick="javascript:BtnOnclick();">
+                    <i class="fa fa-comment"></i>
+                </button>
+                <div id="phonetic" style="display: none">
+                    @foreach (string w in textProvider.GetPhoneticText(Model.Password))
+                    {
+                        <div>
+                            @Html.Label(w)<br />
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @if (Model.PasswordHistory.Count > 0)
+            {
+                <div>
+                    <button id="show-history-button" type="button" onclick="javascript:HistoryBtnOnclick();">
+                        <i class="fa fa-history"></i>
+                    </button>
+                    <div id="history" style="display: none">
+                        @foreach (PasswordEntry e in Model.PasswordHistory)
+                        {
+                            <div class="input-group">
+                                <div class="resultsText password-field">
+                                    @Html.Raw(htmlProvider.GetHtmlPassword(e.Password))
+                                </div>
+                                <span class="input-group-append">
+                                    <button id="copy-button-2" type="button" data-clipboard-text="@e.Password">
+                                        <i class="far fa-copy"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
         </section>
 
         <section>
@@ -50,3 +90,14 @@
         </div>
     </footer>
 </div>
+
+<script type="text/javascript">
+    function BtnOnclick() {
+        $('#phonetic').css("display", "block");
+    }
+
+    function HistoryBtnOnclick() {
+        $('#history').css("display", "block");
+    }
+
+</script>

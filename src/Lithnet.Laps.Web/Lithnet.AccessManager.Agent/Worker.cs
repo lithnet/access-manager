@@ -1,11 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.DirectoryServices;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Principal;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -19,19 +12,22 @@ namespace Lithnet.AccessManager.Agent
 
         private readonly IDirectory directory;
 
-        private readonly ISettingsProvider settings;
+        private readonly IJitSettingsProvider settings;
 
         private readonly IHostApplicationLifetime appLifetime;
 
         private readonly IJitWorker jitWorker;
 
-        public Worker(ILogger<Worker> logger, IDirectory directory, ISettingsProvider settings, IHostApplicationLifetime appLifetime, IJitWorker jitWorker)
+        private readonly ILapsWorker lapsWorker;
+
+        public Worker(ILogger<Worker> logger, IDirectory directory, IJitSettingsProvider settings, IHostApplicationLifetime appLifetime, IJitWorker jitWorker, ILapsWorker lapsWorker)
         {
             this.logger = logger;
             this.directory = directory;
             this.settings = settings;
             this.appLifetime = appLifetime;
             this.jitWorker = jitWorker;
+            this.lapsWorker = lapsWorker;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -70,6 +66,15 @@ namespace Lithnet.AccessManager.Agent
                 catch(Exception ex)
                 {
                     this.logger.LogError(ex, "The JIT worker encountered an exception");
+                }
+
+                try
+                {
+                    this.lapsWorker.DoCheck();
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex, "The LAPS worker encountered an exception");
                 }
             }
             catch (Exception ex)

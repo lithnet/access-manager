@@ -20,8 +20,12 @@ namespace Lithnet.AccessManager
     {
         private static Guid PamFeatureGuid = new Guid("ec43e873-cce8-4640-b4ab-07ffe4ab5bcd");
 
+        private const string AttrMsMcsAdmPwd = "ms-Mcs-AdmPwd";
+
+        private const string AttrMsMcsAdmPwdExpirationTime = "ms-Mcs-AdmPwdExpirationTime";
+
         private Dictionary<SecurityIdentifier, bool> PamEnabledDomainCache = new Dictionary<SecurityIdentifier, bool>();
-        
+
         public SecurityIdentifier GetWellKnownSid(WellKnownSidType sidType)
         {
             return NativeMethods.CreateWellKnownSid(sidType);
@@ -29,7 +33,7 @@ namespace Lithnet.AccessManager
 
         public SecurityIdentifier GetWellKnownSid(WellKnownSidType sidType, SecurityIdentifier domainSid)
         {
-           return NativeMethods.CreateWellKnownSid(sidType, domainSid.AccountDomainSid);
+            return NativeMethods.CreateWellKnownSid(sidType, domainSid.AccountDomainSid);
         }
 
         public bool TryGetUser(string name, out IUser user)
@@ -234,69 +238,6 @@ namespace Lithnet.AccessManager
             settings.GetDirectoryEntry().DeleteTree();
         }
 
-        public void UpdateLamSettings(IComputer computer, IGroup group)
-        {
-            DirectoryEntry de;
-
-            if (!this.TryGetLamSettings(computer, out ILamSettings lamSettings))
-            {
-                de = MsDsAppDataLamSettings.Create(computer);
-            }
-            else
-            {
-                de = lamSettings.GetDirectoryEntry();
-            }
-
-            if (this.ApplyLamSettings(computer, group, lamSettings, de))
-            {
-                de.CommitChanges();
-            }
-        }
-
-        public void UpdateLamSettings(IComputer computer, IList<PasswordHistoryEntry> settings)
-        {
-            DirectoryEntry de;
-
-            if (!this.TryGetLamSettings(computer, out ILamSettings lamSettings))
-            {
-                de = MsDsAppDataLamSettings.Create(computer);
-            }
-            else
-            {
-                de = lamSettings.GetDirectoryEntry();
-            }
-
-            if (this.ApplyLamSettings(computer, settings, lamSettings, de))
-            {
-                de.CommitChanges();
-            }
-        }
-
-        public void UpdateLamSettings(IComputer computer, IGroup group, IList<PasswordHistoryEntry> settings)
-        {
-            DirectoryEntry de;
-
-            if (!this.TryGetLamSettings(computer, out ILamSettings lamSettings))
-            {
-                de = MsDsAppDataLamSettings.Create(computer);
-            }
-            else
-            {
-                de = lamSettings.GetDirectoryEntry();
-            }
-
-            bool changed = false;
-
-            changed |= this.ApplyLamSettings(computer, group, lamSettings, de);
-            changed |= this.ApplyLamSettings(computer, settings, lamSettings, de);
-
-            if (changed)
-            {
-                de.CommitChanges();
-            }
-        }
-
-
         public IList<SecurityIdentifier> GetLocalGroupMembers(string name)
         {
             return NativeMethods.GetLocalGroupMembers(name);
@@ -310,6 +251,31 @@ namespace Lithnet.AccessManager
         public void RemoveLocalGroupMember(string groupName, SecurityIdentifier member)
         {
             NativeMethods.RemoveLocalGroupMember(groupName, member);
+        }
+
+        public void UpdateMsMcsAdmPwdAttribute(IComputer computer, string password, DateTime expiryDate)
+        {
+            DirectoryEntry de = computer.GetDirectoryEntry();
+            de.Properties[AttrMsMcsAdmPwd].Value = password;
+            de.Properties[AttrMsMcsAdmPwdExpirationTime].Value = expiryDate.ToFileTimeUtc();
+            de.CommitChanges();
+        }
+
+        public ILamSettings GetOrCreateLamSettings(IComputer computer)
+        {
+            if (!this.TryGetLamSettings(computer, out ILamSettings lamSettings))
+            {
+                return MsDsAppDataLamSettings.Create(computer);
+            }
+            else
+            {
+                return lamSettings;
+            }
+        }
+
+        public bool TryGetLamSettings(IComputer computer, out ILamSettings lamSettings)
+        {
+            return this.TryGet(() => this.GetLamSettings(computer), out lamSettings);
         }
 
         public ILamSettings GetLamSettings(IComputer computer)
@@ -347,7 +313,7 @@ namespace Lithnet.AccessManager
 
             d.PropertiesToLoad.Add("msDS-ByteArray");
 
-            var result= d.FindOne();
+            var result = d.FindOne();
 
             if (result == null)
             {
@@ -355,12 +321,6 @@ namespace Lithnet.AccessManager
             }
 
             return result.GetPropertyBytes("msDS-ByteArray");
-        }
-
-
-        public bool TryGetLamSettings(IComputer computer, out ILamSettings lamSettings)
-        {
-            return this.TryGet(() => this.GetLamSettings(computer), out lamSettings);
         }
 
         public bool IsPamFeatureEnabled(SecurityIdentifier domainSid)
@@ -566,73 +526,12 @@ namespace Lithnet.AccessManager
             try
             {
                 X500DistinguishedName d2 = new X500DistinguishedName(name);
-
-
                 return true;
             }
             catch
             {
                 return false;
             }
-        }
-
-        private bool IsDnMatch(string dn1, string dn2)
-        {
-            try
-            {
-                X500DistinguishedName x1 = new X500DistinguishedName(dn1);
-                X500DistinguishedName x2 = new X500DistinguishedName(dn2);
-
-                return (string.Equals(x1.Decode(X500DistinguishedNameFlags.UseUTF8Encoding), x2.Decode(X500DistinguishedNameFlags.UseUTF8Encoding), StringComparison.InvariantCultureIgnoreCase));
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private bool ApplyLamSettings(IComputer computer, IGroup group, ILamSettings lam, DirectoryEntry de)
-        {
-            bool changed = false;
-
-            if (group != null)
-            {
-                if (lam == null || !this.IsDnMatch(lam.JitGroupReference, group.DistinguishedName))
-                {
-                    de.Properties["msDS-ObjectReference"].Clear();
-                    de.Properties["msDS-ObjectReference"].Add(group.DistinguishedName);
-                    changed = true;
-                }
-            }
-            else
-            {
-                de.Properties["msDS-ObjectReference"].Clear();
-                changed = true;
-            }
-
-            return changed;
-        }
-
-        public bool ApplyLamSettings(IComputer computer, IList<PasswordHistoryEntry> settings, ILamSettings lam, DirectoryEntry de)
-        {
-            bool changed = false;
-
-            if (settings != null)
-            {
-                if (lam == null || !lam.PasswordHistory.OrderBy(t => t.EffectiveFrom).ThenBy(t => t.EncryptedData).SequenceEqual(settings.OrderBy(t => t.EffectiveFrom).ThenBy(t => t.EncryptedData))) 
-                {
-                    de.Properties["msDS-Settings"].Clear();
-                    de.Properties["msDS-Settings"].AddRange(settings.Select(t => JsonConvert.SerializeObject(t)).ToArray());
-                    changed = true;
-                }
-            }
-            else
-            {
-                de.Properties["msDS-Settings"].Clear();
-                changed = true;
-            }
-
-            return changed;
         }
 
         private bool TryGet<T>(Func<T> getFunc, out T o) where T : class

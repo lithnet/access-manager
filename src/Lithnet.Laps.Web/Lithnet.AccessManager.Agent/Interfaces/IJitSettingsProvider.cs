@@ -2,7 +2,7 @@
 
 namespace Lithnet.AccessManager.Agent
 {
-    public interface ISettingsProvider
+    public interface IJitSettingsProvider
     {
         bool CreateGroup { get; }
 
