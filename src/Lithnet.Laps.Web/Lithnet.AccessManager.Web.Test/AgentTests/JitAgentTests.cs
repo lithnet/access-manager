@@ -7,7 +7,7 @@ using System.Security.Principal;
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace Lithnet.AccessManager.Test
+namespace Lithnet.AccessManager.Agent.Test
 {
     public class JitAgentTests
     {

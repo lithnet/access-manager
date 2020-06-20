@@ -18,6 +18,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Nlog" Version="4.7.2" />
     <PackageReference Include="system.directoryservices" Version="4.7.0" />
+    <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.7.0" />
     <PackageReference Include="system.security.Cryptography.Cng" Version="4.7.0" />
   </ItemGroup>
 

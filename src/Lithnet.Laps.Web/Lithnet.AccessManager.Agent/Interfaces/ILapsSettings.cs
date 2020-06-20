@@ -8,8 +8,6 @@ namespace Lithnet.AccessManager.Agent
 
         bool LapsEnabled { get; }
 
-        int PasswordGenerationStrategy { get; }
-
         int PasswordLength { get; }
 
         string PasswordCharacters { get; }

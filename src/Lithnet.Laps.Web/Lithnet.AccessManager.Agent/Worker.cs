@@ -10,26 +10,23 @@ namespace Lithnet.AccessManager.Agent
     {
         private readonly ILogger<Worker> logger;
 
-        private readonly IDirectory directory;
-
         private readonly IAgentSettings settings;
 
         private readonly IHostApplicationLifetime appLifetime;
 
-        private readonly IJitAgent jitWorker;
+        private readonly IJitAgent jitAgent;
 
-        private readonly ILapsAgent lapsWorker;
+        private readonly ILapsAgent lapsAgent;
 
         private readonly ILocalSam sam;
 
-        public Worker(ILogger<Worker> logger, IDirectory directory, IAgentSettings settings, IHostApplicationLifetime appLifetime, IJitAgent jitWorker, ILapsAgent lapsWorker, ILocalSam sam)
+        public Worker(ILogger<Worker> logger, IAgentSettings settings, IHostApplicationLifetime appLifetime, IJitAgent jitWorker, ILapsAgent lapsWorker, ILocalSam sam)
         {
             this.logger = logger;
-            this.directory = directory;
             this.settings = settings;
             this.appLifetime = appLifetime;
-            this.jitWorker = jitWorker;
-            this.lapsWorker = lapsWorker;
+            this.jitAgent = jitWorker;
+            this.lapsAgent = lapsWorker;
             this.sam = sam;
         }
 
@@ -64,7 +61,7 @@ namespace Lithnet.AccessManager.Agent
 
                 try
                 {
-                    this.jitWorker.DoCheck();
+                    this.jitAgent.DoCheck();
                 }
                 catch(Exception ex)
                 {
@@ -73,7 +70,7 @@ namespace Lithnet.AccessManager.Agent
 
                 try
                 {
-                    this.lapsWorker.DoCheck();
+                    this.lapsAgent.DoCheck();
                 }
                 catch (Exception ex)
                 {

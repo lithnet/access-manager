@@ -5,7 +5,7 @@ using Moq;
 using NLog;
 using NUnit.Framework;
 
-namespace Lithnet.AccessManager.Web.Test
+namespace Lithnet.AccessManager.Test
 {
     /// <summary>
     /// These test cases require two computers in each domain called 'PC1' and PC2' located in an OU called OU=Computers,OU=LAPS Testing at the root of the domain.
@@ -278,17 +278,49 @@ namespace Lithnet.AccessManager.Web.Test
             return false;
         }
 
-        //private PasswordData GetLapsPassword(string computerName)
-        //{
-        //    //var computer = this.directory.GetComputer(computerName);
-        //    //MsMcsAdmPwdProvider msMcsAdmPwdProvider = new MsMcsAdmPwdProvider(this.directory, dummyLogger);
-        //    //return msMcsAdmPwdProvider.GetPasswordEntries(computer);
-        //}
-
         private bool IsComputerInOU(string computerName, string ou)
         {
             var computer = this.directory.GetComputer(computerName);
             return this.directory.IsObjectInOu(computer, ou);
+        }
+
+        [Test]
+        public void AddGroupMember()
+        {
+            this.directory.CreateTtlGroup("G-DL-Test-TTL2", "G-DL-Test-TTL2", "TTL test group 2", "OU=Computers,OU=Laps Testing,DC=idmdev1,DC=local", TimeSpan.FromMinutes(1));
+
+            IGroup group = this.directory.GetGroup("IDMDEV1\\G-DL-Test-TTL2");
+            ISecurityPrincipal user = this.directory.GetUser("IDMDEV1\\user1");
+
+            this.directory.AddGroupMember(group, user);
+
+            CollectionAssert.Contains(this.directory.GetMemberDNsFromGroup(group), user.DistinguishedName);
+        }
+
+        public void TryGetGroup()
+        {
+            IGroup group = this.directory.GetGroup("IDMDEV1\\G-GG-1");
+            Assert.IsTrue(this.directory.TryGetGroup(group.Sid, out IGroup group2));
+            Assert.AreEqual(group.Sid, group2.Sid);
+        }
+
+        public void TryGetUser()
+        {
+            Assert.IsTrue(this.directory.TryGetUser("IDMDEV1\\user1", out _));
+            Assert.IsFalse(this.directory.TryGetUser("IDMDEV1\\doesntexist", out _));
+        }
+
+
+        public void TryGetComputer()
+        {
+            Assert.IsTrue(this.directory.TryGetUser("IDMDEV1\\PC1", out _));
+            Assert.IsFalse(this.directory.TryGetUser("IDMDEV1\\doesntexist", out _));
+        }
+
+        public void TryGetPrincipal ()
+        {
+            Assert.IsTrue(this.directory.TryGetPrincipal("IDMDEV1\\PC1", out _)); ;
+            Assert.IsFalse(this.directory.TryGetPrincipal("IDMDEV1\\doesntexist", out _));
         }
     }
 }

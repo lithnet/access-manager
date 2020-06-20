@@ -1,18 +1,12 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
 using Lithnet.AccessManager.Interop;
-using System.Security.Cryptography.X509Certificates;
-using System.Reflection.Metadata.Ecma335;
-using Microsoft.VisualBasic.CompilerServices;
-using System.Threading;
-using System.Runtime.CompilerServices;
-using Newtonsoft.Json;
-using System.Security;
 using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager
@@ -230,6 +224,7 @@ namespace Lithnet.AccessManager
             group.Properties["entryTTL"].Add((int)ttl.TotalSeconds);
             group.CommitChanges();
         }
+
         public void UpdateMsMcsAdmPwdAttribute(IComputer computer, string password, DateTime expiryDate)
         {
             DirectoryEntry de = computer.GetDirectoryEntry();

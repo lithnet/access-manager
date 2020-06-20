@@ -12,12 +12,18 @@ namespace Lithnet.AccessManager.Agent
 
         private RegistryKey settingsKey;
 
-        public AgentRegistrySettings()
+
+        public AgentRegistrySettings() :
+           this(Registry.LocalMachine.OpenSubKey(policyKeyName, false), Registry.LocalMachine.CreateSubKey(settingsKeyName, true))
         {
-            this.policyKey = Registry.LocalMachine.OpenSubKey(policyKeyName, false);
-            this.settingsKey = Registry.LocalMachine.CreateSubKey(settingsKeyName, true);
         }
 
+        public AgentRegistrySettings(RegistryKey policyKey, RegistryKey settingsKey)
+        {
+            this.policyKey = policyKey;
+            this.settingsKey = settingsKey;
+        }
+    
         public bool Enabled => this.policyKey.GetValue<int>("Enabled", 0) == 1;
 
         public int CheckInterval => this.policyKey.GetValue<int>("CheckInterval", 60);

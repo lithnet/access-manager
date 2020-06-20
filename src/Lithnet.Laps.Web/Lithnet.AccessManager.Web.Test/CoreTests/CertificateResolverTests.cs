@@ -30,6 +30,7 @@ namespace Lithnet.AccessManager.Test
             }
 
             Assert.Throws<CertificateNotFoundException>(() => resolver.GetEncryptionCertificate("ABCDE"));
+            Assert.Throws<ConfigurationException>(() => resolver.GetEncryptionCertificate(null));
         }
 
         [TestCase(StoreLocation.CurrentUser)]
@@ -43,7 +44,7 @@ namespace Lithnet.AccessManager.Test
             {
                 if (cert.HasPrivateKey)
                 {
-                    Assert.AreEqual(cert, resolver.GetEncryptionCertificate(cert.Thumbprint));
+                    Assert.AreEqual(cert, resolver.GetDecryptionCertificate(cert.Thumbprint));
                 }
                 else
                 {
@@ -51,7 +52,8 @@ namespace Lithnet.AccessManager.Test
                 }
             }
 
-            Assert.Throws<CertificateNotFoundException>(() => resolver.GetEncryptionCertificate("ABCDE"));
+            Assert.Throws<CertificateNotFoundException>(() => resolver.GetDecryptionCertificate("ABCDE"));
+            Assert.Throws<ConfigurationException>(() => resolver.GetDecryptionCertificate(null));
         }
     }
 }

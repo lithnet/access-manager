@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using Lithnet.AccessManager.Agent;
 
-namespace Lithnet.AccessManager
+namespace Lithnet.AccessManager.Agent
 {
     public class RandomPasswordGenerator : IPasswordGenerator
     {
@@ -48,7 +48,7 @@ namespace Lithnet.AccessManager
             if (this.settings.UseReadibilitySeparator)
             {
                 var split = this.Split(rawString, Math.Max(this.settings.ReadabilitySeparatorInterval, 3));
-                rawString = string.Join(this.settings.ReadabilitySeparator ?? "-", split);
+                rawString = string.Join(this.settings.ReadabilitySeparator, split);
             }
 
             return rawString;
@@ -58,24 +58,34 @@ namespace Lithnet.AccessManager
         {
             List<char> selectedChars = new List<char>();
 
-            if (this.settings.UseLower)
+            if (string.IsNullOrWhiteSpace(this.settings.PasswordCharacters))
             {
-                selectedChars.AddRange(LowercaseAlphaCharacterSet);
-            }
+                if (this.settings.UseLower)
+                {
+                    selectedChars.AddRange(LowercaseAlphaCharacterSet);
+                }
 
-            if (this.settings.UseUpper)
-            {
-                selectedChars.AddRange(UppercaseAlphaCharacterSet);
-            }
+                if (this.settings.UseUpper)
+                {
+                    selectedChars.AddRange(UppercaseAlphaCharacterSet);
+                }
 
-            if (this.settings.UseNumeric)
-            {
-                selectedChars.AddRange(NumericCharacterSet);
-            }
+                if (this.settings.UseNumeric)
+                {
+                    selectedChars.AddRange(NumericCharacterSet);
+                }
 
-            if (this.settings.UseSymbol)
+                if (this.settings.UseSymbol)
+                {
+                    selectedChars.AddRange(SymbolCharacterSet);
+                }
+            }
+            else
             {
-                selectedChars.AddRange(SymbolCharacterSet);
+                foreach (char c in this.settings.PasswordCharacters)
+                {
+                    selectedChars.Add(c);
+                }
             }
 
             if (selectedChars.Count == 0)
@@ -84,6 +94,14 @@ namespace Lithnet.AccessManager
                 selectedChars.AddRange(NumericCharacterSet);
                 selectedChars.AddRange(UppercaseAlphaCharacterSet);
                 selectedChars.AddRange(SymbolCharacterSet);
+            }
+
+            if (this.settings.UseReadibilitySeparator)
+            {
+                foreach (char c in this.settings.ReadabilitySeparator)
+                {
+                    selectedChars.Remove(c);
+                }
             }
 
             return selectedChars.ToArray();
@@ -107,49 +125,6 @@ namespace Lithnet.AccessManager
             }
 
             return new string(identifier);
-        }
-
-        private long GenerateRandomNumber(int length)
-        {
-            ulong minValue = ulong.Parse("1".PadRight(length, '0'));
-            ulong maxValue = ulong.Parse("1".PadRight(length + 1, '0'));
-
-            return (long)GetValue(minValue, maxValue);
-        }
-
-        private long GenerateRandomNumber()
-        {
-            return GenerateRandomNumber(8);
-        }
-
-        private ulong GetValue(ulong minValue, ulong maxValue)
-        {
-            if (minValue >= maxValue)
-            {
-                throw new ArgumentOutOfRangeException(nameof(maxValue));
-            }
-
-            if (maxValue > long.MaxValue)
-            {
-                throw new ArgumentOutOfRangeException(nameof(maxValue));
-            }
-
-            ulong diff = (ulong)maxValue - minValue;
-
-            ulong upperBound = ulong.MaxValue / diff * diff;
-
-            ulong value;
-            do
-            {
-                value = GetRandomUInt64();
-            } while (value >= upperBound);
-            return (ulong)(minValue + (value % diff));
-        }
-
-        private ulong GetRandomUInt64()
-        {
-            byte[] randomBytes = GetRandomBytes(sizeof(ulong));
-            return BitConverter.ToUInt64(randomBytes, 0);
         }
 
         private byte[] GetRandomBytes(int size)

@@ -32,6 +32,11 @@ namespace Lithnet.AccessManager.Agent
         {
             try
             {
+                if (!this.settings.JitEnabled)
+                {
+                    return;
+                }
+
                 IComputer computer = this.directory.GetComputer(this.sam.GetMachineNTAccountName());
 
                 IGroup group = this.GetOrCreateJitGroup(computer);
@@ -39,7 +44,7 @@ namespace Lithnet.AccessManager.Agent
                 this.sam.UpdateLocalGroupMembership(
                     this.sam.GetBuiltInAdministratorsGroupName(),
                     this.BuildExpectedMembership(group.Sid),
-                    this.settings.AllowUnmanagedLocalAdministratorGroupMembers,
+                    this.settings.AllowUnmanagedAdmins,
                     true);
 
                 this.UpdateJitGroupRegistration(computer, group);
