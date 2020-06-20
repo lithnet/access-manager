@@ -1,8 +1,11 @@
+using System.Runtime.CompilerServices;
 using Lithnet.AccessManager.Web.Internal;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using NLog.Web;
+
+[assembly: InternalsVisibleTo("Lithnet.AccessManager.Test")]
 
 namespace Lithnet.AccessManager.Web
 {

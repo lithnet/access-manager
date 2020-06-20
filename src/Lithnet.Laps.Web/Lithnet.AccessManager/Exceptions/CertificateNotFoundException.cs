@@ -3,7 +3,7 @@
 namespace Lithnet.AccessManager
 {
     [Serializable]
-    public class CertificateNotFoundException : DirectoryException
+    public class CertificateNotFoundException : AccessManagerException
     {
         public CertificateNotFoundException()
         {

@@ -6,9 +6,12 @@ namespace Lithnet.AccessManager.Web
     {
         private readonly IDirectory directory;
 
-        public JitAccessGroupResolver(IDirectory directory)
+        private readonly IAppDataProvider settingsProvider;
+
+        public JitAccessGroupResolver(IDirectory directory, IAppDataProvider settingsProvider)
         {
             this.directory = directory;
+            this.settingsProvider = settingsProvider;
         }
 
         public IGroup GetJitAccessGroup(IComputer computer, string groupName)
@@ -38,17 +41,17 @@ namespace Lithnet.AccessManager.Web
                 }
             }
 
-            if (!this.directory.TryGetLamSettings(computer, out ILamSettings lamSettings))
+            if (!this.settingsProvider.TryGetAppData(computer, out IAppData appData))
             {
                 throw new ObjectNotFoundException($"The Lithnet Access  Manager object for computer {computer.MsDsPrincipalName} was not found in the directory");
             }
 
-            if (lamSettings.JitGroupReference == null)
+            if (appData.JitGroupReference == null)
             {
                 throw new ObjectNotFoundException($"The Lithnet Access Manager object for computer {computer.MsDsPrincipalName} was found, but it did not contain a group entry");
             }
 
-            return this.directory.GetGroup(lamSettings.JitGroupReference);
+            return this.directory.GetGroup(appData.JitGroupReference);
         }
     }
 }

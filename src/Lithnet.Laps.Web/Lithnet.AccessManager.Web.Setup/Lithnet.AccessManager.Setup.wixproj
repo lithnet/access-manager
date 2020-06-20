@@ -38,9 +38,25 @@
     </WixExtension>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lithnet.Laps.Web\Lithnet.AccessManager.Web.csproj">
+    <ProjectReference Include="..\Lithnet.AccessManager.Agent\Lithnet.AccessManager.Agent.csproj">
+      <Name>Lithnet.AccessManager.Agent</Name>
+      <Project>{95b23ee9-2c33-4f83-993a-317e3ee92b6a}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\Lithnet.AccessManager.Web\Lithnet.AccessManager.Web.csproj">
       <Name>Lithnet.AccessManager.Web</Name>
       <Project>{a7badc85-d43b-498c-b55b-c0231644ac88}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\Lithnet.AccessManager\Lithnet.AccessManager.csproj">
+      <Name>Lithnet.AccessManager</Name>
+      <Project>{71efa88b-171c-4554-9ce4-f7f89e609a96}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.DirectoryServices;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
@@ -12,6 +13,27 @@ namespace Lithnet.AccessManager
 {
     public static class DirectoryExtensions
     {
+
+        internal static bool TryGet<T>(this Func<T> getFunc, out T o) where T : class
+        {
+            o = null;
+            try
+            {
+                o = getFunc();
+                return true;
+            }
+            catch (ObjectNotFoundException)
+            {
+            }
+
+            return false;
+        }
+
+        public static DateTime Trim(this DateTime date, long ticks)
+        {
+            return new DateTime(date.Ticks - (date.Ticks % ticks), date.Kind);
+        }
+
         public static bool IsDnMatch(string dn1, string dn2)
         {
             try
@@ -25,6 +47,11 @@ namespace Lithnet.AccessManager
             {
                 return false;
             }
+        }
+
+        public static DirectoryEntry GetParentDirectoryEntry(this IDirectoryObject o)
+        {
+            return o.GetDirectoryEntry().Parent;
         }
 
         public static DirectoryEntry GetDirectoryEntry(this IDirectoryObject o)
@@ -74,6 +101,28 @@ namespace Lithnet.AccessManager
             return DateTime.FromFileTimeUtc(value);
         }
 
+        public static DateTime? GetPropertyDateTimeFromLong(this DirectoryEntry result, string propertyName)
+        {
+            if (!result.Properties.Contains(propertyName))
+            {
+                return null;
+            }
+
+            long value = (long)result.Properties[propertyName][0];
+            return DateTime.FromFileTimeUtc(value);
+        }
+
+        public static DateTime? GetPropertyDateTime(this DirectoryEntry result, string propertyName)
+        {
+            if (!result.Properties.Contains(propertyName))
+            {
+                return null;
+            }
+
+            return ((DateTime)result.Properties[propertyName][0]);
+        }
+
+
         public static string GetPropertyString(this SearchResult result, string propertyName)
         {
             if (!result.Properties.Contains(propertyName))
@@ -95,6 +144,16 @@ namespace Lithnet.AccessManager
         }
 
         public static IEnumerable<string> GetPropertyStrings(this SearchResult result, string propertyName)
+        {
+            if (!result.Properties.Contains(propertyName))
+            {
+                return new string[] { };
+            }
+
+            return result.Properties[propertyName].OfType<object>().Select(t => t.ToString());
+        }
+
+        public static IEnumerable<string> GetPropertyStrings(this DirectoryEntry result, string propertyName)
         {
             if (!result.Properties.Contains(propertyName))
             {

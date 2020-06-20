@@ -4,7 +4,8 @@ namespace Lithnet.AccessManager
 {
     public interface ICertificateResolver
     {
-        X509Certificate2 GetDecryptionCertificate();
-        X509Certificate2 GetEncryptionCertificate();
+        X509Certificate2 GetDecryptionCertificate(string thumbprint);
+
+        X509Certificate2 GetEncryptionCertificate(string thumbprint);
     }
 }

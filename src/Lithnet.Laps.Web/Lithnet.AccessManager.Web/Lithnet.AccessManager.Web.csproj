@@ -3,8 +3,15 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <Company>Lithnet</Company>
+    <Product>Access Manager</Product>
+    <Authors>Lithnet</Authors>
+    <Description>Lithnet Access Manager</Description>
+    <Copyright>(c) 2020 Lithnet</Copyright>
+    <PackageProjectUrl>https://github.com/lithnet/laps-web</PackageProjectUrl>
     <FileVersion>1.0.$([System.DateTime]::UtcNow.Date.Subtract($([System.DateTime]::Parse("2000-01-01"))).TotalDays).$([System.Math]::Floor($([MSBuild]::Divide($([System.DateTime]::UtcNow.TimeOfDay.TotalSeconds), 1.32))))</FileVersion>
     <Version>1.0.$([System.DateTime]::UtcNow.Date.Subtract($([System.DateTime]::Parse("2000-01-01"))).TotalDays)</Version>
+    <Deterministic>false</Deterministic>
   </PropertyGroup>
 
   <ItemGroup>
@@ -91,5 +98,9 @@
     </Content>
     <Content Update="appsettings.*.json" CopyToPublishDirectory="Never" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="&quot;C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe&quot; sign /sha1 &quot;$(CSCERTTHUMBPRINT)&quot; /t http://timestamp.digicert.com /fd sha256 /v &quot;$(TargetPath)&quot;&#xD;&#xA;&quot;C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\symstore&quot; add /f &quot;$(TargetDir)*.pdb&quot; /s \\localhost\symbols /t &quot;$(ProjectName)&quot; /v &quot;@(VersionNumber)&quot;" />
+  </Target>
 
 </Project>

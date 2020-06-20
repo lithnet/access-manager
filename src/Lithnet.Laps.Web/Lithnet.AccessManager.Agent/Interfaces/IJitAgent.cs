@@ -1,6 +1,6 @@
 ﻿namespace Lithnet.AccessManager.Agent
 {
-    public interface ILapsWorker
+    public interface IJitAgent
     {
         void DoCheck();
     }

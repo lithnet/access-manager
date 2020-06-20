@@ -12,15 +12,17 @@ namespace Lithnet.AccessManager.Agent
 
         private readonly IDirectory directory;
 
-        private readonly IJitSettingsProvider settings;
+        private readonly IAgentSettings settings;
 
         private readonly IHostApplicationLifetime appLifetime;
 
-        private readonly IJitWorker jitWorker;
+        private readonly IJitAgent jitWorker;
 
-        private readonly ILapsWorker lapsWorker;
+        private readonly ILapsAgent lapsWorker;
 
-        public Worker(ILogger<Worker> logger, IDirectory directory, IJitSettingsProvider settings, IHostApplicationLifetime appLifetime, IJitWorker jitWorker, ILapsWorker lapsWorker)
+        private readonly ILocalSam sam;
+
+        public Worker(ILogger<Worker> logger, IDirectory directory, IAgentSettings settings, IHostApplicationLifetime appLifetime, IJitAgent jitWorker, ILapsAgent lapsWorker, ILocalSam sam)
         {
             this.logger = logger;
             this.directory = directory;
@@ -28,6 +30,7 @@ namespace Lithnet.AccessManager.Agent
             this.appLifetime = appLifetime;
             this.jitWorker = jitWorker;
             this.lapsWorker = lapsWorker;
+            this.sam = sam;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -36,7 +39,7 @@ namespace Lithnet.AccessManager.Agent
             {
                 logger.LogTrace("Worker running at: {time}", DateTimeOffset.Now);
 
-                if (this.directory.IsDomainController())
+                if (this.sam.IsDomainController())
                 {
                     this.logger.LogWarning("This application should not be run on a domain controller. Shutting down");
                     this.appLifetime.StopApplication();

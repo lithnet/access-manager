@@ -13,11 +13,14 @@ using System.Threading;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 using System.Security;
+using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager
 {
     public sealed class ActiveDirectory : IDirectory
     {
+        private readonly ILogger<ActiveDirectory> logger;
+
         private static Guid PamFeatureGuid = new Guid("ec43e873-cce8-4640-b4ab-07ffe4ab5bcd");
 
         private const string AttrMsMcsAdmPwd = "ms-Mcs-AdmPwd";
@@ -26,19 +29,14 @@ namespace Lithnet.AccessManager
 
         private Dictionary<SecurityIdentifier, bool> PamEnabledDomainCache = new Dictionary<SecurityIdentifier, bool>();
 
-        public SecurityIdentifier GetWellKnownSid(WellKnownSidType sidType)
+        public ActiveDirectory(ILogger<ActiveDirectory> logger)
         {
-            return NativeMethods.CreateWellKnownSid(sidType);
-        }
-
-        public SecurityIdentifier GetWellKnownSid(WellKnownSidType sidType, SecurityIdentifier domainSid)
-        {
-            return NativeMethods.CreateWellKnownSid(sidType, domainSid.AccountDomainSid);
+            this.logger = logger;
         }
 
         public bool TryGetUser(string name, out IUser user)
         {
-            return this.TryGet(() => this.GetUser(name), out user);
+            return DirectoryExtensions.TryGet(() => this.GetUser(name), out user);
         }
 
         public IUser GetUser(string name)
@@ -53,7 +51,7 @@ namespace Lithnet.AccessManager
 
         public bool TryGetComputer(string name, out IComputer computer)
         {
-            return this.TryGet(() => this.GetComputer(name), out computer);
+            return DirectoryExtensions.TryGet(() => this.GetComputer(name), out computer);
         }
 
         public ISecurityPrincipal GetPrincipal(string name)
@@ -80,7 +78,7 @@ namespace Lithnet.AccessManager
 
         public bool TryGetPrincipal(string name, out ISecurityPrincipal principal)
         {
-            return this.TryGet(() => this.GetPrincipal(name), out principal);
+            return DirectoryExtensions.TryGet(() => this.GetPrincipal(name), out principal);
         }
 
         public bool IsContainer(string path)
@@ -119,7 +117,7 @@ namespace Lithnet.AccessManager
 
         public bool TryGetGroup(string name, out IGroup group)
         {
-            return this.TryGet(() => this.GetGroup(name), out group);
+            return DirectoryExtensions.TryGet(() => this.GetGroup(name), out group);
         }
 
         public IGroup GetGroup(SecurityIdentifier sid)
@@ -129,7 +127,24 @@ namespace Lithnet.AccessManager
 
         public bool TryGetGroup(SecurityIdentifier sid, out IGroup group)
         {
-            return this.TryGet(() => this.GetGroup(sid), out group);
+            return DirectoryExtensions.TryGet(() => this.GetGroup(sid), out group);
+        }
+
+        public IGroup CreateGroup(string name, string description, int groupType, DirectoryEntry ou)
+        {
+            string samAccountName = name;
+            if (name.Contains('\\'))
+            {
+                samAccountName = name.Split('\\')[1];
+            }
+
+            DirectoryEntry de = ou.Children.Add($"CN={samAccountName}", "group");
+            de.Properties["samAccountName"].Add(samAccountName);
+            de.Properties["description"].Add(description);
+            de.Properties["groupType"].Add(groupType);
+            de.CommitChanges();
+
+            return this.GetGroup(de.GetPropertySid("objectSid"));
         }
 
         public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, ISecurityPrincipal principal)
@@ -140,23 +155,6 @@ namespace Lithnet.AccessManager
         public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, ISecurityPrincipal principal, SecurityIdentifier targetDomainSid)
         {
             return NativeMethods.CheckForSidInToken(principal.Sid, sidToFindInToken, targetDomainSid);
-        }
-
-        public IComputer GetComputer()
-        {
-            return this.GetComputer(this.GetMachineNetbiosFullyQualifiedName());
-        }
-
-        public string GetMachineNetbiosDomainName()
-        {
-            var result = NativeMethods.GetWorkstationInfo(null);
-            return result.LanGroup;
-        }
-
-        public string GetMachineNetbiosFullyQualifiedName()
-        {
-            var result = NativeMethods.GetWorkstationInfo(null);
-            return $"{result.LanGroup}\\{result.ComputerName}";
         }
 
         public IEnumerable<string> GetMemberDNsFromGroup(IGroup group)
@@ -232,95 +230,12 @@ namespace Lithnet.AccessManager
             group.Properties["entryTTL"].Add((int)ttl.TotalSeconds);
             group.CommitChanges();
         }
-
-        public void DeleteLamSettings(ILamSettings settings)
-        {
-            settings.GetDirectoryEntry().DeleteTree();
-        }
-
-        public IList<SecurityIdentifier> GetLocalGroupMembers(string name)
-        {
-            return NativeMethods.GetLocalGroupMembers(name);
-        }
-
-        public void AddLocalGroupMember(string groupName, SecurityIdentifier member)
-        {
-            NativeMethods.AddLocalGroupMember(groupName, member);
-        }
-
-        public void RemoveLocalGroupMember(string groupName, SecurityIdentifier member)
-        {
-            NativeMethods.RemoveLocalGroupMember(groupName, member);
-        }
-
         public void UpdateMsMcsAdmPwdAttribute(IComputer computer, string password, DateTime expiryDate)
         {
             DirectoryEntry de = computer.GetDirectoryEntry();
             de.Properties[AttrMsMcsAdmPwd].Value = password;
             de.Properties[AttrMsMcsAdmPwdExpirationTime].Value = expiryDate.ToFileTimeUtc();
             de.CommitChanges();
-        }
-
-        public ILamSettings GetOrCreateLamSettings(IComputer computer)
-        {
-            if (!this.TryGetLamSettings(computer, out ILamSettings lamSettings))
-            {
-                return MsDsAppDataLamSettings.Create(computer);
-            }
-            else
-            {
-                return lamSettings;
-            }
-        }
-
-        public bool TryGetLamSettings(IComputer computer, out ILamSettings lamSettings)
-        {
-            return this.TryGet(() => this.GetLamSettings(computer), out lamSettings);
-        }
-
-        public ILamSettings GetLamSettings(IComputer computer)
-        {
-            DirectorySearcher d = new DirectorySearcher
-            {
-                SearchRoot = computer.GetDirectoryEntry(),
-                SearchScope = SearchScope.OneLevel,
-                Filter = MsDsAppDataLamSettings.Filter
-            };
-
-            foreach (string property in MsDsAppDataLamSettings.PropertiesToGet)
-            {
-                d.PropertiesToLoad.Add(property);
-            }
-
-            var result = d.FindOne();
-
-            if (result == null)
-            {
-                throw new ObjectNotFoundException();
-            }
-
-            return new MsDsAppDataLamSettings(result);
-        }
-
-        public byte[] TryGetLamPublicKey(SecurityIdentifier sid)
-        {
-            DirectorySearcher d = new DirectorySearcher
-            {
-                SearchRoot = this.GetConfigurationNamingContext(sid),
-                SearchScope = SearchScope.Subtree,
-                Filter = $"(&(objectClass=msDS-AppData)(CN=AccessManagerPublicKey))",
-            };
-
-            d.PropertiesToLoad.Add("msDS-ByteArray");
-
-            var result = d.FindOne();
-
-            if (result == null)
-            {
-                throw new ObjectNotFoundException();
-            }
-
-            return result.GetPropertyBytes("msDS-ByteArray");
         }
 
         public bool IsPamFeatureEnabled(SecurityIdentifier domainSid)
@@ -362,13 +277,6 @@ namespace Lithnet.AccessManager
             }
 
             return new DirectoryEntry($"LDAP://{configNamingContext}");
-        }
-
-        public bool IsDomainController()
-        {
-            var info = NativeMethods.GetServerInfo(null);
-
-            return (info.Type & ServerTypes.DomainCtrl) == ServerTypes.DomainCtrl || (info.Type & ServerTypes.BackupDomainCtrl) == ServerTypes.BackupDomainCtrl;
         }
 
         private SearchResult DoGcLookup(string objectName, string objectClass, IEnumerable<string> propertiesToGet)
@@ -532,21 +440,6 @@ namespace Lithnet.AccessManager
             {
                 return false;
             }
-        }
-
-        private bool TryGet<T>(Func<T> getFunc, out T o) where T : class
-        {
-            o = null;
-            try
-            {
-                o = getFunc();
-                return true;
-            }
-            catch (ObjectNotFoundException)
-            {
-            }
-
-            return false;
         }
     }
 }

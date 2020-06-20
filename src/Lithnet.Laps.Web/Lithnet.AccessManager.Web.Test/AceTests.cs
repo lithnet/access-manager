@@ -1,18 +1,18 @@
 using Lithnet.AccessManager.Web.Authorization;
+using Microsoft.Extensions.Logging;
 using Moq;
-using NLog;
 using NUnit.Framework;
 
 namespace Lithnet.AccessManager.Web.Test
 {
     public class AceTests
     {
-        private Mock<ILogger> dummyLogger;
+        private Mock<NLog.ILogger> dummyLogger;
 
         [SetUp()]
         public void TestInitialize()
         {
-            dummyLogger = new Mock<ILogger>();
+            dummyLogger = new Mock<NLog.ILogger>();
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace Lithnet.AccessManager.Web.Test
             ace.SetupGet(x => x.Type).Returns(aceType);
             ace.SetupGet(x => x.Access).Returns(AccessMask.Laps);
 
-            ActiveDirectory d = new ActiveDirectory();
+            ActiveDirectory d = new ActiveDirectory(Mock.Of<ILogger<ActiveDirectory>>());
 
             AceEvaluator evaluator = new AceEvaluator(d, dummyLogger.Object);
 

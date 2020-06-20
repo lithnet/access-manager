@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Text.Unicode;
-using Microsoft.Win32.SafeHandles;
 
 namespace Lithnet.AccessManager
 {
@@ -23,11 +20,6 @@ namespace Lithnet.AccessManager
         {
             byte[] dataToEncrypt = Encoding.UTF8.GetBytes(data);
             return Convert.ToBase64String(this.Encrypt(cert, dataToEncrypt));
-        }
-
-        public string Decrypt(string base64Data)
-        {
-            return this.Decrypt(base64Data, ResolveCertificate);
         }
 
         public string Decrypt(string base64Data, Func<string, X509Certificate2> certResolver)
@@ -108,61 +100,30 @@ namespace Lithnet.AccessManager
                             var decryptedBytes = transform.TransformFinalBlock(reader.ReadBytes(remainingBytes), 0, remainingBytes);
                             return Encoding.UTF8.GetString(decryptedBytes);
                         }
-
                     }
                 }
             }
         }
 
-        private static X509Certificate2 ResolveCertificate(string thumbprint)
+        private static byte[] HexStringToBytes(string h)
         {
-            return GetCertificateFromStore(thumbprint, StoreLocation.CurrentUser) ??
-                    GetCertificateFromStore(thumbprint, StoreLocation.LocalMachine) ??
-                    throw new CertificateNotFoundException($"A certificate with the thumbprint {thumbprint} could not be found");
-        }
-
-        private static X509Certificate2 GetCertificateFromStore(string thumbprint, StoreLocation storeLocation)
-        {
-            X509Store store = new X509Store(StoreName.My, storeLocation);
-            store.Open(OpenFlags.ReadOnly);
-
-            try
+            if (h == null)
             {
-                foreach (var item in store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false))
-                {
-                    return item;
-                }
-            }
-            finally
-            {
-                if (store.IsOpen)
-                {
-                    store.Close();
-                }
+                throw new ArgumentNullException(nameof(h));
             }
 
-            return null;
-        }
-
-        private static byte[] HexStringToBytes(string hexHash)
-        {
-            if (hexHash == null)
-            {
-                throw new ArgumentNullException(nameof(hexHash));
-            }
-
-            if (hexHash.Length % 2 != 0)
+            if (h.Length % 2 != 0)
             {
                 throw new ArgumentException($"The value supplied must be a hexadecimal representation of the hash");
             }
 
-            int binaryLength = hexHash.Length / 2;
+            int binaryLength = h.Length / 2;
 
             byte[] hash = new byte[binaryLength];
 
             for (int i = 0; i < binaryLength; i++)
             {
-                hash[i] = Convert.ToByte(hexHash.Substring((i * 2), 2), 16);
+                hash[i] = Convert.ToByte(h.Substring((i * 2), 2), 16);
             }
 
             return hash;

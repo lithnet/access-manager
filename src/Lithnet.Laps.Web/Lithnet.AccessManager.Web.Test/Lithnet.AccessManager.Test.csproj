@@ -14,8 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Lithnet.AccessManager.Agent\Lithnet.AccessManager.Agent.csproj" />
+    <ProjectReference Include="..\Lithnet.AccessManager.Web\Lithnet.AccessManager.Web.csproj" />
     <ProjectReference Include="..\Lithnet.AccessManager\Lithnet.AccessManager.csproj" />
-    <ProjectReference Include="..\Lithnet.Laps.Web\Lithnet.AccessManager.Web.csproj" />
   </ItemGroup>
 
 </Project>

@@ -7,7 +7,7 @@ namespace Lithnet.AccessManager
 {
     public class RandomPasswordGenerator : IPasswordGenerator
     {
-        private readonly ILapsSettingsProvider settings;
+        private readonly ILapsSettings settings;
 
         private readonly RNGCryptoServiceProvider csp;
 
@@ -28,7 +28,7 @@ namespace Lithnet.AccessManager
             'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
               };
 
-        public RandomPasswordGenerator(ILapsSettingsProvider settings, RNGCryptoServiceProvider csp)
+        public RandomPasswordGenerator(ILapsSettings settings, RNGCryptoServiceProvider csp)
         {
             this.settings = settings;
             this.csp = csp;

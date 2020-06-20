@@ -2,13 +2,13 @@
 
 namespace Lithnet.AccessManager.Agent
 {
-    public interface ILapsSettingsProvider
+    public interface ILapsSettings
     {
-        bool Enabled { get; }
+        string SigningCertThumbprint { get; }
 
         bool LapsEnabled { get; }
 
-        bool PasswordStrategy { get; }
+        int PasswordGenerationStrategy { get; }
 
         int PasswordLength { get; }
 
@@ -33,6 +33,7 @@ namespace Lithnet.AccessManager.Agent
         bool WriteToMsMcsAdmPasswordAttributes { get; }
 
         int MaximumPasswordAge { get; }
-    }
 
+        bool WriteToAppData { get; }
+    }
 }
