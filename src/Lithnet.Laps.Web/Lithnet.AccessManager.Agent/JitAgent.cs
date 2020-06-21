@@ -70,7 +70,7 @@ namespace Lithnet.AccessManager.Agent
             if (appData == null)
             {
                 this.logger.LogTrace("Existing settings object not found");
-                appData = this.appDataProvider.GetOrCreateAppData(computer);
+                appData = this.appDataProvider.Create(computer);
                 this.logger.LogInformation("Created settings object in directory as {distinguishedName}", appData.DistinguishedName);
             }
 

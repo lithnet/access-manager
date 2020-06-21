@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.DirectoryServices;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
+using System.Threading.Tasks.Sources;
 
 namespace Lithnet.AccessManager
 {
@@ -59,6 +62,7 @@ namespace Lithnet.AccessManager
             return new DirectoryEntry($"LDAP://{o.DistinguishedName}");
         }
 
+        [DebuggerStepThrough]
         public static bool TryParseAsSid(this string s, out SecurityIdentifier sid)
         {
             sid = null;
@@ -101,6 +105,30 @@ namespace Lithnet.AccessManager
             return DateTime.FromFileTimeUtc(value);
         }
 
+        public static DateTime? GetPropertyDateTimeFromAdsLargeInteger(this DirectoryEntry result, string propertyName)
+        {
+            if (!result.Properties.Contains(propertyName))
+            {
+                return null;
+            }
+
+            object value = result.Properties[propertyName][0];
+          
+            int highPart = (int)value.GetType().InvokeMember("HighPart", BindingFlags.GetProperty, null, value, null);
+            int lowPart = (int)value.GetType().InvokeMember("LowPart", BindingFlags.GetProperty, null, value, null);
+            
+            long nv = highPart;
+            nv <<= 32;
+            nv += lowPart;
+
+            if (nv != 0)
+            {
+                return DateTime.FromFileTimeUtc(nv);
+            }
+
+            return null;
+        }
+
         public static DateTime? GetPropertyDateTimeFromLong(this DirectoryEntry result, string propertyName)
         {
             if (!result.Properties.Contains(propertyName))
@@ -108,8 +136,14 @@ namespace Lithnet.AccessManager
                 return null;
             }
 
-            long value = (long)result.Properties[propertyName][0];
-            return DateTime.FromFileTimeUtc(value);
+            long? value = result.Properties[propertyName][0] as long?;
+
+            if (value == null)
+            {
+                return null;
+            }
+
+            return DateTime.FromFileTimeUtc(value.Value);
         }
 
         public static DateTime? GetPropertyDateTime(this DirectoryEntry result, string propertyName)

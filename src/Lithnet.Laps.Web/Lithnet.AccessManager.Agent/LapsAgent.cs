@@ -22,9 +22,11 @@ namespace Lithnet.AccessManager.Agent
 
         private readonly ILocalSam sam;
 
-        private readonly IAppDataProvider provider;
+        private readonly IAppDataProvider appDataProvider;
 
-        public LapsAgent(ILogger<LapsAgent> logger, IDirectory directory, ILapsSettings settings, IPasswordGenerator passwordGenerator, IEncryptionProvider encryptionProvider, ICertificateResolver certificateResolver, ILocalSam sam, IAppDataProvider provider)
+        private readonly IMsMcsAdmPwdProvider msMcsAdmPwdProvider;
+
+        public LapsAgent(ILogger<LapsAgent> logger, IDirectory directory, ILapsSettings settings, IPasswordGenerator passwordGenerator, IEncryptionProvider encryptionProvider, ICertificateResolver certificateResolver, ILocalSam sam, IAppDataProvider appDataProvider, IMsMcsAdmPwdProvider msMcsAdmPwdProvider)
         {
             this.logger = logger;
             this.directory = directory;
@@ -33,7 +35,8 @@ namespace Lithnet.AccessManager.Agent
             this.encryptionProvider = encryptionProvider;
             this.certificateResolver = certificateResolver;
             this.sam = sam;
-            this.provider = provider;
+            this.appDataProvider = appDataProvider;
+            this.msMcsAdmPwdProvider = msMcsAdmPwdProvider;
         }
 
         public void DoCheck()
@@ -50,17 +53,46 @@ namespace Lithnet.AccessManager.Agent
 
             IComputer computer = this.directory.GetComputer(this.sam.GetMachineNTAccountName());
 
-            var appData = this.provider.GetAppData(computer);
+            var appData = this.appDataProvider.GetAppData(computer);
 
-            if (appData.PasswordExpiry > DateTime.UtcNow)
+            if (this.HasPasswordExpired(appData, computer))
             {
                 this.ChangePassword(appData, computer);
             }
         }
 
-        private void ChangePassword(IAppData appData, IComputer computer)
+        internal bool HasPasswordExpired(IAppData appData, IComputer computer)
         {
-            SecurityIdentifier localAdminSid = this.sam.GetWellKnownSid(WellKnownSidType.AccountAdministratorSid);
+            if (this.settings.WriteToAppData)
+            {
+                if (appData.PasswordExpiry == null)
+                {
+                    return false;
+                }
+
+                return DateTime.UtcNow > appData.PasswordExpiry;
+            }
+            else if (this.settings.WriteToMsMcsAdmPasswordAttributes)
+            {
+                var expiry = this.msMcsAdmPwdProvider.GetExpiry(computer);
+
+                if (expiry == null)
+                {
+                    return false;
+                }
+
+                return DateTime.UtcNow > expiry;
+            }
+
+            return false;
+        }
+
+        internal void ChangePassword(IAppData appData, IComputer computer, SecurityIdentifier sid = null)
+        {
+            if (sid == null)
+            {
+                sid = this.sam.GetWellKnownSid(WellKnownSidType.AccountAdministratorSid);
+            }
 
             string newPassword = this.passwordGenerator.Generate();
             DateTime rotationInstant = DateTime.UtcNow;
@@ -68,21 +100,22 @@ namespace Lithnet.AccessManager.Agent
 
             if (this.settings.WriteToAppData)
             {
-                appData.UpdateCurrentPassword(this.encryptionProvider.Encrypt(this.certificateResolver.GetEncryptionCertificate(this.settings.SigningCertThumbprint), newPassword), rotationInstant, expiryDate, this.settings.PasswordHistoryDaysToKeep);
+                appData.UpdateCurrentPassword(
+                    this.encryptionProvider.Encrypt(
+                        this.certificateResolver.GetEncryptionCertificate(
+                            this.settings.SigningCertThumbprint),
+                        newPassword), 
+                    rotationInstant, 
+                    expiryDate, 
+                    this.settings.PasswordHistoryDaysToKeep);
             }
 
             if (this.settings.WriteToMsMcsAdmPasswordAttributes)
             {
-                this.directory.UpdateMsMcsAdmPwdAttribute(computer, newPassword, expiryDate);
+                this.msMcsAdmPwdProvider.SetPassword(computer, newPassword, expiryDate);
             }
 
-            using (var context = new PrincipalContext(ContextType.Machine))
-            {
-                using (var user = UserPrincipal.FindByIdentity(context, IdentityType.Sid, localAdminSid.ToString()))
-                {
-                    user.SetPassword(newPassword);
-                }
-            }
+            this.sam.SetLocalAccountPassword(sid, newPassword);
         }
     }
 }

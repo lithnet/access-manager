@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lithnet.AccessManager.Web
+namespace Lithnet.AccessManager
 {
     [Serializable]
     public class NoPasswordException : AccessManagerException

@@ -11,6 +11,12 @@ using NUnit.Framework;
 
 namespace Lithnet.AccessManager.Test
 {
+
+    /// <summary>
+    /// These tests require the following objects to be on the local machine
+    /// User: 'testlocal1' 
+    /// Group: 'test-group'
+    /// </summary>
     public class LocalSamTests
     {
         private const string testGroupName = "test-group";
@@ -30,7 +36,7 @@ namespace Lithnet.AccessManager.Test
             sam = new LocalSam(Mock.Of<ILogger<LocalSam>>());
             directory = new ActiveDirectory(Mock.Of<ILogger<ActiveDirectory>>());
         }
-         
+
         [Test]
         public void AddGroupMember()
         {
@@ -39,7 +45,7 @@ namespace Lithnet.AccessManager.Test
 
             sam.AddLocalGroupMember(testGroupName, admin);
 
-            foreach (var p in  testGroup.GetMembers())
+            foreach (var p in testGroup.GetMembers())
             {
                 Assert.AreEqual(admin, p.Sid);
             }
@@ -142,6 +148,20 @@ namespace Lithnet.AccessManager.Test
         public void GetMachineNTAccountName()
         {
             Assert.AreEqual($"{Environment.UserDomainName}\\{Environment.MachineName}", sam.GetMachineNTAccountName());
+        }
+
+        [Test]
+        public void SetPassword()
+        {
+            string newPassword = Guid.NewGuid().ToString();
+
+            using (PrincipalContext c = new PrincipalContext(ContextType.Machine))
+            {
+                var user = UserPrincipal.FindByIdentity(c, "testlocal1");
+                this.sam.SetLocalAccountPassword(user.Sid, newPassword);
+
+                Assert.AreEqual(DateTime.UtcNow.Trim(TimeSpan.TicksPerMinute), user.LastPasswordSet.Value.Trim(TimeSpan.TicksPerMinute));
+            }
         }
 
         private void SetupGroupTests()

@@ -103,7 +103,7 @@ namespace Lithnet.AccessManager
             }
         }
 
-        public void UpdateLocalGroupMembership (string groupName, IEnumerable<SecurityIdentifier> expectedMembers, bool allowOthers, bool ignoreErrors)
+        public void UpdateLocalGroupMembership(string groupName, IEnumerable<SecurityIdentifier> expectedMembers, bool allowOthers, bool ignoreErrors)
         {
             IList<SecurityIdentifier> currentMembers = this.GetLocalGroupMembers(groupName);
             IEnumerable<SecurityIdentifier> membersToAdd = expectedMembers.Except(currentMembers);
@@ -117,6 +117,17 @@ namespace Lithnet.AccessManager
             var info = NativeMethods.GetServerInfo(null);
 
             return (info.Type & ServerTypes.DomainCtrl) == ServerTypes.DomainCtrl || (info.Type & ServerTypes.BackupDomainCtrl) == ServerTypes.BackupDomainCtrl;
+        }
+
+        public void SetLocalAccountPassword(SecurityIdentifier sid, string password)
+        {
+            using (var context = new PrincipalContext(ContextType.Machine))
+            {
+                using (var user = UserPrincipal.FindByIdentity(context, IdentityType.Sid, sid.ToString()))
+                {
+                    user.SetPassword(password);
+                }
+            }
         }
     }
 }

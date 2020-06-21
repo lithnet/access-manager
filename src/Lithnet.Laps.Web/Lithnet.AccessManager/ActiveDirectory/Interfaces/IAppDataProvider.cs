@@ -9,5 +9,7 @@
         IAppData GetOrCreateAppData(IComputer computer);
 
         bool TryGetAppData(IComputer computer, out IAppData appData);
+
+        IAppData Create(IComputer computer);
     }
 }

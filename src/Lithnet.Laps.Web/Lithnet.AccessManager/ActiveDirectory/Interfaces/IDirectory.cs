@@ -17,8 +17,6 @@ namespace Lithnet.AccessManager
 
         bool TryGetComputer(string name, out IComputer computer);
 
-        void UpdateMsMcsAdmPwdAttribute(IComputer computer, string password, DateTime expiryDate);
-
         IGroup GetGroup(string groupName);
 
         IGroup GetGroup(SecurityIdentifier sid);

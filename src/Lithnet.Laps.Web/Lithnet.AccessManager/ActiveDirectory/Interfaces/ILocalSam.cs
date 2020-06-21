@@ -26,5 +26,7 @@ namespace Lithnet.AccessManager
         void UpdateLocalGroupMembership(string groupName, IEnumerable<SecurityIdentifier> membersToAdd, IEnumerable<SecurityIdentifier> membersToRemove, bool ignoreErrors);
 
         void UpdateLocalGroupMembership(string groupName, IEnumerable<SecurityIdentifier> allowedMembers, bool allowOthers, bool ignoreErrors);
+
+        void SetLocalAccountPassword(SecurityIdentifier sid, string password);
     }
 }

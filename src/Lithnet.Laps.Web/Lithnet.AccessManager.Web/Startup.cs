@@ -53,12 +53,12 @@ namespace Lithnet.AccessManager.Web
             services.TryAddScoped<ITemplateProvider, TemplateProvider>();
             services.TryAddScoped<IRateLimiter, RateLimiter>();
             services.TryAddScoped<IAceEvaluator, AceEvaluator>();
-            services.TryAddScoped<IPasswordProvider, MsMcsAdmPwdProvider>();
             services.TryAddScoped<IJitAccessGroupResolver, JitAccessGroupResolver>();
             services.TryAddScoped<IJitProvider, AdGroupJitProvider>();
             services.TryAddScoped<IPhoneticPasswordTextProvider, NatoPhoneticStringProvider>();
             services.TryAddScoped<IHtmlPasswordProvider, HtmlPasswordProvider>();
-
+            services.TryAddScoped<IAppDataProvider, MsDsAppConfigurationProvider>();
+            services.TryAddScoped<IPasswordProvider,PasswordProvider>();
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();
             services.AddScoped<INotificationChannel, PowershellNotificationChannel>();

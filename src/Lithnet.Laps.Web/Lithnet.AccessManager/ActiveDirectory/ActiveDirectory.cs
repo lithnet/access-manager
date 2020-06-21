@@ -17,10 +17,6 @@ namespace Lithnet.AccessManager
 
         private static Guid PamFeatureGuid = new Guid("ec43e873-cce8-4640-b4ab-07ffe4ab5bcd");
 
-        private const string AttrMsMcsAdmPwd = "ms-Mcs-AdmPwd";
-
-        private const string AttrMsMcsAdmPwdExpirationTime = "ms-Mcs-AdmPwdExpirationTime";
-
         private Dictionary<SecurityIdentifier, bool> PamEnabledDomainCache = new Dictionary<SecurityIdentifier, bool>();
 
         public ActiveDirectory(ILogger<ActiveDirectory> logger)
@@ -223,14 +219,6 @@ namespace Lithnet.AccessManager
             group.Properties["groupType"].Add(-2147483644);
             group.Properties["entryTTL"].Add((int)ttl.TotalSeconds);
             group.CommitChanges();
-        }
-
-        public void UpdateMsMcsAdmPwdAttribute(IComputer computer, string password, DateTime expiryDate)
-        {
-            DirectoryEntry de = computer.GetDirectoryEntry();
-            de.Properties[AttrMsMcsAdmPwd].Value = password;
-            de.Properties[AttrMsMcsAdmPwdExpirationTime].Value = expiryDate.ToFileTimeUtc();
-            de.CommitChanges();
         }
 
         public bool IsPamFeatureEnabled(SecurityIdentifier domainSid)
