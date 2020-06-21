@@ -62,13 +62,19 @@ namespace Lithnet.AccessManager
                     return null;
                 }
 
-                if (items.Count > 1 )
+                if (items.Count > 1)
                 {
                     throw new AccessManagerException("There were multiple active passwords in the directory");
                 }
 
                 return items[0];
             }
+        }
+
+        public void UpdatePasswordExpiry(DateTime newExpiry)
+        {
+            this.de.Properties["msDS-DateTime"].Value = newExpiry;
+            this.de.CommitChanges();
         }
 
         public void UpdateCurrentPassword(string encryptedPassword, DateTime rotationInstant, DateTime expiryDate, int maximumPasswordHistory)

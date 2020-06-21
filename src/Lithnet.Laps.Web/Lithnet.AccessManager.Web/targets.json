@@ -23,7 +23,8 @@
         "expire-after": "00:00:15"
       },
       "laps": {
-        "expire-after": "02:00:00"
+        "expire-after": "02:00:00",
+        "allow-history": true
       }
     },
     {

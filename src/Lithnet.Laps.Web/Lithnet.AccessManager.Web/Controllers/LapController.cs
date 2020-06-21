@@ -199,15 +199,15 @@ namespace Lithnet.AccessManager.Web.Controllers
 
         private IActionResult GetLapsPassword(LapRequestModel model, IUser user, IComputer computer, LapsAuthorizationResponse authResponse)
         {
-            IList<PasswordEntry> entries;
+            IList<PasswordEntry> history;
             PasswordEntry current;
+            DateTime? newExpiry = authResponse.ExpireAfter.Ticks > 0 ? DateTime.UtcNow.Add(authResponse.ExpireAfter) : (DateTime?)null;
 
             try
             {
-                entries = this.passwordProvider.GetPasswordEntries(computer, authResponse.ExpireAfter, authResponse.AllowHistory);
+                var entries = this.passwordProvider.GetPasswordEntries(computer, newExpiry, authResponse.AllowHistory);
                 current = entries.SingleOrDefault(t => t.IsCurrent);
-                entries = entries.Where(t => !t.IsCurrent)?.ToList() ?? new List<PasswordEntry>();
-                entries.Add(new PasswordEntry() { Password = "My test history", });
+                history = entries.Where(t => !t.IsCurrent)?.ToList() ?? new List<PasswordEntry>();
 
                 if (current == null)
                 {
@@ -238,7 +238,7 @@ namespace Lithnet.AccessManager.Web.Controllers
                 ComputerName = computer.MsDsPrincipalName,
                 Password = current.Password,
                 ValidUntil = current.ExpiryDate?.ToLocalTime(),
-                PasswordHistory = entries
+                PasswordHistory = history
             });
         }
 

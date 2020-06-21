@@ -20,5 +20,7 @@ namespace Lithnet.AccessManager
         void UpdateJitGroup(IGroup group);
 
         void ClearJitGroup();
+
+        void UpdatePasswordExpiry(DateTime newExpiry);
     }
 }

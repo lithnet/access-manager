@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Moq;
+using NLog.LayoutRenderers;
 using NUnit.Framework;
 
 namespace Lithnet.AccessManager.Test
@@ -107,6 +108,34 @@ namespace Lithnet.AccessManager.Test
             Assert.AreEqual(password, returnedPphi.EncryptedData);
             Assert.AreEqual(expired, appData.PasswordExpiry);
             Assert.AreEqual(password, appData.CurrentPassword.EncryptedData);
+        }
+
+        [TestCase("IDMDEV1\\PC1")]
+        public void Create(string computerName)
+        {
+            IComputer computer = directory.GetComputer(computerName);
+
+            if (!provider.TryGetAppData(computer, out IAppData appData))
+            {
+                appData = provider.Create(computer);
+            }
+
+            DateTime rotationInstant = DateTime.UtcNow;
+            DateTime expiryDate = DateTime.UtcNow.AddDays(30);
+
+            string newPassword = Guid.NewGuid().ToString();
+
+            EncryptionProvider encryptionProvider = new EncryptionProvider();
+            CertificateResolver certificateResolver = new CertificateResolver();
+
+            appData.UpdateCurrentPassword(
+                   encryptionProvider.Encrypt(
+                       certificateResolver.GetEncryptionCertificate(
+                          TestConstants.EncryptionCertificateThumbprint ),
+                       newPassword),
+                   rotationInstant,
+                   expiryDate,
+                   365);
         }
 
         [TestCase("IDMDEV1\\PC1")]
