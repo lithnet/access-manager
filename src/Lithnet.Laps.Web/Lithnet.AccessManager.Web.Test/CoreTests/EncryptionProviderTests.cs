@@ -19,14 +19,28 @@ namespace Lithnet.AccessManager.Test
             dummyLogger = new Mock<NLog.ILogger>();
         }
 
-        [TestCase("A simple test", TestName = "Simple test", Category = "EncryptRoundTrip")]
-        [TestCase(dataBlock, TestName = "Large data set", Category = "EncryptRoundTrip")]
-        public void EncryptRoundTrip(string data)
+        [TestCase("A simple test", TestName = "Simple test v1")]
+        [TestCase(dataBlock, TestName = "Large data set v1")]
+        public void EncryptRoundTripv1(string data)
         {
             EncryptionProvider p = new EncryptionProvider();
             var cert = p.CreateSelfSignedCert();
 
-            string encrypted = p.Encrypt(cert, data);
+            string encrypted = p.Encrypt(cert, data, 1);
+            string decrypted = p.Decrypt(encrypted, _ => cert);
+
+            Assert.AreEqual(data, decrypted);
+        }
+
+
+        [TestCase("A simple test", TestName = "Simple test v2")]
+        [TestCase(dataBlock, TestName = "Large data set v2")]
+        public void EncryptRoundTripv2(string data)
+        {
+            EncryptionProvider p = new EncryptionProvider();
+            var cert = p.CreateSelfSignedCert();
+
+            string encrypted = p.Encrypt(cert, data, 2);
             string decrypted = p.Decrypt(encrypted, _ => cert);
 
             Assert.AreEqual(data, decrypted);
