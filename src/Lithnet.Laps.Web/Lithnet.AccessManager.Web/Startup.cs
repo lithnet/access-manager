@@ -211,6 +211,7 @@ namespace Lithnet.AccessManager.Web
             });
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
         private void ConfigureWindowsAuth(IServiceCollection services, IIwaAuthenticationProvider provider)
         {
             services.AddAuthentication(HttpSysDefaults.AuthenticationScheme);

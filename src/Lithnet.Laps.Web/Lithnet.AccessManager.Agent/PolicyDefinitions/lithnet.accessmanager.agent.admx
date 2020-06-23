@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<policyDefinitions xmlns="http://www.microsoft.com/GroupPolicy/PolicyDefinitions" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0" schemaVersion="1.0">
+  <policyNamespaces>
+    <target prefix="agent" namespace="Lithnet.AccessManager.Agent" />
+    <using prefix="windows" namespace="Microsoft.Policies.Windows" />
+    <using prefix="lithnet" namespace="Lithnet" />
+  </policyNamespaces>
+  <supersededAdm fileName="" />
+  <resources minRequiredRevision="1.0" />
+  <supportedOn>
+    <definitions>
+      <definition name="TS_SUPPORTED_OS" displayName="$(string.TS_SUPPORTED_OS)" />
+    </definitions>
+  </supportedOn>
+  <categories>
+    <category name="cat_lithnet_accessManagerAgent" displayName="$(string.cat_lithnet_accessManagerAgent)">
+      <parentCategory ref="lithnet:CAT_300017F2_090D_4E59_A535_01350C2E0428" />
+    </category>
+  </categories>
+
+  <policies>
+    <policy name="pol_enableAgent"
+            class="Machine"
+            displayName="$(string.pol_enableAgent)"
+            presentation="$(presentation.pol_enableAgent)"
+            explainText="$(string.pol_enableAgent_help)"
+            key="Software\Policies\Lithnet\AccessManager\Agent"
+            valueName="Enabled">
+      <parentCategory ref="cat_lithnet_accessManagerAgent" />
+      <supportedOn ref="TS_SUPPORTED_OS" />
+      <enabledValue>
+        <decimal value="1" />
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0" />
+      </disabledValue>
+      <elements>
+        <decimal id="dtxt_interval" key="Software\Policies\Lithnet\AccessManager\Agent" valueName="Interval" required="true" minValue="1" maxValue="1440"/>
+      </elements>
+    </policy>
+  </policies>
+</policyDefinitions>

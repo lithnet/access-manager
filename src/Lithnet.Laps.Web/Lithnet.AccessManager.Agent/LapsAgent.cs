@@ -41,7 +41,7 @@ namespace Lithnet.AccessManager.Agent
 
         public void DoCheck()
         {
-            if (!this.settings.LapsEnabled)
+            if (!this.settings.Enabled)
             {
                 return;
             }
@@ -103,7 +103,7 @@ namespace Lithnet.AccessManager.Agent
                 appData.UpdateCurrentPassword(
                     this.encryptionProvider.Encrypt(
                         this.certificateResolver.GetEncryptionCertificate(
-                            this.settings.SigningCertThumbprint),
+                            this.settings.CertThumbprint),
                         newPassword), 
                     rotationInstant, 
                     expiryDate, 

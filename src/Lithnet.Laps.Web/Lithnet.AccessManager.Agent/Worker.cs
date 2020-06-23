@@ -45,7 +45,7 @@ namespace Lithnet.AccessManager.Agent
                 
                 this.RunCheck();
 
-                await Task.Delay(TimeSpan.FromMinutes(Math.Max(this.settings.CheckInterval, 5)), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(Math.Max(this.settings.Interval, 5)), stoppingToken);
             }
         }
 

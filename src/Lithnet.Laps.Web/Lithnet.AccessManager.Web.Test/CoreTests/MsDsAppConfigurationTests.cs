@@ -8,8 +8,6 @@ namespace Lithnet.AccessManager.Test
 {
     public class MsDsAppConfigurationTests
     {
-        private Mock<NLog.ILogger> dummyLogger;
-
         private ActiveDirectory directory;
 
         private MsDsAppConfigurationProvider provider;
@@ -17,7 +15,6 @@ namespace Lithnet.AccessManager.Test
         [SetUp()]
         public void TestInitialize()
         {
-            dummyLogger = new Mock<NLog.ILogger>();
             directory = new ActiveDirectory(Mock.Of<Microsoft.Extensions.Logging.ILogger<ActiveDirectory>>());
             provider = new MsDsAppConfigurationProvider();
         }

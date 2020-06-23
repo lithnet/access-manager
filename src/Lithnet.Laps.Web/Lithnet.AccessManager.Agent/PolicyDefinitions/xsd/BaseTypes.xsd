@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ADMX" elementFormDefault="qualified" targetNamespace="http://www.microsoft.com/GroupPolicy/PolicyDefinitions" xmlns:pd="http://www.microsoft.com/GroupPolicy/PolicyDefinitions" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:simpleType name="GUID">
+    <xs:annotation>
+      <xs:documentation>
+        A standard {12345678-1234-1234-1234-123456789abcd} style guid string.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\{[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}\}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="versionString">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="[0-9]{1,4}\.[0-9]{1,5}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="stringReference">
+    <xs:annotation>
+      <xs:documentation>
+        A reference to a localized string in the localized string section/table.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\$\(string\.(\p{L}|\p{N}|_)+\)"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="presentationReference">
+    <xs:annotation>
+      <xs:documentation>
+        A reference to a policy presentation in the localized presentation section/table.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\$\(presentation\.(\p{L}|\p{N}|_)+\)"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="resourceID">
+    <xs:annotation>
+      <xs:documentation>
+        A localized string id (used in the localized string section/table).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(\p{L}|\p{N}|_)+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="Annotation" mixed="true">
+    <xs:sequence>
+      <xs:any processContents="skip"/>
+    </xs:sequence>
+    <xs:attribute name="application" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:simpleType name="itemName">
+    <xs:annotation>
+      <xs:documentation>
+        The base type for all defined type names, e.g. categories.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(\p{L}|\p{N}|_)+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="itemReference">
+    <xs:annotation>
+      <xs:documentation>
+        The base type for all references to defined types, e.g. categories.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="((\p{L}|\p{N}|_)+)|((\p{L}|\p{N}|_)+:(\p{L}|\p{N}|_)+)"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="LocalizedString">
+    <xs:annotation>
+      <xs:documentation>A localized string</xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="id" type="pd:resourceID" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:simpleType name="registryKey">
+    <xs:annotation>
+      <xs:documentation>
+        A valid registry key path (without reference to local system or user hive).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="registryValueName">
+    <xs:annotation>
+      <xs:documentation>
+        A valid registry value name.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="fileName">
+    <xs:annotation>
+      <xs:documentation>
+        A valid file name (without a file path).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+</xs:schema>

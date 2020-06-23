@@ -21,7 +21,6 @@ namespace Lithnet.AccessManager.Test
     {
         private const string testGroupName = "test-group";
 
-        private Mock<NLog.ILogger> dummyLogger;
 
         private ILocalSam sam;
 
@@ -32,9 +31,8 @@ namespace Lithnet.AccessManager.Test
         [SetUp()]
         public void TestInitialize()
         {
-            dummyLogger = new Mock<NLog.ILogger>();
             sam = new LocalSam(Mock.Of<ILogger<LocalSam>>());
-            directory = new ActiveDirectory(Mock.Of<ILogger<ActiveDirectory>>());
+            directory = new ActiveDirectory();
         }
 
         [Test]

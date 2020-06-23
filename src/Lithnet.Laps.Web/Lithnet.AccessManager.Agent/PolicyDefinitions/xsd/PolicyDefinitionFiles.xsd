@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ADMX" elementFormDefault="qualified" targetNamespace="http://www.microsoft.com/GroupPolicy/PolicyDefinitions" xmlns:pd="http://www.microsoft.com/GroupPolicy/PolicyDefinitions" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="BaseTypes.xsd"/>
+  <xs:include schemaLocation="PolicyDefinitions.xsd"/>
+
+  <!--
+         Localization tables
+      -->
+  <xs:complexType name="Localization">
+    <xs:annotation>
+      <xs:documentation>
+        A table of referenced localized strings and policy presentations.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="stringTable" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence minOccurs="1" maxOccurs="unbounded">
+            <xs:element name="string" type="pd:LocalizedString"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="presentationTable" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence minOccurs="1" maxOccurs="unbounded">
+            <xs:element name="presentation" type="pd:PolicyPresentation"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!--
+         Special types and groups
+      -->
+  <xs:complexType name="FileReference">
+    <xs:attribute name="fileName" type="pd:fileName" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="PolicyList">
+    <xs:sequence minOccurs="1" maxOccurs="unbounded">
+      <xs:element name="policy" type="pd:PolicyDefinition"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SupportedOnTable">
+    <xs:sequence>
+      <xs:element name="products" type="pd:SupportedProducts" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="definitions" type="pd:SupportedOnDefinitions" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="CategoryList">
+    <xs:sequence minOccurs="1" maxOccurs="unbounded">
+      <xs:element name="category" type="pd:Category"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PolicyNamespaceAssociation">
+    <xs:attribute name="prefix" type="pd:itemName" use="required"/>
+    <xs:attribute name="namespace" type="xs:anyURI" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="PolicyNamespaces">
+    <xs:sequence>
+      <xs:element name="target" type="pd:PolicyNamespaceAssociation"/>
+      <xs:element name="using" type="pd:PolicyNamespaceAssociation" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="LocalizationResourceReference">
+    <xs:attribute name="minRequiredRevision" type="pd:versionString" use="required"/>
+    <xs:attribute name="fallbackCulture" type="xs:language" default="en-US"/>
+  </xs:complexType>
+
+  <!--
+         Policy Definition file types and base element
+     -->
+  <xs:complexType name="PolicyDefinitions">
+    <xs:annotation>
+      <xs:documentation>
+        The base type for general ADMX files with satellite resource files, etc.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="policyNamespaces" type="pd:PolicyNamespaces"/>
+      <xs:element name="supersededAdm" type="pd:FileReference" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="annotation" type="pd:Annotation" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="resources" type="pd:LocalizationResourceReference"/>
+      <xs:element name="supportedOn" type="pd:SupportedOnTable" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="categories" type="pd:CategoryList" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="policies" type="pd:PolicyList" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+    <xs:attribute name="revision" type="pd:versionString" use="required"/>
+    <xs:attribute name="schemaVersion" type="pd:versionString" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="PolicyDefinitionResources">
+    <xs:annotation>
+      <xs:documentation>
+        The base type for localized RES.ADMX files with a single language/culture per file.
+        Localization files are always in the namespace of the associated PDX file and never reference definitions from other namespaces.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="displayName" type="xs:string"/>
+      <xs:element name="description" type="xs:string"/>
+      <xs:element name="annotation" type="pd:Annotation" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="resources" type="pd:Localization"/>
+    </xs:sequence>
+    <xs:attribute name="revision" type="pd:versionString" use="required"/>
+    <xs:attribute name="schemaVersion" type="pd:versionString" use="required"/>
+  </xs:complexType>
+
+  <!--
+         Used in conjunction: one ADMX file for policy definitions 
+ and an ADML file per language.
+     -->
+  <xs:element name="policyDefinitions" type="pd:PolicyDefinitions"/>
+  <xs:element name="policyDefinitionResources" type="pd:PolicyDefinitionResources"/>
+
+</xs:schema>

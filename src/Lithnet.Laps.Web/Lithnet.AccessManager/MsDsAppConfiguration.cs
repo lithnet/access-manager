@@ -10,7 +10,7 @@ namespace Lithnet.AccessManager
     {
         private IReadOnlyList<ProtectedPasswordHistoryItem> passwordHistoryEntries;
 
-        private DirectoryEntry de;
+        private readonly DirectoryEntry de;
 
         public MsDsAppConfiguration(DirectoryEntry de)
         {

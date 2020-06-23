@@ -1,0 +1,566 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ADMX" targetNamespace= "http://www.microsoft.com/GroupPolicy/PolicyDefinitions" elementFormDefault="qualified" xmlns:pd="http://www.microsoft.com/GroupPolicy/PolicyDefinitions" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0">
+  <xs:include schemaLocation="BaseTypes.xsd"/>
+
+  <!--
+ Policy specification elements
+ -->
+  <xs:attributeGroup name="PolicyElementAttributeGroup">
+    <xs:annotation>
+      <xs:documentation>
+        Attribute group that all policy elements must have.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="id" type="xs:string" use="required"/>
+    <xs:attribute name="clientExtension" type="pd:GUID"/>
+    <xs:attribute name="key" type="pd:registryKey"/>
+    <xs:attribute name="valueName" type="pd:registryValueName"/>
+  </xs:attributeGroup>
+
+  <!-- Policy definition elements -->
+  <xs:complexType name="DecimalElement">
+    <xs:annotation>
+      <xs:documentation>
+        Describes a number/decimal element in a policy
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attributeGroup ref="pd:PolicyElementAttributeGroup"/>
+    <xs:attribute name="required" type="xs:boolean" default="false"/>
+    <xs:attribute name="minValue" type="xs:unsignedInt" default="0"/>
+    <xs:attribute name="maxValue" type="xs:unsignedInt" default="9999"/>
+    <xs:attribute name="storeAsText" type="xs:boolean" default="false"/>
+    <xs:attribute name="soft" type="xs:boolean" default="false"/>
+  </xs:complexType>
+  <xs:complexType name="LongDecimalElement">
+    <xs:annotation>
+      <xs:documentation>Describes a QWORD number/decimal element in a policy</xs:documentation>
+    </xs:annotation>
+    <xs:attributeGroup ref="pd:PolicyElementAttributeGroup"/>
+    <xs:attribute name="required" type="xs:boolean" default="false"/>
+    <xs:attribute name="minValue" type="xs:unsignedLong" default="0"/>
+    <xs:attribute name="maxValue" type="xs:unsignedLong" default="9999"/>
+    <xs:attribute name="storeAsText" type="xs:boolean" default="false"/>
+    <xs:attribute name="soft" type="xs:boolean" default="false"/>
+  </xs:complexType>
+
+  <xs:complexType name="BooleanElement">
+    <xs:annotation>
+      <xs:documentation>
+        Describes a choice element in a policy with associated values for the true and false cases.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="trueValue" type="pd:Value" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="falseValue" type="pd:Value" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="trueList" type="pd:ValueList" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="falseList" type="pd:ValueList" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="pd:PolicyElementAttributeGroup"/>
+  </xs:complexType>
+
+
+  <xs:complexType name="TextElement">
+    <xs:annotation>
+      <xs:documentation>
+        Describes a text element in a policy.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attributeGroup ref="pd:PolicyElementAttributeGroup"/>
+    <xs:attribute name="required" type="xs:boolean" default="false"/>
+    <xs:attribute name="maxLength" type="xs:unsignedInt" default="1023"/>
+    <xs:attribute name="expandable" type="xs:boolean" default="false"/>
+    <xs:attribute name="soft" type="xs:boolean" default="false"/>
+  </xs:complexType>
+
+
+  <xs:complexType name="EnumerationElement">
+    <xs:annotation>
+      <xs:documentation>
+        Describes an enumeration element in a policy.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="item" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="value" type="pd:Value"/>
+            <xs:element name="valueList" type="pd:ValueList" minOccurs="0" maxOccurs="1"/>
+          </xs:sequence>
+          <xs:attribute name="displayName" type="pd:stringReference" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attributeGroup ref="pd:PolicyElementAttributeGroup"/>
+    <xs:attribute name="required" type="xs:boolean" default="false"/>
+  </xs:complexType>
+
+
+  <xs:complexType name="ListElement">
+    <xs:annotation>
+      <xs:documentation>
+        Describes a list element in a policy.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="id" type="xs:string" use="required"/>
+    <xs:attribute name="clientExtension" type="pd:GUID"/>
+    <xs:attribute name="key" type="pd:registryKey"/>
+    <xs:attribute name="valuePrefix" type="xs:string"/>
+    <xs:attribute name="additive" type="xs:boolean" default="false"/>
+    <xs:attribute name="expandable" type="xs:boolean" default="false"/>
+    <xs:attribute name="explicitValue" type="xs:boolean" default="false"/>
+  </xs:complexType>
+
+
+  <xs:complexType name="Value">
+    <xs:choice>
+      <xs:element name="delete">
+        <xs:complexType>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="decimal">
+        <xs:complexType>
+          <xs:attribute name="value" type="xs:unsignedInt" use="required"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="longDecimal">
+        <xs:complexType>
+          <xs:attribute name="value" type="xs:unsignedLong" use="required"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="string">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:maxLength value="255"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:choice>
+  </xs:complexType>
+
+
+  <xs:complexType name="ValueList">
+    <xs:sequence>
+      <xs:element name="item" type="pd:ValueItem" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="defaultKey" type="pd:registryKey"/>
+  </xs:complexType>
+
+
+  <xs:complexType name="ValueItem">
+    <xs:sequence>
+      <xs:element name="value" type="pd:Value"/>
+    </xs:sequence>
+    <xs:attribute name="key" type="pd:registryKey"/>
+    <xs:attribute name="valueName" type="pd:registryValueName" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="multiTextElement">
+    <xs:annotation>
+      <xs:documentation>Describes a multi line text element in a policy</xs:documentation>
+    </xs:annotation>
+    <xs:attributeGroup ref="pd:PolicyElementAttributeGroup"/>
+    <xs:attribute name="required" type="xs:boolean" default="false"/>
+    <xs:attribute name="maxLength" type="xs:unsignedInt" default="1023"/>
+    <xs:attribute name="maxStrings" type="xs:unsignedInt" default="0"/>
+    <xs:attribute name="soft" type="xs:boolean" default="false"/>
+  </xs:complexType>
+
+  <!--
+ Presentation of policy elements
+ -->
+
+  <xs:complexType name="DataElementContent" abstract="true">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="refId" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+
+  <xs:complexType name="DataElement" abstract="true">
+    <xs:attribute name="refId" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <!-- Policy presentation elements -->
+  <xs:complexType name="DecimalTextBox">
+    <xs:annotation>
+      <xs:documentation>
+        Represents a text box with or without a spin control for entering decimal numbers.
+      </xs:documentation>
+      <xs:documentation>
+        Can be associated with either a DecimalElement or TextElement.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="pd:DataElementContent">
+        <xs:attribute name="defaultValue" type="xs:unsignedInt" default="1"/>
+        <xs:attribute name="spin" type="xs:boolean" default="true"/>
+        <xs:attribute name="spinStep" type="xs:unsignedInt" default="1"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+
+  <xs:complexType name="LongDecimalTextBox">
+    <xs:annotation>
+      <xs:documentation>
+        Represents a text box with or without a spin control for entering 64-bit decimal numbers.
+      </xs:documentation>
+      <xs:documentation>
+        Can be associated with either a LongDecimalElement or TextElement.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="pd:DataElementContent">
+        <xs:attribute name="defaultValue" type="xs:unsignedInt" default="1"/>
+        <xs:attribute name="spin" type="xs:boolean" default="true"/>
+        <xs:attribute name="spinStep" type="xs:unsignedInt" default="1"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+
+  <xs:complexType name="TextBox">
+    <xs:annotation>
+      <xs:documentation>
+        Represents a textbox display element.
+      </xs:documentation>
+      <xs:documentation>
+        Can be associated with a TextElement.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="pd:DataElement">
+        <xs:sequence>
+          <xs:element name="label" type="xs:string"/>
+          <xs:element name="defaultValue" type="xs:string" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+
+  <xs:complexType name="MultiTextBox">
+    <xs:annotation>
+      <xs:documentation>
+        Represents a multi-line textbox display element.
+      </xs:documentation>
+      <xs:documentation>
+        Can be associated with a multiTextElement.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="pd:DataElement">
+        <xs:attribute name="showAsDialog" type="xs:boolean" default="false"/>
+        <xs:attribute name="defaultHeight" type="xs:unsignedInt"  default="3"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+
+  <xs:complexType name="CheckBox">
+    <xs:annotation>
+      <xs:documentation>
+        Represents a checkbox display element.
+      </xs:documentation>
+      <xs:documentation>
+        Can be associated with a BooleanElement.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="pd:DataElementContent">
+        <xs:attribute name="defaultChecked" type="xs:boolean" default="false"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+
+  <xs:complexType name="ComboBox">
+    <xs:annotation>
+      <xs:documentation>
+        Represents a combobox display element with default/suggested entries.
+      </xs:documentation>
+      <xs:documentation>
+        Can be associated with a TextElement.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="pd:DataElement">
+        <xs:sequence>
+          <xs:element name="label" type="xs:string"/>
+          <xs:element name="default" type="xs:string" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="suggestion" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="noSort" type="xs:boolean" default="false"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="DropdownList">
+    <xs:annotation>
+      <xs:documentation>
+        Represents a dropdown list display element.
+      </xs:documentation>
+      <xs:documentation>
+        Can be associated with an EnumerationElement.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="pd:DataElementContent">
+        <xs:attribute name="noSort" type="xs:boolean" default="false"/>
+        <xs:attribute name="defaultItem" type="xs:unsignedInt"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="ListBox">
+    <xs:annotation>
+      <xs:documentation>
+        Represents a listbox display element.
+      </xs:documentation>
+      <xs:documentation>
+        Can be associated with a ListElement.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:simpleContent>
+      <xs:extension base="pd:DataElementContent">
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="PolicyPresentation">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="text" type="xs:string"/>
+      <xs:element name="decimalTextBox" type="pd:DecimalTextBox"/>
+      <xs:element name="textBox" type="pd:TextBox"/>
+      <xs:element name="checkBox" type="pd:CheckBox"/>
+      <xs:element name="comboBox" type="pd:ComboBox"/>
+      <xs:element name="dropdownList" type="pd:DropdownList"/>
+      <xs:element name="listBox" type="pd:ListBox"/>
+      <xs:element name="longDecimalTextBox" type="pd:LongDecimalTextBox"/>
+      <xs:element name="multiTextBox" type="pd:MultiTextBox"/>
+    </xs:choice>
+    <xs:attribute name="id" type="pd:resourceID" use="required"/>
+  </xs:complexType>
+
+  <!--
+         Common group declarations for use by categories and policy 
+ definitions
+     -->
+  <xs:group name="BaseDescriptiveGroup">
+    <xs:sequence>
+      <xs:element name="annotation" type="pd:Annotation" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="parentCategory" type="pd:CategoryReference" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="seeAlso" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="keywords" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:group>
+
+
+  <xs:attributeGroup name="BaseDescriptiveAttributeGroup">
+    <xs:attribute name="displayName" type="pd:stringReference" use="required"/>
+    <xs:attribute name="explainText" type="pd:stringReference"/>
+  </xs:attributeGroup>
+
+  <!--
+         Category related types
+     -->
+  <xs:complexType name="CategoryReference">
+    <xs:annotation>
+      <xs:documentation>
+        A reference to an already defined
+        category.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="ref" type="pd:itemReference" use="required"/>
+  </xs:complexType>
+
+
+  <xs:complexType name="Category">
+    <xs:annotation>
+      <xs:documentation>
+        A grouping of policy definitions.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:group ref="pd:BaseDescriptiveGroup"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="pd:itemName" use="required"/>
+    <xs:attributeGroup ref="pd:BaseDescriptiveAttributeGroup"/>
+  </xs:complexType>
+
+  <!--
+         SupportedOn types
+     -->
+  <xs:complexType name="SupportedProducts">
+    <xs:annotation>
+      <xs:documentation>
+        A table of potentially supported products.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="product" type="pd:SupportedProduct" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SupportedProduct">
+    <xs:annotation>
+      <xs:documentation>
+        A potentially supported product that can be referenced by a policy as being supported on.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="majorVersion" type="pd:SupportedMajorVersion" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="pd:itemName" use="required"/>
+    <xs:attribute name="displayName" type="pd:stringReference" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="SupportedMajorVersion">
+    <xs:annotation>
+      <xs:documentation>
+        A major version of a product that can be referenced by a policy as being supported on.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="minorVersion" type="pd:SupportedMinorVersion" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="pd:itemName" use="required"/>
+    <xs:attribute name="displayName" type="pd:stringReference" use="required"/>
+    <xs:attribute name="versionIndex" type="xs:unsignedInt" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="SupportedMinorVersion">
+    <xs:annotation>
+      <xs:documentation>
+        Single version of a component to facilitate simple ranking of versions
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="displayName" type="pd:stringReference" use="required"/>
+    <xs:attribute name="name" type="pd:itemName" use="required"/>
+    <xs:attribute name="versionIndex" type="xs:unsignedInt" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="SupportedOnReference">
+    <xs:annotation>
+      <xs:documentation>
+        Reference to a supported product definition (single version or complex definition).
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="ref" type="pd:itemReference" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="SupportedOnRange">
+    <xs:annotation>
+      <xs:documentation>Supported version range.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="ref" type="pd:itemReference" use="required"/>
+    <xs:attribute name="minVersionIndex" type="xs:unsignedInt" use="optional"/>
+    <xs:attribute name="maxVersionIndex" type="xs:unsignedInt" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="SupportedAndCondition">
+    <xs:annotation>
+      <xs:documentation>
+        A group of supported components that must all be true for the policy definition to be supported.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:choice minOccurs="1" maxOccurs="unbounded">
+        <xs:element name="range" type="pd:SupportedOnRange"/>
+        <xs:element name="reference" type="pd:SupportedOnReference"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SupportedOrCondition">
+    <xs:annotation>
+      <xs:documentation>
+        A group of supported components where at least one must be true for the policy definition to be supported.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:choice minOccurs="1" maxOccurs="unbounded">
+        <xs:element name="range" type="pd:SupportedOnRange"/>
+        <xs:element name="reference" type="pd:SupportedOnReference"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SupportedOnDefinition">
+    <xs:annotation>
+      <xs:documentation>
+        Definition of complex supported product major and/or minor versions, etc.
+        The DisplayName must be a linguistic representation of the complex supported-on definition.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <!-- Can have zero members as conversion from ADMs don't 
+ contain detailed information on this -->
+      <xs:choice minOccurs="0" maxOccurs="1">
+        <xs:element name="or" type="pd:SupportedOrCondition"/>
+        <xs:element name="and" type="pd:SupportedAndCondition"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="name" type="pd:itemName" use="required"/>
+    <xs:attribute name="displayName" type="pd:stringReference" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="SupportedOnDefinitions">
+    <xs:annotation>
+      <xs:documentation>
+        Table of supported components definitions.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="definition" type="pd:SupportedOnDefinition" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!--
+         Policy definition basic types
+     -->
+  <xs:simpleType name="PolicyClass">
+    <xs:annotation>
+      <xs:documentation>
+        An enumeration of the 3 possible classes a policy definition can belong to.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="User"/>
+      <xs:enumeration value="Machine"/>
+      <xs:enumeration value="Both"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="PolicyDefinition">
+    <xs:sequence>
+      <xs:group ref="pd:BaseDescriptiveGroup"/>
+      <xs:element name="supportedOn" type="pd:SupportedOnReference"/>
+      <xs:element name="enabledValue" type="pd:Value" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="disabledValue" type="pd:Value" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="enabledList" type="pd:ValueList" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="disabledList" type="pd:ValueList" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="elements" type="pd:PolicyElements" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="pd:itemName" use="required"/>
+    <xs:attribute name="class" type="pd:PolicyClass" use="required"/>
+    <xs:attributeGroup ref="pd:BaseDescriptiveAttributeGroup"/>
+    <xs:attribute name="presentation" type="pd:presentationReference"/>
+    <xs:attribute name="key" type="pd:registryKey" use="required"/>
+    <xs:attribute name="valueName" type="pd:registryValueName"/>
+  </xs:complexType>
+
+  <xs:complexType name="PolicyElements">
+    <xs:choice minOccurs="1" maxOccurs="unbounded">
+      <xs:element name="boolean" type="pd:BooleanElement"/>
+      <xs:element name="decimal" type="pd:DecimalElement"/>
+      <xs:element name="text" type="pd:TextElement"/>
+      <xs:element name="enum" type="pd:EnumerationElement"/>
+      <xs:element name="list" type="pd:ListElement"/>
+      <xs:element name="longDecimal" type="pd:LongDecimalElement"/>
+      <xs:element name="multiText" type="pd:multiTextElement"/>
+    </xs:choice>
+  </xs:complexType>
+</xs:schema>

@@ -29,7 +29,7 @@ namespace Lithnet.AccessManager.Agent.Test
         [SetUp()]
         public void TestInitialize()
         {
-            this.directory = new ActiveDirectory(Mock.Of<ILogger<ActiveDirectory>>());
+            this.directory = new ActiveDirectory();
             this.sam = new LocalSam(Mock.Of<ILogger<LocalSam>>());
 
             this.mockDirectory = new Mock<IDirectory>();
@@ -56,9 +56,11 @@ namespace Lithnet.AccessManager.Agent.Test
 
             var result = agent.BuildExpectedMembership(expectedMember1.Sid);
 
-            List<SecurityIdentifier> expected = new List<SecurityIdentifier>();
-            expected.Add(this.sam.GetWellKnownSid(WellKnownSidType.AccountAdministratorSid));
-            expected.Add(expectedMember1.Sid);
+            List<SecurityIdentifier> expected = new List<SecurityIdentifier>
+            {
+                this.sam.GetWellKnownSid(WellKnownSidType.AccountAdministratorSid),
+                expectedMember1.Sid
+            };
 
             foreach (string otherMember in otherMembers)
             {

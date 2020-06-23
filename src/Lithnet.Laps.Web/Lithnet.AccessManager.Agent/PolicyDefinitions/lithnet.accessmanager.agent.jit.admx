@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<policyDefinitions xmlns="http://www.microsoft.com/GroupPolicy/PolicyDefinitions" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0" schemaVersion="1.0">
+  <policyNamespaces>
+    <target prefix="agentJit" namespace="Lithnet.AccessManager.Password.Jit"/>
+    <using prefix="agent" namespace="Lithnet.AccessManager.Agent" />
+    <using prefix="windows" namespace="Microsoft.Policies.Windows" />
+    <using prefix="lithnet" namespace="Lithnet" />
+  </policyNamespaces>
+  <supersededAdm fileName="" />
+  <resources minRequiredRevision="1.0" />
+  <supportedOn>
+    <definitions>
+      <definition name="TS_SUPPORTED_OS" displayName="$(string.TS_SUPPORTED_OS)" />
+    </definitions>
+  </supportedOn>
+  <categories>
+    <category name="cat_lithnet_accessManagerAgent_jit" displayName="$(string.cat_lithnet_accessManagerAgent_jit)">
+      <parentCategory ref="agent:cat_lithnet_accessManagerAgent" />
+    </category>
+  </categories>
+  <policies>
+    <policy name="pol_enableJit"
+            class="Machine"
+            displayName="$(string.pol_enableJit)"
+            explainText="$(string.pol_enableJit_help)"
+            key="Software\Policies\Lithnet\AccessManager\Agent\Jit"
+            valueName="Enabled"
+           presentation="$(presentation.pol_enableJit)">
+      <parentCategory ref="cat_lithnet_accessManagerAgent_jit" />
+      <supportedOn ref="TS_SUPPORTED_OS" />
+      <enabledValue>
+        <decimal value="1" />
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0" />
+      </disabledValue>
+      <elements>
+        <text id="txt_jitGroup" valueName="JitGroup" required="true"/>
+      </elements>
+    </policy>
+
+    <policy name="pol_createJitGroup"
+           class="Machine"
+           displayName="$(string.pol_createJitGroup)"
+           explainText="$(string.pol_createJitGroup_help)"
+           key="Software\Policies\Lithnet\AccessManager\Agent\Jit"
+           valueName="CreateJitGroup"
+          presentation="$(presentation.pol_createJitGroup)">
+      <parentCategory ref="cat_lithnet_accessManagerAgent_jit" />
+      <supportedOn ref="TS_SUPPORTED_OS" />
+      <enabledValue>
+        <decimal value="1" />
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0" />
+      </disabledValue>
+      <elements>
+        <text id="txt_jitGroupOU" valueName="JitGroupCreationOU" required="true"/>
+      </elements>
+    </policy>
+
+    <policy name="pol_restrictAdmins"
+          class="Machine"
+          displayName="$(string.pol_restrictAdmins)"
+          explainText="$(string.pol_restrictAdmins_help)"
+          key="Software\Policies\Lithnet\AccessManager\Agent\Jit"
+          valueName="RestrictAdmins"
+         presentation="$(presentation.pol_restrictAdmins)">
+      <parentCategory ref="cat_lithnet_accessManagerAgent_jit" />
+      <supportedOn ref="TS_SUPPORTED_OS" />
+      <enabledValue>
+        <decimal value="1" />
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0" />
+      </disabledValue>
+      <elements>
+        <multiText id="txt_allowedAdmins" valueName="AllowedAdmins" required="false" />
+      </elements>
+    </policy>
+
+    <policy name="pol_publishJitGroup"
+         class="Machine"
+         displayName="$(string.pol_publishJitGroup)"
+         explainText="$(string.pol_publishJitGroup_help)"
+         key="Software\Policies\Lithnet\AccessManager\Agent\Jit"
+         valueName="PublishJitGroup">
+      <parentCategory ref="cat_lithnet_accessManagerAgent_jit" />
+      <supportedOn ref="TS_SUPPORTED_OS" />
+      <enabledValue>
+        <decimal value="1" />
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0" />
+      </disabledValue>
+    </policy>
+  </policies>
+</policyDefinitions>

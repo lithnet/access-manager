@@ -8,9 +8,9 @@ namespace Lithnet.AccessManager.Agent
         private const string policyKeyName = "SOFTWARE\\Policies\\Lithnet\\AccessManager\\Agent\\Jit";
         private const string settingsKeyName = "SOFTWARE\\Lithnet\\AccessManager\\Agent\\Jit";
 
-        private RegistryKey policyKey;
+        private readonly RegistryKey policyKey;
 
-        private RegistryKey settingsKey;
+        private readonly RegistryKey settingsKey;
 
         public JitRegistrySettings() :
            this(Registry.LocalMachine.OpenSubKey(policyKeyName, false), Registry.LocalMachine.CreateSubKey(settingsKeyName, true))
@@ -23,7 +23,7 @@ namespace Lithnet.AccessManager.Agent
             this.settingsKey = settingsKey;
         }
   
-        public bool AllowUnmanagedAdmins => this.policyKey.GetValue<int>("AllowUnmanagedAdmins", 0) == 1;
+        public bool RestrictAdmins => this.policyKey.GetValue<int>("RestrictAdmins", 0) == 1;
 
         public bool JitEnabled => this.policyKey.GetValue<int>("JitEnabled", 0) == 1;
 

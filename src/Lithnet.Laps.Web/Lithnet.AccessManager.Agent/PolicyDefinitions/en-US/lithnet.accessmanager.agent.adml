@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<policyDefinitionResources xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0"
+schemaVersion="1.0" xmlns="http://www.microsoft.com/GroupPolicy/PolicyDefinitions">
+  <displayName>
+  </displayName>
+  <description>
+  </description>
+  <resources>
+    <stringTable>
+      <string id="cat_lithnet_accessManagerAgent">Access Manager Agent</string>
+      <string id="pol_enableAgent">Enable the Lithnet Access Manager agent</string>
+      <string id="pol_enableAgent_help">When enabled, the agent will run at the interval specified below to check for required local admin password changes and JIT activities. Note that the local admin password and JIT settings must be enabled independently of this setting</string>
+
+      <string id="TS_SUPPORTED_OS">At least Microsoft Windows 8.1 or Windows Server 2012</string>
+    </stringTable>
+
+    <presentationTable>
+
+      <presentation id="pol_enableAgent">
+        <decimalTextBox refId="dtxt_interval" defaultValue="60">Agent check interval (minutes)</decimalTextBox>
+      </presentation>
+
+    </presentationTable>
+  </resources>
+</policyDefinitionResources>

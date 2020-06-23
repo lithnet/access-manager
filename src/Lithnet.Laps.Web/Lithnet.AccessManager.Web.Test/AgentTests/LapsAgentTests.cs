@@ -48,12 +48,12 @@ namespace Lithnet.AccessManager.Agent.Test
         [Test]
         public void TestExitOnAgentDisabled()
         {
-            this.settings.SetupGet(a => a.LapsEnabled).Returns(false);
+            this.settings.SetupGet(a => a.Enabled).Returns(false);
 
             LapsAgent agent = this.BuildAgent();
 
             agent.DoCheck();
-            settings.VerifyGet(t => t.LapsEnabled);
+            settings.VerifyGet(t => t.Enabled);
             appDataProvider.Verify(t => t.GetAppData(It.IsAny<IComputer>()), Times.Never);
         }
 
@@ -61,14 +61,14 @@ namespace Lithnet.AccessManager.Agent.Test
         [Test]
         public void TestExitOnNoPasswordProvidersEnabled()
         {
-            this.settings.SetupGet(a => a.LapsEnabled).Returns(true);
+            this.settings.SetupGet(a => a.Enabled).Returns(true);
             this.settings.SetupGet(a => a.WriteToAppData).Returns(false);
             this.settings.SetupGet(a => a.WriteToMsMcsAdmPasswordAttributes).Returns(false);
 
             LapsAgent agent = this.BuildAgent();
 
             agent.DoCheck();
-            settings.VerifyGet(t => t.LapsEnabled);
+            settings.VerifyGet(t => t.Enabled);
             appDataProvider.Verify(t => t.GetAppData(It.IsAny<IComputer>()), Times.Never);
         }
 

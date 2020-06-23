@@ -8,9 +8,9 @@ namespace Lithnet.AccessManager.Agent
         private const string policyKeyName = "SOFTWARE\\Policies\\Lithnet\\AccessManager\\Agent";
         private const string settingsKeyName = "SOFTWARE\\Lithnet\\AccessManager\\Agent";
 
-        private RegistryKey policyKey;
+        private readonly RegistryKey policyKey;
 
-        private RegistryKey settingsKey;
+        private readonly RegistryKey settingsKey;
 
 
         public AgentRegistrySettings() :
@@ -26,6 +26,6 @@ namespace Lithnet.AccessManager.Agent
     
         public bool Enabled => this.policyKey.GetValue<int>("Enabled", 0) == 1;
 
-        public int CheckInterval => this.policyKey.GetValue<int>("CheckInterval", 60);
+        public int Interval => this.policyKey.GetValue<int>("Interval", 60);
     }
 }

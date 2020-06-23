@@ -1,20 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Win32;
 
 namespace Lithnet.AccessManager.Agent
 {
     internal class LapsRegistrySettings : ILapsSettings
     {
-        private const string policyKeyName = "SOFTWARE\\Policies\\Lithnet\\AccessManager\\Agent\\Laps";
-        private const string settingsKeyName = "SOFTWARE\\Lithnet\\AccessManager\\Agent\\Laps";
+        private const string policyKeyName = "SOFTWARE\\Policies\\Lithnet\\AccessManager\\Agent\\Password";
+        private const string settingsKeyName = "SOFTWARE\\Lithnet\\AccessManager\\Agent\\Password";
 
-        private RegistryKey policyKey;
+        private readonly RegistryKey policyKey;
 
-        private RegistryKey settingsKey;
+        private readonly RegistryKey settingsKey;
 
         public LapsRegistrySettings() :
             this(Registry.LocalMachine.OpenSubKey(policyKeyName, false), Registry.LocalMachine.CreateSubKey(settingsKeyName, true))
-        { 
+        {
         }
 
         public LapsRegistrySettings(RegistryKey policyKey, RegistryKey settingsKey)
@@ -23,9 +24,11 @@ namespace Lithnet.AccessManager.Agent
             this.settingsKey = settingsKey;
         }
 
-        public string SigningCertThumbprint => this.policyKey.GetValue<string>("SigningCertThumbprint");
+        public PasswordStorageMode StorageMode => (PasswordStorageMode)(this.policyKey.GetValue<int>("StorageMode", 0));
 
-        public bool LapsEnabled => this.policyKey.GetValue<int>("LapsEnabled", 0) == 1;
+        public string CertThumbprint => this.policyKey.GetValue<string>("CertThumbprint");
+
+        public bool Enabled => this.policyKey.GetValue<int>("Enabled", 0) == 1;
 
         public int PasswordLength => this.policyKey.GetValue<int>("PasswordLength", 16);
 
@@ -47,10 +50,10 @@ namespace Lithnet.AccessManager.Agent
 
         public int PasswordHistoryDaysToKeep => this.policyKey.GetValue<int>("PasswordHistoryDaysToKeep", 0);
 
-        public bool WriteToMsMcsAdmPasswordAttributes => this.policyKey.GetValue<int>("WriteToMsMcsAdmPasswordAttributes", 0) == 1;
+        public bool WriteToMsMcsAdmPasswordAttributes => this.StorageMode.HasFlag(PasswordStorageMode.Laps);
 
         public int MaximumPasswordAge => this.policyKey.GetValue<int>("MaximumPasswordAge", 14);
 
-        public bool WriteToAppData => this.policyKey.GetValue<int>("WriteToAppData", 0) == 1;
+        public bool WriteToAppData => this.StorageMode.HasFlag(PasswordStorageMode.AppData);
     }
 }

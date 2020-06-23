@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util='http://schemas.microsoft.com/wix/UtilExtension'>
   <Product Id="*"
-           Name="Lithnet LAPS Web App"
+           Name="Lithnet Access Manager Web App"
            Language="1033"
            Version="!(bind.FileVersion.fil179C3B100958A078E36F6F46BBBEF740)"
            Manufacturer="Lithnet"
@@ -30,17 +30,19 @@
     </Property>
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
 
-    <Feature Id="ProductFeature" Title="Laps Web App" Level="1">
+    <Feature Id="ProductFeature" Title="Web App" Level="1" Description="Installs the web-based application for accessing LAPS passwords and requesting JIT access">
       <ComponentGroupRef Id="ProductComponents" />
     </Feature>
 
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFiles64Folder">
         <Directory Id="LithnetFolder" Name="Lithnet">
-          <Directory Id="INSTALLFOLDER" Name="Laps Web App" >
-            <Directory Id="NOTIFICATIONTEMPLATESDIR" Name ="NotificationTemplates"/>
-            <Directory Id="LOGSDIR" Name ="Logs"/>
-            <Directory Id="SCRIPTSDIR" Name ="Scripts"/>
+          <Directory Id="AccessManagerFolder" Name="Access Manager">
+            <Directory Id="INSTALLFOLDER" Name="Web" >
+              <Directory Id="NOTIFICATIONTEMPLATESDIR" Name ="NotificationTemplates"/>
+              <Directory Id="LOGSDIR" Name ="Logs"/>
+              <Directory Id="SCRIPTSDIR" Name ="Scripts"/>
+            </Directory>
           </Directory>
         </Directory>
       </Directory>
@@ -87,7 +89,7 @@
       <ComponentRef Id="cmpA0F023B64412A450A343CCF424488552" />
     </ComponentGroup>
 
-    <ComponentGroup Id="UserConfigFiles">
+    <ComponentGroup Id="UserConfigFiles" Directory="INSTALLFOLDER">
       <Component Id="cmp58AE1F27D4DDB080F3961825CDC860CA" Guid="*"  NeverOverwrite="yes">
         <File Id="fil30CBBAF63158674FF13F750BAB90791D" KeyPath="yes" Source="SourceDir\targets.json" />
       </Component>
@@ -133,9 +135,9 @@
     </ComponentGroup>
 
     <Component Id="cmpA0F023B64412A450A343CCF424488552" Guid="*" Directory="INSTALLFOLDER">
-      <File Id="fil179C3B100958A078E36F6F46BBBEF740" KeyPath="yes" Source="SourceDir\Lithnet.Laps.Web.exe" />
+      <File Id="fil179C3B100958A078E36F6F46BBBEF740" KeyPath="yes" Source="SourceDir\Lithnet.AccessManager.Web.exe" />
       <ServiceInstall Id="svcB928E06C6F1445829E0B2EC5DDB85B1E"
-                             DisplayName="Lithnet LAPS Web App"
+                             DisplayName="Lithnet Access Manager Web App"
                              Account="[SERVICE_USERNAME]"
                              Password="[SERVICE_PASSWORD]"
                              Name="[SERVICE_NAME]"
@@ -143,7 +145,7 @@
                              Start="auto"
                              Arguments="/service"
                              Type="ownProcess"
-                             Description="A web-based application for accessing LAPS passwords"
+                             Description="A web-based application for accessing LAPS passwords and requesting JIT access"
                              Vital="yes"
                              Interactive="no">
       </ServiceInstall>

@@ -38,12 +38,12 @@ namespace Lithnet.AccessManager.Agent.Test
         }
 
         [Test]
-        public void CheckInterval()
+        public void Interval()
         {
-            Assert.AreEqual(60, this.registrySettings.CheckInterval);
+            Assert.AreEqual(60, this.registrySettings.Interval);
 
-            policyKey.SetValue("CheckInterval", 75);
-            Assert.AreEqual(75, this.registrySettings.CheckInterval);
+            policyKey.SetValue("Interval", 75);
+            Assert.AreEqual(75, this.registrySettings.Interval);
         }
     }
 }

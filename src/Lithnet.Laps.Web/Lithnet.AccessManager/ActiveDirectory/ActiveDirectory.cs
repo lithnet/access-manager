@@ -13,16 +13,9 @@ namespace Lithnet.AccessManager
 {
     public sealed class ActiveDirectory : IDirectory
     {
-        private readonly ILogger<ActiveDirectory> logger;
-
         private static Guid PamFeatureGuid = new Guid("ec43e873-cce8-4640-b4ab-07ffe4ab5bcd");
 
-        private Dictionary<SecurityIdentifier, bool> PamEnabledDomainCache = new Dictionary<SecurityIdentifier, bool>();
-
-        public ActiveDirectory(ILogger<ActiveDirectory> logger)
-        {
-            this.logger = logger;
-        }
+        private readonly Dictionary<SecurityIdentifier, bool> PamEnabledDomainCache = new Dictionary<SecurityIdentifier, bool>();
 
         public bool TryGetUser(string name, out IUser user)
         {

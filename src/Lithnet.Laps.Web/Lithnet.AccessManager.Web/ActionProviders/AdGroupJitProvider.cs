@@ -7,12 +7,9 @@ namespace Lithnet.AccessManager.Web
     {
         private readonly IDirectory directory;
 
-        private readonly ILogger logger;
-
-        public AdGroupJitProvider(IDirectory directory, ILogger logger)
+        public AdGroupJitProvider(IDirectory directory)
         {
             this.directory = directory;
-            this.logger = logger;
         }
 
         public void GrantJitAccess(IComputer computer, IGroup group, IUser user, TimeSpan expiry)

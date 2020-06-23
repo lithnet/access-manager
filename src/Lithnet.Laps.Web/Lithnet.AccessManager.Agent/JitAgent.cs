@@ -44,7 +44,7 @@ namespace Lithnet.AccessManager.Agent
                 this.sam.UpdateLocalGroupMembership(
                     this.sam.GetBuiltInAdministratorsGroupName(),
                     this.BuildExpectedMembership(group.Sid),
-                    this.settings.AllowUnmanagedAdmins,
+                    !this.settings.RestrictAdmins,
                     true);
 
                 this.UpdateJitGroupRegistration(computer, group);
@@ -119,14 +119,13 @@ namespace Lithnet.AccessManager.Agent
 
         private IGroup GetOrCreateJitGroup(IComputer computer)
         {
-            IGroup group;
 
             if (!this.TryGetGroupName(out string name))
             {
                 throw new ConfigurationException("No JIT group was specified in the configuration");
             }
 
-            if (this.directory.TryGetGroup(name, out group))
+            if (this.directory.TryGetGroup(name, out IGroup group))
             {
                 return group;
             }

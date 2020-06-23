@@ -4,9 +4,9 @@ namespace Lithnet.AccessManager.Agent
 {
     public interface ILapsSettings
     {
-        string SigningCertThumbprint { get; }
+        string CertThumbprint { get; }
 
-        bool LapsEnabled { get; }
+        bool Enabled { get; }
 
         int PasswordLength { get; }
 

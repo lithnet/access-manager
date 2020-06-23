@@ -23,18 +23,18 @@ namespace Lithnet.AccessManager.Agent.Test
         }
 
         [Test]
-        public void LapsEnabled()
+        public void Enabled()
         {
             // Test default value
-            Assert.AreEqual(false, this.registrySettings.LapsEnabled);
+            Assert.AreEqual(false, this.registrySettings.Enabled);
 
             // Test enabled
-            policyKey.SetValue("LapsEnabled", 1);
-            Assert.AreEqual(true, this.registrySettings.LapsEnabled);
+            policyKey.SetValue("Enabled", 1);
+            Assert.AreEqual(true, this.registrySettings.Enabled);
 
             // Test disabled
-            policyKey.SetValue("LapsEnabled", 0);
-            Assert.AreEqual(false, this.registrySettings.LapsEnabled);
+            policyKey.SetValue("Enabled", 0);
+            Assert.AreEqual(false, this.registrySettings.Enabled);
         }
 
         [Test]
@@ -92,12 +92,12 @@ namespace Lithnet.AccessManager.Agent.Test
         }
 
         [Test]
-        public void SigningCertThumbprint()
+        public void CertThumbprint()
         {
-            Assert.AreEqual(null, this.registrySettings.SigningCertThumbprint);
+            Assert.AreEqual(null, this.registrySettings.CertThumbprint);
 
-            policyKey.SetValue("SigningCertThumbprint", "ABCDEFG");
-            Assert.AreEqual("ABCDEFG", this.registrySettings.SigningCertThumbprint);
+            policyKey.SetValue("CertThumbprint", "ABCDEFG");
+            Assert.AreEqual("ABCDEFG", this.registrySettings.CertThumbprint);
         }
 
         [Test]

@@ -2,7 +2,7 @@
 {
     public interface IAgentSettings
     {
-        int CheckInterval { get; }
+        int Interval { get; }
 
         bool Enabled { get; }
     }

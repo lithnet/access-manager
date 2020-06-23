@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<policyDefinitionResources xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0"
+schemaVersion="1.0" xmlns="http://www.microsoft.com/GroupPolicy/PolicyDefinitions">
+  <displayName>
+  </displayName>
+  <description>
+  </description>
+  <resources>
+    <stringTable>
+      <string id="TS_SUPPORTED_OS">At least Microsoft Windows 8.1 or Windows Server 2012</string>
+      <string id="cat_lithnet_accessManagerAgent_jit">Just-in-time access</string>
+      <string id="pol_enableJit">Add JIT group to the local administrators group</string>
+      <string id="pol_enableJit_help">When this policy is enabled, the JIT agent will ensure that the specified group is always a member of the local administrators group.
+      
+You must specify the name of the group, however this name can contain the following placeholders
+
+{computerName} - This will be replaced with the computer's name
+{domain} - This will be replaced with the netbios name of the domain that the computer is joined to. 
+
+For example, if you set the group name to "{domain}\JIT-GROUP-{computerName}", a machine named "SERVER1" in the domain "LITHNET" would have it's JIT group name set to "LITHNET\JIT-GROUP-SERVER1". Either this group must already exist, or the policy setting to enable group creation by the machine must be turned on.
+      
+ If this policy is disabled or not configured, the JIT agent does not modify the membership of the local administrators group.</string>
+
+      <string id="pol_createJitGroup">Allow the computer to create the JIT group if it doesn't exist</string>
+      <string id="pol_createJitGroup_help">When this policy is enabled, the computer will attempt to create the JIT group if it doesn't exist in the directory. In order for this process to be successful, the computer account must have rights to create group objects in the specified OU.
+      
+If this policy is disabled or not configured, the group must be created in the directory by an external process.
+      </string>
+
+      <string id="pol_restrictAdmins">Restrict the membership of the local administrators group</string>
+      <string id="pol_restrictAdmins_help">When this policy is enabled, the members of the local administrator group are restricted to 
+ 
+ - The built-in administrator account
+ - The JIT group specified in the policy
+ - Any additional members specified in this policy setting
+ 
+ All other members will be removed from the local administrators group
+ 
+ If this setting is disabled or not configured, the JIT group will still be added to the local administrators group, but the membership will be left otherwise unchanged.</string>
+
+      <string id="pol_publishJitGroup">Publish the JIT group information to the directory</string>
+      <string id="pol_publishJitGroup_help">When enabled, the JIT agent will publish the JIT group name for this computer in the directory, so that it can be found by the Lithnet Access Manager Web service.
+      
+If this policy is disabled or not configured, the JIT agent does not publish the JIT group name for this computer in the directory. The Lithnet Access Manager Web service will still be able to manage JIT access for this machine, provided the JIT group is specified in the authorization target configuration on the server.</string>
+    </stringTable>
+
+    <presentationTable>
+
+      <presentation id="pol_enableJit">
+        <text>Specify the name, or SID of the group used to provide JIT access to this machine. See the help section for details on variables that can be used when providing a group name</text>
+        <textBox refId="txt_jitGroup">
+          <label>JIT group</label>
+        </textBox>
+      </presentation>
+
+      <presentation id="pol_createJitGroup">
+        <text>Specify the full distinguished name (DN) of the organizational unit where the computer has rights to create group objects</text>
+        <textBox refId="txt_jitGroupOU">
+          <label>OU distinguished name</label>
+        </textBox>
+      </presentation>
+
+      <presentation id="pol_restrictAdmins">
+        <text>Specify additional users or groups to be added to the local administrators group (one per line)</text>
+        <multiTextBox refId="txt_allowedAdmins" defaultHeight="8"/>
+      </presentation>
+      
+    </presentationTable>
+  </resources>
+</policyDefinitionResources>

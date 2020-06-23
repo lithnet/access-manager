@@ -7,8 +7,6 @@ namespace Lithnet.AccessManager.Test
 {
     public class MsMcsAdmPwdProviderTests
     {
-        private Mock<NLog.ILogger> dummyLogger;
-
         private ActiveDirectory directory;
 
         private MsMcsAdmPwdProvider provider;
@@ -16,7 +14,6 @@ namespace Lithnet.AccessManager.Test
         [SetUp()]
         public void TestInitialize()
         {
-            dummyLogger = new Mock<NLog.ILogger>();
             directory = new ActiveDirectory(Mock.Of<Microsoft.Extensions.Logging.ILogger<ActiveDirectory>>());
             provider = new MsMcsAdmPwdProvider(Mock.Of<Microsoft.Extensions.Logging.ILogger<MsMcsAdmPwdProvider>>());
         }
