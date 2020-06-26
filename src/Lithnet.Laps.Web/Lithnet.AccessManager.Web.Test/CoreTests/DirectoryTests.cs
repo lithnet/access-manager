@@ -23,7 +23,7 @@ namespace Lithnet.AccessManager.Test
         public void TestInitialize()
         {
             dummyLogger = new Mock<ILogger>();
-            this.directory = new ActiveDirectory(Mock.Of<Microsoft.Extensions.Logging.ILogger<ActiveDirectory>>());
+            this.directory = new ActiveDirectory();
         }
 
         // THIS domain user found in THIS domain group

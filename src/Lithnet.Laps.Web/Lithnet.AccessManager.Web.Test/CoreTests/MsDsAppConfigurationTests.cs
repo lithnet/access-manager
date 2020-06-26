@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NLog.LayoutRenderers;
 using NUnit.Framework;
@@ -15,14 +17,13 @@ namespace Lithnet.AccessManager.Test
         [SetUp()]
         public void TestInitialize()
         {
-            directory = new ActiveDirectory(Mock.Of<Microsoft.Extensions.Logging.ILogger<ActiveDirectory>>());
+            directory = new ActiveDirectory();
             provider = new MsDsAppConfigurationProvider();
         }
 
         [TestCase("IDMDEV1\\PC1")]
         public void CreateAppData(string computerName)
         {
-            ActiveDirectory directory = new ActiveDirectory(Mock.Of<Microsoft.Extensions.Logging.ILogger<ActiveDirectory>>());
             IComputer computer = directory.GetComputer(computerName);
 
             if (provider.TryGetAppData(computer, out IAppData appData))
@@ -43,7 +44,6 @@ namespace Lithnet.AccessManager.Test
         [TestCase("IDMDEV1\\PC1")]
         public void DeleteAppData(string computerName)
         {
-            ActiveDirectory directory = new ActiveDirectory(Mock.Of<Microsoft.Extensions.Logging.ILogger<ActiveDirectory>>());
             IComputer computer = directory.GetComputer(computerName);
 
             if (!provider.TryGetAppData(computer, out IAppData appData))
@@ -55,25 +55,6 @@ namespace Lithnet.AccessManager.Test
 
             Assert.IsFalse(provider.TryGetAppData(computer, out _));
             Assert.IsTrue(directory.TryGetComputer(computerName, out _));
-        }
-
-        [TestCase("IDMDEV1\\PC1", "IDMDEV1\\JIT-PC1")]
-        public void SetJitGroup(string computerName, string jitGroupName)
-        {
-            IComputer computer = directory.GetComputer(computerName);
-
-            if (!provider.TryGetAppData(computer, out IAppData appData))
-            {
-                appData = provider.Create(computer);
-            }
-
-            appData.UpdateJitGroup(null);
-            Assert.IsNull(appData.JitGroupReference);
-
-            IGroup group = directory.GetGroup(jitGroupName);
-            appData.UpdateJitGroup(group);
-
-            Assert.AreEqual(group.DistinguishedName, appData.JitGroupReference);
         }
 
         [TestCase("IDMDEV1\\PC1")]
@@ -123,12 +104,12 @@ namespace Lithnet.AccessManager.Test
             string newPassword = Guid.NewGuid().ToString();
 
             EncryptionProvider encryptionProvider = new EncryptionProvider();
-            CertificateResolver certificateResolver = new CertificateResolver();
+            CertificateResolver certificateResolver = new CertificateResolver(Mock.Of<ILogger<CertificateResolver>>(), this.directory, Mock.Of<IHostEnvironment>());
 
             appData.UpdateCurrentPassword(
                    encryptionProvider.Encrypt(
-                       certificateResolver.GetEncryptionCertificate(
-                          TestConstants.EncryptionCertificateThumbprint ),
+                       certificateResolver.FindCertificate(false,
+                          TestConstants.EncryptionCertificateThumbprint),
                        newPassword),
                    rotationInstant,
                    expiryDate,

@@ -85,26 +85,5 @@ namespace Lithnet.AccessManager
             gf.SetSecurityDescriptorSddlForm("D:AI(A;;FA;;;CO)");
             return gf.GetSecurityDescriptorBinaryForm();
         }
-
-        //public byte[] TryGetLamPublicKey(SecurityIdentifier sid)
-        //{
-        //    DirectorySearcher d = new DirectorySearcher
-        //    {
-        //        SearchRoot = this.directory.GetConfigurationNamingContext(sid),
-        //        SearchScope = SearchScope.Subtree,
-        //        Filter = $"(&(objectClass=msDS-AppData)(CN=AccessManagerPublicKey))",
-        //    };
-
-        //    d.PropertiesToLoad.Add("msDS-ByteArray");
-
-        //    var result = d.FindOne();
-
-        //    if (result == null)
-        //    {
-        //        throw new ObjectNotFoundException();
-        //    }
-
-        //    return result.GetPropertyBytes("msDS-ByteArray");
-        //}
     }
 }

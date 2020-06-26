@@ -31,8 +31,6 @@ namespace Lithnet.AccessManager.Agent
 
         public bool CreateJitGroup => this.policyKey.GetValue<int>("CreateJitGroup", 0) == 1;
         
-        public bool PublishJitGroup => this.policyKey.GetValue<int>("PublishJitGroup", 0) == 1;
-
         public string JitGroupCreationOU => this.policyKey.GetValue<string>("JitGroupCreationOU");
 
         public IEnumerable<string> AllowedAdmins => this.policyKey.GetValues("AllowedAdmins");

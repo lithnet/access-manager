@@ -168,7 +168,7 @@ namespace Lithnet.AccessManager.Web.Test
             ace.SetupGet(x => x.Type).Returns(aceType);
             ace.SetupGet(x => x.Access).Returns(AccessMask.Laps);
 
-            ActiveDirectory d = new ActiveDirectory(Mock.Of<ILogger<ActiveDirectory>>());
+            ActiveDirectory d = new ActiveDirectory();
 
             AceEvaluator evaluator = new AceEvaluator(d, dummyLogger.Object);
 

@@ -44,7 +44,7 @@ namespace Lithnet.AccessManager.Web
             {
                 IsCurrent = true,
                 Created = data.CurrentPassword.Created,
-                Password = this.encryptionProvider.Decrypt(data.CurrentPassword.EncryptedData, this.certificateResolver.GetDecryptionCertificate),
+                Password = this.encryptionProvider.Decrypt(data.CurrentPassword.EncryptedData, this.certificateResolver.GetCertificateWithPrivateKey),
                 ExpiryDate = newExpiry ?? data.PasswordExpiry
             };
              
@@ -58,7 +58,7 @@ namespace Lithnet.AccessManager.Web
                     {
                         IsCurrent = false,
                         Created = item.Created,
-                        Password = this.encryptionProvider.Decrypt(item.EncryptedData, this.certificateResolver.GetDecryptionCertificate),
+                        Password = this.encryptionProvider.Decrypt(item.EncryptedData, this.certificateResolver.GetCertificateWithPrivateKey),
                         ExpiryDate = item.Retired
                     };
 

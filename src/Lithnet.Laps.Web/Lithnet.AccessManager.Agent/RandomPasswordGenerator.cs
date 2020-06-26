@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using Lithnet.AccessManager.Agent;
 
 namespace Lithnet.AccessManager.Agent
 {

@@ -18,40 +18,30 @@ namespace Lithnet.AccessManager.Web
         {
             string authorizingGroupName = groupName;
 
-            if (authorizingGroupName != null)
+            if (authorizingGroupName == null)
             {
-                if (authorizingGroupName.StartsWith("prop:", StringComparison.OrdinalIgnoreCase))
+                throw new ConfigurationException("There was no JIT group name provided");
+            }
+
+            if (authorizingGroupName.StartsWith("prop:", StringComparison.OrdinalIgnoreCase))
+            {
+                string propertyName = authorizingGroupName.Remove(0, "prop:".Length);
+                var computerEntry = this.directory.GetDirectoryEntry(computer, propertyName);
+
+                var referredGroup = computerEntry.GetPropertyString(propertyName);
+
+                if (referredGroup == null)
                 {
-                    string propertyName = authorizingGroupName.Remove(0, "prop:".Length);
-                    var computerEntry = this.directory.GetDirectoryEntry(computer, propertyName);
-
-                    var referredGroup = computerEntry.GetPropertyString(propertyName);
-
-                    if (referredGroup == null)
-                    {
-                        throw new ObjectNotFoundException($"The JIT group was not found on the computer property {propertyName}");
-                    }
-
-                    return this.directory.GetGroup(referredGroup);
+                    throw new ObjectNotFoundException($"The JIT group was not found on the computer property {propertyName}");
                 }
-                else
-                {
-                    authorizingGroupName = authorizingGroupName.Replace("{computerName}", computer.SamAccountName.TrimEnd('$'), StringComparison.OrdinalIgnoreCase);
-                    return this.directory.GetGroup(authorizingGroupName);
-                }
-            }
 
-            if (!this.settingsProvider.TryGetAppData(computer, out IAppData appData))
+                return this.directory.GetGroup(referredGroup);
+            }
+            else
             {
-                throw new ObjectNotFoundException($"The Lithnet Access  Manager object for computer {computer.MsDsPrincipalName} was not found in the directory");
+                authorizingGroupName = authorizingGroupName.Replace("{computerName}", computer.SamAccountName.TrimEnd('$'), StringComparison.OrdinalIgnoreCase);
+                return this.directory.GetGroup(authorizingGroupName);
             }
-
-            if (appData.JitGroupReference == null)
-            {
-                throw new ObjectNotFoundException($"The Lithnet Access Manager object for computer {computer.MsDsPrincipalName} was found, but it did not contain a group entry");
-            }
-
-            return this.directory.GetGroup(appData.JitGroupReference);
         }
     }
 }

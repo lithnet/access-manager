@@ -37,11 +37,6 @@ If this policy is disabled or not configured, the group must be created in the d
  All other members will be removed from the local administrators group
  
  If this setting is disabled or not configured, the JIT group will still be added to the local administrators group, but the membership will be left otherwise unchanged.</string>
-
-      <string id="pol_publishJitGroup">Publish the JIT group information to the directory</string>
-      <string id="pol_publishJitGroup_help">When enabled, the JIT agent will publish the JIT group name for this computer in the directory, so that it can be found by the Lithnet Access Manager Web service.
-      
-If this policy is disabled or not configured, the JIT agent does not publish the JIT group name for this computer in the directory. The Lithnet Access Manager Web service will still be able to manage JIT access for this machine, provided the JIT group is specified in the authorization target configuration on the server.</string>
     </stringTable>
 
     <presentationTable>

@@ -14,7 +14,7 @@ namespace Lithnet.AccessManager.Test
         [SetUp()]
         public void TestInitialize()
         {
-            directory = new ActiveDirectory(Mock.Of<Microsoft.Extensions.Logging.ILogger<ActiveDirectory>>());
+            directory = new ActiveDirectory();
             provider = new MsMcsAdmPwdProvider(Mock.Of<Microsoft.Extensions.Logging.ILogger<MsMcsAdmPwdProvider>>());
         }
 

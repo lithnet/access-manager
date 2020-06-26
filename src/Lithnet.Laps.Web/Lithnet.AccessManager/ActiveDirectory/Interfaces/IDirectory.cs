@@ -40,6 +40,8 @@ namespace Lithnet.AccessManager
         bool IsObjectInOu(IDirectoryObject computer, string ou);
 
         bool IsContainer(string path);
+        
+        DirectoryEntry GetConfigurationNamingContext(SecurityIdentifier domain);
 
         bool IsPamFeatureEnabled(SecurityIdentifier domainSid);
 

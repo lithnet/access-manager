@@ -47,15 +47,15 @@ namespace Lithnet.AccessManager.Agent.Test
         }
 
         [Test]
-        public void AllowUnmanagedAdmins()
+        public void RestrictAdmins()
         {
-            Assert.AreEqual(false, this.registrySettings.AllowUnmanagedAdmins);
+            Assert.AreEqual(false, this.registrySettings.RestrictAdmins);
 
-            policyKey.SetValue("AllowUnmanagedAdmins", 1);
-            Assert.AreEqual(true, this.registrySettings.AllowUnmanagedAdmins);
+            policyKey.SetValue("RestrictAdmins", 1);
+            Assert.AreEqual(true, this.registrySettings.RestrictAdmins);
 
-            policyKey.SetValue("AllowUnmanagedAdmins", 0);
-            Assert.AreEqual(false, this.registrySettings.AllowUnmanagedAdmins);
+            policyKey.SetValue("RestrictAdmins", 0);
+            Assert.AreEqual(false, this.registrySettings.RestrictAdmins);
         }
 
         [Test]
@@ -68,18 +68,6 @@ namespace Lithnet.AccessManager.Agent.Test
 
             policyKey.SetValue("CreateJitGroup", 0);
             Assert.AreEqual(false, this.registrySettings.CreateJitGroup);
-        }
-
-        [Test]
-        public void PublishJitGroup()
-        {
-            Assert.AreEqual(false, this.registrySettings.PublishJitGroup);
-
-            policyKey.SetValue("PublishJitGroup", 1);
-            Assert.AreEqual(true, this.registrySettings.PublishJitGroup);
-
-            policyKey.SetValue("PublishJitGroup", 0);
-            Assert.AreEqual(false, this.registrySettings.PublishJitGroup);
         }
 
         [Test]

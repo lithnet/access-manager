@@ -35,11 +35,16 @@ namespace Lithnet.AccessManager.Agent
                     services.AddTransient<IEncryptionProvider, EncryptionProvider>();
                     services.AddTransient<ICertificateResolver, CertificateResolver>();
                     services.AddTransient<IMsMcsAdmPwdProvider, MsMcsAdmPwdProvider>();
-                    
+
                     services.AddLogging(builder =>
                     {
-                        builder.SetMinimumLevel(LogLevel.Information);
                         builder.AddNLog("nlog.config");
+                        builder.AddEventLog(settings =>
+                        {
+                            settings.LogName = "Lithnet Access Manager";
+                            settings.SourceName = "Lithnet Access Manager Agent";
+                            settings.Filter = (x, y) => y >= LogLevel.Information;
+                        });
                     });
                 }
               ).UseWindowsService();

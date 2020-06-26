@@ -13,7 +13,7 @@
       InstallScope="perMachine"
       InstallPrivileges="elevated"
       Manufacturer="Lithnet"
-      Platform="x64" />
+      Platform="x86" />
 
     <Media Id="1" Cabinet="Cab1.cab" EmbedCab="yes" />
     <MajorUpgrade Schedule="afterInstallExecute" DowngradeErrorMessage="A later version of [ProductName] is already installed" AllowSameVersionUpgrades="yes" />
@@ -24,7 +24,7 @@
     </Feature>
     
     <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="ProgramFiles64Folder">
+      <Directory Id="ProgramFilesFolder">
         <Directory Id="LithnetFolder" Name="Lithnet">
           <Directory Id="AccessManagerFolder" Name="Access Manager">
             <Directory Id="INSTALLFOLDER" Name="Agent" >
@@ -50,6 +50,7 @@
                                Vital="yes"
                                Interactive="no">
         </ServiceInstall>
+        <util:EventSource Log="Lithnet Access Manager" Name="Agent" EventMessageFile="%systemroot%\system32\mscoree.dll"/>
 
         <ServiceControl Id="ServiceControlEvents" Name="[SERVICE_NAME]" Stop="both" Remove="uninstall" Wait="yes" Start="install"/>
       </Component>

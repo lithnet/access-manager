@@ -26,7 +26,11 @@ namespace Lithnet.AccessManager.Agent
 
         public PasswordStorageMode StorageMode => (PasswordStorageMode)(this.policyKey.GetValue<int>("StorageMode", 0));
 
-        public string CertThumbprint => this.policyKey.GetValue<string>("CertThumbprint");
+        public string CertThumbprint => this.policyKey.GetValue<string>("CertThumbprint") ?? this.settingsKey.GetValue<string>("CertThumbprint");
+
+        public string CertPath => this.policyKey.GetValue<string>("CertPath") ?? this.settingsKey.GetValue<string>("CertPath") ?? "encryption.cer";
+
+        public bool CertDirectoryLookup => this.policyKey.GetValue<int>("CertDirectoryLookup", 1) == 1;
 
         public bool Enabled => this.policyKey.GetValue<int>("Enabled", 0) == 1;
 

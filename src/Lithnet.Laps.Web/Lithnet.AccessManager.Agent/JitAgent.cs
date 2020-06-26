@@ -34,6 +34,7 @@ namespace Lithnet.AccessManager.Agent
             {
                 if (!this.settings.JitEnabled)
                 {
+                    this.logger.LogTrace(EventIDs.JitAgentDisabled, "The JIT agent is disabled");
                     return;
                 }
 
@@ -41,44 +42,17 @@ namespace Lithnet.AccessManager.Agent
 
                 IGroup group = this.GetOrCreateJitGroup(computer);
 
+                this.logger.LogTrace(EventIDs.JitGroupFound, "The JIT group was found in the directory as {principalName}", group.MsDsPrincipalName);
+
                 this.sam.UpdateLocalGroupMembership(
                     this.sam.GetBuiltInAdministratorsGroupName(),
                     this.BuildExpectedMembership(group.Sid),
                     !this.settings.RestrictAdmins,
                     true);
-
-                this.UpdateJitGroupRegistration(computer, group);
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "The JIT agent process encountered an error");
-            }
-        }
-
-        internal void UpdateJitGroupRegistration(IComputer computer, IGroup jitGroup)
-        {
-            this.appDataProvider.TryGetAppData(computer, out IAppData appData);
-
-            // If we've been asked to not publish a JIT group and there is one published
-            if (!this.settings.PublishJitGroup && !string.IsNullOrWhiteSpace(appData?.JitGroupReference))
-            {
-                appData.ClearJitGroup();
-                this.logger.LogInformation("Unpublished JIT group information from the directory");
-                return;
-            }
-
-            if (appData == null)
-            {
-                this.logger.LogTrace("Existing settings object not found");
-                appData = this.appDataProvider.Create(computer);
-                this.logger.LogInformation("Created settings object in directory as {distinguishedName}", appData.DistinguishedName);
-            }
-
-            if (appData.JitGroupReference == null || !DirectoryExtensions.IsDnMatch(appData.JitGroupReference, jitGroup.DistinguishedName))
-            {
-                this.logger.LogTrace("JIT group update required. Expected {expected}. Actual {actual}", jitGroup.DistinguishedName, appData.JitGroupReference);
-                appData.UpdateJitGroup(jitGroup);
-                this.logger.LogInformation("Update JIT reference in the directory to {distinguishedName}", jitGroup.DistinguishedName);
+                this.logger.LogError(EventIDs.JitUnexpectedException, ex, "The JIT agent process encountered an error");
             }
         }
 
@@ -119,11 +93,12 @@ namespace Lithnet.AccessManager.Agent
 
         private IGroup GetOrCreateJitGroup(IComputer computer)
         {
-
             if (!this.TryGetGroupName(out string name))
             {
                 throw new ConfigurationException("No JIT group was specified in the configuration");
             }
+
+            this.logger.LogTrace(EventIDs.JitGroupSearching, "Searching for JIT group {name}", name);
 
             if (this.directory.TryGetGroup(name, out IGroup group))
             {
@@ -140,7 +115,7 @@ namespace Lithnet.AccessManager.Agent
                 throw new ConfigurationException("No JIT group was specified in group policy, and self-creation of group was not enabled");
             }
 
-            logger.LogTrace($"Attempting to create a group named {name}");
+            logger.LogTrace(EventIDs.JitGroupCreating, "Attempting to create a group named {name}", name);
             return this.directory.CreateGroup(name, this.settings.JitGroupDescription, this.settings.JitGroupType, this.DetermineCreationOU(computer));
         }
 

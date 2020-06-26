@@ -17,8 +17,6 @@ namespace Lithnet.AccessManager.Agent
         IEnumerable<string> AllowedAdmins { get; }
 
         bool RestrictAdmins { get; }
-
-        bool PublishJitGroup { get; }
         
         bool JitEnabled { get; }
     }

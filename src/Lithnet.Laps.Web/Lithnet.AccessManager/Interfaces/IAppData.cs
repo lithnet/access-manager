@@ -5,8 +5,6 @@ namespace Lithnet.AccessManager
 {
     public interface IAppData : IDirectoryObject
     {
-        string JitGroupReference { get; }
-
         DateTime? PasswordExpiry { get; }
 
         IReadOnlyList<ProtectedPasswordHistoryItem> PasswordHistory { get; }
@@ -16,10 +14,6 @@ namespace Lithnet.AccessManager
         void UpdateCurrentPassword(string encryptedPassword, DateTime rotationInstant, DateTime expiryDate, int maximumPasswordHistory);
 
         void ClearPasswordHistory();
-
-        void UpdateJitGroup(IGroup group);
-
-        void ClearJitGroup();
 
         void UpdatePasswordExpiry(DateTime newExpiry);
     }

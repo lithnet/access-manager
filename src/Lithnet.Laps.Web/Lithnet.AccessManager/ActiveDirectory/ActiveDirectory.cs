@@ -7,7 +7,6 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
 using Lithnet.AccessManager.Interop;
-using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager
 {
@@ -237,7 +236,7 @@ namespace Lithnet.AccessManager
             return result;
         }
 
-        private DirectoryEntry GetConfigurationNamingContext(SecurityIdentifier domain)
+        private string GetConfigurationNamingContextDn(SecurityIdentifier domain)
         {
             SecurityIdentifier sid = domain.AccountDomainSid;
 
@@ -252,7 +251,12 @@ namespace Lithnet.AccessManager
                 throw new ObjectNotFoundException($"Configuration naming context lookup failed");
             }
 
-            return new DirectoryEntry($"LDAP://{configNamingContext}");
+            return configNamingContext;
+        }
+
+        public DirectoryEntry GetConfigurationNamingContext(SecurityIdentifier domain)
+        {
+            return new DirectoryEntry($"LDAP://{this.GetConfigurationNamingContextDn(domain)}");
         }
 
         private SearchResult DoGcLookup(string objectName, string objectClass, IEnumerable<string> propertiesToGet)

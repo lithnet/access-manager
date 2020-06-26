@@ -38,7 +38,7 @@ namespace Lithnet.AccessManager.Agent
 
                 if (this.sam.IsDomainController())
                 {
-                    this.logger.LogWarning("This application should not be run on a domain controller. Shutting down");
+                    this.logger.LogWarning(EventIDs.RunningOnDC, "This application should not be run on a domain controller. Shutting down");
                     this.appLifetime.StopApplication();
                     return;
                 }
@@ -55,7 +55,7 @@ namespace Lithnet.AccessManager.Agent
             {
                 if (!this.settings.Enabled)
                 {
-                    logger.LogTrace("Lithnet Access Manager agent is not enabled");
+                    logger.LogTrace(EventIDs.AgentDisabled, "Lithnet Access Manager agent is not enabled");
                     return;
                 }
 
@@ -65,7 +65,7 @@ namespace Lithnet.AccessManager.Agent
                 }
                 catch(Exception ex)
                 {
-                    this.logger.LogError(ex, "The JIT worker encountered an exception");
+                    this.logger.LogError(EventIDs.JitUnexpectedException, ex, "The JIT worker encountered an exception");
                 }
 
                 try
@@ -74,12 +74,12 @@ namespace Lithnet.AccessManager.Agent
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError(ex, "The LAPS worker encountered an exception");
+                    this.logger.LogError(EventIDs.LapsUnexpectedException, ex, "The LAPS worker encountered an exception");
                 }
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "An unexpected error occurred");
+                this.logger.LogError(EventIDs.AgentUnexpectedException, ex, "An unexpected error occurred");
             }
         }
     }

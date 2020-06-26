@@ -13,7 +13,7 @@ namespace Lithnet.AccessManager
     {
         public X509Certificate2 CreateSelfSignedCert()
         {
-            CertificateRequest request = new CertificateRequest("CN=Lithnet Access Manager", RSA.Create(4096), HashAlgorithmName.SHA384, RSASignaturePadding.Pkcs1);
+            CertificateRequest request = new CertificateRequest("CN=Lithnet Access Manager", RSA.Create(4096), HashAlgorithmName.SHA384, RSASignaturePadding.Pss);
             X509Certificate2 cert = request.CreateSelfSigned(DateTimeOffset.UtcNow, DateTime.UtcNow.AddYears(20));
 
             return cert;

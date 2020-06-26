@@ -79,20 +79,5 @@
       </elements>
     </policy>
 
-    <policy name="pol_publishJitGroup"
-         class="Machine"
-         displayName="$(string.pol_publishJitGroup)"
-         explainText="$(string.pol_publishJitGroup_help)"
-         key="Software\Policies\Lithnet\AccessManager\Agent\Jit"
-         valueName="PublishJitGroup">
-      <parentCategory ref="cat_lithnet_accessManagerAgent_jit" />
-      <supportedOn ref="TS_SUPPORTED_OS" />
-      <enabledValue>
-        <decimal value="1" />
-      </enabledValue>
-      <disabledValue>
-        <decimal value="0" />
-      </disabledValue>
-    </policy>
   </policies>
 </policyDefinitions>
