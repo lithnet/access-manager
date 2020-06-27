@@ -7,7 +7,7 @@
         {
           "trustee": "idmdev1\\zb-mgr-rnewing",
           "type": "allow",
-          "access": "jit,laps"
+          "access": "jit,laps,lapshistory"
         },
         {
           "name": "idmdev1\\user1",

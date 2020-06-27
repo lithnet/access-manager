@@ -8,7 +8,7 @@ namespace Lithnet.AccessManager.Web.Authorization
         [JsonProperty("expire-after")]
         public TimeSpan ExpireAfter { get; set; }
 
-        [JsonProperty("allow-history")]
-        public bool AllowHistory { get; set; }
+        [JsonProperty("retrieval-location")]
+        public PasswordStorageLocation RetrievalLocation {get; set;}
     }
 }

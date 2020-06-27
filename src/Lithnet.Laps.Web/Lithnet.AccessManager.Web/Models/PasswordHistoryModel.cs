@@ -8,14 +8,10 @@ using Lithnet.AccessManager.Web.Internal;
 
 namespace Lithnet.AccessManager.Web.Models
 {
-    public class LapEntryModel
+    public class PasswordHistoryModel
     {
         [Required]
         public string ComputerName { get; set; }
-
-        public string Password { get; set; }
-
-        public DateTime? ValidUntil { get; set; }
 
         public IList<PasswordEntry> PasswordHistory { get; set; }
     }

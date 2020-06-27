@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using Lithnet.AccessManager.Web.Authorization;
 
 namespace Lithnet.AccessManager.Web.Internal
 {
@@ -28,6 +29,23 @@ namespace Lithnet.AccessManager.Web.Internal
             }
 
             return value.ToString();
+        }
+
+        internal static void ValidateAccessMask(this AccessMask requestedAccess)
+        {
+            if (requestedAccess == 0)
+            {
+                throw new AccessManagerException($"An invalid access mask combination was requested: {requestedAccess}");
+            }
+
+            if (requestedAccess == AccessMask.Jit ||
+                requestedAccess == AccessMask.Laps ||
+                requestedAccess == AccessMask.LapsHistory)
+            {
+                return;
+            }
+
+            throw new AccessManagerException($"An invalid access mask combination was requested: {requestedAccess}");
         }
     }
 }

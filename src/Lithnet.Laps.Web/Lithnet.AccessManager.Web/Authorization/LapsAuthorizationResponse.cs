@@ -9,7 +9,7 @@ namespace Lithnet.AccessManager.Web.Authorization
         /// </summary>
         public TimeSpan ExpireAfter { get; set; }
 
-        public bool AllowHistory { get; set; }
+        internal PasswordStorageLocation RetrievalLocation { get; set; }
 
         internal override AccessMask EvaluatedAccess => AccessMask.Laps;
     }

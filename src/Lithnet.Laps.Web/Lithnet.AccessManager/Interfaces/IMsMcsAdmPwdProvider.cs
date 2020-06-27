@@ -9,5 +9,7 @@ namespace Lithnet.AccessManager
         MsMcsAdmPwdPassword GetPassword(IComputer computer, DateTime? newExpiry);
         
         void SetPassword(IComputer computer, string password, DateTime expiryDate);
+
+        void ClearPassword(IComputer computer);
     }
 }

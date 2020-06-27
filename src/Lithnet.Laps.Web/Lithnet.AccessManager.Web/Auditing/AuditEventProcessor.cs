@@ -91,7 +91,7 @@ namespace Lithnet.AccessManager.Web.Internal
         {
             LapsAuthorizationResponse lapsAuthZResponse = action.AuthzResponse as LapsAuthorizationResponse;
             JitAuthorizationResponse jitAuthZResponse = action.AuthzResponse as JitAuthorizationResponse;
-
+            
             Dictionary<string, string> pairs = new Dictionary<string, string> {
                 { "{user.SamAccountName}", action.User?.SamAccountName},
                 { "{user.MsDsPrincipalName}", action.User?.MsDsPrincipalName},

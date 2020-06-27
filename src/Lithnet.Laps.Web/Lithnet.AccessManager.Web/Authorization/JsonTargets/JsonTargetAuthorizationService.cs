@@ -29,6 +29,8 @@ namespace Lithnet.AccessManager.Web.Authorization
 
         public AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer, AccessMask requestedAccess)
         {
+            requestedAccess.ValidateAccessMask();
+
             var targets = this.GetMatchingTargetsForComputer(computer);
 
             if (targets.Count == 0)
@@ -107,16 +109,24 @@ namespace Lithnet.AccessManager.Web.Authorization
                 response = new LapsAuthorizationResponse()
                 {
                     ExpireAfter = j.Laps.ExpireAfter,
-                    AllowHistory = j.Laps.AllowHistory
+                    RetrievalLocation = j.Laps.RetrievalLocation,
                 };
             }
-            else
+            else if (requestedAccess == AccessMask.LapsHistory)
+            {
+                response = new LapsHistoryAuthorizationResponse();
+            }
+            else if (requestedAccess == AccessMask.Jit)
             {
                 response = new JitAuthorizationResponse()
                 {
                     ExpireAfter = j.Jit.ExpireAfter,
                     AuthorizingGroup = this.jitResolver.GetJitAccessGroup(computer, j.Jit?.AuthorizingGroup).MsDsPrincipalName
                 };
+            }
+            else
+            {
+                throw new AccessManagerException("An invalid access mask was requested");
             }
 
             response.MatchedRuleDescription = $"{j.Type}: {j.Name}";

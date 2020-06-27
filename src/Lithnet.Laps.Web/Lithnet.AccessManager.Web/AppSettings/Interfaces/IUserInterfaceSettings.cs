@@ -8,6 +8,8 @@
 
         bool AllowLaps { get; }
 
+        bool AllowLapsHistory { get; }
+
         bool AllowJit { get; }
     }
 }

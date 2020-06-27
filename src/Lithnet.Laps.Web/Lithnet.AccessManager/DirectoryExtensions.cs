@@ -177,6 +177,16 @@ namespace Lithnet.AccessManager
             return result.Properties[propertyName][0]?.ToString();
         }
 
+        public static int? GetPropertyInteger(this DirectoryEntry result, string propertyName)
+        {
+            if (!result.Properties.Contains(propertyName))
+            {
+                return null;
+            }
+
+            return result.Properties[propertyName][0] as int?;
+        }
+
         public static IEnumerable<string> GetPropertyStrings(this SearchResult result, string propertyName)
         {
             if (!result.Properties.Contains(propertyName))

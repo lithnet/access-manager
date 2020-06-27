@@ -19,5 +19,7 @@ namespace Lithnet.AccessManager.Web.AppSettings
         public bool AllowLaps => this.configuration.GetValueOrDefault("user-interface:allow-laps", true);
 
         public bool AllowJit => this.configuration.GetValueOrDefault("user-interface:allow-jit", true);
+
+        public bool AllowLapsHistory => this.configuration.GetValueOrDefault("user-interface:allow-laps-history", true);
     }
 }

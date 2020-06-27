@@ -6,6 +6,8 @@ namespace Lithnet.AccessManager.Agent
     {
         string CertThumbprint { get; }
 
+        string CertPath { get; }
+
         bool Enabled { get; }
 
         int PasswordLength { get; }

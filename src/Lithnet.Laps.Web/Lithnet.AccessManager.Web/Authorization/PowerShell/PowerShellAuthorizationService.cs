@@ -29,9 +29,15 @@ namespace Lithnet.AccessManager.Web.Authorization
 
         public AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer, AccessMask requestedAccess)
         {
+            requestedAccess.ValidateAccessMask();
+
             if (requestedAccess == AccessMask.Laps)
             {
                 return this.GetLapsAuthorizationResponse(user, computer);
+            }
+            else if  (requestedAccess == AccessMask.LapsHistory)
+            {
+                return this.GetLapsHistoryAuthorizationResponse(user, computer);
             }
             else if (requestedAccess == AccessMask.Jit)
             {
@@ -158,6 +164,66 @@ namespace Lithnet.AccessManager.Web.Authorization
                 Code = AuthorizationResponseCode.NoMatchingRuleForComputer,
             };
         }
+
+        private LapsHistoryAuthorizationResponse GetLapsHistoryAuthorizationResponse(IUser user, IComputer computer)
+        {
+            if (powershell == null)
+            {
+                this.InitializePowerShellSession();
+            }
+
+            this.powershell.ResetState();
+            this.powershell
+                .AddCommand("Get-LapsHistoryAuthorizationResponse")
+                    .AddParameter("user", user)
+                    .AddParameter("computer", computer)
+                    .AddParameter("logger", logger);
+
+            Task<LapsHistoryAuthorizationResponse> task = new Task<LapsHistoryAuthorizationResponse>(() =>
+            {
+                var results = this.powershell.Invoke();
+                this.powershell.ThrowOnPipelineError();
+
+                foreach (PSObject result in results)
+                {
+                    if (result.BaseObject is LapsHistoryAuthorizationResponse res)
+                    {
+                        return res;
+                    }
+                    else
+                    {
+                        this.logger.Warn($"The powerShell script returned an unsupported object of type {result.BaseObject?.GetType().FullName} to the pipeline");
+                    }
+                }
+
+                return null;
+            });
+
+            task.Start();
+            if (!task.Wait(TimeSpan.FromSeconds(this.config.PowershellScriptTimeout)))
+            {
+                throw new TimeoutException("The PowerShell script did not complete within the configured time");
+            }
+
+            if (task.IsFaulted)
+            {
+                throw task.Exception;
+            }
+
+            if (task.Result != null)
+            {
+                this.logger.Trace($"PowerShell script returned the following AuthorizationResponse: {JsonConvert.SerializeObject(task.Result)}");
+                return task.Result;
+            }
+
+            this.logger.Warn($"The PowerShell script did not return an AuthorizationResponse");
+
+            return new LapsHistoryAuthorizationResponse()
+            {
+                Code = AuthorizationResponseCode.NoMatchingRuleForComputer,
+            };
+        }
+
 
         private void InitializePowerShellSession()
         {

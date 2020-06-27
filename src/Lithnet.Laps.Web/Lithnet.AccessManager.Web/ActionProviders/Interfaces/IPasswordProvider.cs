@@ -5,6 +5,8 @@ namespace Lithnet.AccessManager.Web
 {
     public interface IPasswordProvider
     {
-        IList<PasswordEntry> GetPasswordEntries(IComputer computer, DateTime? newExpiry, bool getHistory);
+        PasswordEntry GetCurrentPassword(IComputer computer, DateTime? newExpiry, PasswordStorageLocation retrievalLocation);
+
+        IList<PasswordEntry> GetPasswordHistory(IComputer computer);
     }
 }

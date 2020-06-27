@@ -142,7 +142,7 @@ namespace Lithnet.AccessManager.Agent
                     appData.UpdateCurrentPassword(
                         this.encryptionProvider.Encrypt(
                             this.certificateResolver.FindCertificate(
-                                false, this.settings.CertThumbprint, null),
+                                false, this.settings.CertThumbprint, this.settings.CertPath),
                             newPassword),
                         rotationInstant,
                         expiryDate,
@@ -154,6 +154,10 @@ namespace Lithnet.AccessManager.Agent
                 {
                     this.msMcsAdmPwdProvider.SetPassword(computer, newPassword, expiryDate);
                     this.logger.LogTrace(EventIDs.SetPasswordOnLapsAttribute, "Set password on Microsoft LAPS attribute");
+                }
+                else
+                {
+                    this.msMcsAdmPwdProvider.ClearPassword(computer);
                 }
 
                 this.sam.SetLocalAccountPassword(sid, newPassword);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Lithnet.AccessManager.Web.Internal;
 
 namespace Lithnet.AccessManager.Web.Authorization
 {
@@ -57,8 +58,10 @@ namespace Lithnet.AccessManager.Web.Authorization
             return this.Code == AuthorizationResponseCode.Success || this.Code == AuthorizationResponseCode.ExplicitlyDenied;
         }
 
-        internal static AuthorizationResponse CreateAuthorizationResponse (AccessMask mask)
+        internal static AuthorizationResponse CreateAuthorizationResponse(AccessMask mask)
         {
+            mask.ValidateAccessMask();
+
             if (mask == AccessMask.Laps)
             {
                 return new LapsAuthorizationResponse();
@@ -67,6 +70,11 @@ namespace Lithnet.AccessManager.Web.Authorization
             if (mask == AccessMask.Jit)
             {
                 return new JitAuthorizationResponse();
+            }
+
+            if (mask == AccessMask.LapsHistory)
+            {
+                return new LapsHistoryAuthorizationResponse();
             }
 
             throw new ArgumentException($"Invalid value for mask: {mask}");

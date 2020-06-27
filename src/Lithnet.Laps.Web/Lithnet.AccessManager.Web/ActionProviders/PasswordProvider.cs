@@ -24,78 +24,110 @@ namespace Lithnet.AccessManager.Web
             this.certificateResolver = certificateResolver;
         }
 
-        public IList<PasswordEntry> GetPasswordEntries(IComputer computer, DateTime? newExpiry, bool getHistory)
+        public PasswordEntry GetCurrentPassword(IComputer computer, DateTime? newExpiry, PasswordStorageLocation retrievalLocation)
         {
-            if (this.appDataProvider.TryGetAppData(computer, out IAppData data) && data.CurrentPassword != null)
+            if (retrievalLocation == 0 || (retrievalLocation.HasFlag(PasswordStorageLocation.MsLapsAttribute) && retrievalLocation.HasFlag(PasswordStorageLocation.LithnetAttribute)))
             {
-                return this.GetAppDataEntries(data, newExpiry, getHistory);
+                return GetFromMsLapsOrAppData(computer, newExpiry);
+            }
+            else if (retrievalLocation.HasFlag(PasswordStorageLocation.MsLapsAttribute))
+            {
+                return this.GetMsLapsEntry(computer, newExpiry);
             }
             else
             {
-                return this.GetLapsEntry(computer, newExpiry);
+                if (this.appDataProvider.TryGetAppData(computer, out IAppData data))
+                {
+                    return this.GetAppDataCurrentPassword(data, newExpiry);
+                }
+            }
+
+            throw new NoPasswordException();
+        }
+
+        public IList<PasswordEntry> GetPasswordHistory(IComputer computer)
+        {
+            if (this.appDataProvider.TryGetAppData(computer, out IAppData data))
+            {
+                return GetAppDataPasswordHistoryEntries(data);
+            }
+
+            throw new NoPasswordException();
+        }
+
+        private PasswordEntry GetFromMsLapsOrAppData(IComputer computer, DateTime? newExpiry)
+        {
+            if (this.appDataProvider.TryGetAppData(computer, out IAppData data) && data.CurrentPassword != null)
+            {
+                return this.GetAppDataCurrentPassword(data, newExpiry);
+            }
+            else
+            {
+                return this.GetMsLapsEntry(computer, newExpiry);
             }
         }
 
-        private IList<PasswordEntry> GetAppDataEntries(IAppData data, DateTime? newExpiry, bool getHistory)
+        private PasswordEntry GetAppDataCurrentPassword(IAppData data, DateTime? newExpiry)
         {
-            List<PasswordEntry> list = new List<PasswordEntry>();
+            if (data.CurrentPassword == null)
+            {
+                throw new NoPasswordException();
+            }
 
             PasswordEntry current = new PasswordEntry()
             {
-                IsCurrent = true,
                 Created = data.CurrentPassword.Created,
                 Password = this.encryptionProvider.Decrypt(data.CurrentPassword.EncryptedData, this.certificateResolver.GetCertificateWithPrivateKey),
                 ExpiryDate = newExpiry ?? data.PasswordExpiry
             };
-             
-            list.Add(current);
-
-            if (getHistory)
-            {
-                foreach (var item in data.PasswordHistory.Where(t => t.Retired != null))
-                {
-                    PasswordEntry p = new PasswordEntry()
-                    {
-                        IsCurrent = false,
-                        Created = item.Created,
-                        Password = this.encryptionProvider.Decrypt(item.EncryptedData, this.certificateResolver.GetCertificateWithPrivateKey),
-                        ExpiryDate = item.Retired
-                    };
-
-                    list.Add(p);
-                }
-            }
 
             if (newExpiry != null)
             {
                 data.UpdatePasswordExpiry(newExpiry.Value);
             }
 
-            return list;
+            return current;
         }
 
-        private IList<PasswordEntry> GetLapsEntry(IComputer computer, DateTime? newExpiry)
+        private IList<PasswordEntry> GetAppDataPasswordHistoryEntries(IAppData data)
         {
             List<PasswordEntry> list = new List<PasswordEntry>();
 
+            foreach (var item in data.PasswordHistory.Where(t => t.Retired != null))
+            {
+                PasswordEntry p = new PasswordEntry()
+                {
+                    Created = item.Created,
+                    Password = this.encryptionProvider.Decrypt(item.EncryptedData, this.certificateResolver.GetCertificateWithPrivateKey),
+                    ExpiryDate = item.Retired
+                };
+
+                list.Add(p);
+            }
+
+            if (list.Count == 0)
+            {
+                throw new NoPasswordException();
+            }
+
+            return list;
+        }
+
+        private PasswordEntry GetMsLapsEntry(IComputer computer, DateTime? newExpiry)
+        {
             var result = this.msLapsProvider.GetPassword(computer, newExpiry);
 
             if (string.IsNullOrWhiteSpace(result.Password))
             {
-                return list;
+                throw new NoPasswordException();
             }
 
-            PasswordEntry current = new PasswordEntry()
+            return new PasswordEntry()
             {
-                IsCurrent = true,
                 Created = null,
                 Password = result.Password,
                 ExpiryDate = newExpiry ?? result.ExpiryDate
             };
-
-            list.Add(current);
-
-            return list;
         }
     }
 }

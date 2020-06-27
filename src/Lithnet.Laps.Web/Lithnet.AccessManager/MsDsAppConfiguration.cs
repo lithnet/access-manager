@@ -12,6 +12,8 @@ namespace Lithnet.AccessManager
 
         private readonly DirectoryEntry de;
 
+        private const int PasswordHistoryItemLimit = 500;
+
         public MsDsAppConfiguration(DirectoryEntry de)
         {
             this.de = de;
@@ -23,9 +25,9 @@ namespace Lithnet.AccessManager
 
         public DateTime? PasswordExpiry => this.de?.GetPropertyDateTime("msDS-DateTime");
 
-        public string DistinguishedName => this.de?.GetPropertyString("distinguishedName");
+        public int? Flags => this.de?.GetPropertyInteger("msDS-Integer");
 
-        public string JitGroupReference => this.de?.GetPropertyString("msDS-ObjectReference");
+        public string DistinguishedName => this.de?.GetPropertyString("distinguishedName");
 
         public IReadOnlyList<ProtectedPasswordHistoryItem> PasswordHistory
         {
@@ -131,7 +133,7 @@ namespace Lithnet.AccessManager
                 return newItems;
             }
 
-            foreach (var item in items)
+            foreach (var item in items.OrderByDescending(t => t.Created))
             {
                 if (item.Retired == null)
                 {
@@ -142,31 +144,14 @@ namespace Lithnet.AccessManager
                 {
                     newItems.Add(item);
                 }
+
+                if (newItems.Count >= PasswordHistoryItemLimit)
+                {
+                    break;
+                }
             }
 
             return newItems;
-        }
-
-        public void ClearJitGroup()
-        {
-            this.de.Properties["msDS-ObjectReference"].Clear();
-            this.de.CommitChanges();
-        }
-
-        public void UpdateJitGroup(IGroup group)
-        {
-            if (group == null)
-            {
-                this.ClearJitGroup();
-                return;
-            }
-
-            if (!DirectoryExtensions.IsDnMatch(this.JitGroupReference, group.DistinguishedName))
-            {
-                this.de.Properties["msDS-ObjectReference"].Clear();
-                this.de.Properties["msDS-ObjectReference"].Add(group.DistinguishedName);
-                this.de.CommitChanges();
-            }
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Lithnet.AccessManager.Agent
             this.settingsKey = settingsKey;
         }
 
-        public PasswordStorageMode StorageMode => (PasswordStorageMode)(this.policyKey.GetValue<int>("StorageMode", 0));
+        public PasswordStorageLocation StorageMode => (PasswordStorageLocation)(this.policyKey.GetValue<int>("StorageMode", 0));
 
         public string CertThumbprint => this.policyKey.GetValue<string>("CertThumbprint") ?? this.settingsKey.GetValue<string>("CertThumbprint");
 
@@ -54,10 +54,10 @@ namespace Lithnet.AccessManager.Agent
 
         public int PasswordHistoryDaysToKeep => this.policyKey.GetValue<int>("PasswordHistoryDaysToKeep", 0);
 
-        public bool WriteToMsMcsAdmPasswordAttributes => this.StorageMode.HasFlag(PasswordStorageMode.Laps);
+        public bool WriteToMsMcsAdmPasswordAttributes => this.StorageMode.HasFlag(PasswordStorageLocation.MsLapsAttribute);
 
         public int MaximumPasswordAge => this.policyKey.GetValue<int>("MaximumPasswordAge", 14);
 
-        public bool WriteToAppData => this.StorageMode.HasFlag(PasswordStorageMode.AppData);
+        public bool WriteToAppData => this.StorageMode.HasFlag(PasswordStorageLocation.LithnetAttribute);
     }
 }

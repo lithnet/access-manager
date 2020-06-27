@@ -26,6 +26,18 @@ namespace Lithnet.AccessManager
             de.CommitChanges();
         }
 
+        public void ClearPassword(IComputer computer)
+        {
+            DirectoryEntry de = computer.GetDirectoryEntry();
+
+            if (de.Properties.Contains(AttrMsMcsAdmPwd) || de.Properties.Contains(AttrMsMcsAdmPwdExpirationTime))
+            {
+                de.Properties[AttrMsMcsAdmPwd].Clear();
+                de.Properties[AttrMsMcsAdmPwdExpirationTime].Clear();
+                de.CommitChanges();
+            }    
+        }
+
         public MsMcsAdmPwdPassword GetPassword(IComputer computer, DateTime? newExpiry)
         {
             DirectoryEntry de = computer.GetDirectoryEntry();

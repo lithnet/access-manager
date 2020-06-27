@@ -9,7 +9,5 @@ namespace Lithnet.AccessManager.Web
         public DateTime? ExpiryDate { get; set; }
 
         public DateTime? Created { get; set; }
-        
-        public bool IsCurrent { get; set; }
     }
 }

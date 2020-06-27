@@ -37,7 +37,7 @@ namespace Lithnet.AccessManager.Web.Authorization
                     return response;
                 }
 
-                response?.NotificationChannels?.ForEach(t => summaryResponse.NotificationChannels.Add(t));
+                response?.NotificationChannels?.ForEach(t => summaryResponse?.NotificationChannels?.Add(t));
                 if (summaryResponse.Code == AuthorizationResponseCode.Undefined && response != null)
                 {
                     summaryResponse.Code = response.Code;

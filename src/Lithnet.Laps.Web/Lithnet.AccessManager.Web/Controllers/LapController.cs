@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
 using Lithnet.AccessManager.Web.App_LocalResources;
 using Lithnet.AccessManager.Web.AppSettings;
 using Lithnet.AccessManager.Web.Authorization;
@@ -49,7 +48,8 @@ namespace Lithnet.AccessManager.Web.Controllers
             return this.View(new LapRequestModel
             {
                 ShowReason = this.userInterfaceSettings.UserSuppliedReason != AuditReasonFieldState.Hidden,
-                ReasonRequired = this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required
+                ReasonRequired = this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required,
+                RequestType = this.userInterfaceSettings.AllowLaps ? AccessMask.Laps : AccessMask.Jit
             });
         }
 
@@ -59,6 +59,7 @@ namespace Lithnet.AccessManager.Web.Controllers
         {
             model.ShowReason = this.userInterfaceSettings.UserSuppliedReason != AuditReasonFieldState.Hidden;
             model.ReasonRequired = this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required;
+            model.RequestType = model.RequestType == 0 ? this.userInterfaceSettings.AllowLaps ? AccessMask.Laps : AccessMask.Jit : model.RequestType;
 
             if (!this.ModelState.IsValid)
             {
@@ -140,9 +141,17 @@ namespace Lithnet.AccessManager.Web.Controllers
                 {
                     return this.GetLapsPassword(model, user, computer, (LapsAuthorizationResponse)authResponse);
                 }
-                else
+                else if (authResponse.EvaluatedAccess == AccessMask.LapsHistory)
+                {
+                    return this.GetLapsPasswordHistory(model, user, computer, (LapsHistoryAuthorizationResponse)authResponse);
+                }
+                else if (authResponse.EvaluatedAccess == AccessMask.Jit)
                 {
                     return this.GrantJitAccess(model, user, computer, (JitAuthorizationResponse)authResponse);
+                }
+                else
+                {
+                    throw new AccessManagerException("The evaluated access response mask was not supported");
                 }
             }
             catch (AuditLogFailureException ex)
@@ -163,16 +172,14 @@ namespace Lithnet.AccessManager.Web.Controllers
 
         private void ThrowOnInvalidRequestType(AccessMask requestType)
         {
-            if ((!userInterfaceSettings.AllowJit && requestType.HasFlag(AccessMask.Jit)) ||
-                !userInterfaceSettings.AllowLaps && requestType.HasFlag(AccessMask.Laps))
+            if (!userInterfaceSettings.AllowJit && requestType.HasFlag(AccessMask.Jit) ||
+                !userInterfaceSettings.AllowLaps && requestType.HasFlag(AccessMask.Laps) ||
+                !userInterfaceSettings.AllowLapsHistory && requestType.HasFlag(AccessMask.LapsHistory))
             {
                 throw new ArgumentException("The user requested an access type that was not allowed by the application configuration");
             }
 
-            if (requestType != AccessMask.Jit && requestType != AccessMask.Laps)
-            {
-                throw new ArgumentException($"The user requested an access type that was not supported: {requestType}");
-            }
+            requestType.ValidateAccessMask();
         }
 
         private IActionResult GrantJitAccess(LapRequestModel model, IUser user, IComputer computer, JitAuthorizationResponse authResponse)
@@ -199,15 +206,12 @@ namespace Lithnet.AccessManager.Web.Controllers
 
         private IActionResult GetLapsPassword(LapRequestModel model, IUser user, IComputer computer, LapsAuthorizationResponse authResponse)
         {
-            IList<PasswordEntry> history;
             PasswordEntry current;
             DateTime? newExpiry = authResponse.ExpireAfter.Ticks > 0 ? DateTime.UtcNow.Add(authResponse.ExpireAfter) : (DateTime?)null;
 
             try
             {
-                var entries = this.passwordProvider.GetPasswordEntries(computer, newExpiry, authResponse.AllowHistory);
-                current = entries.SingleOrDefault(t => t.IsCurrent);
-                history = entries.Where(t => !t.IsCurrent)?.ToList() ?? new List<PasswordEntry>();
+                current = this.passwordProvider.GetCurrentPassword(computer, newExpiry, authResponse.RetrievalLocation);
 
                 if (current == null)
                 {
@@ -233,11 +237,47 @@ namespace Lithnet.AccessManager.Web.Controllers
                 ComputerExpiryDate = current.ExpiryDate?.ToLocalTime().ToString(CultureInfo.CurrentUICulture)
             });
 
-            return this.View("Show", new LapEntryModel()
+            return this.View("Show", new CurrentPasswordModel()
             {
                 ComputerName = computer.MsDsPrincipalName,
                 Password = current.Password,
                 ValidUntil = current.ExpiryDate?.ToLocalTime(),
+            });
+        }
+
+        private IActionResult GetLapsPasswordHistory(LapRequestModel model, IUser user, IComputer computer, LapsHistoryAuthorizationResponse authResponse)
+        {
+            IList<PasswordEntry> history;
+            try
+            {
+                history = this.passwordProvider.GetPasswordHistory(computer);
+
+                if (history == null)
+                {
+                    throw new NoPasswordException();
+                }
+            }
+            catch (NoPasswordException)
+            {
+                this.logger.LogEventError(EventIDs.LapsPasswordNotPresent, string.Format(LogMessages.NoLapsPassword, computer.MsDsPrincipalName, user.MsDsPrincipalName));
+
+                model.FailureReason = UIMessages.NoLapsPassword;
+                return this.View("Get", model);
+            }
+
+            this.reporting.GenerateAuditEvent(new AuditableAction
+            {
+                AuthzResponse = authResponse,
+                RequestModel = model,
+                IsSuccess = true,
+                User = user,
+                Computer = computer,
+                EventID = EventIDs.PasswordHistoryAccessed
+            });
+
+            return this.View("History", new PasswordHistoryModel
+            {
+                ComputerName = computer.MsDsPrincipalName,
                 PasswordHistory = history
             });
         }
