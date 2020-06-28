@@ -21,9 +21,9 @@ namespace Lithnet.AccessManager.Web.Internal
 
         private readonly ITemplateProvider templates;
 
-        private readonly AuditOptions auditSettings;
-
         public override string Name => "smtp";
+
+        protected override IList<SmtpNotificationChannelDefinition> NotificationChannelDefinitions { get; }
 
         public SmtpNotificationChannel(ILogger logger, IOptions<EmailOptions> emailSettings, ITemplateProvider templates, IOptions<AuditOptions> auditSettings, ChannelWriter<Action> queue)
             : base(logger, queue)
@@ -31,12 +31,7 @@ namespace Lithnet.AccessManager.Web.Internal
             this.logger = logger;
             this.emailSettings = emailSettings.Value;
             this.templates = templates;
-            this.auditSettings = auditSettings.Value;
-        }
-
-        public override void ProcessNotification(AuditableAction action, Dictionary<string, string> tokens, IImmutableSet<string> notificationChannels)
-        {
-            this.ProcessNotification(action, tokens, notificationChannels, this.auditSettings.NotificationChannels.Smtp);
+            this.NotificationChannelDefinitions = auditSettings.Value.NotificationChannels.Smtp;
         }
 
         protected override void Send(AuditableAction action, Dictionary<string, string> tokens, SmtpNotificationChannelDefinition settings)

@@ -18,19 +18,19 @@ namespace Lithnet.AccessManager.Web.Internal
 
         public abstract string Name { get; }
 
+        protected abstract IList<T> NotificationChannelDefinitions { get; }
+
         public NotificationChannel(ILogger logger, ChannelWriter<Action> queue)
         {
             this.logger = logger;
             this.queue = queue;
         }
 
-        public abstract void ProcessNotification(AuditableAction action, Dictionary<string, string> tokens, IImmutableSet<string> notificationChannels);
-
-        protected void ProcessNotification(AuditableAction action, Dictionary<string, string> tokens, IImmutableSet<string> notificationChannelIDs, IEnumerable<T> notificationChannelSettings)
+        public void ProcessNotification(AuditableAction action, Dictionary<string, string> tokens, IImmutableSet<string> notificationChannelIDs)
         {
             List<Exception> rethrowableExceptions = new List<Exception>();
 
-            foreach (var channel in notificationChannelSettings)
+            foreach (var channel in this.NotificationChannelDefinitions)
             {
                 if (notificationChannelIDs.Any(t => string.Equals(t, channel.ID, StringComparison.OrdinalIgnoreCase)))
                 {

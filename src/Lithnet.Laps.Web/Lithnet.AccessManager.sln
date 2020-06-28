@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lithnet.AccessManager.Serve
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lithnet.AccessManager.Server.UI", "Lithnet.AccessManager.Server.UI\Lithnet.AccessManager.Server.UI.csproj", "{F02F1493-00EF-45E0-A1AD-6AD9E1C3761C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lithnet.AccessManager.Server.Test", "Lithnet.AccessManager.Server.Test\Lithnet.AccessManager.Server.Test.csproj", "{E250293B-46EE-4B5A-BE10-24A54E054D74}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -173,6 +175,24 @@ Global
 		{F02F1493-00EF-45E0-A1AD-6AD9E1C3761C}.Release|x64.Build.0 = Release|Any CPU
 		{F02F1493-00EF-45E0-A1AD-6AD9E1C3761C}.Release|x86.ActiveCfg = Release|Any CPU
 		{F02F1493-00EF-45E0-A1AD-6AD9E1C3761C}.Release|x86.Build.0 = Release|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Debug|x64.Build.0 = Debug|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Debug|x86.Build.0 = Debug|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Dev|Any CPU.ActiveCfg = Debug|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Dev|Any CPU.Build.0 = Debug|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Dev|x64.ActiveCfg = Debug|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Dev|x64.Build.0 = Debug|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Dev|x86.ActiveCfg = Debug|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Dev|x86.Build.0 = Debug|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Release|x64.ActiveCfg = Release|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Release|x64.Build.0 = Release|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Release|x86.ActiveCfg = Release|Any CPU
+		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

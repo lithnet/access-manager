@@ -13,22 +13,17 @@ namespace Lithnet.AccessManager.Web.Internal
 {
     public class WebhookNotificationChannel : NotificationChannel<WebhookNotificationChannelDefinition>
     {
-        private readonly AuditOptions auditSettings;
-
         private readonly ITemplateProvider templates;
 
         public override string Name => "webhook";
 
+        protected override IList<WebhookNotificationChannelDefinition> NotificationChannelDefinitions { get; }
+
         public WebhookNotificationChannel(ILogger logger, IOptions<AuditOptions> auditSettings, ITemplateProvider templates, ChannelWriter<Action> queue)
             : base(logger, queue)
         {
-            this.auditSettings = auditSettings.Value;
+            this.NotificationChannelDefinitions = auditSettings.Value.NotificationChannels.Webhooks;
             this.templates = templates;
-        }
-
-        public override void ProcessNotification(AuditableAction action, Dictionary<string, string> tokens, IImmutableSet<string> notificationChannels)
-        {
-            this.ProcessNotification(action, tokens, notificationChannels, this.auditSettings.NotificationChannels.Webhooks);
         }
 
         protected override void Send(AuditableAction action, Dictionary<string, string> tokens, WebhookNotificationChannelDefinition settings)

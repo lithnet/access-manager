@@ -17,11 +17,11 @@ namespace Lithnet.AccessManager.Web.Internal
     {
         private readonly ILogger logger;
 
-        private readonly AuditOptions auditSettings;
-
         private readonly IWebHostEnvironment env;
 
         public override string Name => "powershell";
+        
+        protected override IList<PowershellNotificationChannelDefinition> NotificationChannelDefinitions { get; }
 
         private PowerShell powershell;
 
@@ -29,13 +29,8 @@ namespace Lithnet.AccessManager.Web.Internal
             : base(logger, queue)
         {
             this.logger = logger;
-            this.auditSettings = auditSettings.Value;
+            this.NotificationChannelDefinitions = auditSettings.Value.NotificationChannels.Powershell;
             this.env = env;
-        }
-
-        public override void ProcessNotification(AuditableAction action, Dictionary<string, string> tokens, IImmutableSet<string> notificationChannels)
-        {
-            this.ProcessNotification(action, tokens, notificationChannels, this.auditSettings.NotificationChannels.Powershell);
         }
 
         protected override void Send(AuditableAction action, Dictionary<string, string> tokens, PowershellNotificationChannelDefinition settings)
