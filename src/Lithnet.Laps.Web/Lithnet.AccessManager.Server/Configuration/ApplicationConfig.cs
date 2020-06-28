@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Xml.Linq;
 using Lithnet.AccessManager.Configuration;
+using Microsoft.AspNetCore.Builder;
 using Newtonsoft.Json;
 
 namespace Lithnet.AccessManager.Server.Configuration
@@ -21,6 +22,10 @@ namespace Lithnet.AccessManager.Server.Configuration
         public RateLimitOptions RateLimits { get; set; }
 
         public UserInterfaceOptions UserInterface { get; set; }
+
+        public ForwardedHeadersOptions ForwardedHeadersOptions { get; set; }
+
+        public AuthorizationOptions Authorization { get; set; }
 
         public void Save(string file)
         {

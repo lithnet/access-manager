@@ -45,19 +45,21 @@ namespace Lithnet.AccessManager.Web.AppSettings
                  options.SignedOutCallbackPath = "/auth/logout";
                  options.SignedOutRedirectUri = "/Home/LoggedOut";
                  options.ResponseType = this.options.ResponseType;
-                 options.Scope.Clear();
-                 options.Scope.Add("openid");
-                 options.Scope.Add("profile");
                  options.SaveTokens = true;
                  options.GetClaimsFromUserInfoEndpoint = true;
                  options.UseTokenLifetime = true;
-
                  options.Events = new OpenIdConnectEvents()
                  {
                      OnTokenValidated = this.FindClaimIdentityInDirectoryOrFail,
                      OnRemoteFailure = this.HandleRemoteFailure,
                      OnAccessDenied = this.HandleAuthNFailed,
                  };
+
+                 options.Scope.Clear();
+                 foreach (var scope in this.options.Scopes)
+                 {
+                     options.Scope.Add(scope);
+                 }
              })
              .AddCookie(options =>
              {
