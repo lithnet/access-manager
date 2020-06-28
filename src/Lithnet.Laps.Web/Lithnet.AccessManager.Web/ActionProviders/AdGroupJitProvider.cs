@@ -20,6 +20,7 @@ namespace Lithnet.AccessManager.Web
             }
             else
             {
+                throw new NotImplementedException();
                 //this.directory.CreateTtlGroup()
             }
         }

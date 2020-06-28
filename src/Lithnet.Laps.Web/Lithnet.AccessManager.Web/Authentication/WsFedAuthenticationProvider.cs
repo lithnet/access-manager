@@ -1,33 +1,59 @@
 ﻿using System.Security.Claims;
+using Lithnet.AccessManager.Configuration;
 using Lithnet.AccessManager.Web.Internal;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NLog;
 
 namespace Lithnet.AccessManager.Web.AppSettings
 {
     public class WsFedAuthenticationProvider : IdpAuthenticationProvider, IWsFedAuthenticationProvider
     {
-        private readonly IConfiguration configuration;
+        private readonly WsFedAuthenticationProviderOptions options;
 
-        public WsFedAuthenticationProvider(IConfiguration configuration, ILogger logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
+        public WsFedAuthenticationProvider(IOptions<WsFedAuthenticationProviderOptions> options, ILogger logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
             :base (logger, directory, httpContextAccessor)
         {
-            this.configuration = configuration;
+            this.options = options.Value;
         }
-
-        public string Realm => this.configuration["authentication:wsfed:realm"];
-
-        public string Metadata => this.configuration["authentication:wsfed:metadata"];
-
-        public override string ClaimName => this.configuration["authentication:wsfed:claim-name"] ?? ClaimTypes.Upn;
-
-        public override string UniqueClaimTypeIdentifier => this.configuration["authentication:oidc:unique-claim-type-identifier"] ?? ClaimTypes.PrimarySid;
-
-        public string SignOutWReply => this.configuration["authentication:wsfed:signout-wreply"] ?? "/Home/LogOut";
-
+        
         public override bool CanLogout => true;
 
-        public override bool IdpLogout => this.configuration.GetValueOrDefault("authentication:wsfed:idp-logout", false);
+        public override bool IdpLogout => this.options.IdpLogout;
+
+        protected override string ClaimName => this.options.ClaimName;
+
+        public override void Configure(IServiceCollection services)
+        {
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            })
+            .AddWsFederation("laps", options =>
+            {
+                options.CallbackPath = "/auth";
+                options.MetadataAddress = this.options.Metadata;
+                options.Wtrealm = this.options.Realm;
+                options.Events = new WsFederationEvents()
+                {
+                    OnSecurityTokenValidated = this.FindClaimIdentityInDirectoryOrFail,
+                    OnAccessDenied = this.HandleAuthNFailed,
+                    OnRemoteFailure = this.HandleRemoteFailure
+                };
+            })
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Home/Login";
+                options.LogoutPath = "/Home/SignOut";
+                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            });
+        }
     }
 }

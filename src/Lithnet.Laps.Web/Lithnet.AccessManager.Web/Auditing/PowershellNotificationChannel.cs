@@ -5,17 +5,19 @@ using System.IO;
 using System.Management.Automation;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Configuration;
 using Lithnet.AccessManager.Web.AppSettings;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 using NLog;
 
 namespace Lithnet.AccessManager.Web.Internal
 {
-    public class PowershellNotificationChannel : NotificationChannel<IPowershellChannelSettings>
+    public class PowershellNotificationChannel : NotificationChannel<PowershellNotificationChannelDefinition>
     {
         private readonly ILogger logger;
 
-        private readonly IAuditSettings auditSettings;
+        private readonly AuditOptions auditSettings;
 
         private readonly IWebHostEnvironment env;
 
@@ -23,20 +25,20 @@ namespace Lithnet.AccessManager.Web.Internal
 
         private PowerShell powershell;
 
-        public PowershellNotificationChannel(ILogger logger, IAuditSettings auditSettings, IWebHostEnvironment env, ChannelWriter<Action> queue)
+        public PowershellNotificationChannel(ILogger logger, IOptions<AuditOptions> auditSettings, IWebHostEnvironment env, ChannelWriter<Action> queue)
             : base(logger, queue)
         {
             this.logger = logger;
-            this.auditSettings = auditSettings;
+            this.auditSettings = auditSettings.Value;
             this.env = env;
         }
 
         public override void ProcessNotification(AuditableAction action, Dictionary<string, string> tokens, IImmutableSet<string> notificationChannels)
         {
-            this.ProcessNotification(action, tokens, notificationChannels, this.auditSettings.Channels.Powershell);
+            this.ProcessNotification(action, tokens, notificationChannels, this.auditSettings.NotificationChannels.Powershell);
         }
 
-        protected override void Send(AuditableAction action, Dictionary<string, string> tokens, IPowershellChannelSettings settings)
+        protected override void Send(AuditableAction action, Dictionary<string, string> tokens, PowershellNotificationChannelDefinition settings)
         {
             if (powershell == null)
             {
@@ -69,7 +71,7 @@ namespace Lithnet.AccessManager.Web.Internal
         }
 
 
-        private void InitializePowerShellSession(IPowershellChannelSettings settings)
+        private void InitializePowerShellSession(PowershellNotificationChannelDefinition settings)
         {
             string path = env.ResolvePath(settings.Script, "Scripts");
 

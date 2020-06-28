@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using Lithnet.AccessManager.Configuration;
 using Lithnet.AccessManager.Web.AppSettings;
 using Lithnet.AccessManager.Web.Internal;
+using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Web.Authorization
 {
@@ -8,16 +10,19 @@ namespace Lithnet.AccessManager.Web.Authorization
     {
         private readonly List<IAuthorizationService> enabledProviders;
 
-        public BuiltInAuthorizationService(IAuthorizationSettings config, JsonTargetAuthorizationService jsonService, PowershellAuthorizationService psService)
+        private readonly AuthorizationOptions options;
+
+        public BuiltInAuthorizationService(IOptions<AuthorizationOptions> options, JsonTargetAuthorizationService jsonService, PowershellAuthorizationService psService)
         {
             this.enabledProviders = new List<IAuthorizationService>();
+            this.options = options.Value;
 
-            if (config.JsonProviderEnabled)
+            if (this.options.JsonProvider?.Enabled ?? false)
             {
                 this.enabledProviders.Add(jsonService);
             }
 
-            if (config.PowershellProviderEnabled)
+            if (this.options.PowershellProvider?.Enabled ?? false)
             {
                 this.enabledProviders.Add(psService);
             }

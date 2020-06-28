@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Net;
+using Lithnet.AccessManager.Configuration;
 using Lithnet.AccessManager.Web.App_LocalResources;
 using Lithnet.AccessManager.Web.AppSettings;
 using Lithnet.AccessManager.Web.Authorization;
 using Lithnet.AccessManager.Web.Exceptions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using NLog;
 
 namespace Lithnet.AccessManager.Web.Internal
@@ -22,15 +24,15 @@ namespace Lithnet.AccessManager.Web.Internal
 
         private readonly IEnumerable<INotificationChannel> notificationChannels;
 
-        private readonly IAuditSettings auditSettings;
+        private readonly AuditOptions auditSettings;
 
-        public AuditEventProcessor(ILogger logger, ITemplateProvider templates, IEnumerable<INotificationChannel> notificationChannels, IHttpContextAccessor httpContextAccessor, IAuditSettings auditSettings)
+        public AuditEventProcessor(ILogger logger, ITemplateProvider templates, IEnumerable<INotificationChannel> notificationChannels, IHttpContextAccessor httpContextAccessor, IOptions<AuditOptions> auditSettings)
         {
             this.logger = logger;
             this.templates = templates;
             this.httpContextAccessor = httpContextAccessor;
             this.notificationChannels = notificationChannels;
-            this.auditSettings = auditSettings;
+            this.auditSettings = auditSettings.Value;
         }
 
         public void GenerateAuditEvent(AuditableAction action)
@@ -169,11 +171,11 @@ namespace Lithnet.AccessManager.Web.Internal
 
             if (action.IsSuccess)
             {
-                this.auditSettings.SuccessChannels?.ForEach(t => channelsToNotify.Add(t));
+                this.auditSettings.GlobalNotifications?.OnSuccess?.ForEach(t => channelsToNotify.Add(t));
             }
             else
             {
-                this.auditSettings.FailureChannels?.ForEach(t => channelsToNotify.Add(t));
+                this.auditSettings.GlobalNotifications?.OnFailure?.ForEach(t => channelsToNotify.Add(t));
             }
 
             return channelsToNotify.ToImmutableHashSet();

@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Channels;
+using Lithnet.AccessManager.Configuration;
 using Lithnet.AccessManager.Web.AppSettings;
 using Lithnet.AccessManager.Web.Exceptions;
 using NLog;
 
 namespace Lithnet.AccessManager.Web.Internal
 {
-    public abstract class NotificationChannel<T> : INotificationChannel where T : IChannelSettings
+    public abstract class NotificationChannel<T> : INotificationChannel where T : NotificationChannelDefinition
     {
         private readonly ILogger logger;
 
@@ -41,7 +42,7 @@ namespace Lithnet.AccessManager.Web.Internal
 
                     try
                     {
-                        if (channel.DenyOnAuditError)
+                        if (channel.Mandatory)
                         {
                             Send(action, tokens, channel, true);
                         }

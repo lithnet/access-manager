@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Lithnet.AccessManager.Web.App_LocalResources;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Lithnet.AccessManager.Web.AppSettings
 {
@@ -9,10 +10,6 @@ namespace Lithnet.AccessManager.Web.AppSettings
         private readonly IDirectory directory;
 
         private readonly IHttpContextAccessor httpContextAccessor;
-
-        public abstract string ClaimName { get; }
-
-        public abstract string UniqueClaimTypeIdentifier { get; }
 
         public abstract bool CanLogout { get; }
 
@@ -44,5 +41,7 @@ namespace Lithnet.AccessManager.Web.AppSettings
             return principal.FindFirst(ClaimTypes.PrimarySid)?.Value ??
                 throw new ObjectNotFoundException(string.Format(LogMessages.UserNotFoundInDirectory, this.httpContextAccessor.HttpContext.User?.Identity?.Name ?? "<unknown user>"));
         }
+
+        public abstract void Configure(IServiceCollection services);
     }
 }

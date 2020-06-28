@@ -5,6 +5,8 @@ using Lithnet.AccessManager.Web.App_LocalResources;
 using Lithnet.AccessManager.Web.Internal;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
 using NLog;
 
 namespace Lithnet.AccessManager.Web.AppSettings
@@ -15,8 +17,10 @@ namespace Lithnet.AccessManager.Web.AppSettings
 
         private readonly IDirectory directory;
 
-        public IdpAuthenticationProvider( ILogger logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
-            :base(httpContextAccessor, directory)
+        protected abstract string ClaimName { get; }
+
+        public IdpAuthenticationProvider(ILogger logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
+            : base(httpContextAccessor, directory)
         {
             this.logger = logger;
             this.directory = directory;

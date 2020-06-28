@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Lithnet.AccessManager.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Lithnet.AccessManager.Web.Internal
 {
@@ -43,41 +45,48 @@ namespace Lithnet.AccessManager.Web.Internal
 
         public static IWebHostBuilder UseHttpSys(this IWebHostBuilder builder, IConfiguration config)
         {
-            if (config["hosting:environment"] != "iis")
+            if (config.GetValueOrDefault("hosting:environment", HostingEnvironment.HttpSys) == HostingEnvironment.HttpSys)
             {
+                HttpSysHostingOptions p = new HttpSysHostingOptions();
+                config.Bind("Hosting:HttpSys", p);
+
                 builder.UseHttpSys(options =>
-                {
-                    if (config["authentication:mode"] == "iwa")
-                    {
-                        options.Authentication.Schemes = config.GetValueOrDefault("authentication:iwa:authentication-schemes", AuthenticationSchemes.Negotiate);
-                        options.Authentication.AllowAnonymous = false;
-                    }
-                    else
-                    {
-                        options.Authentication.AllowAnonymous = true;
-                        options.Authentication.Schemes = AuthenticationSchemes.None;
-                    }
+                 {
+                     if (config.GetValueOrDefault("Authentication:Mode", AuthenticationMode.Iwa) == AuthenticationMode.Iwa)
+                     {
+                         options.Authentication.Schemes = config.GetValueOrDefault("Authentication:Iwa:AuthenticationSchemes", AuthenticationSchemes.Negotiate);
+                         options.Authentication.AllowAnonymous = false;
+                     }
+                     else
+                     {
+                         options.Authentication.AllowAnonymous = true;
+                         options.Authentication.Schemes = AuthenticationSchemes.None;
+                     }
 
-                    //options.ClientCertificateMethod = ClientCertificateMethod.AllowRenegotation;
-                    //options.EnableResponseCaching = false;
-                    //options.Http503Verbosity = Http503VerbosityLevel.Limited;
-                    //options.MaxConnections = 100;
-                    //options.MaxRequestBodySize = 2_048_000;
-                    //options.MaxAccepts = 0;
+                     options.AllowSynchronousIO = p.AllowSynchronousIO;
+                     options.ClientCertificateMethod = p.ClientCertificateMethod;
+                     options.EnableResponseCaching = p.EnableResponseCaching;
+                     options.Http503Verbosity = p.Http503Verbosity;
+                     options.MaxAccepts = p.MaxAccepts;
+                     options.MaxConnections = p.MaxConnections;
+                     options.MaxRequestBodySize = p.MaxRequestBodySize;
+                     options.RequestQueueLimit = p.RequestQueueLimit;
+                     options.RequestQueueMode = p.RequestQueueMode;
+                     options.RequestQueueName = p.RequestQueueName;
+                     options.ThrowWriteExceptions = p.ThrowWriteExceptions;
 
-                    var urls = config.GetValuesOrDefault("hosting:httpsys:urls")?.ToList() ?? new List<string>();
+                     if (p.Urls.Count == 0)
+                     {
+                         options.UrlPrefixes.Add("http://+:80");
+                         options.UrlPrefixes.Add("https://+:443");
+                     }
 
-                    if (urls.Count == 0)
-                    {
-                        options.UrlPrefixes.Add("http://+:80");
-                        options.UrlPrefixes.Add("https://+:443");
-                    }
-
-                    foreach (string url in urls)
-                    {
-                        options.UrlPrefixes.Add(url);
-                    }
-                });
+                     foreach (string url in p.Urls)
+                     {
+                         options.UrlPrefixes.Add(url);
+                     }
+                 }
+                 );
             }
 
             return builder;

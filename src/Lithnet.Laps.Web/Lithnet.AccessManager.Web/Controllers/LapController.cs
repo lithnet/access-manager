@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using Lithnet.AccessManager.Configuration;
 using Lithnet.AccessManager.Web.App_LocalResources;
 using Lithnet.AccessManager.Web.AppSettings;
 using Lithnet.AccessManager.Web.Authorization;
@@ -10,6 +11,7 @@ using Lithnet.AccessManager.Web.Internal;
 using Lithnet.AccessManager.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using NLog;
 using IAuthorizationService = Lithnet.AccessManager.Web.Authorization.IAuthorizationService;
 
@@ -24,20 +26,20 @@ namespace Lithnet.AccessManager.Web.Controllers
         private readonly IDirectory directory;
         private readonly IAuditEventProcessor reporting;
         private readonly IRateLimiter rateLimiter;
-        private readonly IUserInterfaceSettings userInterfaceSettings;
+        private readonly UserInterfaceOptions userInterfaceSettings;
         private readonly IAuthenticationProvider authenticationProvider;
         private readonly IPasswordProvider passwordProvider;
         private readonly IJitProvider jitProvider;
 
         public LapController(IAuthorizationService authorizationService, ILogger logger, IDirectory directory,
-            IAuditEventProcessor reporting, IRateLimiter rateLimiter, IUserInterfaceSettings userInterfaceSettings, IAuthenticationProvider authenticationProvider, IPasswordProvider passwordProvider, IJitProvider jitProvider)
+            IAuditEventProcessor reporting, IRateLimiter rateLimiter, IOptions<UserInterfaceOptions> userInterfaceSettings, IAuthenticationProvider authenticationProvider, IPasswordProvider passwordProvider, IJitProvider jitProvider)
         {
             this.authorizationService = authorizationService;
             this.logger = logger;
             this.directory = directory;
             this.reporting = reporting;
             this.rateLimiter = rateLimiter;
-            this.userInterfaceSettings = userInterfaceSettings;
+            this.userInterfaceSettings = userInterfaceSettings.Value;
             this.authenticationProvider = authenticationProvider;
             this.passwordProvider = passwordProvider;
             this.jitProvider = jitProvider;

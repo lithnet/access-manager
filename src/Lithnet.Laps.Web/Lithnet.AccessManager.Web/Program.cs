@@ -19,7 +19,7 @@ namespace Lithnet.AccessManager.Web
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.json", true)
                 .AddEnvironmentVariables("laps")
                 .AddCommandLine(args)
                 .Build();

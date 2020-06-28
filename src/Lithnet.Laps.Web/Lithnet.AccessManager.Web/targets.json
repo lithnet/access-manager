@@ -19,7 +19,7 @@
         "on-failure": [ "email-domain-admins" ]
       },
       "jit": {
-        "trustee": null, //"IDMDEV1\\JIT-ACCESS_FIM-{computerName}",//"prop:managedBy",
+        "trustee": "IDMDEV1\\JIT-{computerName}",//"prop:managedBy",
         // "target-group" : "IDMDEV1\\blar",
         // "is-shadow-group": false,
         "expire-after": "00:00:15"

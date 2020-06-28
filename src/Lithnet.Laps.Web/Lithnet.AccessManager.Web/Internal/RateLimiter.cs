@@ -1,18 +1,20 @@
 ﻿using System;
+using Lithnet.AccessManager.Configuration;
 using Lithnet.AccessManager.Web.AppSettings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Web.Internal
 {
     public sealed class RateLimiter : IRateLimiter
     {
-        private readonly IRateLimitSettings rateLimits;
+        private readonly RateLimitOptions rateLimits;
         private readonly IMemoryCache memoryCache;
 
-        public RateLimiter(IRateLimitSettings rateLimits, IMemoryCache memoryCache)
+        public RateLimiter(IOptions<RateLimitOptions> rateLimits, IMemoryCache memoryCache)
         {
-            this.rateLimits = rateLimits;
+            this.rateLimits = rateLimits.Value;
             this.memoryCache = memoryCache;
         }
 
@@ -21,9 +23,9 @@ namespace Lithnet.AccessManager.Web.Internal
             if (this.rateLimits.PerIP.Enabled)
             {
                 RateLimitResult result =
-                    this.IsIpThresholdExceeded(r, this.rateLimits.PerIP.ReqPerMinute, 60) ??
-                    this.IsIpThresholdExceeded(r, this.rateLimits.PerIP.ReqPerHour, 3600) ??
-                    this.IsIpThresholdExceeded(r, this.rateLimits.PerIP.ReqPerDay, 86400);
+                    this.IsIpThresholdExceeded(r, this.rateLimits.PerIP.RequestsPerMinute, 60) ??
+                    this.IsIpThresholdExceeded(r, this.rateLimits.PerIP.RequestsPerHour, 3600) ??
+                    this.IsIpThresholdExceeded(r, this.rateLimits.PerIP.RequestsPerDay, 86400);
 
                 if (result != null)
                 {
@@ -36,9 +38,9 @@ namespace Lithnet.AccessManager.Web.Internal
             if (this.rateLimits.PerUser.Enabled)
             {
                 RateLimitResult result =
-                    this.IsUserThresholdExceeded(userid, this.rateLimits.PerUser.ReqPerMinute, 60) ??
-                    this.IsUserThresholdExceeded(userid, this.rateLimits.PerUser.ReqPerHour, 3600) ??
-                    this.IsUserThresholdExceeded(userid, this.rateLimits.PerUser.ReqPerDay, 86400);
+                    this.IsUserThresholdExceeded(userid, this.rateLimits.PerUser.RequestsPerMinute, 60) ??
+                    this.IsUserThresholdExceeded(userid, this.rateLimits.PerUser.RequestsPerHour, 3600) ??
+                    this.IsUserThresholdExceeded(userid, this.rateLimits.PerUser.RequestsPerDay, 86400);
 
                 if (result != null)
                 {

@@ -1,5 +1,7 @@
-﻿@using Lithnet.AccessManager.Web.AppSettings;
-@inject IUserInterfaceSettings uiSettings
+﻿@using Lithnet.AccessManager.Configuration;
+@using Microsoft.Extensions.Options;
+
+@inject IOptions<UserInterfaceOptions> uiSettings
 
 @{
     ViewBag.Title = UIMessages.HeadingRequestAccess;
@@ -17,7 +19,7 @@
             <section>
                 <label class="title">Request type</label>
                 <div class="form-check">
-                    @if (uiSettings.AllowLaps)
+                    @if (uiSettings.Value.AllowLaps)
                     {
                         @Html.RadioButtonFor(m => m.RequestType, "Laps", new { @class = "form-check-input", @id = "lapscheck" })
                         <label class="form-check-label" for="lapscheck">Current local admin password</label>
@@ -25,14 +27,14 @@
                     }
                 </div>
                 <div class="form-check">
-                    @if (uiSettings.AllowLapsHistory)
+                    @if (uiSettings.Value.AllowLapsHistory)
                     {
                         @Html.RadioButtonFor(m => m.RequestType, "LapsHistory", new { @class = "form-check-input", @id = "lapshistorycheck" })
                         <label class="form-check-label" for="lapshistorycheck">Previous local admin passwords</label>
                     }
                 </div>
                 <div class="form-check">
-                    @if (uiSettings.AllowJit)
+                    @if (uiSettings.Value.AllowJit)
                     {
                         @Html.RadioButtonFor(m => m.RequestType, "Jit", new { @class = "form-check-input", @id = "jitcheck" })
                         <label class="form-check-label" for="jitcheck">Just-in-time access</label>

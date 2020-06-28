@@ -1,29 +1,31 @@
 ﻿using System.Security.Claims;
+using Lithnet.AccessManager.Configuration;
 using Lithnet.AccessManager.Web.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Web.AppSettings
 {
     public class IwaAuthenticationProvider : HttpContextAuthenticationProvider, IIwaAuthenticationProvider
     {
-        private readonly IConfiguration configuration;
+        private readonly IwaAuthenticationProviderOptions options;
 
-        public IwaAuthenticationProvider(IConfiguration configuration, IDirectory directory, IHttpContextAccessor httpContextAccessor)
+        public IwaAuthenticationProvider(IOptions<IwaAuthenticationProviderOptions> options, IDirectory directory, IHttpContextAccessor httpContextAccessor)
             :base (httpContextAccessor, directory)
         {
-            this.configuration = configuration;
+            this.options = options.Value;
         }
-
-        public override string UniqueClaimTypeIdentifier => this.configuration["authentication:iwa:unique-claim-type-identifier"] ?? ClaimTypes.PrimarySid;
-
-        public override string ClaimName => ClaimTypes.PrimarySid;
 
         public override bool CanLogout => false;
 
         public override bool IdpLogout => false;
 
-        public AuthenticationSchemes AuthenticationSchemes => this.configuration.GetValueOrDefault("authentication:iwa:authentication-schemes", AuthenticationSchemes.Negotiate);
+        public override void Configure(IServiceCollection services)
+        {
+            services.AddAuthentication(HttpSysDefaults.AuthenticationScheme);
+        }
     }
 }

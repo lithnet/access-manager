@@ -1,7 +1,9 @@
 ﻿@using System.Configuration
-@using Lithnet.AccessManager.Web
-@using Lithnet.AccessManager.Web.AppSettings
-@inject IUserInterfaceSettings uiSettings
+@using Lithnet.AccessManager.Web.AppSettings;
+@using Lithnet.AccessManager.Configuration;
+@using Microsoft.Extensions.Options;
+
+@inject IOptions<UserInterfaceOptions> uiSettings
 @inject IAuthenticationProvider authSettings
 
 <!DOCTYPE html>
@@ -9,7 +11,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@uiSettings.Title</title>
+    <title>@uiSettings.Value.Title</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
@@ -17,8 +19,8 @@
 <body>
     <div class="content">
         <div class="app-header">
-            <img class="app-logo" alt="@uiSettings.Title" src="~/images/logo.png" />
-            <div class="app-title">@uiSettings.Title</div>
+            <img class="app-logo" alt="@uiSettings.Value.Title" src="~/images/logo.png" />
+            <div class="app-title">@uiSettings.Value.Title</div>
         </div>
         @RenderBody()
     </div>

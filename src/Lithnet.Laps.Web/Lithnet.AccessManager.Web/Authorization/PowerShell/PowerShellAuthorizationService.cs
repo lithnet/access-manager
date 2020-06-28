@@ -2,9 +2,11 @@
 using System.IO;
 using System.Management.Automation;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Configuration;
 using Lithnet.AccessManager.Web.AppSettings;
 using Lithnet.AccessManager.Web.Internal;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using NLog;
 
@@ -14,16 +16,16 @@ namespace Lithnet.AccessManager.Web.Authorization
     {
         private readonly ILogger logger;
 
-        private readonly IAuthorizationSettings config;
+        private readonly PowershellAuthorizationProviderOptions options;
 
         private readonly IWebHostEnvironment env;
 
         private PowerShell powershell;
 
-        public PowershellAuthorizationService(ILogger logger, IAuthorizationSettings config, IWebHostEnvironment env)
+        public PowershellAuthorizationService(ILogger logger, IOptions<PowershellAuthorizationProviderOptions> options, IWebHostEnvironment env)
         {
             this.logger = logger;
-            this.config = config;
+            this.options = options.Value;
             this.env = env;
         }
 
@@ -82,7 +84,7 @@ namespace Lithnet.AccessManager.Web.Authorization
             });
 
             task.Start();
-            if (!task.Wait(TimeSpan.FromSeconds(this.config.PowershellScriptTimeout)))
+            if (!task.Wait(TimeSpan.FromSeconds(this.options.ScriptTimeout)))
             {
                 throw new TimeoutException("The PowerShell script did not complete within the configured time");
             }
@@ -141,7 +143,7 @@ namespace Lithnet.AccessManager.Web.Authorization
             });
 
             task.Start();
-            if (!task.Wait(TimeSpan.FromSeconds(this.config.PowershellScriptTimeout)))
+            if (!task.Wait(TimeSpan.FromSeconds(this.options.ScriptTimeout)))
             {
                 throw new TimeoutException("The PowerShell script did not complete within the configured time");
             }
@@ -200,7 +202,7 @@ namespace Lithnet.AccessManager.Web.Authorization
             });
 
             task.Start();
-            if (!task.Wait(TimeSpan.FromSeconds(this.config.PowershellScriptTimeout)))
+            if (!task.Wait(TimeSpan.FromSeconds(this.options.ScriptTimeout)))
             {
                 throw new TimeoutException("The PowerShell script did not complete within the configured time");
             }
@@ -227,7 +229,7 @@ namespace Lithnet.AccessManager.Web.Authorization
 
         private void InitializePowerShellSession()
         {
-            string path = this.env.ResolvePath(this.config.PowershellScriptFile);
+            string path = this.env.ResolvePath(this.options.ScriptFile);
 
             if (path == null || !File.Exists(path))
             {

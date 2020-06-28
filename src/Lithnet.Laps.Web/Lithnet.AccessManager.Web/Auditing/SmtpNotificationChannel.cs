@@ -5,39 +5,41 @@ using System.Net;
 using System.Net.Mail;
 using System.Threading.Channels;
 using HtmlAgilityPack;
+using Lithnet.AccessManager.Configuration;
 using Lithnet.AccessManager.Web.App_LocalResources;
 using Lithnet.AccessManager.Web.AppSettings;
+using Microsoft.Extensions.Options;
 using NLog;
 
 namespace Lithnet.AccessManager.Web.Internal
 {
-    public class SmtpNotificationChannel : NotificationChannel<ISmtpChannelSettings>
+    public class SmtpNotificationChannel : NotificationChannel<SmtpNotificationChannelDefinition>
     {
         private readonly ILogger logger;
 
-        private readonly IEmailSettings emailSettings;
+        private readonly EmailOptions emailSettings;
 
         private readonly ITemplateProvider templates;
 
-        private readonly IAuditSettings auditSettings;
+        private readonly AuditOptions auditSettings;
 
         public override string Name => "smtp";
 
-        public SmtpNotificationChannel(ILogger logger, IEmailSettings emailSettings, ITemplateProvider templates, IAuditSettings auditSettings, ChannelWriter<Action> queue)
+        public SmtpNotificationChannel(ILogger logger, IOptions<EmailOptions> emailSettings, ITemplateProvider templates, IOptions<AuditOptions> auditSettings, ChannelWriter<Action> queue)
             : base(logger, queue)
         {
             this.logger = logger;
-            this.emailSettings = emailSettings;
+            this.emailSettings = emailSettings.Value;
             this.templates = templates;
-            this.auditSettings = auditSettings;
+            this.auditSettings = auditSettings.Value;
         }
 
         public override void ProcessNotification(AuditableAction action, Dictionary<string, string> tokens, IImmutableSet<string> notificationChannels)
         {
-            this.ProcessNotification(action, tokens, notificationChannels, this.auditSettings.Channels.Smtp);
+            this.ProcessNotification(action, tokens, notificationChannels, this.auditSettings.NotificationChannels.Smtp);
         }
 
-        protected override void Send(AuditableAction action, Dictionary<string, string> tokens, ISmtpChannelSettings settings)
+        protected override void Send(AuditableAction action, Dictionary<string, string> tokens, SmtpNotificationChannelDefinition settings)
         {
             string message = action.IsSuccess ? templates.GetTemplate(settings.TemplateSuccess) : templates.GetTemplate(settings.TemplateFailure);
             string subject = GetSubjectLine(message, action.IsSuccess);

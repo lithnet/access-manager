@@ -4,32 +4,34 @@ using System.Collections.Immutable;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Channels;
+using Lithnet.AccessManager.Configuration;
 using Lithnet.AccessManager.Web.AppSettings;
+using Microsoft.Extensions.Options;
 using NLog;
 
 namespace Lithnet.AccessManager.Web.Internal
 {
-    public class WebhookNotificationChannel : NotificationChannel<IWebhookChannelSettings>
+    public class WebhookNotificationChannel : NotificationChannel<WebhookNotificationChannelDefinition>
     {
-        private readonly IAuditSettings auditSettings;
+        private readonly AuditOptions auditSettings;
 
         private readonly ITemplateProvider templates;
 
         public override string Name => "webhook";
 
-        public WebhookNotificationChannel(ILogger logger, IAuditSettings auditSettings, ITemplateProvider templates, ChannelWriter<Action> queue)
+        public WebhookNotificationChannel(ILogger logger, IOptions<AuditOptions> auditSettings, ITemplateProvider templates, ChannelWriter<Action> queue)
             : base(logger, queue)
         {
-            this.auditSettings = auditSettings;
+            this.auditSettings = auditSettings.Value;
             this.templates = templates;
         }
 
         public override void ProcessNotification(AuditableAction action, Dictionary<string, string> tokens, IImmutableSet<string> notificationChannels)
         {
-            this.ProcessNotification(action, tokens, notificationChannels, this.auditSettings.Channels.Webhooks);
+            this.ProcessNotification(action, tokens, notificationChannels, this.auditSettings.NotificationChannels.Webhooks);
         }
 
-        protected override void Send(AuditableAction action, Dictionary<string, string> tokens, IWebhookChannelSettings settings)
+        protected override void Send(AuditableAction action, Dictionary<string, string> tokens, WebhookNotificationChannelDefinition settings)
         {
             HttpClient client = new HttpClient();
             HttpRequestMessage message = new HttpRequestMessage();
