@@ -6,8 +6,16 @@
         xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
+                            xmlns:s="https://github.com/canton7/Stylet"
         Title="RootView" Height="450" Width="800">
     <Grid>
-        <TextBlock>Hello, World</TextBlock>
+        <StackPanel>
+            <TextBlock>Hello, World</TextBlock>
+
+            <Button Command="{s:Action ShowObjectPicker}" >Open object picker</Button>
+            <Button Command="{s:Action ShowContainerPicker}" >Open container picker</Button>
+            <TextBox Text="{Binding User}"/>
+            <TextBox Text="{Binding Container}"/>
+        </StackPanel>
     </Grid>
 </controls:MetroWindow>
