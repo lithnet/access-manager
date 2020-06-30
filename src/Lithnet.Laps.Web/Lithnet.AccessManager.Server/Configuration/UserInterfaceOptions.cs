@@ -1,4 +1,6 @@
-﻿namespace Lithnet.AccessManager.Configuration
+﻿using Newtonsoft.Json;
+
+namespace Lithnet.AccessManager.Configuration
 {
     public class UserInterfaceOptions
     {

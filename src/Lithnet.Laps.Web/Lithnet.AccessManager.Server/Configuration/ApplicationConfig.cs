@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace Lithnet.AccessManager.Server.Configuration
 {
-    public class ApplicationConfig
+    public class ApplicationConfig : IApplicationConfig
     {
         public HostingOptions Hosting { get; set; }
 
@@ -33,7 +33,7 @@ namespace Lithnet.AccessManager.Server.Configuration
             File.WriteAllText(file, data);
         }
 
-        public static ApplicationConfig Load(string file)
+        public static IApplicationConfig Load(string file)
         {
             string data = File.ReadAllText(file);
             return JsonConvert.DeserializeObject<ApplicationConfig>(data);

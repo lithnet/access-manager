@@ -13,20 +13,17 @@ namespace Lithnet.AccessManager.Server.UI.Interop
 {
     internal static class NativeMethods
     {
-        private const int DSBI_ENTIREDIRECTORY = 0x00090000;
-
         private const int MAX_PATH = 256;
-
-        private const int E_NOTIMPL = unchecked((int)0x80004001);
 
         private const int S_FALSE = 1;
 
         private const int S_OK = 0;
 
+       
         private const string CFSTR_DSOP_DS_SELECTION_LIST = "CFSTR_DSOP_DS_SELECTION_LIST";
 
         [DllImport("dsuiext.dll", CharSet = CharSet.Unicode)]
-        private static extern int DsBrowseForContainer(IntPtr pInfo);
+        private static extern DsBrowseResult DsBrowseForContainer(IntPtr pInfo);
 
         [DllImport("ole32.dll")]
         private static extern void ReleaseStgMedium([In] ref STGMEDIUM stgmedium);
@@ -59,9 +56,9 @@ namespace Lithnet.AccessManager.Server.UI.Interop
                 pInfo = Marshal.AllocHGlobal(Marshal.SizeOf<DSBrowseInfo>());
                 Marshal.StructureToPtr(info, pInfo, false);
 
-                int status = DsBrowseForContainer(pInfo);
+                DsBrowseResult status = DsBrowseForContainer(pInfo);
 
-                if (status == 1)
+                if (status == DsBrowseResult.Ok)
                 {
                     DSBrowseInfo result = Marshal.PtrToStructure<DSBrowseInfo>(pInfo);
                     return result.Path;

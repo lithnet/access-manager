@@ -1,0 +1,52 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.UserInterfaceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+             xmlns:s="https://github.com/canton7/Stylet"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel>
+        <GroupBox Header="User interface customization">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Grid.Column="0" Content="Application name"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Title}"/>
+
+                <Label Grid.Row="1" Grid.Column="0" Content="Application logo"/>
+                <Image Grid.Row="1" Grid.Column="1" Source="{Binding Image}" Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Center" MaxWidth="500" MaxHeight="500"/>
+                <Button Grid.Row="1" Grid.Column="2" Content="..." Command="{s:Action FindImage}"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Request configuration">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding AllowLaps}">Allow local admin password requests</CheckBox>
+                <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding AllowLapsHistory}">Allow local admin password history requests</CheckBox>
+                <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding AllowJit}">Allow JIT requests</CheckBox>
+                <StackPanel Grid.Row="3" Grid.Column="0" Orientation="Horizontal" ToolTip="Specify if a reason for requesting admin access is required, optional, or not shown at all">
+                    <Label Content="Reason field" />
+                    <ComboBox SelectedItem="{Binding UserSuppliedReason}" ItemsSource="{Binding UserSuppliedReasonValues}"></ComboBox>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+    </StackPanel>
+</UserControl>

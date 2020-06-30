@@ -16,6 +16,7 @@
             <Button Command="{s:Action ShowContainerPicker}" >Open container picker</Button>
             <TextBox Text="{Binding User}"/>
             <TextBox Text="{Binding Container}"/>
+            <ContentControl s:View.Model="{Binding Config}"/>
         </StackPanel>
     </Grid>
 </controls:MetroWindow>

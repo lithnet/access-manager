@@ -101,6 +101,9 @@
     </Content>
     <Content Update="libman.json" CopyToPublishDirectory="Never" CopyToOutputDirectory="Never">
     </Content>
+    <Content Update="wwwroot\images\custom.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Update="appsettings.*.json" CopyToPublishDirectory="Never" />
   </ItemGroup>
 

@@ -5,7 +5,7 @@ namespace Lithnet.AccessManager.Configuration
 {
     public class IwaAuthenticationProviderOptions : AuthenticationProviderOptions
     {
-        public AuthenticationSchemes AuthenticationSchemes { get; set; }
+        public AuthenticationSchemes AuthenticationSchemes { get; set; } = AuthenticationSchemes.Negotiate;
         
         public override string ClaimName { get; set; } = ClaimTypes.PrimarySid;
 

@@ -5,7 +5,9 @@ using System.Security.Principal;
 using System.Text;
 using System.Windows;
 using System.Windows.Interop;
+using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
+using Newtonsoft.Json;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -16,10 +18,18 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string Container { get; set; }
 
+        public ApplicationConfigViewModel Config { get; set; }
 
-        public RootViewModel()
+        public RootViewModel(IApplicationConfig config)
         {
             this.DisplayName = "Lithnet Access Manager Service Configuration";
+            this.Config = new ApplicationConfigViewModel(config);
+        }
+
+        public void LoadFile(string path)
+        {
+            string data = System.IO.File.ReadAllText(path);
+            //this.Config = JsonConvert.DeserializeObject<ApplicationConfig>(data);
         }
 
         public void ShowObjectPicker()
