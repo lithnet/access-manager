@@ -1,0 +1,78 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.IpDetectionView"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             Dialog:DialogParticipation.Register="{Binding}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+            <CheckBox IsChecked="{Binding Enabled}" VerticalAlignment="Center" >Enable client IP resolution from X-Forwarded-For headers</CheckBox>
+        </StackPanel>
+
+        <Label Grid.Row="1" Grid.Column="0" Content="Maximum allowed entries in the header"/>
+        <mah:NumericUpDown Grid.Row="1" Grid.Column="1" Value="{Binding ForwardLimit}" Minimum="0" Maximum="65535" Interval="1" HideUpDownButtons="True" Width="50" TextAlignment="Left" HorizontalAlignment="Left" IsEnabled="{Binding Enabled}"/>
+
+        <Label Grid.Row="2" Grid.Column="0" Content="Known proxy IP addresses"/>
+        <ListBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding KnownProxies}" SelectedItem="{Binding SelectedProxy}" IsEnabled="{Binding Enabled}"></ListBox>
+
+        <Grid  Grid.Row="3" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="75"/>
+                <ColumnDefinition Width="75"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <TextBox Grid.Column="0"  Text="{Binding NewProxy}" IsEnabled="{Binding Enabled}"></TextBox>
+            <Button Grid.Column="1" Command="{s:Action AddProxy}" Content="Add" ></Button>
+            <Button Grid.Column="2" Command="{s:Action RemoveProxy}" Content="Remove"></Button>
+        </Grid>
+
+
+        <Label Grid.Row="4" Grid.Column="0" Content="Known proxy networks"/>
+        <ListBox Grid.Row="4" Grid.Column="1" ItemsSource="{Binding KnownNetworks}" SelectedItem="{Binding SelectedNetwork}" IsEnabled="{Binding Enabled}"></ListBox>
+
+        <Grid Grid.Row="5" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="75"/>
+                <ColumnDefinition Width="75"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <TextBox Grid.Column="0"  Text="{Binding NewNetwork}" IsEnabled="{Binding Enabled}"></TextBox>
+            <Button Grid.Column="1" Command="{s:Action AddNetwork}" Content="Add"></Button>
+            <Button Grid.Column="2" Command="{s:Action RemoveNetwork}" Content="Remove"></Button>
+        </Grid>
+
+    </Grid>
+</UserControl>

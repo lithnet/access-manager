@@ -35,7 +35,7 @@ namespace Lithnet.AccessManager.Web
             services.TryAddScoped<IIwaAuthenticationProvider, IwaAuthenticationProvider>();
             services.TryAddScoped<IOidcAuthenticationProvider, OidcAuthenticationProvider>();
             services.TryAddScoped<IWsFedAuthenticationProvider, WsFedAuthenticationProvider>();
-            
+
             services.TryAddScoped<IJsonTargetsProvider, JsonFileTargetsProvider>();
             services.TryAddScoped<IAuthorizationService, BuiltInAuthorizationService>();
             services.TryAddScoped<JsonTargetAuthorizationService, JsonTargetAuthorizationService>();
@@ -72,7 +72,7 @@ namespace Lithnet.AccessManager.Web
             services.Configure<AuthenticationOptions>(Configuration.GetSection("Authentication"));
             services.Configure<HostingOptions>(Configuration.GetSection("Hosting"));
             services.Configure<AuthorizationOptions>(Configuration.GetSection("Authorization"));
-            services.Configure<ForwardedHeadersOptions>(Configuration.GetSection("ForwardedHeadersOptions"));
+            services.Configure<ForwardedHeadersAppOptions>(Configuration.GetSection("ForwardedHeaders"));
 
             services.Configure<JsonFileTargetsProviderOptions>(Configuration.GetSection("Authorization:JsonProvider"));
             services.Configure<PowershellAuthorizationProviderOptions>(Configuration.GetSection("Authorization:PowershellProvider"));
@@ -80,9 +80,10 @@ namespace Lithnet.AccessManager.Web
             this.ConfigureAuthentication(services);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider provider)
         {
-            app.UseForwardedHeaders();
+            var fwdOptions = provider.GetRequiredService<IOptions<ForwardedHeadersAppOptions>>().Value;
+            app.UseForwardedHeaders(fwdOptions.ToNativeOptions());
 
             if (env.IsDevelopment())
             {
@@ -93,7 +94,7 @@ namespace Lithnet.AccessManager.Web
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-            
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
@@ -117,7 +118,7 @@ namespace Lithnet.AccessManager.Web
             var provider = services.BuildServiceProvider();
             var authSettings = provider.GetService<IOptions<AuthenticationOptions>>();
             IAuthenticationProvider authProvider;
-            
+
             switch (authSettings.Value.Mode)
             {
                 case AuthenticationMode.Iwa:

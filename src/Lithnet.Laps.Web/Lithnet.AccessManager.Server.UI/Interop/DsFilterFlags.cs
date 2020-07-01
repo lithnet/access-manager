@@ -6,7 +6,7 @@ using System.Text;
 namespace Lithnet.AccessManager.Server.UI.Interop
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct DsFilterFlags
+    public struct DsFilterFlags
     {
         public DsopUplevelFitlerFlags UpLevel;
 

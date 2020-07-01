@@ -23,10 +23,10 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public UserInterfaceOptions UserInterface { get; set; }
 
-        public ForwardedHeadersOptions ForwardedHeadersOptions { get; set; }
+        public ForwardedHeadersAppOptions ForwardedHeaders { get; set; }
 
         public AuthorizationOptions Authorization { get; set; }
-
+        
         public void Save(string file)
         {
             string data = JsonConvert.SerializeObject(this);

@@ -6,7 +6,7 @@ using System.Text;
 namespace Lithnet.AccessManager.Server.UI.Interop
 {
 	[StructLayout(LayoutKind.Sequential)]
-	internal struct DsopUplevelFitlerFlags
+	public struct DsopUplevelFitlerFlags
 	{
 		/// <summary>
 		/// Filter flags to use for an up-level scope, regardless of whether it is a mixed or native mode domain. This member can be a combination of one or more of the following flags.

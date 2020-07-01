@@ -10,12 +10,11 @@
         Title="RootView" Height="450" Width="800">
     <Grid>
         <StackPanel>
-            <TextBlock>Hello, World</TextBlock>
-
+            <StackPanel Orientation="Horizontal">
             <Button Command="{s:Action ShowObjectPicker}" >Open object picker</Button>
             <Button Command="{s:Action ShowContainerPicker}" >Open container picker</Button>
-            <TextBox Text="{Binding User}"/>
-            <TextBox Text="{Binding Container}"/>
+            </StackPanel>
+            
             <ContentControl s:View.Model="{Binding Config}"/>
         </StackPanel>
     </Grid>

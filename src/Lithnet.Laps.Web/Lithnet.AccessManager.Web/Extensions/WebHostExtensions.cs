@@ -74,17 +74,10 @@ namespace Lithnet.AccessManager.Web.Internal
                      options.RequestQueueMode = p.RequestQueueMode;
                      options.RequestQueueName = p.RequestQueueName;
                      options.ThrowWriteExceptions = p.ThrowWriteExceptions;
-
-                     if (p.Urls.Count == 0)
-                     {
-                         options.UrlPrefixes.Add("http://+:80");
-                         options.UrlPrefixes.Add("https://+:443");
-                     }
-
-                     foreach (string url in p.Urls)
-                     {
-                         options.UrlPrefixes.Add(url);
-                     }
+                     
+                     options.UrlPrefixes.Clear();
+                     options.UrlPrefixes.Add(p.BuildHttpUrlPrefix());
+                     options.UrlPrefixes.Add(p.BuildHttpsUrlPrefix());
                  }
                  );
             }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using System.ServiceProcess;
 using System.Text;
 using System.Windows;
 
@@ -19,7 +20,8 @@ namespace Lithnet.AccessManager.Server.UI.Interop
 
         private const int S_OK = 0;
 
-       
+        private const uint SERVICE_NO_CHANGE = 0xffffffff;
+
         private const string CFSTR_DSOP_DS_SELECTION_LIST = "CFSTR_DSOP_DS_SELECTION_LIST";
 
         [DllImport("dsuiext.dll", CharSet = CharSet.Unicode)]
@@ -33,6 +35,9 @@ namespace Lithnet.AccessManager.Server.UI.Interop
 
         [DllImport("Kernel32.dll", SetLastError = true)]
         private static extern bool GlobalUnlock(IntPtr ptr);
+
+        [DllImport("advapi32.dll", SetLastError = true)]
+        private static extern bool ChangeServiceConfig(IntPtr hService, uint nServiceType, uint nStartType, uint nErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, IntPtr lpdwTagId, string pDependencies, string lpServiceStartName, string lpPassword, string lpDisplayName);
 
         public static string ShowContainerDialog(IntPtr hwnd, string dialogTitle = null, string treeViewTitle = null, AdsFormat pathFormat = AdsFormat.X500Dn)
         {
@@ -75,13 +80,18 @@ namespace Lithnet.AccessManager.Server.UI.Interop
             }
         }
 
-        public static IEnumerable<DsopResult> ShowObjectPickerDialog(IntPtr hwnd, params string[] attributesToGet)
+        public static IEnumerable<DsopResult> ShowObjectPickerDialog(IntPtr hwnd, DsopScopeInitInfo scope, params string[] attributesToGet)
+        {
+            return ShowObjectPickerDialog(hwnd, new List<DsopScopeInitInfo> { scope }, attributesToGet);
+        }
+
+        public static IEnumerable<DsopResult> ShowObjectPickerDialog(IntPtr hwnd, IList<DsopScopeInitInfo> scopes, params string[] attributesToGet)
         {
             IDsObjectPicker idsObjectPicker = (IDsObjectPicker)new DSObjectPicker();
 
             try
             {
-                using LpStructArrayMarshaller<DsopScopeInitInfo> scopeInitInfoArray = CreateScopes();
+                using LpStructArrayMarshaller<DsopScopeInitInfo> scopeInitInfoArray = CreateScopes(scopes);
                 using LpStringArrayConverter attributes = new LpStringArrayConverter(attributesToGet);
                 DsopDialogInitializationInfo initInfo = CreateInitInfo(scopeInitInfoArray.Ptr, scopeInitInfoArray.Count, attributes.Ptr, attributes.Count);
 
@@ -115,6 +125,30 @@ namespace Lithnet.AccessManager.Server.UI.Interop
             }
         }
 
+        public static void ChangeServiceCredentials(string serviceName, string username, string password)
+        {
+            ServiceController controller = new ServiceController(serviceName);
+            try
+            {
+                bool success = false;
+                controller.ServiceHandle.DangerousAddRef(ref success);
+
+                if (!success)
+                {
+                    throw new InvalidOperationException("Could not increment handle");
+                }
+
+                if (!ChangeServiceConfig(controller.ServiceHandle.DangerousGetHandle(), SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, null, null, IntPtr.Zero, null, username, password, null))
+                {
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                }
+            }
+            finally
+            {
+                controller.ServiceHandle.DangerousRelease();
+            }
+        }
+
         private static DsopDialogInitializationInfo CreateInitInfo(IntPtr pScopeInitInfo, int scopeCount, IntPtr attrributesToGet, int attributesToGetCount)
         {
             var initInfo = new DsopDialogInitializationInfo
@@ -132,49 +166,18 @@ namespace Lithnet.AccessManager.Server.UI.Interop
             return initInfo;
         }
 
-        private static LpStructArrayMarshaller<DsopScopeInitInfo> CreateScopes()
+        private static LpStructArrayMarshaller<DsopScopeInitInfo> CreateScopes(IList<DsopScopeInitInfo> scopes)
         {
-            List<DsopScopeInitInfo> list = new List<DsopScopeInitInfo>();
+            for (int i = 0; i < scopes.Count; i++)
+            {
+                var s = scopes[i];
+                s.Size = Marshal.SizeOf<DsopScopeInitInfo>();
+            }
 
-            DsopScopeInitInfo scope = new DsopScopeInitInfo();
+          
 
-            scope.Size = Marshal.SizeOf<DsopScopeInitInfo>();
-            scope.ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_ENTERPRISE_DOMAIN;
-            scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE | DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_COMPUTERS | DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_USERS;
-            scope.Filter.UpLevel.BothModeFilter = DsopObjectFilterFlags.DSOP_FILTER_USERS | DsopObjectFilterFlags.DSOP_FILTER_WELL_KNOWN_PRINCIPALS | DsopObjectFilterFlags.DSOP_FILTER_UNIVERSAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_SERVICE_ACCOUNTS | DsopObjectFilterFlags.DSOP_FILTER_GLOBAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_DOMAIN_LOCAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_BUILTIN_GROUPS | DsopObjectFilterFlags.DSOP_FILTER_COMPUTERS;
-
-            list.Add(scope);
-
-            scope = new DsopScopeInitInfo();
-            scope.Size = Marshal.SizeOf<DsopScopeInitInfo>();
-            scope.ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_GLOBAL_CATALOG;
-            scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_COMPUTERS | DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_USERS;
-            scope.Filter.UpLevel.BothModeFilter = DsopObjectFilterFlags.DSOP_FILTER_USERS | DsopObjectFilterFlags.DSOP_FILTER_WELL_KNOWN_PRINCIPALS | DsopObjectFilterFlags.DSOP_FILTER_UNIVERSAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_SERVICE_ACCOUNTS | DsopObjectFilterFlags.DSOP_FILTER_GLOBAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_DOMAIN_LOCAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_BUILTIN_GROUPS | DsopObjectFilterFlags.DSOP_FILTER_COMPUTERS;
-
-
-            list.Add(scope);
-
-            scope = new DsopScopeInitInfo();
-            scope.Size = Marshal.SizeOf<DsopScopeInitInfo>();
-            scope.ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_EXTERNAL_UPLEVEL_DOMAIN;
-            scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_COMPUTERS | DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_USERS;
-            scope.Filter.UpLevel.BothModeFilter = DsopObjectFilterFlags.DSOP_FILTER_USERS | DsopObjectFilterFlags.DSOP_FILTER_WELL_KNOWN_PRINCIPALS | DsopObjectFilterFlags.DSOP_FILTER_UNIVERSAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_SERVICE_ACCOUNTS | DsopObjectFilterFlags.DSOP_FILTER_GLOBAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_DOMAIN_LOCAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_BUILTIN_GROUPS | DsopObjectFilterFlags.DSOP_FILTER_COMPUTERS;
-
-
-            list.Add(scope);
-
-            scope = new DsopScopeInitInfo();
-            scope.Size = Marshal.SizeOf<DsopScopeInitInfo>();
-            scope.ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_USER_ENTERED_UPLEVEL_SCOPE;
-            scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_COMPUTERS | DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_USERS;
-            scope.Filter.UpLevel.BothModeFilter = DsopObjectFilterFlags.DSOP_FILTER_USERS | DsopObjectFilterFlags.DSOP_FILTER_WELL_KNOWN_PRINCIPALS | DsopObjectFilterFlags.DSOP_FILTER_UNIVERSAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_SERVICE_ACCOUNTS | DsopObjectFilterFlags.DSOP_FILTER_GLOBAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_DOMAIN_LOCAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_BUILTIN_GROUPS | DsopObjectFilterFlags.DSOP_FILTER_COMPUTERS;
-
-            list.Add(scope);
-
-            return new LpStructArrayMarshaller<DsopScopeInitInfo>(list);
+            return new LpStructArrayMarshaller<DsopScopeInitInfo>(scopes);
         }
-
-
 
         private static IEnumerable<DsopResult> GetResultsFromDataObject(IDataObject data, string[] requestedAttributes)
         {

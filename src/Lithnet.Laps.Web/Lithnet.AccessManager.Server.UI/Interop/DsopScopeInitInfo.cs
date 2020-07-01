@@ -7,12 +7,12 @@ namespace Lithnet.AccessManager.Server.UI.Interop
 {
     [StructLayout(LayoutKind.Sequential)]
 
-    internal struct DsopScopeInitInfo
+    public struct DsopScopeInitInfo
     {
         /// <summary>
         /// Contains the size, in bytes, of the structure.
         /// </summary>
-        public int Size;
+        internal int Size;
 
         /// <summary>
         /// Flags that indicate the scope types described by this structure. You can combine multiple scope types if all specified scopes use the same settings. 
