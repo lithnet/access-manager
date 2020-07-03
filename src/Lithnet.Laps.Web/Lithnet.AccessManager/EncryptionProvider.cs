@@ -1,11 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Net.Http.Headers;
-using System.Runtime.ConstrainedExecution;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using NLog.LayoutRenderers.Wrappers;
 
 namespace Lithnet.AccessManager
 {
@@ -59,7 +56,8 @@ namespace Lithnet.AccessManager
 
                 using (ICryptoTransform transform = aes.CreateEncryptor())
                 {
-                    byte[] encryptedKey = ((RSA)cert.PublicKey.Key).Encrypt(aes.Key, RSAEncryptionPadding.OaepSHA512);
+                    RSA publicKey = cert.GetRSAPublicKey();
+                    byte[] encryptedKey = publicKey.Encrypt(aes.Key, RSAEncryptionPadding.OaepSHA512);
 
                     using (MemoryStream outStream = new MemoryStream())
                     {
@@ -97,7 +95,8 @@ namespace Lithnet.AccessManager
 
                 aes.Encrypt(nonce, dataToEncrypt, encryptedData, tag, additionalData);
 
-                byte[] encryptedKey = ((RSA)cert.PublicKey.Key).Encrypt(key, RSAEncryptionPadding.OaepSHA512);
+                RSA publicKey = cert.GetRSAPublicKey();
+                byte[] encryptedKey = publicKey.Encrypt(key, RSAEncryptionPadding.OaepSHA512);
 
                 using (MemoryStream outStream = new MemoryStream())
                 {
@@ -161,7 +160,8 @@ namespace Lithnet.AccessManager
                 aesManaged.Mode = CipherMode.CBC;
                 aesManaged.Padding = PaddingMode.PKCS7;
 
-                byte[] decryptedKey = ((RSA)cert.PrivateKey).Decrypt(encryptedKey, RSAEncryptionPadding.OaepSHA512);
+                RSA privateKey = cert.GetRSAPrivateKey();
+                byte[] decryptedKey = privateKey.Decrypt(encryptedKey, RSAEncryptionPadding.OaepSHA512);
 
                 using (ICryptoTransform transform = aesManaged.CreateDecryptor(decryptedKey, iv))
                 {
@@ -188,7 +188,8 @@ namespace Lithnet.AccessManager
             byte[] nonce = reader.ReadBytes(nonceLength);
             byte[] tag = reader.ReadBytes(tagLength);
 
-            byte[] decryptedKey = ((RSA)cert.PrivateKey).Decrypt(encryptedKey, RSAEncryptionPadding.OaepSHA512);
+            RSA privateKey = cert.GetRSAPrivateKey();
+            byte[] decryptedKey = privateKey.Decrypt(encryptedKey, RSAEncryptionPadding.OaepSHA512);
 
             int remainingBytes = (int)(inputStream.Length - inputStream.Position);
 

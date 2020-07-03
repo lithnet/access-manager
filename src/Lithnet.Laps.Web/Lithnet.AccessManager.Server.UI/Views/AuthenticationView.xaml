@@ -10,65 +10,14 @@
     <StackPanel>
         <StackPanel.Resources>
             <BooleanToVisibilityConverter x:Key="btvc" />
+            <local:EnumToDisplayConverter x:Key="enumconv"/>
         </StackPanel.Resources>
-        <Grid Margin="10">
-            <Grid.Resources>
-                <Style TargetType="Border" >
-                    <Setter Property="Padding" Value="5" />
-                </Style>
-            </Grid.Resources>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-
-            <Label Grid.Row="0" Grid.Column="0" Content="Authentication provider"/>
-            <ComboBox Grid.Row="0" Grid.Column="1" SelectedItem="{Binding AuthenticationMode}" ItemsSource="{Binding AuthenticationModeValues}"></ComboBox>
-
-            <GroupBox Grid.Row="1" Grid.ColumnSpan="2" Header="Integrated windows authentication" Visibility="{Binding Path=IwaVisible, Converter={StaticResource btvc}}">
-                <StackPanel Orientation="Horizontal">
-                    <Label Content="Authentication scheme"/>
-                    <ComboBox SelectedItem="{Binding IwaAuthenticationSchemes}" ItemsSource="{Binding IwaAuthenticationSchemesValues}"></ComboBox>
-                </StackPanel>
-            </GroupBox>
-
-            <GroupBox Grid.Row="2" Grid.ColumnSpan="2" Header="OpenID Connect" Visibility="{Binding Path=OidcVisible, Converter={StaticResource btvc}}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    
-                    <Label Grid.Row="0" Grid.Column="0" Content="Issuer/Authority"/>
-                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding OidcAuthority}" />
-
-                    <Label Grid.Row="1" Grid.Column="0" Content="Client ID"/>
-                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding OidcClientID}" />
-
-                    <Label Grid.Row="2" Grid.Column="0" Content="Secret"/>
-                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding OidcSecret}" />
-
-                    <Label Grid.Row="2" Grid.Column="0" Content="Secret"/>
-                    <PasswordBox Grid.Row="2" Grid.Column="1" local:PasswordBoxBindingHelper.BindPassword="True" local:PasswordBoxBindingHelper.BoundPassword="{Binding Path=OidcSecret, Mode=TwoWay}"/>
-
-                </Grid>
-                    
-            </GroupBox>
-
-            <GroupBox Grid.Row="3" Grid.ColumnSpan="2" Header="WS-Federation" Visibility="{Binding Path=WsFedVisible, Converter={StaticResource btvc}}">
-                <Grid>
+                <Grid Margin="10">
+                    <Grid.Resources>
+                        <Style TargetType="Border" >
+                            <Setter Property="Padding" Value="5" />
+                        </Style>
+                    </Grid.Resources>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -80,15 +29,75 @@
                         <RowDefinition />
                     </Grid.RowDefinitions>
 
-                    <Label Grid.Row="0" Grid.Column="0" Content="Metadata URL"/>
-                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding WsFedMetadata}" />
+                    <Label Grid.Row="0" Grid.Column="0" Content="Authentication provider"/>
+                    <ComboBox Grid.Row="0" Grid.Column="1" 
+                      ItemsSource="{Binding AuthenticationModeValues, Mode=OneWay}"
+                      SelectedItem="{Binding AuthenticationMode}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource enumconv}}"></TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
 
-                    <Label Grid.Row="1" Grid.Column="0" Content="Realm"/>
-                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding WsFedRealm}" />
+                    <GroupBox Grid.Row="1" Grid.ColumnSpan="2" Header="Integrated windows authentication" Visibility="{Binding Path=IwaVisible, Converter={StaticResource btvc}}">
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Authentication scheme"/>
+                            <ComboBox SelectedItem="{Binding IwaAuthenticationSchemes}" ItemsSource="{Binding IwaAuthenticationSchemesValues}"></ComboBox>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Grid.Row="2" Grid.ColumnSpan="2" Header="OpenID Connect" Visibility="{Binding Path=OidcVisible, Converter={StaticResource btvc}}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0" Content="Issuer/Authority"/>
+                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding OidcAuthority}" />
+
+                            <Label Grid.Row="1" Grid.Column="0" Content="Client ID"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding OidcClientID}" />
+
+                            <Label Grid.Row="2" Grid.Column="0" Content="Secret"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding OidcSecret}" />
+
+                            <Label Grid.Row="2" Grid.Column="0" Content="Secret"/>
+                            <PasswordBox Grid.Row="2" Grid.Column="1" local:PasswordBoxBindingHelper.BindPassword="True" local:PasswordBoxBindingHelper.BoundPassword="{Binding Path=OidcSecret, Mode=TwoWay}"/>
+
+                        </Grid>
+
+                    </GroupBox>
+
+                    <GroupBox Grid.Row="3" Grid.ColumnSpan="2" Header="WS-Federation" Visibility="{Binding Path=WsFedVisible, Converter={StaticResource btvc}}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0" Content="Metadata URL"/>
+                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding WsFedMetadata}" />
+
+                            <Label Grid.Row="1" Grid.Column="0" Content="Realm"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding WsFedRealm}" />
+                        </Grid>
+                    </GroupBox>
+
                 </Grid>
-            </GroupBox>
-           
-        </Grid>
 
     </StackPanel>
 </UserControl>

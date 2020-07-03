@@ -6,7 +6,7 @@ namespace Lithnet.AccessManager.Configuration
     {
         public bool Enabled { get; set; }
 
-        public string ID { get; set; }
+        public string Id { get; set; }
 
         public bool Mandatory { get; set; }
     }

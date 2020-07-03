@@ -10,7 +10,6 @@ using System.Windows.Media.Imaging;
 using Lithnet.AccessManager.Configuration;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
-using Microsoft.AspNetCore.Server.HttpSys;
 using Newtonsoft.Json;
 using Stylet;
 

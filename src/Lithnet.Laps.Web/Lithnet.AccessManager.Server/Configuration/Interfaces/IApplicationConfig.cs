@@ -5,6 +5,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 {
     public interface IApplicationConfig
     {
+        string Path { get; set; }
+
         AuditOptions Auditing { get; set; }
 
         AuthenticationOptions Authentication { get; set; }

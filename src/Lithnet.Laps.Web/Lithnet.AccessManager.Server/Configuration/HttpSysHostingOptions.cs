@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Microsoft.AspNetCore.Server.HttpSys;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Lithnet.AccessManager.Configuration
 {
-    public class HttpSysHostingOptions : HttpSysOptions
+    public class HttpSysHostingOptions
     {
         public static Guid AppId = new Guid("{4C3E21BA-7BEF-46C8-BC85-A4407DB6F596}");
 
@@ -17,7 +18,27 @@ namespace Lithnet.AccessManager.Configuration
 
         public string Path { get; set; }
 
-        public  string BuildHttpUrlPrefix()
+        public int MaxAccepts { get; set; }
+
+        public bool EnableResponseCaching { get; set; }
+
+        public bool ThrowWriteExceptions { get; set; }
+
+        public long? MaxConnections { get; set; }
+
+        public long RequestQueueLimit { get; set; }
+
+        public long? MaxRequestBodySize { get; set; }
+
+        public bool AllowSynchronousIO { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Http503VerbosityLevel Http503Verbosity { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ClientCertificateMethod ClientCertificateMethod { get; set; }
+
+        public string BuildHttpUrlPrefix()
         {
             string host = "+";
             int port = 80;
@@ -35,7 +56,7 @@ namespace Lithnet.AccessManager.Configuration
             return BuildPrefix(host, port, this.Path, false);
         }
 
-        public  string BuildHttpsUrlPrefix()
+        public string BuildHttpsUrlPrefix()
         {
             string host = "+";
             int port = 443;

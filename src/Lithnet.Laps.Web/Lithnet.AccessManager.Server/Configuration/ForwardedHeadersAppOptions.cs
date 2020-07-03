@@ -5,8 +5,8 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Server.HttpSys;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Lithnet.AccessManager.Configuration
 {
@@ -30,6 +30,7 @@ namespace Lithnet.AccessManager.Configuration
         public string OriginalProtoHeaderName { get; set; }
          = defaultOptions.OriginalProtoHeaderName;
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public ForwardedHeaders ForwardedHeaders { get; set; }
          = defaultOptions.ForwardedHeaders;
 

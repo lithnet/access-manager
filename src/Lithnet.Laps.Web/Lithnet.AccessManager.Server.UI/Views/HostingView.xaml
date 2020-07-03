@@ -11,14 +11,21 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel>
-        <Grid Margin="10">
+        <Grid Margin="10" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
 
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
@@ -43,12 +50,20 @@
             <Label Grid.Row="5" Grid.Column="1" Content="Optionally, enter a specific hostname to listen on. Leave this field blank to listen on all hostnames"/>
 
             <Label Grid.Row="6" Grid.Column="0" Content="Certificate"/>
-            <ComboBox Grid.Row="6" Grid.Column="1" DisplayMemberPath="Subject" SelectedItem="{Binding Certificate}" ItemsSource="{Binding AvailableCertificates}"></ComboBox>
+            <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding CertificateDisplayName, Mode=OneWay}" IsReadOnly="True"/>
+            <Button Grid.Row="6" Grid.Column="2" Command="{s:Action ShowCertificateDialog}" Content="Show ..."/>
+            <Button Grid.Row="7" Grid.Column="2" Command="{s:Action ShowSelectCertificateDialog}" Content="Select from store..."/>
+            <Button Grid.Row="8" Grid.Column="2" Command="{s:Action ShowImportDialog}" Content="Import..."/>
             <Label Grid.Row="7" Grid.Column="1" Content="{Binding CertificateExpiryText}"/>
 
-            <Label Grid.Row="8" Grid.Column="0" Content="Service Account"/>
-            <TextBox Grid.Row="8" Grid.Column="1" Text="{Binding ServiceAccountDisplayName}" IsReadOnly="True"/>
-            <Button Grid.Row="8" Grid.Column="2" Command="{s:Action SelectServiceAccountUser}" Content="..."/>
+            <Label Grid.Row="10" Grid.Column="0" Content="Service Account"/>
+            <TextBox Grid.Row="10" Grid.Column="1" Text="{Binding ServiceAccountDisplayName}" IsReadOnly="True"/>
+            <Button Grid.Row="10" Grid.Column="2" Command="{s:Action SelectServiceAccountUser}" Content="..."/>
+
+            <Label Grid.Row="11" Grid.Column="0" Content="Service Status"/>
+            <Label Grid.Row="11" Grid.Column="1" Content="{Binding ServiceStatus}"/>
+            <Button Grid.Row="11" Grid.Column="2"  Command="{s:Action StartService}" Content="Start Service..."/>
+            <Button Grid.Row="12" Grid.Column="2" Command="{s:Action StopService}" Content="Stop Service..."/>
         </Grid>
 
     </StackPanel>

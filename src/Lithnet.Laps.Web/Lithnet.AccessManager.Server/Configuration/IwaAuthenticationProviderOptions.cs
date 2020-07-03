@@ -1,10 +1,12 @@
 ﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Server.HttpSys;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Lithnet.AccessManager.Configuration
 {
     public class IwaAuthenticationProviderOptions : AuthenticationProviderOptions
     {
+        [JsonConverter(typeof(StringEnumConverter))]
         public AuthenticationSchemes AuthenticationSchemes { get; set; } = AuthenticationSchemes.Negotiate;
         
         public override string ClaimName { get; set; } = ClaimTypes.PrimarySid;

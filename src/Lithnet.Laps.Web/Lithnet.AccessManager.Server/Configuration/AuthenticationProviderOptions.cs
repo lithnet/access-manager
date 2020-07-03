@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Server.HttpSys;
 
 namespace Lithnet.AccessManager.Configuration
 {

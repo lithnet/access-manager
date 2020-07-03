@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Lithnet.AccessManager.Configuration
 {
@@ -6,6 +7,7 @@ namespace Lithnet.AccessManager.Configuration
     {
         public string Title { get; set; } = "Lithnet Access Manager";
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public AuditReasonFieldState UserSuppliedReason { get; set; } = AuditReasonFieldState.Optional;
 
         public bool AllowLaps { get; set; } = true;

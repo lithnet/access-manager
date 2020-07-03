@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using HttpSys = Microsoft.AspNetCore.Server.HttpSys;
 
 namespace Lithnet.AccessManager.Web.Internal
 {
@@ -54,27 +55,25 @@ namespace Lithnet.AccessManager.Web.Internal
                  {
                      if (config.GetValueOrDefault("Authentication:Mode", AuthenticationMode.Iwa) == AuthenticationMode.Iwa)
                      {
-                         options.Authentication.Schemes = config.GetValueOrDefault("Authentication:Iwa:AuthenticationSchemes", AuthenticationSchemes.Negotiate);
+                         options.Authentication.Schemes = config.GetValueOrDefault("Authentication:Iwa:AuthenticationSchemes", HttpSys.AuthenticationSchemes.Negotiate);
                          options.Authentication.AllowAnonymous = false;
                      }
                      else
                      {
                          options.Authentication.AllowAnonymous = true;
-                         options.Authentication.Schemes = AuthenticationSchemes.None;
+                         options.Authentication.Schemes = HttpSys.AuthenticationSchemes.None;
                      }
 
                      options.AllowSynchronousIO = p.AllowSynchronousIO;
-                     options.ClientCertificateMethod = p.ClientCertificateMethod;
+                     options.ClientCertificateMethod = (HttpSys.ClientCertificateMethod)p.ClientCertificateMethod;
                      options.EnableResponseCaching = p.EnableResponseCaching;
-                     options.Http503Verbosity = p.Http503Verbosity;
+                     options.Http503Verbosity = (HttpSys.Http503VerbosityLevel)p.Http503Verbosity;
                      options.MaxAccepts = p.MaxAccepts;
                      options.MaxConnections = p.MaxConnections;
                      options.MaxRequestBodySize = p.MaxRequestBodySize;
                      options.RequestQueueLimit = p.RequestQueueLimit;
-                     options.RequestQueueMode = p.RequestQueueMode;
-                     options.RequestQueueName = p.RequestQueueName;
                      options.ThrowWriteExceptions = p.ThrowWriteExceptions;
-                     
+
                      options.UrlPrefixes.Clear();
                      options.UrlPrefixes.Add(p.BuildHttpUrlPrefix());
                      options.UrlPrefixes.Add(p.BuildHttpsUrlPrefix());

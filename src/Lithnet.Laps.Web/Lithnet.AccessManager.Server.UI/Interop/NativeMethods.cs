@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.ServiceProcess;
 using System.Text;
 using System.Windows;
@@ -24,6 +27,12 @@ namespace Lithnet.AccessManager.Server.UI.Interop
 
         private const string CFSTR_DSOP_DS_SELECTION_LIST = "CFSTR_DSOP_DS_SELECTION_LIST";
 
+        private const int CRYPTUI_WIZ_IMPORT_ALLOW_CERT = 0x00020000;
+
+        private const int CRYPTUI_WIZ_IMPORT_NO_CHANGE_DEST_STORE = 0x00010000;
+
+        private const int CRYPTUI_WIZ_IMPORT_TO_LOCALMACHINE = 0x00100000;
+      
         [DllImport("dsuiext.dll", CharSet = CharSet.Unicode)]
         private static extern DsBrowseResult DsBrowseForContainer(IntPtr pInfo);
 
@@ -38,6 +47,9 @@ namespace Lithnet.AccessManager.Server.UI.Interop
 
         [DllImport("advapi32.dll", SetLastError = true)]
         private static extern bool ChangeServiceConfig(IntPtr hService, uint nServiceType, uint nStartType, uint nErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, IntPtr lpdwTagId, string pDependencies, string lpServiceStartName, string lpPassword, string lpDisplayName);
+
+        [DllImport("cryptui.dll", SetLastError = true)]
+        private static extern bool CryptUIWizImport(int dwFlags, IntPtr hwndParent, [MarshalAs(UnmanagedType.LPWStr)] string pwszWizardTitle, IntPtr pImportSrc, IntPtr hDestCertStore);
 
         public static string ShowContainerDialog(IntPtr hwnd, string dialogTitle = null, string treeViewTitle = null, AdsFormat pathFormat = AdsFormat.X500Dn)
         {
@@ -149,6 +161,70 @@ namespace Lithnet.AccessManager.Server.UI.Interop
             }
         }
 
+        public static string GetKeyLocation(X509Certificate2 cert)
+        {
+            var cng = cert.PrivateKey as RSACng;
+            var crypto = cert.PrivateKey as RSACryptoServiceProvider;
+
+            string name = cng.Key.UniqueName ?? crypto.CspKeyContainerInfo.UniqueKeyContainerName;
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return null;
+            }
+
+            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Application Data\Microsoft\Crypto\RSA\MachineKeys", name);
+
+            if (File.Exists(path))
+            {
+                return path;
+            }
+
+            path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Application Data\Microsoft\Crypto\Keys", name);
+
+
+            if (File.Exists(path))
+            {
+                return path;
+            }
+
+            return null;
+        }
+
+        public static X509Certificate2 ShowCertificateImportDialog(IntPtr hwnd, string title, StoreLocation location, StoreName name)
+        {
+            List<string> thumbprints = new List<string>();
+
+            using (X509Store store = new X509Store(name, StoreLocation.LocalMachine, OpenFlags.ReadWrite))
+            {
+                thumbprints = store.Certificates.OfType<X509Certificate2>().Select(t => t.Thumbprint).ToList();
+
+                if (!CryptUIWizImport(CRYPTUI_WIZ_IMPORT_ALLOW_CERT | CRYPTUI_WIZ_IMPORT_NO_CHANGE_DEST_STORE | CRYPTUI_WIZ_IMPORT_TO_LOCALMACHINE,
+                    hwnd, title, IntPtr.Zero, store.StoreHandle))
+                {
+                    int result = Marshal.GetLastWin32Error();
+                    throw new Win32Exception(result);
+                }
+            }
+
+            using (X509Store store = new X509Store(name, StoreLocation.LocalMachine, OpenFlags.ReadWrite))
+            {
+                var newCertificateList = store.Certificates.OfType<X509Certificate2>().ToList();
+
+                var newItems = newCertificateList.Where(t => !thumbprints.Any(u => u == t.Thumbprint));
+
+                foreach (var newItem in newItems)
+                {
+                    if (newItem.HasPrivateKey)
+                    {
+                        return newItem;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         private static DsopDialogInitializationInfo CreateInitInfo(IntPtr pScopeInitInfo, int scopeCount, IntPtr attrributesToGet, int attributesToGetCount)
         {
             var initInfo = new DsopDialogInitializationInfo
@@ -173,8 +249,6 @@ namespace Lithnet.AccessManager.Server.UI.Interop
                 var s = scopes[i];
                 s.Size = Marshal.SizeOf<DsopScopeInitInfo>();
             }
-
-          
 
             return new LpStructArrayMarshaller<DsopScopeInitInfo>(scopes);
         }

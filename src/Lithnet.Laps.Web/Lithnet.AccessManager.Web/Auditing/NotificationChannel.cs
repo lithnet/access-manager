@@ -32,11 +32,11 @@ namespace Lithnet.AccessManager.Web.Internal
 
             foreach (var channel in this.NotificationChannelDefinitions)
             {
-                if (notificationChannelIDs.Any(t => string.Equals(t, channel.ID, StringComparison.OrdinalIgnoreCase)))
+                if (notificationChannelIDs.Any(t => string.Equals(t, channel.Id, StringComparison.OrdinalIgnoreCase)))
                 {
                     if (!channel.Enabled)
                     {
-                        this.logger.Trace($"Skipping delivery of audit notification to {channel.ID} as it is currently disabled");
+                        this.logger.Trace($"Skipping delivery of audit notification to {channel.Id} as it is currently disabled");
                         continue;
                     }
 
@@ -70,13 +70,13 @@ namespace Lithnet.AccessManager.Web.Internal
         {
             try
             {
-                this.logger.Trace($"Attempting delivery of audit notification to {channel.ID}");
+                this.logger.Trace($"Attempting delivery of audit notification to {channel.Id}");
                 this.Send(action, tokens, channel);
-                this.logger.Trace($"Delivery of audit notification to {channel.ID} successful");
+                this.logger.Trace($"Delivery of audit notification to {channel.Id} successful");
             }
             catch (Exception ex)
             {
-                this.logger.LogEventError(EventIDs.NotificationChannelError, $"Delivery of audit notification to {channel.ID} failed", ex);
+                this.logger.LogEventError(EventIDs.NotificationChannelError, $"Delivery of audit notification to {channel.Id} failed", ex);
 
                 if (rethrowExceptions)
                 {

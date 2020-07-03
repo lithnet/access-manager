@@ -21,6 +21,10 @@ using MahApps.Metro.Controls.Dialogs;
 using System.Threading.Tasks;
 using System.DirectoryServices.AccountManagement;
 using NLog.LayoutRenderers.Wrappers;
+using System.IO;
+using System.Security.AccessControl;
+using PropertyChanged;
+using System.Runtime.CompilerServices;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -30,6 +34,8 @@ namespace Lithnet.AccessManager.Server.UI
         private const string ServiceName = "lithnetadminaccesservice";
         private readonly HostingOptions model;
         private readonly IDialogCoordinator dialogCoordinator;
+
+        private ServiceController controller;
 
         public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator)
         {
@@ -42,7 +48,19 @@ namespace Lithnet.AccessManager.Server.UI
             this.ActiveServiceAccount = this.GetServiceAccount();
             this.ServiceAccount = this.ActiveServiceAccount;
             this.DisplayName = "Web hosting";
+
+            try
+            {
+                controller = new ServiceController(ServiceName);
+                this.ServiceStatus = controller.Status.ToString();
+            }
+            catch
+            {
+                this.ServiceStatus = "Error: service not found";
+            }
         }
+
+        public string ServiceStatus { get; set; }
 
         public int HttpPort { get => this.model.HttpSys.HttpPort; set => this.model.HttpSys.HttpPort = value; }
 
@@ -55,6 +73,8 @@ namespace Lithnet.AccessManager.Server.UI
         public bool IsReading => !this.IsEditing;
 
         public X509Certificate2 Certificate { get; set; }
+
+        public string CertificateDisplayName => this.Certificate.ToDisplayName();
 
         public SecurityIdentifier ServiceAccount { get; set; }
 
@@ -80,10 +100,8 @@ namespace Lithnet.AccessManager.Server.UI
 
         private bool HasCertificateChanged => this.ActiveCertificate != this.Certificate;
 
-        private bool HasServiceAccountChanged => this.ActiveServiceAccount != this.ServiceAccount || 
+        private bool HasServiceAccountChanged => this.ActiveServiceAccount != this.ServiceAccount ||
             this.ServiceAccountPassword != null;
-
-        public IEnumerable<X509Certificate2> AvailableCertificates => this.GetAvailableCertificates();
 
         public string CertificateExpiryText
         {
@@ -151,7 +169,7 @@ namespace Lithnet.AccessManager.Server.UI
                     }
                 }
 
-                        this.ServiceAccountPassword = r.Password;
+                this.ServiceAccountPassword = r.Password;
 
             }
             catch (Exception ex)
@@ -160,40 +178,66 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public void StopService()
+        public bool CanStopService => this.ServiceStatus == ServiceControllerStatus.Running.ToString();
+
+        public bool CanStartService => this.ServiceStatus == ServiceControllerStatus.Stopped.ToString();
+
+        public async Task StopService()
         {
-            using ServiceController controller = new ServiceController(ServiceName);
-            if (controller.Status != ServiceControllerStatus.Stopped)
+            if (this.CanStopService)
             {
                 controller.Stop();
+                this.ServiceStatus = "Stopping";
             }
 
-            controller.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30));
+            await Task.Run(async () =>
+            {
+                try
+                {
+                    controller.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30));
+                }
+                catch (System.ServiceProcess.TimeoutException)
+                {
+                    await dialogCoordinator.ShowMessageAsync(this, "Service control", "The service did not stop in the requested time");
+                }
+            })
+           .ContinueWith((x) => this.ServiceStatus = controller.Status.ToString());
         }
 
-        public void StartService()
+        public async Task StartService()
         {
-            using ServiceController controller = new ServiceController(ServiceName);
-            if (controller.Status != ServiceControllerStatus.Running)
+            if (this.CanStartService)
             {
                 controller.Start();
+                this.ServiceStatus = "Starting";
             }
 
-            controller.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
+            await Task.Run(async () =>
+            {
+                try
+                {
+                    controller.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
+                }
+                catch (System.ServiceProcess.TimeoutException)
+                {
+                    await dialogCoordinator.ShowMessageAsync(this, "Service control", "The service did not start in the requested time");
+                }
+            })
+             .ContinueWith((x) => this.ServiceStatus = controller.Status.ToString());
         }
 
-        public void RestartService()
+        public async Task RestartService()
         {
-            this.StopService();
-            this.StartService();
+            await this.StopService();
+            await this.StartService();
         }
 
-        public void CreateUrlReservation(string url, SecurityIdentifier sid)
+        private void CreateUrlReservation(string url, SecurityIdentifier sid)
         {
             UrlAcl.Create(url, string.Format(SddlTemplate, sid.ToString()));
         }
 
-        public void DeleteUrlReservation(string url)
+        private void DeleteUrlReservation(string url)
         {
             foreach (var acl in UrlAcl.GetAllBindings())
             {
@@ -204,7 +248,36 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public X509Certificate2 GetCertificate()
+        public bool CanShowCertificateDialog => this.Certificate != null;
+
+        public void ShowCertificateDialog()
+        {
+            X509Certificate2UI.DisplayCertificate(this.Certificate, this.GetHandle());
+        }
+
+        public void ShowSelectCertificateDialog()
+        {
+            X509Certificate2Collection results = X509Certificate2UI.SelectFromCollection(this.GetAvailableCertificateCollection(), "Select TLS certificate", "Select a certificate to use as the TLS certificate for this web site", X509SelectionFlag.SingleSelection, this.GetHandle());
+
+            if (results.Count == 1)
+            {
+                this.Certificate = results[0];
+            }
+        }
+
+
+        public void ShowImportDialog()
+        {
+            X509Certificate2 newCert = NativeMethods.ShowCertificateImportDialog(this.GetHandle(), "Import certificate", StoreLocation.LocalMachine, StoreName.My);
+
+            if (newCert != null)
+            {
+                this.Certificate = newCert;
+            }
+        }
+
+
+        private X509Certificate2 GetCertificate()
         {
             foreach (CertificateBinding binding in this.GetCertificateBindings())
             {
@@ -225,10 +298,8 @@ namespace Lithnet.AccessManager.Server.UI
             return results.ToList();
         }
 
-        public void ReplaceCertificate(X509Certificate2 cert, int port)
+        private void ReplaceCertificate(X509Certificate2 cert, int port)
         {
-            // Grant access to private key
-
             var config = new CertificateBindingConfiguration();
 
             foreach (var b in config.Query())
@@ -249,12 +320,14 @@ namespace Lithnet.AccessManager.Server.UI
             config.Bind(binding);
         }
 
-        public IEnumerable<X509Certificate2> GetAvailableCertificates()
+        private X509Certificate2Collection GetAvailableCertificateCollection()
         {
+            X509Certificate2Collection certs = new X509Certificate2Collection();
+
             X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine, OpenFlags.ReadOnly);
             Oid serverAuthOid = new Oid("1.3.6.1.5.5.7.3.1");
 
-            foreach (X509Certificate2 c in store.Certificates.OfType<X509Certificate2>().Where(t => t.HasPrivateKey))
+            foreach (X509Certificate2 c in store.Certificates.Find(X509FindType.FindByTimeValid, DateTime.Now, false).OfType<X509Certificate2>().Where(t => t.HasPrivateKey))
             {
                 foreach (X509EnhancedKeyUsageExtension x in c.Extensions.OfType<X509EnhancedKeyUsageExtension>())
                 {
@@ -262,11 +335,35 @@ namespace Lithnet.AccessManager.Server.UI
                     {
                         if (o.Value == serverAuthOid.Value)
                         {
-                            yield return c;
+                            certs.Add(c);
                         }
                     }
                 }
             }
+
+            return certs;
+        }
+
+        private void AddPrivateKeyReadPermission(X509Certificate2 cert, SecurityIdentifier sid)
+        {
+            string location = NativeMethods.GetKeyLocation(cert);
+
+            if (location == null)
+            {
+                throw new CertificateNotFoundException("The certificate private key was not found. Manually add permissions for the service account to read this private key");
+            }
+
+            AddFileSecurity(location, sid, FileSystemRights.Read, AccessControlType.Allow);
+        }
+
+        private static void AddFileSecurity(string fileName, IdentityReference account, FileSystemRights rights, AccessControlType controlType)
+        {
+            FileInfo info = new FileInfo(fileName);
+            FileSecurity fSecurity = info.GetAccessControl();
+
+            fSecurity.AddAccessRule(new FileSystemAccessRule(account, rights, controlType));
+
+            info.SetAccessControl(fSecurity);
         }
 
         private X509Certificate2 GetCertificateFromStore(string storeName, string thumbprint)
@@ -289,7 +386,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             if (this.ServiceAccountDisplayName == null)
             {
-                return null;
+                this.ServiceAccountDisplayName = "LocalSystem";
             }
 
             NTAccount account = new NTAccount(this.ServiceAccountDisplayName);
@@ -301,15 +398,18 @@ namespace Lithnet.AccessManager.Server.UI
             NativeMethods.ChangeServiceCredentials(ServiceName, username, password);
         }
 
-        public void SaveHostingSettings()
+        public async Task SaveHostingSettings()
         {
-            this.StopService();
+            await this.StopService();
+
+            if (this.HasServiceAccountChanged || this.ServiceAccountPassword != null)
+            {
+                this.SetServiceAccount(this.ServiceAccountDisplayName, this.ServiceAccountPassword);
+            }
 
             if (this.HasServiceAccountChanged)
             {
-                this.SetServiceAccount(this.ServiceAccountDisplayName, this.ServiceAccountPassword);
-
-                // Update on disk ACLs
+                // update on disk ACLs
             }
 
             if (this.HasHttpPortChanged || this.HasHttpsPortChanged || this.HasServiceAccountChanged || this.HasHostnameChanged)
@@ -324,17 +424,21 @@ namespace Lithnet.AccessManager.Server.UI
                 this.CreateUrlReservation(this.model.HttpSys.BuildHttpsUrlPrefix(), this.ServiceAccount);
             }
 
+            if (this.HasCertificateChanged || this.HasServiceAccountChanged)
+            {
+                this.AddPrivateKeyReadPermission(this.Certificate, this.ServiceAccount);
+            }
+
             if (this.HasCertificateChanged || this.HasHttpsPortChanged)
             {
-                // Grant access to private key
                 this.ReplaceCertificate(this.Certificate, this.HttpsPort);
             }
 
 
             // Commit config
 
-
-            this.StartService();
+            await this.StartService();
         }
     }
 }
+
