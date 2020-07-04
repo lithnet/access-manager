@@ -10,61 +10,141 @@
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Margin="5">
-    <StackPanel>
-        <Grid Margin="10" >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
+        <StackPanel>
+            <GroupBox Header="Service"
+                  Margin="5">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
 
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Label Grid.Row="0" Grid.Column="0" Content="HTTP Port"/>
-            <mah:NumericUpDown Grid.Row="0" Grid.Column="1" Value="{Binding HttpPort}" Minimum="1" Maximum="65535" Interval="1" HideUpDownButtons="True" Width="50" TextAlignment="Left" HorizontalAlignment="Left"/>
-            <Label Grid.Row="1" Grid.Column="1" Content="Enter the HTTP port to listen on (Default 80). Note that all connections on this port are redirected to HTTPS"/>
+                    <Label Grid.Row="0" Grid.Column="0"
+                       Content="Service Account"
+                       Margin="5"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" 
+                         Text="{Binding ServiceAccountDisplayName}" 
+                         IsReadOnly="True"
+                         Margin="5"/>
+                    <Button Grid.Row="0" Grid.Column="2"
+                        Command="{s:Action SelectServiceAccountUser}"
+                        Content="Set service account..."
+                        Margin="5"/>
 
-            <Label Grid.Row="2" Grid.Column="0" Content="HTTPS Port"/>
-            <mah:NumericUpDown Grid.Row="2" Grid.Column="1" Value="{Binding HttpsPort}" Minimum="1" Maximum="65535" Interval="1" HideUpDownButtons="True" Width="50" TextAlignment="Left" HorizontalAlignment="Left"/>
-            <Label Grid.Row="3" Grid.Column="1" Content="Enter the HTTPS port to listen on (Default 443)"/>
+                    <Label Grid.Row="1" Grid.Column="0"
+                       Content="Service Status"
+                       Margin="5"/>
+                    <Label Grid.Row="1" Grid.Column="1" 
+                       Content="{Binding ServiceStatus}"
+                       Margin="5"/>
+                    <Button Grid.Row="1" Grid.Column="2" 
+                        Command="{s:Action StartService}"
+                        Content="Start Service"
+                        Margin="5"/>
+                    <Button Grid.Row="2" Grid.Column="2" 
+                        Command="{s:Action StopService}" 
+                        Content="Stop Service"
+                        Margin="5"/>
+                </Grid>
+            </GroupBox>
 
-            <Label Grid.Row="4" Grid.Column="0" Content="Hostname"/>
-            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Hostname}"/>
-            <Label Grid.Row="5" Grid.Column="1" Content="Optionally, enter a specific hostname to listen on. Leave this field blank to listen on all hostnames"/>
+            <GroupBox Header="Web host"
+                  Margin="5">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
 
-            <Label Grid.Row="6" Grid.Column="0" Content="Certificate"/>
-            <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding CertificateDisplayName, Mode=OneWay}" IsReadOnly="True"/>
-            <Button Grid.Row="6" Grid.Column="2" Command="{s:Action ShowCertificateDialog}" Content="Show ..."/>
-            <Button Grid.Row="7" Grid.Column="2" Command="{s:Action ShowSelectCertificateDialog}" Content="Select from store..."/>
-            <Button Grid.Row="8" Grid.Column="2" Command="{s:Action ShowImportDialog}" Content="Import..."/>
-            <Label Grid.Row="7" Grid.Column="1" Content="{Binding CertificateExpiryText}"/>
+                    <Label Grid.Row="0" Grid.Column="0" 
+                   Content="HTTP Port"
+                   Margin="5"/>
+                    <mah:NumericUpDown Grid.Row="0" Grid.Column="1" 
+                               Value="{Binding HttpPort}" 
+                               Minimum="1" Maximum="65535" Interval="1"
+                               HideUpDownButtons="True"
+                               Width="50" 
+                               TextAlignment="Left" HorizontalAlignment="Left"
+                               Margin="5 5 5 0"/>
+                    <Label Grid.Row="1" Grid.Column="1" 
+                   Content="Enter the HTTP port to listen on (Default 80). Note that all connections on this port are redirected to HTTPS"
+                   Margin="5 0 5 0"/>
 
-            <Label Grid.Row="10" Grid.Column="0" Content="Service Account"/>
-            <TextBox Grid.Row="10" Grid.Column="1" Text="{Binding ServiceAccountDisplayName}" IsReadOnly="True"/>
-            <Button Grid.Row="10" Grid.Column="2" Command="{s:Action SelectServiceAccountUser}" Content="..."/>
+                    <Label Grid.Row="2" Grid.Column="0" 
+                   Content="HTTPS Port"
+                   Margin="5"/>
+                    <mah:NumericUpDown Grid.Row="2" Grid.Column="1" 
+                               Value="{Binding HttpsPort}" 
+                               Minimum="1" Maximum="65535" Interval="1" 
+                               HideUpDownButtons="True"
+                               Width="50" 
+                               TextAlignment="Left" HorizontalAlignment="Left"
+                               Margin="5 5 5 0"/>
+                    <Label Grid.Row="3" Grid.Column="1" 
+                   Content="Enter the HTTPS port to listen on (Default 443)"
+                   Margin="5 0 5 0"/>
 
-            <Label Grid.Row="11" Grid.Column="0" Content="Service Status"/>
-            <Label Grid.Row="11" Grid.Column="1" Content="{Binding ServiceStatus}"/>
-            <Button Grid.Row="11" Grid.Column="2"  Command="{s:Action StartService}" Content="Start Service..."/>
-            <Button Grid.Row="12" Grid.Column="2" Command="{s:Action StopService}" Content="Stop Service..."/>
-        </Grid>
+                    <Label Grid.Row="4" Grid.Column="0" 
+                   Content="Hostname"
+                   Margin="5"/>
+                    <TextBox Grid.Row="4" Grid.Column="1"
+                     Text="{Binding Hostname}"
+                     Margin="5 5 5 0"/>
+                    <Label Grid.Row="5" Grid.Column="1" 
+                   Content="Optionally, enter a specific hostname to listen on. Leave this field blank to listen on all hostnames"
+                   Margin="5 0 5 0"/>
 
-    </StackPanel>
+                    <Label Grid.Row="6" Grid.Column="0"
+                       Content="Certificate"
+                       Margin="5"/>
+                    <TextBox Grid.Row="6" Grid.Column="1"
+                         Text="{Binding CertificateDisplayName, Mode=OneWay}" 
+                         IsReadOnly="True"
+                         Margin="5"/>
+                    <Button Grid.Row="6" Grid.Column="2"
+                        Command="{s:Action ShowCertificateDialog}"
+                        Content="View certificate..."
+                        Margin="5"/>
+                    <Button Grid.Row="7" Grid.Column="2" 
+                        Command="{s:Action ShowSelectCertificateDialog}"
+                        Content="Select from store..."
+                        Margin="5"/>
+                    <Button Grid.Row="8" Grid.Column="2" 
+                        Command="{s:Action ShowImportDialog}"
+                        Content="Import..."
+                        Margin="5"/>
+                    <Label Grid.Row="7" Grid.Column="1"
+                       Content="{Binding CertificateExpiryText}"
+                       Margin="5"/>
+
+                </Grid>
+            </GroupBox>
+
+        </StackPanel>
 </UserControl>
