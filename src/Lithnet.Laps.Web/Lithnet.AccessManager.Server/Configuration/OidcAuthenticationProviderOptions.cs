@@ -19,6 +19,6 @@ namespace Lithnet.AccessManager.Configuration
 
         public override bool IdpLogout { get; set; }
 
-        public IList<string> Scopes { get; set; } = new List<string> { "profile", "openid" };
+        public IList<string> Scopes { get; set; }
     }
 }

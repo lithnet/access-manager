@@ -1,5 +1,7 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using System.Windows.Media.Animation;
 using Lithnet.AccessManager.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -49,10 +51,18 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string NewNetwork { get; set; }
 
+        public bool CanAddNetwork => this.Enabled && !string.IsNullOrWhiteSpace(this.NewNetwork);
+
         public async Task AddNetwork()
         {
             if (string.IsNullOrWhiteSpace(this.NewNetwork))
             {
+                return;
+            }
+
+            if (this.KnownNetworks.Contains(this.NewNetwork))
+            {
+                await this.dialogCoordinator.ShowMessageAsync(this, "Validation", "The specified network range already exists");
                 return;
             }
 
@@ -79,34 +89,30 @@ namespace Lithnet.AccessManager.Server.UI
                 }
             }
 
-            if (IPAddress.TryParse(split[0], out _))
-            {
-                this.KnownNetworks.Add(this.NewNetwork);
-            }
-            else
+            if (!IPAddress.TryParse(split[0], out _))
             {
                 await this.dialogCoordinator.ShowMessageAsync(this, "Validation", "The specified value was not a valid IP address");
                 return;
             }
-        }
 
-        public bool CanAddNetwork()
-        {
-            return this.Enabled && !string.IsNullOrWhiteSpace(this.NewNetwork);
+            this.KnownNetworks.Add(this.NewNetwork);
+            this.model.KnownNetworks.Add(this.NewNetwork);
+            this.NewNetwork = null;
         }
 
         public void RemoveNetwork()
         { 
             if (this.SelectedNetwork != null)
             {
-                this.KnownNetworks.Remove(this.SelectedNetwork);
+                string value = this.SelectedNetwork;
+                this.NewNetwork = value;
+                this.KnownNetworks.Remove(value);
+                this.model.KnownNetworks.Remove(value);
+                this.SelectedNetwork = this.KnownNetworks.FirstOrDefault();
             }
         }
         
-        public bool CanRemoveNetwork()
-        {
-            return this.Enabled && this.SelectedNetwork != null;
-        }
+        public bool CanRemoveNetwork => this.Enabled && this.SelectedNetwork != null;
 
         public string SelectedProxy { get; set; }
 
@@ -119,33 +125,39 @@ namespace Lithnet.AccessManager.Server.UI
                 return;
             }
 
-            if (IPAddress.TryParse(this.NewProxy, out _))
+            if (this.KnownProxies.Contains(this.NewProxy))
             {
-                this.KnownProxies.Add(this.NewProxy);
+                await this.dialogCoordinator.ShowMessageAsync(this, "Validation", "The specified IP address already exists");
+                return;
             }
-            else
+
+            if (!IPAddress.TryParse(this.NewProxy, out _))
             {
                 await this.dialogCoordinator.ShowMessageAsync(this, "Validation", "The specified value was not a valid IP address");
+                return;
             }
+
+            this.KnownProxies.Add(this.NewProxy);
+            this.model.KnownProxies.Add(this.NewProxy);
+            this.NewProxy = null;
         }
 
-        public bool CanAddProxy()
-        {
-            return this.Enabled && !string.IsNullOrWhiteSpace(this.NewProxy);
-        }
+        public bool CanAddProxy => this.Enabled && !string.IsNullOrWhiteSpace(this.NewProxy);
 
         public void RemoveProxy()
         {
             if (this.SelectedProxy != null)
             {
-                this.KnownProxies.Remove(this.SelectedProxy);
+                string value = this.SelectedProxy;
+                this.NewProxy = value;
+                this.KnownProxies.Remove(value);
+                this.model.KnownProxies.Remove(value);
+
+                this.SelectedProxy = this.KnownProxies.FirstOrDefault();
             }
         }
 
-        public bool CanRemoveProxy()
-        {
-            return this.Enabled && this.SelectedProxy != null;
-        }
+        public bool CanRemoveProxy => this.Enabled && this.SelectedProxy != null;
 
         public string DisplayName { get; set; } = "IP address detection";
     }

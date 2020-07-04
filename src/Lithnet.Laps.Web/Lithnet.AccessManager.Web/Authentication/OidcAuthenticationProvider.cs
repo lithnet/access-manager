@@ -56,9 +56,17 @@ namespace Lithnet.AccessManager.Web.AppSettings
                  };
 
                  options.Scope.Clear();
-                 foreach (var scope in this.options.Scopes)
+                 if (this.options?.Scopes.Count == 0)
                  {
-                     options.Scope.Add(scope);
+                     options.Scope.Add("openid");
+                     options.Scope.Add("profile");
+                 }
+                 else
+                 {
+                     foreach (var scope in this.options.Scopes)
+                     {
+                         options.Scope.Add(scope);
+                     }
                  }
              })
              .AddCookie(options =>

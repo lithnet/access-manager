@@ -43,7 +43,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             await ChildWindowManager.ShowChildWindowAsync(this.GetWindow(), w);
 
-            if (w.Result == MahApps.Metro.Controls.Dialogs.MessageDialogResult.Affirmative)
+            if (w.Result == MessageDialogResult.Affirmative)
             {
                 this.model.Add(m);
                 this.ViewModels.Add(vm);
@@ -60,7 +60,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             await ChildWindowManager.ShowChildWindowAsync(this.GetWindow(), w);
 
-            if (w.Result == MahApps.Metro.Controls.Dialogs.MessageDialogResult.Affirmative)
+            if (w.Result == MessageDialogResult.Affirmative)
             {
                 this.model.Remove(this.SelectedItem.Model);
                 this.ViewModels.Remove(this.SelectedItem);
@@ -89,6 +89,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 this.model.Remove(this.SelectedItem.Model);
                 this.ViewModels.Remove(this.SelectedItem);
+                this.SelectedItem = this.ViewModels.FirstOrDefault();
             }
         }
 

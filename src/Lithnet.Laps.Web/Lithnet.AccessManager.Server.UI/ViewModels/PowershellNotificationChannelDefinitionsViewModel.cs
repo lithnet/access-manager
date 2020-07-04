@@ -59,7 +59,7 @@ JsonConvert.DeserializeObject<PowershellNotificationChannelDefinition>(JsonConve
 
             await ChildWindowManager.ShowChildWindowAsync(this.GetWindow(), w);
 
-            if (w.Result == MahApps.Metro.Controls.Dialogs.MessageDialogResult.Affirmative)
+            if (w.Result == MessageDialogResult.Affirmative)
             {
                 this.model.Remove(this.SelectedItem.Model);
                 this.ViewModels.Remove(this.SelectedItem);
@@ -88,6 +88,7 @@ JsonConvert.DeserializeObject<PowershellNotificationChannelDefinition>(JsonConve
             {
                 this.model.Remove(this.SelectedItem.Model);
                 this.ViewModels.Remove(this.SelectedItem);
+                this.SelectedItem = this.ViewModels.FirstOrDefault();
             }
         }
 
