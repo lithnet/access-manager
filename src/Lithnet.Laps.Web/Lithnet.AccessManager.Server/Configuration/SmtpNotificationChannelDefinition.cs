@@ -8,6 +8,6 @@ namespace Lithnet.AccessManager.Configuration
 
         public string TemplateFailure { get; set; }
 
-        public IList<string> EmailAddresses { get; set; }
+        public IList<string> EmailAddresses { get; set; } = new List<string>();
     }
 }

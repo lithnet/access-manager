@@ -1,16 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Principal;
-using System.Text;
-using System.Windows;
-using System.Windows.Interop;
-using System.Windows.Media.Imaging;
 using Lithnet.AccessManager.Configuration;
-using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.UI.Interop;
-using Newtonsoft.Json;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -65,7 +56,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool IwaVisible => this.AuthenticationMode == AuthenticationMode.Iwa;
 
-        public string  OidcAuthority{ get => this.model.Oidc.Authority; set => this.model.Oidc.Authority = value; }
+        public string OidcAuthority{ get => this.model.Oidc.Authority; set => this.model.Oidc.Authority = value; }
 
         public string OidcClientID { get => this.model.Oidc.ClientID; set => this.model.Oidc.ClientID = value; }
 

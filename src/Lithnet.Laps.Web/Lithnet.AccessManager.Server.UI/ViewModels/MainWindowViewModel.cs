@@ -2,18 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
-using System.Text;
 using System.Windows;
 using System.Windows.Interop;
-using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
-using MahApps.Metro.Controls.Dialogs;
-using Newtonsoft.Json;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class RootViewModel : Screen
+    public class MainWindowViewModel : Screen
     {
         public string User { get; set; }
 
@@ -21,16 +17,30 @@ namespace Lithnet.AccessManager.Server.UI
 
         public ApplicationConfigViewModel Config { get; set; }
 
-        public RootViewModel(IApplicationConfig config, IDialogCoordinator dialogCoordinator)
+        public MainWindowViewModel(ApplicationConfigViewModel c)
         {
-            this.DisplayName = "Lithnet Access Manager Service Configuration";
-            this.Config = new ApplicationConfigViewModel(config, dialogCoordinator);
+            this.DisplayName = "Lithnet Admin Access Service Configuration";
+            this.Config = c;
         }
 
-        public void LoadFile(string path)
+        public void Save()
         {
-            string data = System.IO.File.ReadAllText(path);
-            //this.Config = JsonConvert.DeserializeObject<ApplicationConfig>(data);
+            this.Config.Save();
+        }
+
+        public void Close()
+        {
+            this.RequestClose();
+        }
+
+        public void Help()
+        {
+
+        }
+
+        public void About()
+        {
+
         }
 
         public void ShowObjectPicker()

@@ -30,9 +30,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
-            <CheckBox IsChecked="{Binding Enabled}" VerticalAlignment="Center" >Enable client IP resolution from X-Forwarded-For headers</CheckBox>
-        </StackPanel>
+        <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding Enabled}" VerticalAlignment="Center" >Enable client IP resolution from X-Forwarded-For headers</CheckBox>
 
         <Label Grid.Row="1" Grid.Column="0" Content="Maximum allowed entries in the header"/>
         <mah:NumericUpDown Grid.Row="1" Grid.Column="1" Value="{Binding ForwardLimit}" Minimum="0" Maximum="65535" Interval="1" HideUpDownButtons="True" Width="50" TextAlignment="Left" HorizontalAlignment="Left" IsEnabled="{Binding Enabled}"/>

@@ -1,0 +1,63 @@
+﻿<controls:MetroWindow x:Class="Lithnet.AccessManager.Server.UI.MainWindowView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+        xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+        mc:Ignorable="d"
+        xmlns:s="https://github.com/canton7/Stylet"
+        Title="Lithnet Admin Access Service Configuration"
+        BorderThickness="1"
+        BorderBrush="{DynamicResource AccentColorBrush}"
+        Height="Auto"
+        Width="Auto">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <DockPanel Grid.Row="0"
+                   Grid.ColumnSpan="4">
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_File">
+                    <MenuItem.ItemsSource>
+                        <CompositeCollection>
+                            <MenuItem Header="Save" 
+                                      Command="{s:Action Save}" />
+
+                            <MenuItem Header="Close" 
+                                      Command="{s:Action Close}" />
+
+                        </CompositeCollection>
+                    </MenuItem.ItemsSource>
+
+                </MenuItem>
+                <MenuItem Header="_Help">
+                    <MenuItem.ItemsSource>
+                        <CompositeCollection>
+                            <MenuItem Header="Online Help"
+                                      Command="{s:Action Help}"/>
+                            <Separator />
+                            <MenuItem Header="About"
+                                      Command="{s:Action About}"/>
+                        </CompositeCollection>
+                    </MenuItem.ItemsSource>
+                </MenuItem>
+            </Menu>
+
+        </DockPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <Button Command="{s:Action ShowObjectPicker}" >Open object picker</Button>
+            <Button Command="{s:Action ShowContainerPicker}" >Open container picker</Button>
+        </StackPanel>
+        
+        <ContentControl Grid.Row="2" s:View.Model="{Binding Config}"/>
+    </Grid>
+</controls:MetroWindow>

@@ -11,16 +11,26 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IDialogCoordinator dialogCoordinator;
 
-        public ApplicationConfigViewModel(IApplicationConfig model, IDialogCoordinator dialogCoordinator)
+        public ApplicationConfigViewModel(
+            IApplicationConfig model, 
+            IDialogCoordinator dialogCoordinator,
+            AuthenticationViewModel authentication,
+            UserInterfaceViewModel ui,
+            RateLimitsViewModel rate,
+            IpDetectionViewModel ip,
+            AuditingViewModel audit,
+            EmailViewModel mail,
+            HostingViewModel hosting)
         {
             this.model = model;
             this.dialogCoordinator = dialogCoordinator;
-            this.Items.Add(new HostingViewModel(this.model.Hosting, dialogCoordinator));
-            this.Items.Add(new UserInterfaceViewModel(this.model.UserInterface));
-            this.Items.Add(new EmailViewModel(this.model.Email));
-            this.Items.Add(new RateLimitsViewModel(this.model.RateLimits));
-            this.Items.Add(new AuthenticationViewModel(this.model.Authentication));
-            this.Items.Add(new IpDetectionViewModel(this.model.ForwardedHeaders, dialogCoordinator));
+            this.Items.Add(hosting);
+            this.Items.Add(ui);
+            this.Items.Add(mail);
+            this.Items.Add(rate);
+            this.Items.Add(authentication);
+            this.Items.Add(ip);
+            this.Items.Add(audit);
         }
 
         public void Save()

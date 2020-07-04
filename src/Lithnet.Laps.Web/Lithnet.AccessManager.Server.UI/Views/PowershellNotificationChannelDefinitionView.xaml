@@ -1,0 +1,52 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.PowershellNotificationChannelDefinitionView"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             Dialog:DialogParticipation.Register="{Binding}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <AdornerDecorator>
+        <StackPanel>
+            <Grid Margin="10" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+
+                <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding Enabled}" VerticalAlignment="Center">Enabled</CheckBox>
+
+                <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding Mandatory}" VerticalAlignment="Center">
+                    <TextBlock Text="Deny the user's request if the delivery of this notification fails" TextWrapping="Wrap"></TextBlock></CheckBox>
+
+                <Label Grid.Row="2" Grid.Column="0" Content="Display name"/>
+                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding DisplayName, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <Label Grid.Row="3" Grid.Column="0" Content="Script"/>
+                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Script, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Grid.Row="3" Grid.Column="2" Command="{s:Action ShowScriptDialog}" Content="..."/>
+
+                <Label Grid.Row="4" Grid.Column="0" Content="Timeout (seconds)"/>
+                <mah:NumericUpDown Grid.Row="4" Grid.Column="1" Value="{Binding TimeOut}" Minimum="1" Maximum="900" Interval="1" HideUpDownButtons="True" Width="50" TextAlignment="Left" HorizontalAlignment="Left"/>
+
+            </Grid>
+
+        </StackPanel>
+    </AdornerDecorator>
+</UserControl>

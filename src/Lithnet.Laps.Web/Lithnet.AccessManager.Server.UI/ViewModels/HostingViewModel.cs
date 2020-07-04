@@ -1,30 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.DirectoryServices.AccountManagement;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
-using System.Text;
-using System.Windows;
-using System.Windows.Interop;
+using System.ServiceProcess;
+using System.Threading.Tasks;
 using Lithnet.AccessManager.Configuration;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
-using Newtonsoft.Json;
-using Stylet;
-using SslCertBinding.Net;
-using System.Net;
-using System.ServiceProcess;
-using Microsoft.Win32;
-using System.Windows.Media.Animation;
 using MahApps.Metro.Controls.Dialogs;
-using System.Threading.Tasks;
-using System.DirectoryServices.AccountManagement;
-using NLog.LayoutRenderers.Wrappers;
-using System.IO;
-using System.Security.AccessControl;
-using PropertyChanged;
-using System.Runtime.CompilerServices;
+using Microsoft.Win32;
+using SslCertBinding.Net;
+using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -37,9 +29,9 @@ namespace Lithnet.AccessManager.Server.UI
 
         private ServiceController controller;
 
-        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator)
+        public HostingViewModel(IApplicationConfig config, IDialogCoordinator dialogCoordinator)
         {
-            this.model = model;
+            this.model = config.Hosting;
             this.dialogCoordinator = dialogCoordinator;
             this.ActiveHttpPort = this.model.HttpSys.HttpPort;
             this.ActiveHttpsPort = this.model.HttpSys.HttpsPort;

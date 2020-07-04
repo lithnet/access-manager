@@ -76,11 +76,16 @@ namespace Lithnet.AccessManager.Server.UI
             return builder.ToString();
         }
 
-        public static IntPtr GetHandle(this Screen screen)
+        public static IntPtr GetHandle(this IViewAware view)
         {
-            Window window = Window.GetWindow(screen.View);
+            Window window = Window.GetWindow(view.View);
             var wih = new WindowInteropHelper(window);
             return wih.Handle;
+        }
+
+        public static Window GetWindow(this IViewAware view)
+        {
+            return Window.GetWindow(view.View);
         }
     }
 }

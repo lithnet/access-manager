@@ -2,8 +2,8 @@
 {
     public class AuditOptions 
     {
-        public NotificationChannels NotificationChannels { get; set; }
+        public NotificationChannels NotificationChannels { get; set; } = new NotificationChannels();
 
-        public AuditNotificationChannels GlobalNotifications { get; set; }
+        public AuditNotificationChannels GlobalNotifications { get; set; } = new AuditNotificationChannels();
     }
 }

@@ -1,20 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Security.Principal;
-using System.Text;
+﻿using System.Net;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Interop;
-using System.Windows.Media.Imaging;
 using Lithnet.AccessManager.Configuration;
-using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.UI.Interop;
 using MahApps.Metro.Controls.Dialogs;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
-using Newtonsoft.Json;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI

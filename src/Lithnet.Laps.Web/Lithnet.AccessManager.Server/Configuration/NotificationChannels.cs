@@ -4,10 +4,10 @@ namespace Lithnet.AccessManager.Configuration
 {
     public class NotificationChannels
     {
-        public IList<SmtpNotificationChannelDefinition> Smtp { get; set; }
+        public IList<SmtpNotificationChannelDefinition> Smtp { get; set; } = new List<SmtpNotificationChannelDefinition>();
 
-        public IList<WebhookNotificationChannelDefinition> Webhooks { get; set; }
+        public IList<WebhookNotificationChannelDefinition> Webhooks { get; set; } = new List<WebhookNotificationChannelDefinition>();
 
-        public IList<PowershellNotificationChannelDefinition> Powershell { get; set; }
+        public IList<PowershellNotificationChannelDefinition> Powershell { get; set; } = new List<PowershellNotificationChannelDefinition>();
     }
 }

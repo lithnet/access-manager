@@ -8,7 +8,7 @@
 
         public string Url { get; set; }
 
-        public string HttpMethod { get; set; }
+        public string HttpMethod { get; set; } = "POST";
 
         public string ContentType { get; set; } = "application/json";
     }

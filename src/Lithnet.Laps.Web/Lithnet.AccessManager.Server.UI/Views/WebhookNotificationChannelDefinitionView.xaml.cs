@@ -8,17 +8,17 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
-using MahApps.Metro.Controls;
 
 namespace Lithnet.AccessManager.Server.UI
 {
     /// <summary>
-    /// Interaction logic for RootView.xaml
+    /// Interaction logic for WebhookNotificationChannelDefinitionView.xaml
     /// </summary>
-    public partial class RootView : MetroWindow
+    public partial class WebhookNotificationChannelDefinitionView : UserControl
     {
-        public RootView()
+        public WebhookNotificationChannelDefinitionView()
         {
             InitializeComponent();
         }
