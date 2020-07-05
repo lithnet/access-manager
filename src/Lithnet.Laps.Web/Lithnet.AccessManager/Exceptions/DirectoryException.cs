@@ -15,6 +15,7 @@ namespace Lithnet.AccessManager
         }
 
         public DirectoryException(string message, Exception inner) : base(message, inner)
+
         {
         }
 

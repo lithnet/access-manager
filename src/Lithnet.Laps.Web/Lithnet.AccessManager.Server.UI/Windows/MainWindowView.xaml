@@ -22,6 +22,9 @@
                         <MenuItem Header="Save" 
                                       Command="{s:Action Save}" />
 
+                        <MenuItem Header="Test" 
+                                      Command="{s:Action Test}" />
+                        
                         <MenuItem Header="Close" 
                                       Command="{s:Action Close}" />
 

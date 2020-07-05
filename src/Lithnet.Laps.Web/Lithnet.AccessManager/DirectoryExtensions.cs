@@ -6,6 +6,7 @@ using System.DirectoryServices;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Security.AccessControl;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
@@ -16,6 +17,19 @@ namespace Lithnet.AccessManager
 {
     public static class DirectoryExtensions
     {
+        internal static byte[] ToBytes(this SecurityIdentifier s)
+        {
+            byte[] b = new byte[s.BinaryLength];
+            s.GetBinaryForm(b, 0);
+            return b;
+        }
+
+        internal static byte[] ToBytes(this GenericSecurityDescriptor s)
+        {
+            byte[] b = new byte[s.BinaryLength];
+            s.GetBinaryForm(b, 0);
+            return b;
+        }
 
         internal static bool TryGet<T>(this Func<T> getFunc, out T o) where T : class
         {

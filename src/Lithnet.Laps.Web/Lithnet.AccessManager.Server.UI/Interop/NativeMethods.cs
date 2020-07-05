@@ -12,6 +12,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.ServiceProcess;
 using System.Text;
 using System.Windows;
+using Lithnet.AccessManager.Interop;
 
 namespace Lithnet.AccessManager.Server.UI.Interop
 {

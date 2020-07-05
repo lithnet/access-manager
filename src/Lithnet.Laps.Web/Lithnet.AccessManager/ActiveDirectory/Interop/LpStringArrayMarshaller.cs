@@ -4,39 +4,43 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Lithnet.AccessManager.Server.UI.Interop
+namespace Lithnet.AccessManager.Interop
 {
-    public class LpStructArrayMarshaller<T> : IDisposable where T : struct
+    public class LpStringArrayConverter : IDisposable
     {
         public IntPtr Ptr { get; private set; } = IntPtr.Zero;
 
-        public IReadOnlyList<T> Items { get; private set; }
+        private List<IntPtr> allocatedStrings = new List<IntPtr>();
 
-        public int Count => this.Items.Count;
+        public IReadOnlyList<string> Items { get; private set; }
+
+        public int Count => this.allocatedStrings.Count;
 
         private bool disposedValue;
 
-        public LpStructArrayMarshaller(IList<T> items)
-            : this(items.ToArray())
+        public LpStringArrayConverter(IList<string> items)
+            :this(items.ToArray())
         {
         }
 
-        public LpStructArrayMarshaller(T[] array)
+        public LpStringArrayConverter(string[] array)
         {
             if (array == null || array.Length == 0)
             {
                 return;
             }
 
-            this.Items = new List<T>(array).AsReadOnly();
+            this.Items = new List<string>(array).AsReadOnly();
 
             int size = array.Length;
 
-            this.Ptr = Marshal.AllocCoTaskMem(Marshal.SizeOf<DsopScopeInitInfo>() * size);
+            this.Ptr = Marshal.AllocCoTaskMem(size * IntPtr.Size);
 
             for (int i = 0; i < size; i++)
             {
-                Marshal.StructureToPtr<T>(array[i], new IntPtr(this.Ptr.ToInt64() + (i * Marshal.SizeOf<DsopScopeInitInfo>())), false);
+                IntPtr s = Marshal.StringToCoTaskMemUni(array[i]);
+                Marshal.WriteIntPtr(this.Ptr, i * IntPtr.Size, s);
+                this.allocatedStrings.Add(s);
             }
         }
 
@@ -53,11 +57,16 @@ namespace Lithnet.AccessManager.Server.UI.Interop
                     Marshal.FreeCoTaskMem(this.Ptr);
                 }
 
+                foreach (IntPtr p in this.allocatedStrings)
+                {
+                    Marshal.FreeCoTaskMem(p);
+                }
+
                 disposedValue = true;
             }
         }
 
-        ~LpStructArrayMarshaller()
+        ~LpStringArrayConverter()
         {
             Dispose(disposing: false);
         }

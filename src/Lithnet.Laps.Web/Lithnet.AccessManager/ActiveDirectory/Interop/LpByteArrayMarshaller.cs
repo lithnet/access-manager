@@ -4,43 +4,40 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Lithnet.AccessManager.Server.UI.Interop
+namespace Lithnet.AccessManager.Interop
 {
-    public class LpStringArrayConverter : IDisposable
+    public class LpArrayOfByteArrayConverter : IDisposable
     {
         public IntPtr Ptr { get; private set; } = IntPtr.Zero;
 
-        private List<IntPtr> allocatedStrings = new List<IntPtr>();
+        private List<IntPtr> allocatedItems = new List<IntPtr>();
 
-        public IReadOnlyList<string> Items { get; private set; }
+        public IReadOnlyList<byte[]> Items { get; private set; }
 
-        public int Count => this.allocatedStrings.Count;
+        public int Count => this.allocatedItems.Count;
 
         private bool disposedValue;
 
-        public LpStringArrayConverter(IList<string> items)
-            :this(items.ToArray())
+        public LpArrayOfByteArrayConverter(List<byte[]> array)
         {
-        }
-
-        public LpStringArrayConverter(string[] array)
-        {
-            if (array == null || array.Length == 0)
+            if (array == null || array.Count == 0)
             {
                 return;
             }
 
-            this.Items = new List<string>(array).AsReadOnly();
+            this.Items = array.AsReadOnly();
 
-            int size = array.Length;
+            int size = array.Count;
 
-            this.Ptr = Marshal.AllocCoTaskMem(size * IntPtr.Size);
+            this.Ptr = Marshal.AllocHGlobal(size * IntPtr.Size);
 
             for (int i = 0; i < size; i++)
             {
-                IntPtr s = Marshal.StringToCoTaskMemUni(array[i]);
+                IntPtr s = Marshal.AllocHGlobal(array[i].Length);
+                Marshal.Copy(array[i], 0, s, array[i].Length);
+
                 Marshal.WriteIntPtr(this.Ptr, i * IntPtr.Size, s);
-                this.allocatedStrings.Add(s);
+                this.allocatedItems.Add(s);
             }
         }
 
@@ -54,19 +51,19 @@ namespace Lithnet.AccessManager.Server.UI.Interop
 
                 if (this.Ptr != IntPtr.Zero)
                 {
-                    Marshal.FreeCoTaskMem(this.Ptr);
+                    Marshal.FreeHGlobal(this.Ptr);
                 }
 
-                foreach (IntPtr p in this.allocatedStrings)
+                foreach (IntPtr p in this.allocatedItems)
                 {
-                    Marshal.FreeCoTaskMem(p);
+                    Marshal.FreeHGlobal(p);
                 }
 
                 disposedValue = true;
             }
         }
 
-        ~LpStringArrayConverter()
+        ~LpArrayOfByteArrayConverter()
         {
             Dispose(disposing: false);
         }

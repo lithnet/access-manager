@@ -1,9 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Security.AccessControl;
+using System.Security.Permissions;
 using System.Security.Principal;
 using System.Threading;
+using Lithnet.AccessManager.Interop;
 using Moq;
 using NLog;
 using NUnit.Framework;
+using NUnit.Framework.Constraints;
 
 namespace Lithnet.AccessManager.Test
 {
@@ -24,6 +30,29 @@ namespace Lithnet.AccessManager.Test
         {
             dummyLogger = new Mock<ILogger>();
             this.directory = new ActiveDirectory();
+        }
+
+        [Test]
+        public void TestAcl()
+        {
+            var sid = WindowsIdentity.GetCurrent().User;
+            SecurityIdentifier wks = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
+
+            DiscretionaryAcl dacl1 = new DiscretionaryAcl(false, false, 1);
+            dacl1.AddAccess(AccessControlType.Allow, sid, 0x200, InheritanceFlags.None, PropagationFlags.None);
+            CommonSecurityDescriptor csd = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, sid, sid, null, dacl1);
+
+            DiscretionaryAcl dacl2 = new DiscretionaryAcl(false, false, 1);
+            dacl2.AddAccess(AccessControlType.Allow, wks, 0x400, InheritanceFlags.None, PropagationFlags.None);
+            CommonSecurityDescriptor csd2 = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, wks, wks, null, dacl2);
+
+            List<GenericSecurityDescriptor> list = new List<GenericSecurityDescriptor>();
+            list.Add(csd2);
+
+            Assert.IsTrue(NativeMethods.AccessCheck(sid, csd, 0x200));
+            Assert.IsTrue(NativeMethods.AccessCheck(sid, csd, 0x400, list));
+            Assert.IsTrue(NativeMethods.AccessCheck(sid, csd, 0x600, list));
+            Assert.IsFalse(NativeMethods.AccessCheck(sid, csd, 0x800));
         }
 
         // THIS domain user found in THIS domain group
@@ -317,7 +346,7 @@ namespace Lithnet.AccessManager.Test
             Assert.IsFalse(this.directory.TryGetUser("IDMDEV1\\doesntexist", out _));
         }
 
-        public void TryGetPrincipal ()
+        public void TryGetPrincipal()
         {
             Assert.IsTrue(this.directory.TryGetPrincipal("IDMDEV1\\PC1", out _)); ;
             Assert.IsFalse(this.directory.TryGetPrincipal("IDMDEV1\\doesntexist", out _));

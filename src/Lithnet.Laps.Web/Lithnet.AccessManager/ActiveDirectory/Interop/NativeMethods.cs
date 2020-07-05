@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 using System.Security.Policy;
 using System.Security.Principal;
 using NLog;
@@ -67,28 +69,31 @@ namespace Lithnet.AccessManager.Interop
 
         [DllImport("authz.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool AuthzInitializeRemoteResourceManager(IntPtr rpcInitInfo, out IntPtr authRm);
+        private static extern bool AuthzInitializeRemoteResourceManager(IntPtr rpcInitInfo, out SafeAuthzResourceManagerHandle authRm);
 
         [DllImport("authz.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool AuthzInitializeContextFromSid(AuthzInitFlags flags, byte[] rawUserSid, IntPtr authzRm, IntPtr expirationTime, Luid identifier, IntPtr dynamicGroupArgs, out IntPtr authzClientContext);
+        private static extern bool AuthzInitializeContextFromSid(AuthzInitFlags flags, byte[] rawUserSid, SafeAuthzResourceManagerHandle authRm, IntPtr expirationTime, Luid identifier, IntPtr dynamicGroupArgs, out SafeAuthzContextHandle authzClientContext);
 
         [DllImport("authz.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool AuthzInitializeResourceManager(AuthzResourceManagerFlags flags, IntPtr pfnAccessCheck, IntPtr pfnComputeDynamicGroups, IntPtr pfnFreeDynamicGroups,
-            string szResourceManagerName, out IntPtr phAuthzResourceManager);
+            string szResourceManagerName, out SafeAuthzResourceManagerHandle phAuthzResourceManager);
 
         [DllImport("authz.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool AuthzFreeContext(IntPtr authzClientContext);
+        private static extern bool AuthzFreeContext(SafeAuthzResourceManagerHandle authzClientContext);
 
         [DllImport("authz.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool AuthzFreeResourceManager(IntPtr handle);
+        private static extern bool AuthzFreeResourceManager(SafeAuthzResourceManagerHandle authRm);
 
         [DllImport("authz.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool AuthzGetInformationFromContext(IntPtr hAuthzClientContext, AuthzContextInformationClass infoClass, uint bufferSize, out uint pSizeRequired, IntPtr buffer);
+        private static extern bool AuthzGetInformationFromContext(SafeAuthzContextHandle hAuthzClientContext, AuthzContextInformationClass infoClass, uint bufferSize, out uint pSizeRequired, IntPtr buffer);
+
+        [DllImport("authz.dll", SetLastError = true)]
+        private static extern bool AuthzAccessCheck(AuthzAccessCheckFlags flags, SafeAuthzContextHandle hAuthzClientContext, ref AuthzAccessRequest pRequest, IntPtr AuditEvent, [MarshalAs(UnmanagedType.LPArray)]byte[] pSecurityDescriptor, IntPtr OptionalSecurityDescriptorArray, int OptionalSecurityDescriptorCount, ref AuthzAccessReply pReply, IntPtr phAccessCheckResults);
 
         [DllImport("NetAPI32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private extern static int NetLocalGroupGetMembers([MarshalAs(UnmanagedType.LPWStr)] string servername, [MarshalAs(UnmanagedType.LPWStr)] string localgroupname, int level, out IntPtr bufptr, int prefmaxlen, out int entriesread, out int totalentries, IntPtr resume_handle);
@@ -146,7 +151,7 @@ namespace Lithnet.AccessManager.Interop
 
                 return new SecurityIdentifier(info.DomainSid);
             }
-            finally 
+            finally
             {
                 if (pPolicyData != IntPtr.Zero)
                 {
@@ -568,115 +573,205 @@ namespace Lithnet.AccessManager.Interop
 
         private static IEnumerable<SecurityIdentifier> GetTokenGroups(SecurityIdentifier principalSid, string authzServerName = null)
         {
-            IntPtr userClientCtxt = IntPtr.Zero;
-            IntPtr pstructure = IntPtr.Zero;
-            IntPtr pClientInfo = IntPtr.Zero;
-            IntPtr authzRm = IntPtr.Zero;
+            SafeAuthzResourceManagerHandle authzRm = null;
 
             try
             {
-                try
+                if (!string.IsNullOrWhiteSpace(authzServerName))
                 {
-                    if (!string.IsNullOrWhiteSpace(authzServerName))
+                    AuthzRpcInitInfoClient client = new AuthzRpcInitInfoClient
                     {
-                        AuthzRpcInitInfoClient client = new AuthzRpcInitInfoClient
-                        {
-                            Version = AuthzRpcClientVersion.V1,
-                            ObjectUuid = NativeMethods.AuthzObjectUuidWithcap,
-                            Protocol = NativeMethods.RcpOverTcpProtocol,
-                            Server = authzServerName
-                        };
+                        Version = AuthzRpcClientVersion.V1,
+                        ObjectUuid = NativeMethods.AuthzObjectUuidWithcap,
+                        Protocol = NativeMethods.RcpOverTcpProtocol,
+                        Server = authzServerName
+                    };
 
-                        pClientInfo = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(AuthzRpcInitInfoClient)));
-                        Marshal.StructureToPtr(client, pClientInfo, false);
 
-                        if (!NativeMethods.AuthzInitializeRemoteResourceManager(pClientInfo, out authzRm))
-                        {
-                            throw new DirectoryException("AuthzInitializeRemoteResourceManager failed", new Win32Exception(Marshal.GetLastWin32Error()));
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    NativeMethods.logger.Warn(ex, $"Unable to connect to the remote server {authzServerName} to generate the authorization token for principal {principalSid}. The local server will be used instead, however the token generated may not contain authorization groups from other domains");
-                }
+                    SafeAllocHGlobalHandle clientInfo = new SafeAllocHGlobalHandle(Marshal.SizeOf(typeof(AuthzRpcInitInfoClient)));
+                    IntPtr pClientInfo = clientInfo.DangerousGetHandle();
+                    Marshal.StructureToPtr(client, pClientInfo, false);
 
-                if (authzRm == IntPtr.Zero)
-                {
-                    if (!NativeMethods.AuthzInitializeResourceManager(AuthzResourceManagerFlags.NO_AUDIT, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, null, out authzRm))
+                    if (!NativeMethods.AuthzInitializeRemoteResourceManager(pClientInfo, out authzRm))
                     {
-                        throw new DirectoryException("AuthzInitializeResourceManager failed", new Win32Exception(Marshal.GetLastWin32Error()));
+                        throw new DirectoryException("AuthzInitializeRemoteResourceManager failed", new Win32Exception(Marshal.GetLastWin32Error()));
                     }
-                }
-
-                byte[] sidBytes = new byte[principalSid.BinaryLength];
-                principalSid.GetBinaryForm(sidBytes, 0);
-
-                if (!NativeMethods.AuthzInitializeContextFromSid(AuthzInitFlags.Default, sidBytes, authzRm, IntPtr.Zero, Luid.NullLuid, IntPtr.Zero, out userClientCtxt))
-                {
-                    int errorCode = Marshal.GetLastWin32Error();
-
-                    if (errorCode == 5)
-                    {
-                        throw new DirectoryException("AuthzInitializeContextFromSid failed", new Win32Exception(errorCode, "Access was denied. Please ensure that \r\n1) The service account is a member of the built-in group called 'Windows Authorization Access Group' in the domain where the computer object is located\r\n2) The service account is a member of the built-in group called 'Access Control Assistance Operators' in the domain where the computer object is located"));
-                    }
-
-                    throw new DirectoryException("AuthzInitializeContextFromSid failed", new Win32Exception(errorCode));
-                }
-
-                uint sizeRequired = 0;
-
-                if (!NativeMethods.AuthzGetInformationFromContext(userClientCtxt, AuthzContextInformationClass.AuthzContextInfoGroupsSids, sizeRequired, out sizeRequired, IntPtr.Zero))
-                {
-                    Win32Exception e = new Win32Exception(Marshal.GetLastWin32Error());
-
-                    if (e.NativeErrorCode != NativeMethods.InsufficientBuffer)
-                    {
-                        throw new DirectoryException("AuthzGetInformationFromContext failed", e);
-                    }
-                }
-
-                pstructure = Marshal.AllocHGlobal((int)sizeRequired);
-
-                if (!NativeMethods.AuthzGetInformationFromContext(userClientCtxt, AuthzContextInformationClass.AuthzContextInfoGroupsSids, sizeRequired, out sizeRequired, pstructure))
-                {
-                    throw new DirectoryException("AuthzGetInformationFromContext failed", new Win32Exception(Marshal.GetLastWin32Error()));
-                }
-
-                TokenGroups groups = Marshal.PtrToStructure<TokenGroups>(pstructure);
-
-                // Set the pointer to the first Groups array item in the structure
-                IntPtr current = IntPtr.Add(pstructure, Marshal.OffsetOf<TokenGroups>(nameof(groups.Groups)).ToInt32());
-
-                for (int i = 0; i < groups.GroupCount; i++)
-                {
-                    SidAndAttributes sidAndAttributes = (SidAndAttributes)Marshal.PtrToStructure(current, typeof(SidAndAttributes));
-                    yield return new SecurityIdentifier(sidAndAttributes.Sid);
-                    current = IntPtr.Add(current, Marshal.SizeOf(typeof(SidAndAttributes)));
                 }
             }
-            finally
+            catch (Exception ex)
             {
-                if (pstructure != IntPtr.Zero)
-                {
-                    Marshal.FreeHGlobal(pstructure);
-                }
+                NativeMethods.logger.Warn(ex, $"Unable to connect to the remote server {authzServerName} to generate the authorization token for principal {principalSid}. The local server will be used instead, however the token generated may not contain authorization groups from other domains");
+            }
 
-                if (userClientCtxt != IntPtr.Zero)
+            if (authzRm == null || authzRm.IsInvalid)
+            {
+                if (!NativeMethods.AuthzInitializeResourceManager(AuthzResourceManagerFlags.NO_AUDIT, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, null, out authzRm))
                 {
-                    NativeMethods.AuthzFreeContext(userClientCtxt);
-                }
-
-                if (authzRm != IntPtr.Zero)
-                {
-                    NativeMethods.AuthzFreeResourceManager(authzRm);
-                }
-
-                if (pClientInfo != IntPtr.Zero)
-                {
-                    Marshal.FreeHGlobal(pClientInfo);
+                    throw new DirectoryException("AuthzInitializeResourceManager failed", new Win32Exception(Marshal.GetLastWin32Error()));
                 }
             }
+
+            byte[] sidBytes = new byte[principalSid.BinaryLength];
+            principalSid.GetBinaryForm(sidBytes, 0);
+
+            SafeAuthzContextHandle userClientCtxt = null;
+            if (!NativeMethods.AuthzInitializeContextFromSid(AuthzInitFlags.Default, sidBytes, authzRm, IntPtr.Zero, Luid.NullLuid, IntPtr.Zero, out userClientCtxt))
+            {
+                int errorCode = Marshal.GetLastWin32Error();
+
+                if (errorCode == 5)
+                {
+                    throw new DirectoryException("AuthzInitializeContextFromSid failed", new Win32Exception(errorCode, "Access was denied. Please ensure that \r\n1) The service account is a member of the built-in group called 'Windows Authorization Access Group' in the domain where the computer object is located\r\n2) The service account is a member of the built-in group called 'Access Control Assistance Operators' in the domain where the computer object is located"));
+                }
+
+                throw new DirectoryException("AuthzInitializeContextFromSid failed", new Win32Exception(errorCode));
+            }
+
+            uint sizeRequired = 0;
+
+            if (!NativeMethods.AuthzGetInformationFromContext(userClientCtxt, AuthzContextInformationClass.AuthzContextInfoGroupsSids, sizeRequired, out sizeRequired, IntPtr.Zero))
+            {
+                Win32Exception e = new Win32Exception(Marshal.GetLastWin32Error());
+
+                if (e.NativeErrorCode != NativeMethods.InsufficientBuffer)
+                {
+                    throw new DirectoryException("AuthzGetInformationFromContext failed", e);
+                }
+            }
+
+            SafeAllocHGlobalHandle structure = new SafeAllocHGlobalHandle(sizeRequired);
+            IntPtr pstructure = structure.DangerousGetHandle();
+
+            if (!NativeMethods.AuthzGetInformationFromContext(userClientCtxt, AuthzContextInformationClass.AuthzContextInfoGroupsSids, sizeRequired, out sizeRequired, pstructure))
+            {
+                throw new DirectoryException("AuthzGetInformationFromContext failed", new Win32Exception(Marshal.GetLastWin32Error()));
+            }
+
+            TokenGroups groups = Marshal.PtrToStructure<TokenGroups>(pstructure);
+
+            // Set the pointer to the first Groups array item in the structure
+            IntPtr current = IntPtr.Add(pstructure, Marshal.OffsetOf<TokenGroups>(nameof(groups.Groups)).ToInt32());
+
+            for (int i = 0; i < groups.GroupCount; i++)
+            {
+                SidAndAttributes sidAndAttributes = (SidAndAttributes)Marshal.PtrToStructure(current, typeof(SidAndAttributes));
+                yield return new SecurityIdentifier(sidAndAttributes.Sid);
+                current = IntPtr.Add(current, Marshal.SizeOf(typeof(SidAndAttributes)));
+            }
+        }
+
+        public static bool AccessCheck(SecurityIdentifier sid, GenericSecurityDescriptor securityDescriptor, int requestedAccess, IList<GenericSecurityDescriptor> otherSecurityDescriptors = null,  string authzServerName = null)
+        {
+            SafeAuthzResourceManagerHandle authzRm = InitializeResourceManager(authzServerName);
+            SafeAuthzContextHandle userClientCtxt = InitializeAuthorizationContextFromSid(authzRm, sid);
+
+            byte[] securityDescriptorBytes = securityDescriptor.ToBytes();
+
+            AuthzAccessRequest request = new AuthzAccessRequest();
+            request.PrincipalSelfSid = sid.ToBytes();
+            request.DesiredAccess = requestedAccess;
+
+            AuthzAccessReply reply = new AuthzAccessReply();
+            SafeAllocHGlobalHandle accessMaskReply = new SafeAllocHGlobalHandle(Marshal.SizeOf<uint>());
+            SafeAllocHGlobalHandle errorReply = new SafeAllocHGlobalHandle(Marshal.SizeOf<uint>());
+            SafeAllocHGlobalHandle saclReply = new SafeAllocHGlobalHandle(Marshal.SizeOf<uint>());
+
+            reply.ResultListLength = 1;
+            reply.GrantedAccessMask = accessMaskReply.DangerousGetHandle();
+            reply.SaclEvaluationResults = saclReply.DangerousGetHandle();
+            reply.Error = errorReply.DangerousGetHandle();
+
+            IntPtr pOthers = IntPtr.Zero;
+            int othersCount = otherSecurityDescriptors?.Count ?? 0;
+            if (othersCount > 0)
+            {
+                List<byte[]> list = new List<byte[]>();
+                foreach(var item in otherSecurityDescriptors)
+                {
+                    list.Add(item.ToBytes());
+                }
+
+                LpArrayOfByteArrayConverter r = new LpArrayOfByteArrayConverter(list);
+                pOthers = r.Ptr;
+            }
+
+            if (!NativeMethods.AuthzAccessCheck(AuthzAccessCheckFlags.None, userClientCtxt, ref request, IntPtr.Zero, securityDescriptorBytes, pOthers, othersCount, ref reply, IntPtr.Zero))
+            {
+                throw new DirectoryException("AuthzAccessCheck failed", new Win32Exception(Marshal.GetLastWin32Error()));
+            }
+
+            int maskResult = Marshal.ReadInt32(reply.GrantedAccessMask);
+            int error = Marshal.ReadInt32(reply.Error);
+
+            if (error == 0)
+            {
+                return (requestedAccess & maskResult) == requestedAccess;
+            }
+
+            return false;
+        }
+
+        private static SafeAuthzContextHandle InitializeAuthorizationContextFromSid(SafeAuthzResourceManagerHandle authzRm, SecurityIdentifier sid)
+        {
+            byte[] sidBytes = new byte[sid.BinaryLength];
+            sid.GetBinaryForm(sidBytes, 0);
+
+            if (!NativeMethods.AuthzInitializeContextFromSid(AuthzInitFlags.Default, sidBytes, authzRm, IntPtr.Zero, Luid.NullLuid, IntPtr.Zero, out SafeAuthzContextHandle userClientCtxt))
+            {
+                int errorCode = Marshal.GetLastWin32Error();
+
+                if (errorCode == 5)
+                {
+                    throw new DirectoryException("AuthzInitializeContextFromSid failed", new Win32Exception(errorCode, "Access was denied. Please ensure that \r\n1) The service account is a member of the built-in group called 'Windows Authorization Access Group' in the domain where the computer object is located\r\n2) The service account is a member of the built-in group called 'Access Control Assistance Operators' in the domain where the computer object is located"));
+                }
+
+                throw new DirectoryException("AuthzInitializeContextFromSid failed", new Win32Exception(errorCode));
+            }
+
+            return userClientCtxt;
+        }
+
+        private static SafeAuthzResourceManagerHandle InitializeResourceManager(string authzServerName)
+        {
+            SafeAuthzResourceManagerHandle authzRm = null;
+
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(authzServerName))
+                {
+                    AuthzRpcInitInfoClient client = new AuthzRpcInitInfoClient
+                    {
+                        Version = AuthzRpcClientVersion.V1,
+                        ObjectUuid = NativeMethods.AuthzObjectUuidWithcap,
+                        Protocol = NativeMethods.RcpOverTcpProtocol,
+                        Server = authzServerName
+                    };
+
+
+                    SafeAllocHGlobalHandle clientInfo = new SafeAllocHGlobalHandle(Marshal.SizeOf(typeof(AuthzRpcInitInfoClient)));
+                    IntPtr pClientInfo = clientInfo.DangerousGetHandle();
+                    Marshal.StructureToPtr(client, pClientInfo, false);
+
+                    if (!NativeMethods.AuthzInitializeRemoteResourceManager(pClientInfo, out authzRm))
+                    {
+                        throw new DirectoryException("AuthzInitializeRemoteResourceManager failed", new Win32Exception(Marshal.GetLastWin32Error()));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                NativeMethods.logger.Warn(ex, $"Unable to connect to create an authorization context against the remote server {authzServerName}. The local server will be used instead, however calculated group membership from other domains may not be correct");
+            }
+
+            if (authzRm == null || authzRm.IsInvalid)
+            {
+                if (!NativeMethods.AuthzInitializeResourceManager(AuthzResourceManagerFlags.NO_AUDIT, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, null, out authzRm))
+                {
+                    throw new DirectoryException("AuthzInitializeResourceManager failed", new Win32Exception(Marshal.GetLastWin32Error()));
+                }
+            }
+
+            return authzRm;
         }
     }
 }

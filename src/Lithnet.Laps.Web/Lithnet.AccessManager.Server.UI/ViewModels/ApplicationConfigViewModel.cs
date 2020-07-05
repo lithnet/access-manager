@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Community.Windows.Forms;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Stylet;
@@ -13,7 +14,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDialogCoordinator dialogCoordinator;
 
         public ApplicationConfigViewModel(
-            IApplicationConfig model, 
+            IApplicationConfig model,
             IDialogCoordinator dialogCoordinator,
             AuthenticationViewModel authentication,
             UserInterfaceViewModel ui,
