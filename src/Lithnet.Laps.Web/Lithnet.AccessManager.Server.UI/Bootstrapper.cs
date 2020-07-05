@@ -46,6 +46,7 @@ namespace Lithnet.AccessManager.Server.UI
             builder.Bind<WebhookNotificationChannelDefinitionViewModel>().ToSelf();
             
             builder.Bind<IDialogCoordinator>().To(typeof(DialogCoordinator));
+            builder.Bind<INotificationSubscriptionProvider>().To(typeof(NotificationSubscriptionProvider));
             builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentModelValidator<>));
             builder.Bind(typeof(IValidator<>)).ToAllImplementations();
 

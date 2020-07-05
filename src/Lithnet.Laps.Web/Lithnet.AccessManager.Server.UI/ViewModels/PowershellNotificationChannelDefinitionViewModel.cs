@@ -5,35 +5,18 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class PowershellNotificationChannelDefinitionViewModel : ValidatingModelBase, IViewAware
+    public class PowershellNotificationChannelDefinitionViewModel : NotificationChannelDefinitionViewModel<PowershellNotificationChannelDefinition>
     {
-        public PowershellNotificationChannelDefinitionViewModel(PowershellNotificationChannelDefinition model)
+        public PowershellNotificationChannelDefinitionViewModel(PowershellNotificationChannelDefinition model, INotificationSubscriptionProvider subscriptionProvider):
+            base (model)
         {
-            this.Model = model;
-            this.Validator = new FluentModelValidator<PowershellNotificationChannelDefinitionViewModel>(new PowershellNotificationChannelDefinitionValidator());
+            this.Validator = new FluentModelValidator<PowershellNotificationChannelDefinitionViewModel>(new PowershellNotificationChannelDefinitionValidator(subscriptionProvider));
             this.Validate();
         }
-
-        public PowershellNotificationChannelDefinition Model { get; }
-
-        public bool Enabled { get => this.Model.Enabled; set => this.Model.Enabled = value; }
-
-        public string DisplayName { get => this.Model.DisplayName; set => this.Model.DisplayName = value; }
-
-        public string Id { get => this.Model.Id; set => this.Model.Id = value; }
-
-        public bool Mandatory { get => this.Model.Mandatory; set => this.Model.Mandatory = value; }
 
         public string Script { get => this.Model.Script; set => this.Model.Script = value; }
 
         public int TimeOut { get => this.Model.TimeOut; set => this.Model.TimeOut = value; }
-
-        public UIElement View { get; private set; }
-
-        public void AttachView(UIElement view)
-        {
-            this.View = view;
-        }
 
         public void ShowScriptDialog()
         {

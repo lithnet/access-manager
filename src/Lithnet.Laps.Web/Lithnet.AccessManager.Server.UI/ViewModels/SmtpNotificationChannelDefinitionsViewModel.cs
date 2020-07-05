@@ -12,94 +12,23 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class SmtpNotificationChannelDefinitionsViewModel : PropertyChangedBase, IHaveDisplayName, IViewAware
+    public class SmtpNotificationChannelDefinitionsViewModel : NotificationChannelDefinitionsViewModel<SmtpNotificationChannelDefinition, SmtpNotificationChannelDefinitionViewModel>
     {
-        private readonly IList<SmtpNotificationChannelDefinition> model;
-
-        private readonly IDialogCoordinator dialogCoordinator;
-
-        public BindableCollection<SmtpNotificationChannelDefinitionViewModel> ViewModels { get; }
-
-        public SmtpNotificationChannelDefinitionsViewModel(IList<SmtpNotificationChannelDefinition> model, IDialogCoordinator dialogCoordinator)
+        public SmtpNotificationChannelDefinitionsViewModel(IList<SmtpNotificationChannelDefinition> model, IDialogCoordinator dialogCoordinator, INotificationSubscriptionProvider subscriptionProvider, IEventAggregator eventAggregator)
+            : base(model, dialogCoordinator, subscriptionProvider, eventAggregator)
         {
-            this.model = model;
-            this.dialogCoordinator = dialogCoordinator;
-            this.ViewModels = new BindableCollection<SmtpNotificationChannelDefinitionViewModel>(model.Select(t => new SmtpNotificationChannelDefinitionViewModel(t)));
-        }
- 
-        public string DisplayName { get; set; } = "SMTP";
-
-        public SmtpNotificationChannelDefinitionViewModel SelectedItem { get; set; }
-
-        public async Task Add()
-        {
-            DialogWindow w = new DialogWindow();
-            w.Title = "Add SMTP notification channel";
-            var m = new SmtpNotificationChannelDefinition();
-            var vm = new SmtpNotificationChannelDefinitionViewModel(m);
-            w.DataContext = vm;
-            vm.Enabled = true;
-            vm.Id = Guid.NewGuid().ToString();
-
-            await ChildWindowManager.ShowChildWindowAsync(this.GetWindow(), w);
-
-            if (w.Result == MessageDialogResult.Affirmative)
-            {
-                this.model.Add(m);
-                this.ViewModels.Add(vm);
-            }
-        }
-        public async Task Edit()
-        {
-            DialogWindow w = new DialogWindow();
-            w.Title = "Edit SMTP notification channel";
-            var m = JsonConvert.DeserializeObject<SmtpNotificationChannelDefinition>(JsonConvert.SerializeObject(this.SelectedItem.Model));
-            var vm = new SmtpNotificationChannelDefinitionViewModel(m);
-
-            w.DataContext = vm;
-
-            await ChildWindowManager.ShowChildWindowAsync(this.GetWindow(), w);
-
-            if (w.Result == MessageDialogResult.Affirmative)
-            {
-                this.model.Remove(this.SelectedItem.Model);
-                this.ViewModels.Remove(this.SelectedItem);
-                this.model.Add(m);
-                this.ViewModels.Add(vm);
-                this.SelectedItem = vm;
-            }
         }
 
-        public bool CanEdit => this.SelectedItem != null;
+        public override string DisplayName { get; set; } = "SMTP";
 
-        public async Task Delete()
+        protected override SmtpNotificationChannelDefinitionViewModel CreateViewModel(SmtpNotificationChannelDefinition model)
         {
-            if (this.SelectedItem == null)
-            {
-                return;
-            }
-
-            MetroDialogSettings s = new MetroDialogSettings
-            {
-                AnimateShow = false,
-                AnimateHide = false
-            };
-
-            if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", "Are you sure you want to delete this channel?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
-            {
-                this.model.Remove(this.SelectedItem.Model);
-                this.ViewModels.Remove(this.SelectedItem);
-                this.SelectedItem = this.ViewModels.FirstOrDefault();
-            }
+            return new SmtpNotificationChannelDefinitionViewModel(model, this.NotificationSubscriptions);
         }
 
-        public bool CanDelete => this.SelectedItem != null;
-
-        public void AttachView(UIElement view)
+        protected override SmtpNotificationChannelDefinition CreateModel()
         {
-            this.View = view;
+            return new SmtpNotificationChannelDefinition();
         }
-
-        public UIElement View { get; set; }
     }
 }

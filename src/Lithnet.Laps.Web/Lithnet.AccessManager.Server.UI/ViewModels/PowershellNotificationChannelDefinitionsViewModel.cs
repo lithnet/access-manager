@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Animation;
 using Lithnet.AccessManager.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.SimpleChildWindow;
@@ -11,96 +12,23 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class PowershellNotificationChannelDefinitionsViewModel : PropertyChangedBase, IHaveDisplayName, IViewAware
+    public class PowershellNotificationChannelDefinitionsViewModel : NotificationChannelDefinitionsViewModel<PowershellNotificationChannelDefinition, PowershellNotificationChannelDefinitionViewModel>
     {
-        private readonly IList<PowershellNotificationChannelDefinition> model;
-
-        public BindableCollection<PowershellNotificationChannelDefinitionViewModel> ViewModels { get; }
-
-        private readonly IDialogCoordinator dialogCoordinator;
-
-        public PowershellNotificationChannelDefinitionsViewModel(IList<PowershellNotificationChannelDefinition> model, IDialogCoordinator dialogCoordinator)
+        public PowershellNotificationChannelDefinitionsViewModel(IList<PowershellNotificationChannelDefinition> model, IDialogCoordinator dialogCoordinator, INotificationSubscriptionProvider subscriptionProvider, IEventAggregator eventAggregator) :
+            base (model, dialogCoordinator, subscriptionProvider, eventAggregator)
         {
-            this.model = model;
-            this.dialogCoordinator = dialogCoordinator;
-            this.ViewModels = new BindableCollection<PowershellNotificationChannelDefinitionViewModel>(this.model.Select(t => new PowershellNotificationChannelDefinitionViewModel(t)));
         }
 
-        public PowershellNotificationChannelDefinitionViewModel SelectedItem { get; set; }
-
-        public async Task Add()
+        protected override PowershellNotificationChannelDefinitionViewModel CreateViewModel(PowershellNotificationChannelDefinition model)
         {
-            DialogWindow w = new DialogWindow();
-            w.Title = "Add PowerShell notification channel";
-            var m = new PowershellNotificationChannelDefinition();
-            var vm = new PowershellNotificationChannelDefinitionViewModel(m);
-            w.DataContext = vm;
-            vm.Enabled = true;
-            vm.Id = Guid.NewGuid().ToString();
-
-            await ChildWindowManager.ShowChildWindowAsync(this.GetWindow(), w);
-
-            if (w.Result == MessageDialogResult.Affirmative)
-            {
-                this.model.Add(m);
-                this.ViewModels.Add(vm);
-            }
-        }
-        public async Task Edit()
-        {
-            DialogWindow w = new DialogWindow();
-            w.Title = "Edit PowerShell notification channel";
-
-            var m =
-JsonConvert.DeserializeObject<PowershellNotificationChannelDefinition>(JsonConvert.SerializeObject(this.SelectedItem.Model));
-            var vm = new PowershellNotificationChannelDefinitionViewModel(m);
-
-            w.DataContext = vm;
-
-            await ChildWindowManager.ShowChildWindowAsync(this.GetWindow(), w);
-
-            if (w.Result == MessageDialogResult.Affirmative)
-            {
-                this.model.Remove(this.SelectedItem.Model);
-                this.ViewModels.Remove(this.SelectedItem);
-                this.model.Add(m);
-                this.ViewModels.Add(vm);
-                this.SelectedItem = vm;
-            }
+            return new PowershellNotificationChannelDefinitionViewModel(model, this.NotificationSubscriptions);
         }
 
-        public bool CanEdit => this.SelectedItem != null;
-
-        public async Task Delete()
+        protected override PowershellNotificationChannelDefinition CreateModel()
         {
-            if (this.SelectedItem == null)
-            {
-                return;
-            }
-
-            MetroDialogSettings s = new MetroDialogSettings
-            {
-                AnimateShow = false,
-                AnimateHide = false
-            };
-
-            if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", "Are you sure you want to delete this channel?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
-            {
-                this.model.Remove(this.SelectedItem.Model);
-                this.ViewModels.Remove(this.SelectedItem);
-                this.SelectedItem = this.ViewModels.FirstOrDefault();
-            }
+            return new PowershellNotificationChannelDefinition();
         }
 
-        public bool CanDelete => this.SelectedItem != null;
-
-        public void AttachView(UIElement view)
-        {
-            this.View = view;
-        }
-
-        public string DisplayName { get; set; } = "PowerShell";
-
-        public UIElement View { get; set; }
+        public override string DisplayName { get; set; } = "PowerShell";
     }
 }

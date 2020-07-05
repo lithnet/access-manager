@@ -7,14 +7,11 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class SmtpNotificationChannelDefinitionViewModel : ValidatingModelBase, IViewAware
+    public class SmtpNotificationChannelDefinitionViewModel : NotificationChannelDefinitionViewModel<SmtpNotificationChannelDefinition>
     {
-        public SmtpNotificationChannelDefinition Model { get; }
-
-        public SmtpNotificationChannelDefinitionViewModel(SmtpNotificationChannelDefinition model)
+        public SmtpNotificationChannelDefinitionViewModel(SmtpNotificationChannelDefinition model, INotificationSubscriptionProvider subscriptionProvider)
+            : base(model)
         {
-            this.Model = model;
-
             if (this.Model.EmailAddresses == null)
             {
                 this.Model.EmailAddresses = new List<string>();
@@ -22,17 +19,9 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.EmailAddresses = new BindableCollection<string>(this.Model.EmailAddresses);
 
-            this.Validator = new FluentModelValidator<SmtpNotificationChannelDefinitionViewModel>(new SmtpNotificationChannelDefinitionValidator());
+            this.Validator = new FluentModelValidator<SmtpNotificationChannelDefinitionViewModel>(new SmtpNotificationChannelDefinitionValidator(subscriptionProvider));
             this.Validate();
         }
-
-        public bool Enabled { get => this.Model.Enabled; set => this.Model.Enabled = value; }
-
-        public string DisplayName { get => this.Model.DisplayName; set => this.Model.DisplayName = value; }
-
-        public string Id { get => this.Model.Id; set => this.Model.Id = value; }
-
-        public bool Mandatory { get => this.Model.Mandatory; set => this.Model.Mandatory = value; }
 
         public BindableCollection<string> EmailAddresses { get; }
 
@@ -44,10 +33,14 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string SelectedRecipient { get; set; }
 
+        public string RecipientList => string.Join(", ", this.EmailAddresses);
+
         public void AddRecipient()
         {
             this.Model.EmailAddresses.Add(this.NewRecipient);
             this.EmailAddresses.Add(this.NewRecipient);
+            this.ValidateProperty(nameof(this.EmailAddresses));
+            this.NewRecipient = null;
         }
 
         public bool CanAddRecipient
@@ -59,14 +52,7 @@ namespace Lithnet.AccessManager.Server.UI
                     return false;
                 }
 
-                try
-                {
-                    MailAddress m = new MailAddress(this.NewRecipient);
-                    return true;
-                }
-                catch { }
-
-                return false;
+                return this.ValidateProperty(nameof(this.NewRecipient));
             }
         }
 
@@ -75,6 +61,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.NewRecipient = this.SelectedRecipient;
             this.EmailAddresses.Remove(this.SelectedRecipient);
             this.Model.EmailAddresses.Remove(this.SelectedRecipient);
+            this.ValidateProperty(nameof(this.EmailAddresses));
         }
 
         public bool CanRemoveRecipient => this.SelectedRecipient != null;
@@ -102,18 +89,11 @@ namespace Lithnet.AccessManager.Server.UI
             openFileDialog.DereferenceLinks = true;
             openFileDialog.Filter = "All files (*.*)|*.*";
             openFileDialog.Multiselect = false;
-             
+
             if (openFileDialog.ShowDialog(Window.GetWindow(this.View)) == true)
             {
                 this.TemplateFailure = openFileDialog.FileName;
             }
-        }
-
-        public UIElement View { get; private set; }
-
-        public void AttachView(UIElement view)
-        {
-            this.View = view;
         }
     }
 }

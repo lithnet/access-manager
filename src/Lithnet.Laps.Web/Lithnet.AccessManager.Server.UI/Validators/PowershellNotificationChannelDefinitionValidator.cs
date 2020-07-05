@@ -8,20 +8,19 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class PowershellNotificationChannelDefinitionValidator : AbstractValidator<PowershellNotificationChannelDefinitionViewModel>
     {
-        public PowershellNotificationChannelDefinitionValidator()
+        private readonly INotificationSubscriptionProvider provider;
+
+        public PowershellNotificationChannelDefinitionValidator(INotificationSubscriptionProvider subscriptionProvider)
         {
-            this.RuleFor(r => r.DisplayName).NotEmpty();
-            this.RuleFor(r => r.Script).Custom((item, context) =>
-                {
-                    if (string.IsNullOrWhiteSpace(item))
-                    {
-                        context.AddFailure("A script must be specified");
-                    }
-                    else if (!System.IO.File.Exists(item))
-                    {
-                        context.AddFailure("The file does not exist");
-                    }
-                });
+            this.provider = subscriptionProvider;
+
+            this.RuleFor(r => r.DisplayName)
+                .NotEmpty().WithMessage("Display name is required")
+                .Must((item, propertyValue) => this.provider.IsUnique(item.DisplayName, item.Id)).WithMessage("The display name is already in use");
+
+            this.RuleFor(r => r.Script)
+               .NotEmpty().WithMessage("A file must be provided")
+               .Must(t => t == null || System.IO.File.Exists(t)).WithMessage("The file does not exist");
         }
     }
 }

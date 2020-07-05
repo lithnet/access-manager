@@ -15,7 +15,7 @@
             <Grid Margin="10" >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="300"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
@@ -29,24 +29,48 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
 
+                <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
+                          IsChecked="{Binding Enabled}" 
+                          VerticalAlignment="Center" 
+                          Content="Enabled"
+                          Margin="5"/>
 
-                <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding Enabled}" VerticalAlignment="Center">Enabled</CheckBox>
+                <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
+                          IsChecked="{Binding Mandatory}" 
+                          VerticalAlignment="Center"
+                          Margin="5">
+                    <TextBlock Text="Deny the user's request if the delivery of this notification fails" TextWrapping="Wrap"></TextBlock>
+                </CheckBox>
+                
+                <Label Grid.Row="2" Grid.Column="0"
+                       Content="Display name"
+                       Margin="5"/>
+                <TextBox Grid.Row="2" Grid.Column="1" 
+                         Text="{Binding DisplayName, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="5"/>
 
-                <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" IsChecked="{Binding Mandatory}" VerticalAlignment="Center">
-                    <TextBlock Text="Deny the user's request if the delivery of this notification fails" TextWrapping="Wrap"></TextBlock></CheckBox>
+                <Label Grid.Row="3" Grid.Column="0"
+                       Content="Script"
+                       Margin="5"/>
+                <TextBox Grid.Row="3" Grid.Column="1" 
+                         Text="{Binding Script, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="5"/>
+                <Button Grid.Row="3" Grid.Column="2" 
+                        Command="{s:Action ShowScriptDialog}" 
+                        Content="..."
+                        Margin="5"/>
 
-                <Label Grid.Row="2" Grid.Column="0" Content="Display name"/>
-                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding DisplayName, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"/>
-
-                <Label Grid.Row="3" Grid.Column="0" Content="Script"/>
-                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Script, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"/>
-                <Button Grid.Row="3" Grid.Column="2" Command="{s:Action ShowScriptDialog}" Content="..."/>
-
-                <Label Grid.Row="4" Grid.Column="0" Content="Timeout (seconds)"/>
-                <mah:NumericUpDown Grid.Row="4" Grid.Column="1" Value="{Binding TimeOut}" Minimum="1" Maximum="900" Interval="1" HideUpDownButtons="True" Width="50" TextAlignment="Left" HorizontalAlignment="Left"/>
-
+                <Label Grid.Row="4" Grid.Column="0" 
+                       Content="Timeout (seconds)"
+                       Margin="5"/>
+                <mah:NumericUpDown Grid.Row="4" Grid.Column="1" 
+                                   Value="{Binding TimeOut}"
+                                   Minimum="1" Maximum="900" Interval="1"
+                                   HideUpDownButtons="True"
+                                   Width="50" 
+                                   TextAlignment="Left" HorizontalAlignment="Left"
+                                   Margin="5"/>
             </Grid>
-
         </StackPanel>
     </AdornerDecorator>
 </UserControl>

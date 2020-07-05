@@ -1,28 +1,19 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using Lithnet.AccessManager.Configuration;
 using Microsoft.Win32;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class WebhookNotificationChannelDefinitionViewModel : ValidatingModelBase, IViewAware
+    public class WebhookNotificationChannelDefinitionViewModel : NotificationChannelDefinitionViewModel<WebhookNotificationChannelDefinition>
     {
-        public WebhookNotificationChannelDefinition Model { get; }
-
-        public WebhookNotificationChannelDefinitionViewModel(WebhookNotificationChannelDefinition model)
+        public WebhookNotificationChannelDefinitionViewModel(WebhookNotificationChannelDefinition model, INotificationSubscriptionProvider subscriptionProvider)
+            :base(model)
         {
-            this.Model = model;
-            this.Validator = new FluentModelValidator<WebhookNotificationChannelDefinitionViewModel>(new WebhookNotificationChannelDefinitionValidator());
+            this.Validator = new FluentModelValidator<WebhookNotificationChannelDefinitionViewModel>(new WebhookNotificationChannelDefinitionValidator(subscriptionProvider));
             this.Validate();
         }
-
-        public bool Enabled { get => this.Model.Enabled; set => this.Model.Enabled = value; }
-
-        public string DisplayName { get => this.Model.DisplayName; set => this.Model.DisplayName = value; }
-
-        public string Id { get => this.Model.Id; set => this.Model.Id = value; }
-
-        public bool Mandatory { get => this.Model.Mandatory; set => this.Model.Mandatory = value; }
 
         public string ContentType { get => this.Model.ContentType; set => this.Model.ContentType = value; }
 
@@ -30,16 +21,24 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string Url { get => this.Model.Url; set => this.Model.Url = value; }
 
+        public string UrlHost
+        {
+            get
+            {
+                try
+                {
+                    Uri u = new Uri(this.Url);
+                    return u.Host;
+                }
+                catch { }
+
+                return null;
+            }
+        }
+
         public string TemplateFailure { get => this.Model.TemplateFailure; set => this.Model.TemplateFailure = value; }
 
         public string TemplateSuccess { get => this.Model.TemplateSuccess; set => this.Model.TemplateSuccess = value; }
-
-        public UIElement View { get; private set; }
-
-        public void AttachView(UIElement view)
-        {
-            this.View = view;
-        }
 
         public void ShowTemplateSuccessDialog()
         {
@@ -70,6 +69,5 @@ namespace Lithnet.AccessManager.Server.UI
                 this.TemplateFailure = openFileDialog.FileName;
             }
         }
-
     }
 }

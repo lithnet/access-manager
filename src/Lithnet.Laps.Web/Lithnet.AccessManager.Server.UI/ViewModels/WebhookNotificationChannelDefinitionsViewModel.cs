@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,96 +12,23 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class WebhookNotificationChannelDefinitionsViewModel : PropertyChangedBase, IHaveDisplayName, IViewAware
+    public class WebhookNotificationChannelDefinitionsViewModel : NotificationChannelDefinitionsViewModel<WebhookNotificationChannelDefinition, WebhookNotificationChannelDefinitionViewModel>
     {
-        private readonly IList<WebhookNotificationChannelDefinition> model;
-
-        private readonly IDialogCoordinator dialogCoordinator;
-
-        public BindableCollection<WebhookNotificationChannelDefinitionViewModel> ViewModels { get; }
-
-        public WebhookNotificationChannelDefinitionsViewModel(IList<WebhookNotificationChannelDefinition> model, IDialogCoordinator dialogCoordinator)
+        public WebhookNotificationChannelDefinitionsViewModel(IList<WebhookNotificationChannelDefinition> model, IDialogCoordinator dialogCoordinator, INotificationSubscriptionProvider subscriptionProvider, IEventAggregator eventAggregator)
+            : base(model, dialogCoordinator, subscriptionProvider, eventAggregator)
         {
-            this.model = model;
-            this.dialogCoordinator = dialogCoordinator;
-            this.ViewModels = new BindableCollection<WebhookNotificationChannelDefinitionViewModel>(model.Select(t => new WebhookNotificationChannelDefinitionViewModel(t)));
-        }
- 
-        public string DisplayName { get; set; } = "Webhook";
-
-        public WebhookNotificationChannelDefinitionViewModel SelectedItem { get; set; }
-
-        public async Task Add()
-        {
-            DialogWindow w = new DialogWindow();
-            w.Title = "Add webhook notification channel";
-
-            var m = new WebhookNotificationChannelDefinition();
-            var vm = new WebhookNotificationChannelDefinitionViewModel(m);
-            w.DataContext = vm;
-            vm.Enabled = true;
-            vm.Id = Guid.NewGuid().ToString();
-
-            await ChildWindowManager.ShowChildWindowAsync(this.GetWindow(), w);
-
-            if (w.Result == MessageDialogResult.Affirmative)
-            {
-                this.model.Add(m);
-                this.ViewModels.Add(vm);
-            }
-        }
-        public async Task Edit()
-        {
-            DialogWindow w = new DialogWindow();
-            w.Title = "Edit webhook notification channel";
-
-            var m = JsonConvert.DeserializeObject<WebhookNotificationChannelDefinition>(JsonConvert.SerializeObject(this.SelectedItem.Model));
-            var vm = new WebhookNotificationChannelDefinitionViewModel(m);
-
-            w.DataContext = vm;
-
-            await ChildWindowManager.ShowChildWindowAsync(this.GetWindow(), w);
-
-            if (w.Result == MessageDialogResult.Affirmative)
-            {
-                this.model.Remove(this.SelectedItem.Model);
-                this.ViewModels.Remove(this.SelectedItem);
-                this.model.Add(m);
-                this.ViewModels.Add(vm);
-                this.SelectedItem = vm;
-            }
         }
 
-        public bool CanEdit => this.SelectedItem != null;
+        public override string DisplayName { get; set; } = "Webhook";
 
-        public async Task Delete()
+        protected override WebhookNotificationChannelDefinition CreateModel()
         {
-            if (this.SelectedItem == null)
-            {
-                return;
-            }
-
-            MetroDialogSettings s = new MetroDialogSettings
-            {
-                AnimateShow = false,
-                AnimateHide = false
-            };
-
-            if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", "Are you sure you want to delete this channel?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
-            {
-                this.model.Remove(this.SelectedItem.Model);
-                this.ViewModels.Remove(this.SelectedItem);
-                this.SelectedItem = this.ViewModels.FirstOrDefault();
-            }
+            return new WebhookNotificationChannelDefinition();
         }
 
-        public bool CanDelete => this.SelectedItem != null;
-
-        public void AttachView(UIElement view)
+        protected override WebhookNotificationChannelDefinitionViewModel CreateViewModel(WebhookNotificationChannelDefinition model)
         {
-            this.View = view;
+            return new WebhookNotificationChannelDefinitionViewModel(model, this.NotificationSubscriptions);
         }
-
-        public UIElement View { get; set; }
     }
 }

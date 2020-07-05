@@ -11,53 +11,40 @@
         BorderThickness="1"
         BorderBrush="{DynamicResource AccentColorBrush}"
         Height="Auto"
-        Width="Auto">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
+        Width="Auto" SizeToContent="Manual"
+        Margin="10">
 
-        <DockPanel Grid.Row="0"
-                   Grid.ColumnSpan="4">
-            <Menu DockPanel.Dock="Top">
-                <MenuItem Header="_File">
-                    <MenuItem.ItemsSource>
-                        <CompositeCollection>
-                            <MenuItem Header="Save" 
+    <DockPanel LastChildFill="True">
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem.ItemsSource>
+                    <CompositeCollection>
+                        <MenuItem Header="Save" 
                                       Command="{s:Action Save}" />
 
-                            <MenuItem Header="Close" 
+                        <MenuItem Header="Close" 
                                       Command="{s:Action Close}" />
 
-                        </CompositeCollection>
-                    </MenuItem.ItemsSource>
+                    </CompositeCollection>
+                </MenuItem.ItemsSource>
 
-                </MenuItem>
-                <MenuItem Header="_Help">
-                    <MenuItem.ItemsSource>
-                        <CompositeCollection>
-                            <MenuItem Header="Online Help"
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem.ItemsSource>
+                    <CompositeCollection>
+                        <MenuItem Header="Online Help"
                                       Command="{s:Action Help}"/>
-                            <Separator />
-                            <MenuItem Header="About"
+                        <Separator />
+                        <MenuItem Header="About"
                                       Command="{s:Action About}"/>
-                        </CompositeCollection>
-                    </MenuItem.ItemsSource>
-                </MenuItem>
-            </Menu>
+                    </CompositeCollection>
+                </MenuItem.ItemsSource>
+            </MenuItem>
+        </Menu>
 
-        </DockPanel>
+        <ContentControl DockPanel.Dock="Bottom" 
+                            s:View.Model="{Binding Config}"/>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal">
-            <Button Command="{s:Action ShowObjectPicker}" >Open object picker</Button>
-            <Button Command="{s:Action ShowContainerPicker}" >Open container picker</Button>
-        </StackPanel>
-        
-        <ContentControl Grid.Row="2" s:View.Model="{Binding Config}"/>
-    </Grid>
+    </DockPanel>
+
 </controls:MetroWindow>

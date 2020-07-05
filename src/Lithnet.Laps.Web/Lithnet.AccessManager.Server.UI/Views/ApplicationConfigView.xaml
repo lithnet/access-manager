@@ -10,16 +10,19 @@
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Margin="5">
-    <Grid Margin="10" >
-
-        <mah:MetroAnimatedSingleRowTabControl TabStripPlacement="Left" Grid.Row="1" ItemsSource="{Binding Items}" SelectedItem="{Binding ActiveItem}" DisplayMemberPath="DisplayName">
-            <TabControl.ContentTemplate>
-                <DataTemplate>
-                    <ScrollViewer>
-                        <ContentControl s:View.Model="{Binding}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" IsTabStop="False"/>
-                    </ScrollViewer>
-                </DataTemplate>
-            </TabControl.ContentTemplate>
-        </mah:MetroAnimatedSingleRowTabControl>
-    </Grid>
+    <mah:MetroAnimatedSingleRowTabControl TabStripPlacement="Left" 
+                                          ItemsSource="{Binding Items}" 
+                                          SelectedItem="{Binding ActiveItem}"  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                          DisplayMemberPath="DisplayName">
+        <TabControl.ContentTemplate>
+            <DataTemplate>
+                <!--<Grid>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">-->
+                        <ContentControl s:View.Model="{Binding}" 
+                                    IsTabStop="False"/>
+                    <!--</ScrollViewer>
+                </Grid>-->
+            </DataTemplate>
+        </TabControl.ContentTemplate>
+    </mah:MetroAnimatedSingleRowTabControl>
 </UserControl>

@@ -18,7 +18,7 @@
                                xmlns:s="https://github.com/canton7/Stylet" 
                                mc:Ignorable="d">
     <AdornerDecorator>
-        <Grid>
+        <Grid Margin="15">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition/>
@@ -26,23 +26,34 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <AdornerDecorator>
-                <ContentControl Grid.Row="0" s:View.Model="{Binding}"/>
-            </AdornerDecorator>
+            <ScrollViewer Grid.Row="0" 
+                          VerticalScrollBarVisibility="Auto"
+                          Margin="5">
+                <AdornerDecorator>
+                    <ContentControl Grid.Row="0" s:View.Model="{Binding}"/>
+                </AdornerDecorator>
+            </ScrollViewer>
 
-            <StackPanel Grid.Row="1" DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="Cancel" Click="Close_Click">
+            <StackPanel Grid.Row="1"
+                        Orientation="Horizontal" 
+                        HorizontalAlignment="Right">
 
-                </Button>
-                <Button Content="Save" Command="Save">
+                <Button Content="Cancel" 
+                        Click="Close_Click"
+                        Margin="5"
+                        Width="75"/>
+
+                <Button Content="Save" 
+                        Command="Save"
+                        Margin="5"
+                        IsDefault="True"
+                        Width="75">
                     <Button.CommandBindings>
                         <CommandBinding Command="Save" 
                         Executed="Save_Executed" CanExecute="Save_CanExecute"/>
                     </Button.CommandBindings>
                 </Button>
             </StackPanel>
-
-
         </Grid>
     </AdornerDecorator>
 </simpleChildWindow:ChildWindow>
