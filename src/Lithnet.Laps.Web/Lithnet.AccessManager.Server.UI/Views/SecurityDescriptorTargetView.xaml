@@ -1,0 +1,307 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.SecurityDescriptorTargetView"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             Dialog:DialogParticipation.Register="{Binding}"
+             mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="800" Margin="5">
+    <AdornerDecorator>
+        <StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <GroupBox Grid.Row="0" Grid.Column="0"
+                          Header="Target">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Label Grid.Row="2" Grid.Column="0" 
+                       Content="Target"
+                        Margin="5"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" 
+                         Text="{Binding DisplayName, Mode=OneWay}"
+                         IsReadOnly="True"
+                         Margin="5"/>
+                        <Button Grid.Row="2" Grid.Column="2" 
+                        Command="{s:Action SelectTarget}" 
+                        Content="Select target..."
+                         Margin="5"/>
+
+                        <Label Grid.Row="3" Grid.Column="0" 
+                       Content="Type"
+                       Margin="5"/>
+                        <Label Grid.Row="3" Grid.Column="1" 
+                       Content="{Binding Type}"
+                       Margin="5"/>
+
+                        <Label Grid.Row="4" Grid.Column="0" 
+                               Content="Security Descriptor"
+                               Margin="5"/>
+                        
+                        <TextBox Grid.Row="4" Grid.Column="1" 
+                         Text="{Binding SecurityDescriptor}"
+                         IsReadOnly="True"
+                         Margin="5"/>
+
+                        <Label Grid.Row="5" Grid.Column="0" 
+                       Content="Access control"
+                       Margin="5"/>
+
+                        <RadioButton Grid.Row="5" Grid.Column="1"
+                             IsChecked="{Binding IsModePermission}" 
+                             Content="In-built permissions"
+                             Background="Transparent"
+                             Margin="5"/>
+                        <Button Grid.Row="5" Grid.Column="2" 
+                        Command="{s:Action EditPermissions}" 
+                        Content="Edit permissions..."
+                        IsEnabled="{Binding IsModePermission}"
+                         Margin="5"/>
+                        <RadioButton Grid.Row="6" Grid.Column="1"
+                             IsChecked="{Binding IsModeScript}" 
+                             Content="Use an external script"
+                             Background="Transparent"
+                             Margin="5"/>
+
+                        <Label Grid.Row="7" Grid.Column="0"
+                       Content="Script"
+                        Margin="5"/>
+                        <TextBox Grid.Row="7" Grid.Column="1" 
+                         Text="{Binding Script}"
+                         IsEnabled="{Binding IsModeScript}"
+                          Margin="5"/>
+                        <Button Grid.Row="7" Grid.Column="2" 
+                                Command="{s:Action SelectScript}" 
+                                Content="..."
+                                Width="30"
+                                HorizontalAlignment="Left"
+                                IsEnabled="{Binding IsModeScript}"
+                                Margin="5"/>
+                    </Grid>
+                </GroupBox>
+
+
+                <GroupBox Grid.Row="1" Grid.Column="0"
+                          Header="Local admin password access settings">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                                      IsChecked="{Binding ExpireLapsPassword}" 
+                                      Content="Expire the local admin password once it has been accessed"
+                                      Margin="5"/>
+
+                        <Label Grid.Row="1" Grid.Column="0"
+                                   Content="Expire the password after (minutes)"
+                                   Margin="5"/>
+                        <mah:NumericUpDown Grid.Row="1" Grid.Column="1" 
+                                   Value="{Binding LapsExpireMinutes}" 
+                                   Minimum="0" Interval="15" 
+                                   HideUpDownButtons="False"
+                                   Width="100" 
+                                   TextAlignment="Left"
+                                   HorizontalAlignment="Left"
+                                   Margin="5"/>
+
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Grid.Row="2" Grid.Column="0"
+                          Header="Just-in-time access settings">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Row="0" Grid.Column="0"
+                                   Content="Add user to the following group"                       
+                                   Margin="5"/>
+
+                        <TextBox Grid.Row="0" Grid.Column="1" 
+                                     Text="{Binding JitGroupName, Mode=OneWay}"
+                                     IsReadOnly="True"
+                                     Margin="5"/>
+                        <Button Grid.Row="0" Grid.Column="2" 
+                                    Command="{s:Action SelectJitGroup}" 
+                                    Content="..."
+                                    Width="30"
+                                    HorizontalAlignment="Left"
+                                    Margin="5"/>
+
+                        <Label Grid.Row="1" Grid.Column="0"
+                                   Content="Expire the access after (minutes)"
+                                   Margin="5"/>
+                        <mah:NumericUpDown Grid.Row="1" Grid.Column="1" 
+                                   Value="{Binding JitExpireMinutes}" 
+                                   Minimum="1" Interval="15" 
+                                   HideUpDownButtons="False"
+                                   Width="100" 
+                                   TextAlignment="Left"
+                                   HorizontalAlignment="Left"
+                                   Margin="5"/>
+
+                    </Grid>
+                </GroupBox>
+
+
+                <Grid Grid.Row="3" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <GroupBox Grid.Row="0" Grid.Column="0"
+                          Header="Success notifications">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <ListView  Grid.Row="0" Grid.Column="0" 
+                                  BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
+                                  ItemsSource="{Binding SuccessSubscriptions}"
+                                  SelectedItem="{Binding SelectedSuccessSubscription}"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                                       Height="100"
+                                  Margin="5">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding DisplayName}" Width="250"/>
+                                        <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="100"/>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+
+                            <DockPanel Grid.Row="1" 
+                                   Margin="5" LastChildFill="True"
+                                    >
+
+                                <StackPanel DockPanel.Dock="Right"
+                                        Orientation="Horizontal">
+                                    <Button Content="Add" 
+                                    Command="{s:Action AddSuccess}" 
+                                    MinWidth="60"
+                                    Margin="0 5 5 5"/>
+                                    <Button Content="Remove"
+                                    Command="{s:Action RemoveSuccess}" 
+                                    MinWidth="60"
+                                    Margin="5"/>
+                                </StackPanel>
+                                <ComboBox
+                                DockPanel.Dock="Left"
+                                Margin="5"
+                                ItemsSource="{Binding AvailableSuccessSubscriptions}" 
+                                SelectedItem="{Binding SelectedAvailableSuccessSubscription}"
+                                DisplayMemberPath="ControlDisplayName"/>
+                            </DockPanel>
+                        </Grid>
+                    </GroupBox>
+
+                    <GroupBox Grid.Row="0" Grid.Column="1"
+                          Header="Failure notifications">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <ListView  Grid.Row="0" Grid.Column="0" 
+                                  BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
+                                  ItemsSource="{Binding FailureSubscriptions}"
+                                  SelectedItem="{Binding SelectedFailureSubscription}"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                                       Height="100"
+                                       
+                                  Margin="5">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding DisplayName}" Width="250"/>
+                                        <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="100"/>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+
+                            <DockPanel Grid.Row="1" 
+                                   Margin="5" 
+                                   LastChildFill="True">
+
+                                <StackPanel DockPanel.Dock="Right"
+                                        Orientation="Horizontal">
+                                    <Button Content="Add" 
+                                    Command="{s:Action AddFailure}" 
+                                    MinWidth="60"
+                                    Margin="0 5 5 5"/>
+                                    <Button Content="Remove"
+                                    Command="{s:Action RemoveFailure}" 
+                                    MinWidth="60"
+                                    Margin="5"/>
+                                </StackPanel>
+                                <ComboBox
+                                DockPanel.Dock="Left"
+                                Margin="5"
+                                ItemsSource="{Binding AvailableFailureSubscriptions}" 
+                                SelectedItem="{Binding SelectedAvailableFailureSubscription}"
+                                DisplayMemberPath="ControlDisplayName"/>
+                            </DockPanel>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </Grid>
+        </StackPanel>
+    </AdornerDecorator>
+</UserControl>
+    

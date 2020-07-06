@@ -17,6 +17,7 @@ namespace Lithnet.AccessManager.Server.UI
             IApplicationConfig model,
             IDialogCoordinator dialogCoordinator,
             AuthenticationViewModel authentication,
+            AuthorizationViewModel authorization,
             UserInterfaceViewModel ui,
             RateLimitsViewModel rate,
             IpDetectionViewModel ip,
@@ -26,13 +27,15 @@ namespace Lithnet.AccessManager.Server.UI
         {
             this.model = model;
             this.dialogCoordinator = dialogCoordinator;
+
             this.Items.Add(hosting);
+            this.Items.Add(authentication);
+            this.Items.Add(audit);
+            this.Items.Add(authorization);
             this.Items.Add(ui);
             this.Items.Add(mail);
             this.Items.Add(rate);
-            this.Items.Add(authentication);
             this.Items.Add(ip);
-            this.Items.Add(audit);
         }
 
         public void Save()

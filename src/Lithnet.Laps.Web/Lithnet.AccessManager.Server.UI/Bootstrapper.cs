@@ -16,7 +16,7 @@ namespace Lithnet.AccessManager.Server.UI
     {
         protected override void ConfigureIoC(IStyletIoCBuilder builder)
         {
-            var appconfig = ApplicationConfig.Load(@"D:\dev\git\lithnet\laps-web\src\Lithnet.Laps.Web\Lithnet.AccessManager.Web\appsettings.json");
+            var appconfig = ApplicationConfig.Load(ApplicationContextProvider.ConfigFile);
 
             builder.Bind<IApplicationConfig>().ToInstance(appconfig);
             builder.Bind<AuthenticationOptions>().ToInstance(appconfig.Authentication);
@@ -33,6 +33,7 @@ namespace Lithnet.AccessManager.Server.UI
             builder.Bind<EmailViewModel>().ToSelf();
             builder.Bind<HostingViewModel>().ToSelf();
             builder.Bind<AuditingViewModel>().ToSelf();
+            builder.Bind<AuthorizationViewModel>().ToSelf();
 
             builder.Bind<IpDetectionViewModel>().ToSelf();
             builder.Bind<PowershellNotificationChannelDefinitionsViewModel>().ToSelf();

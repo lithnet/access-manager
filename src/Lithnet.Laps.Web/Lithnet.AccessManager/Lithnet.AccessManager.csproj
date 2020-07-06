@@ -14,6 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="lithnet.security.authorization" Version="1.0.7492" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.5" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.5" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
@@ -24,7 +25,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="&quot;C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe&quot; sign /sha1 &quot;$(CSCERTTHUMBPRINT)&quot; /t http://timestamp.digicert.com /fd sha256 /v &quot;$(TargetPath)&quot;&#xD;&#xA;&quot;C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\symstore&quot; add /f &quot;$(TargetDir)*.pdb&quot; /s \\localhost\symbols /t &quot;$(ProjectName)&quot; /v &quot;@(VersionNumber)&quot;" />
+    <Exec Command="&quot;C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe&quot; sign /sha1 &quot;$(CSCERTTHUMBPRINT)&quot; /t http://timestamp.digicert.com /fd sha256 /v &quot;$(TargetPath)&quot;&#xD;&#xA;&quot;C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\symstore&quot; add /f &quot;$(TargetDir)*.pdb&quot; /s \\localhost\symbols /t &quot;$(ProjectName)&quot; /v &quot;@(VersionNumber)&quot;&#xD;&#xA;" />
   </Target>
 
 </Project>

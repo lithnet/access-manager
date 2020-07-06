@@ -6,6 +6,7 @@ using System.Security.Permissions;
 using System.Security.Principal;
 using System.Threading;
 using Lithnet.AccessManager.Interop;
+using Lithnet.Security.Authorization;
 using Moq;
 using NLog;
 using NUnit.Framework;
@@ -33,7 +34,24 @@ namespace Lithnet.AccessManager.Test
         }
 
         [Test]
-        public void TestAcl()
+
+        public void BuildSomeSDs()
+        {
+            var sid = WindowsIdentity.GetCurrent().User;
+            SecurityIdentifier wks = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
+
+            DiscretionaryAcl dacl1 = new DiscretionaryAcl(false, false, 2);
+            dacl1.AddAccess(AccessControlType.Allow, sid, 0x1800, InheritanceFlags.None, PropagationFlags.None);
+            dacl1.AddAccess(AccessControlType.Allow, wks, 0x800, InheritanceFlags.None, PropagationFlags.None);
+
+            CommonSecurityDescriptor csd = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, wks, sid, null, dacl1);
+
+            string sddl = csd.GetSddlForm(AccessControlSections.All);
+        }
+
+
+        [Test]
+        public void TestAcl2()
         {
             var sid = WindowsIdentity.GetCurrent().User;
             SecurityIdentifier wks = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
@@ -47,12 +65,41 @@ namespace Lithnet.AccessManager.Test
             CommonSecurityDescriptor csd2 = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, wks, wks, null, dacl2);
 
             List<GenericSecurityDescriptor> list = new List<GenericSecurityDescriptor>();
+            list.Add(csd);
             list.Add(csd2);
 
-            Assert.IsTrue(NativeMethods.AccessCheck(sid, csd, 0x200));
-            Assert.IsTrue(NativeMethods.AccessCheck(sid, csd, 0x400, list));
-            Assert.IsTrue(NativeMethods.AccessCheck(sid, csd, 0x600, list));
-            Assert.IsFalse(NativeMethods.AccessCheck(sid, csd, 0x800));
+            AuthorizationContext c = new AuthorizationContext(WindowsIdentity.GetCurrent().AccessToken);
+            Assert.IsTrue(c.AccessCheck(csd, 0x200));
+            Assert.IsTrue(c.AccessCheck(list, 0x400));
+            Assert.IsTrue(c.AccessCheck(list, 0x600));
+            Assert.IsFalse(c.AccessCheck(csd, 0x800));
+            Assert.IsFalse(c.AccessCheck(list, 0x800));
+        }
+
+        [Test]
+        public void TestAcl3()
+        {
+            var sid = WindowsIdentity.GetCurrent().User;
+            SecurityIdentifier wks = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
+
+            DiscretionaryAcl dacl1 = new DiscretionaryAcl(false, false, 1);
+            dacl1.AddAccess(AccessControlType.Allow, sid, 0x200, InheritanceFlags.None, PropagationFlags.None);
+            CommonSecurityDescriptor csd = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, sid, sid, null, dacl1);
+
+            DiscretionaryAcl dacl2 = new DiscretionaryAcl(false, false, 1);
+            dacl2.AddAccess(AccessControlType.Allow, wks, 0x400, InheritanceFlags.None, PropagationFlags.None);
+            CommonSecurityDescriptor csd2 = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, wks, wks, null, dacl2);
+
+            List<GenericSecurityDescriptor> list = new List<GenericSecurityDescriptor>();
+            list.Add(csd);
+            list.Add(csd2);
+
+            AuthorizationContext c = new AuthorizationContext(WindowsIdentity.GetCurrent().User);
+            Assert.IsTrue(c.AccessCheck(csd, 0x200));
+            Assert.IsTrue(c.AccessCheck(list, 0x400));
+            Assert.IsTrue(c.AccessCheck(list, 0x600));
+            Assert.IsFalse(c.AccessCheck(csd, 0x800));
+            Assert.IsFalse(c.AccessCheck(list, 0x800));
         }
 
         // THIS domain user found in THIS domain group

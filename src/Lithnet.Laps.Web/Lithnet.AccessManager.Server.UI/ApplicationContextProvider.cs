@@ -15,5 +15,7 @@ namespace Lithnet.AccessManager.Server.UI
         public static string WwwRootPath { get; } = $"{AppPath}\\wwwroot";
 
         public static string ImagesPath { get; } = $"{AppPath}\\wwwroot\\images";
+
+        public static string ConfigFile { get; } = $"{AppPath}\\appsettings.json";
     }
 }

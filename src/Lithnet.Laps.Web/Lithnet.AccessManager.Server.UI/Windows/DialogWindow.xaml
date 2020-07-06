@@ -12,29 +12,16 @@
                                Padding="30"
                                MinWidth="500"
                                MinHeight="300"
+                                MaxHeight="1000"
                                CloseOnOverlay="True"
                                GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
                                ShowCloseButton="True"
                                xmlns:s="https://github.com/canton7/Stylet" 
                                mc:Ignorable="d">
     <AdornerDecorator>
-        <Grid Margin="15">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <ScrollViewer Grid.Row="0" 
-                          VerticalScrollBarVisibility="Auto"
-                          Margin="5">
-                <AdornerDecorator>
-                    <ContentControl Grid.Row="0" s:View.Model="{Binding}"/>
-                </AdornerDecorator>
-            </ScrollViewer>
-
-            <StackPanel Grid.Row="1"
+        <DockPanel LastChildFill="True"
+                   Margin="15">
+            <StackPanel DockPanel.Dock="Bottom"
                         Orientation="Horizontal" 
                         HorizontalAlignment="Right">
 
@@ -54,6 +41,14 @@
                     </Button.CommandBindings>
                 </Button>
             </StackPanel>
-        </Grid>
+
+            <ScrollViewer DockPanel.Dock="Top"
+                          VerticalScrollBarVisibility="Auto"
+                          Margin="5">
+                <AdornerDecorator>
+                    <ContentControl Grid.Row="0" s:View.Model="{Binding}"/>
+                </AdornerDecorator>
+            </ScrollViewer>
+        </DockPanel>
     </AdornerDecorator>
 </simpleChildWindow:ChildWindow>
