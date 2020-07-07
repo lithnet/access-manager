@@ -49,7 +49,7 @@ namespace Lithnet.AccessManager.Web.Authorization
 
             foreach (var target in targets)
             {
-                RawSecurityDescriptor sd = new RawSecurityDescriptor(target.SecurityDescriptor);
+                RawSecurityDescriptor sd = new RawSecurityDescriptor("");//target.SecurityDescriptor);
                 sds.Add(sd);
 
                 if (c.AccessCheck(sd, (int)requestedAccess))

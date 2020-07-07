@@ -341,6 +341,11 @@ namespace Lithnet.AccessManager.Interop
             }
         }
 
+        public static string GetDn(SecurityIdentifier nameToFind)
+        {
+            return GetDn(nameToFind.ToString(), DsNameFormat.DS_SID_OR_SID_HISTORY_NAME);
+        }
+
         public static string GetDn(string nameToFind)
         {
             return GetDn(nameToFind, DsNameFormat.DS_UNKNOWN_NAME);

@@ -42,110 +42,17 @@
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
-                    <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
-                <Label Grid.Row="0" Grid.ColumnSpan="2" Content="Audit events are always logged to the windows event log, but you can specify other channels that should always be notified"/>
+                <Label Grid.Row="0" 
+                       Content="Audit events are always logged to the windows event log, but you can specify other channels that should always be notified"/>
 
-                <GroupBox Grid.Row="1" Grid.Column="0"
-                          Header="Success notifications">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-
-                        <ListView  Grid.Row="0" Grid.Column="0" 
-                                  BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
-                                  ItemsSource="{Binding SuccessSubscriptions}"
-                                  SelectedItem="{Binding SelectedSuccessSubscription}"
-                                  ScrollViewer.VerticalScrollBarVisibility="Visible" 
-                                  Margin="5">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding DisplayName}" Width="250"/>
-                                    <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="100"/>
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
-
-                        <DockPanel Grid.Row="1" 
-                                   Margin="5" LastChildFill="True"
-                                    >
-
-                            <StackPanel DockPanel.Dock="Right"
-                                        Orientation="Horizontal">
-                                <Button Content="Add" 
-                                    Command="{s:Action AddSuccess}" 
-                                    MinWidth="60"
-                                    Margin="0 5 5 5"/>
-                                <Button Content="Remove"
-                                    Command="{s:Action RemoveSuccess}" 
-                                    MinWidth="60"
-                                    Margin="5"/>
-                            </StackPanel>
-                            <ComboBox
-                                DockPanel.Dock="Left"
-                                Margin="5"
-                                ItemsSource="{Binding AvailableSuccessSubscriptions}" 
-                                SelectedItem="{Binding SelectedAvailableSuccessSubscription}"
-                                DisplayMemberPath="ControlDisplayName"/>
-                        </DockPanel>
-                    </Grid>
-                </GroupBox>
-
-                <GroupBox Grid.Row="1" Grid.Column="1"
-                          Header="Failure notifications">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-
-                        <ListView  Grid.Row="0" Grid.Column="0" 
-                                  BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
-                                  ItemsSource="{Binding FailureSubscriptions}"
-                                  SelectedItem="{Binding SelectedFailureSubscription}"
-                                  ScrollViewer.VerticalScrollBarVisibility="Visible" 
-                                  Margin="5">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding DisplayName}" Width="250"/>
-                                    <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="100"/>
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
-
-                        <DockPanel Grid.Row="1" 
-                                   Margin="5" 
-                                   LastChildFill="True">
-
-                            <StackPanel DockPanel.Dock="Right"
-                                        Orientation="Horizontal">
-                                <Button Content="Add" 
-                                    Command="{s:Action AddFailure}" 
-                                    MinWidth="60"
-                                    Margin="0 5 5 5"/>
-                                <Button Content="Remove"
-                                    Command="{s:Action RemoveFailure}" 
-                                    MinWidth="60"
-                                    Margin="5"/>
-                            </StackPanel>
-                            <ComboBox
-                                DockPanel.Dock="Left"
-                                Margin="5"
-                                ItemsSource="{Binding AvailableFailureSubscriptions}" 
-                                SelectedItem="{Binding SelectedAvailableFailureSubscription}"
-                                DisplayMemberPath="ControlDisplayName"/>
-                        </DockPanel>
-                    </Grid>
-                </GroupBox>
+                <ContentControl Grid.Row="1" 
+                                s:View.Model="{Binding Notifications}" 
+                                VerticalContentAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch" 
+                                IsTabStop="False"
+                                Margin="5"/>
             </Grid>
         </GroupBox>
     </Grid>

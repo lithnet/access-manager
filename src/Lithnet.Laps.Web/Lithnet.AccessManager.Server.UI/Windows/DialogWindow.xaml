@@ -25,15 +25,16 @@
                         Orientation="Horizontal" 
                         HorizontalAlignment="Right">
 
-                <Button Content="Cancel" 
+                <Button Content="{Binding Path=CancelButtonName, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type simpleChildWindow:ChildWindow}}}" 
                         Click="Close_Click"
                         Margin="5"
+                        IsDefault="{Binding Path=CancelButtonIsDefault, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type simpleChildWindow:ChildWindow}}}"
                         Width="75"/>
 
-                <Button Content="Save" 
+                <Button Content="{Binding Path=SaveButtonName, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type simpleChildWindow:ChildWindow}}}" 
                         Command="Save"
                         Margin="5"
-                        IsDefault="True"
+                        IsDefault="{Binding Path=SaveButtonIsDefault, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type simpleChildWindow:ChildWindow}}}"
                         Width="75">
                     <Button.CommandBindings>
                         <CommandBinding Command="Save" 

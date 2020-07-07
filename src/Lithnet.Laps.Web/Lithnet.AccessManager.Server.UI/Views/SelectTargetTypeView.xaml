@@ -1,0 +1,45 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.SelectTargetTypeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Label Grid.Row="0" Grid.Column="0" 
+                           Content="Target type"
+                           Margin="5"/>
+        <ComboBox Grid.Row="0" Grid.Column="1" 
+                              ItemsSource="{Binding TargetTypeValues, Mode=OneWay}"
+                              SelectedItem="{Binding TargetType}"
+                              Width="200"
+                              Margin="5">
+            <ComboBox.Resources>
+                <local:EnumToDisplayConverter x:Key="enumconv"/>
+            </ComboBox.Resources>
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Converter={StaticResource enumconv}}"></TextBlock>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <Label Grid.Row="1" Grid.Column="0"
+               Content="Forest"
+               Margin="5"/>
+        <ComboBox Grid.Row="1" Grid.Column="1" 
+                              ItemsSource="{Binding AvailableForests, Mode=OneWay}"
+                              SelectedItem="{Binding SelectedForest}"
+                              Width="200"
+                              Margin="5"/>
+
+    </Grid>
+</UserControl>

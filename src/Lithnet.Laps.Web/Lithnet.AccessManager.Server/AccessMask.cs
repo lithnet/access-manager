@@ -1,28 +1,25 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.Serialization;
+using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Lithnet.AccessManager.Web.Authorization
+namespace Lithnet.AccessManager.Server
 {
     [JsonConverter(typeof(StringEnumConverter))]
     [Flags]
     public enum AccessMask
     {
-        [EnumMember(Value = "undefined")]
         Undefined = 0,
 
         [Description("Active local admin password")]
-        [EnumMember(Value = "laps")]
         Laps = 0x200,
 
-        [Description("Just-in-time access")]
-        [EnumMember(Value = "jit")]
-        Jit = 0x400,
-
         [Description("Previous local admin passwords")]
-        [EnumMember(Value = "lapshistory")]
-        LapsHistory = 0x800,
+        LapsHistory = 0x400,
+
+        [Description("Just-in-time access")]
+        Jit = 0x800,
     }
 }

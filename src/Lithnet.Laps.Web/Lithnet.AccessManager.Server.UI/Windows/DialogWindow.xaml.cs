@@ -12,19 +12,29 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.SimpleChildWindow;
+using PropertyChanged;
 
 namespace Lithnet.AccessManager.Server.UI
 {
     /// <summary>
     /// Interaction logic for ChildWindow.xaml
     /// </summary>
+    [AddINotifyPropertyChangedInterface]
     public partial class DialogWindow : ChildWindow
     {
         public DialogWindow()
         {
             InitializeComponent();
         }
-                     
+
+        public bool CancelButtonIsDefault { get; set; } = true;
+
+        public bool SaveButtonIsDefault { get => !this.CancelButtonIsDefault; set => this.CancelButtonIsDefault = !value; }
+
+        public string SaveButtonName { get; set; } = "Save";
+
+        public string CancelButtonName { get; set; } = "Cancel";
+
         public MessageDialogResult Result { get; set; }
 
         private void Close_Click(object sender, RoutedEventArgs e)
@@ -48,16 +58,8 @@ namespace Lithnet.AccessManager.Server.UI
                 e.CanExecute = false;
                 return;
             }
-            
+
             e.CanExecute = true;
         }
-
-        //private void ChildWindow_Loaded(object sender, RoutedEventArgs e)
-        //{
-        //    var vm = this.DataContext as PowershellNotificationChannelDefinitionViewModel;
-
-        //    vm?.ValidateVm();
-
-        //}
     }
 }

@@ -51,7 +51,6 @@ namespace Lithnet.AccessManager.Server.UI
             var m = this.CreateModel();
             var vm = this.CreateViewModel(m);
             w.DataContext = vm;
-            vm.Id = Guid.NewGuid().ToString();
 
             await ChildWindowManager.ShowChildWindowAsync(this.GetWindow(), w);
 

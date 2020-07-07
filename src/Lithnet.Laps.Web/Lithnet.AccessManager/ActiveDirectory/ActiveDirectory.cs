@@ -274,7 +274,7 @@ namespace Lithnet.AccessManager
             }
             else if (objectName.TryParseAsSid(out SecurityIdentifier sid))
             {
-                dn = $"<SID={sid}>";
+                dn = NativeMethods.GetDn(sid);
             }
             else if (this.IsDistinguishedName(objectName))
             {

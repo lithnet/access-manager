@@ -33,7 +33,7 @@ namespace Lithnet.AccessManager.Server.UI.Interop
         private const int CRYPTUI_WIZ_IMPORT_NO_CHANGE_DEST_STORE = 0x00010000;
 
         private const int CRYPTUI_WIZ_IMPORT_TO_LOCALMACHINE = 0x00100000;
-      
+
         [DllImport("dsuiext.dll", CharSet = CharSet.Unicode)]
         private static extern DsBrowseResult DsBrowseForContainer(IntPtr pInfo);
 
@@ -93,12 +93,12 @@ namespace Lithnet.AccessManager.Server.UI.Interop
             }
         }
 
-        public static IEnumerable<DsopResult> ShowObjectPickerDialog(IntPtr hwnd, DsopScopeInitInfo scope, params string[] attributesToGet)
+        public static IEnumerable<DsopResult> ShowObjectPickerDialog(IntPtr hwnd, string targetComputer, DsopScopeInitInfo scope, params string[] attributesToGet)
         {
-            return ShowObjectPickerDialog(hwnd, new List<DsopScopeInitInfo> { scope }, attributesToGet);
+            return ShowObjectPickerDialog(hwnd, targetComputer, new List<DsopScopeInitInfo> { scope }, attributesToGet);
         }
 
-        public static IEnumerable<DsopResult> ShowObjectPickerDialog(IntPtr hwnd, IList<DsopScopeInitInfo> scopes, params string[] attributesToGet)
+        public static IEnumerable<DsopResult> ShowObjectPickerDialog(IntPtr hwnd, string targetComputer, IList<DsopScopeInitInfo> scopes, params string[] attributesToGet)
         {
             IDsObjectPicker idsObjectPicker = (IDsObjectPicker)new DSObjectPicker();
 
@@ -106,7 +106,7 @@ namespace Lithnet.AccessManager.Server.UI.Interop
             {
                 using LpStructArrayMarshaller<DsopScopeInitInfo> scopeInitInfoArray = CreateScopes(scopes);
                 using LpStringArrayConverter attributes = new LpStringArrayConverter(attributesToGet);
-                DsopDialogInitializationInfo initInfo = CreateInitInfo(scopeInitInfoArray.Ptr, scopeInitInfoArray.Count, attributes.Ptr, attributes.Count);
+                DsopDialogInitializationInfo initInfo = CreateInitInfo(scopeInitInfoArray.Ptr, targetComputer, scopeInitInfoArray.Count, attributes.Ptr, attributes.Count);
 
                 int hresult = idsObjectPicker.Initialize(ref initInfo);
 
@@ -119,7 +119,7 @@ namespace Lithnet.AccessManager.Server.UI.Interop
 
                 if (hresult == S_FALSE)
                 {
-                    return null;
+                    return new List<DsopResult>();
                 }
 
                 if (hresult != S_OK)
@@ -226,17 +226,17 @@ namespace Lithnet.AccessManager.Server.UI.Interop
             return null;
         }
 
-        private static DsopDialogInitializationInfo CreateInitInfo(IntPtr pScopeInitInfo, int scopeCount, IntPtr attrributesToGet, int attributesToGetCount)
+        private static DsopDialogInitializationInfo CreateInitInfo(IntPtr pScopeInitInfo, string targetComputer, int scopeCount, IntPtr attrributesToGet, int attributesToGetCount)
         {
             var initInfo = new DsopDialogInitializationInfo
             {
                 Size = Marshal.SizeOf<DsopDialogInitializationInfo>(),
-                TargetComputer = null,// "extdev1.local",
+                TargetComputer = targetComputer,
                 ScopeInfoCount = scopeCount,
                 ScopeInfo = pScopeInitInfo,
                 Options = 0
             };
-
+            
             initInfo.AttributesToFetchCount = attributesToGetCount;
             initInfo.AttributesToFetch = attrributesToGet;
 

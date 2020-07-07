@@ -21,6 +21,7 @@
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
 
                 <GroupBox Grid.Row="0" Grid.Column="0"
@@ -34,85 +35,105 @@
                         <Grid.RowDefinitions>
                             <RowDefinition />
                             <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
+                        </Grid.RowDefinitions>
+
+                        <Label Grid.Row="0" Grid.Column="0" 
+                               Content="Target"
+                               Margin="5"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" 
+                                 Text="{Binding DisplayName, Mode=OneWay}"
+                                 IsReadOnly="True"
+                                 Margin="5"/>
+                        <Button Grid.Row="0" Grid.Column="2" 
+                                Command="{s:Action SelectTarget}" 
+                                Content="Select target..."
+                                Margin="5"/>
+
+                        <Label Grid.Row="1" Grid.Column="0" 
+                               Content="Type"
+                               Margin="5"/>
+                        <Label Grid.Row="1" Grid.Column="1" 
+                               Content="{Binding Type}"
+                               Margin="5"/>
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Grid.Row="1" Grid.Column="0"
+                          IsEnabled="{Binding CanEdit, Mode=OneWay}"
+                          Header="Access control">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
                             <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Label Grid.Row="2" Grid.Column="0" 
-                       Content="Target"
-                        Margin="5"/>
-                        <TextBox Grid.Row="2" Grid.Column="1" 
-                         Text="{Binding DisplayName, Mode=OneWay}"
-                         IsReadOnly="True"
-                         Margin="5"/>
-                        <Button Grid.Row="2" Grid.Column="2" 
-                        Command="{s:Action SelectTarget}" 
-                        Content="Select target..."
-                         Margin="5"/>
 
-                        <Label Grid.Row="3" Grid.Column="0" 
-                       Content="Type"
-                       Margin="5"/>
-                        <Label Grid.Row="3" Grid.Column="1" 
-                       Content="{Binding Type}"
-                       Margin="5"/>
 
-                        <Label Grid.Row="4" Grid.Column="0" 
+                        <Label Grid.Row="0" Grid.Column="0" 
                                Content="Security Descriptor"
                                Margin="5"/>
-                        
-                        <TextBox Grid.Row="4" Grid.Column="1" 
-                         Text="{Binding SecurityDescriptor}"
-                         IsReadOnly="True"
-                         Margin="5"/>
 
-                        <Label Grid.Row="5" Grid.Column="0" 
-                       Content="Access control"
-                       Margin="5"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" 
+                                 Text="{Binding SecurityDescriptor}"
+                                 IsReadOnly="True"
+                                 Margin="5"/>
 
-                        <RadioButton Grid.Row="5" Grid.Column="1"
+                        <Label Grid.Row="1" Grid.Column="0" 
+                               Content="Access control"
+                               Margin="5"/>
+                        <RadioButton Grid.Row="1" Grid.Column="1"
                              IsChecked="{Binding IsModePermission}" 
                              Content="In-built permissions"
+                             IsEnabled="{Binding CanEdit, Mode=OneWay}"
                              Background="Transparent"
                              Margin="5"/>
-                        <Button Grid.Row="5" Grid.Column="2" 
-                        Command="{s:Action EditPermissions}" 
-                        Content="Edit permissions..."
-                        IsEnabled="{Binding IsModePermission}"
-                         Margin="5"/>
-                        <RadioButton Grid.Row="6" Grid.Column="1"
-                             IsChecked="{Binding IsModeScript}" 
-                             Content="Use an external script"
-                             Background="Transparent"
-                             Margin="5"/>
-
-                        <Label Grid.Row="7" Grid.Column="0"
-                       Content="Script"
-                        Margin="5"/>
-                        <TextBox Grid.Row="7" Grid.Column="1" 
-                         Text="{Binding Script}"
-                         IsEnabled="{Binding IsModeScript}"
-                          Margin="5"/>
-                        <Button Grid.Row="7" Grid.Column="2" 
-                                Command="{s:Action SelectScript}" 
-                                Content="..."
-                                Width="30"
-                                HorizontalAlignment="Left"
-                                IsEnabled="{Binding IsModeScript}"
+                        <Button Grid.Row="1" Grid.Column="2" 
+                                Command="{s:Action EditPermissions}" 
+                                Content="Edit permissions..."
                                 Margin="5"/>
+
+                        <RadioButton Grid.Row="2" Grid.Column="1"
+                                     IsChecked="{Binding IsModeScript}" 
+                                     Content="Use an external script"
+                                     Background="Transparent"
+                                     IsEnabled="{Binding CanEdit, Mode=OneWay}"
+                                     Margin="5"/>
+
+                        <Label Grid.Row="3" Grid.Column="0"
+                               Content="Script"
+                               Margin="5"/>
+                        <TextBox Grid.Row="3" Grid.Column="1" 
+                                 Text="{Binding Script}"
+                                 IsEnabled="{Binding CanSelectScript}"
+                                 Margin="5"/>
+                        <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+                            <Button Command="{s:Action EditScript}" 
+                                    Content="Edit in PowerShell ISE..."
+                                    IsEnabled="{Binding IsModeScript}"
+                                    Margin="5"/>
+                            <Button Command="{s:Action SelectScript}" 
+                                    Content="Select existing file..."
+                                    IsEnabled="{Binding IsModeScript}"
+                                    Margin="5"/>
+                            <Button Command="{s:Action CreateNewScript}" 
+                                    Content="Create new..."
+                                    IsEnabled="{Binding IsModeScript}"
+                                    Margin="5"/>
+                        </StackPanel>
+                        
                     </Grid>
                 </GroupBox>
 
-
-                <GroupBox Grid.Row="1" Grid.Column="0"
+                <GroupBox Grid.Row="2" Grid.Column="0"
+                          IsEnabled="{Binding CanEdit, Mode=OneWay}"
+                          Visibility="{Binding ShowLapsOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                           Header="Local admin password access settings">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -144,10 +165,13 @@
                     </Grid>
                 </GroupBox>
 
-                <GroupBox Grid.Row="2" Grid.Column="0"
+                <GroupBox Grid.Row="3" Grid.Column="0"
+                          IsEnabled="{Binding CanEdit, Mode=OneWay}"
+                          Visibility="{Binding ShowJitOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                           Header="Just-in-time access settings">
                     <Grid>
                         <Grid.RowDefinitions>
+                            <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
                         </Grid.RowDefinitions>
@@ -162,8 +186,7 @@
                                    Margin="5"/>
 
                         <TextBox Grid.Row="0" Grid.Column="1" 
-                                     Text="{Binding JitGroupName, Mode=OneWay}"
-                                     IsReadOnly="True"
+                                     Text="{Binding JitGroupDisplayName}"
                                      Margin="5"/>
                         <Button Grid.Row="0" Grid.Column="2" 
                                     Command="{s:Action SelectJitGroup}" 
@@ -172,10 +195,15 @@
                                     HorizontalAlignment="Left"
                                     Margin="5"/>
 
-                        <Label Grid.Row="1" Grid.Column="0"
+                        <TextBlock Grid.Row="1" Grid.Column="1"
+                                   Text="Select the group to add the user to, or build a template using the {computername} and {computerdomain} placeholders. For example, if you specify '{computerdomain}\G-JIT-{computername}', for a computer in the domain LITHNET with the name PC1, the user will be added to a group called 'LITHNET\G-JIT-PC1'"
+                                   TextWrapping="Wrap"
+                                   Margin="5 0 5 5 "/>
+
+                        <Label Grid.Row="2" Grid.Column="0"
                                    Content="Expire the access after (minutes)"
                                    Margin="5"/>
-                        <mah:NumericUpDown Grid.Row="1" Grid.Column="1" 
+                        <mah:NumericUpDown Grid.Row="2" Grid.Column="1" 
                                    Value="{Binding JitExpireMinutes}" 
                                    Minimum="1" Interval="15" 
                                    HideUpDownButtons="False"
@@ -187,119 +215,12 @@
                     </Grid>
                 </GroupBox>
 
-
-                <Grid Grid.Row="3" >
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-
-                    <GroupBox Grid.Row="0" Grid.Column="0"
-                          Header="Success notifications">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-
-                            <ListView  Grid.Row="0" Grid.Column="0" 
-                                  BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
-                                  ItemsSource="{Binding SuccessSubscriptions}"
-                                  SelectedItem="{Binding SelectedSuccessSubscription}"
-                                  ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                                       Height="100"
-                                  Margin="5">
-                                <ListView.View>
-                                    <GridView>
-                                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding DisplayName}" Width="250"/>
-                                        <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="100"/>
-                                    </GridView>
-                                </ListView.View>
-                            </ListView>
-
-                            <DockPanel Grid.Row="1" 
-                                   Margin="5" LastChildFill="True"
-                                    >
-
-                                <StackPanel DockPanel.Dock="Right"
-                                        Orientation="Horizontal">
-                                    <Button Content="Add" 
-                                    Command="{s:Action AddSuccess}" 
-                                    MinWidth="60"
-                                    Margin="0 5 5 5"/>
-                                    <Button Content="Remove"
-                                    Command="{s:Action RemoveSuccess}" 
-                                    MinWidth="60"
-                                    Margin="5"/>
-                                </StackPanel>
-                                <ComboBox
-                                DockPanel.Dock="Left"
-                                Margin="5"
-                                ItemsSource="{Binding AvailableSuccessSubscriptions}" 
-                                SelectedItem="{Binding SelectedAvailableSuccessSubscription}"
-                                DisplayMemberPath="ControlDisplayName"/>
-                            </DockPanel>
-                        </Grid>
-                    </GroupBox>
-
-                    <GroupBox Grid.Row="0" Grid.Column="1"
-                          Header="Failure notifications">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-
-                            <ListView  Grid.Row="0" Grid.Column="0" 
-                                  BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
-                                  ItemsSource="{Binding FailureSubscriptions}"
-                                  SelectedItem="{Binding SelectedFailureSubscription}"
-                                  ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                                       Height="100"
-                                       
-                                  Margin="5">
-                                <ListView.View>
-                                    <GridView>
-                                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding DisplayName}" Width="250"/>
-                                        <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="100"/>
-                                    </GridView>
-                                </ListView.View>
-                            </ListView>
-
-                            <DockPanel Grid.Row="1" 
-                                   Margin="5" 
-                                   LastChildFill="True">
-
-                                <StackPanel DockPanel.Dock="Right"
-                                        Orientation="Horizontal">
-                                    <Button Content="Add" 
-                                    Command="{s:Action AddFailure}" 
-                                    MinWidth="60"
-                                    Margin="0 5 5 5"/>
-                                    <Button Content="Remove"
-                                    Command="{s:Action RemoveFailure}" 
-                                    MinWidth="60"
-                                    Margin="5"/>
-                                </StackPanel>
-                                <ComboBox
-                                DockPanel.Dock="Left"
-                                Margin="5"
-                                ItemsSource="{Binding AvailableFailureSubscriptions}" 
-                                SelectedItem="{Binding SelectedAvailableFailureSubscription}"
-                                DisplayMemberPath="ControlDisplayName"/>
-                            </DockPanel>
-                        </Grid>
-                    </GroupBox>
-                </Grid>
+                <ContentControl Grid.Row="4"
+                                s:View.Model="{Binding Notifications}" 
+                                VerticalContentAlignment="Stretch"
+                                HorizontalContentAlignment="Stretch"
+                                IsTabStop="False"/>
+                
             </Grid>
         </StackPanel>
     </AdornerDecorator>
