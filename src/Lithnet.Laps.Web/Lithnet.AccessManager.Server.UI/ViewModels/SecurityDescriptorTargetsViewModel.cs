@@ -51,6 +51,7 @@ namespace Lithnet.AccessManager.Server.UI
             var m = this.CreateModel();
             var vm = this.CreateViewModel(m);
             w.DataContext = vm;
+            w.SaveButtonIsDefault = true;
 
             await ChildWindowManager.ShowChildWindowAsync(this.GetWindow(), w);
 
@@ -66,6 +67,7 @@ namespace Lithnet.AccessManager.Server.UI
             w.Title = "Edit target";
             w.HorizontalContentAlignment = HorizontalAlignment.Stretch; 
             w.VerticalContentAlignment = VerticalAlignment.Stretch;
+            w.SaveButtonIsDefault = true;
 
             var m = JsonConvert.DeserializeObject<SecurityDescriptorTarget>(JsonConvert.SerializeObject(this.SelectedItem.Model));
             var vm = this.CreateViewModel(m);
@@ -77,9 +79,12 @@ namespace Lithnet.AccessManager.Server.UI
             if (w.Result == MessageDialogResult.Affirmative)
             {
                 this.Model.Remove(this.SelectedItem.Model);
+
+                int existingPosition = this.ViewModels.IndexOf(this.SelectedItem);
+
                 this.ViewModels.Remove(this.SelectedItem);
                 this.Model.Add(m);
-                this.ViewModels.Add(vm);
+                this.ViewModels.Insert(Math.Min(existingPosition, this.ViewModels.Count), vm);
                 this.SelectedItem = vm;
             }
         }

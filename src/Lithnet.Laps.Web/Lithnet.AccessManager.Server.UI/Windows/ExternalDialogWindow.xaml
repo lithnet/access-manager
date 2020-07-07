@@ -1,0 +1,61 @@
+﻿<controls:MetroWindow x:Class="Lithnet.AccessManager.Server.UI.ExternalDialogWindow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+                      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                      xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+                      xmlns:simpleChildWindow="clr-namespace:MahApps.Metro.SimpleChildWindow;assembly=MahApps.Metro.SimpleChildWindow"
+                      d:DesignHeight="300"
+                      d:DesignWidth="300"
+                      BorderBrush="{DynamicResource MahApps.Brushes.AccentBase}"
+                      BorderThickness="1"
+                      Padding="30"
+                      MinWidth="500"
+                      MaxHeight="1000"
+                      SizeToContent="WidthAndHeight"
+                      WindowStartupLocation="CenterOwner"
+                      ShowInTaskbar="False"
+                      ShowCloseButton="True"
+                      ShowMaxRestoreButton="False"
+                      ShowMinButton="False"
+                      WindowStyle="SingleBorderWindow"
+                      xmlns:s="https://github.com/canton7/Stylet"
+                      mc:Ignorable="d">
+    <AdornerDecorator>
+        <DockPanel LastChildFill="True"
+                   Margin="15">
+            <StackPanel DockPanel.Dock="Bottom"
+                        Orientation="Horizontal" 
+                        HorizontalAlignment="Right">
+
+                <Button Content="{Binding Path=CancelButtonName, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" 
+                        Click="Close_Click"
+                        IsCancel="True"
+                        Margin="5"
+                        Width="75"/>
+
+                <Button x:Name="SaveButton"
+                        Content="{Binding Path=SaveButtonName, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" 
+                        Command="Save"
+                        IsDefault="True"
+                        Margin="5"
+                        Width="75">
+                    <Button.CommandBindings>
+                        <CommandBinding Command="Save" 
+                                        Executed="Save_Executed"
+                                        CanExecute="Save_CanExecute"/>
+                    </Button.CommandBindings>
+                </Button>
+            </StackPanel>
+
+            <ScrollViewer DockPanel.Dock="Top"
+                          VerticalScrollBarVisibility="Auto"
+                          Margin="5">
+                <AdornerDecorator>
+                    <ContentControl Grid.Row="0" s:View.Model="{Binding}"/>
+                </AdornerDecorator>
+            </ScrollViewer>
+        </DockPanel>
+    </AdornerDecorator>
+</controls:MetroWindow>

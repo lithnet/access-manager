@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.SimpleChildWindow;
 using PropertyChanged;
@@ -20,19 +21,12 @@ namespace Lithnet.AccessManager.Server.UI
     /// Interaction logic for ChildWindow.xaml
     /// </summary>
     [AddINotifyPropertyChangedInterface]
-    public partial class DialogWindow : ChildWindow
+    public partial class ExternalDialogWindow : MetroWindow
     {
-        public DialogWindow()
+        public ExternalDialogWindow()
         {
             InitializeComponent();
-            
-            //this.IsModal = true;
-            //this.AllowFocusElement = true;
-            //this.FocusedElement = this.SaveButton;
-            //this.IsWindowHostActive = false;
-            //this.SaveButton.IsDefault = true;
             this.SaveButton.Focus();
-
         }
 
         public bool CancelButtonIsDefault { get; set; } = true;
@@ -47,13 +41,13 @@ namespace Lithnet.AccessManager.Server.UI
 
         private void Close_Click(object sender, RoutedEventArgs e)
         {
-            this.Result = MessageDialogResult.Canceled;
+            this.DialogResult = false;
             this.Close();
         }
 
         private void Save_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            this.Result = MessageDialogResult.Affirmative;
+            this.DialogResult = true;
             this.Close();
         }
 

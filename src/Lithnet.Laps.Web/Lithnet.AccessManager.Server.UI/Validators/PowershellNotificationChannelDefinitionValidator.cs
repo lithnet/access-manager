@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using FluentValidation;
 using Stylet;
@@ -19,8 +20,7 @@ namespace Lithnet.AccessManager.Server.UI
                 .Must((item, propertyValue) => this.provider.IsUnique(item.DisplayName, item.Id)).WithMessage("The display name is already in use");
 
             this.RuleFor(r => r.Script)
-               .NotEmpty().WithMessage("A file must be provided")
-               .Must(t => t == null || System.IO.File.Exists(t)).WithMessage("The file does not exist");
+                .SetValidator(new FileSelectionViewModelValidator());
         }
     }
 }

@@ -1,5 +1,10 @@
-﻿using System.Windows;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
+using System.Windows;
 using Lithnet.AccessManager.Configuration;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
 using Stylet;
 
@@ -7,31 +12,31 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class PowershellNotificationChannelDefinitionViewModel : NotificationChannelDefinitionViewModel<PowershellNotificationChannelDefinition>
     {
-        public PowershellNotificationChannelDefinitionViewModel(PowershellNotificationChannelDefinition model, INotificationSubscriptionProvider subscriptionProvider):
-            base (model)
+        private readonly IDialogCoordinator dialogCoordinator;
+
+        public PowershellNotificationChannelDefinitionViewModel(PowershellNotificationChannelDefinition model, IDialogCoordinator dialogCoordinator, INotificationSubscriptionProvider subscriptionProvider) :
+            base(model)
         {
+            this.dialogCoordinator = dialogCoordinator;
             this.Validator = new FluentModelValidator<PowershellNotificationChannelDefinitionViewModel>(new PowershellNotificationChannelDefinitionValidator(subscriptionProvider));
             this.Validate();
+
+            this.Script = new FileSelectionViewModel(model, () => model.Script, AppPathProvider.ScriptsPath, dialogCoordinator);
+            this.Script.DefaultFileExtension = "ps1";
+            this.Script.Filter = "PowerShell script|*.ps1";
+            this.Script.NewFileContent = ScriptTemplates.AuditScriptTemplate;
+            this.Script.PropertyChanged += Script_PropertyChanged;
         }
 
-        public string Script { get => this.Model.Script; set => this.Model.Script = value; }
+        private void Script_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            this.ValidateProperty(nameof(this.Script));
+        }
+
+        public string ScriptFile => this.Script.File;
+
+        public FileSelectionViewModel Script { get; }
 
         public int TimeOut { get => this.Model.TimeOut; set => this.Model.TimeOut = value; }
-
-        public void ShowScriptDialog()
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.CheckFileExists = true;
-            openFileDialog.CheckPathExists = true;
-            openFileDialog.DefaultExt = "ps1";
-            openFileDialog.DereferenceLinks = true;
-            openFileDialog.Filter = "PowerShell Script (*.ps1)|*.ps1";
-            openFileDialog.Multiselect = false;
-
-            if (openFileDialog.ShowDialog(Window.GetWindow(this.View)) == true)
-            {
-                this.Script = openFileDialog.FileName;
-            }
-        }
     }
 }

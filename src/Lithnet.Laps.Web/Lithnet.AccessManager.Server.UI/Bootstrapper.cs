@@ -16,7 +16,7 @@ namespace Lithnet.AccessManager.Server.UI
     {
         protected override void ConfigureIoC(IStyletIoCBuilder builder)
         {
-            var appconfig = ApplicationConfig.Load(ApplicationContextProvider.ConfigFile);
+            var appconfig = ApplicationConfig.Load(AppPathProvider.ConfigFile);
 
             builder.Bind<IApplicationConfig>().ToInstance(appconfig);
             builder.Bind<AuthenticationOptions>().ToInstance(appconfig.Authentication);

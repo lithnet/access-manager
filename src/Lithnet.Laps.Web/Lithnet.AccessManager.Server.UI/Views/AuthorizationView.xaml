@@ -11,7 +11,9 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <ContentControl s:View.Model="{Binding Targets}" 
+        <GroupBox Header="Authorization rules">
+            <ContentControl s:View.Model="{Binding Targets}" 
                                     IsTabStop="False"/>
+        </GroupBox>
     </Grid>
 </UserControl>

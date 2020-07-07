@@ -16,6 +16,7 @@ using MahApps.Metro.SimpleChildWindow;
 using Stylet;
 using System.IO;
 using System.Diagnostics;
+using System.Runtime.Versioning;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -27,6 +28,8 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IDirectory directory;
 
+        private readonly IDialogCoordinator dialogCoordinator;
+
         public SecurityDescriptorTarget Model { get; }
 
         public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, IDialogCoordinator dialogCoordinator, INotificationSubscriptionProvider subscriptionProvider, IEventAggregator eventAggregator)
@@ -35,13 +38,27 @@ namespace Lithnet.AccessManager.Server.UI
             this.Model = model;
             this.subscriptions = subscriptionProvider;
             this.eventAggregator = eventAggregator;
+            this.dialogCoordinator = dialogCoordinator;
+
+            this.Script = new FileSelectionViewModel(model, () => model.Script, AppPathProvider.ScriptsPath, dialogCoordinator);
+            this.Script.DefaultFileExtension = "ps1";
+            this.Script.Filter = "PowerShell script|*.ps1";
+            this.Script.NewFileContent = ScriptTemplates.AuthorizationScriptTemplate;
+            this.Script.ShouldValidate = false;
 
             this.Notifications = new NotificationChannelSelectionViewModel(this.Model.Notifications, subscriptionProvider, eventAggregator);
         }
 
         public NotificationChannelSelectionViewModel Notifications { get; }
 
-        public AuthorizationMode AuthorizationMode { get => this.Model.AuthorizationMode; set => this.Model.AuthorizationMode = value; }
+        public AuthorizationMode AuthorizationMode
+        {
+            get => this.Model.AuthorizationMode; set
+            {
+                this.Model.AuthorizationMode = value;
+                this.Script.ShouldValidate = (value == AuthorizationMode.PowershellScript);
+            }
+        }
 
         public bool IsModePermission { get => this.AuthorizationMode == AuthorizationMode.SecurityDescriptor; set => this.AuthorizationMode = value ? AuthorizationMode.SecurityDescriptor : AuthorizationMode.PowershellScript; }
 
@@ -49,7 +66,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string Id { get => this.Model.Id; set => this.Model.Id = value; }
 
-        public string Script { get => this.Model.Script; set => this.Model.Script = value; }
+        public FileSelectionViewModel Script { get; }
 
         public TargetType Type { get => this.Model.Type; set => this.Model.Type = value; }
 
@@ -156,99 +173,46 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public void SelectScript()
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.CheckFileExists = true;
-            openFileDialog.CheckPathExists = true;
-            openFileDialog.DefaultExt = "ps1";
-            openFileDialog.DereferenceLinks = true;
-            openFileDialog.Filter = "PowerShell Script (*.ps1)|*.ps1";
-            openFileDialog.Multiselect = false;
-
-            if (this.Script != null)
-            {
-                try
-                {
-                    openFileDialog.InitialDirectory = Path.GetDirectoryName(this.Script);
-                    openFileDialog.FileName = Path.GetFileName(this.Script);
-                }
-                catch { }
-            }
-
-            if (openFileDialog.InitialDirectory == null)
-            {
-                openFileDialog.InitialDirectory = ApplicationContextProvider.ScriptsPath;
-            }
-
-            if (openFileDialog.ShowDialog(this.GetWindow()) == true)
-            {
-                this.Script = openFileDialog.FileName;
-            }
-        }
-
-        public bool CanEditScript => this.IsModeScript && !string.IsNullOrEmpty(this.Script);
-
-        public void EditScript()
-        {
-            try
-            {
-                ProcessStartInfo startInfo = new ProcessStartInfo(this.Script) { Verb = "Edit", UseShellExecute = true };
-
-                Process newProcess = new Process { StartInfo = startInfo };
-                newProcess.Start();
-            }
-            catch (Exception ex)
-            {
-                DialogCoordinator.Instance.ShowMessageAsync(this, "Error", $"Could not start default editor for PowerShell scripts\r\n{ex.Message}");
-            }
-        }
-
         public bool CanSelectJitGroup => this.CanEdit;
-
-        public void CreateScript()
-        {
-            SaveFileDialog dialog = new SaveFileDialog
-            {
-                AddExtension = true,
-                DefaultExt = "ps1",
-                OverwritePrompt = true,
-                Filter = "PowerShell script|*.ps1",
-                InitialDirectory = ApplicationContextProvider.ScriptsPath
-            };
-
-            if (dialog.ShowDialog() != true)
-            {
-                return;
-            }
-
-            try
-            {
-                File.WriteAllText(dialog.FileName,"");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Could not save the file\n{ex.Message}", "Unable to save");
-                return;
-            }
-
-            this.Script = dialog.FileName;
-
-            this.EditScript();
-        }
 
         public void SelectJitGroup()
         {
+            ExternalDialogWindow w = new ExternalDialogWindow();
+            w.Title = "Select forest";
+            var vm = new SelectForestViewModel();
+            w.DataContext = vm;
+            w.SaveButtonName = "Next...";
+            w.SaveButtonIsDefault = true;
+            vm.AvailableForests = new List<string>();
+            var domain = Domain.GetCurrentDomain();
+            vm.AvailableForests.Add(domain.Forest.Name);
+            vm.SelectedForest = domain.Forest.Name;
+
+            foreach (var trust in domain.Forest.GetAllTrustRelationships().OfType<TrustRelationshipInformation>())
+            {
+                if (trust.TrustDirection == TrustDirection.Inbound || trust.TrustDirection == TrustDirection.Bidirectional)
+                {
+                    vm.AvailableForests.Add(trust.TargetName);
+                }
+            }
+
+            w.Owner = this.GetWindow();
+
+            if (!w.ShowDialog() ?? false)
+            {
+                return;
+            }
+
             DsopScopeInitInfo scope = new DsopScopeInitInfo();
             scope.Filter = new DsFilterFlags();
 
             scope.Filter.UpLevel.BothModeFilter = DsopObjectFilterFlags.DSOP_FILTER_DOMAIN_LOCAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_GLOBAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_UNIVERSAL_GROUPS_SE;
-
             scope.ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_ENTERPRISE_DOMAIN | DsopScopeTypeFlags.DSOP_SCOPE_TYPE_USER_ENTERED_UPLEVEL_SCOPE | DsopScopeTypeFlags.DSOP_SCOPE_TYPE_EXTERNAL_UPLEVEL_DOMAIN;
-
             scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS | DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
 
-            var result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), null, scope, "objectClass", "objectSid").FirstOrDefault();
+            string target = vm.SelectedForest == domain.Forest.Name ? null : vm.SelectedForest;
+
+            var result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), target, scope, "objectClass", "objectSid").FirstOrDefault();
 
             if (result != null)
             {

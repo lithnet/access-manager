@@ -12,11 +12,14 @@
                                Padding="30"
                                MinWidth="500"
                                MinHeight="300"
-                                MaxHeight="1000"
+                               MaxHeight="1000"
                                CloseOnOverlay="True"
                                GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
                                ShowCloseButton="True"
-                               xmlns:s="https://github.com/canton7/Stylet" 
+                               xmlns:s="https://github.com/canton7/Stylet"
+                               IsModal="True"
+                               IsWindowHostActive="False"
+                               AllowFocusElement="True"
                                mc:Ignorable="d">
     <AdornerDecorator>
         <DockPanel LastChildFill="True"
@@ -28,13 +31,14 @@
                 <Button Content="{Binding Path=CancelButtonName, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type simpleChildWindow:ChildWindow}}}" 
                         Click="Close_Click"
                         Margin="5"
-                        IsDefault="{Binding Path=CancelButtonIsDefault, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type simpleChildWindow:ChildWindow}}}"
+                        Focusable="False"
                         Width="75"/>
 
-                <Button Content="{Binding Path=SaveButtonName, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type simpleChildWindow:ChildWindow}}}" 
+                <Button x:Name="SaveButton"
+                        Content="{Binding Path=SaveButtonName, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type simpleChildWindow:ChildWindow}}}" 
                         Command="Save"
+                        Focusable="True"
                         Margin="5"
-                        IsDefault="{Binding Path=SaveButtonIsDefault, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type simpleChildWindow:ChildWindow}}}"
                         Width="75">
                     <Button.CommandBindings>
                         <CommandBinding Command="Save" 

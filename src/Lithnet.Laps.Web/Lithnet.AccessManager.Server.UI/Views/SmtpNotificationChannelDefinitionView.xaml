@@ -58,6 +58,7 @@
                          Margin="5"/>
                 <Button Grid.Row="3" Grid.Column="2" 
                         Command="{s:Action ShowTemplateSuccessDialog}" 
+                        Width="30"
                         Content="..."
                         Margin="5"/>
 
@@ -69,6 +70,7 @@
                          Margin="5"/>
                 <Button Grid.Row="4" Grid.Column="2" 
                         Command="{s:Action ShowTemplateFailureDialog}" 
+                        Width="30"
                         Content="..."
                         Margin="5"/>
                 

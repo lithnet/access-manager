@@ -25,4 +25,34 @@
     <ProjectReference Include="..\Lithnet.AccessManager\Lithnet.AccessManager.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="ScriptTemplates.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ScriptTemplates.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Views\SelectForestView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Windows\ExternalDialogWindow.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="ScriptTemplates.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ScriptTemplates.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\SelectForestView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Windows\ExternalDialogWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
 </Project>

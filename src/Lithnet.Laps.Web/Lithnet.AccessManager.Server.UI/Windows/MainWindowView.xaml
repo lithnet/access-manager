@@ -9,9 +9,11 @@
         xmlns:s="https://github.com/canton7/Stylet"
         Title="Lithnet Admin Access Service Configuration"
         BorderThickness="1"
-        BorderBrush="{DynamicResource AccentColorBrush}"
+        
         Height="Auto"
-        Width="Auto" SizeToContent="Manual"
+        Width="Auto" 
+        SizeToContent="Manual"
+        
         Margin="10">
 
     <DockPanel LastChildFill="True">

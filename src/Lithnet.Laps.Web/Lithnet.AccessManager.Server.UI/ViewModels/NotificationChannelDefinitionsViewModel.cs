@@ -42,6 +42,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             DialogWindow w = new DialogWindow();
             w.Title = "Add notification channel";
+            w.SaveButtonIsDefault = true;
             var m = this.CreateModel();
             var vm = this.CreateViewModel(m);
             w.DataContext = vm;
@@ -61,6 +62,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             DialogWindow w = new DialogWindow();
             w.Title = "Edit notification channel";
+            w.SaveButtonIsDefault = true;
 
             var m = JsonConvert.DeserializeObject<TModel>(JsonConvert.SerializeObject(this.SelectedItem.Model));
             var vm = this.CreateViewModel(m);
@@ -72,9 +74,12 @@ namespace Lithnet.AccessManager.Server.UI
             if (w.Result == MessageDialogResult.Affirmative)
             {
                 this.Model.Remove(this.SelectedItem.Model);
+
+                int existingPosition = this.ViewModels.IndexOf(this.SelectedItem);
+                
                 this.ViewModels.Remove(this.SelectedItem);
                 this.Model.Add(m);
-                this.ViewModels.Add(vm);
+                this.ViewModels.Insert(Math.Min(existingPosition, this.ViewModels.Count), vm);
                 this.SelectedItem = vm;
                 this.EventAggregator.Publish(new NotificationSubscriptionChangedEvent { ModificationType = ModificationType.Modified, ModifiedObject = m });
             }

@@ -80,6 +80,7 @@
                 <Button Grid.Row="6" Grid.Column="2" 
                         Command="{s:Action ShowTemplateSuccessDialog}" 
                         Content="..."
+                        Width="30"
                          Margin="5"/>
 
                 <Label Grid.Row="7" Grid.Column="0" 
@@ -91,6 +92,7 @@
                 <Button Grid.Row="7" Grid.Column="2" 
                         Command="{s:Action ShowTemplateFailureDialog}" 
                         Content="..."
+                        Width="30"
                          Margin="5"/>
             </Grid>
         </StackPanel>

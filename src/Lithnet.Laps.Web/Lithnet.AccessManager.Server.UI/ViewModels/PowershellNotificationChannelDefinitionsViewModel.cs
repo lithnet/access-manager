@@ -21,7 +21,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         protected override PowershellNotificationChannelDefinitionViewModel CreateViewModel(PowershellNotificationChannelDefinition model)
         {
-            return new PowershellNotificationChannelDefinitionViewModel(model, this.NotificationSubscriptions);
+            return new PowershellNotificationChannelDefinitionViewModel(model, this.DialogCoordinator, this.NotificationSubscriptions);
         }
 
         protected override PowershellNotificationChannelDefinition CreateModel()

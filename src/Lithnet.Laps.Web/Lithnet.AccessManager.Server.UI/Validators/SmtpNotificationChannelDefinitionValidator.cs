@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using FluentValidation;
 using Stylet;
@@ -24,11 +25,11 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.RuleFor(r => r.TemplateSuccess)
                 .NotEmpty().WithMessage("A file must be provided")
-                .Must(t => t == null || System.IO.File.Exists(t)).WithMessage("The file does not exist");
+                .Must(t => string.IsNullOrWhiteSpace(t) || File.Exists(AppPathProvider.GetFullPath(t, AppPathProvider.TemplatesPath))).WithMessage("The file does not exist");
 
             this.RuleFor(r => r.TemplateFailure)
                 .NotEmpty().WithMessage("A file must be provided")
-                .Must(t => t == null || System.IO.File.Exists(t)).WithMessage("The file does not exist");
+                .Must(t => string.IsNullOrWhiteSpace(t) || File.Exists(AppPathProvider.GetFullPath(t, AppPathProvider.TemplatesPath))).WithMessage("The file does not exist");
         }
     }
 }

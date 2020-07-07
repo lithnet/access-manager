@@ -51,7 +51,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                string path = $"{ApplicationContextProvider.ImagesPath}\\logo.png";
+                string path = $"{AppPathProvider.ImagesPath}\\logo.png";
                 this.Image = this.LoadImageFromFile(path);
             }
             catch (Exception ex)
@@ -75,7 +75,7 @@ namespace Lithnet.AccessManager.Server.UI
             BitmapEncoder encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(image));
 
-            using (var fileStream = new System.IO.FileStream($"{ApplicationContextProvider.ImagesPath}\\logo.png", System.IO.FileMode.Create))
+            using (var fileStream = new System.IO.FileStream($"{AppPathProvider.ImagesPath}\\logo.png", System.IO.FileMode.Create))
             {
                 encoder.Save(fileStream);
             }

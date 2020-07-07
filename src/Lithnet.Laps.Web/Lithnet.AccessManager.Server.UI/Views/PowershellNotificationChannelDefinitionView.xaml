@@ -16,11 +16,8 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="300"/>
-                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
@@ -41,7 +38,7 @@
                           Margin="5">
                     <TextBlock Text="Deny the user's request if the delivery of this notification fails" TextWrapping="Wrap"></TextBlock>
                 </CheckBox>
-                
+
                 <Label Grid.Row="2" Grid.Column="0"
                        Content="Display name"
                        Margin="5"/>
@@ -52,18 +49,15 @@
                 <Label Grid.Row="3" Grid.Column="0"
                        Content="Script"
                        Margin="5"/>
-                <TextBox Grid.Row="3" Grid.Column="1" 
-                         Text="{Binding Script, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
-                         Margin="5"/>
-                <Button Grid.Row="3" Grid.Column="2" 
-                        Command="{s:Action ShowScriptDialog}" 
-                        Content="..."
-                        Margin="5"/>
 
-                <Label Grid.Row="4" Grid.Column="0" 
+                <ContentControl Grid.Row="3" Grid.Column="1"
+                                s:View.Model="{Binding Script}" 
+                                Margin="5"/>
+
+                <Label Grid.Row="5" Grid.Column="0" 
                        Content="Timeout (seconds)"
                        Margin="5"/>
-                <mah:NumericUpDown Grid.Row="4" Grid.Column="1" 
+                <mah:NumericUpDown Grid.Row="5" Grid.Column="1" 
                                    Value="{Binding TimeOut}"
                                    Minimum="1" Maximum="900" Interval="1"
                                    HideUpDownButtons="True"

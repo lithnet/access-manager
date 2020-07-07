@@ -65,10 +65,8 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
@@ -87,47 +85,48 @@
 
                         <Label Grid.Row="1" Grid.Column="0" 
                                Content="Access control"
+                               VerticalAlignment="Top"
                                Margin="5"/>
-                        <RadioButton Grid.Row="1" Grid.Column="1"
+
+                        <Grid Grid.Row="1" Grid.Column="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+
+                            <RadioButton Grid.Row="0" Grid.Column="0"
                              IsChecked="{Binding IsModePermission}" 
                              Content="In-built permissions"
                              IsEnabled="{Binding CanEdit, Mode=OneWay}"
+                                         VerticalAlignment="Top"
                              Background="Transparent"
                              Margin="5"/>
-                        <Button Grid.Row="1" Grid.Column="2" 
-                                Command="{s:Action EditPermissions}" 
-                                Content="Edit permissions..."
-                                Margin="5"/>
+                            <Button Grid.Row="0" Grid.Column="1" 
+                                    Command="{s:Action EditPermissions}" 
+                                    Content="Edit permissions..."
+                                    VerticalAlignment="Top"
+                                    HorizontalAlignment="Left"
+                                    Margin="5"/>
 
-                        <RadioButton Grid.Row="2" Grid.Column="1"
+                            <RadioButton Grid.Row="1" Grid.Column="0"
                                      IsChecked="{Binding IsModeScript}" 
                                      Content="Use an external script"
                                      Background="Transparent"
+                                     VerticalAlignment="Top"
                                      IsEnabled="{Binding CanEdit, Mode=OneWay}"
                                      Margin="5"/>
 
-                        <Label Grid.Row="3" Grid.Column="0"
-                               Content="Script"
-                               Margin="5"/>
-                        <TextBox Grid.Row="3" Grid.Column="1" 
-                                 Text="{Binding Script}"
-                                 IsEnabled="{Binding CanSelectScript}"
-                                 Margin="5"/>
-                        <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
-                            <Button Command="{s:Action EditScript}" 
-                                    Content="Edit in PowerShell ISE..."
-                                    IsEnabled="{Binding IsModeScript}"
-                                    Margin="5"/>
-                            <Button Command="{s:Action SelectScript}" 
-                                    Content="Select existing file..."
-                                    IsEnabled="{Binding IsModeScript}"
-                                    Margin="5"/>
-                            <Button Command="{s:Action CreateNewScript}" 
-                                    Content="Create new..."
-                                    IsEnabled="{Binding IsModeScript}"
-                                    Margin="5"/>
-                        </StackPanel>
-                        
+
+                            <ContentControl Grid.Row="1" Grid.Column="1"
+                                        s:View.Model="{Binding Script}" 
+                                            VerticalAlignment="Top"
+                                        IsEnabled="{Binding IsModeScript}"
+                                        Margin="5"/>
+                        </Grid>
                     </Grid>
                 </GroupBox>
 
@@ -220,7 +219,7 @@
                                 VerticalContentAlignment="Stretch"
                                 HorizontalContentAlignment="Stretch"
                                 IsTabStop="False"/>
-                
+
             </Grid>
         </StackPanel>
     </AdornerDecorator>

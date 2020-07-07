@@ -13,10 +13,6 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class AuditingViewModel : Conductor<PropertyChangedBase>.Collection.OneActive
     {
-        private readonly INotificationSubscriptionProvider subscriptions;
-
-        private readonly IEventAggregator eventAggregator;
-
         private readonly AuditOptions model;
 
         public AuditingViewModel(AuditOptions model, IDialogCoordinator dialogCoordinator, INotificationSubscriptionProvider subscriptionProvider, IEventAggregator eventAggregator)
@@ -24,15 +20,15 @@ namespace Lithnet.AccessManager.Server.UI
             this.DisplayName = "Auditing";
 
             this.model = model;
-            this.subscriptions = subscriptionProvider;
             this.Powershell = new PowershellNotificationChannelDefinitionsViewModel(model.NotificationChannels.Powershell, dialogCoordinator, subscriptionProvider, eventAggregator);
             this.Webhook = new WebhookNotificationChannelDefinitionsViewModel(this.model.NotificationChannels.Webhooks, dialogCoordinator, subscriptionProvider, eventAggregator);
             this.Smtp = new SmtpNotificationChannelDefinitionsViewModel(this.model.NotificationChannels.Smtp, dialogCoordinator, subscriptionProvider, eventAggregator);
 
-            this.Items.Add(this.Powershell);
-            this.Items.Add(this.Webhook);
             this.Items.Add(this.Smtp);
-            this.ActivateItem(this.Powershell);
+            this.Items.Add(this.Webhook);
+            this.Items.Add(this.Powershell);
+
+            this.ActivateItem(this.Smtp);
 
             this.Notifications = new NotificationChannelSelectionViewModel(this.model.GlobalNotifications, subscriptionProvider, eventAggregator);
         }
@@ -44,7 +40,5 @@ namespace Lithnet.AccessManager.Server.UI
         private WebhookNotificationChannelDefinitionsViewModel Webhook { get; }
 
         private SmtpNotificationChannelDefinitionsViewModel Smtp { get; }
-
-
     }
 }
