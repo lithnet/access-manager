@@ -53,14 +53,15 @@ namespace Lithnet.AccessManager.Server.UI
             builder.Bind<ICertificateProvider>().To<CertificateProvider>();
             builder.Bind<IAppPathProvider>().To<AppPathProvider>();
 
-            builder.Bind<INotificationChannelSelectionViewModelFactory>()
-                .To<NotificationChannelSelectionViewModelFactory>();
+            builder.Bind<INotificationChannelSelectionViewModelFactory>().To<NotificationChannelSelectionViewModelFactory>();
             builder.Bind<ISecurityDescriptorTargetViewModelFactory>().To<SecurityDescriptorTargetViewModelFactory>();
             builder.Bind<ISecurityDescriptorTargetsViewModelFactory>().To<SecurityDescriptorTargetsViewModelFactory>();
             builder.Bind<IFileSelectionViewModelFactory>().To<FileSelectionViewModelFactory>();
+            builder.Bind<IActiveDirectoryDomainConfigurationViewModelFactory>().To<ActiveDirectoryDomainConfigurationViewModelFactory>();
+            builder.Bind<IActiveDirectoryForestConfigurationViewModelFactory>().To<ActiveDirectoryForestConfigurationViewModelFactory>();
+
             builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
-            builder.Bind(typeof(INotificationChannelDefinitionViewModelFactory<,>))
-                .ToAllImplementations();
+            builder.Bind(typeof(INotificationChannelDefinitionViewModelFactory<,>)).ToAllImplementations();
 
             builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentModelValidator<>));
             builder.Bind(typeof(IValidator<>)).ToAllImplementations();

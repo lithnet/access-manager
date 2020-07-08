@@ -12,10 +12,9 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly Forest forest;
 
-
         private readonly ICertificateProvider certificateProvider;
 
-        public ActiveDirectoryForestConfigurationViewModel(Forest forest, IServiceSettingsProvider serviceSettings, IDirectory directory, IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider)
+        public ActiveDirectoryForestConfigurationViewModel(Forest forest, IActiveDirectoryDomainConfigurationViewModelFactory domainFactory, ICertificateProvider certificateProvider)
         {
             this.forest = forest;
             this.certificateProvider = certificateProvider;
@@ -24,7 +23,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             foreach (var domain in forest.Domains.OfType<Domain>())
             {
-                this.Domains.Add(new ActiveDirectoryDomainConfigurationViewModel(domain, serviceSettings, directory, dialogCoordinator));
+                this.Domains.Add(domainFactory.CreateViewModel(domain));
             }
 
             this.SelectedDomain = this.Domains.FirstOrDefault();

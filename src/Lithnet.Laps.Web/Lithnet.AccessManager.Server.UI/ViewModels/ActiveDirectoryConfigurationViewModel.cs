@@ -9,19 +9,19 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class ActiveDirectoryConfigurationViewModel : PropertyChangedBase , IHaveDisplayName
     {
-        public ActiveDirectoryConfigurationViewModel(IServiceSettingsProvider serviceSettings, IDirectory directory, IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider)
+        public ActiveDirectoryConfigurationViewModel(IActiveDirectoryForestConfigurationViewModelFactory forestFactory)
         {
             this.Forests = new List<ActiveDirectoryForestConfigurationViewModel>();
 
             var domain = Domain.GetCurrentDomain();
-            this.Forests.Add(new ActiveDirectoryForestConfigurationViewModel(domain.Forest, serviceSettings, directory, dialogCoordinator, certificateProvider));
+            this.Forests.Add(forestFactory.CreateViewModel(domain.Forest));
             
             foreach (var trust in domain.Forest.GetAllTrustRelationships().OfType<TrustRelationshipInformation>())
             {
                 if (trust.TrustDirection == TrustDirection.Inbound || trust.TrustDirection == TrustDirection.Bidirectional)
                 {
                     var forest = Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, trust.TargetName));
-                    var vm = new ActiveDirectoryForestConfigurationViewModel(forest, serviceSettings, directory, dialogCoordinator,  certificateProvider);
+                    var vm = forestFactory.CreateViewModel(forest);
                     this.Forests.Add(vm);
                 }
             }
