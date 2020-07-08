@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Security.AccessControl;
-using System.Security.Principal;
-using System.Windows;
-using System.Windows.Interop;
+﻿using System.Security.AccessControl;
 using Community.Windows.Forms;
-using Lithnet.AccessManager.Server.UI.Interop;
 using Lithnet.AccessManager.Server.UI.Providers;
 using Stylet;
 

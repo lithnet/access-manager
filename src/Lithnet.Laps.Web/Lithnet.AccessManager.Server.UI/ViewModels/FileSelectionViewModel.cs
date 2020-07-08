@@ -5,14 +5,13 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
-using Lithnet.AccessManager.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class FileSelectionViewModel : ValidatingModelBase, IViewAware
+    public sealed class FileSelectionViewModel : ValidatingModelBase, IViewAware
     {
         private readonly IDialogCoordinator dialogCoordinator;
 
@@ -20,18 +19,20 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly object model;
 
+        private readonly IAppPathProvider appPathProvider;
+
         private bool shouldValidate = true;
 
-        public FileSelectionViewModel(object model, Expression<Func<string>> property, string basePath, IDialogCoordinator dialogCoordinator)
+        public FileSelectionViewModel(object model, Expression<Func<string>> property, string basePath, IModelValidator<FileSelectionViewModel> validator, IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider)
         {
             this.model = model;
+            this.appPathProvider = appPathProvider;
             var expr = (MemberExpression)property.Body;
             var prop = (PropertyInfo)expr.Member;
             this.property = prop;
             this.dialogCoordinator = dialogCoordinator;
             this.BasePath = basePath;
-
-            this.Validator = new FluentModelValidator<FileSelectionViewModel>(new FileSelectionViewModelValidator());
+            this.Validator = validator;
             this.Validate();
         }
 
@@ -85,7 +86,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 try
                 {
-                    string builtPath = AppPathProvider.GetFullPath(this.File, this.BasePath);
+                    string builtPath = this.appPathProvider.GetFullPath(this.File, this.BasePath);
                     openFileDialog.InitialDirectory = Path.GetDirectoryName(builtPath);
                     openFileDialog.FileName = Path.GetFileName(builtPath);
                 }
@@ -93,13 +94,13 @@ namespace Lithnet.AccessManager.Server.UI
             }
 
             if (string.IsNullOrWhiteSpace(openFileDialog.InitialDirectory))
-                {
+            {
                 openFileDialog.InitialDirectory = this.BasePath;
             }
 
             if (openFileDialog.ShowDialog(this.GetWindow()) == true)
             {
-                this.File = AppPathProvider.GetRelativePath(openFileDialog.FileName, this.BasePath);
+                this.File = this.appPathProvider.GetRelativePath(openFileDialog.FileName, this.BasePath);
             }
         }
 
@@ -111,7 +112,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                string builtPath = AppPathProvider.GetFullPath(this.File, this.BasePath);
+                string builtPath = this.appPathProvider.GetFullPath(this.File, this.BasePath);
 
                 ProcessStartInfo startInfo = new ProcessStartInfo(builtPath) { Verb = "Edit", UseShellExecute = true };
                 Process newProcess = new Process { StartInfo = startInfo };
@@ -153,7 +154,7 @@ namespace Lithnet.AccessManager.Server.UI
                 return;
             }
 
-            this.File = AppPathProvider.GetRelativePath(dialog.FileName, this.BasePath);
+            this.File = this.appPathProvider.GetRelativePath(dialog.FileName, this.BasePath);
 
             await this.EditFile();
         }

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
 using Lithnet.AccessManager.Server.UI.Interop;
 
 namespace Lithnet.AccessManager.Server.UI

@@ -9,8 +9,7 @@
              d:DesignHeight="450" d:DesignWidth="800" Margin="5">
     <StackPanel>
         <StackPanel.Resources>
-            <BooleanToVisibilityConverter x:Key="btvc" />
-            <local:EnumToDisplayConverter x:Key="enumconv"/>
+            <local:EnumToDisplayConverter x:Key="EnumDescriptionConverter"/>
         </StackPanel.Resources>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -48,7 +47,7 @@
                               Margin="5">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Converter={StaticResource enumconv}}"></TextBlock>
+                                <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"></TextBlock>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
@@ -56,7 +55,7 @@
             </GroupBox>
             <GroupBox Grid.Row="1" Grid.ColumnSpan="2" 
                       Header="Integrated windows authentication"
-                      Visibility="{Binding Path=IwaVisible, Converter={StaticResource btvc}}"
+                      Visibility="{Binding Path=IwaVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                       Margin="5">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -80,7 +79,7 @@
 
             <GroupBox Grid.Row="2" Grid.ColumnSpan="2" 
                       Header="OpenID Connect" 
-                      Visibility="{Binding Path=OidcVisible, Converter={StaticResource btvc}}"
+                      Visibility="{Binding Path=OidcVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                       Margin="5">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -129,7 +128,7 @@
 
             <GroupBox Grid.Row="3" Grid.ColumnSpan="2" 
                       Header="WS-Federation" 
-                      Visibility="{Binding Path=WsFedVisible, Converter={StaticResource btvc}}"
+                      Visibility="{Binding Path=WsFedVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                       Margin="5">
                 <Grid>
                     <Grid.ColumnDefinitions>

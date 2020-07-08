@@ -33,7 +33,7 @@ namespace Lithnet.AccessManager.Agent
                     services.AddTransient<IAppDataProvider, MsDsAppConfigurationProvider>();
                     services.AddSingleton<RNGCryptoServiceProvider>();
                     services.AddTransient<IEncryptionProvider, EncryptionProvider>();
-                    services.AddTransient<ICertificateResolver, CertificateResolver>();
+                    services.AddTransient<ICertificateProvider, CertificateProvider>();
                     services.AddTransient<IMsMcsAdmPwdProvider, MsMcsAdmPwdProvider>();
 
                     services.AddLogging(builder =>

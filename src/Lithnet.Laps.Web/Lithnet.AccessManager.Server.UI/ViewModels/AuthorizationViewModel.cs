@@ -1,5 +1,4 @@
 ﻿using Lithnet.AccessManager.Configuration;
-using MahApps.Metro.Controls.Dialogs;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -8,10 +7,10 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly AuthorizationOptions model;
 
-        public AuthorizationViewModel(AuthorizationOptions model, IDialogCoordinator dialogCoordinator, INotificationSubscriptionProvider subscriptionProvider, IEventAggregator eventAggregator)
+        public AuthorizationViewModel(AuthorizationOptions model, SecurityDescriptorTargetsViewModelFactory factory)
         {
             this.model = model;
-            this.Targets = new SecurityDescriptorTargetsViewModel(model.BuiltInProvider.Targets, dialogCoordinator, subscriptionProvider, eventAggregator);
+            this.Targets = factory.CreateViewModel(model.BuiltInProvider.Targets);
         }
 
         public SecurityDescriptorTargetsViewModel Targets { get; }

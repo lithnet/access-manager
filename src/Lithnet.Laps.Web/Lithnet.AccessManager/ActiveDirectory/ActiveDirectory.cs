@@ -12,9 +12,9 @@ namespace Lithnet.AccessManager
 {
     public sealed class ActiveDirectory : IDirectory
     {
-        private static Guid PamFeatureGuid = new Guid("ec43e873-cce8-4640-b4ab-07ffe4ab5bcd");
+        private static readonly Guid PamFeatureGuid = new Guid("ec43e873-cce8-4640-b4ab-07ffe4ab5bcd");
 
-        private readonly Dictionary<SecurityIdentifier, bool> PamEnabledDomainCache = new Dictionary<SecurityIdentifier, bool>();
+        private readonly Dictionary<SecurityIdentifier, bool> pamEnabledDomainCache = new Dictionary<SecurityIdentifier, bool>();
 
         public bool TryGetUser(string name, out IUser user)
         {
@@ -26,10 +26,21 @@ namespace Lithnet.AccessManager
             return new ActiveDirectoryUser(this.DoGcLookup(name, "user", ActiveDirectoryUser.PropertiesToGet));
         }
 
+        public IUser GetUser(SecurityIdentifier sid)
+        {
+            return new ActiveDirectoryUser(this.GetDirectoryEntry(NativeMethods.GetDn(sid), "user", ActiveDirectoryUser.PropertiesToGet));
+        }
+
         public IComputer GetComputer(string name)
         {
             return new ActiveDirectoryComputer(this.DoGcLookup(name, "computer", ActiveDirectoryComputer.PropertiesToGet));
         }
+
+        public IComputer GetComputer(SecurityIdentifier sid)
+        {
+            return new ActiveDirectoryComputer(this.GetDirectoryEntry(NativeMethods.GetDn(sid), "computer", ActiveDirectoryComputer.PropertiesToGet));
+        }
+
 
         public bool TryGetComputer(string name, out IComputer computer)
         {
@@ -104,7 +115,15 @@ namespace Lithnet.AccessManager
 
         public IGroup GetGroup(SecurityIdentifier sid)
         {
-            return new ActiveDirectoryGroup(this.DoGcLookup(sid.ToString(), "group", ActiveDirectoryGroup.PropertiesToGet));
+            return new ActiveDirectoryGroup(this.GetDirectoryEntry(NativeMethods.GetDn(sid), "group", ActiveDirectoryGroup.PropertiesToGet));
+        }
+
+        public IGroup GetGroup(SecurityIdentifier groupSid, SecurityIdentifier domainSid)
+        {
+            string server = NativeMethods.GetDnsDomainNameFromSid(domainSid);
+            string dn = NativeMethods.GetDn(groupSid.ToString(), DsNameFormat.SecurityIdentifier, server);
+
+            return new ActiveDirectoryGroup(this.GetDirectoryEntry(dn, "group", ActiveDirectoryGroup.PropertiesToGet));
         }
 
         public bool TryGetGroup(SecurityIdentifier sid, out IGroup group)
@@ -139,9 +158,29 @@ namespace Lithnet.AccessManager
             return NativeMethods.CheckForSidInToken(principal.Sid, sidToFindInToken, targetDomainSid);
         }
 
+        public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, SecurityIdentifier principal)
+        {
+            return this.IsSidInPrincipalToken(sidToFindInToken, principal, principal.AccountDomainSid);
+        }
+
+        public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, SecurityIdentifier principal, SecurityIdentifier targetDomainSid)
+        {
+            return NativeMethods.CheckForSidInToken(principal, sidToFindInToken, targetDomainSid);
+        }
+
         public IEnumerable<string> GetMemberDNsFromGroup(IGroup group)
         {
             return this.GetMemberDNsFromGroup(group.DistinguishedName);
+        }
+
+        public string TranslateName(string name, DsNameFormat nameFormat, DsNameFormat requiredFormat)
+        {
+            return this.TranslateName(name, nameFormat, requiredFormat, null);
+        }
+
+        public string TranslateName(string name, DsNameFormat nameFormat, DsNameFormat requiredFormat, string dnsDomainName)
+        {
+            return NativeMethods.CrackNames(nameFormat, requiredFormat, name, dnsDomainName).Name;
         }
 
         private IEnumerable<string> GetMemberDNsFromGroup(string dn)
@@ -217,7 +256,7 @@ namespace Lithnet.AccessManager
         {
             SecurityIdentifier sid = domainSid.AccountDomainSid;
 
-            if (PamEnabledDomainCache.TryGetValue(sid, out bool value))
+            if (pamEnabledDomainCache.TryGetValue(sid, out bool value))
             {
                 return value;
             }
@@ -231,7 +270,7 @@ namespace Lithnet.AccessManager
 
             bool result = d.FindOne() != null;
 
-            PamEnabledDomainCache.Add(domainSid, result);
+            pamEnabledDomainCache.Add(domainSid, result);
 
             return result;
         }

@@ -1,18 +1,20 @@
 ﻿using System;
 using System.IO;
-using System.Windows;
 using Lithnet.AccessManager.Configuration;
 using Microsoft.Win32;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class WebhookNotificationChannelDefinitionViewModel : NotificationChannelDefinitionViewModel<WebhookNotificationChannelDefinition>
+    public sealed class WebhookNotificationChannelDefinitionViewModel : NotificationChannelDefinitionViewModel<WebhookNotificationChannelDefinition>
     {
-        public WebhookNotificationChannelDefinitionViewModel(WebhookNotificationChannelDefinition model, INotificationSubscriptionProvider subscriptionProvider)
+        private readonly IAppPathProvider appPathProvider;
+
+        public WebhookNotificationChannelDefinitionViewModel(WebhookNotificationChannelDefinition model, IModelValidator<WebhookNotificationChannelDefinitionViewModel> validator, INotificationSubscriptionProvider subscriptionProvider, IAppPathProvider appPathProvider)
             :base(model)
         {
-            this.Validator = new FluentModelValidator<WebhookNotificationChannelDefinitionViewModel>(new WebhookNotificationChannelDefinitionValidator(subscriptionProvider));
+            this.appPathProvider = appPathProvider;
+            this.Validator = validator;
             this.Validate();
         }
 
@@ -64,7 +66,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 try
                 {
-                    string builtPath = AppPathProvider.GetFullPath(initialFile, AppPathProvider.TemplatesPath);
+                    string builtPath = this.appPathProvider.GetFullPath(initialFile, this.appPathProvider.TemplatesPath);
                     openFileDialog.InitialDirectory = Path.GetDirectoryName(builtPath);
                     openFileDialog.FileName = Path.GetFileName(builtPath);
                 }
@@ -73,12 +75,12 @@ namespace Lithnet.AccessManager.Server.UI
 
             if (string.IsNullOrWhiteSpace(openFileDialog.InitialDirectory))
             {
-                openFileDialog.InitialDirectory = AppPathProvider.TemplatesPath;
+                openFileDialog.InitialDirectory = this.appPathProvider.TemplatesPath;
             }
 
             if (openFileDialog.ShowDialog(this.GetWindow()) == true)
             {
-                return AppPathProvider.GetRelativePath(openFileDialog.FileName, AppPathProvider.TemplatesPath);
+                return this.appPathProvider.GetRelativePath(openFileDialog.FileName, this.appPathProvider.TemplatesPath);
             }
 
             return initialFile;

@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Markup;
 
 namespace Lithnet.AccessManager.Server.UI
 {

@@ -6,7 +6,6 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
-using Microsoft.Win32;
 using Community.Windows.Forms;
 using Lithnet.AccessManager.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
@@ -14,39 +13,27 @@ using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.SimpleChildWindow;
 using Stylet;
-using System.IO;
-using System.Diagnostics;
-using System.Runtime.Versioning;
 
 namespace Lithnet.AccessManager.Server.UI
 {
     public class SecurityDescriptorTargetViewModel : PropertyChangedBase, IViewAware
     {
-        private readonly INotificationSubscriptionProvider subscriptions;
-
-        private readonly IEventAggregator eventAggregator;
-
         private readonly IDirectory directory;
-
-        private readonly IDialogCoordinator dialogCoordinator;
 
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, IDialogCoordinator dialogCoordinator, INotificationSubscriptionProvider subscriptionProvider, IEventAggregator eventAggregator)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory,  IAppPathProvider appPathProvider)
         {
             this.directory = new ActiveDirectory();
             this.Model = model;
-            this.subscriptions = subscriptionProvider;
-            this.eventAggregator = eventAggregator;
-            this.dialogCoordinator = dialogCoordinator;
 
-            this.Script = new FileSelectionViewModel(model, () => model.Script, AppPathProvider.ScriptsPath, dialogCoordinator);
+            this.Script = fileSelectionViewModelFactory.CreateViewModel(model, () => model.Script, appPathProvider.ScriptsPath);
             this.Script.DefaultFileExtension = "ps1";
             this.Script.Filter = "PowerShell script|*.ps1";
             this.Script.NewFileContent = ScriptTemplates.AuthorizationScriptTemplate;
             this.Script.ShouldValidate = false;
 
-            this.Notifications = new NotificationChannelSelectionViewModel(this.Model.Notifications, subscriptionProvider, eventAggregator);
+            this.Notifications = notificationChannelFactory.CreateViewModel(model.Notifications);
         }
 
         public NotificationChannelSelectionViewModel Notifications { get; }

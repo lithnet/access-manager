@@ -13,19 +13,19 @@ namespace Lithnet.AccessManager.Test
 {
     public class CertificateResolverTests
     {
-        private Mock<IHostEnvironment> env;
+        private Mock<IAppPathProvider> env;
 
-        private CertificateResolver resolver;
+        private CertificateProvider provider;
 
         private ActiveDirectory directory;
 
         [SetUp()]
         public void TestInitialize()
         {
-            this.env = new Mock<IHostEnvironment>();
-            this.env.SetupGet(t => t.ContentRootPath).Returns(Environment.CurrentDirectory);
+            this.env = new Mock<IAppPathProvider>();
+            this.env.SetupGet(t => t.AppPath).Returns(Environment.CurrentDirectory);
             this.directory = new ActiveDirectory();
-            resolver = new CertificateResolver(Mock.Of<ILogger<CertificateResolver>>(), directory, env.Object);
+            provider = new CertificateProvider(Mock.Of<ILogger<CertificateProvider>>(), directory, env.Object);
         }
 
         [TestCase(StoreLocation.CurrentUser)]
@@ -36,10 +36,10 @@ namespace Lithnet.AccessManager.Test
 
             foreach (var cert in store.Certificates)
             {
-                Assert.AreEqual(cert, resolver.FindCertificate(false, cert.Thumbprint));
+                Assert.AreEqual(cert, provider.FindCertificate(false, cert.Thumbprint));
             }
 
-            Assert.Throws<CertificateNotFoundException>(() => resolver.FindCertificate(false, "ABCDE"));
+            Assert.Throws<CertificateNotFoundException>(() => provider.FindCertificate(false, "ABCDE"));
         }
 
         [TestCase(StoreLocation.CurrentUser)]
@@ -52,21 +52,21 @@ namespace Lithnet.AccessManager.Test
             {
                 if (cert.HasPrivateKey)
                 {
-                    Assert.AreEqual(cert, resolver.FindCertificate(true, cert.Thumbprint));
+                    Assert.AreEqual(cert, provider.FindCertificate(true, cert.Thumbprint));
                 }
                 else
                 {
-                    Assert.Throws<CertificateValidationException>(() => resolver.FindCertificate(true, cert.Thumbprint));
+                    Assert.Throws<CertificateValidationException>(() => provider.FindCertificate(true, cert.Thumbprint));
                 }
             }
 
-            Assert.Throws<CertificateNotFoundException>(() => resolver.FindCertificate(true, "ABCDE"));
+            Assert.Throws<CertificateNotFoundException>(() => provider.FindCertificate(true, "ABCDE"));
         }
 
         [TestCase("TestFiles\\DigiCertGlobalRootG3.crt")]
         public void GetCertificateFromPartialPath(string path)
         {
-            Assert.IsTrue(resolver.TryGetCertificateFromPath(path, out X509Certificate2 cert));
+            Assert.IsTrue(provider.TryGetCertificateFromPath(path, out X509Certificate2 cert));
             Assert.IsNotNull(cert);
         }
 
@@ -74,7 +74,7 @@ namespace Lithnet.AccessManager.Test
         public void GetCertificateFromFullPath(string path)
         {
             path = Path.Combine(Environment.CurrentDirectory, path);
-            Assert.IsTrue(resolver.TryGetCertificateFromPath(path, out X509Certificate2 cert));
+            Assert.IsTrue(provider.TryGetCertificateFromPath(path, out X509Certificate2 cert));
             Assert.IsNotNull(cert);
         }
 
@@ -82,21 +82,21 @@ namespace Lithnet.AccessManager.Test
         public void GetCertificateFromUrl(string url)
         {
             Uri uri = new Uri(url);
-            Assert.IsTrue(resolver.TryGetCertificateFromUrl(uri, out X509Certificate2 cert));
+            Assert.IsTrue(provider.TryGetCertificateFromUrl(uri, out X509Certificate2 cert));
             Assert.IsNotNull(cert);
         }
 
         [TestCase("https://cacerts.digicert.com/DigiCertGlobalRootG3.crt")]
         public void GetCertificateFromPathUrl(string url)
         {
-            Assert.IsTrue(resolver.TryGetCertificateFromPath(url, out X509Certificate2 cert));
+            Assert.IsTrue(provider.TryGetCertificateFromPath(url, out X509Certificate2 cert));
             Assert.IsNotNull(cert);
         }
 
         [Test]
         public void GetCertificateFromDirectory()
         {
-            Assert.IsTrue(resolver.TryGetCertificateFromDirectory(out X509Certificate2 cert));
+            Assert.IsTrue(provider.TryGetCertificateFromDirectory(out X509Certificate2 cert));
             Assert.IsNotNull(cert);
         }
     }

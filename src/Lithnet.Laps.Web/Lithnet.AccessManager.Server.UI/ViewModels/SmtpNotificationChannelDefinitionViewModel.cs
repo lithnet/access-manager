@@ -1,19 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Net.Mail;
-using System.Windows;
 using Lithnet.AccessManager.Configuration;
 using Microsoft.Win32;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class SmtpNotificationChannelDefinitionViewModel : NotificationChannelDefinitionViewModel<SmtpNotificationChannelDefinition>
+    public sealed class SmtpNotificationChannelDefinitionViewModel : NotificationChannelDefinitionViewModel<SmtpNotificationChannelDefinition>
     {
-        public SmtpNotificationChannelDefinitionViewModel(SmtpNotificationChannelDefinition model, INotificationSubscriptionProvider subscriptionProvider)
+        private readonly IAppPathProvider appPathProvider;
+
+        public SmtpNotificationChannelDefinitionViewModel(SmtpNotificationChannelDefinition model, IModelValidator<SmtpNotificationChannelDefinitionViewModel> validator, INotificationSubscriptionProvider subscriptionProvider, IAppPathProvider appPathProvider)
             : base(model)
         {
+            this.appPathProvider = appPathProvider;
+
             if (this.Model.EmailAddresses == null)
             {
                 this.Model.EmailAddresses = new List<string>();
@@ -21,7 +22,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.EmailAddresses = new BindableCollection<string>(this.Model.EmailAddresses);
 
-            this.Validator = new FluentModelValidator<SmtpNotificationChannelDefinitionViewModel>(new SmtpNotificationChannelDefinitionValidator(subscriptionProvider));
+            this.Validator = validator;
             this.Validate();
         }
 
@@ -92,7 +93,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 try
                 {
-                    string builtPath = AppPathProvider.GetFullPath(initialFile, AppPathProvider.TemplatesPath);
+                    string builtPath = this.appPathProvider.GetFullPath(initialFile, this.appPathProvider.TemplatesPath);
                     openFileDialog.InitialDirectory = Path.GetDirectoryName(builtPath);
                     openFileDialog.FileName = Path.GetFileName(builtPath);
                 }
@@ -101,12 +102,12 @@ namespace Lithnet.AccessManager.Server.UI
 
             if (string.IsNullOrWhiteSpace(openFileDialog.InitialDirectory))
             {
-                openFileDialog.InitialDirectory = AppPathProvider.TemplatesPath;
+                openFileDialog.InitialDirectory = this.appPathProvider.TemplatesPath;
             }
 
             if (openFileDialog.ShowDialog(this.GetWindow()) == true)
             {
-                return AppPathProvider.GetRelativePath(openFileDialog.FileName, AppPathProvider.TemplatesPath);
+                return this.appPathProvider.GetRelativePath(openFileDialog.FileName, this.appPathProvider.TemplatesPath);
             }
 
             return initialFile;

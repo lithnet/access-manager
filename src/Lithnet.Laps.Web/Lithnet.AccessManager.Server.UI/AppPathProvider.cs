@@ -1,28 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using ControlzEx.Standard;
+﻿using System.IO;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public static class AppPathProvider
+    public class AppPathProvider : IAppPathProvider
     {
-        public static string AppPath { get; } = @"D:\dev\git\lithnet\laps-web\src\Lithnet.Laps.Web\Lithnet.AccessManager.Web";
+        public AppPathProvider()
+        {
+            this.AppPath = @"D:\dev\git\lithnet\laps-web\src\Lithnet.Laps.Web\Lithnet.AccessManager.Web";
+            this.TemplatesPath = $"{AppPath}\\NotificationTemplates";
+            this.ConfigFile = $"{AppPath}\\appsettings.json";
+            this.ImagesPath = $"{AppPath}\\wwwroot\\images";
+            this.ScriptsPath = $"{AppPath}\\Scripts";
+            this.WwwRootPath = $"{AppPath}\\wwwroot";
+        }
 
-        public static string TemplatesPath { get; } = $"{AppPath}\\NotificationTemplates";
+        public string AppPath { get; }
 
-        public static string ScriptsPath { get; } = $"{AppPath}\\Scripts";
+        public string TemplatesPath { get; } 
 
-        public static string WwwRootPath { get; } = $"{AppPath}\\wwwroot";
+        public string ScriptsPath { get; } 
 
-        public static string ImagesPath { get; } = $"{AppPath}\\wwwroot\\images";
+        public string WwwRootPath { get; } 
 
-        public static string ConfigFile { get; } = $"{AppPath}\\appsettings.json";
+        public string ImagesPath { get; }
 
-        public static string GetRelativePath(string file, string basePath)
+        public string ConfigFile { get; } 
+
+        public string GetRelativePath(string file, string basePath)
         {
             string selectedPath = Path.GetDirectoryName(file);
+
             if (string.Equals(selectedPath, basePath))
             {
                 return Path.GetFileName(file);
@@ -33,7 +40,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public static string GetFullPath(string file, string basePath)
+        public string GetFullPath(string file, string basePath)
         {
             if (Path.IsPathFullyQualified(file))
             {

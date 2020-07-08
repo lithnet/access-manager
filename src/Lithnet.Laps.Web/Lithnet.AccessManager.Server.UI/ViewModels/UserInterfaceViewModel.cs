@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Lithnet.AccessManager.Configuration;
 using MahApps.Metro.Controls.Dialogs;
@@ -18,8 +17,11 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IDialogCoordinator dialogCoordinator;
 
-        public UserInterfaceViewModel(UserInterfaceOptions model, IDialogCoordinator dialogCoordinator)
+        private readonly IAppPathProvider appPathProvider;
+
+        public UserInterfaceViewModel(UserInterfaceOptions model, IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider)
         {
+            this.appPathProvider = appPathProvider;
             this.dialogCoordinator = dialogCoordinator;
             this.model = model;
             this.LoadImage();
@@ -51,7 +53,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                string path = $"{AppPathProvider.ImagesPath}\\logo.png";
+                string path = $"{this.appPathProvider.ImagesPath}\\logo.png";
                 this.Image = this.LoadImageFromFile(path);
             }
             catch (Exception ex)
@@ -75,7 +77,7 @@ namespace Lithnet.AccessManager.Server.UI
             BitmapEncoder encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(image));
 
-            using (var fileStream = new System.IO.FileStream($"{AppPathProvider.ImagesPath}\\logo.png", System.IO.FileMode.Create))
+            using (var fileStream = new System.IO.FileStream($"{this.appPathProvider.ImagesPath}\\logo.png", System.IO.FileMode.Create))
             {
                 encoder.Save(fileStream);
             }

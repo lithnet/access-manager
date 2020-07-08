@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.AccessControl;
-using System.Text;
+﻿using System.Security.AccessControl;
 using Community.Security.AccessControl;
-using Lithnet.AccessManager.Web.Authorization;
 
 namespace Lithnet.AccessManager.Server.UI.Providers
 {

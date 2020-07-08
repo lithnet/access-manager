@@ -104,11 +104,11 @@ namespace Lithnet.AccessManager.Test
             string newPassword = Guid.NewGuid().ToString();
 
             EncryptionProvider encryptionProvider = new EncryptionProvider();
-            CertificateResolver certificateResolver = new CertificateResolver(Mock.Of<ILogger<CertificateResolver>>(), this.directory, Mock.Of<IHostEnvironment>());
+            CertificateProvider certificateProvider = new CertificateProvider(Mock.Of<ILogger<CertificateProvider>>(), this.directory, Mock.Of<IHostEnvironment>());
 
             appData.UpdateCurrentPassword(
                    encryptionProvider.Encrypt(
-                       certificateResolver.FindCertificate(false,
+                       certificateProvider.FindCertificate(false,
                           TestConstants.EncryptionCertificateThumbprint),
                        newPassword),
                    rotationInstant,

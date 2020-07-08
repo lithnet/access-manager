@@ -1,34 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Collections.Generic;
 using Lithnet.AccessManager.Configuration;
 using MahApps.Metro.Controls.Dialogs;
-using MahApps.Metro.SimpleChildWindow;
-using Newtonsoft.Json;
-using NLog.Targets.Wrappers;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
     public class SmtpNotificationChannelDefinitionsViewModel : NotificationChannelDefinitionsViewModel<SmtpNotificationChannelDefinition, SmtpNotificationChannelDefinitionViewModel>
     {
-        public SmtpNotificationChannelDefinitionsViewModel(IList<SmtpNotificationChannelDefinition> model, IDialogCoordinator dialogCoordinator, INotificationSubscriptionProvider subscriptionProvider, IEventAggregator eventAggregator)
-            : base(model, dialogCoordinator, subscriptionProvider, eventAggregator)
+        public SmtpNotificationChannelDefinitionsViewModel(IList<SmtpNotificationChannelDefinition> model, SmtpNotificationChannelDefinitionViewModelFactory factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator) :
+            base(model, factory, dialogCoordinator, eventAggregator)
         {
         }
 
         public override string DisplayName { get; set; } = "SMTP";
-
-        protected override SmtpNotificationChannelDefinitionViewModel CreateViewModel(SmtpNotificationChannelDefinition model)
-        {
-            return new SmtpNotificationChannelDefinitionViewModel(model, this.NotificationSubscriptions);
-        }
-
-        protected override SmtpNotificationChannelDefinition CreateModel()
-        {
-            return new SmtpNotificationChannelDefinition();
-        }
     }
 }

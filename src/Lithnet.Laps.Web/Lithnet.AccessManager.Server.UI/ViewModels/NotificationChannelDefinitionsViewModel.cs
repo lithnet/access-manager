@@ -15,26 +15,22 @@ namespace Lithnet.AccessManager.Server.UI
     {
         protected IList<TModel> Model { get; }
 
-        protected INotificationSubscriptionProvider NotificationSubscriptions { get; }
-               
         protected IDialogCoordinator DialogCoordinator { get; }
 
         protected IEventAggregator EventAggregator { get; }
 
+        private readonly NotificationChannelDefinitionViewModelFactory<TModel, TViewModel> factory;
+
         public BindableCollection<TViewModel> ViewModels { get; }
 
-        public NotificationChannelDefinitionsViewModel(IList<TModel> model, IDialogCoordinator dialogCoordinator, INotificationSubscriptionProvider subscriptionProvider, IEventAggregator eventAggregator)
+        protected NotificationChannelDefinitionsViewModel(IList<TModel> model, NotificationChannelDefinitionViewModelFactory<TModel, TViewModel> factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator)
         {
+            this.factory = factory;
             this.Model = model;
             this.EventAggregator = eventAggregator;
-            this.NotificationSubscriptions = subscriptionProvider;
             this.DialogCoordinator = dialogCoordinator;
-            this.ViewModels = new BindableCollection<TViewModel>(this.Model.Select(t => this.CreateViewModel(t)));
+            this.ViewModels = new BindableCollection<TViewModel>(this.Model.Select(t => this.factory.CreateViewModel(t)));
         }
-
-        protected abstract TViewModel CreateViewModel(TModel model);
-
-        protected abstract TModel CreateModel();
 
         public TViewModel SelectedItem { get; set; }
 
@@ -43,13 +39,13 @@ namespace Lithnet.AccessManager.Server.UI
             DialogWindow w = new DialogWindow();
             w.Title = "Add notification channel";
             w.SaveButtonIsDefault = true;
-            var m = this.CreateModel();
-            var vm = this.CreateViewModel(m);
+            var m = this.factory.CreateModel();
+            var vm = this.factory.CreateViewModel(m);
             w.DataContext = vm;
             vm.Enabled = true;
             vm.Id = Guid.NewGuid().ToString();
 
-            await ChildWindowManager.ShowChildWindowAsync(this.GetWindow(), w);
+            await this.GetWindow().ShowChildWindowAsync(w);
 
             if (w.Result == MessageDialogResult.Affirmative)
             {
@@ -65,18 +61,18 @@ namespace Lithnet.AccessManager.Server.UI
             w.SaveButtonIsDefault = true;
 
             var m = JsonConvert.DeserializeObject<TModel>(JsonConvert.SerializeObject(this.SelectedItem.Model));
-            var vm = this.CreateViewModel(m);
+            var vm = this.factory.CreateViewModel(m);
 
             w.DataContext = vm;
 
-            await ChildWindowManager.ShowChildWindowAsync(this.GetWindow(), w);
+            await this.GetWindow().ShowChildWindowAsync(w);
 
             if (w.Result == MessageDialogResult.Affirmative)
             {
                 this.Model.Remove(this.SelectedItem.Model);
 
                 int existingPosition = this.ViewModels.IndexOf(this.SelectedItem);
-                
+
                 this.ViewModels.Remove(this.SelectedItem);
                 this.Model.Add(m);
                 this.ViewModels.Insert(Math.Min(existingPosition, this.ViewModels.Count), vm);

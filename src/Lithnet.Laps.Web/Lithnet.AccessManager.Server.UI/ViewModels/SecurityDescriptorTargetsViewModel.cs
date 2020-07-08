@@ -13,28 +13,20 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class SecurityDescriptorTargetsViewModel : PropertyChangedBase, IHaveDisplayName, IViewAware
     {
-        protected IList<SecurityDescriptorTarget> Model { get; }
+        private readonly SecurityDescriptorTargetViewModelFactory factory;
 
-        protected INotificationSubscriptionProvider NotificationSubscriptions { get; }
+        protected IList<SecurityDescriptorTarget> Model { get; }
 
         protected IDialogCoordinator DialogCoordinator { get; }
 
-        protected IEventAggregator EventAggregator { get; }
-
         public BindableCollection<SecurityDescriptorTargetViewModel> ViewModels { get; }
 
-        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, IDialogCoordinator dialogCoordinator, INotificationSubscriptionProvider subscriptionProvider, IEventAggregator eventAggregator)
+        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, SecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator)
         {
+            this.factory = factory;
             this.Model = model;
-            this.EventAggregator = eventAggregator;
-            this.NotificationSubscriptions = subscriptionProvider;
             this.DialogCoordinator = dialogCoordinator;
-            this.ViewModels = new BindableCollection<SecurityDescriptorTargetViewModel>(this.Model.Select(t => this.CreateViewModel(t)));
-        }
-
-        protected SecurityDescriptorTargetViewModel CreateViewModel(SecurityDescriptorTarget model)
-        {
-            return new SecurityDescriptorTargetViewModel(model, DialogCoordinator, NotificationSubscriptions, EventAggregator);
+            this.ViewModels = new BindableCollection<SecurityDescriptorTargetViewModel>(this.Model.Select(factory.CreateViewModel));
         }
 
         protected SecurityDescriptorTarget CreateModel()
@@ -49,11 +41,11 @@ namespace Lithnet.AccessManager.Server.UI
             DialogWindow w = new DialogWindow();
             w.Title = "Add target";
             var m = this.CreateModel();
-            var vm = this.CreateViewModel(m);
+            var vm = this.factory.CreateViewModel(m);
             w.DataContext = vm;
             w.SaveButtonIsDefault = true;
 
-            await ChildWindowManager.ShowChildWindowAsync(this.GetWindow(), w);
+            await this.GetWindow().ShowChildWindowAsync(w);
 
             if (w.Result == MessageDialogResult.Affirmative)
             {
@@ -70,11 +62,11 @@ namespace Lithnet.AccessManager.Server.UI
             w.SaveButtonIsDefault = true;
 
             var m = JsonConvert.DeserializeObject<SecurityDescriptorTarget>(JsonConvert.SerializeObject(this.SelectedItem.Model));
-            var vm = this.CreateViewModel(m);
+            var vm = this.factory.CreateViewModel(m);
 
             w.DataContext = vm;
 
-            await ChildWindowManager.ShowChildWindowAsync(this.GetWindow(), w);
+            await this.GetWindow().ShowChildWindowAsync(w);
 
             if (w.Result == MessageDialogResult.Affirmative)
             {

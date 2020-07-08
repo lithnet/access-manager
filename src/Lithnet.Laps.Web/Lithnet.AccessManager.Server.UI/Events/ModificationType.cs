@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Lithnet.AccessManager.Server.UI
+﻿namespace Lithnet.AccessManager.Server.UI
 {
     public enum ModificationType
     {

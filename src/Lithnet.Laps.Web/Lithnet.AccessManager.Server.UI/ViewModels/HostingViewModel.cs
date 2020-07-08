@@ -14,7 +14,6 @@ using Lithnet.AccessManager.Configuration;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using MahApps.Metro.Controls.Dialogs;
-using Microsoft.Win32;
 using SslCertBinding.Net;
 using Stylet;
 
@@ -23,33 +22,25 @@ namespace Lithnet.AccessManager.Server.UI
     public class HostingViewModel : Screen, IHaveDisplayName
     {
         private const string SddlTemplate = "D:(A;;GX;;;{0})";
-        private const string ServiceName = "lithnetadminaccesservice";
+        
         private readonly HostingOptions model;
+
         private readonly IDialogCoordinator dialogCoordinator;
 
-        private ServiceController controller;
+        private readonly IServiceSettingsProvider serviceSettings;
 
-        public HostingViewModel(IApplicationConfig config, IDialogCoordinator dialogCoordinator)
+        public HostingViewModel(IApplicationConfig config, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings)
         {
             this.model = config.Hosting;
             this.dialogCoordinator = dialogCoordinator;
+            this.serviceSettings = serviceSettings;
             this.ActiveHttpPort = this.model.HttpSys.HttpPort;
             this.ActiveHttpsPort = this.model.HttpSys.HttpsPort;
             this.ActiveHostname = this.model.HttpSys.Hostname;
             this.ActiveCertificate = this.GetCertificate();
-            this.ActiveServiceAccount = this.GetServiceAccount();
+            this.ActiveServiceAccount = this.serviceSettings.GetServiceAccount();
             this.ServiceAccount = this.ActiveServiceAccount;
             this.DisplayName = "Web hosting";
-
-            try
-            {
-                controller = new ServiceController(ServiceName);
-                this.ServiceStatus = controller.Status.ToString();
-            }
-            catch
-            {
-                this.ServiceStatus = "Error: service not found";
-            }
         }
 
         public string ServiceStatus { get; set; }
@@ -178,7 +169,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             if (this.CanStopService)
             {
-                controller.Stop();
+                this.serviceSettings.ServiceController.Stop();
                 this.ServiceStatus = "Stopping";
             }
 
@@ -186,21 +177,21 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 try
                 {
-                    controller.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30));
+                    this.serviceSettings.ServiceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30));
                 }
                 catch (System.ServiceProcess.TimeoutException)
                 {
                     await dialogCoordinator.ShowMessageAsync(this, "Service control", "The service did not stop in the requested time");
                 }
             })
-           .ContinueWith((x) => this.ServiceStatus = controller.Status.ToString());
+           .ContinueWith((x) => this.ServiceStatus = this.serviceSettings.ServiceController.Status.ToString());
         }
 
         public async Task StartService()
         {
             if (this.CanStartService)
             {
-                controller.Start();
+                this.serviceSettings.ServiceController.Start();
                 this.ServiceStatus = "Starting";
             }
 
@@ -208,14 +199,14 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 try
                 {
-                    controller.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
+                    this.serviceSettings.ServiceController.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
                 }
                 catch (System.ServiceProcess.TimeoutException)
                 {
                     await dialogCoordinator.ShowMessageAsync(this, "Service control", "The service did not start in the requested time");
                 }
             })
-             .ContinueWith((x) => this.ServiceStatus = controller.Status.ToString());
+             .ContinueWith((x) => this.ServiceStatus = this.serviceSettings.ServiceController.Status.ToString());
         }
 
         public async Task RestartService()
@@ -365,30 +356,7 @@ namespace Lithnet.AccessManager.Server.UI
             return store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false)?[0];
         }
 
-        private SecurityIdentifier GetServiceAccount()
-        {
-            RegistryKey key = Registry.LocalMachine.OpenSubKey($@"HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\{ServiceName}", false);
-
-            if (key == null)
-            {
-                return null;
-            }
-
-            this.ServiceAccountDisplayName = key.GetValue("ObjectName") as string;
-
-            if (this.ServiceAccountDisplayName == null)
-            {
-                this.ServiceAccountDisplayName = "LocalSystem";
-            }
-
-            NTAccount account = new NTAccount(this.ServiceAccountDisplayName);
-            return (SecurityIdentifier)account.Translate(typeof(SecurityIdentifier));
-        }
-
-        private void SetServiceAccount(string username, string password)
-        {
-            NativeMethods.ChangeServiceCredentials(ServiceName, username, password);
-        }
+        
 
         public async Task SaveHostingSettings()
         {
@@ -396,7 +364,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             if (this.HasServiceAccountChanged || this.ServiceAccountPassword != null)
             {
-                this.SetServiceAccount(this.ServiceAccountDisplayName, this.ServiceAccountPassword);
+                this.serviceSettings.SetServiceAccount(this.ServiceAccountDisplayName, this.ServiceAccountPassword);
             }
 
             if (this.HasServiceAccountChanged)

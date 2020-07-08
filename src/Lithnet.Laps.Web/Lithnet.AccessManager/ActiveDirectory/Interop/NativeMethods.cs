@@ -343,17 +343,23 @@ namespace Lithnet.AccessManager.Interop
 
         public static string GetDn(SecurityIdentifier nameToFind)
         {
-            return GetDn(nameToFind.ToString(), DsNameFormat.DS_SID_OR_SID_HISTORY_NAME);
+            return GetDn(nameToFind.ToString(), DsNameFormat.SecurityIdentifier);
         }
 
         public static string GetDn(string nameToFind)
         {
-            return GetDn(nameToFind, DsNameFormat.DS_UNKNOWN_NAME);
+            return GetDn(nameToFind, DsNameFormat.Unknown);
         }
 
         public static string GetDn(string nameToFind, DsNameFormat nameFormat)
         {
-            var result = CrackNames(nameFormat, DsNameFormat.DS_FQDN_1779_NAME, nameToFind);
+            var result = CrackNames(nameFormat, DsNameFormat.DistinguishedName, nameToFind);
+            return result.Name;
+        }
+
+        public static string GetDn(string nameToFind, DsNameFormat nameFormat, string server)
+        {
+            var result = CrackNames(nameFormat, DsNameFormat.DistinguishedName, nameToFind, server);
             return result.Name;
         }
 
@@ -419,11 +425,11 @@ namespace Lithnet.AccessManager.Interop
 
         public static string GetDnsDomainNameFromSid(SecurityIdentifier sid)
         {
-            var result = CrackNames(DsNameFormat.DS_SID_OR_SID_HISTORY_NAME, DsNameFormat.DS_NT4_ACCOUNT_NAME, sid.Value);
+            var result = CrackNames(DsNameFormat.SecurityIdentifier, DsNameFormat.Nt4Name, sid.Value);
             return result.Domain;
         }
 
-        private static DsNameResultItem CrackNames(DsNameFormat formatOffered, DsNameFormat formatDesired, string name, string dnsDomainName = null, int referralLevel = 0)
+        public static DsNameResultItem CrackNames(DsNameFormat formatOffered, DsNameFormat formatDesired, string name, string dnsDomainName = null, int referralLevel = 0)
         {
             IntPtr hds = IntPtr.Zero;
 

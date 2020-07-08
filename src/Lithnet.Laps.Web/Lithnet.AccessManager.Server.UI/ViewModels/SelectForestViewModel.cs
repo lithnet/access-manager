@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Lithnet.AccessManager.Configuration;
+﻿using System.Collections.Generic;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI

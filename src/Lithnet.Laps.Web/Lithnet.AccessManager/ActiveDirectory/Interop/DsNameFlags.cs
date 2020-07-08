@@ -11,7 +11,7 @@
         DS_NAME_NO_FLAGS = 0,
 
         /// <summary>
-        /// Performs a syntactical mapping at the client without transferring over the network. The only syntactic mapping supported is from DS_FQDN_1779_NAME to DS_CANONICAL_NAME or DS_CANONICAL_NAME_EX. DsCrackNames returns the DS_NAME_ERROR_NO_SYNTACTICAL_MAPPING flag if a syntactical mapping is not possible.
+        /// Performs a syntactical mapping at the client without transferring over the network. The only syntactic mapping supported is from DistinguishedName to DS_CANONICAL_NAME or DS_CANONICAL_NAME_EX. DsCrackNames returns the DS_NAME_ERROR_NO_SYNTACTICAL_MAPPING flag if a syntactical mapping is not possible.
         /// </summary>
         DS_NAME_FLAG_SYNTACTICAL_ONLY = 1,
 

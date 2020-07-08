@@ -1,21 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.DirectoryServices.ActiveDirectory;
-using System.Linq;
-using System.Security.AccessControl;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using System.Windows;
-using System.Windows.Documents;
-using System.Windows.Media.Animation;
-using Community.Windows.Forms;
 using Lithnet.AccessManager.Configuration;
-using Lithnet.AccessManager.Server.UI.Interop;
-using Lithnet.AccessManager.Server.UI.Providers;
-using MahApps.Metro.Controls.Dialogs;
-using MahApps.Metro.SimpleChildWindow;
-using NLog.Web.LayoutRenderers;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI

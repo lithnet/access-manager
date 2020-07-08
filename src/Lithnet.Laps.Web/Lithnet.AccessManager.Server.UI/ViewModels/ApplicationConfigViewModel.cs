@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
-using Community.Windows.Forms;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Stylet;
@@ -23,13 +21,15 @@ namespace Lithnet.AccessManager.Server.UI
             IpDetectionViewModel ip,
             AuditingViewModel audit,
             EmailViewModel mail,
-            HostingViewModel hosting)
+            HostingViewModel hosting,
+            ActiveDirectoryConfigurationViewModel ad)
         {
             this.model = model;
             this.dialogCoordinator = dialogCoordinator;
 
             this.Items.Add(hosting);
             this.Items.Add(authentication);
+            this.Items.Add(ad);
             this.Items.Add(audit);
             this.Items.Add(authorization);
             this.Items.Add(ui);

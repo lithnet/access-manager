@@ -53,7 +53,7 @@ namespace Lithnet.AccessManager.Web
             services.TryAddScoped<IPasswordProvider, PasswordProvider>();
             services.TryAddScoped<IMsMcsAdmPwdProvider, MsMcsAdmPwdProvider>();
             services.TryAddScoped<IEncryptionProvider, EncryptionProvider>();
-            services.TryAddScoped<ICertificateResolver, CertificateResolver>();
+            services.TryAddScoped<ICertificateProvider, CertificateProvider>();
 
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();

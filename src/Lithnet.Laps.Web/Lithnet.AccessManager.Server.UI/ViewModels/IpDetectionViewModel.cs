@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using System.Windows.Media.Animation;
 using Lithnet.AccessManager.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.AspNetCore.HttpOverrides;

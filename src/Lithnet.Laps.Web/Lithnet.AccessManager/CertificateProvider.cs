@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.DirectoryServices;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -10,19 +12,36 @@ using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager
 {
-    public class CertificateResolver : ICertificateResolver
+    public class CertificateProvider : ICertificateProvider
     {
         private readonly IDirectory directory;
 
         private readonly ILogger logger;
 
-        private IHostEnvironment env;
+        private readonly IAppPathProvider appPathProvider;
 
-        public CertificateResolver(ILogger<CertificateResolver> logger, IDirectory directory, IHostEnvironment env)
+        public const string LithnetAccessManagerEku = "1.3.6.1.4.1.55989.2.1.1";
+
+        public X509Certificate2 CreateSelfSignedCert(string subject)
+        {
+            CertificateRequest request = new CertificateRequest($"CN={subject},OU=Access Manager,O=Lithnet", RSA.Create(4096), HashAlgorithmName.SHA384, RSASignaturePadding.Pss);
+
+            var eku = new X509EnhancedKeyUsageExtension();
+            eku.EnhancedKeyUsages.Add(new Oid(LithnetAccessManagerEku));
+            request.CertificateExtensions.Add(eku);
+            request.CertificateExtensions.Add(new X509KeyUsageExtension(X509KeyUsageFlags.KeyEncipherment, true));
+            request.CertificateExtensions.Add(new X509BasicConstraintsExtension(false, false, 0, true));
+
+            X509Certificate2 cert = request.CreateSelfSigned(DateTimeOffset.UtcNow, DateTime.UtcNow.AddYears(20));
+
+            return cert;
+        }
+
+        public CertificateProvider(ILogger<CertificateProvider> logger, IDirectory directory, IAppPathProvider appPathProvider)
         {
             this.directory = directory;
             this.logger = logger;
-            this.env = env;
+            this.appPathProvider = appPathProvider;
         }
 
         public X509Certificate2 GetCertificateWithPrivateKey(string thumbprint)
@@ -62,6 +81,30 @@ namespace Lithnet.AccessManager
             }
 
             return cert;
+        }
+
+        public X509Certificate2Collection GetEligibleCertificates()
+        {
+            X509Certificate2Collection certs = new X509Certificate2Collection();
+
+            X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine, OpenFlags.ReadOnly);
+            Oid serverAuthOid = new Oid(LithnetAccessManagerEku);
+
+            foreach (X509Certificate2 c in store.Certificates.Find(X509FindType.FindByTimeValid, DateTime.Now, false).OfType<X509Certificate2>().Where(t => t.HasPrivateKey))
+            {
+                foreach (X509EnhancedKeyUsageExtension x in c.Extensions.OfType<X509EnhancedKeyUsageExtension>())
+                {
+                    foreach (Oid o in x.EnhancedKeyUsages)
+                    {
+                        if (o.Value == serverAuthOid.Value)
+                        {
+                            certs.Add(c);
+                        }
+                    }
+                }
+            }
+
+            return certs;
         }
 
         internal bool TryGetCertificateFromDirectory(out X509Certificate2 cert)
@@ -110,7 +153,7 @@ namespace Lithnet.AccessManager
             }
             else if (Uri.TryCreate(path, UriKind.Relative, out Uri p))
             {
-                var testPath = Path.Combine(this.env.ContentRootPath, path);
+                var testPath = Path.Combine(this.appPathProvider.AppPath, path);
                 return this.TryGetCertificateFromFile(testPath, out cert);
             }
 

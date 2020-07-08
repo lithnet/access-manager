@@ -22,7 +22,7 @@ namespace Lithnet.AccessManager.Agent.Test
 
         private Mock<IEncryptionProvider> encryptionProvider;
 
-        private Mock<ICertificateResolver> certificateResolver;
+        private Mock<ICertificateProvider> certificateResolver;
 
         private Mock<IAppDataProvider> appDataProvider;
 
@@ -39,7 +39,7 @@ namespace Lithnet.AccessManager.Agent.Test
             this.admPwdProvider = new Mock<IMsMcsAdmPwdProvider>();
             this.sam = new Mock<ILocalSam>();
             this.encryptionProvider = new Mock<IEncryptionProvider>();
-            this.certificateResolver = new Mock<ICertificateResolver>();
+            this.certificateResolver = new Mock<ICertificateProvider>();
             this.appDataProvider = new Mock<IAppDataProvider>();
             this.appData = new Mock<IAppData>();
             this.computer = new Mock<IComputer>();
@@ -168,7 +168,7 @@ namespace Lithnet.AccessManager.Agent.Test
             Assert.IsFalse(agent.HasPasswordExpired(null, this.computer.Object));
         }
 
-        private LapsAgent BuildAgent(ILapsSettings settings = null, IDirectory directory = null, IPasswordGenerator passwordGenerator = null, IMsMcsAdmPwdProvider admPwdProvider = null, ILocalSam sam = null, IEncryptionProvider encryptionProvider = null, ICertificateResolver certificateResolver = null, IAppDataProvider appDataProvider = null)
+        private LapsAgent BuildAgent(ILapsSettings settings = null, IDirectory directory = null, IPasswordGenerator passwordGenerator = null, IMsMcsAdmPwdProvider admPwdProvider = null, ILocalSam sam = null, IEncryptionProvider encryptionProvider = null, ICertificateProvider certificateProvider = null, IAppDataProvider appDataProvider = null)
         {
             return new LapsAgent(
                 Mock.Of<ILogger<LapsAgent>>(),
@@ -176,7 +176,7 @@ namespace Lithnet.AccessManager.Agent.Test
                 settings ?? this.settings.Object,
                 passwordGenerator ?? this.passwordGenerator.Object,
                 encryptionProvider ?? this.encryptionProvider.Object,
-                certificateResolver ?? this.certificateResolver.Object,
+                certificateProvider ?? this.certificateResolver.Object,
                 sam ?? this.sam.Object,
                 appDataProvider ?? this.appDataProvider.Object,
                 admPwdProvider ?? this.admPwdProvider.Object);

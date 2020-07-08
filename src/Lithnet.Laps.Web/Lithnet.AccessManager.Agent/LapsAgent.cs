@@ -17,7 +17,7 @@ namespace Lithnet.AccessManager.Agent
 
         private readonly IEncryptionProvider encryptionProvider;
 
-        private readonly ICertificateResolver certificateResolver;
+        private readonly ICertificateProvider certificateProvider;
 
         private readonly ILocalSam sam;
 
@@ -25,14 +25,14 @@ namespace Lithnet.AccessManager.Agent
 
         private readonly IMsMcsAdmPwdProvider msMcsAdmPwdProvider;
 
-        public LapsAgent(ILogger<LapsAgent> logger, IDirectory directory, ILapsSettings settings, IPasswordGenerator passwordGenerator, IEncryptionProvider encryptionProvider, ICertificateResolver certificateResolver, ILocalSam sam, IAppDataProvider appDataProvider, IMsMcsAdmPwdProvider msMcsAdmPwdProvider)
+        public LapsAgent(ILogger<LapsAgent> logger, IDirectory directory, ILapsSettings settings, IPasswordGenerator passwordGenerator, IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider, ILocalSam sam, IAppDataProvider appDataProvider, IMsMcsAdmPwdProvider msMcsAdmPwdProvider)
         {
             this.logger = logger;
             this.directory = directory;
             this.settings = settings;
             this.passwordGenerator = passwordGenerator;
             this.encryptionProvider = encryptionProvider;
-            this.certificateResolver = certificateResolver;
+            this.certificateProvider = certificateProvider;
             this.sam = sam;
             this.appDataProvider = appDataProvider;
             this.msMcsAdmPwdProvider = msMcsAdmPwdProvider;
@@ -141,7 +141,7 @@ namespace Lithnet.AccessManager.Agent
                 {
                     appData.UpdateCurrentPassword(
                         this.encryptionProvider.Encrypt(
-                            this.certificateResolver.FindCertificate(
+                            this.certificateProvider.FindCertificate(
                                 false, this.settings.CertThumbprint, this.settings.CertPath),
                             newPassword),
                         rotationInstant,

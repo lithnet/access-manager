@@ -14,20 +14,9 @@ namespace Lithnet.AccessManager.Server.UI
         {
             this.model = model;
             
-            if (model.Iwa == null)
-            {
-                model.Iwa = new IwaAuthenticationProviderOptions();
-            }
-
-            if (model.Oidc == null)
-            {
-                model.Oidc = new OidcAuthenticationProviderOptions();
-            }
-
-            if (model.WsFed == null)
-            {
-                model.WsFed = new WsFedAuthenticationProviderOptions();
-            }
+            model.Iwa ??= new IwaAuthenticationProviderOptions();
+            model.Oidc ??= new OidcAuthenticationProviderOptions();
+            model.WsFed ??= new WsFedAuthenticationProviderOptions();
         }
 
         public AuthenticationMode AuthenticationMode { get => this.model.Mode; set => this.model.Mode = value; }

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows;
-using FluentValidation;
+﻿using FluentValidation;
 using Lithnet.AccessManager.Configuration;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
-using MahApps.Metro.SimpleChildWindow;
+using Microsoft.Extensions.Logging;
 using Stylet;
 using StyletIoC;
 
@@ -16,7 +12,9 @@ namespace Lithnet.AccessManager.Server.UI
     {
         protected override void ConfigureIoC(IStyletIoCBuilder builder)
         {
-            var appconfig = ApplicationConfig.Load(AppPathProvider.ConfigFile);
+            IAppPathProvider pathProvider = new AppPathProvider();
+
+            var appconfig = ApplicationConfig.Load(pathProvider.ConfigFile);
 
             builder.Bind<IApplicationConfig>().ToInstance(appconfig);
             builder.Bind<AuthenticationOptions>().ToInstance(appconfig.Authentication);
@@ -34,6 +32,7 @@ namespace Lithnet.AccessManager.Server.UI
             builder.Bind<HostingViewModel>().ToSelf();
             builder.Bind<AuditingViewModel>().ToSelf();
             builder.Bind<AuthorizationViewModel>().ToSelf();
+            builder.Bind<ActiveDirectoryConfigurationViewModel>().ToSelf();
 
             builder.Bind<IpDetectionViewModel>().ToSelf();
             builder.Bind<PowershellNotificationChannelDefinitionsViewModel>().ToSelf();
@@ -46,10 +45,28 @@ namespace Lithnet.AccessManager.Server.UI
             builder.Bind<WebhookNotificationChannelDefinitionsViewModel>().ToSelf();
             builder.Bind<WebhookNotificationChannelDefinitionViewModel>().ToSelf();
             
-            builder.Bind<IDialogCoordinator>().To(typeof(DialogCoordinator));
-            builder.Bind<INotificationSubscriptionProvider>().To(typeof(NotificationSubscriptionProvider));
+            builder.Bind<IDialogCoordinator>().To<DialogCoordinator>();
+            builder.Bind<IDirectory>().To<ActiveDirectory>();
+            builder.Bind<IServiceSettingsProvider>().To<ServiceSettingsProvider>();
+            builder.Bind<INotificationSubscriptionProvider>().To<NotificationSubscriptionProvider>();
+            builder.Bind<IEncryptionProvider>().To<EncryptionProvider>();
+            builder.Bind<ICertificateProvider>().To<CertificateProvider>();
+            builder.Bind<IAppPathProvider>().To<AppPathProvider>();
+
+            builder.Bind<INotificationChannelSelectionViewModelFactory>()
+                .To<NotificationChannelSelectionViewModelFactory>();
+            builder.Bind<ISecurityDescriptorTargetViewModelFactory>().To<SecurityDescriptorTargetViewModelFactory>();
+            builder.Bind<ISecurityDescriptorTargetsViewModelFactory>().To<SecurityDescriptorTargetsViewModelFactory>();
+            builder.Bind<IFileSelectionViewModelFactory>().To<FileSelectionViewModelFactory>();
+            builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
+            builder.Bind(typeof(INotificationChannelDefinitionViewModelFactory<,>))
+                .ToAllImplementations();
+
             builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentModelValidator<>));
             builder.Bind(typeof(IValidator<>)).ToAllImplementations();
+            builder.Bind<ILoggerFactory>().To<LoggerFactory>();
+            builder.Bind(typeof(ILogger<>)).To(typeof(Logger<>));
+
 
             base.ConfigureIoC(builder);
 

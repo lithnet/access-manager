@@ -1,31 +1,22 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Threading.Tasks;
-using System.Windows;
-using Lithnet.AccessManager.Configuration;
+﻿using Lithnet.AccessManager.Configuration;
 using MahApps.Metro.Controls.Dialogs;
-using Microsoft.Win32;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class PowershellNotificationChannelDefinitionViewModel : NotificationChannelDefinitionViewModel<PowershellNotificationChannelDefinition>
+    public sealed class PowershellNotificationChannelDefinitionViewModel : NotificationChannelDefinitionViewModel<PowershellNotificationChannelDefinition>
     {
-        private readonly IDialogCoordinator dialogCoordinator;
-
-        public PowershellNotificationChannelDefinitionViewModel(PowershellNotificationChannelDefinition model, IDialogCoordinator dialogCoordinator, INotificationSubscriptionProvider subscriptionProvider) :
+        public PowershellNotificationChannelDefinitionViewModel(PowershellNotificationChannelDefinition model, IModelValidator<PowershellNotificationChannelDefinitionViewModel> validator, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider) :
             base(model)
         {
-            this.dialogCoordinator = dialogCoordinator;
-            this.Validator = new FluentModelValidator<PowershellNotificationChannelDefinitionViewModel>(new PowershellNotificationChannelDefinitionValidator(subscriptionProvider));
-            this.Validate();
-
-            this.Script = new FileSelectionViewModel(model, () => model.Script, AppPathProvider.ScriptsPath, dialogCoordinator);
+            this.Script = fileSelectionViewModelFactory.CreateViewModel(model, () => model.Script, appPathProvider.ScriptsPath);
             this.Script.DefaultFileExtension = "ps1";
             this.Script.Filter = "PowerShell script|*.ps1";
             this.Script.NewFileContent = ScriptTemplates.AuditScriptTemplate;
             this.Script.PropertyChanged += Script_PropertyChanged;
+
+            this.Validator = validator;
+            this.Validate();
         }
 
         private void Script_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

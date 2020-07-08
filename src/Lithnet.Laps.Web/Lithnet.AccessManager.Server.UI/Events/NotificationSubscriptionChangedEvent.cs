@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Lithnet.AccessManager.Configuration;
+﻿using Lithnet.AccessManager.Configuration;
 
 namespace Lithnet.AccessManager.Server.UI
 {

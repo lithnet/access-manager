@@ -1,13 +1,12 @@
 ﻿using System.Windows;
 using Lithnet.AccessManager.Configuration;
-using Microsoft.Win32;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
     public abstract class NotificationChannelDefinitionViewModel<TModel> : ValidatingModelBase, IViewAware where TModel : NotificationChannelDefinition
     {
-        public NotificationChannelDefinitionViewModel(TModel model)
+        protected NotificationChannelDefinitionViewModel(TModel model)
         {
             this.Model = model;
         }

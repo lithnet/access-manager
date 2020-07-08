@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Lithnet.AccessManager.Server.UI.Interop
+﻿namespace Lithnet.AccessManager.Server.UI.Interop
 {
     public enum AdsFormat
     {

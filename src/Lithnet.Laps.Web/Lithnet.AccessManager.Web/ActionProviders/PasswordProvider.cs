@@ -14,14 +14,14 @@ namespace Lithnet.AccessManager.Web
 
         private readonly IEncryptionProvider encryptionProvider;
 
-        private readonly ICertificateResolver certificateResolver;
+        private readonly ICertificateProvider certificateProvider;
 
-        public PasswordProvider(IMsMcsAdmPwdProvider msMcsAdmPwdProvider, IAppDataProvider appDataProvider, IEncryptionProvider encryptionProvider, ICertificateResolver certificateResolver)
+        public PasswordProvider(IMsMcsAdmPwdProvider msMcsAdmPwdProvider, IAppDataProvider appDataProvider, IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider)
         {
             this.msLapsProvider = msMcsAdmPwdProvider;
             this.appDataProvider = appDataProvider;
             this.encryptionProvider = encryptionProvider;
-            this.certificateResolver = certificateResolver;
+            this.certificateProvider = certificateProvider;
         }
 
         public PasswordEntry GetCurrentPassword(IComputer computer, DateTime? newExpiry, PasswordStorageLocation retrievalLocation)
@@ -77,7 +77,7 @@ namespace Lithnet.AccessManager.Web
             PasswordEntry current = new PasswordEntry()
             {
                 Created = data.CurrentPassword.Created,
-                Password = this.encryptionProvider.Decrypt(data.CurrentPassword.EncryptedData, this.certificateResolver.GetCertificateWithPrivateKey),
+                Password = this.encryptionProvider.Decrypt(data.CurrentPassword.EncryptedData, this.certificateProvider.GetCertificateWithPrivateKey),
                 ExpiryDate = newExpiry ?? data.PasswordExpiry
             };
 
@@ -98,7 +98,7 @@ namespace Lithnet.AccessManager.Web
                 PasswordEntry p = new PasswordEntry()
                 {
                     Created = item.Created,
-                    Password = this.encryptionProvider.Decrypt(item.EncryptedData, this.certificateResolver.GetCertificateWithPrivateKey),
+                    Password = this.encryptionProvider.Decrypt(item.EncryptedData, this.certificateProvider.GetCertificateWithPrivateKey),
                     ExpiryDate = item.Retired
                 };
 

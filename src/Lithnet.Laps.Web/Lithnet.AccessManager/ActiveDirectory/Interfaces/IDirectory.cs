@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.DirectoryServices;
 using System.Security.Principal;
+using Lithnet.AccessManager.Interop;
 
 namespace Lithnet.AccessManager
 {
@@ -15,11 +16,15 @@ namespace Lithnet.AccessManager
 
         IComputer GetComputer(string name);
 
+        IComputer GetComputer(SecurityIdentifier sid);
+
         bool TryGetComputer(string name, out IComputer computer);
 
         IGroup GetGroup(string groupName);
 
         IGroup GetGroup(SecurityIdentifier sid);
+
+        IGroup GetGroup(SecurityIdentifier groupSid, SecurityIdentifier domainSid);
 
         IGroup CreateGroup(string name, string description, int groupType, DirectoryEntry ou);
 
@@ -35,6 +40,8 @@ namespace Lithnet.AccessManager
 
         IUser GetUser(string userName);
 
+        IUser GetUser(SecurityIdentifier sid);
+
         bool TryGetUser(string name, out IUser user);
 
         bool IsObjectInOu(IDirectoryObject computer, string ou);
@@ -49,10 +56,19 @@ namespace Lithnet.AccessManager
 
         bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, ISecurityPrincipal principal, SecurityIdentifier targetDomainSid);
 
+        bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, SecurityIdentifier principal,
+            SecurityIdentifier targetDomainSid);
+
+        bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, SecurityIdentifier principal);
+
         SearchResult GetDirectoryEntry(string dn, string objectClass, params string[] propertiesToLoad);
 
         SearchResult GetDirectoryEntry(ISecurityPrincipal principal, params string[] propertiesToLoad);
 
         SearchResult SearchDirectoryEntry(string basedn, string filter, SearchScope scope, params string[] propertiesToLoad);
+
+        string TranslateName(string name, DsNameFormat nameFormat, DsNameFormat requiredFormat, string dnsDomainName);
+
+        string TranslateName(string name, DsNameFormat nameFormat, DsNameFormat requiredFormat);
     }
 }
