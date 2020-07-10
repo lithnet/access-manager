@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using PropertyChanged;
@@ -18,6 +19,10 @@ namespace Lithnet.AccessManager.Server.UI
             InitializeComponent();
             this.SaveButton.Focus();
         }
+
+        public bool CancelButtonVisible { get; set; } = true;
+
+        public bool SaveButtonVisible { get; set; } = true;
 
         public bool CancelButtonIsDefault { get; set; } = true;
 
@@ -43,9 +48,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         private void Save_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            var vm = this.DataContext as INotifyDataErrorInfo;
-
-            if (vm != null && vm.HasErrors)
+            if (this.DataContext is INotifyDataErrorInfo vm && vm.HasErrors)
             {
                 e.CanExecute = false;
                 return;

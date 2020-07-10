@@ -50,7 +50,17 @@ namespace Lithnet.AccessManager
         
         DirectoryEntry GetConfigurationNamingContext(SecurityIdentifier domain);
 
+        DirectoryEntry GetConfigurationNamingContext(string dnsDomain);
+        
+        DirectoryEntry GetSchemaNamingContext(SecurityIdentifier domain);
+
+        DirectoryEntry GetSchemaNamingContext(string dnsDomain);
+
+        bool DoesSchemaAttributeExist(string dnsDomain, string attributeName);
+
         bool IsPamFeatureEnabled(SecurityIdentifier domainSid);
+
+        bool IsPamFeatureEnabled(string dnsDomain);
 
         bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, ISecurityPrincipal principal);
 

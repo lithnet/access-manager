@@ -21,6 +21,7 @@
                       ShowMinButton="False"
                       WindowStyle="SingleBorderWindow"
                       xmlns:s="https://github.com/canton7/Stylet"
+                      controls:DialogParticipation.Register="{Binding}"
                       mc:Ignorable="d">
     <AdornerDecorator>
         <DockPanel LastChildFill="True"
@@ -32,6 +33,7 @@
                 <Button Content="{Binding Path=CancelButtonName, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" 
                         Click="Close_Click"
                         IsCancel="True"
+                        Visibility="{Binding Path=CancelButtonVisible, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Margin="5"
                         Width="75"/>
 
@@ -39,6 +41,7 @@
                         Content="{Binding Path=SaveButtonName, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" 
                         Command="Save"
                         IsDefault="True"
+                        Visibility="{Binding Path=SaveButtonVisible, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Margin="5"
                         Width="75">
                     <Button.CommandBindings>

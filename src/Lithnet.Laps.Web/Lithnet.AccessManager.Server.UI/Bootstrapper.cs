@@ -59,6 +59,7 @@ namespace Lithnet.AccessManager.Server.UI
             builder.Bind<IFileSelectionViewModelFactory>().To<FileSelectionViewModelFactory>();
             builder.Bind<IActiveDirectoryDomainConfigurationViewModelFactory>().To<ActiveDirectoryDomainConfigurationViewModelFactory>();
             builder.Bind<IActiveDirectoryForestConfigurationViewModelFactory>().To<ActiveDirectoryForestConfigurationViewModelFactory>();
+            builder.Bind<IX509Certificate2ViewModelFactory>().To<X509Certificate2ViewModelFactory>();
 
             builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
             builder.Bind(typeof(INotificationChannelDefinitionViewModelFactory<,>)).ToAllImplementations();

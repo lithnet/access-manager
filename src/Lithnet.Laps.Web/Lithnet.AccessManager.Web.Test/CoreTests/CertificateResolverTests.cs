@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
 using System.Text;
 using Castle.Core.Logging;
 using Microsoft.Extensions.Hosting;
@@ -96,7 +97,7 @@ namespace Lithnet.AccessManager.Test
         [Test]
         public void GetCertificateFromDirectory()
         {
-            Assert.IsTrue(provider.TryGetCertificateFromDirectory(out X509Certificate2 cert));
+            Assert.IsTrue(provider.TryGetCertificateFromDirectory(out X509Certificate2 cert, WindowsIdentity.GetCurrent().User));
             Assert.IsNotNull(cert);
         }
     }

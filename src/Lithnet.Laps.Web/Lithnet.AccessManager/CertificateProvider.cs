@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
+using Lithnet.AccessManager.Interop;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -26,15 +27,17 @@ namespace Lithnet.AccessManager
         {
             CertificateRequest request = new CertificateRequest($"CN={subject},OU=Access Manager,O=Lithnet", RSA.Create(4096), HashAlgorithmName.SHA384, RSASignaturePadding.Pss);
 
-            var eku = new X509EnhancedKeyUsageExtension();
-            eku.EnhancedKeyUsages.Add(new Oid(LithnetAccessManagerEku));
-            request.CertificateExtensions.Add(eku);
+            var enhancedKeyUsage = new OidCollection();
+            enhancedKeyUsage.Add(new Oid(LithnetAccessManagerEku, "Lithnet Access Manager Encryption"));
+            request.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(enhancedKeyUsage, critical: true));
             request.CertificateExtensions.Add(new X509KeyUsageExtension(X509KeyUsageFlags.KeyEncipherment, true));
             request.CertificateExtensions.Add(new X509BasicConstraintsExtension(false, false, 0, true));
 
             X509Certificate2 cert = request.CreateSelfSigned(DateTimeOffset.UtcNow, DateTime.UtcNow.AddYears(20));
-
-            return cert;
+            string p = Guid.NewGuid().ToString();
+            var raw = cert.Export(X509ContentType.Pfx, p);
+            var f = new X509Certificate2(raw, p, X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet);
+            return f;
         }
 
         public CertificateProvider(ILogger<CertificateProvider> logger, IDirectory directory, IAppPathProvider appPathProvider)
@@ -67,7 +70,7 @@ namespace Lithnet.AccessManager
 
             if (cert == null)
             {
-                this.TryGetCertificateFromDirectory(out cert);
+                this.TryGetCertificateFromDirectory(out cert, WindowsIdentity.GetCurrent().User);
             }
 
             if (requirePrivateKey && !cert.HasPrivateKey)
@@ -83,14 +86,14 @@ namespace Lithnet.AccessManager
             return cert;
         }
 
-        public X509Certificate2Collection GetEligibleCertificates()
+        public X509Certificate2Collection GetEligibleCertificates(bool needPrivateKey)
         {
             X509Certificate2Collection certs = new X509Certificate2Collection();
 
             X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine, OpenFlags.ReadOnly);
             Oid serverAuthOid = new Oid(LithnetAccessManagerEku);
 
-            foreach (X509Certificate2 c in store.Certificates.Find(X509FindType.FindByTimeValid, DateTime.Now, false).OfType<X509Certificate2>().Where(t => t.HasPrivateKey))
+            foreach (X509Certificate2 c in store.Certificates.Find(X509FindType.FindByTimeValid, DateTime.Now, false).OfType<X509Certificate2>().Where(t => !needPrivateKey || t.HasPrivateKey))
             {
                 foreach (X509EnhancedKeyUsageExtension x in c.Extensions.OfType<X509EnhancedKeyUsageExtension>())
                 {
@@ -107,26 +110,59 @@ namespace Lithnet.AccessManager
             return certs;
         }
 
-        internal bool TryGetCertificateFromDirectory(out X509Certificate2 cert)
+        public X509Certificate2 GetCertificateFromDirectory(SecurityIdentifier domainSid)
+        {
+            string dnsDomain = NativeMethods.GetDnsDomainNameFromSid(domainSid.AccountDomainSid);
+            return GetCertificateFromDirectory(dnsDomain);
+        }
+
+        public X509Certificate2 GetCertificateFromDirectory(string dnsDomain)
+        {
+            var cnc = this.directory.GetConfigurationNamingContext(dnsDomain);
+            string dn = cnc.GetPropertyString("distinguishedName");
+            dn = $"LDAP://CN=AccessManagerPublicKey,CN=Lithnet,CN=Services,{dn}";
+            DirectoryEntry amobject = new DirectoryEntry(dn);
+
+            byte[] data = amobject?.GetPropertyBytes("msDS-ByteArray");
+
+            if (data != null)
+            {
+                return new X509Certificate2(data);
+            }
+
+            throw new ObjectNotFoundException("There was no certificate published in the directory");
+        }
+
+        public void PublishCertificateToDirectory(X509Certificate2 cert, string dnsDomain)
+        {
+            
+        }
+
+        public bool TryGetCertificateFromDirectory(out X509Certificate2 cert, string dnsDomain)
         {
             cert = null;
 
             try
             {
-                var cnc = this.directory.GetConfigurationNamingContext(WindowsIdentity.GetCurrent().User);
-                string dn = cnc.GetPropertyString("distinguishedName");
-                dn = $"LDAP://CN=AccessManagerPublicKey,CN=Lithnet,CN=Services,{dn}";
-                DirectoryEntry amobject = new DirectoryEntry(dn);
+                cert = this.GetCertificateFromDirectory(dnsDomain);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.LogTrace(ex, "TryGetCertificateFromDirectory failed");
+            }
 
-                byte[] data = amobject?.GetPropertyBytes("msDS-ByteArray");
+            return false;
+        }
 
-                if (data != null)
-                {
-                    cert = new X509Certificate2(data);
-                    return true;
-                }
+        public bool TryGetCertificateFromDirectory(out X509Certificate2 cert, SecurityIdentifier domain)
+        {
+            cert = null;
 
-                logger.LogTrace("Could not find a certificate published in the directory");
+            try
+            {
+                cert = this.GetCertificateFromDirectory(domain);
+                return true;
             }
             catch (Exception ex)
             {

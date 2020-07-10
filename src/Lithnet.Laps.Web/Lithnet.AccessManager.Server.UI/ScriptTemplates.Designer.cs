@@ -104,5 +104,22 @@ namespace Lithnet.AccessManager.Server.UI {
                 return ResourceManager.GetString("AuthorizationScriptTemplate", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to # Publish-LithnetAccessManagerCertificate
+        ///# 
+        ///# This script creates an object in the Configuration Naming context of the root domain in the forest with a copy
+        ///# that contains the public key of the certificate Lithnet Access Manager Agents should use to encrypt their local
+        ///# admin passwords and password history
+        ///#
+        ///# This script requires membership in their the Enterprise Admin group, or the Domain Admin group on the root domain of the forest
+        ///# 
+        ///# Note, this script has been pre-populated out with the in [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string PublishCertificateTemplate {
+            get {
+                return ResourceManager.GetString("PublishCertificateTemplate", resourceCulture);
+            }
+        }
     }
 }

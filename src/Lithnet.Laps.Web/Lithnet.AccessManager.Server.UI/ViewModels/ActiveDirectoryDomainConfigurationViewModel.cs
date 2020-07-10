@@ -148,6 +148,26 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
+
+        public bool CanDelegateJitPermission { get; set; }
+
+        public void DelegateJitPermission()
+        {
+        }
+
+        public bool CanDelegateMsLapsPermission { get; set; }
+
+        public void DelegateMsLapsPermission()
+        {
+        }
+
+        public bool CanDelegateLithnetLapsPermission { get; set; }
+
+        public void DelegateLithnetAccessManagerPermission()
+        {
+        }
+
+
         private bool IsGroupMember(SecurityIdentifier groupSid, SecurityIdentifier userSid)
         {
             using PrincipalContext p = new PrincipalContext(ContextType.Domain, this.domain.Name);

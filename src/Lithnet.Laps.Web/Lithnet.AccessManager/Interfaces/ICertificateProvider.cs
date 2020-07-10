@@ -11,6 +11,12 @@ namespace Lithnet.AccessManager
 
         X509Certificate2 GetCertificateWithPrivateKey(string thumbprint);
 
-        X509Certificate2Collection GetEligibleCertificates();
+        X509Certificate2Collection GetEligibleCertificates(bool needPrivateKey);
+
+        bool TryGetCertificateFromDirectory(out X509Certificate2 cert, string dnsDomain);
+
+        X509Certificate2 GetCertificateFromDirectory(string dnsDomain);
+
+        void PublishCertificateToDirectory(X509Certificate2 cert, string dnsDomain);
     }
 }

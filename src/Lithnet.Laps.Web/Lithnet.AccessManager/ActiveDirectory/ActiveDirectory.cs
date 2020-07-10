@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
@@ -14,7 +15,7 @@ namespace Lithnet.AccessManager
     {
         private static readonly Guid PamFeatureGuid = new Guid("ec43e873-cce8-4640-b4ab-07ffe4ab5bcd");
 
-        private readonly Dictionary<SecurityIdentifier, bool> pamEnabledDomainCache = new Dictionary<SecurityIdentifier, bool>();
+        private readonly Dictionary<string, bool> pamEnabledDomainCache = new Dictionary<string, bool>();
 
         public bool TryGetUser(string name, out IUser user)
         {
@@ -256,46 +257,98 @@ namespace Lithnet.AccessManager
         {
             SecurityIdentifier sid = domainSid.AccountDomainSid;
 
-            if (pamEnabledDomainCache.TryGetValue(sid, out bool value))
+            return this.IsPamFeatureEnabled(NativeMethods.GetDnsDomainNameFromSid(sid));
+        }
+
+        public bool IsPamFeatureEnabled(string dnsDomain)
+        {
+            if (pamEnabledDomainCache.TryGetValue(dnsDomain, out bool value))
             {
                 return value;
             }
 
             DirectorySearcher d = new DirectorySearcher
             {
-                SearchRoot = this.GetConfigurationNamingContext(sid),
+                SearchRoot = this.GetConfigurationNamingContext(dnsDomain),
                 SearchScope = SearchScope.Subtree,
                 Filter = $"(&(objectClass=msDS-OptionalFeature)(msDS-OptionalFeatureGUID={PamFeatureGuid.ToOctetString()}))",
             };
 
             bool result = d.FindOne() != null;
 
-            pamEnabledDomainCache.Add(domainSid, result);
+            pamEnabledDomainCache.Add(dnsDomain, result);
 
             return result;
         }
 
-        private string GetConfigurationNamingContextDn(SecurityIdentifier domain)
+        private string GetContextDn(string contextName, string dnsDomain)
+        {
+            var rootDse = new DirectoryEntry($"LDAP://{dnsDomain}/rootDSE");
+
+            var context = (string)rootDse.Properties[contextName]?.Value;
+
+            if (context == null)
+            {
+                throw new ObjectNotFoundException($"Naming context lookup failed for {contextName}");
+            }
+
+            return context;
+        }
+
+
+        public DirectoryEntry GetConfigurationNamingContext(SecurityIdentifier domain)
         {
             SecurityIdentifier sid = domain.AccountDomainSid;
 
             string dc = NativeMethods.GetDnsDomainNameFromSid(sid);
 
-            var rootDse = new DirectoryEntry($"LDAP://{dc}/rootDSE");
-
-            var configNamingContext = (string)rootDse.Properties["configurationNamingContext"]?.Value;
-
-            if (configNamingContext == null)
-            {
-                throw new ObjectNotFoundException($"Configuration naming context lookup failed");
-            }
-
-            return configNamingContext;
+            return new DirectoryEntry($"LDAP://{this.GetConfigurationNamingContext(dc)}");
         }
 
-        public DirectoryEntry GetConfigurationNamingContext(SecurityIdentifier domain)
+        public DirectoryEntry GetConfigurationNamingContext(string dnsDomain)
         {
-            return new DirectoryEntry($"LDAP://{this.GetConfigurationNamingContextDn(domain)}");
+            return new DirectoryEntry($"LDAP://{this.GetContextDn("configurationNamingContext", dnsDomain)}");
+        }
+
+
+        public DirectoryEntry GetSchemaNamingContext(SecurityIdentifier domain)
+        {
+            SecurityIdentifier sid = domain.AccountDomainSid;
+
+            string dc = NativeMethods.GetDnsDomainNameFromSid(sid);
+
+            return new DirectoryEntry($"LDAP://{this.GetSchemaNamingContext(dc)}");
+        }
+
+        public DirectoryEntry GetSchemaNamingContext(string dnsDomain)
+        {
+            return new DirectoryEntry($"LDAP://{this.GetContextDn("schemaNamingContext", dnsDomain)}");
+        }
+
+        public bool DoesSchemaAttributeExist(string dnsDomain, string attributeName)
+        {
+            DirectorySearcher d = new DirectorySearcher
+            {
+                SearchRoot = this.GetSchemaNamingContext(dnsDomain),
+                SearchScope = SearchScope.Subtree,
+                Filter = $"(&(objectClass=attributeSchema)(lDAPDisplayName={attributeName}))"
+            };
+
+            d.PropertiesToLoad.Add("distinguishedName");
+
+            SearchResultCollection result = d.FindAll();
+
+            if (result.Count > 1)
+            {
+                throw new InvalidOperationException($"More than one attribute called {attributeName} was found");
+            }
+
+            if (result.Count == 0)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private SearchResult DoGcLookup(string objectName, string objectClass, IEnumerable<string> propertiesToGet)

@@ -40,6 +40,9 @@
     <Compile Update="Views\ActiveDirectoryConfigurationView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\ScriptContentView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\SelectForestView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -63,6 +66,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\ActiveDirectoryConfigurationView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\ScriptContentView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\SelectForestView.xaml">
