@@ -1,0 +1,155 @@
+﻿using System;
+using System.Collections.Generic;
+using System.DirectoryServices.ActiveDirectory;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Windows;
+using MahApps.Metro.Controls.Dialogs;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using PropertyChanged;
+using Stylet;
+
+namespace Lithnet.AccessManager.Server.UI
+{
+    public class LapsConfigurationViewModel : PropertyChangedBase, IViewAware, IHaveDisplayName
+    {
+        private readonly ICertificateProvider certificateProvider;
+
+        private readonly IDirectory directory;
+
+        private readonly IX509Certificate2ViewModelFactory certificate2ViewModelFactory;
+
+        private readonly IDialogCoordinator dialogCoordinator;
+
+        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IDirectory directory, IX509Certificate2ViewModelFactory certificate2ViewModelFactory)
+        {
+            this.directory = directory;
+            this.certificateProvider = certificateProvider;
+            this.certificate2ViewModelFactory = certificate2ViewModelFactory;
+            this.dialogCoordinator = dialogCoordinator;
+
+            this.Forests = new List<Forest>();
+
+            var domain = Domain.GetCurrentDomain();
+            this.Forests.Add(domain.Forest);
+
+            foreach (var trust in domain.Forest.GetAllTrustRelationships().OfType<TrustRelationshipInformation>())
+            {
+                if (trust.TrustDirection == TrustDirection.Inbound || trust.TrustDirection == TrustDirection.Bidirectional)
+                {
+                    var forest = Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, trust.TargetName));
+                    this.Forests.Add(forest);
+                }
+            }
+
+            this.SelectedForest = this.Forests.FirstOrDefault();
+        }
+
+        public List<Forest> Forests { get; }
+
+        public Forest SelectedForest { get; set; }
+
+        public void AttachView(UIElement view)
+        {
+            this.View = view;
+        }
+
+        public UIElement View { get; set; }
+
+        public X509Certificate2ViewModel SelectedCertificate { get; set; }
+
+        [PropertyChanged.DependsOn(nameof(SelectedForest))]
+        public BindableCollection<X509Certificate2ViewModel> AvailableCertificates => this.BuildAvailableCertificates(this.SelectedForest);
+
+        public bool CanPublishSelectedCertificate => !this.SelectedCertificate?.IsPublished ?? false;
+
+        public void PublishSelectedCertificate()
+        {
+            var de = this.directory.GetConfigurationNamingContext(this.SelectedForest.RootDomain.Name);
+            var certData = Convert.ToBase64String(this.SelectedCertificate.Model.RawData, Base64FormattingOptions.InsertLineBreaks);
+
+            var vm = new ScriptContentViewModel(this.dialogCoordinator)
+            {
+                HelpText = "Run the following script to publish the encryption certificate",
+                ScriptText = ScriptTemplates.PublishCertificateTemplate
+                    .Replace("{configurationNamingContext}", de.GetPropertyString("distinguishedName"))
+                    .Replace("{certificateData}", certData)
+            };
+
+            ExternalDialogWindow w = new ExternalDialogWindow
+            {
+                DataContext = vm,
+                SaveButtonVisible = false,
+                CancelButtonName = "Close"
+            };
+
+            w.ShowDialog();
+        }
+
+        public bool CanGenerateEncryptionCertificate { get; set; } = true;
+
+        public void GenerateEncryptionCertificate()
+        {
+            X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert(this.SelectedForest.Name);
+
+            using X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+            store.Open(OpenFlags.ReadWrite);
+            store.Add(cert);
+
+            var vm = this.certificate2ViewModelFactory.CreateViewModel(cert);
+
+            this.AvailableCertificates.Add(vm);
+            this.SelectedCertificate = vm;
+        }
+
+        public bool CanShowCertificateDialog => this.SelectedCertificate != null;
+
+        public void ShowCertificateDialog()
+        {
+            X509Certificate2UI.DisplayCertificate(this.SelectedCertificate.Model, this.GetHandle());
+        }
+
+        private BindableCollection<X509Certificate2ViewModel> BuildAvailableCertificates(Forest forest)
+        {
+            var availableCertificates = new BindableCollection<X509Certificate2ViewModel>();
+
+            if (forest == null)
+            {
+                return availableCertificates;
+            }
+
+            var allCertificates = certificateProvider.GetEligibleCertificates(false).OfType<X509Certificate2>();
+            this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert, forest.RootDomain.Name);
+
+            bool foundPublished = false;
+
+            foreach (var certificate in allCertificates)
+            {
+                var vm = this.certificate2ViewModelFactory.CreateViewModel(certificate);
+
+                if (certificate.Thumbprint == publishedCert?.Thumbprint)
+                {
+                    vm.IsPublished = true;
+                    foundPublished = true;
+                }
+
+                if (certificate.Subject.StartsWith($"CN={forest.RootDomain.Name}", StringComparison.OrdinalIgnoreCase))
+                {
+                    availableCertificates.Add(vm);
+                }
+            }
+
+            if (!foundPublished && publishedCert != null)
+            {
+                var vm = this.certificate2ViewModelFactory.CreateViewModel(publishedCert);
+                vm.IsOrphaned = true;
+                vm.IsPublished = true;
+                availableCertificates.Add(vm);
+            }
+
+            return availableCertificates;
+        }
+
+        public string DisplayName { get; set; } = "Password encryption";
+    }
+}

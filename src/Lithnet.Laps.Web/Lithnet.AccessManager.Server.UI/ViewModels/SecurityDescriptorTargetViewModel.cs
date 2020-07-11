@@ -235,7 +235,7 @@ namespace Lithnet.AccessManager.Server.UI
                 }
             }
 
-            await ChildWindowManager.ShowChildWindowAsync(this.GetWindow(), w);
+            await this.GetWindow().ShowChildWindowAsync(w);
 
             if (w.Result != MessageDialogResult.Affirmative)
             {

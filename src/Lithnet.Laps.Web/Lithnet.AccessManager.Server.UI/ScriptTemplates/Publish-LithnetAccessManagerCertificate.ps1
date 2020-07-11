@@ -6,7 +6,7 @@
 #
 # This script requires membership in their the Enterprise Admin group, or the Domain Admin group on the root domain of the forest
 # 
-# Note, this script has been pre-populated out with the information required to publish the certificate in your forest
+# Note, this script has been pre-populated with the information required to publish the certificate in your forest
 #
 # Version 1.0
 
@@ -52,7 +52,7 @@ try
 }
 catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException]
 {
-    Write-Warning "$publcKeyObjectName doesn't exist. Creating"
-    New-ADObject -Name $publcKeyObjectName -Path $lithnetContainerDN -Type "msDS-AppData" -OtherAttributes @{"msDS-ByteArray"=$certBytes}
+    Write-Warning "$publicKeyObjectName doesn't exist. Creating"
+    New-ADObject -Name $publicKeyObjectName -Path $lithnetContainerDN -Type "msDS-AppData" -OtherAttributes @{"msDS-ByteArray"=$certBytes}
     Write-Information "Created Public key container $keyContainerDN";
 }

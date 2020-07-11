@@ -25,6 +25,7 @@ namespace Lithnet.AccessManager.Server.UI
             builder.Bind<HostingOptions>().ToInstance(appconfig.Hosting);
             builder.Bind<RateLimitOptions>().ToInstance(appconfig.RateLimits);
             builder.Bind<UserInterfaceOptions>().ToInstance(appconfig.UserInterface);
+            builder.Bind<JitConfigurationOptions>().ToInstance(appconfig.JitConfiguration);
 
             builder.Bind<ApplicationConfigViewModel>().ToSelf();
             builder.Bind<AuthenticationViewModel>().ToSelf();
@@ -32,7 +33,7 @@ namespace Lithnet.AccessManager.Server.UI
             builder.Bind<HostingViewModel>().ToSelf();
             builder.Bind<AuditingViewModel>().ToSelf();
             builder.Bind<AuthorizationViewModel>().ToSelf();
-            builder.Bind<ActiveDirectoryConfigurationViewModel>().ToSelf();
+            builder.Bind<ActiveDirectorySchemaViewModel>().ToSelf();
 
             builder.Bind<IpDetectionViewModel>().ToSelf();
             builder.Bind<PowershellNotificationChannelDefinitionsViewModel>().ToSelf();
@@ -40,11 +41,11 @@ namespace Lithnet.AccessManager.Server.UI
             builder.Bind<RateLimitsViewModel>().ToSelf();
             builder.Bind<SmtpNotificationChannelDefinitionsViewModel>().ToSelf();
             builder.Bind<SmtpNotificationChannelDefinitionViewModel>().ToSelf();
-
             builder.Bind<UserInterfaceViewModel>().ToSelf();
             builder.Bind<WebhookNotificationChannelDefinitionsViewModel>().ToSelf();
             builder.Bind<WebhookNotificationChannelDefinitionViewModel>().ToSelf();
-            
+            builder.Bind<ActiveDirectoryConfigurationViewModel>().ToSelf();
+
             builder.Bind<IDialogCoordinator>().To<DialogCoordinator>();
             builder.Bind<IDirectory>().To<ActiveDirectory>();
             builder.Bind<IServiceSettingsProvider>().To<ServiceSettingsProvider>();
@@ -60,6 +61,10 @@ namespace Lithnet.AccessManager.Server.UI
             builder.Bind<IActiveDirectoryDomainConfigurationViewModelFactory>().To<ActiveDirectoryDomainConfigurationViewModelFactory>();
             builder.Bind<IActiveDirectoryForestConfigurationViewModelFactory>().To<ActiveDirectoryForestConfigurationViewModelFactory>();
             builder.Bind<IX509Certificate2ViewModelFactory>().To<X509Certificate2ViewModelFactory>();
+            builder.Bind<IActiveDirectorySchemaViewModelFactory>().To<ActiveDirectorySchemaViewModelFactory>();
+            builder.Bind<ILapsConfigurationViewModelFactory>().To<LapsConfigurationViewModelFactory>();
+            builder.Bind<IJitGroupMappingViewModelFactory>().To<JitGroupMappingViewModelFactory>();
+            builder.Bind<IJitConfigurationViewModelFactory>().To<JitConfigurationViewModelFactory>();
 
             builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
             builder.Bind(typeof(INotificationChannelDefinitionViewModelFactory<,>)).ToAllImplementations();

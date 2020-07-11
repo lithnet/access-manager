@@ -7,11 +7,9 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class ActiveDirectoryForestConfigurationViewModelFactory : IActiveDirectoryForestConfigurationViewModelFactory
-    {
+    public class LapsConfigurationViewModelFactory : ILapsConfigurationViewModelFactory
+    { 
         private readonly ICertificateProvider certificateProvider;
-
-        private readonly IActiveDirectoryDomainConfigurationViewModelFactory domainFactory;
 
         private readonly IDirectory directory;
 
@@ -19,18 +17,17 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IDialogCoordinator dialogCoordinator;
 
-        public ActiveDirectoryForestConfigurationViewModelFactory(ICertificateProvider certificateProvider, IActiveDirectoryDomainConfigurationViewModelFactory domainFactory, IDirectory directory, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IDialogCoordinator dialogCoordinator)
+        public LapsConfigurationViewModelFactory(ICertificateProvider certificateProvider, IDirectory directory, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IDialogCoordinator dialogCoordinator)
         {
             this.certificateProvider = certificateProvider;
-            this.domainFactory = domainFactory;
             this.directory = directory;
             this.certificate2ViewModelFactory = certificate2ViewModelFactory;
             this.dialogCoordinator = dialogCoordinator;
         }
 
-        public ActiveDirectoryForestConfigurationViewModel CreateViewModel(Forest model)
+        public LapsConfigurationViewModel CreateViewModel()
         {
-            return new ActiveDirectoryForestConfigurationViewModel(model, dialogCoordinator, domainFactory, directory);
+            return new LapsConfigurationViewModel(dialogCoordinator, certificateProvider, directory, certificate2ViewModelFactory);
         }
     }
 }

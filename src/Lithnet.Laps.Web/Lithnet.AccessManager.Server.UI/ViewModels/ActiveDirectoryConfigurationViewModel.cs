@@ -1,42 +1,26 @@
-﻿using System.Collections.Generic;
-using System.DirectoryServices.ActiveDirectory;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
+﻿using System.Linq;
+using Lithnet.AccessManager.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class ActiveDirectoryConfigurationViewModel : PropertyChangedBase , IHaveDisplayName
+    public class ActiveDirectoryConfigurationViewModel : Conductor<PropertyChangedBase>.Collection.OneActive
     {
-        public ActiveDirectoryConfigurationViewModel(IActiveDirectoryForestConfigurationViewModelFactory forestFactory)
+        public ActiveDirectoryConfigurationViewModel(IActiveDirectorySchemaViewModelFactory schemaFactory, ILapsConfigurationViewModelFactory lapsFactory, IJitConfigurationViewModelFactory jitFactory)
         {
-            this.Forests = new List<ActiveDirectoryForestConfigurationViewModel>();
+            this.DisplayName = "Active Directory";
 
-            var domain = Domain.GetCurrentDomain();
-            this.Forests.Add(forestFactory.CreateViewModel(domain.Forest));
-            
-            foreach (var trust in domain.Forest.GetAllTrustRelationships().OfType<TrustRelationshipInformation>())
-            {
-                if (trust.TrustDirection == TrustDirection.Inbound || trust.TrustDirection == TrustDirection.Bidirectional)
-                {
-                    var forest = Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, trust.TargetName));
-                    var vm = forestFactory.CreateViewModel(forest);
-                    this.Forests.Add(vm);
-                }
-            }
+            this.Items.Add(schemaFactory.CreateViewModel());
+            this.Items.Add(lapsFactory.CreateViewModel());
+            this.Items.Add(jitFactory.CreateViewModel());
 
-            this.SelectedForest = this.Forests.FirstOrDefault();
+            this.ActiveItem = this.Items.FirstOrDefault();
         }
 
-        public List<ActiveDirectoryForestConfigurationViewModel> Forests { get; }
-
-        public ActiveDirectoryForestConfigurationViewModel SelectedForest { get; set; }
-
-        public X509Certificate2 EncryptionCertificate { get; set; }
-
-        public string EncryptionCertificateStatus { get; set; }
-
-        public string DisplayName { get; set; } = "Active Directory";
+        public sealed override void ActivateItem(PropertyChangedBase item)
+        {
+            base.ActivateItem(item);
+        }
     }
 }

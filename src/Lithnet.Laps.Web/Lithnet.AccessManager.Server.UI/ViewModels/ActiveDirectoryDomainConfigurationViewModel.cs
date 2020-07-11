@@ -13,12 +13,6 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly Domain domain;
 
-        private readonly IServiceSettingsProvider serviceSettings;
-
-        private readonly IDirectory directory;
-
-        private readonly SecurityIdentifier domainSid;
-
         private readonly SecurityIdentifier waagSid = new SecurityIdentifier("S-1-5-32-560");
 
         private readonly SecurityIdentifier acaoSid = new SecurityIdentifier("S-1-5-32-579");
@@ -31,14 +25,20 @@ namespace Lithnet.AccessManager.Server.UI
         {
             this.domain = domain;
             this.dialogCoordinator = dialogCoordinator;
-            this.serviceSettings = serviceSettings;
-            this.directory = directory;
-            this.domainSid = domain.GetDirectoryEntry().GetPropertySid("objectSid");
 
             this.serviceAccountSid = serviceSettings.GetServiceAccount();
 
-            this.CheckWaagStatus();
-            this.CheckAcaoStatus();
+            _ = this.Initialize();
+        }
+
+        private async Task Initialize()
+        {
+            await Task.Run(() =>
+            {
+                this.CheckWaagStatus();
+                this.CheckAcaoStatus();
+                    
+            }).ConfigureAwait(false);
         }
 
         public string WaagStatus { get; set; }
@@ -54,43 +54,6 @@ namespace Lithnet.AccessManager.Server.UI
         public bool IsNotAcaoMember => !this.IsAcaoMember;
 
         public string DisplayName => this.domain.Name;
-
-        public bool CanAddToWaag => this.serviceAccountSid != null && !this.IsWaagMember;
-
-        public async Task AddToWaag()
-        {
-            try
-            {
-                using PrincipalContext p = new PrincipalContext(ContextType.Domain, this.domain.Name);
-                using GroupPrincipal g = GroupPrincipal.FindByIdentity(p, IdentityType.Sid, this.waagSid.ToString());
-                g.Members.Add(p, IdentityType.Sid, this.serviceAccountSid.ToString());
-                g.Save();
-
-                this.CheckWaagStatus();
-            }
-            catch (Exception ex)
-            {
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not add the service account to the built-in group 'Windows Authorization Access Group'. Try adding the service account to the group manually\r\n\r\n{ex.Message}");
-            }
-        }
-
-        public bool CanAddToAcao => this.serviceAccountSid != null && !this.IsAcaoMember;
-
-        public async Task AddToAcao()
-        {
-            try
-            {
-                using PrincipalContext p = new PrincipalContext(ContextType.Domain, this.domain.Name);
-                using GroupPrincipal g = GroupPrincipal.FindByIdentity(p, IdentityType.Sid, this.acaoSid.ToString());
-                g.Members.Add(p, IdentityType.Sid, this.serviceAccountSid.ToString());
-                g.Save();
-                this.CheckAcaoStatus();
-            }
-            catch (Exception ex)
-            {
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not add the service account to the built-in group 'Access Control Assistance Operators'. Try adding the service account to the group manually\r\n\r\n{ex.Message}");
-            }
-        }
 
         private void CheckAcaoStatus()
         {
@@ -115,7 +78,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.AcaoStatus = "Could not determine group membership. Try to add the service account to the group";
+                this.AcaoStatus = "Could not determine group membership. Try to add the service account to the group manually";
                 this.IsAcaoMember = false;
             }
         }
@@ -143,30 +106,10 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.WaagStatus = "Could not determine group membership. Try to add the service account to the group";
+                this.WaagStatus = "Could not determine group membership. Try to add the service account to the group manually";
                 this.IsWaagMember = false;
             }
         }
-
-
-        public bool CanDelegateJitPermission { get; set; }
-
-        public void DelegateJitPermission()
-        {
-        }
-
-        public bool CanDelegateMsLapsPermission { get; set; }
-
-        public void DelegateMsLapsPermission()
-        {
-        }
-
-        public bool CanDelegateLithnetLapsPermission { get; set; }
-
-        public void DelegateLithnetAccessManagerPermission()
-        {
-        }
-
 
         private bool IsGroupMember(SecurityIdentifier groupSid, SecurityIdentifier userSid)
         {

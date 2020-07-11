@@ -1,0 +1,85 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.JitConfigurationView"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             Dialog:DialogParticipation.Register="{Binding}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <GroupBox Header="JIT group creation">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" 
+                       Margin="5"
+                       TextWrapping="Wrap">Lithnet Access Manager can automatically create a JIT group for each computer in a specified OU based on a templated name.
+            </TextBlock>
+
+            <CheckBox Grid.Row="1" Grid.Column="0"
+                      IsChecked="{Binding EnableJitGroupCreation}"
+                      Margin="5"
+                      Content="Enable automatic JIT group creation"/>
+
+            <CheckBox Grid.Row="2" Grid.Column="0"
+                      IsChecked="{Binding EnableJitGroupDeletion}"
+                      Margin="5"
+                      Content="Automatically delete the corresponding JIT group when a computer is deleted"/>
+
+            <ListView Grid.Row="3" Grid.Column="0" 
+                                      BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
+                                      ItemsSource="{Binding GroupMappings}"
+                                      SelectedItem="{Binding SelectedGroupMapping}"
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                                      Height="300"
+                                      MouseDoubleClick="{s:Action Edit}"
+                                      Margin="5">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Computer OU" 
+                                            DisplayMemberBinding="{Binding ComputerOU}" 
+                                            Width="Auto"/>
+                        <GridViewColumn Header="Group OU"
+                                            DisplayMemberBinding="{Binding GroupOU}" 
+                                            Width="Auto"/>
+                        <GridViewColumn Header="Group name template"
+                                            DisplayMemberBinding="{Binding GroupNameTemplate}" 
+                                            Width="Auto"/>
+                        <GridViewColumn Header="Group type"
+                                            DisplayMemberBinding="{Binding GroupType}" 
+                                            Width="Auto"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+
+            <StackPanel Grid.Row="4" Grid.Column="0"
+                        Orientation="Horizontal">
+                <Button Command="{s:Action Add}" 
+                    Content="Add..." 
+                    Margin="5"/>
+                <Button Command="{s:Action Delete}"
+                    Content="Delete selected..."
+                    Margin="5"/>
+                <Button Command="{s:Action Edit}"
+                    Content="Edit selected..."
+                    Margin="5"/>
+            </StackPanel>
+        </Grid>
+    </GroupBox>
+</UserControl>

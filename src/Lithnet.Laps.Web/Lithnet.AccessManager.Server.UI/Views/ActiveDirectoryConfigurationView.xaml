@@ -15,82 +15,16 @@
 
 
     <GroupBox Header="Active Directory">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="150"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-
-            <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                      Header="Forest Configuration">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <Label Grid.Row="0" Grid.Column="0" 
-                           Content="Forest"
-                           Margin="5"/>
-                    <ComboBox Grid.Row="0" Grid.Column="1" 
-                              ItemsSource="{Binding Forests, Mode=OneWay}"
-                              SelectedItem="{Binding SelectedForest}"
-                              DisplayMemberPath="DisplayName"
-                              Margin="5">
-                    </ComboBox>
-
-                    <ContentControl  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                                     s:View.Model="{Binding SelectedForest}" 
-                                     VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 
-                                     IsTabStop="False"
-                                     Margin="5"/>
-                </Grid>
-            </GroupBox>
-
-            <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-                      Header="Domain Configuration">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-
-
-                    <Label Grid.Row="1" Grid.Column="0" 
-                           Content="Domain"
-                           Margin="5"/>
-                    <ComboBox Grid.Row="1" Grid.Column="1" 
-                              DataContext="{Binding SelectedForest}"
-                              ItemsSource="{Binding Domains, Mode=OneWay}"
-                              SelectedItem="{Binding SelectedDomain}"
-                              DisplayMemberPath="DisplayName"
-                              Margin="5">
-                    </ComboBox>
-
-                    <ContentControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
-                                    DataContext="{Binding SelectedForest}"
-                                    s:View.Model="{Binding SelectedDomain}" 
-                                    VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 
-                                    IsTabStop="False"
-                                    Margin="5"/>
-                </Grid>
-            </GroupBox>
-
-        </Grid>
+        <mah:MetroAnimatedSingleRowTabControl BorderThickness="1"  
+                                                  ItemsSource="{Binding Items}" 
+                                                  SelectedItem="{Binding ActiveItem}"
+                                                  DisplayMemberPath="DisplayName"
+                                                  Margin="5">
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <ContentControl s:View.Model="{Binding}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" IsTabStop="False"/>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </mah:MetroAnimatedSingleRowTabControl>
     </GroupBox>
 </UserControl>

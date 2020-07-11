@@ -7,10 +7,10 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:s="https://github.com/canton7/Stylet"
              xmlns:dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -34,19 +34,26 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Label Grid.Row="0"
+            <StackPanel  Grid.Row="0"
+                         Orientation="Horizontal">
+                <iconPacks:PackIconFontAwesome Kind="CheckSquareSolid"
+                                               Foreground="DarkGreen" 
+                                               Visibility="{Binding IsWaagMember, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                               VerticalAlignment="Center"/>
+
+                <iconPacks:PackIconFontAwesome Kind="ExclamationTriangleSolid"
+                                               Foreground="DarkOrange" 
+                                               Visibility="{Binding IsNotWaagMember, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                               VerticalAlignment="Center"/>
+                <Label
                    FontWeight="Bold"
                    Content="{Binding WaagStatus, Mode=OneWay,FallbackValue='Status unknown'}"
                    Margin="0 5 0 0"/>
+            </StackPanel>
+
             <TextBlock Grid.Row="1"
                        Margin="5 0 0 0"
-                       TextWrapping="Wrap">The built-in "Windows Authorization Access Group" grants permissions are required for the service account to calculate group membership of users within a domain. This is required for all installations.</TextBlock>
-            <Button Grid.Row="2"
-                    Content="Add service account to group"
-                    Visibility="{Binding IsNotWaagMember, Converter={StaticResource BooleanToVisibilityConverter}}"
-                    Command="{s:Action AddToWaag}"
-                    HorizontalAlignment="Left"
-                    Margin="5 5 0 0"/>
+                       TextWrapping="Wrap">The built-in "Windows Authorization Access Group" grants permissions that are required for the service account to calculate group membership of users within a domain. This is required for all installations.</TextBlock>
         </Grid>
 
         <Label Grid.Row="1" Grid.Column="0"
@@ -62,19 +69,27 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Label Grid.Row="0"
+
+            <StackPanel  Grid.Row="0"
+                         Orientation="Horizontal">
+                <iconPacks:PackIconFontAwesome Kind="CheckSquareSolid"
+                                               Foreground="DarkGreen" 
+                                               Visibility="{Binding IsAcaoMember, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                               VerticalAlignment="Center"/>
+
+                <iconPacks:PackIconFontAwesome Kind="ExclamationTriangleSolid"
+                                               Foreground="DarkOrange" 
+                                               Visibility="{Binding IsNotAcaoMember, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                               VerticalAlignment="Center"/>
+                <Label
                    FontWeight="Bold"
                    Content="{Binding AcaoStatus, Mode=OneWay, FallbackValue='Status unknown'}"
+                   VerticalAlignment="Center"
                    Margin="0 5 0 0"/>
+            </StackPanel>
             <TextBlock Grid.Row="1"
                        Margin="5 0 0 0"
                        TextWrapping="Wrap">The built-in "Access Control Assistance Operators" grants permissions that are required for the service account to calculate group membership of users from across a forest trust. This is only required where a trust is in place between forests</TextBlock>
-            <Button  Grid.Row="2"
-                     Content="Add service account to group"
-                     Visibility="{Binding IsNotAcaoMember, Converter={StaticResource BooleanToVisibilityConverter}}"
-                     Command="{s:Action AddToAcao}"
-                     HorizontalAlignment="Left"
-                     Margin="5 5 0 0"/>
         </Grid>
     </Grid>
 </UserControl>

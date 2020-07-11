@@ -22,6 +22,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Label Grid.Row="0" Grid.Column="0"
@@ -32,143 +33,46 @@
                Content="{Binding ForestFunctionalLevel}"
                Margin="5"/>
 
-        <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" 
-          Header="Microsoft LAPS Agent support">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="150"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <TextBlock Grid.Row="0" Grid.Column="0"
+        <TextBlock Grid.Row="1" Grid.Column="0"
                            Text="Microsoft LAPS schema status"
                            TextWrapping="WrapWithOverflow"
                            Margin="5"/>
 
-                <TextBlock Grid.Row="0" Grid.Column="1" 
+        <TextBlock Grid.Row="1" Grid.Column="1" 
                            Text="{Binding MsLapsSchemaPresentText}"
                            Margin="5"/>
 
-                <Button Grid.Row="0" Grid.Column="2" 
+        <Button Grid.Row="1" Grid.Column="2" 
                         Content="Deploy schema..."
                         Command="{s:Action ExtendSchemaMsLaps}"
                         Margin="5"/>
 
-                <TextBlock Grid.Row="0" Grid.Column="1"
+        <TextBlock Grid.Row="2" Grid.Column="1"
                            Text="If you plan to use this tool with the Microsoft LAPS agent, then you'll need to deploy the Microsoft LAPS schema if you have not already done so"
                            TextWrapping="WrapWithOverflow"
                            Visibility="{Binding CanExtendSchemaMsLaps, Converter={StaticResource BooleanToVisibilityConverter}}"
                            Margin="5"/>
-            </Grid>
-        </GroupBox>
 
-        <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" 
-                  Header="Lithnet Access Manager Agent support">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="150"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="1" Grid.Column="0"
+        <TextBlock Grid.Row="3" Grid.Column="0"
                    Text="Lithnet Admin Access Manager schema status"
                    TextWrapping="WrapWithOverflow"
                    Margin="5"/>
 
-                <TextBlock Grid.Row="1" Grid.Column="1" 
+        <TextBlock Grid.Row="3" Grid.Column="1" 
                    Text="{Binding LithnetAccessManagerSchemaPresentText}"
                    Margin="5"/>
 
-                <Button Grid.Row="1" Grid.Column="2" 
+        <Button Grid.Row="3" Grid.Column="2" 
                 Content="Deploy schema..."
                 Command="{s:Action ExtendSchemaLithnetAccessManager}"
                 Margin="5"/>
 
-                <TextBlock Grid.Row="2" Grid.Column="1"
+        <TextBlock Grid.Row="4" Grid.Column="1"
                    Text="If you plan to deploy the Lithnet Access Manager agent to allow the encrypted local admin password, password history, or JIT features, you'll need to deploy the Lithnet Access Manager schema"
                    Visibility="{Binding CanExtendSchemaLithnetAccessManager, Converter={StaticResource BooleanToVisibilityConverter}}"
                    TextWrapping="WrapWithOverflow"
                    Margin="5"/>
 
-                <TextBlock Grid.Row="3" Grid.Column="0"
-                   Text="Just-in-time access support"
-                   TextWrapping="WrapWithOverflow"
-                   Margin="5"/>
-
-                <TextBlock Grid.Row="3" Grid.Column="1" 
-                   Text="{Binding PamSupportState}"
-                   Margin="5"/>
-
-
-                <TextBlock Grid.Row="5" Grid.Column="0"
-                           Text="Password encryption certificates"
-                           TextWrapping="Wrap"
-                           Margin="5"/>
-
-                <ListView Grid.Row="5" Grid.Column="1"
-                                      BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
-                                      ItemsSource="{Binding AvailableCertificates}"
-                                      SelectedItem="{Binding SelectedCertificate}"
-                                      ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                                      MinHeight="75"
-                                      MaxHeight="125"
-                                      Margin="5">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Subject" 
-                                            DisplayMemberBinding="{Binding Subject}" 
-                                            Width="200"/>
-                            <GridViewColumn Header="Issued"
-                                            DisplayMemberBinding="{Binding NotBefore}" 
-                                            Width="100"/>
-                            <GridViewColumn Header="Expiry"
-                                            DisplayMemberBinding="{Binding NotAfter}" 
-                                            Width="100"/>
-                            <GridViewColumn Header="Published"
-                                            DisplayMemberBinding="{Binding IsPublished}" 
-                                            Width="100"/>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-
-                <StackPanel Grid.Row="5" Grid.Column="2"
-                            Orientation="Vertical">
-                    <Button Command="{s:Action ShowCertificateDialog}"
-                            Content="View certificate..."
-                            Height="Auto"
-                            VerticalAlignment="Bottom"
-                            Margin="5"/>
-                    <Button Command="{s:Action PublishSelectedCertificate}"
-                            Content="Publish..."
-                            Margin="5"/>
-                    <Button Command="{s:Action GenerateEncryptionCertificate}"
-                            Content="Generate new..."
-                            Margin="5"/>
-                </StackPanel>
-            </Grid>
-        </GroupBox>
     </Grid>
 </UserControl>

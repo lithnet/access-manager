@@ -39,7 +39,7 @@
                     </Grid.RowDefinitions>
 
                     <Label Grid.Row="0" Grid.Column="0" 
-                           Content="Provider"
+                           Content="Authentication provider"
                            Margin="5"/>
                     <ComboBox Grid.Row="0" Grid.Column="1" 
                               ItemsSource="{Binding AuthenticationModeValues, Mode=OneWay}"

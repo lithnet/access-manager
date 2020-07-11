@@ -1,0 +1,79 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.JitGroupMappingView"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             Dialog:DialogParticipation.Register="{Binding}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <AdornerDecorator>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="400"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0"
+                       Content="Computer OU"
+                       Margin="5"/>
+            <TextBox Grid.Row="0" Grid.Column="1" 
+                         Text="{Binding ComputerOU, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
+                         IsReadOnly="True"
+                         Margin="5"/>
+            <Button Grid.Row="0" Grid.Column="2"
+                    Command="{s:Action SelectComputerOU}"
+                    Content="..."
+                    Margin="5"/>
+
+            <Label Grid.Row="1" Grid.Column="0"
+                       Content="Group OU"
+                       Margin="5"/>
+            <TextBox Grid.Row="1" Grid.Column="1" 
+                     Text="{Binding GroupOU, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
+                     IsReadOnly="True"
+                     Margin="5"/>
+            <Button Grid.Row="1" Grid.Column="2"
+                    Command="{s:Action SelectGroupOU}"
+                    Content="..."
+                    Margin="5"/>
+
+
+            <Label Grid.Row="2" Grid.Column="0"
+                   Content="Group name template"
+                   Margin="5"/>
+            <TextBox Grid.Row="2" Grid.Column="1" 
+                     Text="{Binding GroupNameTemplate, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="5"/>
+
+            <Label Grid.Row="3" Grid.Column="0"
+                   Content="Group type"
+                   Margin="5"/>
+            <ComboBox Grid.Row="3" Grid.Column="1" 
+                       ItemsSource="{Binding GroupTypeValues, Mode=OneWay}"
+                       SelectedItem="{Binding GroupType}"
+                       Margin="5">
+                <ComboBox.Resources>
+                    <local:EnumToDisplayConverter x:Key="EnumDescriptionConverter"/>
+                </ComboBox.Resources>
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"></TextBlock>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </Grid>
+    </AdornerDecorator>
+</UserControl>

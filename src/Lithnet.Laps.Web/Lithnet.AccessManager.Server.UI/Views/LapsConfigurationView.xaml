@@ -1,0 +1,107 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.LapsConfigurationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             dialog:DialogParticipation.Register="{Binding}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" Margin="5">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" 
+               Content="Forest"
+               Margin="5"/>
+        <ComboBox Grid.Row="0" Grid.Column="1" 
+                  ItemsSource="{Binding Forests, Mode=OneWay}"
+                  SelectedItem="{Binding SelectedForest}"
+                  DisplayMemberPath="Name"
+                  Margin="5"/>
+
+        <TextBlock Grid.Row="1" Grid.Column="0"
+                           Text="Password encryption certificates"
+                           TextWrapping="Wrap"
+                           Margin="5"/>
+
+        <ListView Grid.Row="1" Grid.Column="1"
+                                      BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
+                                      ItemsSource="{Binding AvailableCertificates}"
+                                      SelectedItem="{Binding SelectedCertificate}"
+                                      ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                                      MinHeight="75"
+                                      MaxHeight="125"
+                                      Margin="5">
+            <ListView.Resources>
+                <DataTemplate x:Key="PublishedIconTemplate">
+                    <iconPacks:PackIconFontAwesome Kind="CheckSolid"
+                                                   Foreground="DarkGreen" 
+                                                   Visibility="{Binding IsPublished, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                   VerticalAlignment="Center"/>
+                </DataTemplate>
+                <DataTemplate x:Key="PrivateKeyIconTemplate">
+                    <StackPanel Orientation="Horizontal">
+                        <iconPacks:PackIconFontAwesome Kind="CheckSolid"
+                                                   Foreground="DarkGreen" 
+                                                   Visibility="{Binding HasPrivateKey, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                   VerticalAlignment="Center"/>
+                        <iconPacks:PackIconFontAwesome Kind="TimesCircleRegular" 
+                                                   Foreground="DarkRed" 
+                                                   Visibility="{Binding HasNoPrivateKey, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.Resources>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Subject" 
+                                            DisplayMemberBinding="{Binding Subject}" 
+                                            Width="Auto"/>
+                    <GridViewColumn Header="Issued"
+                                            DisplayMemberBinding="{Binding NotBefore}" 
+                                            Width="Auto"/>
+                    <GridViewColumn Header="Expiry"
+                                            DisplayMemberBinding="{Binding NotAfter}" 
+                                            Width="Auto"/>
+                    <GridViewColumn Header="Published"
+                                            CellTemplate="{StaticResource PublishedIconTemplate}"
+                                            Width="Auto"/>
+                    <GridViewColumn Header="Has Private Key"
+                                    CellTemplate="{StaticResource PrivateKeyIconTemplate}"
+                                    Width="Auto"/>
+                </GridView>
+            </ListView.View>
+
+
+        </ListView>
+
+        <StackPanel Grid.Row="1" Grid.Column="2"
+                            Orientation="Vertical">
+            <Button Command="{s:Action ShowCertificateDialog}"
+                            Content="View certificate..."
+                            Height="Auto"
+                            VerticalAlignment="Bottom"
+                            Margin="5"/>
+            <Button Command="{s:Action PublishSelectedCertificate}"
+                            Content="Publish..."
+                            Margin="5"/>
+            <Button Command="{s:Action GenerateEncryptionCertificate}"
+                            Content="Generate new..."
+                            Margin="5"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

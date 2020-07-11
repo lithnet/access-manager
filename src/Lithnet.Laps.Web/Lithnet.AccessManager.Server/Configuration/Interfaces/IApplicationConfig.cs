@@ -23,6 +23,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         UserInterfaceOptions UserInterface { get; set; }
 
+        JitConfigurationOptions JitConfiguration { get; set; }
+
         void Save(string file);
     }
 }

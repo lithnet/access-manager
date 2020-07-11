@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="8.6.2" />
     <PackageReference Include="mahapps.metro" Version="2.1.0" />
+    <PackageReference Include="MahApps.Metro.IconPacks" Version="4.3.0" />
     <PackageReference Include="MahApps.Metro.SimpleChildWindow" Version="2.0.0-alpha0043" />
     <PackageReference Include="newtonsoft.json" Version="12.0.3" />
     <PackageReference Include="PropertyChanged.Fody" Version="3.2.8" />
@@ -31,6 +32,15 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>ScriptTemplates.resx</DependentUpon>
     </Compile>
+    <Compile Update="Views\JitConfigurationView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\LapsConfigurationView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\ActiveDirectorySchemaView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\ActiveDirectoryDomainConfigurationView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -38,6 +48,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\ActiveDirectoryConfigurationView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\JitGroupMappingView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\ScriptContentView.xaml.cs">
@@ -59,6 +72,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="Views\JitConfigurationView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\LapsConfigurationView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\ActiveDirectorySchemaView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\ActiveDirectoryDomainConfigurationView.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -66,6 +88,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\ActiveDirectoryConfigurationView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\JitGroupMappingView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\ScriptContentView.xaml">

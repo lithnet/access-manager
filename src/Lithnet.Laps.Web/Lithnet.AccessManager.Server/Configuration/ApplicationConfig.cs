@@ -32,6 +32,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public ForwardedHeadersAppOptions ForwardedHeaders { get; set; }
         
+        public JitConfigurationOptions JitConfiguration { get; set; }
+
         public void Save(string file)
         {
             JsonSerializerSettings settings = new JsonSerializerSettings
