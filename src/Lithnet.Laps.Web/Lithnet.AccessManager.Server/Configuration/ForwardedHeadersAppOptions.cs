@@ -12,7 +12,7 @@ namespace Lithnet.AccessManager.Configuration
 {
     public class ForwardedHeadersAppOptions
     {
-        private static ForwardedHeadersOptions defaultOptions = new ForwardedHeadersOptions();
+        private static readonly ForwardedHeadersOptions defaultOptions = new ForwardedHeadersOptions();
 
         public string ForwardedForHeaderName { get; set; } = defaultOptions.ForwardedForHeaderName;
 

@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Text;
-using System.Xml.Linq;
-using System.Xml.XPath;
+﻿using System.IO;
 using Lithnet.AccessManager.Configuration;
-using Microsoft.AspNetCore.Builder;
 using Newtonsoft.Json;
 
 namespace Lithnet.AccessManager.Server.Configuration

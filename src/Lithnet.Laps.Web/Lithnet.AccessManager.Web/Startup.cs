@@ -76,9 +76,7 @@ namespace Lithnet.AccessManager.Web
             services.Configure<AuthorizationOptions>(Configuration.GetSection("Authorization"));
             services.Configure<ForwardedHeadersAppOptions>(Configuration.GetSection("ForwardedHeaders"));
             services.Configure<JitConfigurationOptions>(Configuration.GetSection("JitConfiguration"));
-
-            services.Configure<JsonFileTargetsProviderOptions>(Configuration.GetSection("Authorization:JsonProvider"));
-            services.Configure<PowershellAuthorizationProviderOptions>(Configuration.GetSection("Authorization:PowershellProvider"));
+            
             services.Configure<BuiltInProviderOptions>(Configuration.GetSection("Authorization:BuiltInProvider"));
 
             this.ConfigureAuthentication(services);

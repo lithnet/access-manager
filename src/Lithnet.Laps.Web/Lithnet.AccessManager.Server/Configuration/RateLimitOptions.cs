@@ -2,8 +2,8 @@
 {
     public class RateLimitOptions
     {
-        public RateLimitThresholds PerIP { get; set; }
+        public RateLimitThresholds PerIP { get; set; } = new RateLimitThresholds();
 
-        public RateLimitThresholds PerUser { get; set; }
+        public RateLimitThresholds PerUser { get; set; } = new RateLimitThresholds();
     }
 }
