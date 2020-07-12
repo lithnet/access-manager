@@ -13,7 +13,7 @@ namespace Lithnet.AccessManager.Web.Authorization
 
         private readonly AuthorizationOptions options;
 
-        public BuiltInAuthorizationService(IOptions<AuthorizationOptions> options, JsonTargetAuthorizationService jsonService, PowershellAuthorizationService psService)
+        public BuiltInAuthorizationService(IOptions<AuthorizationOptions> options, JsonTargetAuthorizationService jsonService)
         {
             this.enabledProviders = new List<IAuthorizationService>();
             this.options = options.Value;
@@ -22,11 +22,6 @@ namespace Lithnet.AccessManager.Web.Authorization
             {
                 this.enabledProviders.Add(jsonService);
             }
-
-            //if (this.options.PowershellProvider?.Enabled ?? false)
-            //{
-            //    this.enabledProviders.Add(psService);
-            //}
         }
 
         public AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer, AccessMask requestedAccess)

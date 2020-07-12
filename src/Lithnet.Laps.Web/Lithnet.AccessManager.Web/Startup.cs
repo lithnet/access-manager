@@ -39,8 +39,8 @@ namespace Lithnet.AccessManager.Web
             services.TryAddScoped<IJsonTargetsProvider, JsonFileTargetsProvider>();
             services.TryAddScoped<IAuthorizationService, SecurityDescriptorAuthorizationService>();
             services.TryAddScoped<SecurityDescriptorAuthorizationService>();
+            services.TryAddScoped<IPowerShellSecurityDescriptorGenerator, PowerShellSecurityDescriptorGenerator>();
             services.TryAddScoped<JsonTargetAuthorizationService, JsonTargetAuthorizationService>();
-            services.TryAddScoped<PowershellAuthorizationService, PowershellAuthorizationService>();
             services.TryAddScoped<IDirectory, ActiveDirectory>();
             services.TryAddScoped<IAuditEventProcessor, AuditEventProcessor>();
             services.TryAddScoped<ITemplateProvider, TemplateProvider>();

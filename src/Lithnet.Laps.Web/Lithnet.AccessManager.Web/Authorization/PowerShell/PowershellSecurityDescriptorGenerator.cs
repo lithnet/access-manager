@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Management.Automation;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Web.Internal;
@@ -9,7 +11,7 @@ using ILogger = NLog.ILogger;
 
 namespace Lithnet.AccessManager.Web.Authorization
 {
-    public class PowershellAuthorizationService
+    public class PowerShellSecurityDescriptorGenerator : IPowerShellSecurityDescriptorGenerator
     {
         private readonly ILogger logger;
 
@@ -17,31 +19,46 @@ namespace Lithnet.AccessManager.Web.Authorization
 
         private PowerShell powershell;
 
-        public PowershellAuthorizationService(ILogger logger, IAppPathProvider env)
+        public PowerShellSecurityDescriptorGenerator(ILogger logger, IAppPathProvider env)
         {
             this.logger = logger;
             this.env = env;
         }
 
-        public PowerShellAuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer, AccessMask requestedAccess, string script, int timeout)
+        public CommonSecurityDescriptor GenerateSecurityDescriptor(IUser user, IComputer computer, AccessMask requestedAccess, string script, int timeout)
         {
             requestedAccess.ValidateAccessMask();
             this.InitializePowerShellSession(script);
 
+            PowerShellAuthorizationResponse result;
+
             if (requestedAccess == AccessMask.Laps)
             {
-                return this.GetLapsAuthorizationResponse(user, computer, timeout);
+                result = this.GetLapsAuthorizationResponse(user, computer, timeout);
             }
             else if (requestedAccess == AccessMask.LapsHistory)
             {
-                return this.GetLapsHistoryAuthorizationResponse(user, computer, timeout);
+                result = this.GetLapsHistoryAuthorizationResponse(user, computer, timeout);
             }
             else if (requestedAccess == AccessMask.Jit)
             {
-                return this.GetJitAuthorizationResponse(user, computer, timeout);
+                result = this.GetJitAuthorizationResponse(user, computer, timeout);
+            }
+            else
+            {
+                throw new ArgumentException("The requested access type was unknown");
             }
 
-            throw new ArgumentException("The requested access type was unknown");
+            if (result.IsAllowed || result.IsAllowed)
+            {
+                DiscretionaryAcl dacl = new DiscretionaryAcl(false, false, 1);
+                dacl.AddAccess(result.IsDenied ? AccessControlType.Deny : AccessControlType.Allow, user.Sid, (int)requestedAccess, InheritanceFlags.None, PropagationFlags.None);
+                return new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, dacl);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private PowerShellAuthorizationResponse GetJitAuthorizationResponse(IUser user, IComputer computer, int timeout)

@@ -22,9 +22,7 @@ namespace Lithnet.AccessManager.Web.Internal
         {
             FieldInfo fi = value.GetType().GetField(value.ToString());
 
-            DescriptionAttribute[] attributes = fi.GetCustomAttributes(typeof(DescriptionAttribute), false) as DescriptionAttribute[];
-
-            if (attributes != null && attributes.Any())
+            if (fi?.GetCustomAttributes(typeof(DescriptionAttribute), false) is DescriptionAttribute[] attributes && attributes.Any())
             {
                 return attributes.First().Description;
             }

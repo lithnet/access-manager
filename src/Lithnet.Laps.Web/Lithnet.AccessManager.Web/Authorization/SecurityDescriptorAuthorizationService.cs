@@ -22,9 +22,9 @@ namespace Lithnet.AccessManager.Web.Authorization
 
         private readonly IJitAccessGroupResolver jitResolver;
 
-        private readonly PowershellAuthorizationService powershell;
+        private readonly IPowerShellSecurityDescriptorGenerator powershell;
 
-        public SecurityDescriptorAuthorizationService(IOptions<BuiltInProviderOptions> options, IDirectory directory, ILogger logger, IJitAccessGroupResolver jitResolver, PowershellAuthorizationService powershell)
+        public SecurityDescriptorAuthorizationService(IOptions<BuiltInProviderOptions> options, IDirectory directory, ILogger logger, IJitAccessGroupResolver jitResolver, IPowerShellSecurityDescriptorGenerator powershell)
         {
             this.directory = directory;
             this.logger = logger;
@@ -47,32 +47,17 @@ namespace Lithnet.AccessManager.Web.Authorization
 
             List<GenericSecurityDescriptor> sds = new List<GenericSecurityDescriptor>();
             List<string> failureNotificationRecipients = new List<string>();
-            AuthorizationContext c = new AuthorizationContext(user.Sid, this.directory.GetDnsDomainName(computer.Sid));
+
+            AuthorizationContext c = new AuthorizationContext(user.Sid, this.GetAuthorizationContextTarget(user, computer));
             List<SecurityDescriptorTarget> successfulTargets = new List<SecurityDescriptorTarget>();
 
             foreach (var target in targets.Where(t => t.AuthorizationMode == AuthorizationMode.PowershellScript))
             {
-                var response = this.powershell.GetAuthorizationResponse(user, computer, requestedAccess, target.Script, 30);
-
-                if (response.IsDenied || response.IsAllowed)
-                {
-                    DiscretionaryAcl dacl = new DiscretionaryAcl(false, false, 1);
-                    dacl.AddAccess(response.IsDenied ? AccessControlType.Deny : AccessControlType.Allow, user.Sid, (int)requestedAccess, InheritanceFlags.None, PropagationFlags.None);
-                    CommonSecurityDescriptor sd = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, dacl);
-                    sds.Add(sd);
-
-                    if (response.IsAllowed)
-                    {
-                        successfulTargets.Add(target);
-                    }
-                    else
-                    {
-                        target.Notifications?.OnFailure?.ForEach(u => failureNotificationRecipients.Add(u));
-                    }
-                }
+                var response = this.powershell.GenerateSecurityDescriptor(user, computer, requestedAccess, target.Script, 30);
+                target.SecurityDescriptor = response?.GetSddlForm(AccessControlSections.All);
             }
 
-            foreach (var target in targets.Where(t => t.AuthorizationMode == AuthorizationMode.SecurityDescriptor))
+            foreach (var target in targets)
             {
                 if (string.IsNullOrWhiteSpace(target.SecurityDescriptor))
                 {
@@ -101,9 +86,24 @@ namespace Lithnet.AccessManager.Web.Authorization
             else
             {
                 var j = successfulTargets[0];
-                this.logger.Trace($"User {user.MsDsPrincipalName} is authorized to read passwords for computer {computer.MsDsPrincipalName} from target {j.Id}");
+                this.logger.Trace($"User {user.MsDsPrincipalName} is authorized for {requestedAccess} access to computer {computer.MsDsPrincipalName} from target {j.Id}");
 
                 return BuildAuthZResponseSuccess(requestedAccess, j, computer);
+            }
+        }
+
+        private string GetAuthorizationContextTarget(IUser user, IComputer computer)
+        {
+            switch (this.options.AccessControlEvaluationLocation)
+            {
+                case AclEvaluationLocation.ComputerDomain:
+                    return this.directory.GetDnsDomainName(computer.Sid);
+
+                case AclEvaluationLocation.UserDomain:
+                    return this.directory.GetDnsDomainName(user.Sid);
+
+                default:
+                    return null;
             }
         }
 

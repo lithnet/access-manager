@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
+﻿using System.IO;
+using Microsoft.Extensions.Hosting;
 
 namespace Lithnet.AccessManager.Web.Internal
 {
     public class WebAppPathProvider : IAppPathProvider
     {
-        private readonly IWebHostEnvironment env;
+        private readonly IHostEnvironment env;
 
-        public WebAppPathProvider(IWebHostEnvironment env)
+        public WebAppPathProvider(IHostEnvironment env)
         {
             this.env = env;
             this.AppPath = env.ContentRootPath;
             this.TemplatesPath = $"{AppPath}\\NotificationTemplates";
             this.ConfigFile = $"{AppPath}\\appsettings.json";
-            this.ImagesPath = $"{AppPath}\\wwwroot\\images";
             this.ScriptsPath = $"{AppPath}\\Scripts";
-            this.WwwRootPath = env.WebRootPath;
+            this.WwwRootPath = $"{AppPath}\\wwwroot";
+            this.ImagesPath = $"{AppPath}\\wwwroot\\images";
         }
 
         public string AppPath { get; }
