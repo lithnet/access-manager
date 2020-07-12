@@ -37,7 +37,8 @@ namespace Lithnet.AccessManager.Web
             services.TryAddScoped<IWsFedAuthenticationProvider, WsFedAuthenticationProvider>();
 
             services.TryAddScoped<IJsonTargetsProvider, JsonFileTargetsProvider>();
-            services.TryAddScoped<IAuthorizationService, BuiltInAuthorizationService>();
+            services.TryAddScoped<IAuthorizationService, SecurityDescriptorAuthorizationService>();
+            services.TryAddScoped<SecurityDescriptorAuthorizationService>();
             services.TryAddScoped<JsonTargetAuthorizationService, JsonTargetAuthorizationService>();
             services.TryAddScoped<PowershellAuthorizationService, PowershellAuthorizationService>();
             services.TryAddScoped<IDirectory, ActiveDirectory>();
@@ -47,13 +48,14 @@ namespace Lithnet.AccessManager.Web
             services.TryAddScoped<IAceEvaluator, AceEvaluator>();
             services.TryAddScoped<IJitAccessGroupResolver, JitAccessGroupResolver>();
             services.TryAddScoped<IJitProvider, AdGroupJitProvider>();
-            services.TryAddScoped<IPhoneticPasswordTextProvider, NatoPhoneticStringProvider>();
+            services.TryAddScoped<IPhoneticPasswordTextProvider, PhoneticStringProvider>();
             services.TryAddScoped<IHtmlPasswordProvider, HtmlPasswordProvider>();
             services.TryAddScoped<IAppDataProvider, MsDsAppConfigurationProvider>();
             services.TryAddScoped<IPasswordProvider, PasswordProvider>();
             services.TryAddScoped<IMsMcsAdmPwdProvider, MsMcsAdmPwdProvider>();
             services.TryAddScoped<IEncryptionProvider, EncryptionProvider>();
             services.TryAddScoped<ICertificateProvider, CertificateProvider>();
+            services.TryAddScoped<IAppPathProvider, WebAppPathProvider>();
 
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();
@@ -73,9 +75,11 @@ namespace Lithnet.AccessManager.Web
             services.Configure<HostingOptions>(Configuration.GetSection("Hosting"));
             services.Configure<AuthorizationOptions>(Configuration.GetSection("Authorization"));
             services.Configure<ForwardedHeadersAppOptions>(Configuration.GetSection("ForwardedHeaders"));
+            services.Configure<JitConfigurationOptions>(Configuration.GetSection("JitConfiguration"));
 
             services.Configure<JsonFileTargetsProviderOptions>(Configuration.GetSection("Authorization:JsonProvider"));
             services.Configure<PowershellAuthorizationProviderOptions>(Configuration.GetSection("Authorization:PowershellProvider"));
+            services.Configure<BuiltInProviderOptions>(Configuration.GetSection("Authorization:BuiltInProvider"));
 
             this.ConfigureAuthentication(services);
         }

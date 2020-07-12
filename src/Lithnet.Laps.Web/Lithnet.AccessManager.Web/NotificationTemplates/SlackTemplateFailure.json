@@ -29,11 +29,11 @@
         },
         {
           "type": "mrkdwn",
-          "text": "*Matched rule:*\n{AuthzResult.MatchedRuleDescription}"
+          "text": "*Matched rule description:*\n{AuthzResult.MatchedRuleDescription}"
         },
         {
           "type": "mrkdwn",
-          "text": "*Matched principal:*\n{AuthzResult.MatchedPrincipal}"
+          "text": "*Matched rule ID:*\n{AuthzResult.MatchedRule}"
         },
         {
           "type": "mrkdwn",

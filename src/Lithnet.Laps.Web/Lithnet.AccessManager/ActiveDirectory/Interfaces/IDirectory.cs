@@ -8,6 +8,8 @@ namespace Lithnet.AccessManager
 {
     public interface IDirectory
     {
+        string GetDnsDomainNameFromDN(string dn);
+        string GetDnsDomainName(SecurityIdentifier sid);
         void AddGroupMember(IGroup group, ISecurityPrincipal principal);
 
         void AddGroupMember(IGroup group, ISecurityPrincipal principal, TimeSpan ttl);

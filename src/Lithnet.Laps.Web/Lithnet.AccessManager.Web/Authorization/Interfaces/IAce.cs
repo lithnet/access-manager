@@ -1,4 +1,6 @@
-﻿namespace Lithnet.AccessManager.Web.Authorization
+﻿using Lithnet.AccessManager.Server;
+
+namespace Lithnet.AccessManager.Web.Authorization
 {
     public interface IAce
     {

@@ -17,7 +17,7 @@ namespace Lithnet.AccessManager.Web.Internal
     {
         private readonly ILogger logger;
 
-        private readonly IWebHostEnvironment env;
+        private readonly IAppPathProvider env;
 
         public override string Name => "powershell";
         
@@ -25,7 +25,7 @@ namespace Lithnet.AccessManager.Web.Internal
 
         private PowerShell powershell;
 
-        public PowershellNotificationChannel(ILogger logger, IOptions<AuditOptions> auditSettings, IWebHostEnvironment env, ChannelWriter<Action> queue)
+        public PowershellNotificationChannel(ILogger logger, IOptions<AuditOptions> auditSettings, IAppPathProvider env, ChannelWriter<Action> queue)
             : base(logger, queue)
         {
             this.logger = logger;
@@ -68,7 +68,7 @@ namespace Lithnet.AccessManager.Web.Internal
 
         private void InitializePowerShellSession(PowershellNotificationChannelDefinition settings)
         {
-            string path = env.ResolvePath(settings.Script, "Scripts");
+            string path = this.env.GetFullPath(settings.Script, env.ScriptsPath);
 
             if (path == null || !File.Exists(path))
             {

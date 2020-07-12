@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Web.Authorization;
 
 namespace Lithnet.AccessManager.Web.Internal

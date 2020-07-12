@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Lithnet.AccessManager.Server.Configuration;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Lithnet.AccessManager.Configuration
@@ -15,5 +17,7 @@ namespace Lithnet.AccessManager.Configuration
         public bool AllowJit { get; set; } = true;
 
         public bool AllowLapsHistory { get; set; } = true;
+
+        public PhoneticSettings PhoneticSettings { get; set; } = new PhoneticSettings();
     }
 }

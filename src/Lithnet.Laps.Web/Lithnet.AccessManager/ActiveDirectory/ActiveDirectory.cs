@@ -295,6 +295,22 @@ namespace Lithnet.AccessManager
             return context;
         }
 
+        public string GetDnsDomainName(SecurityIdentifier sid)
+        {
+            return NativeMethods.GetDnsDomainNameFromSid(sid);
+        }
+
+        public string GetDnsDomainNameFromDN(string dn)
+        {
+            DirectoryEntry de = new DirectoryEntry($"LDAP://{dn}");
+            while (!string.Equals(de.SchemaClassName, "domainDns", StringComparison.OrdinalIgnoreCase))
+            {
+                de = de.Parent;
+            }
+
+            SecurityIdentifier sid = de.GetPropertySid("objectSid");
+            return this.GetDnsDomainName(sid);
+        }
 
         public DirectoryEntry GetConfigurationNamingContext(SecurityIdentifier domain)
         {

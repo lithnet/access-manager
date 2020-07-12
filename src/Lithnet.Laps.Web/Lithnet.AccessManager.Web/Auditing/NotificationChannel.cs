@@ -20,7 +20,7 @@ namespace Lithnet.AccessManager.Web.Internal
 
         protected abstract IList<T> NotificationChannelDefinitions { get; }
 
-        public NotificationChannel(ILogger logger, ChannelWriter<Action> queue)
+        protected NotificationChannel(ILogger logger, ChannelWriter<Action> queue)
         {
             this.logger = logger;
             this.queue = queue;

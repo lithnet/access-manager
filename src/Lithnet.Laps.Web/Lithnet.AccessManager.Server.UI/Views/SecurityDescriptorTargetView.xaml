@@ -35,6 +35,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition />
                             <RowDefinition />
+                            <RowDefinition />
                         </Grid.RowDefinitions>
 
                         <Label Grid.Row="0" Grid.Column="0" 
@@ -55,6 +56,13 @@
                         <Label Grid.Row="1" Grid.Column="1" 
                                Content="{Binding Type}"
                                Margin="5"/>
+
+                        <Label Grid.Row="2" Grid.Column="0"
+                               Content="Description"
+                               Margin="5"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" 
+                                 Text="{Binding Description}"
+                                 Margin="5"/>
                     </Grid>
                 </GroupBox>
 

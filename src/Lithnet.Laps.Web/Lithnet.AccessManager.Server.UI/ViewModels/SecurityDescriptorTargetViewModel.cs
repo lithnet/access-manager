@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.AccessControl;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Community.Windows.Forms;
 using Lithnet.AccessManager.Configuration;
+using Lithnet.AccessManager.Interop;
 using Lithnet.AccessManager.Server.UI.Interop;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
@@ -22,7 +24,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory,  IAppPathProvider appPathProvider)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider)
         {
             this.directory = new ActiveDirectory();
             this.Model = model;
@@ -51,7 +53,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool IsModeScript { get => this.AuthorizationMode == AuthorizationMode.PowershellScript; set => this.AuthorizationMode = value ? AuthorizationMode.PowershellScript : AuthorizationMode.SecurityDescriptor; }
 
-        public string Id { get => this.Model.Id; set => this.Model.Id = value; }
+        public string Target { get => this.Model.Target; set => this.Model.Target = value; }
 
         public FileSelectionViewModel Script { get; }
 
@@ -59,7 +61,11 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string SecurityDescriptor { get => this.Model.SecurityDescriptor; set => this.Model.SecurityDescriptor = value; }
 
+        public string Description { get => this.Model.Description; set => this.Model.Description = value; }
+
         public string JitAuthorizingGroup { get => this.Model.Jit.AuthorizingGroup; set => this.Model.Jit.AuthorizingGroup = value; }
+
+        public string EvaluationDomain { get; set; }
 
         public string JitGroupDisplayName
         {
@@ -115,15 +121,15 @@ namespace Lithnet.AccessManager.Server.UI
 
         public PasswordStorageLocation RetrievalLocation { get => this.Model.Laps.RetrievalLocation; set => this.Model.Laps.RetrievalLocation = value; }
 
-        public string DisplayName => this.Type == TargetType.Container ? this.Id : this.TryGetNameFromSid(this.Id);
+        public string DisplayName => this.Type == TargetType.Container ? this.Target : this.TryGetNameFromSid(this.Target);
 
         public bool ShowLapsOptions => this.IsModeScript || SdHasMask(this.SecurityDescriptor, AccessMask.Laps);
 
         public bool ShowJitOptions => this.IsModeScript || SdHasMask(this.SecurityDescriptor, AccessMask.Jit);
 
-        public bool CanEdit => this.Id != null;
+        public bool CanEdit => this.Target != null;
 
-        public bool CanEditPermissions => this.CanEdit && this.AuthorizationMode == AuthorizationMode.SecurityDescriptor;
+        public bool CanEditPermissions => this.CanEdit && this.AuthorizationMode == AuthorizationMode.SecurityDescriptor && this.Target != null;
 
         public bool CanSelectScript => this.CanEdit && this.AuthorizationMode == AuthorizationMode.PowershellScript;
 
@@ -147,7 +153,22 @@ namespace Lithnet.AccessManager.Server.UI
             RawSecurityDescriptor sd = new RawSecurityDescriptor(this.SecurityDescriptor);
             byte[] sdBytes = new byte[sd.BinaryLength];
             sd.GetBinaryForm(sdBytes, 0);
-            dialog.Initialize(this.DisplayName, this.DisplayName, false, provider, sdBytes);
+            
+            string targetServer = null;
+
+            if (this.Type == TargetType.Container)
+            {
+                targetServer = this.directory.GetDnsDomainNameFromDN(this.Target);
+            }
+            else
+            {
+                if (this.Target.TryParseAsSid(out SecurityIdentifier sid))
+                {
+                    targetServer = this.directory.GetDnsDomainName(sid);
+                }
+            }
+
+            dialog.Initialize(this.DisplayName, this.DisplayName, false, provider, sdBytes, targetServer);
 
             var r = dialog.ShowDialog();
 
@@ -249,7 +270,7 @@ namespace Lithnet.AccessManager.Server.UI
                 var container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select domain", "Select domain");
                 if (container != null)
                 {
-                    this.Id = container;
+                    this.Target = container;
                 }
             }
             else
@@ -280,7 +301,7 @@ namespace Lithnet.AccessManager.Server.UI
                         return;
                     }
 
-                    this.Id = new SecurityIdentifier(sid, 0).ToString();
+                    this.Target = new SecurityIdentifier(sid, 0).ToString();
                 }
             }
         }

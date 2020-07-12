@@ -1,4 +1,5 @@
 ﻿using System;
+using Lithnet.AccessManager.Server;
 using NLog;
 
 namespace Lithnet.AccessManager.Web.Authorization

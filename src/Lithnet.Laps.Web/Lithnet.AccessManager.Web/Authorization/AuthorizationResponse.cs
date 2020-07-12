@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Web.Internal;
 
 namespace Lithnet.AccessManager.Web.Authorization
@@ -12,19 +13,14 @@ namespace Lithnet.AccessManager.Web.Authorization
         public string MatchedRuleDescription { get; set; }
 
         /// <summary>
+        /// The ID of the rule that was used to make this authorization decision, if one was made
+        /// </summary>
+        public string MatchedRule { get; set; }
+
+        /// <summary>
         /// A list of email addresses that should be notified of this success or failure event
         /// </summary>
         public IList<string> NotificationChannels { get; set; }
-
-        /// <summary>
-        /// Additional information about the authorization decision that can be included in audit messages
-        /// </summary>
-        public string AdditionalInformation { get; set; }
-
-        /// <summary>
-        /// An identifier that provides context as to the principal (user or group) that was used to make the authorization decision, if one was made
-        /// </summary>
-        public string Trustee { get; set; }
 
         /// <summary>
         /// The access type that was approved or denied in this response

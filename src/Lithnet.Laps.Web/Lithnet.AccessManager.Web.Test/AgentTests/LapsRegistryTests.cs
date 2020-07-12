@@ -161,27 +161,15 @@ namespace Lithnet.AccessManager.Agent.Test
         }
 
         [Test]
-        public void WriteToAppData()
-        {
-            Assert.AreEqual(false, this.registrySettings.WriteToAppData);
-            
-            policyKey.SetValue("WriteToAppData", 1);
-            Assert.AreEqual(true, this.registrySettings.WriteToAppData);
-
-            policyKey.SetValue("WriteToAppData", 0);
-            Assert.AreEqual(false, this.registrySettings.WriteToAppData);
-        }
-
-        [Test]
         public void WriteToMsMcsAdmPasswordAttributes()
         {
-            Assert.AreEqual(false, this.registrySettings.WriteToMsMcsAdmPasswordAttributes);
+            Assert.AreEqual(PasswordStorageLocation.Auto, this.registrySettings.StorageMode);
 
-            policyKey.SetValue("WriteToMsMcsAdmPasswordAttributes", 1);
-            Assert.AreEqual(true, this.registrySettings.WriteToMsMcsAdmPasswordAttributes);
+            policyKey.SetValue("StorageMode", (int)PasswordStorageLocation.LithnetAttribute);
+            Assert.AreEqual(PasswordStorageLocation.LithnetAttribute, this.registrySettings.StorageMode);
 
-            policyKey.SetValue("WriteToMsMcsAdmPasswordAttributes", 0);
-            Assert.AreEqual(false, this.registrySettings.WriteToMsMcsAdmPasswordAttributes);
+            policyKey.SetValue("StorageMode", 0);
+            Assert.AreEqual(PasswordStorageLocation.Auto, this.registrySettings.StorageMode);
         }
     }
 }

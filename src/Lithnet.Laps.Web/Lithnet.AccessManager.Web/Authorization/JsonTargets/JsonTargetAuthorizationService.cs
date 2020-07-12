@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Lithnet.AccessManager.Configuration;
+using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Web.Internal;
 using NLog;
 
@@ -92,8 +94,7 @@ namespace Lithnet.AccessManager.Web.Authorization
         {
             AuthorizationResponse response = AuthorizationResponse.CreateAuthorizationResponse(requestedAccess);
 
-            response.MatchedRuleDescription = $"{j.Type}: {j.Name}";
-            response.Trustee = ace.Sid ?? ace.Trustee;
+            response.MatchedRuleDescription = $"{j.Type.ToString()}: {j.Name}";
             response.Code = AuthorizationResponseCode.ExplicitlyDenied;
             response.NotificationChannels = this.GetNotificationRecipients(j, ace, false);
 
@@ -129,8 +130,7 @@ namespace Lithnet.AccessManager.Web.Authorization
                 throw new AccessManagerException("An invalid access mask was requested");
             }
 
-            response.MatchedRuleDescription = $"{j.Type}: {j.Name}";
-            response.Trustee = ace.Sid ?? ace.Trustee;
+            response.MatchedRuleDescription = $"{j.Type.ToString()}: {j.Name}";
             response.Code = AuthorizationResponseCode.Success;
             response.NotificationChannels = this.GetNotificationRecipients(j, ace, true);
             return response;
@@ -212,7 +212,7 @@ namespace Lithnet.AccessManager.Web.Authorization
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogEventError(EventIDs.TargetRuleProcessingError, $"An error occurred processing the target {target.Type}:{target.Name}", ex);
+                    this.logger.LogEventError(EventIDs.TargetRuleProcessingError, $"An error occurred processing the target {target.Type.ToString()}:{target.Name}", ex);
                 }
             }
 

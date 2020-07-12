@@ -45,7 +45,7 @@ namespace Lithnet.AccessManager.Web.Internal
                 }
                 catch (Exception e)
                 {
-                    logger.LogEventError(EventIDs.BackgroundTaskUnhandledError, "An unhandled exception occured in a background task", e);
+                    logger.LogEventError(EventIDs.BackgroundTaskUnhandledError, "An unhandled exception occurred in a background task", e);
                 }
             }
         }

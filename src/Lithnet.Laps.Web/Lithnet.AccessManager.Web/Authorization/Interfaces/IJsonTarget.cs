@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Lithnet.AccessManager.Configuration;
 
 namespace Lithnet.AccessManager.Web.Authorization
 {

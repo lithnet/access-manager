@@ -8,13 +8,11 @@ function Get-LapsAuthorizationResponse{
 	$logger.Trace("We're in PowerShell!");
 	$logger.Trace("Checking if $($user.MsDsPrincipalName) has access to LAPS for $($computer.MsDsPrincipalName)");
 
-	$response = New-Object -TypeName "Lithnet.AccessManager.Web.Authorization.LapsAuthorizationResponse"
+	$response = New-Object -TypeName "Lithnet.AccessManager.Web.PowerShellAuthorizationResponse"
 
-	$response.Code = "ExplicitlyDenied";
-	$response.MatchedRuleDescription = "nah mate";
-
-	$logger.Trace($response.ResponseCode);
-
+	# Set IsAllowed to true to allow access, or set IsDenied to explicitly deny access, or leave both as false if no decision was made. This will allow other rules to be evaluated.
+	$response.IsAllowed = $false;
+	$response.IsDenied = $false;
 
 	Write-Output $response;
 }
@@ -29,12 +27,11 @@ function Get-LapsHistoryAuthorizationResponse{
 	$logger.Trace("We're in PowerShell!");
 	$logger.Trace("Checking if $($user.MsDsPrincipalName) has access to LAPS password history for $($computer.MsDsPrincipalName)");
 
-	$response = New-Object -TypeName "Lithnet.AccessManager.Web.Authorization.LapsHistoryAuthorizationResponse"
-
-	$response.Code = "ExplicitlyDenied";
-	$response.MatchedRuleDescription = "nah mate";
-
-	$logger.Trace($response.ResponseCode);
+	$response = New-Object -TypeName "Lithnet.AccessManager.Web.PowerShellAuthorizationResponse"
+		
+	# Set IsAllowed to true to allow access, or set IsDenied to explicitly deny access, or leave both as false if no decision was made. This will allow other rules to be evaluated.
+	$response.IsAllowed = $false;
+	$response.IsDenied = $false;
 
 	Write-Output $response;
 }
@@ -50,13 +47,11 @@ function Get-JitAuthorizationResponse{
 	$logger.Trace("We're in PowerShell!");
 	$logger.Trace("Checking if $($user.MsDsPrincipalName) can request JIT access to $($computer.MsDsPrincipalName)");
 
-	$response = New-Object -TypeName "Lithnet.AccessManager.Web.Authorization.JitAuthorizationResponse"
-
-	$response.Code = "ExplicitlyDenied";
-	$response.MatchedRuleDescription = "no way";
-	$response.AuthorizingGroupName = $null;
-
-	$logger.Trace($response.ResponseCode);
+	$response = New-Object -TypeName "Lithnet.AccessManager.Web.PowerShellAuthorizationResponse"
+	
+	# Set IsAllowed to true to allow access, or set IsDenied to explicitly deny access, or leave both as false if no decision was made. This will allow other rules to be evaluated.
+	$response.IsAllowed = $false;
+	$response.IsDenied = $false;
 
 	Write-Output $response;
 }

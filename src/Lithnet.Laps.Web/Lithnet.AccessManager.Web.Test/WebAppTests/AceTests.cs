@@ -1,7 +1,11 @@
-using Lithnet.AccessManager.Web.Authorization;
-using Microsoft.Extensions.Logging;
+using System.IO;
+using System.Security.AccessControl;
+using System.Security.Principal;
+using Lithnet.AccessManager.Server;
+using Lithnet.Security.Authorization;
 using Moq;
 using NUnit.Framework;
+using AceType = Lithnet.AccessManager.Web.Authorization.AceType;
 
 namespace Lithnet.AccessManager.Web.Test
 {
@@ -44,7 +48,6 @@ namespace Lithnet.AccessManager.Web.Test
         ///
         /// </summary>
         /// <param name="acePrincipal">The name of the user or group that grants access</param>
-        /// <param name="computer">The 'target' computer that we are simulating checking an ACE on. The computer itself doesn't play a part in its test, rather we use the computers domain to determine where to build the user's token. This way domain local groups in the domain where the computer exists will be respected</param>
         /// <param name="requestor">The user who is requesting access to the resource that we are checking the ACE against</param>
 
         // Test global groups in THIS domain against a user in THIS domain
@@ -113,35 +116,35 @@ namespace Lithnet.AccessManager.Web.Test
         [TestCase("extdev1\\G-UG-3", "extdev1\\user3")]
         public void TestAceMatch(string acePrincipal, string requestor)
         {
-            Assert.IsTrue(this.IsMatch(acePrincipal, requestor));
+            ActiveDirectory d = new  ActiveDirectory();
+            Assert.IsTrue(this.IsMatch(acePrincipal, requestor, null));
         }
 
-
         // These cases fail because the AuthzInitializeContextFromSid API fails when used with a one-way trust
-        [TestCase("extdev1\\G-DL-1", "idmdev1\\user1")]
-        [TestCase("extdev1\\G-DL-1", "subdev1\\user1")]
-        [TestCase("extdev1\\G-DL-2", "idmdev1\\user2")]
-        [TestCase("extdev1\\G-DL-2", "subdev1\\user2")]
-        [TestCase("extdev1\\G-DL-3", "idmdev1\\user3")]
-        [TestCase("extdev1\\G-DL-3", "subdev1\\user3")]
+        //[TestCase("extdev1\\G-DL-1", "idmdev1\\user1")]
+        //[TestCase("extdev1\\G-DL-1", "subdev1\\user1")]
+        //[TestCase("extdev1\\G-DL-2", "idmdev1\\user2")]
+        //[TestCase("extdev1\\G-DL-2", "subdev1\\user2")]
+        //[TestCase("extdev1\\G-DL-3", "idmdev1\\user3")]
+        //[TestCase("extdev1\\G-DL-3", "subdev1\\user3")]
 
         // Test to make sure mismatched group membership is not a match
-        [TestCase("subdev1\\G-DL-2", "idmdev1\\user1")]
-        [TestCase("subdev1\\G-DL-2", "subdev1\\user1")]
-        [TestCase("subdev1\\G-DL-3", "idmdev1\\user2")]
-        [TestCase("subdev1\\G-DL-3", "subdev1\\user2")]
-        [TestCase("subdev1\\G-DL-1", "idmdev1\\user3")]
-        [TestCase("subdev1\\G-DL-1", "subdev1\\user3")]
+        [TestCase("subdev1\\G-DL-2", "idmdev1\\user1", "subdev1.idmdev1.local")]
+        [TestCase("subdev1\\G-DL-2", "subdev1\\user1", "subdev1.idmdev1.local")]
+        [TestCase("subdev1\\G-DL-3", "idmdev1\\user2", "subdev1.idmdev1.local")]
+        [TestCase("subdev1\\G-DL-3", "subdev1\\user2", "subdev1.idmdev1.local")]
+        [TestCase("subdev1\\G-DL-1", "idmdev1\\user3", "subdev1.idmdev1.local")]
+        [TestCase("subdev1\\G-DL-1", "subdev1\\user3", "subdev1.idmdev1.local")]
 
-        [TestCase("idmdev1\\G-DL-2", "idmdev1\\user1")]
-        [TestCase("idmdev1\\G-DL-2", "subdev1\\user1")]
-        [TestCase("idmdev1\\G-DL-3", "idmdev1\\user2")]
-        [TestCase("idmdev1\\G-DL-3", "subdev1\\user2")]
-        [TestCase("idmdev1\\G-DL-1", "idmdev1\\user3")]
-        [TestCase("idmdev1\\G-DL-1", "subdev1\\user3")]
-        public void TestAceNotMatch(string trustee, string requestor)
+        [TestCase("idmdev1\\G-DL-2", "idmdev1\\user1", "idmdev1.local")]
+        [TestCase("idmdev1\\G-DL-2", "subdev1\\user1", "idmdev1.local")]
+        [TestCase("idmdev1\\G-DL-3", "idmdev1\\user2", "idmdev1.local")]
+        [TestCase("idmdev1\\G-DL-3", "subdev1\\user2", "idmdev1.local")]
+        [TestCase("idmdev1\\G-DL-1", "idmdev1\\user3", "idmdev1.local")]
+        [TestCase("idmdev1\\G-DL-1", "subdev1\\user3", "idmdev1.local")]
+        public void TestAceNotMatch(string trustee, string requestor, string servername)
         {
-            Assert.IsFalse(this.IsMatch(trustee, requestor));
+            Assert.IsFalse(this.IsMatch(trustee, requestor, servername));
         }
 
         [TestCase("idmdev1\\G-XX-1", "idmdev1\\user3")] // Test a group we know doesn't exist in THIS domain
@@ -149,30 +152,27 @@ namespace Lithnet.AccessManager.Web.Test
         [TestCase("extdev1\\G-XX-1", "extdev1\\user3")] // Test a group we know doesn't exist in EXT domain
         public void TestAceExceptionThrownOnDeny(string trustee, string requestor)
         {
-            Assert.Throws<ObjectNotFoundException>(() => this.IsMatch(trustee, requestor, AceType.Deny));
+            Assert.Throws<ObjectNotFoundException>(() => this.IsMatch(trustee, requestor, null, AceType.Deny));
         }
 
-        [TestCase("idmdev1\\G-XX-1", "idmdev1\\user3")] // Test a group we know doesn't exist in THIS domain
-        [TestCase("subdev1\\G-XX-1", "subdev1\\user3")] // Test a group we know doesn't exist in CHILD domain
-        [TestCase("extdev1\\G-XX-1", "extdev1\\user3")] // Test a group we know doesn't exist in EXT domain
-
-        public void TestAceExceptionIgnoredOnAllow(string trustee, string requestor)
+        private bool IsMatch(string trustee, string requestor, string serverName, AceType aceType = AceType.Allow)
         {
-            Assert.IsFalse(this.IsMatch(trustee, requestor, AceType.Allow));
-        }
-
-        private bool IsMatch(string trustee, string requestor, AceType aceType = AceType.Allow)
-        {
-            Mock<IAce> ace = new Mock<IAce>();
-            ace.SetupGet(a => a.Trustee).Returns(trustee);
-            ace.SetupGet(x => x.Type).Returns(aceType);
-            ace.SetupGet(x => x.Access).Returns(AccessMask.Laps);
-
             ActiveDirectory d = new ActiveDirectory();
+            var user = d.GetUser(requestor);
+            var p = d.GetPrincipal(trustee);
 
-            AceEvaluator evaluator = new AceEvaluator(d, dummyLogger.Object);
+            DiscretionaryAcl dacl = new DiscretionaryAcl(false, false, 1);
+            dacl.AddAccess(aceType ==  AceType.Deny ? AccessControlType.Deny : AccessControlType.Allow, p.Sid, (int)AccessMask.Jit, InheritanceFlags.None, PropagationFlags.None);
+            CommonSecurityDescriptor sd = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, dacl);
 
-            return evaluator.IsMatchingAce(ace.Object, d.GetUser(requestor), AccessMask.Laps);
+            if (serverName == null)
+            {
+                serverName = d.GetDnsDomainName(p.Sid);
+            }
+
+            AuthorizationContext c = new AuthorizationContext(user.Sid, serverName);
+            
+            return c.AccessCheck(sd, (int) Server.AccessMask.Jit);
         }
     }
 }

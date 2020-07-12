@@ -28,12 +28,12 @@
           "value": "{computer.LapsExpiryDate}"
         },
         {
-          "name": "Matched rule",
+          "name": "Matched rule description",
           "value": "{AuthzResult.MatchedRuleDescription}"
         },
         {
-          "name": "Matched principal",
-          "value": "{AuthzResult.MatchedPrincipal}"
+          "name": "Matched rule ID",
+          "value": "{AuthzResult.MatchedRule}"
         },
         {
           "name": "Request reason",

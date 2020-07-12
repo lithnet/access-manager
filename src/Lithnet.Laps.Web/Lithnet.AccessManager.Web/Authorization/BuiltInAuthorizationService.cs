@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Lithnet.AccessManager.Configuration;
+using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Web.AppSettings;
 using Lithnet.AccessManager.Web.Internal;
 using Microsoft.Extensions.Options;
@@ -22,10 +23,10 @@ namespace Lithnet.AccessManager.Web.Authorization
                 this.enabledProviders.Add(jsonService);
             }
 
-            if (this.options.PowershellProvider?.Enabled ?? false)
-            {
-                this.enabledProviders.Add(psService);
-            }
+            //if (this.options.PowershellProvider?.Enabled ?? false)
+            //{
+            //    this.enabledProviders.Add(psService);
+            //}
         }
 
         public AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer, AccessMask requestedAccess)

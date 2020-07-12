@@ -1,4 +1,5 @@
-﻿using Lithnet.AccessManager.Web.Internal;
+﻿using Lithnet.AccessManager.Server;
+using Lithnet.AccessManager.Web.Internal;
 using Newtonsoft.Json;
 
 namespace Lithnet.AccessManager.Web.Authorization

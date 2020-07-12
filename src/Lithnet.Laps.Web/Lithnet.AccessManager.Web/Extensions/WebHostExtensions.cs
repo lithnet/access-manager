@@ -12,38 +12,6 @@ namespace Lithnet.AccessManager.Web.Internal
 {
     internal static class WebHostExtensions
     {
-        public static string ResolvePath(this IWebHostEnvironment env, string path, params string[] searchSegments)
-        {
-            if (Path.IsPathFullyQualified(path))
-            {
-                return path;
-            }
-            else
-            {
-                string mappedpath = Path.Combine(env.ContentRootPath, $"{path}");
-
-                if (File.Exists(mappedpath))
-                {
-                    return mappedpath;
-                }
-
-                if (searchSegments != null)
-                {
-                    foreach (string segment in searchSegments)
-                    {
-                        mappedpath = Path.Combine(env.ContentRootPath, segment, $"{path}");
-
-                        if (File.Exists(mappedpath))
-                        {
-                            return mappedpath;
-                        }
-                    }
-                }
-            }
-
-            return null;
-        }
-
         public static IWebHostBuilder UseHttpSys(this IWebHostBuilder builder, IConfiguration config)
         {
             if (config.GetValueOrDefault("hosting:environment", HostingEnvironment.HttpSys) == HostingEnvironment.HttpSys)

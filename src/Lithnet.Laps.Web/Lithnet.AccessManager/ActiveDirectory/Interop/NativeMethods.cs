@@ -375,6 +375,11 @@ namespace Lithnet.AccessManager.Interop
                 throw new ArgumentNullException(nameof(sidToCheck));
             }
 
+            if (principalSid == sidToCheck)
+            {
+                return true;
+            }
+
             string server;
 
             if (requestContext == null || requestContext.IsEqualDomainSid(NativeMethods.CurrentDomainSid))

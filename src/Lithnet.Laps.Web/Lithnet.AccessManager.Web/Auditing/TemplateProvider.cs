@@ -9,9 +9,9 @@ namespace Lithnet.AccessManager.Web.Internal
     {
         private readonly ILogger logger;
 
-        private readonly IWebHostEnvironment env;
+        private readonly IAppPathProvider env;
 
-        public TemplateProvider(ILogger logger, IWebHostEnvironment env)
+        public TemplateProvider(ILogger logger, IAppPathProvider env)
         {
             this.env = env;
             this.logger = logger;
@@ -21,7 +21,7 @@ namespace Lithnet.AccessManager.Web.Internal
         {
             try
             {
-                string path = env.ResolvePath(templateNameOrPath, "NotificationTemplates");
+                string path = env.GetFullPath(templateNameOrPath, env.TemplatesPath);
 
                 if (path == null || !File.Exists(path))
                 {

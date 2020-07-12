@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
+using Lithnet.AccessManager.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Web.Internal
 {
-    public class NatoPhoneticStringProvider : IPhoneticPasswordTextProvider
+    public class PhoneticStringProvider : IPhoneticPasswordTextProvider
     {
-        private static Dictionary<char, string> dictionary = new Dictionary<char, string>() {
+        private static readonly Dictionary<char, string> defaultDictionary = new Dictionary<char, string>() {
             { 'a', "alpha" },
             { 'b', "bravo" },
             { 'c', "charlie" },
@@ -80,6 +81,43 @@ namespace Lithnet.AccessManager.Web.Internal
             { '£', "pound" },
         };
 
+        private readonly Dictionary<char, string> dictionary;
+
+        private readonly PhoneticSettings settings;
+
+        public PhoneticStringProvider(IOptions<UserInterfaceOptions> options)
+        {
+            this.settings = options.Value.PhoneticSettings ?? new PhoneticSettings()
+            {
+                GroupSize = 4,
+                LowerPrefix = null,
+                UpperPrefix = "capital"
+            };
+
+            if (this.settings.CharacterMappings != null && this.settings.CharacterMappings.Count > 0)
+            {
+                this.dictionary = new Dictionary<char, string>();
+                foreach (var kvp in this.settings.CharacterMappings)
+                {
+                    char key = kvp.Key[0];
+                    if (!this.dictionary.ContainsKey(key))
+                    {
+                        this.dictionary.Add(key, kvp.Value);
+                    }
+                }
+
+                this.dictionary.Add(':', this.settings.PhoneticNameColon ?? "colon");
+            }
+
+            foreach (var (key, value) in defaultDictionary)
+            {
+                if (!this.dictionary.ContainsKey(key))
+                {
+                    this.dictionary.Add(key, value);
+                }
+            }
+        }
+
         public IEnumerable<string> GetPhoneticText(string password)
         {
             int count = 0;
@@ -90,7 +128,7 @@ namespace Lithnet.AccessManager.Web.Internal
             {
                 char c = password[i];
 
-                if (count > 3)
+                if (count >= this.settings.GroupSize)
                 {
                     count = 0;
                     yield return group.ToString();
@@ -104,15 +142,19 @@ namespace Lithnet.AccessManager.Web.Internal
                     }
                 }
 
-                string prefix = string.Empty;
-
-                if (char.IsUpper(c))
+                if (char.IsUpper(c) && this.settings.UpperPrefix != null)
                 {
-                    prefix = "capital ";
-
+                    group.Append(this.settings.UpperPrefix);
+                    group.Append(" ");
                 }
 
-                group.Append($"{prefix}{this.GetPhoneticName(char.ToLower(c))}");
+                if (char.IsLower(c) && this.settings.LowerPrefix != null)
+                {
+                    group.Append(this.settings.LowerPrefix);
+                    group.Append(" ");
+                }
+
+                group.Append(this.GetPhoneticName(c));
                 count++;
             }
 
@@ -124,9 +166,15 @@ namespace Lithnet.AccessManager.Web.Internal
 
         private string GetPhoneticName(char c)
         {
-            if (dictionary.ContainsKey(c))
+            if (this.dictionary.ContainsKey(c))
             {
-                return dictionary[c];
+                return this.dictionary[c];
+            }
+
+            char lower = char.ToLower(c);
+            if (this.dictionary.ContainsKey(lower))
+            {
+                return this.dictionary[lower];
             }
 
             return c.ToString();

@@ -17,7 +17,7 @@
         Success = 1,
 
         /// <summary>
-        /// There were no rules found that apply to the specific computer. This implictly denies access to a user.
+        /// There were no rules found that apply to the specific computer. This implicitly denies access to a user.
         /// 
         /// If an authorization provider provides this response code, then subsequent authorization providers will be offered a chance to authorize the user
         /// </summary>
@@ -31,7 +31,7 @@
         NoMatchingRuleForUser = 4,
 
         /// <summary>
-        /// The users is explicity prohibited from accessing the password for the computer. This is usually the response from a 'deny' ACL. 
+        /// The users is explicitly prohibited from accessing the password for the computer. This is usually the response from a 'deny' ACL. 
         /// 
         /// If an authorization provider provides this response code, processing stops, and subsequent authorization providers are not called
         /// </summary>
