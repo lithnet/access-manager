@@ -4,7 +4,7 @@ using Microsoft.Win32;
 
 namespace Lithnet.AccessManager.Agent
 {
-    internal class LapsRegistrySettings : ILapsSettings
+    public class LapsRegistrySettings : ILapsSettings
     {
         private const string policyKeyName = "SOFTWARE\\Policies\\Lithnet\\AccessManager\\Agent\\Password";
         private const string settingsKeyName = "SOFTWARE\\Lithnet\\AccessManager\\Agent\\Password";

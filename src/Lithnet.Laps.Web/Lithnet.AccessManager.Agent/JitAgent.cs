@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.DirectoryServices;
-using System.Linq;
 using System.Security.Principal;
 using Microsoft.Extensions.Logging;
 
@@ -17,15 +15,12 @@ namespace Lithnet.AccessManager.Agent
 
         private readonly ILocalSam sam;
 
-        private readonly IAppDataProvider appDataProvider;
-
-        public JitAgent(ILogger<JitAgent> logger, IDirectory directory, IJitSettings settings, ILocalSam sam, IAppDataProvider provider)
+        public JitAgent(ILogger<JitAgent> logger, IDirectory directory, IJitSettings settings, ILocalSam sam)
         {
             this.logger = logger;
             this.directory = directory;
             this.settings = settings;
             this.sam = sam;
-            this.appDataProvider = provider;
         }
 
         public void DoCheck()
@@ -38,9 +33,7 @@ namespace Lithnet.AccessManager.Agent
                     return;
                 }
 
-                IComputer computer = this.directory.GetComputer(this.sam.GetMachineNTAccountName());
-
-                IGroup group = this.GetOrCreateJitGroup(computer);
+                IGroup group = this.GetJitGroup();
 
                 this.logger.LogTrace(EventIDs.JitGroupFound, "The JIT group was found in the directory as {principalName}", group.MsDsPrincipalName);
 
@@ -64,7 +57,7 @@ namespace Lithnet.AccessManager.Agent
             return allowedAdmins;
         }
 
-        private List<SecurityIdentifier> GetOtherAllowedAdmins()
+        internal List<SecurityIdentifier> GetOtherAllowedAdmins()
         {
             List<SecurityIdentifier> allowedAdmins = new List<SecurityIdentifier>();
 
@@ -91,52 +84,31 @@ namespace Lithnet.AccessManager.Agent
             return allowedAdmins;
         }
 
-        private IGroup GetOrCreateJitGroup(IComputer computer)
+        internal IGroup GetJitGroup()
         {
             if (!this.TryGetGroupName(out string name))
             {
                 throw new ConfigurationException("No JIT group was specified in the configuration");
             }
 
-            this.logger.LogTrace(EventIDs.JitGroupSearching, "Searching for JIT group {name}", name);
+            this.logger.LogTrace(EventIDs.JitGroupSearching, $"Searching for JIT group {name}", name);
+
+            if (name.TryParseAsSid(out SecurityIdentifier sid))
+            {
+                return this.directory.GetGroup(sid);
+            }
 
             if (this.directory.TryGetGroup(name, out IGroup group))
             {
                 return group;
             }
-
-            if (name.TryParseAsSid(out _))
+            else
             {
                 throw new ObjectNotFoundException($"The JIT group could not be found: {name}");
             }
-
-            if (!this.settings.CreateJitGroup)
-            {
-                throw new ConfigurationException("No JIT group was specified in group policy, and self-creation of group was not enabled");
-            }
-
-            logger.LogTrace(EventIDs.JitGroupCreating, "Attempting to create a group named {name}", name);
-            return this.directory.CreateGroup(name, this.settings.JitGroupDescription, this.settings.JitGroupType, this.DetermineCreationOU(computer));
         }
 
-        private DirectoryEntry DetermineCreationOU(IComputer computer)
-        {
-            string ouToCreate = this.settings.JitGroupCreationOU;
-
-            DirectoryEntry ou;
-            if (string.IsNullOrEmpty(ouToCreate))
-            {
-                ou = computer.GetParentDirectoryEntry();
-            }
-            else
-            {
-                ou = new DirectoryEntry($"LDAP://{ouToCreate}");
-            }
-
-            return ou;
-        }
-
-        private bool TryGetGroupName(out string groupName)
+        internal bool TryGetGroupName(out string groupName)
         {
             groupName = this.settings.JitGroup;
 
@@ -146,9 +118,11 @@ namespace Lithnet.AccessManager.Agent
             }
 
             string domain = this.sam.GetMachineNetbiosDomainName();
+
             groupName = groupName
                 .Replace("{computerName}", Environment.MachineName, StringComparison.OrdinalIgnoreCase)
-                .Replace("{domain}", domain, StringComparison.OrdinalIgnoreCase);
+                .Replace("{domain}", domain, StringComparison.OrdinalIgnoreCase)
+                .Replace("{computerDomain}", domain, StringComparison.OrdinalIgnoreCase);
 
             if (!groupName.Contains('\\') && !groupName.TryParseAsSid(out _))
             {

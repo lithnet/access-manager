@@ -76,7 +76,7 @@ namespace Lithnet.AccessManager.Agent
             }
         }
 
-        internal bool IsMsLapsInstalled()
+        public bool IsMsLapsInstalled()
         {
             RegistryKey r = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UpgradeCodes\77F1646A33805F848A7A683CFB6B88A7", false);
 
@@ -90,7 +90,7 @@ namespace Lithnet.AccessManager.Agent
             return r?.GetValue<int>("AdmPwdEnabled", 0) == 1;
         }
 
-        internal bool HasPasswordExpired(IAppData appData, IComputer computer)
+        public bool HasPasswordExpired(IAppData appData, IComputer computer)
         {
             try
             {
@@ -124,7 +124,7 @@ namespace Lithnet.AccessManager.Agent
             }
         }
 
-        internal void ChangePassword(IAppData appData, IComputer computer, SecurityIdentifier sid = null)
+        public void ChangePassword(IAppData appData, IComputer computer, SecurityIdentifier sid = null)
         {
             try
             {

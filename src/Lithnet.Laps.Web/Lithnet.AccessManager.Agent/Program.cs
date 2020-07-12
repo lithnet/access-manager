@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 
-[assembly: InternalsVisibleTo("Lithnet.AccessManager.Test")]
+[assembly:InternalsVisibleTo("Lithnet.AccessManager.Agent.Test")]
 
 namespace Lithnet.AccessManager.Agent
 {

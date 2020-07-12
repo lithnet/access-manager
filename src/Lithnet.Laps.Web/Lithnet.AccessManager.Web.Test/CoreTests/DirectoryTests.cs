@@ -34,23 +34,6 @@ namespace Lithnet.AccessManager.Test
         }
 
         [Test]
-
-        public void BuildSomeSDs()
-        {
-            var sid = WindowsIdentity.GetCurrent().User;
-            SecurityIdentifier wks = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
-
-            DiscretionaryAcl dacl1 = new DiscretionaryAcl(false, false, 2);
-            dacl1.AddAccess(AccessControlType.Allow, sid, 0x1800, InheritanceFlags.None, PropagationFlags.None);
-            dacl1.AddAccess(AccessControlType.Allow, wks, 0x800, InheritanceFlags.None, PropagationFlags.None);
-
-            CommonSecurityDescriptor csd = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, wks, sid, null, dacl1);
-
-            string sddl = csd.GetSddlForm(AccessControlSections.All);
-        }
-
-
-        [Test]
         public void TestAcl2()
         {
             var sid = WindowsIdentity.GetCurrent().User;

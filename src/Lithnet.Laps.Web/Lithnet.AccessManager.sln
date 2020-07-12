@@ -20,11 +20,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager", "Li
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Lithnet.AccessManager.Agent.Setup", "Lithnet.AccessManager.Agent.Setup\Lithnet.AccessManager.Agent.Setup.wixproj", "{200F583B-1175-4835-954E-E4C972DA4FAC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lithnet.AccessManager.Server", "Lithnet.AccessManager.Server\Lithnet.AccessManager.Server.csproj", "{E12D6CFF-29C5-4EB2-8522-652EC1FEAAE6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager.Server", "Lithnet.AccessManager.Server\Lithnet.AccessManager.Server.csproj", "{E12D6CFF-29C5-4EB2-8522-652EC1FEAAE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lithnet.AccessManager.Server.UI", "Lithnet.AccessManager.Server.UI\Lithnet.AccessManager.Server.UI.csproj", "{F02F1493-00EF-45E0-A1AD-6AD9E1C3761C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager.Server.UI", "Lithnet.AccessManager.Server.UI\Lithnet.AccessManager.Server.UI.csproj", "{F02F1493-00EF-45E0-A1AD-6AD9E1C3761C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lithnet.AccessManager.Server.Test", "Lithnet.AccessManager.Server.Test\Lithnet.AccessManager.Server.Test.csproj", "{E250293B-46EE-4B5A-BE10-24A54E054D74}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager.Server.Test", "Lithnet.AccessManager.Server.Test\Lithnet.AccessManager.Server.Test.csproj", "{E250293B-46EE-4B5A-BE10-24A54E054D74}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lithnet.AccessManager.Agent.Test", "Lithnet.AccessManager.Agent.Test\Lithnet.AccessManager.Agent.Test.csproj", "{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -193,6 +195,24 @@ Global
 		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Release|x64.Build.0 = Release|Any CPU
 		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Release|x86.ActiveCfg = Release|Any CPU
 		{E250293B-46EE-4B5A-BE10-24A54E054D74}.Release|x86.Build.0 = Release|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Debug|x64.Build.0 = Debug|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Debug|x86.Build.0 = Debug|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Dev|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Dev|Any CPU.Build.0 = Debug|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Dev|x64.ActiveCfg = Debug|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Dev|x64.Build.0 = Debug|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Dev|x86.ActiveCfg = Debug|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Dev|x86.Build.0 = Debug|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Release|x64.ActiveCfg = Release|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Release|x64.Build.0 = Release|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Release|x86.ActiveCfg = Release|Any CPU
+		{1CD490CB-1E66-4AF6-9624-2EBFE61346C2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

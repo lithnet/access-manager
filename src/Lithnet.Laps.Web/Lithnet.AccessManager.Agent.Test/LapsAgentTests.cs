@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Security.Cryptography;
 using System.Security.Principal;
-using Markdig.Extensions.Yaml;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
