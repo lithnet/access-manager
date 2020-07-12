@@ -1,4 +1,4 @@
-﻿using Lithnet.AccessManager.Configuration;
+﻿using Lithnet.AccessManager.Server.Configuration;
 
 namespace Lithnet.AccessManager.Server.UI
 {

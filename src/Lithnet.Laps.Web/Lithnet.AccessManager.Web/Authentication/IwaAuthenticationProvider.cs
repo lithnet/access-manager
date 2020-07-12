@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using Lithnet.AccessManager.Configuration;
+using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Web.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.HttpSys;

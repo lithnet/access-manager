@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Lithnet.AccessManager.Server
+namespace Lithnet.AccessManager.Server.Configuration
 {
     [JsonConverter(typeof(StringEnumConverter))]
     [Flags]

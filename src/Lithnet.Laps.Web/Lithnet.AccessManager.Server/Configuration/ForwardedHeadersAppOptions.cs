@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Lithnet.AccessManager.Configuration
+namespace Lithnet.AccessManager.Server.Configuration
 {
     public class ForwardedHeadersAppOptions
     {

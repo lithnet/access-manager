@@ -1,4 +1,5 @@
 ﻿using Lithnet.AccessManager.Server;
+using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Web.Internal;
 using Newtonsoft.Json;
 

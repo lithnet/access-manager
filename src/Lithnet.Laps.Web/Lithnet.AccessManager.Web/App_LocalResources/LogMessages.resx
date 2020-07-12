@@ -148,37 +148,6 @@
   <data name="UnknownComputerPlaceholder" xml:space="preserve">
     <value>unknown</value>
   </data>
-  <data name="AuditEmailSubjectFailure" xml:space="preserve">
-    <value>Access to {computer.MsDsPrincipalName} was denied for {user.MsDsPrincipalName}</value>
-  </data>
-  <data name="AuditEmailSubjectSuccess" xml:space="preserve">
-    <value>Access to {computer.MsDsPrincipalName} was granted for {user.MsDsPrincipalName}</value>
-  </data>
-  <data name="DefaultAuditFailureText" xml:space="preserve">
-    <value>AUDIT: FAILURE          
-Username:			{user.MsDsPrincipalName}
-Name:				{user.DisplayName}
-UPN:				{user.UserPrincipalName}
-SID:				{user.Sid}
-User DN:				{user.DistinguishedName}
-Computer name:			{computer.MsDsPrincipalName}
-Computer DN:			{computer.DistinguishedName}
-Target ID:			{target.ID}
-Reader principal:			{reader.Principal}
-Detail:				{message}</value>
-  </data>
-  <data name="DefaultAuditSuccessText" xml:space="preserve">
-    <value>AUDIT: SUCCESS       
-Username:			{user.MsDsPrincipalName}
-Name:				{user.DisplayName}
-UPN:				{user.UserPrincipalName}
-SID:				{user.Sid}
-User DN:				{user.DistinguishedName}
-Computer name:			{computer.MsDsPrincipalName}
-Computer DN:			{computer.DistinguishedName}
-Target ID:			{target.ID}
-Reader principal:			{reader.Principal}</value>
-  </data>
   <data name="AuthenticatedAndMappedUser" xml:space="preserve">
     <value>Successfully authenticated and mapped directory user
 {0}</value>
@@ -209,9 +178,6 @@ Reader principal:			{reader.Principal}</value>
   </data>
   <data name="AuthNAccessDenied" xml:space="preserve">
     <value>The external authentication provider denied the logon request</value>
-  </data>
-  <data name="NotificationChannelError" xml:space="preserve">
-    <value>The notification channel '{0}' failed to process the audit message</value>
   </data>
   <data name="ReasonRequired" xml:space="preserve">
     <value>The user {0} did not fill out the mandatory request reason field</value>

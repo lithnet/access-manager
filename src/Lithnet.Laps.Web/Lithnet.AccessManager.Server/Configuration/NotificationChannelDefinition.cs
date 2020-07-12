@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Lithnet.AccessManager.Configuration
+namespace Lithnet.AccessManager.Server.Configuration
 {
     public abstract class NotificationChannelDefinition
     {

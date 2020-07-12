@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using Lithnet.AccessManager.Server;
+using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Web.App_LocalResources;
-using Lithnet.AccessManager.Web.Authorization;
 
 namespace Lithnet.AccessManager.Web.Models
 {
@@ -18,21 +17,6 @@ namespace Lithnet.AccessManager.Web.Models
         public AccessMask RequestType { get; set; } = AccessMask.Laps;
 
         public bool RequestLapsHistory { get; set; }
-
-        internal AccessMask RequestedAccess
-        {
-            get
-            {
-                if (this.RequestType == AccessMask.Laps)
-                {
-                    return this.RequestType | (this.RequestLapsHistory ? AccessMask.LapsHistory : 0);
-                }
-                else
-                {
-                    return this.RequestType;
-                }
-            }
-        }
 
         public bool ShowReason { get; set; }
 

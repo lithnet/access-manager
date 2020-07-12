@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Lithnet.AccessManager.Configuration
+namespace Lithnet.AccessManager.Server.Configuration
 {
     public enum AuthenticationMode
     {

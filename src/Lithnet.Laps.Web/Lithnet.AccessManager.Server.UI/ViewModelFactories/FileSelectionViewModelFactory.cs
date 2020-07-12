@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
-using Lithnet.AccessManager.Configuration;
+using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Stylet;
 

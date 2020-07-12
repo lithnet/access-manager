@@ -2,19 +2,21 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using Lithnet.AccessManager.Configuration;
-using Lithnet.AccessManager.Server;
+using Lithnet.AccessManager.Server.App_LocalResources;
+using Lithnet.AccessManager.Server.Auditing;
+using Lithnet.AccessManager.Server.Authorization;
+using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.AccessManager.Server.Exceptions;
+using Lithnet.AccessManager.Server.Extensions;
 using Lithnet.AccessManager.Web.App_LocalResources;
 using Lithnet.AccessManager.Web.AppSettings;
-using Lithnet.AccessManager.Web.Authorization;
-using Lithnet.AccessManager.Web.Exceptions;
 using Lithnet.AccessManager.Web.Internal;
 using Lithnet.AccessManager.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using NLog;
-using IAuthorizationService = Lithnet.AccessManager.Web.Authorization.IAuthorizationService;
+using IAuthorizationService = Lithnet.AccessManager.Server.Authorization.IAuthorizationService;
 
 namespace Lithnet.AccessManager.Web.Controllers
 {
@@ -194,13 +196,14 @@ namespace Lithnet.AccessManager.Web.Controllers
             this.reporting.GenerateAuditEvent(new AuditableAction
             {
                 AuthzResponse = authResponse,
-                RequestModel = model,
+                RequestedComputerName = model.ComputerName,
+                RequestReason = model.UserRequestReason,
                 IsSuccess = true,
                 User = user,
                 Computer = computer,
                 EventID = EventIDs.JitGranted,
                 ComputerExpiryDate = expiryDate.ToString()
-            });
+            }) ;
 
             var jitDetails = new JitDetailsModel(computer.MsDsPrincipalName, user.MsDsPrincipalName, expiryDate);
 
@@ -232,7 +235,8 @@ namespace Lithnet.AccessManager.Web.Controllers
             this.reporting.GenerateAuditEvent(new AuditableAction
             {
                 AuthzResponse = authResponse,
-                RequestModel = model,
+                RequestedComputerName = model.ComputerName,
+                RequestReason = model.UserRequestReason,
                 IsSuccess = true,
                 User = user,
                 Computer = computer,
@@ -271,7 +275,8 @@ namespace Lithnet.AccessManager.Web.Controllers
             this.reporting.GenerateAuditEvent(new AuditableAction
             {
                 AuthzResponse = authResponse,
-                RequestModel = model,
+                RequestedComputerName = model.ComputerName,
+                RequestReason = model.UserRequestReason,
                 IsSuccess = true,
                 User = user,
                 Computer = computer,
@@ -291,7 +296,8 @@ namespace Lithnet.AccessManager.Web.Controllers
             {
                 User = user,
                 IsSuccess = false,
-                RequestModel = model,
+                RequestedComputerName = model.ComputerName,
+                RequestReason = model.UserRequestReason,
             };
 
             if (rateLimitResult.IsUserRateLimit)
@@ -316,7 +322,8 @@ namespace Lithnet.AccessManager.Web.Controllers
                 User = user,
                 Computer = computer,
                 IsSuccess = false,
-                RequestModel = model,
+                RequestedComputerName = model.ComputerName,
+                RequestReason = model.UserRequestReason,
                 Message = string.Format(LogMessages.AuthorizationFailed, user.MsDsPrincipalName, model.ComputerName)
             };
 

@@ -1,7 +1,4 @@
-﻿using Lithnet.AccessManager.Configuration;
-using Microsoft.AspNetCore.Builder;
-
-namespace Lithnet.AccessManager.Server.Configuration
+﻿namespace Lithnet.AccessManager.Server.Configuration
 {
     public interface IApplicationConfig
     {

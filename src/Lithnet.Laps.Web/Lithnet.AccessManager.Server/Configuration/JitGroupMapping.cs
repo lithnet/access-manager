@@ -1,7 +1,6 @@
-﻿using System.Security.Claims;
-using Lithnet.AccessManager.Server;
+﻿using Lithnet.AccessManager.Server.Configuration;
 
-namespace Lithnet.AccessManager.Configuration
+namespace Lithnet.AccessManager.Server.Configuration
 {
     public class JitGroupMapping
     {

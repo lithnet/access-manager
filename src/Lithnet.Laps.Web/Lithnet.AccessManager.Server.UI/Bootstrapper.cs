@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Lithnet.AccessManager.Configuration;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;

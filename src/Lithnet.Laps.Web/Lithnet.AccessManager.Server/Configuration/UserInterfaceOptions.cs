@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using Lithnet.AccessManager.Server.Configuration;
+﻿using Lithnet.AccessManager.Server.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Lithnet.AccessManager.Configuration
+namespace Lithnet.AccessManager.Server.Configuration
 {
     public class UserInterfaceOptions
     {

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Lithnet.AccessManager.Configuration;
+using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Web.Internal;
 using Newtonsoft.Json;
 

@@ -61,24 +61,6 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Access to {computer.MsDsPrincipalName} was denied for {user.MsDsPrincipalName}.
-        /// </summary>
-        internal static string AuditEmailSubjectFailure {
-            get {
-                return ResourceManager.GetString("AuditEmailSubjectFailure", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Access to {computer.MsDsPrincipalName} was granted for {user.MsDsPrincipalName}.
-        /// </summary>
-        internal static string AuditEmailSubjectSuccess {
-            get {
-                return ResourceManager.GetString("AuditEmailSubjectSuccess", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Successfully authenticated and mapped directory user
         ///{0}.
         /// </summary>
@@ -188,43 +170,6 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to AUDIT: FAILURE          
-        ///Username:			{user.MsDsPrincipalName}
-        ///Name:				{user.DisplayName}
-        ///UPN:				{user.UserPrincipalName}
-        ///SID:				{user.Sid}
-        ///User DN:				{user.DistinguishedName}
-        ///Computer name:			{computer.MsDsPrincipalName}
-        ///Computer DN:			{computer.DistinguishedName}
-        ///Target ID:			{target.ID}
-        ///Reader principal:			{reader.Principal}
-        ///Detail:				{message}.
-        /// </summary>
-        internal static string DefaultAuditFailureText {
-            get {
-                return ResourceManager.GetString("DefaultAuditFailureText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to AUDIT: SUCCESS       
-        ///Username:			{user.MsDsPrincipalName}
-        ///Name:				{user.DisplayName}
-        ///UPN:				{user.UserPrincipalName}
-        ///SID:				{user.Sid}
-        ///User DN:				{user.DistinguishedName}
-        ///Computer name:			{computer.MsDsPrincipalName}
-        ///Computer DN:			{computer.DistinguishedName}
-        ///Target ID:			{target.ID}
-        ///Reader principal:			{reader.Principal}.
-        /// </summary>
-        internal static string DefaultAuditSuccessText {
-            get {
-                return ResourceManager.GetString("DefaultAuditSuccessText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The computer {0} requested by {1} did not have a LAPS password in the directory.
         /// </summary>
         internal static string NoLapsPassword {
@@ -239,15 +184,6 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         internal static string NoTargetsExist {
             get {
                 return ResourceManager.GetString("NoTargetsExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The notification channel &apos;{0}&apos; failed to process the audit message.
-        /// </summary>
-        internal static string NotificationChannelError {
-            get {
-                return ResourceManager.GetString("NotificationChannelError", resourceCulture);
             }
         }
         

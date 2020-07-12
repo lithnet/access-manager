@@ -55,12 +55,11 @@
     <PackageReference Include="microsoft.aspnetcore.authentication.openidconnect" Version="3.1.4" />
     <PackageReference Include="microsoft.aspnetcore.authentication.WsFederation" Version="3.1.4" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.5" />
-    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.0.1" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.0.2" />
     <PackageReference Include="nlog" Version="4.7.2" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.9.2" />
     <PackageReference Include="nlog.WindowsEventLog" Version="4.7.2" />
     <PackageReference Include="system.directoryservices" Version="4.7.0" />
-    <PackageReference Include="system.management.automation" Version="7.0.1" />
     <PackageReference Include="system.security.Cryptography.Cng" Version="4.7.0" />
   </ItemGroup>
 
@@ -105,6 +104,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="appsettings.*.json" CopyToPublishDirectory="Never" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Authorization\PowerShell\" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

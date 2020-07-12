@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Lithnet.AccessManager.Configuration;
+using Lithnet.AccessManager.Server.Configuration;
 using PropertyChanged;
 
 namespace Lithnet.AccessManager.Server.UI

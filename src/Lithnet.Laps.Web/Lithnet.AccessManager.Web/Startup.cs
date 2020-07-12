@@ -1,7 +1,9 @@
 using System;
 using System.Configuration;
 using System.Threading.Channels;
-using Lithnet.AccessManager.Configuration;
+using Lithnet.AccessManager.Server.Auditing;
+using Lithnet.AccessManager.Server.Authorization;
+using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Web.AppSettings;
 using Lithnet.AccessManager.Web.Authorization;
 using Lithnet.AccessManager.Web.Extensions;

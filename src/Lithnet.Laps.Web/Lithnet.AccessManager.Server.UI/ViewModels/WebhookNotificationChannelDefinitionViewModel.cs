@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Lithnet.AccessManager.Configuration;
+using Lithnet.AccessManager.Server.Configuration;
 using Microsoft.Win32;
 using Stylet;
 

@@ -5,14 +5,32 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="htmlagilitypack" Version="1.11.24" />
     <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.5" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="6.7.0" />
+    <PackageReference Include="microsoft.powershell.sdk" Version="7.0.2" />
     <PackageReference Include="newtonsoft.json" Version="12.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Lithnet.AccessManager\Lithnet.AccessManager.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="App_LocalResources\LogMessages.Designer.cs">
+      <DependentUpon>LogMessages.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="App_LocalResources\LogMessages.resx">
+      <SubType>Designer</SubType>
+      <LastGenOutput>LogMessages.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

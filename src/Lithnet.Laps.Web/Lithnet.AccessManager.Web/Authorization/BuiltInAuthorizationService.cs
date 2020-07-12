@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using Lithnet.AccessManager.Configuration;
-using Lithnet.AccessManager.Server;
-using Lithnet.AccessManager.Web.AppSettings;
-using Lithnet.AccessManager.Web.Internal;
+using Lithnet.AccessManager.Server.Authorization;
+using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Web.Authorization
@@ -20,7 +19,7 @@ namespace Lithnet.AccessManager.Web.Authorization
 
             if (this.options.JsonProvider?.Enabled ?? false)
             {
-                this.enabledProviders.Add(jsonService);
+               // this.enabledProviders.Add(jsonService);
             }
         }
 

@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Windows;
-using Lithnet.AccessManager.Configuration;
+using Lithnet.AccessManager.Server.Configuration;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI

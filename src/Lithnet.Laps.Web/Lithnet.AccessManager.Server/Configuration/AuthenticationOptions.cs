@@ -1,7 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Lithnet.AccessManager.Server.Configuration;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Lithnet.AccessManager.Configuration
+namespace Lithnet.AccessManager.Server.Configuration
 {
     public class AuthenticationOptions
     {

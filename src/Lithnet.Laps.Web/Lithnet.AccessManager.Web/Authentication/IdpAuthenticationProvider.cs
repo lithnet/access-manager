@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.App_LocalResources;
+using Lithnet.AccessManager.Server.Auditing;
+using Lithnet.AccessManager.Server.Extensions;
 using Lithnet.AccessManager.Web.App_LocalResources;
 using Lithnet.AccessManager.Web.Internal;
 using Microsoft.AspNetCore.Authentication;
@@ -19,7 +22,7 @@ namespace Lithnet.AccessManager.Web.AppSettings
 
         protected abstract string ClaimName { get; }
 
-        public IdpAuthenticationProvider(ILogger logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
+        protected IdpAuthenticationProvider(ILogger logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
             : base(httpContextAccessor, directory)
         {
             this.logger = logger;

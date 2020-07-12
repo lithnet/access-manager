@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Lithnet.AccessManager.Configuration
+﻿namespace Lithnet.AccessManager.Server.Configuration
 {
     public enum Http503VerbosityLevel : long
     {

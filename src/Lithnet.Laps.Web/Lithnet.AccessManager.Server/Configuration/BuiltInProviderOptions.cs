@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using Lithnet.AccessManager.Server;
+using Lithnet.AccessManager.Server.Configuration;
 
-namespace Lithnet.AccessManager.Configuration
+namespace Lithnet.AccessManager.Server.Configuration
 {
     public class BuiltInProviderOptions
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lithnet.AccessManager.Configuration
+namespace Lithnet.AccessManager.Server.Configuration
 {
     [Flags]
     public enum AuditReasonFieldState
