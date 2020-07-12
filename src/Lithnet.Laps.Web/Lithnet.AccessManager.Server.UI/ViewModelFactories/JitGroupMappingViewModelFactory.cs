@@ -1,8 +1,4 @@
-﻿using System;
-using System.DirectoryServices.ActiveDirectory;
-using System.Linq.Expressions;
-using Lithnet.AccessManager.Server.Configuration;
-using MahApps.Metro.Controls.Dialogs;
+﻿using Lithnet.AccessManager.Server.Configuration;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI

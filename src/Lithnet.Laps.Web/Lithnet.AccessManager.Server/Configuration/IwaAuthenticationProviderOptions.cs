@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using Lithnet.AccessManager.Server.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 

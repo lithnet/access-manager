@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
 using Stylet;

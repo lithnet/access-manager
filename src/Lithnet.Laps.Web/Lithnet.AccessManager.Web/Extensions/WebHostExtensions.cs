@@ -1,12 +1,7 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Lithnet.AccessManager.Server.Configuration;
+﻿using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using HttpSys = Microsoft.AspNetCore.Server.HttpSys;
 
 namespace Lithnet.AccessManager.Web.Internal

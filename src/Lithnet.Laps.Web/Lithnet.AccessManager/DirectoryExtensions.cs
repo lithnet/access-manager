@@ -5,13 +5,11 @@ using System.Diagnostics;
 using System.DirectoryServices;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Security.AccessControl;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
-using System.Threading.Tasks.Sources;
 
 namespace Lithnet.AccessManager
 {

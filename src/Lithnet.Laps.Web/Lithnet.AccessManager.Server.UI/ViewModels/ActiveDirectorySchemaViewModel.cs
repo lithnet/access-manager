@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using MahApps.Metro.Controls.Dialogs;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI

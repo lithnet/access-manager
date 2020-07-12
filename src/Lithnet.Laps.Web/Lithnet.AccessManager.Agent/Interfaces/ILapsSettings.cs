@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Lithnet.AccessManager.Agent
+﻿namespace Lithnet.AccessManager.Agent
 {
     public interface ILapsSettings
     {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Cryptography;
 using System.Security.Principal;
 using Microsoft.Extensions.Logging;
 using Moq;

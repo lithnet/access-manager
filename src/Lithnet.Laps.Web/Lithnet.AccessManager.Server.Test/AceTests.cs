@@ -1,7 +1,5 @@
-using System.IO;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using Lithnet.AccessManager.Server;
 using Lithnet.Security.Authorization;
 using Moq;
 using NUnit.Framework;

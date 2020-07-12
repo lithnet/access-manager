@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.AccessControl;
@@ -8,7 +7,6 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
 using Community.Windows.Forms;
-using Lithnet.AccessManager.Interop;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using Lithnet.AccessManager.Server.UI.Providers;

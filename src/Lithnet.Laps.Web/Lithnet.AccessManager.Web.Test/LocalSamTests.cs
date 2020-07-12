@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
-using System.Text;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;

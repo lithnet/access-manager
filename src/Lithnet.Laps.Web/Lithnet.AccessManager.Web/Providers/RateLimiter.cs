@@ -1,6 +1,5 @@
 ﻿using System;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Web.AppSettings;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;

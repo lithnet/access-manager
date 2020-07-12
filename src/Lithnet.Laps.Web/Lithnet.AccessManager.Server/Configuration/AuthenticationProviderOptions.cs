@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-namespace Lithnet.AccessManager.Server.Configuration
+﻿namespace Lithnet.AccessManager.Server.Configuration
 {
     public abstract class AuthenticationProviderOptions
     {

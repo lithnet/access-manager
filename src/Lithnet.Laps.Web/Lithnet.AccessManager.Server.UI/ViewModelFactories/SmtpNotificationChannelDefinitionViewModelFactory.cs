@@ -1,6 +1,4 @@
-﻿using System.Threading;
-using Lithnet.AccessManager.Server.Configuration;
-using MahApps.Metro.Controls.Dialogs;
+﻿using Lithnet.AccessManager.Server.Configuration;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI

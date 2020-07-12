@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Security.AccessControl;
-using System.Security.Permissions;
 using System.Security.Principal;
 using System.Threading;
-using Lithnet.AccessManager.Interop;
 using Lithnet.Security.Authorization;
 using Moq;
 using NLog;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 
 namespace Lithnet.AccessManager.Test
 {

@@ -1,5 +1,4 @@
-﻿using Lithnet.AccessManager.Server.Configuration;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Lithnet.AccessManager.Server.Configuration

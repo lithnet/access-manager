@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Lithnet.AccessManager.Server.Configuration;
-using MahApps.Metro.Controls.Dialogs;
 
 namespace Lithnet.AccessManager.Server.UI
 {

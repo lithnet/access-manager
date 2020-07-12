@@ -1,5 +1,4 @@
-﻿using Lithnet.AccessManager.Server;
-using Lithnet.AccessManager.Server.Configuration;
+﻿using Lithnet.AccessManager.Server.Configuration;
 
 namespace Lithnet.AccessManager.Web.Authorization
 {

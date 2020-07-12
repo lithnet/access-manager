@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Principal;
-using Lithnet.AccessManager.Server.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 

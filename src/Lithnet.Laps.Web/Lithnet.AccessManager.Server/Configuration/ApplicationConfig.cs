@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using Lithnet.AccessManager.Server.Configuration;
 using Newtonsoft.Json;
 
 namespace Lithnet.AccessManager.Server.Configuration

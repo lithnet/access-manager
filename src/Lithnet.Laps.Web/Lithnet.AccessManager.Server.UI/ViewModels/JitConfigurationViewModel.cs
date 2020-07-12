@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Forms;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.SimpleChildWindow;

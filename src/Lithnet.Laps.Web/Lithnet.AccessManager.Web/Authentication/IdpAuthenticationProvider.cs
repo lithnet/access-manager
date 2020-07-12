@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Server.App_LocalResources;
 using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Extensions;
 using Lithnet.AccessManager.Web.App_LocalResources;
 using Lithnet.AccessManager.Web.Internal;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.JsonWebTokens;
 using NLog;
 
 namespace Lithnet.AccessManager.Web.AppSettings

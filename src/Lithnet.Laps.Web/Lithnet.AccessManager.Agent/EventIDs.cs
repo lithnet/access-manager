@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Lithnet.AccessManager.Agent
+﻿namespace Lithnet.AccessManager.Agent
 {
     internal class EventIDs 
     {

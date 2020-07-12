@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Lithnet.AccessManager.Interop
+﻿namespace Lithnet.AccessManager.Interop
 {
     enum PolicyInformationClass
     {

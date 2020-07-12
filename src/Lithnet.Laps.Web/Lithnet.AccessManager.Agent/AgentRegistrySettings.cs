@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 
 namespace Lithnet.AccessManager.Agent
 {

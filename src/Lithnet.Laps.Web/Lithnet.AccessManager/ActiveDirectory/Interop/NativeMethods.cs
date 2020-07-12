@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
-using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
-using System.Security.AccessControl;
-using System.Security.Policy;
 using System.Security.Principal;
 using Lithnet.Security.Authorization;
-using Microsoft.Win32.SafeHandles;
 using NLog;
 
 namespace Lithnet.AccessManager.Interop

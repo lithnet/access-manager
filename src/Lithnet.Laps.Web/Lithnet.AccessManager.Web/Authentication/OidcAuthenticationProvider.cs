@@ -1,13 +1,9 @@
-﻿using System.Security.Claims;
-using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Web.Internal;
+﻿using Lithnet.AccessManager.Server.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using NLog;
 
 namespace Lithnet.AccessManager.Web.AppSettings

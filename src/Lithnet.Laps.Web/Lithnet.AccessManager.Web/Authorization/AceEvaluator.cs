@@ -1,5 +1,4 @@
 ﻿using System;
-using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Configuration;
 using NLog;
 

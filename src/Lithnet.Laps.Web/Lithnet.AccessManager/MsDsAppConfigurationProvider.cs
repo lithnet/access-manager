@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.DirectoryServices;
-using System.Security.Principal;
-using System.Text;
+﻿using System.DirectoryServices;
 
 namespace Lithnet.AccessManager
 {

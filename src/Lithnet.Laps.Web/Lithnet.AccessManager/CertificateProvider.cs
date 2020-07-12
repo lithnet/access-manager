@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.DirectoryServices;
 using System.IO;
 using System.Linq;
@@ -8,7 +7,6 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using Lithnet.AccessManager.Interop;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager

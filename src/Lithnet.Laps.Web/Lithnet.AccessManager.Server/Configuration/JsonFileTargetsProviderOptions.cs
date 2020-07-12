@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Lithnet.AccessManager.Server.Configuration
+﻿namespace Lithnet.AccessManager.Server.Configuration
 {
     public class JsonFileTargetsProviderOptions
     {

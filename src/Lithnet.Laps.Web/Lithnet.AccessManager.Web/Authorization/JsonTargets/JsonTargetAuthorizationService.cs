@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Extensions;
-using Lithnet.AccessManager.Web.Internal;
 using NLog;
 
 namespace Lithnet.AccessManager.Web.Authorization

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
 using System.Text;
 using Lithnet.AccessManager.Server.Configuration;
 using Microsoft.Extensions.Options;

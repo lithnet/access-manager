@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NLog.LayoutRenderers;
 using NUnit.Framework;
 
 namespace Lithnet.AccessManager.Test

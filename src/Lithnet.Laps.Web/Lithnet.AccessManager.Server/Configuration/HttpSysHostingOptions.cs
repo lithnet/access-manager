@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using Lithnet.AccessManager.Server.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 

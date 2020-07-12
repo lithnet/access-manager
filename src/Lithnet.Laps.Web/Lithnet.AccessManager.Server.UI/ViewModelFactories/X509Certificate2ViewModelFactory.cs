@@ -1,9 +1,4 @@
-﻿using System;
-using System.Linq.Expressions;
-using System.Security.Cryptography.X509Certificates;
-using Lithnet.AccessManager.Server.Configuration;
-using MahApps.Metro.Controls.Dialogs;
-using Stylet;
+﻿using System.Security.Cryptography.X509Certificates;
 
 namespace Lithnet.AccessManager.Server.UI
 {

@@ -1,6 +1,4 @@
-﻿using System;
-using Lithnet.AccessManager.Agent;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using NUnit.Framework;
 
 namespace Lithnet.AccessManager.Agent.Test
