@@ -8,6 +8,8 @@ namespace Lithnet.AccessManager
     {
         private readonly SearchResult group;
 
+        private readonly DirectoryEntry de;
+
         internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "tokenGroups", "displayName", "objectGuid", "objectSid", "samAccountName", "msDS-PrincipalName", "objectClass" };
 
         public ActiveDirectoryGroup(SearchResult groupPrincipal)
@@ -15,14 +17,19 @@ namespace Lithnet.AccessManager
             this.group = groupPrincipal;
         }
 
-        public Guid? Guid => this.group.GetPropertyGuid("objectGuid");
+        public ActiveDirectoryGroup (DirectoryEntry directoryEntry)
+        {
+            this.de = directoryEntry;
+        }
 
-        public string MsDsPrincipalName => this.group.GetPropertyString("msDS-PrincipalName");
+        public Guid? Guid => this.group?.GetPropertyGuid("objectGuid") ?? this.de.GetPropertyGuid("objectGuid");
 
-        public SecurityIdentifier Sid => this.group.GetPropertySid("objectSid");
+        public string MsDsPrincipalName => this.group?.GetPropertyString("msDS-PrincipalName") ?? this.de.GetPropertyString("msDS-PrincipalName");
 
-        public string SamAccountName => this.group.GetPropertyString("samAccountName");
+        public SecurityIdentifier Sid => this.group?.GetPropertySid("objectSid") ?? this.de.GetPropertySid("objectSid");
 
-        public string DistinguishedName => this.group.GetPropertyString("distinguishedName");
+        public string SamAccountName => this.group?.GetPropertyString("samAccountName") ?? this.de.GetPropertyString("samAccountName");
+
+        public string DistinguishedName => this.group?.GetPropertyString("distinguishedName") ?? this.de.GetPropertyString("distinguishedName");
     }
 }

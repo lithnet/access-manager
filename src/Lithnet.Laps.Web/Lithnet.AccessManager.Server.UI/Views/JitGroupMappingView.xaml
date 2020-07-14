@@ -24,6 +24,8 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <Label Grid.Row="0" Grid.Column="0"
@@ -38,30 +40,44 @@
                     Content="..."
                     Margin="5"/>
 
-            <Label Grid.Row="1" Grid.Column="0"
+            <StackPanel Grid.Row="1" Grid.Column="1">
+                <RadioButton Margin="5 0 5 0"
+                         Content="Create groups for computers in this container only"
+                         IsChecked="{Binding OneLevel}"/>
+                <RadioButton Margin="5 0 5 5"
+                         Content="Create groups for computers in this and all child containers"
+                         IsChecked="{Binding Subtree}"/>
+
+            </StackPanel>
+
+            <Label Grid.Row="2" Grid.Column="0"
                        Content="Group OU"
                        Margin="5"/>
-            <TextBox Grid.Row="1" Grid.Column="1" 
+            <TextBox Grid.Row="2" Grid.Column="1" 
                      Text="{Binding GroupOU, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
                      IsReadOnly="True"
                      Margin="5"/>
-            <Button Grid.Row="1" Grid.Column="2"
+            <Button Grid.Row="2" Grid.Column="2"
                     Command="{s:Action SelectGroupOU}"
                     Content="..."
                     Margin="5"/>
 
+            <CheckBox Grid.Row="3" Grid.Column="1"
+                      Margin="5"
+                      Content="Delete groups in this OU that do not have matching computers"
+                      IsChecked="{Binding EnableJitGroupDeletion}"/>
 
-            <Label Grid.Row="2" Grid.Column="0"
+            <Label Grid.Row="4" Grid.Column="0"
                    Content="Group name template"
                    Margin="5"/>
-            <TextBox Grid.Row="2" Grid.Column="1" 
+            <TextBox Grid.Row="4" Grid.Column="1" 
                      Text="{Binding GroupNameTemplate, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
                      Margin="5"/>
 
-            <Label Grid.Row="3" Grid.Column="0"
+            <Label Grid.Row="5" Grid.Column="0"
                    Content="Group type"
                    Margin="5"/>
-            <ComboBox Grid.Row="3" Grid.Column="1" 
+            <ComboBox Grid.Row="5" Grid.Column="1" 
                        ItemsSource="{Binding GroupTypeValues, Mode=OneWay}"
                        SelectedItem="{Binding GroupType}"
                        Margin="5">

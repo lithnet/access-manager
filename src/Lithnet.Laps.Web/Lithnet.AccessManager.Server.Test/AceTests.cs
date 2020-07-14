@@ -1,10 +1,11 @@
 using System.Security.AccessControl;
 using System.Security.Principal;
+using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.Security.Authorization;
 using Moq;
 using NUnit.Framework;
 
-namespace Lithnet.AccessManager.Web.Test
+namespace Lithnet.AccessManager.Server.Test
 {
     public class AceTests
     {
@@ -169,7 +170,7 @@ namespace Lithnet.AccessManager.Web.Test
 
             AuthorizationContext c = new AuthorizationContext(user.Sid, serverName);
             
-            return c.AccessCheck(sd, (int) Server.AccessMask.Jit);
+            return c.AccessCheck(sd, (int) AccessMask.Jit);
         }
     }
 }

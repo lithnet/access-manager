@@ -123,7 +123,7 @@ namespace Lithnet.AccessManager.Web.Authorization
                 response = new JitAuthorizationResponse()
                 {
                     ExpireAfter = j.Jit.ExpireAfter,
-                    AuthorizingGroup = this.jitResolver.GetJitAccessGroup(computer, j.Jit?.AuthorizingGroup).MsDsPrincipalName
+                    AuthorizingGroup = this.jitResolver.GetJitGroup(computer, j.Jit?.AuthorizingGroup).MsDsPrincipalName
                 };
             }
             else

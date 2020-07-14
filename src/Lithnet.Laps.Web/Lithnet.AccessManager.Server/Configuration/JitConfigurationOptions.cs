@@ -8,6 +8,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public bool EnableJitGroupCreation { get; set; }
 
-        public bool EnableJitGroupDeletion { get; set; }
+        public int? FullSyncInterval { get; set; }
+
+        public int? DeltaSyncInterval { get; set; }
     }
 }

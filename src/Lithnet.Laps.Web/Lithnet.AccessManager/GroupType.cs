@@ -2,18 +2,18 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Lithnet.AccessManager.Server.Configuration
+namespace Lithnet.AccessManager
 {
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum GroupType
+    public enum GroupType : uint
     {
         [Description("Domain local")]
-        DomainLocal = 0,
+        DomainLocal = 0x80000004,
 
         [Description("Global")]
-        Global = 1,
+        Global = 0x80000002,
 
         [Description("Universal")]
-        Universal = 2
+        Universal = 0x80000008
     }
 }

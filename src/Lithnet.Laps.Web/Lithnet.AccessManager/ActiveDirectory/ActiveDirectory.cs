@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
+using System.Text.RegularExpressions;
 using Lithnet.AccessManager.Interop;
 
 namespace Lithnet.AccessManager
@@ -131,21 +132,26 @@ namespace Lithnet.AccessManager
             return DirectoryExtensions.TryGet(() => this.GetGroup(sid), out group);
         }
 
-        public IGroup CreateGroup(string name, string description, int groupType, DirectoryEntry ou)
+        public void CreateGroup(string name, string description, GroupType groupType, string ou)
         {
+            DirectoryEntry oude = new DirectoryEntry($"LDAP://{ou}");
             string samAccountName = name;
             if (name.Contains('\\'))
             {
                 samAccountName = name.Split('\\')[1];
             }
-
-            DirectoryEntry de = ou.Children.Add($"CN={samAccountName}", "group");
+            
+            DirectoryEntry de = oude.Children.Add($"CN={samAccountName}", "group");
             de.Properties["samAccountName"].Add(samAccountName);
             de.Properties["description"].Add(description);
-            de.Properties["groupType"].Add(groupType);
+            de.Properties["groupType"].Add(unchecked((int)groupType));
             de.CommitChanges();
+        }
 
-            return this.GetGroup(de.GetPropertySid("objectSid"));
+        public void DeleteGroup(string name)
+        {
+            IGroup group = this.GetGroup(name);
+            group.GetDirectoryEntry().DeleteTree();
         }
 
         public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, ISecurityPrincipal principal)
@@ -252,6 +258,12 @@ namespace Lithnet.AccessManager
             group.CommitChanges();
         }
 
+        public string GetDomainNetbiosName(SecurityIdentifier sid)
+        {
+            return TranslateName(sid.AccountDomainSid.ToString(),
+                DsNameFormat.SecurityIdentifier, DsNameFormat.Nt4Name).Trim('\\');
+        }
+
         public bool IsPamFeatureEnabled(SecurityIdentifier domainSid)
         {
             SecurityIdentifier sid = domainSid.AccountDomainSid;
@@ -306,9 +318,21 @@ namespace Lithnet.AccessManager
             {
                 de = de.Parent;
             }
-
+            
             SecurityIdentifier sid = de.GetPropertySid("objectSid");
             return this.GetDnsDomainName(sid);
+        }
+
+        public string GetNetbiosDomainNameFromDN(string dn)
+        {
+            DirectoryEntry de = new DirectoryEntry($"LDAP://{dn}");
+            while (!string.Equals(de.SchemaClassName, "domainDns", StringComparison.OrdinalIgnoreCase))
+            {
+                de = de.Parent;
+            }
+
+            SecurityIdentifier sid = de.GetPropertySid("objectSid");
+            return this.GetDomainNetbiosName(sid);
         }
 
         public DirectoryEntry GetConfigurationNamingContext(SecurityIdentifier domain)

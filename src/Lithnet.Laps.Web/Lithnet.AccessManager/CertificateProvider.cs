@@ -89,7 +89,7 @@ namespace Lithnet.AccessManager
             X509Certificate2Collection certs = new X509Certificate2Collection();
 
             X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine, OpenFlags.ReadOnly);
-            Oid serverAuthOid = new Oid(LithnetAccessManagerEku);
+            Oid accessManagerEku = new Oid(LithnetAccessManagerEku);
 
             foreach (X509Certificate2 c in store.Certificates.Find(X509FindType.FindByTimeValid, DateTime.Now, false).OfType<X509Certificate2>().Where(t => !needPrivateKey || t.HasPrivateKey))
             {
@@ -97,7 +97,7 @@ namespace Lithnet.AccessManager
                 {
                     foreach (Oid o in x.EnhancedKeyUsages)
                     {
-                        if (o.Value == serverAuthOid.Value)
+                        if (o.Value == accessManagerEku.Value)
                         {
                             certs.Add(c);
                         }

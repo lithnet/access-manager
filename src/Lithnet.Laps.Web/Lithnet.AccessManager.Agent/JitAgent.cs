@@ -15,12 +15,15 @@ namespace Lithnet.AccessManager.Agent
 
         private readonly ILocalSam sam;
 
-        public JitAgent(ILogger<JitAgent> logger, IDirectory directory, IJitSettings settings, ILocalSam sam)
+        private readonly IJitAccessGroupResolver jitGroupResolver;
+
+        public JitAgent(ILogger<JitAgent> logger, IDirectory directory, IJitSettings settings, ILocalSam sam, IJitAccessGroupResolver jitGroupResolver)
         {
             this.logger = logger;
             this.directory = directory;
             this.settings = settings;
             this.sam = sam;
+            this.jitGroupResolver = jitGroupResolver;
         }
 
         public void DoCheck()
@@ -33,7 +36,8 @@ namespace Lithnet.AccessManager.Agent
                     return;
                 }
 
-                IGroup group = this.GetJitGroup();
+                IGroup group = this.jitGroupResolver.GetJitGroup(this.settings.JitGroup, Environment.MachineName,
+                    this.sam.GetMachineNetbiosDomainName());
 
                 this.logger.LogTrace(EventIDs.JitGroupFound, "The JIT group was found in the directory as {principalName}", group.MsDsPrincipalName);
 
@@ -82,54 +86,6 @@ namespace Lithnet.AccessManager.Agent
             }
 
             return allowedAdmins;
-        }
-
-        internal IGroup GetJitGroup()
-        {
-            if (!this.TryGetGroupName(out string name))
-            {
-                throw new ConfigurationException("No JIT group was specified in the configuration");
-            }
-
-            this.logger.LogTrace(EventIDs.JitGroupSearching, $"Searching for JIT group {name}", name);
-
-            if (name.TryParseAsSid(out SecurityIdentifier sid))
-            {
-                return this.directory.GetGroup(sid);
-            }
-
-            if (this.directory.TryGetGroup(name, out IGroup group))
-            {
-                return group;
-            }
-            else
-            {
-                throw new ObjectNotFoundException($"The JIT group could not be found: {name}");
-            }
-        }
-
-        internal bool TryGetGroupName(out string groupName)
-        {
-            groupName = this.settings.JitGroup;
-
-            if (groupName == null)
-            {
-                return false;
-            }
-
-            string domain = this.sam.GetMachineNetbiosDomainName();
-
-            groupName = groupName
-                .Replace("{computerName}", Environment.MachineName, StringComparison.OrdinalIgnoreCase)
-                .Replace("{domain}", domain, StringComparison.OrdinalIgnoreCase)
-                .Replace("{computerDomain}", domain, StringComparison.OrdinalIgnoreCase);
-
-            if (!groupName.Contains('\\') && !groupName.TryParseAsSid(out _))
-            {
-                groupName = $"{domain}\\{groupName}";
-            }
-
-            return true;
         }
     }
 }

@@ -11,7 +11,9 @@ namespace Lithnet.AccessManager.Server.UI
                .NotEmpty()
                     .WithMessage("A group name template must be provided")
                .Must((item, propertyValue) => propertyValue.Contains("{computerName}", StringComparison.OrdinalIgnoreCase))
-                    .WithMessage("The template must contain the '{computerName}' placeholder");
+                    .WithMessage("The template must contain the '{computerName}' placeholder")
+               .Must((item, propertyValue) => !propertyValue.Contains("\\"))
+                    .WithMessage("The template must not include the domain name");
 
             this.RuleFor(r => r.GroupOU)
                 .NotEmpty()

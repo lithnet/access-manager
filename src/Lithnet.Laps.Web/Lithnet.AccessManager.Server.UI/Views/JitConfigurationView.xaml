@@ -37,11 +37,6 @@
                       Margin="5"
                       Content="Enable automatic JIT group creation"/>
 
-            <CheckBox Grid.Row="2" Grid.Column="0"
-                      IsChecked="{Binding EnableJitGroupDeletion}"
-                      Margin="5"
-                      Content="Automatically delete the corresponding JIT group when a computer is deleted"/>
-
             <ListView Grid.Row="3" Grid.Column="0" 
                                       BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
                                       ItemsSource="{Binding GroupMappings}"

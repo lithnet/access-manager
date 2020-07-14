@@ -8,8 +8,14 @@ namespace Lithnet.AccessManager
 {
     public interface IDirectory
     {
+        string GetNetbiosDomainNameFromDN(string dn);
+
         string GetDnsDomainNameFromDN(string dn);
+
         string GetDnsDomainName(SecurityIdentifier sid);
+
+        string GetDomainNetbiosName(SecurityIdentifier sid);
+
         void AddGroupMember(IGroup group, ISecurityPrincipal principal);
 
         void AddGroupMember(IGroup group, ISecurityPrincipal principal, TimeSpan ttl);
@@ -22,13 +28,15 @@ namespace Lithnet.AccessManager
 
         bool TryGetComputer(string name, out IComputer computer);
 
+        void DeleteGroup(string name);
+
         IGroup GetGroup(string groupName);
 
         IGroup GetGroup(SecurityIdentifier sid);
 
         IGroup GetGroup(SecurityIdentifier groupSid, SecurityIdentifier domainSid);
 
-        IGroup CreateGroup(string name, string description, int groupType, DirectoryEntry ou);
+        void CreateGroup(string name, string description, GroupType groupType, string ou);
 
         bool TryGetGroup(SecurityIdentifier sid, out IGroup group);
 

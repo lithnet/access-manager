@@ -38,6 +38,24 @@ namespace Lithnet.AccessManager.Server.UI
             set => this.Model.GroupNameTemplate = value;
         }
 
+        public bool EnableJitGroupDeletion
+        {
+            get => this.Model.EnableJitGroupDeletion;
+            set => this.Model.EnableJitGroupDeletion = value;
+        }
+
+        public bool Subtree
+        {
+            get => this.Model.Subtree;
+            set => this.Model.Subtree = value;
+        }
+
+        public bool OneLevel
+        {
+            get => !this.Model.Subtree;
+            set => this.Model.Subtree = !value;
+        }
+
         public GroupType GroupType
         {
             get => this.Model.GroupType;

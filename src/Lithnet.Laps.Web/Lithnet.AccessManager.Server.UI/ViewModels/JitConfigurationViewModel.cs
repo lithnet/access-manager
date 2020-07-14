@@ -58,12 +58,6 @@ namespace Lithnet.AccessManager.Server.UI
             set => this.jitOptions.EnableJitGroupCreation = value;
         }
 
-        public bool EnableJitGroupDeletion
-        {
-            get => this.jitOptions.EnableJitGroupDeletion;
-            set => this.jitOptions.EnableJitGroupDeletion = value;
-        }
-
         private void PopulatePamSupportState()
         {
             //if (this.forest.ForestModeLevel < 2)

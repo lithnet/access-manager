@@ -43,12 +43,11 @@ namespace Lithnet.AccessManager.Web
             services.TryAddScoped<SecurityDescriptorAuthorizationService>();
             services.TryAddScoped<IPowerShellSecurityDescriptorGenerator, PowerShellSecurityDescriptorGenerator>();
             services.TryAddScoped<JsonTargetAuthorizationService, JsonTargetAuthorizationService>();
-            services.TryAddScoped<IDirectory, ActiveDirectory>();
+            services.TryAddSingleton<IDirectory, ActiveDirectory>();
             services.TryAddScoped<IAuditEventProcessor, AuditEventProcessor>();
             services.TryAddScoped<ITemplateProvider, TemplateProvider>();
             services.TryAddScoped<IRateLimiter, RateLimiter>();
             services.TryAddScoped<IAceEvaluator, AceEvaluator>();
-            services.TryAddScoped<IJitAccessGroupResolver, JitAccessGroupResolver>();
             services.TryAddScoped<IJitProvider, AdGroupJitProvider>();
             services.TryAddScoped<IPhoneticPasswordTextProvider, PhoneticStringProvider>();
             services.TryAddScoped<IHtmlPasswordProvider, HtmlPasswordProvider>();
@@ -58,6 +57,8 @@ namespace Lithnet.AccessManager.Web
             services.TryAddScoped<IEncryptionProvider, EncryptionProvider>();
             services.TryAddScoped<ICertificateProvider, CertificateProvider>();
             services.TryAddScoped<IAppPathProvider, WebAppPathProvider>();
+            
+            services.TryAddSingleton<IJitAccessGroupResolver, JitAccessGroupResolver>();
 
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();
@@ -68,6 +69,7 @@ namespace Lithnet.AccessManager.Web
             services.AddSingleton(backgroundProcessingChannel.Reader);
             services.AddSingleton(backgroundProcessingChannel.Writer);
             services.AddHostedService<AuditWorker>();
+            services.AddHostedService<JitGroupWorker>();
 
             services.Configure<UserInterfaceOptions>(Configuration.GetSection("UserInterface"));
             services.Configure<RateLimitOptions>(Configuration.GetSection("RateLimits"));
