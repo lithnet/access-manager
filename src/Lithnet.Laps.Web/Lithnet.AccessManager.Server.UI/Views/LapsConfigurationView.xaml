@@ -22,11 +22,13 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Label Grid.Row="0" Grid.Column="0" 
-               Content="Forest"
-               Margin="5"/>
+        <TextBlock Grid.Row="0" Grid.Column="0" 
+                   Text="Forest"
+                   Margin="5"/>
         <ComboBox Grid.Row="0" Grid.Column="1" 
                   ItemsSource="{Binding Forests, Mode=OneWay}"
                   SelectedItem="{Binding SelectedForest}"
@@ -44,7 +46,7 @@
                                       SelectedItem="{Binding SelectedCertificate}"
                                       ScrollViewer.VerticalScrollBarVisibility="Auto" 
                                       MinHeight="75"
-                                      MaxHeight="125"
+                                      MaxHeight="200"
                                       Margin="5">
             <ListView.Resources>
                 <DataTemplate x:Key="PublishedIconTemplate">
@@ -85,8 +87,6 @@
                                     Width="Auto"/>
                 </GridView>
             </ListView.View>
-
-
         </ListView>
 
         <StackPanel Grid.Row="1" Grid.Column="2"
@@ -97,11 +97,36 @@
                             VerticalAlignment="Bottom"
                             Margin="5"/>
             <Button Command="{s:Action PublishSelectedCertificate}"
-                            Content="Publish..."
-                            Margin="5"/>
+                    Margin="5" 
+                    VerticalContentAlignment="Center">
+                <StackPanel Orientation="Horizontal" 
+                            VerticalAlignment="Center">
+                    <iconPacks:PackIconMaterial Kind="ScriptOutline" Margin="0 0 2 0"/>
+                    <TextBlock Text="PUBLISH..." VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
             <Button Command="{s:Action GenerateEncryptionCertificate}"
                             Content="Generate new..."
                             Margin="5"/>
         </StackPanel>
+
+        <TextBlock Grid.Row="2" Grid.Column="1"
+                   TextWrapping="Wrap"
+                   Text="You must delegate permission on all the OUs that contain computers where the Lithnet Access Manager agent will be installed. Use the following script to assign access for computers to write their encrypted password data and history to the directory, and to allow the Lithnet Access Manager service account to read that data"
+                   Margin="5"/>
+
+        <Button Grid.Row="3" Grid.Column="1" 
+                Command="{s:Action DelegateServicePermission}"
+                Margin="5" 
+                HorizontalAlignment="Left"
+                VerticalContentAlignment="Center">
+            <StackPanel Orientation="Horizontal" 
+                        VerticalAlignment="Center">
+                <iconPacks:PackIconMaterial Kind="ScriptOutline" Margin="0 0 2 0"/>
+                <TextBlock Text="DELEGATE PERMISSIONS..." VerticalAlignment="Center"/>
+            </StackPanel>
+        </Button>
+
     </Grid>
 </UserControl>

@@ -7,6 +7,7 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:s="https://github.com/canton7/Stylet"
              xmlns:dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Margin="5">
@@ -25,32 +26,43 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Label Grid.Row="0" Grid.Column="0"
-               Content="Forest functional level"
-               Margin="5"/>
+        <TextBlock Grid.Row="0" Grid.Column="0"
+                   Text="Forest functional level"
+                   Margin="5"/>
 
-        <Label Grid.Row="0" Grid.Column="1"
-               Content="{Binding ForestFunctionalLevel}"
-               Margin="5"/>
+        <TextBlock Grid.Row="0" Grid.Column="1"
+                   Text="{Binding ForestFunctionalLevel}"
+                   Margin="5"/>
+
 
         <TextBlock Grid.Row="1" Grid.Column="0"
-                           Text="Microsoft LAPS schema status"
-                           TextWrapping="WrapWithOverflow"
-                           Margin="5"/>
+                   Text="Microsoft LAPS schema status"
+                   TextWrapping="WrapWithOverflow"
+                   Margin="5"/>
 
-        <TextBlock Grid.Row="1" Grid.Column="1" 
-                           Text="{Binding MsLapsSchemaPresentText}"
-                           Margin="5"/>
 
-        <Button Grid.Row="1" Grid.Column="2" 
-                        Content="Deploy schema..."
-                        Command="{s:Action ExtendSchemaMsLaps}"
-                        Margin="5"/>
+        <StackPanel Grid.Row="1" Grid.Column="1"
+                     Orientation="Horizontal">
+            <iconPacks:PackIconFontAwesome Kind="CheckSquareSolid"
+                                           Foreground="DarkGreen" 
+                                           Visibility="{Binding IsMsLapsSchemaPresent, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           VerticalAlignment="Center"/>
+
+            <iconPacks:PackIconFontAwesome Kind="InfoCircleSolid"
+                                           Foreground="Gray" 
+                                           Visibility="{Binding IsNotMsLapsSchemaPresent, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           VerticalAlignment="Center"/>
+            <Label
+                FontWeight="Bold"
+                Content="{Binding MsLapsSchemaPresentText, Mode=OneWay,FallbackValue='Status unknown'}"
+                Margin="0 5 0 0"/>
+        </StackPanel>
+
 
         <TextBlock Grid.Row="2" Grid.Column="1"
-                           Text="If you plan to use this tool with the Microsoft LAPS agent, then you'll need to deploy the Microsoft LAPS schema if you have not already done so"
+                           Text="If you plan to use this tool with the Microsoft LAPS agent, then you'll need to deploy the Microsoft LAPS schema"
                            TextWrapping="WrapWithOverflow"
-                           Visibility="{Binding CanExtendSchemaMsLaps, Converter={StaticResource BooleanToVisibilityConverter}}"
+                           Visibility="{Binding IsNotMsLapsSchemaPresent, Converter={StaticResource BooleanToVisibilityConverter}}"
                            Margin="5"/>
 
 
@@ -59,17 +71,36 @@
                    TextWrapping="WrapWithOverflow"
                    Margin="5"/>
 
-        <TextBlock Grid.Row="3" Grid.Column="1" 
-                   Text="{Binding LithnetAccessManagerSchemaPresentText}"
-                   Margin="5"/>
+        <StackPanel Grid.Row="3" Grid.Column="1"
+                    Orientation="Horizontal">
+            <iconPacks:PackIconFontAwesome Kind="CheckSquareSolid"
+                                           Foreground="DarkGreen" 
+                                           Visibility="{Binding IsLithnetSchemaPresent, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           VerticalAlignment="Center"/>
+
+            <iconPacks:PackIconFontAwesome Kind="InfoCircleSolid"
+                                           Foreground="Gray" 
+                                           Visibility="{Binding IsNotLithnetSchemaPresent, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           VerticalAlignment="Center"/>
+            <Label
+                FontWeight="Bold"
+                Content="{Binding LithnetAccessManagerSchemaPresentText, Mode=OneWay,FallbackValue='Status unknown'}"
+                Margin="0 5 0 0"/>
+        </StackPanel>
 
         <Button Grid.Row="3" Grid.Column="2" 
-                Content="Deploy schema..."
                 Command="{s:Action ExtendSchemaLithnetAccessManager}"
-                Margin="5"/>
+                Margin="5" 
+                VerticalContentAlignment="Center">
+            <StackPanel Orientation="Horizontal" 
+                        VerticalAlignment="Center">
+                <iconPacks:PackIconMaterial Kind="ScriptOutline" Margin="0 0 2 0"/>
+                <TextBlock Text="DEPLOY SCHEMA..." VerticalAlignment="Center"/>
+            </StackPanel>
+        </Button>
 
         <TextBlock Grid.Row="4" Grid.Column="1"
-                   Text="If you plan to deploy the Lithnet Access Manager agent to allow the encrypted local admin password, password history, or JIT features, you'll need to deploy the Lithnet Access Manager schema"
+                   Text="If you plan to deploy the Lithnet Access Manager agent to allow the encrypted local admin password and password history features, you'll need to deploy the Lithnet Access Manager schema"
                    Visibility="{Binding CanExtendSchemaLithnetAccessManager, Converter={StaticResource BooleanToVisibilityConverter}}"
                    TextWrapping="WrapWithOverflow"
                    Margin="5"/>

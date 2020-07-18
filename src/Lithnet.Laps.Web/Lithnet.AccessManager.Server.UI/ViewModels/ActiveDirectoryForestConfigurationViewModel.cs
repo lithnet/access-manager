@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using MahApps.Metro.Controls.Dialogs;
 using Stylet;
@@ -23,6 +24,18 @@ namespace Lithnet.AccessManager.Server.UI
             this.domainFactory = domainFactory;
             this.dialogCoordinator = dialogCoordinator;
             this.Forest = forest;
+
+            _ = this.Initialize();
+        }
+
+        private async Task Initialize()
+        {
+            await Task.Run(() =>
+            {
+                this.PopulateLithnetSchemaStatus();
+                this.PopulateMsLapsSchemaStatus();
+
+            }).ConfigureAwait(false);
         }
 
         public string MsLapsSchemaPresentText { get; set; }
@@ -75,7 +88,7 @@ namespace Lithnet.AccessManager.Server.UI
                     4 => "Windows Server 2008 R2",
                     5 => "Windows Server 2012",
                     6 => "Windows Server 2012 R2",
-                    var e when e >= 7 => "Windows Server 2016",
+                    var e when e >= 7 => "Windows Server 2016 or higher",
                     _ => "Unknown forest functional level"
                 };
             }
@@ -86,37 +99,53 @@ namespace Lithnet.AccessManager.Server.UI
             return this.Forest.ForestModeLevel >= 7;
         }
 
-        public bool CanExtendSchemaMsLaps { get; set; }
-
-        public void ExtendSchemaMsLaps()
-        {
-
-        }
-
-        public bool CanExtendSchemaLithnetAccessManager { get; set; }
+        public bool CanExtendSchemaLithnetAccessManager => this.IsNotLithnetSchemaPresent;
 
         public void ExtendSchemaLithnetAccessManager()
         {
+            var vm = new ScriptContentViewModel(this.dialogCoordinator)
+            {
+                HelpText = "Run the following script with Schema Admins rights to extend the schema",
+                ScriptText = ScriptTemplates.UpdateAdSchemaTemplate
+            };
 
+            ExternalDialogWindow w = new ExternalDialogWindow
+            {
+                DataContext = vm,
+                SaveButtonVisible = false,
+                CancelButtonName = "Close"
+            };
+
+            w.ShowDialog();
+
+            this.PopulateLithnetSchemaStatus();
         }
+
+        public bool IsLithnetSchemaPresent { get; set; }
+
+        public bool IsNotLithnetSchemaPresent => !this.IsLithnetSchemaPresent;
+
+        public bool IsMsLapsSchemaPresent { get; set; }
+
+        public bool IsNotMsLapsSchemaPresent => !this.IsMsLapsSchemaPresent;
 
         private void PopulateLithnetSchemaStatus()
         {
             try
             {
                 var schema = ActiveDirectorySchema.GetSchema(new DirectoryContext(DirectoryContextType.Forest, this.Forest.Name));
-                schema.FindProperty("lithnetEncryptedAdminPassword");
-                this.CanExtendSchemaLithnetAccessManager = false;
+                schema.FindProperty("lithnetAdminPassword");
+                this.IsLithnetSchemaPresent = true;
                 this.LithnetAccessManagerSchemaPresentText = "Present";
             }
             catch (ActiveDirectoryObjectNotFoundException)
             {
-                this.CanExtendSchemaLithnetAccessManager = true;
+                this.IsLithnetSchemaPresent = false;
                 this.LithnetAccessManagerSchemaPresentText = "Not present";
             }
             catch
             {
-                this.CanExtendSchemaLithnetAccessManager = false;
+                this.IsLithnetSchemaPresent = false;
                 this.LithnetAccessManagerSchemaPresentText = "Error looking up schema";
             }
         }
@@ -127,17 +156,17 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 var schema = ActiveDirectorySchema.GetSchema(new DirectoryContext(DirectoryContextType.Forest, this.Forest.Name));
                 schema.FindProperty("ms-Mcs-AdmPwd");
-                this.CanExtendSchemaMsLaps = false;
+                this.IsMsLapsSchemaPresent = true;
                 this.MsLapsSchemaPresentText = "Present";
             }
             catch (ActiveDirectoryObjectNotFoundException)
             {
-                this.CanExtendSchemaMsLaps = true;
+                this.IsMsLapsSchemaPresent = false;
                 this.MsLapsSchemaPresentText = "Not present";
             }
             catch
             {
-                this.CanExtendSchemaMsLaps = false;
+                this.IsMsLapsSchemaPresent = false;
                 this.MsLapsSchemaPresentText = "Error looking up schema";
             }
         }

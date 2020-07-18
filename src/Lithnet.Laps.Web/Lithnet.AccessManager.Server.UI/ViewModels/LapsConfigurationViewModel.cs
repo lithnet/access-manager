@@ -19,12 +19,15 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IDialogCoordinator dialogCoordinator;
 
-        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IDirectory directory, IX509Certificate2ViewModelFactory certificate2ViewModelFactory)
+        private readonly IServiceSettingsProvider serviceSettings;
+
+        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IDirectory directory, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IServiceSettingsProvider serviceSettings)
         {
             this.directory = directory;
             this.certificateProvider = certificateProvider;
             this.certificate2ViewModelFactory = certificate2ViewModelFactory;
             this.dialogCoordinator = dialogCoordinator;
+            this.serviceSettings = serviceSettings;
 
             this.Forests = new List<Forest>();
 
@@ -82,6 +85,15 @@ namespace Lithnet.AccessManager.Server.UI
             };
 
             w.ShowDialog();
+
+            if (this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert,
+                this.SelectedForest.RootDomain.Name))
+            {
+                if (publishedCert.Thumbprint == this.SelectedCertificate.Model.Thumbprint)
+                {
+                    this.SelectedCertificate.IsPublished = true;
+                }
+            }
         }
 
         public bool CanGenerateEncryptionCertificate { get; set; } = true;
@@ -105,6 +117,24 @@ namespace Lithnet.AccessManager.Server.UI
         public void ShowCertificateDialog()
         {
             X509Certificate2UI.DisplayCertificate(this.SelectedCertificate.Model, this.GetHandle());
+        }
+
+        public void DelegateServicePermission()
+        {
+            var vm = new ScriptContentViewModel(this.dialogCoordinator)
+            {
+                HelpText = "Modify the OU variable in this script, and run it with domain admin rights to assign permissions for the service account to be able to read the encrypted local admin passwords and history from the directory",
+                ScriptText = ScriptTemplates.GrantAccessManagerPermissions.Replace("{serviceAccount}", this.serviceSettings.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
+            };
+
+            ExternalDialogWindow w = new ExternalDialogWindow
+            {
+                DataContext = vm,
+                SaveButtonVisible = false,
+                CancelButtonName = "Close"
+            };
+
+            w.ShowDialog();
         }
 
         private BindableCollection<X509Certificate2ViewModel> BuildAvailableCertificates(Forest forest)
@@ -148,6 +178,6 @@ namespace Lithnet.AccessManager.Server.UI
             return availableCertificates;
         }
 
-        public string DisplayName { get; set; } = "Password encryption";
+        public string DisplayName { get; set; } = "Password encryption and history";
     }
 }

@@ -1,4 +1,16 @@
-﻿Import-Module ActiveDirectory    
+﻿# Update-AdSchema
+# 
+# This script creates the attributes and object classes required to enable encrypted local admin passwords and password history support
+# with the Lithnet Access Manager Agent
+#
+# This script requires membership in their the Schema Admin group
+# 
+#
+# Version 1.0
+$ErrorActionPreference = "Stop"
+$InformationPreference = "Continue"
+
+Import-Module ActiveDirectory
     
 $rootDSE = Get-ADRootDSE
 $schemaNC = $rootDSE.schemaNamingContext

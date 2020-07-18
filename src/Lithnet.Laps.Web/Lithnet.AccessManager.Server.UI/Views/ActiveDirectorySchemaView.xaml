@@ -21,8 +21,8 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Label Grid.Row="0" Grid.Column="0" 
-                   Content="Forest"
+        <TextBlock Grid.Row="0" Grid.Column="0" 
+                   Text="Forest"
                    Margin="5"/>
         <ComboBox Grid.Row="0" Grid.Column="1" 
                       ItemsSource="{Binding Forests, Mode=OneWay}"
@@ -51,9 +51,9 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <Label Grid.Row="1" Grid.Column="0" 
-                           Content="Domain"
-                           Margin="5"/>
+                <TextBlock Grid.Row="1" Grid.Column="0" 
+                           Text="Domain"
+                           Margin="5,5,5,0" Height="26" VerticalAlignment="Top"/>
                 <ComboBox Grid.Row="1" Grid.Column="1" 
                               DataContext="{Binding SelectedForest}"
                               ItemsSource="{Binding Domains, Mode=OneWay}"

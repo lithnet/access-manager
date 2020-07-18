@@ -16,7 +16,7 @@ $ErrorActionPreference = "Stop"
 $InformationPreference = "Continue"
 $object = $null;
 $lithnetContainerName = "Lithnet"
-$publicKeyObjectName = "AccessManagerPublicKey";
+$publicKeyObjectName = "AccessManagerConfig";
 $servicesContainerDN = "CN=Services,{configurationNamingContext}";
 $lithnetContainerDN = "CN=$lithnetContainerName,$servicesContainerDN";
 $keyContainerDN = "CN=$publicKeyObjectName,$lithnetContainerDN";
@@ -47,12 +47,12 @@ try
     Write-Information "Attempting to get public key container $keyContainerDN";
     $object = Get-ADObject $keyContainerDN;
     Write-Information "Found public key container $keyContainerDN";
-    Set-ADObject -Identity $keyContainerDN -Replace @{"msDS-ByteArray"=$certBytes}
+    Set-ADObject -Identity $keyContainerDN -Replace @{"caCertificate"=$certBytes}
     Write-Information "Successfully published certificate to directory";
 }
 catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException]
 {
     Write-Warning "$publicKeyObjectName doesn't exist. Creating"
-    New-ADObject -Name $publicKeyObjectName -Path $lithnetContainerDN -Type "msDS-AppData" -OtherAttributes @{"msDS-ByteArray"=$certBytes}
+    New-ADObject -Name $publicKeyObjectName -Path $lithnetContainerDN -Type "lithnetAccessManagerConfig" -OtherAttributes @{"appSchemaVersion"="1"; "caCertificate"=$certBytes}
     Write-Information "Created Public key container $keyContainerDN";
 }

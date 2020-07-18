@@ -118,10 +118,10 @@ namespace Lithnet.AccessManager
         {
             var cnc = this.directory.GetConfigurationNamingContext(dnsDomain);
             string dn = cnc.GetPropertyString("distinguishedName");
-            dn = $"LDAP://CN=AccessManagerPublicKey,CN=Lithnet,CN=Services,{dn}";
+            dn = $"LDAP://CN=AccessManagerConfig,CN=Lithnet,CN=Services,{dn}";
             DirectoryEntry amobject = new DirectoryEntry(dn);
 
-            byte[] data = amobject?.GetPropertyBytes("msDS-ByteArray");
+            byte[] data = amobject?.GetPropertyBytes("caCertificate");
 
             if (data != null)
             {

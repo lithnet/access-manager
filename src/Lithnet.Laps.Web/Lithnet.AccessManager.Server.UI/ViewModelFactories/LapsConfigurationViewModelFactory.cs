@@ -1,4 +1,5 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+﻿using System.Windows.Media.Animation;
+using MahApps.Metro.Controls.Dialogs;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -12,17 +13,20 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IDialogCoordinator dialogCoordinator;
 
-        public LapsConfigurationViewModelFactory(ICertificateProvider certificateProvider, IDirectory directory, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IDialogCoordinator dialogCoordinator)
+        private readonly IServiceSettingsProvider serviceSettings;
+
+        public LapsConfigurationViewModelFactory(ICertificateProvider certificateProvider, IDirectory directory, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings)
         {
             this.certificateProvider = certificateProvider;
             this.directory = directory;
             this.certificate2ViewModelFactory = certificate2ViewModelFactory;
             this.dialogCoordinator = dialogCoordinator;
+            this.serviceSettings = serviceSettings;
         }
 
         public LapsConfigurationViewModel CreateViewModel()
         {
-            return new LapsConfigurationViewModel(dialogCoordinator, certificateProvider, directory, certificate2ViewModelFactory);
+            return new LapsConfigurationViewModel(dialogCoordinator, certificateProvider, directory, certificate2ViewModelFactory, serviceSettings);
         }
     }
 }

@@ -106,6 +106,74 @@ namespace Lithnet.AccessManager.Server.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to # Grant-AccessManagerPermissions
+        ///# 
+        ///# This script grants permissions for computer objects to write their encrypted password details to the directory, and allows the Lithnet Access Manager service account to read that data
+        ///#
+        ///# This script requires membership in the Domain Admins group 
+        ///#
+        ///# Version 1.0
+        ///
+        ///
+        ///#-------------------------------------------------------------------------
+        ///# Set the following values as appropriate for your environment
+        ///#---------------------------------------------------------- [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GrantAccessManagerPermissions {
+            get {
+                return ResourceManager.GetString("GrantAccessManagerPermissions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to # Grant-ComputerSelfPermission
+        ///# 
+        ///# This script grants permissions for computer objects to set their own password attributes
+        ///#
+        ///# This script requires membership in the Domain Admins group 
+        ///# 
+        ///#
+        ///# Version 1.0
+        ///
+        ///
+        ///#-------------------------------------------------------------------------
+        ///# Set the following values as appropriate for your environment
+        ///#-------------------------------------------------------------------------
+        ///
+        ///$OU = &quot;OU=Laps Testing,DC=IDMDEV1,DC=LOCAL&quot;
+        ///
+        ///#-------------------------- [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GrantComputerSelfPermission {
+            get {
+                return ResourceManager.GetString("GrantComputerSelfPermission", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to # Grant-ServiceAccountPermission
+        ///# 
+        ///# This script grants permissions for a user or group to read the admin password values, as well as trigger a password reset by cleaning the password expiry field
+        ///#
+        ///# This script requires membership in the Domain Admins group 
+        ///# 
+        ///#
+        ///# Version 1.0
+        ///
+        ///
+        ///#-------------------------------------------------------------------------
+        ///# Set the following values as appropriate for your environment
+        ///#-------------------------------------------------------------------------
+        ///
+        ///$ [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GrantServiceAccountPermission {
+            get {
+                return ResourceManager.GetString("GrantServiceAccountPermission", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to # Publish-LithnetAccessManagerCertificate
         ///# 
         ///# This script creates an object in the Configuration Naming context of the root domain in the forest with a copy
@@ -114,11 +182,36 @@ namespace Lithnet.AccessManager.Server.UI {
         ///#
         ///# This script requires membership in their the Enterprise Admin group, or the Domain Admin group on the root domain of the forest
         ///# 
-        ///# Note, this script has been pre-populated out with the in [rest of string was truncated]&quot;;.
+        ///# Note, this script has been pre-populated with the inform [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PublishCertificateTemplate {
             get {
                 return ResourceManager.GetString("PublishCertificateTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to # Update-AdSchema
+        ///# 
+        ///# This script creates the attributes and object classes required to enable encrypted local admin passwords and password history support
+        ///# with the Lithnet Access Manager Agent
+        ///#
+        ///# This script requires membership in their the Schema Admin group
+        ///# 
+        ///#
+        ///# Version 1.0
+        ///$ErrorActionPreference = &quot;Stop&quot;
+        ///$InformationPreference = &quot;Continue&quot;
+        ///
+        ///Import-Module ActiveDirectory    
+        ///    
+        ///$rootDSE = Get-ADRootDSE
+        ///$schemaNC = $rootDSE.schemaNamingContext
+        ///$schemaMaster = Get-ADObject $schemaNC [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string UpdateAdSchemaTemplate {
+            get {
+                return ResourceManager.GetString("UpdateAdSchemaTemplate", resourceCulture);
             }
         }
     }
