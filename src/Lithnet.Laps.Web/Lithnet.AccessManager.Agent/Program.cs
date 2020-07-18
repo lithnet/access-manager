@@ -30,11 +30,11 @@ namespace Lithnet.AccessManager.Agent
                     services.AddTransient<ILapsAgent, LapsAgent>();
                     services.AddTransient<ILocalSam, LocalSam>();
                     services.AddTransient<IPasswordGenerator, RandomPasswordGenerator>();
-                    services.AddTransient<IAppDataProvider, MsDsAppConfigurationProvider>();
                     services.AddSingleton<RNGCryptoServiceProvider>();
                     services.AddTransient<IEncryptionProvider, EncryptionProvider>();
                     services.AddTransient<ICertificateProvider, CertificateProvider>();
                     services.AddTransient<IMsMcsAdmPwdProvider, MsMcsAdmPwdProvider>();
+                    services.AddTransient<ILithnetAdminPasswordProvider, LithnetAdminPasswordProvider>();
 
                     services.AddLogging(builder =>
                     {

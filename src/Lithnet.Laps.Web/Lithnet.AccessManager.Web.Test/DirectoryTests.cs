@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.DirectoryServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading;
+using Lithnet.AccessManager.Interop;
 using Lithnet.Security.Authorization;
 using Moq;
 using NLog;
@@ -200,7 +202,8 @@ namespace Lithnet.AccessManager.Test
         [TestCase("OU=Domain Controllers,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL")]
         public void ValidateIsContainer(string dn)
         {
-            Assert.IsTrue(this.directory.IsContainer(dn));
+            DirectoryEntry de = new DirectoryEntry($"LDAP://{dn}");
+            Assert.IsTrue(this.directory.IsContainer(de));
         }
 
         [TestCase("CN=G-GG-1,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL")]
@@ -211,7 +214,8 @@ namespace Lithnet.AccessManager.Test
         [TestCase("CN=PC1,OU=Computers,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL")]
         public void ValidateIsNotContainer(string dn)
         {
-            Assert.IsFalse(this.directory.IsContainer(dn));
+            DirectoryEntry de = new DirectoryEntry($"LDAP://{dn}");
+            Assert.IsFalse(this.directory.IsContainer(de));
         }
 
         [TestCase("IDMDEV1\\G-GG-1", "G-GG-1", "CN=G-GG-1,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1")]
@@ -269,6 +273,8 @@ namespace Lithnet.AccessManager.Test
             //var password = this.directory.GetPassword(computer);
 
             //Assert.AreEqual(now, password.ExpirationTime);
+
+            var x =  NativeMethods.GetDirectoryEntry("CN=G-GG-1,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", DsNameFormat.DistinguishedName);
         }
 
         [Test]
@@ -291,15 +297,15 @@ namespace Lithnet.AccessManager.Test
             IGroup group = this.directory.GetGroup(groupName);
             ISecurityPrincipal p = this.directory.GetUser(memberName);
 
-            this.directory.AddGroupMember(group, p, TimeSpan.FromSeconds(10));
+            group.AddMember(p, TimeSpan.FromSeconds(10));
 
             Thread.Sleep(TimeSpan.FromSeconds(5));
 
-            CollectionAssert.Contains(this.directory.GetMemberDNsFromGroup(group), p.DistinguishedName);
+            CollectionAssert.Contains(group.GetMemberDNs(), p.DistinguishedName);
 
             Thread.Sleep(TimeSpan.FromSeconds(15));
 
-            CollectionAssert.DoesNotContain(this.directory.GetMemberDNsFromGroup(group), p.DistinguishedName);
+            CollectionAssert.DoesNotContain(group.GetMemberDNs(), p.DistinguishedName);
         }
 
         [TestCase("EXTDEV1\\JIT-PC1", "IDMDEV1\\user1")]
@@ -309,7 +315,7 @@ namespace Lithnet.AccessManager.Test
             IGroup group = this.directory.GetGroup(groupName);
             ISecurityPrincipal p = this.directory.GetUser(memberName);
 
-            this.directory.AddGroupMember(group, p, TimeSpan.FromSeconds(10));
+            group.AddMember(p, TimeSpan.FromSeconds(10));
 
             Thread.Sleep(TimeSpan.FromSeconds(5));
 
@@ -322,7 +328,7 @@ namespace Lithnet.AccessManager.Test
 
         private bool IsSidDnInGroup(IGroup group, ISecurityPrincipal p)
         {
-            foreach (string dn in this.directory.GetMemberDNsFromGroup(group))
+            foreach (string dn in group.GetMemberDNs())
             {
                 if (dn.StartsWith($"CN={p.Sid},", StringComparison.OrdinalIgnoreCase))
                 {
@@ -340,16 +346,21 @@ namespace Lithnet.AccessManager.Test
         }
 
         [Test]
-        public void AddGroupMember()
+        public void AddGroupMemberToTtlGroup()
         {
-            this.directory.CreateTtlGroup("G-DL-Test-TTL2", "G-DL-Test-TTL2", "TTL test group 2", "OU=Computers,OU=Laps Testing,DC=idmdev1,DC=local", TimeSpan.FromMinutes(1));
+            string groupName =  TestContext.CurrentContext.Random.GetString(10, "abcdefghijklmnop");
 
-            IGroup group = this.directory.GetGroup("IDMDEV1\\G-DL-Test-TTL2");
+            this.directory.CreateTtlGroup(groupName, groupName, "TTL test group 2", "OU=Laps Testing,DC=idmdev1,DC=local", TimeSpan.FromMinutes(1));
+
+            Thread.Sleep(20000);
+            IGroup group = this.directory.GetGroup($"IDMDEV1\\{groupName}");
             ISecurityPrincipal user = this.directory.GetUser("IDMDEV1\\user1");
 
-            this.directory.AddGroupMember(group, user);
+            group.AddMember(user);
 
-            CollectionAssert.Contains(this.directory.GetMemberDNsFromGroup(group), user.DistinguishedName);
+            CollectionAssert.Contains(group.GetMemberDNs(), user.DistinguishedName);
+
+            this.directory.DeleteGroup($"IDMDEV1\\{groupName}");
         }
 
         public void TryGetGroup()

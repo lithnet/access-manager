@@ -8,17 +8,11 @@ namespace Lithnet.AccessManager
 {
     public interface IDirectory
     {
-        string GetNetbiosDomainNameFromDN(string dn);
+        string GetDomainNameDnsFromDn(string dn);
 
-        string GetDnsDomainNameFromDN(string dn);
+        string GetDomainNameDnsFromSid(SecurityIdentifier sid);
 
-        string GetDnsDomainName(SecurityIdentifier sid);
-
-        string GetDomainNetbiosName(SecurityIdentifier sid);
-
-        void AddGroupMember(IGroup group, ISecurityPrincipal principal);
-
-        void AddGroupMember(IGroup group, ISecurityPrincipal principal, TimeSpan ttl);
+        string GetDomainNameNetBiosFromSid(SecurityIdentifier sid);
 
         void CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl);
 
@@ -34,16 +28,12 @@ namespace Lithnet.AccessManager
 
         IGroup GetGroup(SecurityIdentifier sid);
 
-        IGroup GetGroup(SecurityIdentifier groupSid, SecurityIdentifier domainSid);
-
         void CreateGroup(string name, string description, GroupType groupType, string ou);
 
         bool TryGetGroup(SecurityIdentifier sid, out IGroup group);
 
         bool TryGetGroup(string name, out IGroup group);
      
-        IEnumerable<string> GetMemberDNsFromGroup(IGroup group);
-
         ISecurityPrincipal GetPrincipal(string principalName);
 
         bool TryGetPrincipal(string name, out ISecurityPrincipal principal);
@@ -56,7 +46,7 @@ namespace Lithnet.AccessManager
 
         bool IsObjectInOu(IDirectoryObject computer, string ou);
 
-        bool IsContainer(string path);
+        bool IsContainer(DirectoryEntry path);
         
         DirectoryEntry GetConfigurationNamingContext(SecurityIdentifier domain);
 
@@ -80,13 +70,7 @@ namespace Lithnet.AccessManager
             SecurityIdentifier targetDomainSid);
 
         bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, SecurityIdentifier principal);
-
-        SearchResult GetDirectoryEntry(string dn, string objectClass, params string[] propertiesToLoad);
-
-        SearchResult GetDirectoryEntry(ISecurityPrincipal principal, params string[] propertiesToLoad);
-
-        SearchResult SearchDirectoryEntry(string basedn, string filter, SearchScope scope, params string[] propertiesToLoad);
-
+     
         string TranslateName(string name, DsNameFormat nameFormat, DsNameFormat requiredFormat, string dnsDomainName);
 
         string TranslateName(string name, DsNameFormat nameFormat, DsNameFormat requiredFormat);

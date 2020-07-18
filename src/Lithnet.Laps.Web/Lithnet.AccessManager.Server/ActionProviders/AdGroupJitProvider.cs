@@ -15,7 +15,7 @@ namespace Lithnet.AccessManager
         {
             if (this.directory.IsPamFeatureEnabled(group.Sid))
             {
-                this.directory.AddGroupMember(group, user, expiry);
+                group.AddMember(user, expiry);
             }
             else
             {

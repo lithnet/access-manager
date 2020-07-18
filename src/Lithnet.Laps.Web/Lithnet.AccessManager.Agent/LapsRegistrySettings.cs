@@ -56,6 +56,6 @@ namespace Lithnet.AccessManager.Agent
 
         public int MaximumPasswordAge => this.policyKey.GetValue<int>("MaximumPasswordAge", 14);
 
-        public bool WriteToAppData => this.StorageMode.HasFlag(PasswordStorageLocation.LithnetAttribute);
+        public bool WriteToLithnetAttributes => this.StorageMode.HasFlag(PasswordStorageLocation.LithnetAttribute);
     }
 }

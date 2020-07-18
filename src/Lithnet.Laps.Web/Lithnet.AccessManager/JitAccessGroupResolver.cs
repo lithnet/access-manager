@@ -1,4 +1,5 @@
 ﻿using System;
+using System.DirectoryServices;
 using System.Security.Cryptography;
 using System.Security.Principal;
 
@@ -25,9 +26,7 @@ namespace Lithnet.AccessManager
             if (authorizingGroupName.StartsWith("prop:", StringComparison.OrdinalIgnoreCase))
             {
                 string propertyName = authorizingGroupName.Remove(0, "prop:".Length);
-                var computerEntry = this.directory.GetDirectoryEntry(computer, propertyName);
-
-                var referredGroup = computerEntry.GetPropertyString(propertyName);
+                var referredGroup = computer.DirectoryEntry.GetPropertyString(propertyName);
 
                 if (referredGroup == null)
                 {
@@ -39,7 +38,7 @@ namespace Lithnet.AccessManager
             }
             else
             {
-                string domain = this.directory.GetDomainNetbiosName(computer.Sid);
+                string domain = this.directory.GetDomainNameNetBiosFromSid(computer.Sid);
                 string computerName = computer.SamAccountName.TrimEnd('$');
 
                 return this.GetJitGroup(authorizingGroupName, computerName, domain);
@@ -52,7 +51,6 @@ namespace Lithnet.AccessManager
             {
                 throw new ConfigurationException("There was no JIT group name provided");
             }
-
 
             if (groupNameTemplate.TryParseAsSid(out SecurityIdentifier sid))
             {

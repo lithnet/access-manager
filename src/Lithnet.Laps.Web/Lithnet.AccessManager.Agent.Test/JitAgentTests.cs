@@ -9,11 +9,11 @@ namespace Lithnet.AccessManager.Agent.Test
 {
     public class JitAgentTests
     {
-        private Mock<IAppDataProvider> mockProvider;
-
         private Mock<ILocalSam> mockSam;
 
         private Mock<IJitSettings> mockSettings;
+
+        private Mock<IJitAccessGroupResolver> groupResolver;
 
         private JitAgent agent;
 
@@ -26,12 +26,11 @@ namespace Lithnet.AccessManager.Agent.Test
         {
             this.directory = new ActiveDirectory();
             this.sam = new LocalSam(Mock.Of<ILogger<LocalSam>>());
-
-            this.mockProvider = new Mock<IAppDataProvider>();
             this.mockSam = new Mock<ILocalSam>();
             this.mockSettings = new Mock<IJitSettings>();
+            this.groupResolver = new Mock<IJitAccessGroupResolver>();
 
-            this.agent = new JitAgent(Mock.Of<ILogger<JitAgent>>(), this.directory, this.mockSettings.Object, this.mockSam.Object);
+            this.agent = new JitAgent(Mock.Of<ILogger<JitAgent>>(), this.directory, this.mockSettings.Object, this.mockSam.Object, this.groupResolver.Object);
         }
 
         [TestCase("IDMDEV1\\G-DL-1", "IDMDEV1\\user1", "IDMDEV1\\user2")]
@@ -67,71 +66,6 @@ namespace Lithnet.AccessManager.Agent.Test
 
             agent.DoCheck();
             mockSettings.VerifyGet(t => t.JitEnabled);
-        }
-
-        [Test]
-        public void TestGetGroupFromName()
-        {
-            string groupName = "IDMDEV1\\G-DL-1";
-
-            mockSettings.SetupGet(a => a.JitGroup).Returns(groupName);
-            IGroup group = agent.GetJitGroup();
-            Assert.AreEqual(groupName, group.MsDsPrincipalName.ToUpper());
-        }
-
-        [Test]
-        public void TestGetGroupFromSid()
-        {
-            string groupName = "IDMDEV1\\G-DL-1";
-            IGroup g = this.directory.GetGroup(groupName);
-            mockSettings.SetupGet(a => a.JitGroup).Returns(g.Sid.ToString());
-            IGroup group = agent.GetJitGroup();
-            Assert.AreEqual(g.Sid, group.Sid);
-        }
-
-
-        [Test]
-        public void TestGetGroupNameWithNameTemplate()
-        {
-            mockSettings.SetupGet(a => a.JitGroup).Returns("IDMDEV1\\JIT-{computerName}");
-            Assert.IsTrue(agent.TryGetGroupName(out string groupName));
-            Assert.AreEqual($"IDMDEV1\\JIT-{Environment.MachineName}", groupName);
-        }
-
-        [Test]
-        public void TestGetGroupNameWithFixedName()
-        {
-            mockSettings.SetupGet(a => a.JitGroup).Returns("IDMDEV1\\JIT-PC1");
-            Assert.IsTrue(agent.TryGetGroupName(out string groupName));
-            Assert.AreEqual($"IDMDEV1\\JIT-PC1", groupName);
-        }
-
-        [Test]
-        public void TestGetGroupNameWithNoDomain()
-        {
-            mockSettings.SetupGet(a => a.JitGroup).Returns("JIT-PC1");
-            mockSam.Setup(a => a.GetMachineNetbiosDomainName()).Returns(Environment.UserDomainName);
-            Assert.IsTrue(agent.TryGetGroupName(out string groupName));
-            Assert.AreEqual($"IDMDEV1\\JIT-PC1", groupName);
-        }
-
-        [Test]
-        public void TestGetGroupNameWithSid()
-        {
-            string sid = WindowsIdentity.GetCurrent().User.ToString();
-            mockSettings.SetupGet(a => a.JitGroup).Returns(sid);
-            Assert.IsTrue(agent.TryGetGroupName(out string groupName));
-            Assert.AreEqual(sid, groupName);
-        }
-
-        [Test]
-        public void TestGetGroupNameWithDomainTemplate()
-        {
-            mockSettings.SetupGet(a => a.JitGroup).Returns("{domain}\\JIT-{computerName}");
-            mockSam.Setup(a => a.GetMachineNetbiosDomainName()).Returns(Environment.UserDomainName);
-
-            Assert.IsTrue(agent.TryGetGroupName(out string groupName));
-            Assert.AreEqual($"{Environment.UserDomainName}\\JIT-{Environment.MachineName}", groupName);
         }
     }
 }

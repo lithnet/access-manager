@@ -8,16 +8,16 @@ namespace Lithnet.AccessManager
     {
         private readonly IMsMcsAdmPwdProvider msLapsProvider;
 
-        private readonly IAppDataProvider appDataProvider;
+        private readonly ILithnetAdminPasswordProvider lithnetProvider;
 
         private readonly IEncryptionProvider encryptionProvider;
 
         private readonly ICertificateProvider certificateProvider;
 
-        public PasswordProvider(IMsMcsAdmPwdProvider msMcsAdmPwdProvider, IAppDataProvider appDataProvider, IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider)
+        public PasswordProvider(IMsMcsAdmPwdProvider msMcsAdmPwdProvider, ILithnetAdminPasswordProvider lithnetProvider, IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider)
         {
             this.msLapsProvider = msMcsAdmPwdProvider;
-            this.appDataProvider = appDataProvider;
+            this.lithnetProvider = lithnetProvider;
             this.encryptionProvider = encryptionProvider;
             this.certificateProvider = certificateProvider;
         }
@@ -26,72 +26,61 @@ namespace Lithnet.AccessManager
         {
             if (retrievalLocation == 0 || (retrievalLocation.HasFlag(PasswordStorageLocation.MsLapsAttribute) && retrievalLocation.HasFlag(PasswordStorageLocation.LithnetAttribute)))
             {
-                return GetFromMsLapsOrAppData(computer, newExpiry);
+                return GetFromMsLapsOrLithnet(computer, newExpiry) ?? throw new NoPasswordException();
             }
             else if (retrievalLocation.HasFlag(PasswordStorageLocation.MsLapsAttribute))
             {
-                return this.GetMsLapsEntry(computer, newExpiry);
+                return this.GetMsLapsEntry(computer, newExpiry) ?? throw new NoPasswordException();
             }
             else
             {
-                if (this.appDataProvider.TryGetAppData(computer, out IAppData data))
-                {
-                    return this.GetAppDataCurrentPassword(data, newExpiry);
-                }
+                return this.GetLithnetCurrentPassword(computer, newExpiry) ?? throw new NoPasswordException();
             }
-
-            throw new NoPasswordException();
         }
 
         public IList<PasswordEntry> GetPasswordHistory(IComputer computer)
         {
-            if (this.appDataProvider.TryGetAppData(computer, out IAppData data))
-            {
-                return GetAppDataPasswordHistoryEntries(data);
-            }
-
-            throw new NoPasswordException();
+            return this.GetPasswordHistoryEntries(computer) ?? throw new NoPasswordException();
         }
 
-        private PasswordEntry GetFromMsLapsOrAppData(IComputer computer, DateTime? newExpiry)
+        private PasswordEntry GetFromMsLapsOrLithnet(IComputer computer, DateTime? newExpiry)
         {
-            if (this.appDataProvider.TryGetAppData(computer, out IAppData data) && data.CurrentPassword != null)
-            {
-                return this.GetAppDataCurrentPassword(data, newExpiry);
-            }
-            else
+            var result = this.GetLithnetCurrentPassword(computer, newExpiry);
+
+            if (result == null)
             {
                 return this.GetMsLapsEntry(computer, newExpiry);
             }
+            else
+            {
+                return result;
+            }
         }
 
-        private PasswordEntry GetAppDataCurrentPassword(IAppData data, DateTime? newExpiry)
+        private PasswordEntry GetLithnetCurrentPassword(IComputer computer, DateTime? newExpiry)
         {
-            if (data.CurrentPassword == null)
+            var item = this.lithnetProvider.GetCurrentPassword(computer, newExpiry);
+
+            if (item == null)
             {
-                throw new NoPasswordException();
+                return null;
             }
 
             PasswordEntry current = new PasswordEntry()
             {
-                Created = data.CurrentPassword.Created,
-                Password = this.encryptionProvider.Decrypt(data.CurrentPassword.EncryptedData, this.certificateProvider.GetCertificateWithPrivateKey),
-                ExpiryDate = newExpiry ?? data.PasswordExpiry
+                Created = item.Created,
+                Password = this.encryptionProvider.Decrypt(item.EncryptedData, this.certificateProvider.GetCertificateWithPrivateKey),
+                ExpiryDate = newExpiry ?? this.lithnetProvider.GetExpiry(computer)
             };
-
-            if (newExpiry != null)
-            {
-                data.UpdatePasswordExpiry(newExpiry.Value);
-            }
 
             return current;
         }
 
-        private IList<PasswordEntry> GetAppDataPasswordHistoryEntries(IAppData data)
+        private IList<PasswordEntry> GetPasswordHistoryEntries(IComputer computer)
         {
             List<PasswordEntry> list = new List<PasswordEntry>();
 
-            foreach (var item in data.PasswordHistory.Where(t => t.Retired != null))
+            foreach (var item in this.lithnetProvider.GetPasswordHistory(computer))
             {
                 PasswordEntry p = new PasswordEntry()
                 {
@@ -117,7 +106,7 @@ namespace Lithnet.AccessManager
 
             if (string.IsNullOrWhiteSpace(result.Password))
             {
-                throw new NoPasswordException();
+                return null;
             }
 
             return new PasswordEntry()

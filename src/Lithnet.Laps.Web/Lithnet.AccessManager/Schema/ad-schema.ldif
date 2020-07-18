@@ -1,7 +1,7 @@
 # ==================================================================
 # 
 #  This file should be imported with the following command:
-#    ldifde -i -u -f ad0-schema.ldf -s server:port -b username domain password -j . -c "cn=Configuration,dc=X" #configurationNamingContext
+#    ldifde -i -u -f ad0-schema.ldf -s server:port -b username domain password -j . -c "cn=Schema,cn=Configuration,dc=X" #schemaNamingContext
 # 
 # ==================================================================
 
@@ -9,68 +9,52 @@
 dn: cn=Lithnet-Admin-Password,cn=Schema,cn=Configuration,dc=X
 changetype: ntdsschemaadd
 objectClass: attributeSchema
-attributeId: 1.3.6.1.4.1.55989.1.1.1 
-ldapDisplayName: lithnetAdminPassword
-attributeSyntax: 2.5.5.12
-adminDescription: Local admin password
-adminDisplayName: lithnetAdminPassword
 # schemaIDGUID: f440de15-5e53-4522-a221-0000b9d757dd
 schemaIDGUID:: Fd5A9FNeIkWiIQAAuddX3Q==
+attributeId: 1.3.6.1.4.1.55989.1.1.1 
+ldapDisplayName: lithnetAdminPassword
+adminDisplayName: lithnetAdminPassword
+attributeSyntax: 2.5.5.12
 oMSyntax: 64
 searchFlags: 904
 isSingleValued: TRUE
+isMemberOfPartialAttributeSet: FALSE
 systemOnly: FALSE
+showInAdvancedViewOnly: FALSE
 
 
 # Attribute: lithnetAdminPasswordHistory
 dn: cn=Lithnet-Admin-Password-History,cn=Schema,cn=Configuration,dc=X
 changetype: ntdsschemaadd
 objectClass: attributeSchema
-attributeId: 1.3.6.1.4.1.55989.1.1.2
-ldapDisplayName: lithnetAdminPasswordHistory
-attributeSyntax: 2.5.5.12
-adminDescription: Local admin password history
-adminDisplayName: lithnetAdminPasswordHistory
 # schemaIDGUID: 5e7f84e2-9561-4ac3-b3b4-0000121aa663
-schemaIDGUID:: 4oR/XmGVw0qztAAAEhqmYw==
+schemaIDGUID:: 4oR/XmGVw0qztAAAEhqmYw==attributeId: 1.3.6.1.4.1.55989.1.1.2
+ldapDisplayName: lithnetAdminPasswordHistory
+adminDisplayName: lithnetAdminPasswordHistory
+attributeSyntax: 2.5.5.12
 oMSyntax: 64
 searchFlags: 904
 isSingleValued: FALSE
+isMemberOfPartialAttributeSet: FALSE
 systemOnly: FALSE
+showInAdvancedViewOnly: FALSE
 
 
 # Attribute: lithnetAdminPasswordExpiry
 dn: cn=Lithnet-Admin-Password-Expiry,cn=Schema,cn=Configuration,dc=X
 changetype: ntdsschemaadd
 objectClass: attributeSchema
-attributeId: 1.3.6.1.4.1.55989.1.1.3
-ldapDisplayName: lithnetAdminPasswordExpiry
-attributeSyntax: 2.5.5.12
-adminDescription: Local admin password expiry date
-adminDisplayName: lithnetAdminPasswordExpiry
 # schemaIDGUID: 0f65f007-22e9-4a4f-9fba-000025aa156d
 schemaIDGUID:: B/BlD+kiT0qfugAAJaoVbQ==
-oMSyntax: 64
+attributeId: 1.3.6.1.4.1.55989.1.1.3
+ldapDisplayName: lithnetAdminPasswordExpiry
+adminDisplayName: lithnetAdminPasswordExpiry
+attributeSyntax: 2.5.5.16
+oMSyntax: 65
 isSingleValued: TRUE
+isMemberOfPartialAttributeSet: FALSE
 systemOnly: FALSE
-
-
-
-# Attribute: lithnetCertificateData
-dn: cn=Lithnet-Certificate-Data,cn=Schema,cn=Configuration,dc=X
-changetype: ntdsschemaadd
-objectClass: attributeSchema
-attributeId:  1.3.6.1.4.1.55989.1.1.4
-ldapDisplayName: lithnetCertificateData
-attributeSyntax: 2.5.5.12
-adminDescription: Certificate public key
-adminDisplayName: lithnetCertificateData
-# schemaIDGUID: 60535a38-77c5-49cf-bfbc-8a8d4ee6ba6e
-schemaIDGUID:: OFpTYMV3z0m/vIqNTua6bg==
-oMSyntax: 64
-isSingleValued: TRUE
-systemOnly: FALSE
-
+showInAdvancedViewOnly: FALSE
 
 
 dn: CN=Computer,CN=Schema,CN=Configuration,DC=x
@@ -87,6 +71,7 @@ add: schemaUpdateNow
 schemaUpdateNow: 1
 -
 
+
 dn: cn=Lithnet-Access-Manager-Configuration,cn=Schema,cn=Configuration,dc=X
 changetype: ntdsschemaadd
 objectClass: classSchema
@@ -98,16 +83,16 @@ schemaIDGUID:: ampqLD9vfkCBx7eAezaTaA==
 objectClassCategory: 1
 subclassOf: applicationSettings
 rdnAttId: cn
-mayContain: cn
-mayContain: lithnetCertificateData
 mayContain: keywords
 mayContain: msDS-ByteArray
 mayContain: msDS-DateTime
+mayContain: msDS-Settings
 mayContain: msDS-Integer
 mayContain: msDS-ObjectReference
 mayContain: appSchemaVersion
 mayContain: caCertificate
-defaultObjectCategory: cn=Lithnet-Access-Manager-Configuration,cn=Schema,cn=Configuration,dc=X
+possSuperiors: container
+
 
 dn:
 changetype: modify

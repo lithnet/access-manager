@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.DirectoryServices;
 using System.Linq;
 using System.Reflection;
@@ -64,16 +65,6 @@ namespace Lithnet.AccessManager
             }
         }
 
-        public static DirectoryEntry GetParentDirectoryEntry(this IDirectoryObject o)
-        {
-            return o.GetDirectoryEntry().Parent;
-        }
-
-        public static DirectoryEntry GetDirectoryEntry(this IDirectoryObject o)
-        {
-            return new DirectoryEntry($"LDAP://{o.DistinguishedName}");
-        }
-
         [DebuggerStepThrough]
         public static bool TryParseAsSid(this string s, out SecurityIdentifier sid)
         {
@@ -117,6 +108,7 @@ namespace Lithnet.AccessManager
             return DateTime.FromFileTimeUtc(value);
         }
 
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         public static DateTime? GetPropertyDateTimeFromAdsLargeInteger(this DirectoryEntry result, string propertyName)
         {
             if (!result.Properties.Contains(propertyName))
@@ -125,17 +117,20 @@ namespace Lithnet.AccessManager
             }
 
             object value = result.Properties[propertyName][0];
-          
+
+            if (value == null)
+            {
+                return null;
+            }
+
             int highPart = (int)value.GetType().InvokeMember("HighPart", BindingFlags.GetProperty, null, value, null);
             int lowPart = (int)value.GetType().InvokeMember("LowPart", BindingFlags.GetProperty, null, value, null);
-            
-            long nv = highPart;
-            nv <<= 32;
-            nv += lowPart;
 
-            if (nv != 0)
+            long r = (long)highPart << 32 | (uint)lowPart;
+
+            if (r > 0)
             {
-                return DateTime.FromFileTimeUtc(nv);
+                return DateTime.FromFileTimeUtc(r);
             }
 
             return null;
@@ -185,7 +180,7 @@ namespace Lithnet.AccessManager
             {
                 return null;
             }
-
+            
             return result.Properties[propertyName][0]?.ToString();
         }
 
@@ -220,6 +215,16 @@ namespace Lithnet.AccessManager
         }
 
         public static string GetPropertyCommaSeparatedString(this SearchResult result, string propertyName)
+        {
+            if (!result.Properties.Contains(propertyName))
+            {
+                return null;
+            }
+
+            return string.Join(", ", result.Properties[propertyName].OfType<object>().Select(t => t.ToString()));
+        }
+
+        public static string GetPropertyCommaSeparatedString(this DirectoryEntry result, string propertyName)
         {
             if (!result.Properties.Contains(propertyName))
             {

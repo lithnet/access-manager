@@ -21,11 +21,11 @@ namespace Lithnet.AccessManager.Agent
 
         private readonly ILocalSam sam;
 
-        private readonly IAppDataProvider appDataProvider;
+        private readonly ILithnetAdminPasswordProvider lithnetAdminPasswordProvider;
 
         private readonly IMsMcsAdmPwdProvider msMcsAdmPwdProvider;
 
-        public LapsAgent(ILogger<LapsAgent> logger, IDirectory directory, ILapsSettings settings, IPasswordGenerator passwordGenerator, IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider, ILocalSam sam, IAppDataProvider appDataProvider, IMsMcsAdmPwdProvider msMcsAdmPwdProvider)
+        public LapsAgent(ILogger<LapsAgent> logger, IDirectory directory, ILapsSettings settings, IPasswordGenerator passwordGenerator, IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider, ILocalSam sam, ILithnetAdminPasswordProvider lithnetAdminPasswordProvider, IMsMcsAdmPwdProvider msMcsAdmPwdProvider)
         {
             this.logger = logger;
             this.directory = directory;
@@ -34,7 +34,7 @@ namespace Lithnet.AccessManager.Agent
             this.encryptionProvider = encryptionProvider;
             this.certificateProvider = certificateProvider;
             this.sam = sam;
-            this.appDataProvider = appDataProvider;
+            this.lithnetAdminPasswordProvider = lithnetAdminPasswordProvider;
             this.msMcsAdmPwdProvider = msMcsAdmPwdProvider;
         }
 
@@ -48,7 +48,7 @@ namespace Lithnet.AccessManager.Agent
                     return;
                 }
 
-                if (!this.settings.WriteToAppData && !this.settings.WriteToMsMcsAdmPasswordAttributes)
+                if (!this.settings.WriteToLithnetAttributes && !this.settings.WriteToMsMcsAdmPasswordAttributes)
                 {
                     this.logger.LogTrace(EventIDs.LapsAgentNotConfigured, "The LAPS agent is not configured to write passwords to any attribute stores");
                     return;
@@ -62,12 +62,10 @@ namespace Lithnet.AccessManager.Agent
 
                 IComputer computer = this.directory.GetComputer(this.sam.GetMachineNTAccountName());
 
-                var appData = this.appDataProvider.GetAppData(computer);
-
-                if (this.HasPasswordExpired(appData, computer))
+                if (this.HasPasswordExpired(computer))
                 {
                     logger.LogTrace(EventIDs.PasswordExpired, "Password has expired and needs to be changed");
-                    this.ChangePassword(appData, computer);
+                    this.ChangePassword(computer);
                 }
             }
             catch (Exception ex)
@@ -90,18 +88,19 @@ namespace Lithnet.AccessManager.Agent
             return r?.GetValue<int>("AdmPwdEnabled", 0) == 1;
         }
 
-        public bool HasPasswordExpired(IAppData appData, IComputer computer)
+        public bool HasPasswordExpired(IComputer computer)
         {
             try
             {
-                if (this.settings.WriteToAppData)
+                if (this.settings.WriteToLithnetAttributes)
                 {
-                    if (appData.PasswordExpiry == null)
+                    DateTime? expiry = lithnetAdminPasswordProvider.GetExpiry(computer);
+                    if (expiry == null)
                     {
                         return false;
                     }
 
-                    return DateTime.UtcNow > appData.PasswordExpiry;
+                    return DateTime.UtcNow > expiry;
                 }
                 else if (this.settings.WriteToMsMcsAdmPasswordAttributes)
                 {
@@ -124,7 +123,7 @@ namespace Lithnet.AccessManager.Agent
             }
         }
 
-        public void ChangePassword(IAppData appData, IComputer computer, SecurityIdentifier sid = null)
+        public void ChangePassword(IComputer computer, SecurityIdentifier sid = null)
         {
             try
             {
@@ -137,9 +136,9 @@ namespace Lithnet.AccessManager.Agent
                 DateTime rotationInstant = DateTime.UtcNow;
                 DateTime expiryDate = DateTime.UtcNow.AddDays(this.settings.MaximumPasswordAge);
 
-                if (this.settings.WriteToAppData)
+                if (this.settings.WriteToLithnetAttributes)
                 {
-                    appData.UpdateCurrentPassword(
+                    lithnetAdminPasswordProvider.UpdateCurrentPassword(computer,
                         this.encryptionProvider.Encrypt(
                             this.certificateProvider.FindCertificate(
                                 false, this.settings.CertThumbprint, this.settings.CertPath),

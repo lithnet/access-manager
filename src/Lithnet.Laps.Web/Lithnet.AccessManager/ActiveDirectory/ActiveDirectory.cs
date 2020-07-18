@@ -6,7 +6,6 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
-using System.Text.RegularExpressions;
 using Lithnet.AccessManager.Interop;
 
 namespace Lithnet.AccessManager
@@ -14,6 +13,7 @@ namespace Lithnet.AccessManager
     public sealed class ActiveDirectory : IDirectory
     {
         private static readonly Guid PamFeatureGuid = new Guid("ec43e873-cce8-4640-b4ab-07ffe4ab5bcd");
+
 
         private readonly Dictionary<string, bool> pamEnabledDomainCache = new Dictionary<string, bool>();
 
@@ -29,7 +29,7 @@ namespace Lithnet.AccessManager
 
         public IUser GetUser(SecurityIdentifier sid)
         {
-            return new ActiveDirectoryUser(this.GetDirectoryEntry(NativeMethods.GetDn(sid), "user", ActiveDirectoryUser.PropertiesToGet));
+            return new ActiveDirectoryUser(this.DoGcLookup(sid.ToString(), "user", ActiveDirectoryUser.PropertiesToGet));
         }
 
         public IComputer GetComputer(string name)
@@ -39,9 +39,8 @@ namespace Lithnet.AccessManager
 
         public IComputer GetComputer(SecurityIdentifier sid)
         {
-            return new ActiveDirectoryComputer(this.GetDirectoryEntry(NativeMethods.GetDn(sid), "computer", ActiveDirectoryComputer.PropertiesToGet));
+            return new ActiveDirectoryComputer(this.DoGcLookup(sid.ToString(), "computer", ActiveDirectoryComputer.PropertiesToGet));
         }
-
 
         public bool TryGetComputer(string name, out IComputer computer)
         {
@@ -50,7 +49,7 @@ namespace Lithnet.AccessManager
 
         public ISecurityPrincipal GetPrincipal(string name)
         {
-            SearchResult result = this.DoGcLookup(name, "*", ActiveDirectoryComputer.PropertiesToGet);
+            var result = this.DoGcLookup(name, "*", ActiveDirectoryComputer.PropertiesToGet);
 
             if (result.HasPropertyValue("objectClass", "computer"))
             {
@@ -75,16 +74,14 @@ namespace Lithnet.AccessManager
             return DirectoryExtensions.TryGet(() => this.GetPrincipal(name), out principal);
         }
 
-        public bool IsContainer(string path)
+        public bool IsContainer(DirectoryEntry de)
         {
             try
             {
-                SearchResult result = this.GetDirectoryEntry(path, "*", "objectClass");
-
-                return result.HasPropertyValue("objectClass", "organizationalUnit") ||
-                       result.HasPropertyValue("objectClass", "domain") ||
-                       result.HasPropertyValue("objectClass", "domainDNS") ||
-                       result.HasPropertyValue("objectClass", "container");
+                return de.HasPropertyValue("objectClass", "organizationalUnit") ||
+                       de.HasPropertyValue("objectClass", "domain") ||
+                       de.HasPropertyValue("objectClass", "domainDNS") ||
+                       de.HasPropertyValue("objectClass", "container");
             }
             catch
             {
@@ -116,15 +113,7 @@ namespace Lithnet.AccessManager
 
         public IGroup GetGroup(SecurityIdentifier sid)
         {
-            return new ActiveDirectoryGroup(this.GetDirectoryEntry(NativeMethods.GetDn(sid), "group", ActiveDirectoryGroup.PropertiesToGet));
-        }
-
-        public IGroup GetGroup(SecurityIdentifier groupSid, SecurityIdentifier domainSid)
-        {
-            string server = NativeMethods.GetDnsDomainNameFromSid(domainSid);
-            string dn = NativeMethods.GetDn(groupSid.ToString(), DsNameFormat.SecurityIdentifier, server);
-
-            return new ActiveDirectoryGroup(this.GetDirectoryEntry(dn, "group", ActiveDirectoryGroup.PropertiesToGet));
+            return new ActiveDirectoryGroup(this.DoGcLookup(sid.ToString(), "group", ActiveDirectoryGroup.PropertiesToGet));
         }
 
         public bool TryGetGroup(SecurityIdentifier sid, out IGroup group)
@@ -140,7 +129,7 @@ namespace Lithnet.AccessManager
             {
                 samAccountName = name.Split('\\')[1];
             }
-            
+
             DirectoryEntry de = oude.Children.Add($"CN={samAccountName}", "group");
             de.Properties["samAccountName"].Add(samAccountName);
             de.Properties["description"].Add(description);
@@ -150,8 +139,8 @@ namespace Lithnet.AccessManager
 
         public void DeleteGroup(string name)
         {
-            IGroup group = this.GetGroup(name);
-            group.GetDirectoryEntry().DeleteTree();
+            var result = this.DoGcLookup(name, "group", null);
+            result.DeleteTree();
         }
 
         public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, ISecurityPrincipal principal)
@@ -174,11 +163,6 @@ namespace Lithnet.AccessManager
             return NativeMethods.CheckForSidInToken(principal, sidToFindInToken, targetDomainSid);
         }
 
-        public IEnumerable<string> GetMemberDNsFromGroup(IGroup group)
-        {
-            return this.GetMemberDNsFromGroup(group.DistinguishedName);
-        }
-
         public string TranslateName(string name, DsNameFormat nameFormat, DsNameFormat requiredFormat)
         {
             return this.TranslateName(name, nameFormat, requiredFormat, null);
@@ -187,59 +171,6 @@ namespace Lithnet.AccessManager
         public string TranslateName(string name, DsNameFormat nameFormat, DsNameFormat requiredFormat, string dnsDomainName)
         {
             return NativeMethods.CrackNames(nameFormat, requiredFormat, name, dnsDomainName).Name;
-        }
-
-        private IEnumerable<string> GetMemberDNsFromGroup(string dn)
-        {
-            HashSet<string> memberDNs = new HashSet<string>();
-
-            int rangeLower = 0;
-            int rangeUpper = 1499;
-            int rangeStep = 1500;
-
-            while (true)
-            {
-                var de = this.GetDirectoryEntry(dn, "group", $"member;range={rangeLower}-{rangeUpper}");
-
-                if (de == null)
-                {
-                    return memberDNs;
-                }
-
-                var returnedMemberPropertyName = de.Properties.PropertyNames.OfType<string>().FirstOrDefault(t => t.StartsWith("member;range=", StringComparison.OrdinalIgnoreCase));
-
-                if (returnedMemberPropertyName == null)
-                {
-                    return memberDNs;
-                }
-
-                foreach (var item in de.Properties[returnedMemberPropertyName].OfType<string>())
-                {
-                    memberDNs.Add(item);
-                }
-
-                if (returnedMemberPropertyName.EndsWith("*"))
-                {
-                    return memberDNs;
-                }
-
-                rangeLower = rangeUpper + 1;
-                rangeUpper += rangeStep;
-            }
-        }
-
-        public void AddGroupMember(IGroup group, ISecurityPrincipal principal, TimeSpan ttl)
-        {
-            var groupEntry = group.GetDirectoryEntry();
-            groupEntry.Properties["member"].Add($"<TTL={ttl.TotalSeconds},<SID={principal.Sid}>>");
-            groupEntry.CommitChanges();
-        }
-
-        public void AddGroupMember(IGroup group, ISecurityPrincipal principal)
-        {
-            var groupEntry = group.GetDirectoryEntry();
-            groupEntry.Properties["member"].Add($"<SID={principal.Sid}>");
-            groupEntry.CommitChanges();
         }
 
         public void CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl)
@@ -256,12 +187,6 @@ namespace Lithnet.AccessManager
             group.Properties["groupType"].Add(-2147483644);
             group.Properties["entryTTL"].Add((int)ttl.TotalSeconds);
             group.CommitChanges();
-        }
-
-        public string GetDomainNetbiosName(SecurityIdentifier sid)
-        {
-            return TranslateName(sid.AccountDomainSid.ToString(),
-                DsNameFormat.SecurityIdentifier, DsNameFormat.Nt4Name).Trim('\\');
         }
 
         public bool IsPamFeatureEnabled(SecurityIdentifier domainSid)
@@ -306,33 +231,20 @@ namespace Lithnet.AccessManager
             return context;
         }
 
-        public string GetDnsDomainName(SecurityIdentifier sid)
+        public string GetDomainNameNetBiosFromSid(SecurityIdentifier sid)
+        {
+            return TranslateName(sid.AccountDomainSid.ToString(), DsNameFormat.SecurityIdentifier, DsNameFormat.Nt4Name).Trim('\\');
+        }
+
+        public string GetDomainNameDnsFromSid(SecurityIdentifier sid)
         {
             return NativeMethods.GetDnsDomainNameFromSid(sid);
         }
 
-        public string GetDnsDomainNameFromDN(string dn)
+        public string GetDomainNameDnsFromDn(string dn)
         {
-            DirectoryEntry de = new DirectoryEntry($"LDAP://{dn}");
-            while (!string.Equals(de.SchemaClassName, "domainDns", StringComparison.OrdinalIgnoreCase))
-            {
-                de = de.Parent;
-            }
-            
-            SecurityIdentifier sid = de.GetPropertySid("objectSid");
-            return this.GetDnsDomainName(sid);
-        }
-
-        public string GetNetbiosDomainNameFromDN(string dn)
-        {
-            DirectoryEntry de = new DirectoryEntry($"LDAP://{dn}");
-            while (!string.Equals(de.SchemaClassName, "domainDns", StringComparison.OrdinalIgnoreCase))
-            {
-                de = de.Parent;
-            }
-
-            SecurityIdentifier sid = de.GetPropertySid("objectSid");
-            return this.GetDomainNetbiosName(sid);
+            var result = NativeMethods.CrackNames(DsNameFormat.DistinguishedName, DsNameFormat.DistinguishedName, dn);
+            return result.Domain;
         }
 
         public DirectoryEntry GetConfigurationNamingContext(SecurityIdentifier domain)
@@ -348,7 +260,6 @@ namespace Lithnet.AccessManager
         {
             return new DirectoryEntry($"LDAP://{this.GetContextDn("configurationNamingContext", dnsDomain)}");
         }
-
 
         public DirectoryEntry GetSchemaNamingContext(SecurityIdentifier domain)
         {
@@ -390,62 +301,46 @@ namespace Lithnet.AccessManager
             return true;
         }
 
-        private SearchResult DoGcLookup(string objectName, string objectClass, IEnumerable<string> propertiesToGet)
+        private DirectoryEntry DoGcLookup(string objectName, string objectClass, IEnumerable<string> propertiesToGet)
         {
-            string dn;
-
             if (objectClass.Equals("computer", StringComparison.OrdinalIgnoreCase) && !objectName.EndsWith("$"))
             {
                 objectName += "$";
             }
 
-            if (objectName.Contains("\\") || objectName.Contains("@"))
+            if (objectName.Contains("\\"))
             {
-                dn = NativeMethods.GetDn(objectName);
+                return NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.Nt4Name);
+            }
+            else if (objectName.Contains("@"))
+            {
+                return NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.UserPrincipalName);
             }
             else if (objectName.TryParseAsSid(out SecurityIdentifier sid))
             {
-                dn = NativeMethods.GetDn(sid);
+                return NativeMethods.GetDirectoryEntry(sid);
             }
             else if (this.IsDistinguishedName(objectName))
             {
-                dn = objectName;
+                return NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.DistinguishedName);
             }
             else
             {
-                dn = ActiveDirectory.DoGcLookupFromSimpleName(objectName, objectClass);
+                string dn = ActiveDirectory.GcGetDnFromSimpleName(objectName, objectClass);
+
+                if (dn == null)
+                {
+                    throw new ObjectNotFoundException(
+                        $"An object {objectName} of type {objectClass} was not found in the global catalog");
+                }
+
+                var de = new DirectoryEntry($"LDAP://{dn}");
+
+                return de;
             }
-
-            if (dn == null)
-            {
-                throw new ObjectNotFoundException($"An object {objectName} of type {objectClass} was not found in the global catalog");
-            }
-
-            DirectorySearcher d = new DirectorySearcher
-            {
-                SearchRoot = new DirectoryEntry($"LDAP://{dn}"),
-                SearchScope = SearchScope.Base,
-                Filter = $"(objectClass={objectClass})"
-            };
-
-            foreach (string prop in propertiesToGet)
-            {
-                d.PropertiesToLoad.Add(prop);
-            }
-
-            d.PropertiesToLoad.AddIfMissing("objectClass", StringComparer.OrdinalIgnoreCase);
-
-            SearchResult result = d.FindOne();
-
-            if (result == null)
-            {
-                throw new ObjectNotFoundException($"The object {dn} was not found in the directory or was not of the object class {objectClass}");
-            }
-
-            return result;
         }
 
-        private static string DoGcLookupFromSimpleName(string samAccountName, string objectClass)
+        private static string GcGetDnFromSimpleName(string samAccountName, string objectClass)
         {
             DirectorySearcher d = new DirectorySearcher
             {
@@ -456,7 +351,7 @@ namespace Lithnet.AccessManager
 
             d.PropertiesToLoad.Add("distinguishedName");
 
-            SearchResultCollection result = d.FindAll();
+            using SearchResultCollection result = d.FindAll();
 
             if (result.Count > 1)
             {
@@ -469,33 +364,6 @@ namespace Lithnet.AccessManager
             }
 
             return result[0].Properties["distinguishedName"][0].ToString();
-        }
-
-        public SearchResult GetDirectoryEntry(ISecurityPrincipal principal, params string[] propertiesToLoad)
-        {
-            return this.GetDirectoryEntry(principal.DistinguishedName, "*", propertiesToLoad);
-        }
-
-        public SearchResult SearchDirectoryEntry(string basedn, string filter, SearchScope scope, params string[] propertiesToLoad)
-        {
-            DirectorySearcher d = new DirectorySearcher
-            {
-                SearchRoot = new DirectoryEntry($"LDAP://{basedn}"),
-                SearchScope = scope,
-                Filter = filter
-            };
-
-            foreach (string prop in propertiesToLoad)
-            {
-                d.PropertiesToLoad.Add(prop);
-            }
-
-            return d.FindOne();
-        }
-
-        public SearchResult GetDirectoryEntry(string dn, string objectClass, params string[] propertiesToLoad)
-        {
-            return this.SearchDirectoryEntry(dn, $"objectClass={objectClass}", SearchScope.Base, propertiesToLoad);
         }
 
         private static string EscapeSearchFilterParameter(string p)

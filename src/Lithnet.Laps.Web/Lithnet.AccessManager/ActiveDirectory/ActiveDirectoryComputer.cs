@@ -8,25 +8,28 @@ namespace Lithnet.AccessManager
     {
         internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "description", "displayName", "objectGuid", "objectSid" , "msDS-PrincipalName", "objectClass" };
 
-        private readonly SearchResult computer;
+        private readonly DirectoryEntry de;
 
-        public ActiveDirectoryComputer(SearchResult computer)
+        public ActiveDirectoryComputer(DirectoryEntry directoryEntry)
         {
-            this.computer = computer;
+            this.de = directoryEntry;
+            this.de.RefreshCache(PropertiesToGet);
         }
 
-        public string SamAccountName => this.computer.GetPropertyString("samAccountName");
+        public string SamAccountName =>  this.de.GetPropertyString("samAccountName");
 
-        public string DistinguishedName => this.computer.GetPropertyString("distinguishedName");
+        public string DistinguishedName => this.de.GetPropertyString("distinguishedName");
 
-        public string MsDsPrincipalName => this.computer.GetPropertyString("msDS-PrincipalName");
+        public string MsDsPrincipalName =>  this.de.GetPropertyString("msDS-PrincipalName");
 
-        public string Description => this.computer.GetPropertyString("description");
+        public string Description => this.de.GetPropertyString("description");
 
-        public string DisplayName => this.computer.GetPropertyString("displayName");
+        public string DisplayName => this.de.GetPropertyString("displayName");
 
-        public Guid? Guid => this.computer.GetPropertyGuid("objectGuid");
+        public Guid? Guid => this.de.GetPropertyGuid("objectGuid");
 
-        public SecurityIdentifier Sid => this.computer.GetPropertySid("objectSid");
+        public SecurityIdentifier Sid => this.de.GetPropertySid("objectSid");
+
+        public DirectoryEntry DirectoryEntry => this.de;
     }
 }

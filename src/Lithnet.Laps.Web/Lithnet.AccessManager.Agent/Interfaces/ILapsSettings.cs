@@ -32,6 +32,6 @@
 
         int MaximumPasswordAge { get; }
 
-        bool WriteToAppData { get; }
+        bool WriteToLithnetAttributes { get; }
     }
 }

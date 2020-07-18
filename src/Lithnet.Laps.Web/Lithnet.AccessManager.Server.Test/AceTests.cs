@@ -165,7 +165,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             if (serverName == null)
             {
-                serverName = d.GetDnsDomainName(p.Sid);
+                serverName = d.GetDomainNameDnsFromSid(p.Sid);
             }
 
             AuthorizationContext c = new AuthorizationContext(user.Sid, serverName);

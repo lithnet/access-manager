@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Lithnet.Security.Authorization;
@@ -348,14 +350,29 @@ namespace Lithnet.AccessManager.Interop
 
         public static string GetDn(string nameToFind, DsNameFormat nameFormat)
         {
-            var result = CrackNames(nameFormat, DsNameFormat.DistinguishedName, nameToFind);
-            return result.Name;
+            return GetDn(nameToFind, nameFormat, null);
         }
 
         public static string GetDn(string nameToFind, DsNameFormat nameFormat, string server)
         {
             var result = CrackNames(nameFormat, DsNameFormat.DistinguishedName, nameToFind, server);
             return result.Name;
+        }
+
+        public static DirectoryEntry GetDirectoryEntry(string nameToFind, DsNameFormat nameFormat)
+        {
+            return GetDirectoryEntry(nameToFind, nameFormat, null);
+        }
+
+        public static DirectoryEntry GetDirectoryEntry(string nameToFind, DsNameFormat nameFormat, string server)
+        {
+            var result = CrackNames(nameFormat, DsNameFormat.DistinguishedName, nameToFind, server);
+            return new DirectoryEntry($"LDAP://{result.Domain}/{result.Name}");
+        }
+
+        public static DirectoryEntry GetDirectoryEntry(SecurityIdentifier nameToFind)
+        {
+            return GetDirectoryEntry(nameToFind.ToString(), DsNameFormat.SecurityIdentifier);
         }
 
         public static bool CheckForSidInToken(SecurityIdentifier principalSid, SecurityIdentifier sidToCheck, SecurityIdentifier requestContext = null)

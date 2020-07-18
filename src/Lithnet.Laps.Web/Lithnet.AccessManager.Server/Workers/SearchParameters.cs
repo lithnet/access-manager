@@ -14,8 +14,6 @@ namespace Lithnet.AccessManager.Server.Workers
         
         public string DnsDomain { get; set; }
 
-        public string NetBiosDomain { get; set; }
-
         public long LastUsn { get; set; }
     }
 }

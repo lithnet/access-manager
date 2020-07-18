@@ -235,7 +235,9 @@ namespace Lithnet.AccessManager.Server.Test
 
             JitConfigurationOptions s = new JitConfigurationOptions();
             s.EnableJitGroupCreation = true;
-            s.EnableJitGroupDeletion = true;
+            s.DeltaSyncInterval = TestContext.CurrentContext.Random.Next();
+            s.FullSyncInterval = TestContext.CurrentContext.Random.Next();
+
             s.JitGroupMappings = new List<JitGroupMapping>
             {
                 new JitGroupMapping
@@ -243,18 +245,27 @@ namespace Lithnet.AccessManager.Server.Test
                     ComputerOU = TestContext.CurrentContext.Random.GetString(),
                     GroupOU = TestContext.CurrentContext.Random.GetString(),
                     GroupNameTemplate = TestContext.CurrentContext.Random.GetString(),
-                    GroupType = GroupType.Universal
+                    GroupType = GroupType.Universal,
+                    EnableJitGroupDeletion = false,
+                    GroupDescription =  TestContext.CurrentContext.Random.GetString(),
+                    PreferredDC =  TestContext.CurrentContext.Random.GetString(),
+                    Subtree = true
                 }
             };
 
             JitConfigurationOptions n = JsonConvert.DeserializeObject<JitConfigurationOptions>(JsonConvert.SerializeObject(s));
 
             Assert.AreEqual(s.EnableJitGroupCreation, n.EnableJitGroupCreation);
-            Assert.AreEqual(s.EnableJitGroupDeletion, n.EnableJitGroupDeletion);
+            Assert.AreEqual(s.DeltaSyncInterval, n.DeltaSyncInterval);
+            Assert.AreEqual(s.FullSyncInterval, n.FullSyncInterval);
             Assert.AreEqual(s.JitGroupMappings[0].ComputerOU, n.JitGroupMappings[0].ComputerOU);
             Assert.AreEqual(s.JitGroupMappings[0].GroupOU, n.JitGroupMappings[0].GroupOU);
             Assert.AreEqual(s.JitGroupMappings[0].GroupNameTemplate, n.JitGroupMappings[0].GroupNameTemplate);
             Assert.AreEqual(s.JitGroupMappings[0].GroupType, n.JitGroupMappings[0].GroupType);
+            Assert.AreEqual(s.JitGroupMappings[0].EnableJitGroupDeletion, n.JitGroupMappings[0].EnableJitGroupDeletion);
+            Assert.AreEqual(s.JitGroupMappings[0].GroupDescription, n.JitGroupMappings[0].GroupDescription);
+            Assert.AreEqual(s.JitGroupMappings[0].PreferredDC, n.JitGroupMappings[0].PreferredDC);
+            Assert.AreEqual(s.JitGroupMappings[0].Subtree, n.JitGroupMappings[0].Subtree);
         }
 
         [Test]

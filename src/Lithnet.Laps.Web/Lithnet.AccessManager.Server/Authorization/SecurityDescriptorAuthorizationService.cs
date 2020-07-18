@@ -97,10 +97,10 @@ namespace Lithnet.AccessManager.Server.Authorization
             switch (this.options.AccessControlEvaluationLocation)
             {
                 case AclEvaluationLocation.ComputerDomain:
-                    return this.directory.GetDnsDomainName(computer.Sid);
+                    return this.directory.GetDomainNameDnsFromSid(computer.Sid);
 
                 case AclEvaluationLocation.UserDomain:
-                    return this.directory.GetDnsDomainName(user.Sid);
+                    return this.directory.GetDomainNameDnsFromSid(user.Sid);
 
                 default:
                     return null;

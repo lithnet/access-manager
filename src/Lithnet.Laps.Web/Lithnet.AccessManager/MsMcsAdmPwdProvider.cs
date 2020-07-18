@@ -19,7 +19,7 @@ namespace Lithnet.AccessManager
 
         public void SetPassword(IComputer computer, string password, DateTime expiryDate)
         {
-            DirectoryEntry de = computer.GetDirectoryEntry();
+            DirectoryEntry de = computer.DirectoryEntry;
             de.Properties[AttrMsMcsAdmPwd].Value = password;
             de.Properties[AttrMsMcsAdmPwdExpirationTime].Value = expiryDate.ToFileTimeUtc().ToString();
             de.CommitChanges();
@@ -27,7 +27,7 @@ namespace Lithnet.AccessManager
 
         public void ClearPassword(IComputer computer)
         {
-            DirectoryEntry de = computer.GetDirectoryEntry();
+            DirectoryEntry de = computer.DirectoryEntry;
 
             if (de.Properties.Contains(AttrMsMcsAdmPwd) || de.Properties.Contains(AttrMsMcsAdmPwdExpirationTime))
             {
@@ -39,7 +39,7 @@ namespace Lithnet.AccessManager
 
         public MsMcsAdmPwdPassword GetPassword(IComputer computer, DateTime? newExpiry)
         {
-            DirectoryEntry de = computer.GetDirectoryEntry();
+            DirectoryEntry de = computer.DirectoryEntry;
 
             if (!de.Properties.Contains(AttrMsMcsAdmPwd))
             {
@@ -70,7 +70,7 @@ namespace Lithnet.AccessManager
 
         public DateTime? GetExpiry(IComputer computer)
         {
-            DirectoryEntry de = computer.GetDirectoryEntry();
+            DirectoryEntry de = computer.DirectoryEntry;
 
             if (!de.Properties.Contains(AttrMsMcsAdmPwdExpirationTime))
             {

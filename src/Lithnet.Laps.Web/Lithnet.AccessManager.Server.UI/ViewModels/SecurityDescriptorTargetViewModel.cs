@@ -156,13 +156,13 @@ namespace Lithnet.AccessManager.Server.UI
 
             if (this.Type == TargetType.Container)
             {
-                targetServer = this.directory.GetDnsDomainNameFromDN(this.Target);
+                targetServer = this.directory.GetDomainNameDnsFromDn(this.Target);
             }
             else
             {
                 if (this.Target.TryParseAsSid(out SecurityIdentifier sid))
                 {
-                    targetServer = this.directory.GetDnsDomainName(sid);
+                    targetServer = this.directory.GetDomainNameDnsFromSid(sid);
                 }
             }
 

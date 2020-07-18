@@ -133,8 +133,7 @@ namespace Lithnet.AccessManager.Server.Auditing
                 usnData = new SearchParameters
                 {
                     Server = mapping.PreferredDC,
-                    DnsDomain = this.directory.GetDnsDomainNameFromDN(mapping.ComputerOU),
-                    NetBiosDomain = this.directory.GetNetbiosDomainNameFromDN(mapping.ComputerOU),
+                    DnsDomain = this.directory.GetDomainNameDnsFromDn(mapping.ComputerOU),
                     LastUsn = 0
                 };
 
@@ -196,7 +195,7 @@ namespace Lithnet.AccessManager.Server.Auditing
             var expectedGroupNames = GetExpectedGroupNames(computers, mapping.GroupNameTemplate).ToList();
             var currentGroupNames = groups.Select(t => t.GetPropertyString("cn")).ToList();
 
-            var groupsToCreate = expectedGroupNames.Except(currentGroupNames).ToList();
+            var groupsToCreate = expectedGroupNames.Except(currentGroupNames, StringComparer.CurrentCultureIgnoreCase).ToList();
 
             if (groupsToCreate.Count > 0)
             {
@@ -210,12 +209,14 @@ namespace Lithnet.AccessManager.Server.Auditing
 
             if (mapping.EnableJitGroupDeletion)
             {
-                var groupsToDelete = currentGroupNames.Except(expectedGroupNames).ToList();
+                var groupsToDelete = groups
+                    .Where(t => !expectedGroupNames.Contains(t.GetPropertyString("cn"), StringComparer.CurrentCultureIgnoreCase))
+                    .Select(t => t.GetPropertyString("ms-DSPrincipalName")).ToList();
 
                 if (groupsToDelete.Count > 0)
                 {
                     this.logger.Trace($"{groupsToDelete.Count} groups to delete");
-                    this.DeleteGroups(groupsToDelete, data.NetBiosDomain);
+                    this.DeleteGroups(groupsToDelete);
                 }
                 else
                 {
@@ -242,11 +243,11 @@ namespace Lithnet.AccessManager.Server.Auditing
             }
         }
 
-        private void DeleteGroups(IEnumerable<string> groupsToDelete, string domain)
+        private void DeleteGroups(IEnumerable<string> groupsToDelete)
         {
             foreach (var group in groupsToDelete)
             {
-                string groupName = $"{domain}\\{group}";
+                string groupName = group;
 
                 try
                 {
@@ -287,6 +288,7 @@ namespace Lithnet.AccessManager.Server.Auditing
             };
 
             d.PropertiesToLoad.Add("cn");
+            d.PropertiesToLoad.Add("msDS-PrincipalName");
 
             SearchResultCollection result = d.FindAll();
 

@@ -6,35 +6,36 @@ namespace Lithnet.AccessManager
 {
     public sealed class ActiveDirectoryUser : IUser
     {
-        private readonly SearchResult user;
+        private readonly DirectoryEntry de;
 
         internal static string[] PropertiesToGet = { "samAccountName", "distinguishedName", "description", "displayName", "userPrincipalName", "objectSid", "mail", "givenName", "sn", "msDS-PrincipalName", "objectClass" };
 
-        public ActiveDirectoryUser(SearchResult user)
+        public ActiveDirectoryUser(DirectoryEntry directoryEntry)
         {
-            this.user = user;
+            this.de = directoryEntry;
+            this.de.RefreshCache(PropertiesToGet);
         }
 
-        public string SamAccountName => this.user.GetPropertyString("samAccountName");
+        public string SamAccountName => this.de.GetPropertyString("samAccountName");
 
-        public string MsDsPrincipalName => this.user.GetPropertyString("msDS-PrincipalName");
+        public string MsDsPrincipalName => this.de.GetPropertyString("msDS-PrincipalName");
 
-        public string DistinguishedName => this.user.GetPropertyString("distinguishedName");
+        public string DistinguishedName => this.de.GetPropertyString("distinguishedName");
 
-        public SecurityIdentifier Sid => this.user.GetPropertySid("objectSid");
+        public SecurityIdentifier Sid => this.de.GetPropertySid("objectSid");
 
-        public string DisplayName => this.user.GetPropertyString("displayName");
+        public string DisplayName => this.de.GetPropertyString("displayName");
 
-        public string UserPrincipalName => this.user.GetPropertyString("userPrincipalName");
+        public string UserPrincipalName => this.de.GetPropertyString("userPrincipalName");
 
-        public string Description => this.user.GetPropertyString("description");
+        public string Description => this.de.GetPropertyString("description");
 
-        public string EmailAddress => this.user.GetPropertyString("mail");
+        public string EmailAddress => this.de.GetPropertyString("mail");
 
-        public Guid? Guid => this.user.GetPropertyGuid("objectGuid");
+        public Guid? Guid => this.de.GetPropertyGuid("objectGuid");
 
-        public string GivenName => this.user.GetPropertyString("givenName");
+        public string GivenName => this.de.GetPropertyString("givenName");
 
-        public string Surname => this.user.GetPropertyString("sn");
+        public string Surname => this.de.GetPropertyString("sn");
     }
 }
