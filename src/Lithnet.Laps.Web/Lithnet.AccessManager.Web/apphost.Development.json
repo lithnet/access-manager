@@ -1,0 +1,15 @@
+{
+  "Hosting": {
+    "Environment": "HttpSys",
+    "HttpSys": {
+      "UrlPrefixes": [ "http://localhost:5000", "https://localhost:5001" ]
+    },
+    "Logging": {
+      "LogLevel": {
+        "Default": "Information",
+        "Microsoft": "Warning",
+        "Microsoft.Hosting.Lifetime": "Information"
+      }
+    }
+  }
+}

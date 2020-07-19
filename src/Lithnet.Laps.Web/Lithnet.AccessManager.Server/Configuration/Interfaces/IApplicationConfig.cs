@@ -14,8 +14,6 @@
 
         ForwardedHeadersAppOptions ForwardedHeaders { get; set; }
 
-        HostingOptions Hosting { get; set; }
-
         RateLimitOptions RateLimits { get; set; }
 
         UserInterfaceOptions UserInterface { get; set; }

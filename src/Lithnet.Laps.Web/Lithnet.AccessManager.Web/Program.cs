@@ -20,6 +20,7 @@ namespace Lithnet.AccessManager.Web
         {
             var config = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", true)
+                .AddJsonFile("apphost.json", true)
                 .AddEnvironmentVariables("laps")
                 .AddCommandLine(args)
                 .Build();
@@ -28,6 +29,7 @@ namespace Lithnet.AccessManager.Web
                  .ConfigureAppConfiguration(builder =>
                  {
                      builder.AddJsonFile("appsecrets.json", true);
+                     builder.AddJsonFile("apphost.json", true);
                      builder.AddEnvironmentVariables("laps");
                      config = builder.Build();
                  }).ConfigureWebHostDefaults(webBuilder =>

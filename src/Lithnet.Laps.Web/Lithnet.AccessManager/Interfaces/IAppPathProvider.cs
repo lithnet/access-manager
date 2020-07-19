@@ -12,7 +12,9 @@
 
         string ImagesPath { get; } 
 
-        string ConfigFile { get; } 
+        string ConfigFile { get; }
+
+        string HostingConfigFile { get; }
 
         string GetRelativePath(string file, string basePath);
 

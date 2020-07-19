@@ -138,24 +138,11 @@ namespace Lithnet.AccessManager.Server.UI.Interop
         public static void ChangeServiceCredentials(string serviceName, string username, string password)
         {
             ServiceController controller = new ServiceController(serviceName);
-            try
-            {
-                bool success = false;
-                controller.ServiceHandle.DangerousAddRef(ref success);
 
-                if (!success)
-                {
-                    throw new InvalidOperationException("Could not increment handle");
-                }
-
-                if (!ChangeServiceConfig(controller.ServiceHandle.DangerousGetHandle(), SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, null, null, IntPtr.Zero, null, username, password, null))
-                {
-                    throw new Win32Exception(Marshal.GetLastWin32Error());
-                }
-            }
-            finally
+            if (!ChangeServiceConfig(controller.ServiceHandle.DangerousGetHandle(), SERVICE_NO_CHANGE,
+                SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, null, null, IntPtr.Zero, null, username, password, null))
             {
-                controller.ServiceHandle.DangerousRelease();
+                throw new Win32Exception(Marshal.GetLastWin32Error());
             }
         }
 

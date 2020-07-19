@@ -10,141 +10,179 @@
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800" Margin="5">
-        <StackPanel>
-            <GroupBox Header="Service"
+    <StackPanel>
+        <GroupBox Header="Service"
                   Margin="5">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
-                    <Label Grid.Row="0" Grid.Column="0"
+                <Label Grid.Row="0" Grid.Column="0"
                        Content="Service Account"
                        Margin="5"/>
-                    <TextBox Grid.Row="0" Grid.Column="1" 
-                         Text="{Binding ServiceAccountDisplayName}" 
+                <TextBox Grid.Row="0" Grid.Column="1" 
+                         Text="{Binding ServiceAccountDisplayName, Mode=OneWay}" 
                          IsReadOnly="True"
                          Margin="5"/>
-                    <Button Grid.Row="0" Grid.Column="2"
+                <Button Grid.Row="0" Grid.Column="2"
+                        IsEnabled="{Binding IsEditing}"
                         Command="{s:Action SelectServiceAccountUser}"
                         Content="Set service account..."
                         Margin="5"/>
 
-                    <Label Grid.Row="1" Grid.Column="0"
+                <Label Grid.Row="1" Grid.Column="0"
                        Content="Service Status"
                        Margin="5"/>
-                    <Label Grid.Row="1" Grid.Column="1" 
+                <Label Grid.Row="1" Grid.Column="1" 
                        Content="{Binding ServiceStatus}"
                        Margin="5"/>
-                    <Button Grid.Row="1" Grid.Column="2" 
+                <Button Grid.Row="1" Grid.Column="2" 
                         Command="{s:Action StartService}"
                         Content="Start Service"
                         Margin="5"/>
-                    <Button Grid.Row="2" Grid.Column="2" 
+                <Button Grid.Row="2" Grid.Column="2" 
                         Command="{s:Action StopService}" 
                         Content="Stop Service"
                         Margin="5"/>
-                </Grid>
-            </GroupBox>
+            </Grid>
+        </GroupBox>
 
-            <GroupBox Header="Web host"
+        <GroupBox Header="TLS/SSL Certificate"
                   Margin="5">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
-                    <Label Grid.Row="0" Grid.Column="0" 
+                <Label Grid.Row="0" Grid.Column="0"
+                       Content=" Certificate"
+                       Margin="5"/>
+                <TextBox Grid.Row="0" Grid.Column="1"
+                         Text="{Binding CertificateDisplayName, Mode=OneWay}" 
+                         IsReadOnly="True"
+                         Margin="5"/>
+                <Button Grid.Row="0" Grid.Column="2"
+                        Command="{s:Action ShowCertificateDialog}"
+                        Content="View certificate..."
+                        Margin="5"/>
+                <Button Grid.Row="1" Grid.Column="2" 
+                        IsEnabled="{Binding IsEditing}"
+                        Command="{s:Action ShowSelectCertificateDialog}"
+                        Content="Select from store..."
+                        Margin="5"/>
+                <Button Grid.Row="2" Grid.Column="2" 
+                        Command="{s:Action ShowImportDialog}"
+                        IsEnabled="{Binding IsEditing}"
+                        Content="Import..."
+                        Margin="5"/>
+                <Label Grid.Row="1" Grid.Column="1"
+                       Content="{Binding CertificateExpiryText}"
+                       Margin="5"/>
+
+
+
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Header="Web host"
+                  IsEnabled="{Binding IsEditing}"
+                  Margin="5">
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+               
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="3" Grid.Column="0" 
                    Content="HTTP Port"
                    Margin="5"/>
-                    <mah:NumericUpDown Grid.Row="0" Grid.Column="1" 
+                <mah:NumericUpDown Grid.Row="3" Grid.Column="1" 
                                Value="{Binding HttpPort}" 
                                Minimum="1" Maximum="65535" Interval="1"
                                HideUpDownButtons="True"
                                Width="50" 
                                TextAlignment="Left" HorizontalAlignment="Left"
                                Margin="5 5 5 0"/>
-                    <Label Grid.Row="1" Grid.Column="1" 
+                <Label Grid.Row="4" Grid.Column="1" 
                    Content="Enter the HTTP port to listen on (Default 80). Note that all connections on this port are redirected to HTTPS"
                    Margin="5 0 5 0"/>
 
-                    <Label Grid.Row="2" Grid.Column="0" 
+                <Label Grid.Row="5" Grid.Column="0" 
                    Content="HTTPS Port"
                    Margin="5"/>
-                    <mah:NumericUpDown Grid.Row="2" Grid.Column="1" 
+                <mah:NumericUpDown Grid.Row="5" Grid.Column="1" 
                                Value="{Binding HttpsPort}" 
                                Minimum="1" Maximum="65535" Interval="1" 
                                HideUpDownButtons="True"
                                Width="50" 
                                TextAlignment="Left" HorizontalAlignment="Left"
                                Margin="5 5 5 0"/>
-                    <Label Grid.Row="3" Grid.Column="1" 
+                <Label Grid.Row="6" Grid.Column="1" 
                    Content="Enter the HTTPS port to listen on (Default 443)"
                    Margin="5 0 5 0"/>
 
-                    <Label Grid.Row="4" Grid.Column="0" 
+                <Label Grid.Row="7" Grid.Column="0" 
                    Content="Hostname"
                    Margin="5"/>
-                    <TextBox Grid.Row="4" Grid.Column="1"
+                <TextBox Grid.Row="7" Grid.Column="1"
                      Text="{Binding Hostname}"
                      Margin="5 5 5 0"/>
-                    <Label Grid.Row="5" Grid.Column="1" 
+                <Label Grid.Row="8" Grid.Column="1" 
                    Content="Optionally, enter a specific hostname to listen on. Leave this field blank to listen on all hostnames"
                    Margin="5 0 5 0"/>
 
-                    <Label Grid.Row="6" Grid.Column="0"
-                       Content="Certificate"
-                       Margin="5"/>
-                    <TextBox Grid.Row="6" Grid.Column="1"
-                         Text="{Binding CertificateDisplayName, Mode=OneWay}" 
-                         IsReadOnly="True"
-                         Margin="5"/>
-                    <Button Grid.Row="6" Grid.Column="2"
-                        Command="{s:Action ShowCertificateDialog}"
-                        Content="View certificate..."
-                        Margin="5"/>
-                    <Button Grid.Row="7" Grid.Column="2" 
-                        Command="{s:Action ShowSelectCertificateDialog}"
-                        Content="Select from store..."
-                        Margin="5"/>
-                    <Button Grid.Row="8" Grid.Column="2" 
-                        Command="{s:Action ShowImportDialog}"
-                        Content="Import..."
-                        Margin="5"/>
-                    <Label Grid.Row="7" Grid.Column="1"
-                       Content="{Binding CertificateExpiryText}"
-                       Margin="5"/>
+            </Grid>
+        </GroupBox>
 
-                </Grid>
-            </GroupBox>
+        <StackPanel Orientation="Horizontal"
+                    Margin="5"
+                    HorizontalAlignment="Right">
 
+        <Button Content="Revert changes"
+                Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}"
+                HorizontalAlignment="Left"
+                Command="{s:Action CancelSave}"
+                Margin="5"/>
+
+        <Button Content="{Binding EditSettingsButtonText, FallbackValue='Edit settings'}"
+                HorizontalAlignment="Left"
+                Command="{s:Action EditSettings}"
+                Margin="5"/>
         </StackPanel>
+    </StackPanel>
 </UserControl>

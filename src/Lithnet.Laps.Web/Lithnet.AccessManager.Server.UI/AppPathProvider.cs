@@ -9,6 +9,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.AppPath = @"D:\dev\git\lithnet\laps-web\src\Lithnet.Laps.Web\Lithnet.AccessManager.Web";
             this.TemplatesPath = $"{AppPath}\\NotificationTemplates";
             this.ConfigFile = $"{AppPath}\\appsettings.json";
+            this.HostingConfigFile = $"{AppPath}\\apphost.json";
             this.ImagesPath = $"{AppPath}\\wwwroot\\images";
             this.ScriptsPath = $"{AppPath}\\Scripts";
             this.WwwRootPath = $"{AppPath}\\wwwroot";
@@ -24,7 +25,9 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string ImagesPath { get; }
 
-        public string ConfigFile { get; } 
+        public string ConfigFile { get; }
+        
+        public string HostingConfigFile { get; }
 
         public string GetRelativePath(string file, string basePath)
         {

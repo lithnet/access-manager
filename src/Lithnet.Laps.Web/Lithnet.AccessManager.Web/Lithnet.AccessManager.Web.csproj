@@ -98,6 +98,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </Content>
+    <Content Update="apphost.Development.json">
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </Content>
     <Content Update="libman.json" CopyToPublishDirectory="Never" CopyToOutputDirectory="Never">
     </Content>
     <Content Update="wwwroot\images\custom.png">

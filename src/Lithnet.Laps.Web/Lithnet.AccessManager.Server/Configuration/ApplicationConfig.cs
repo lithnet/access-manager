@@ -8,8 +8,7 @@ namespace Lithnet.AccessManager.Server.Configuration
         [JsonIgnore]
         public string Path { get; set; }
 
-        public HostingOptions Hosting { get; set; }
-                
+               
         public AuthenticationOptions Authentication { get; set; }
         
         public AuthorizationOptions Authorization { get; set; }

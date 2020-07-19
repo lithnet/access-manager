@@ -15,13 +15,15 @@ namespace Lithnet.AccessManager.Server.UI
 
             var appconfig = ApplicationConfig.Load(pathProvider.ConfigFile);
 
+            var hosting = HostingOptions.Load(pathProvider.HostingConfigFile);
+
             builder.Bind<IApplicationConfig>().ToInstance(appconfig);
             builder.Bind<AuthenticationOptions>().ToInstance(appconfig.Authentication);
             builder.Bind<AuditOptions>().ToInstance(appconfig.Auditing);
             builder.Bind<AuthorizationOptions>().ToInstance(appconfig.Authorization);
             builder.Bind<EmailOptions>().ToInstance(appconfig.Email);
             builder.Bind<ForwardedHeadersAppOptions>().ToInstance(appconfig.ForwardedHeaders);
-            builder.Bind<HostingOptions>().ToInstance(appconfig.Hosting);
+            builder.Bind<HostingOptions>().ToInstance(hosting);
             builder.Bind<RateLimitOptions>().ToInstance(appconfig.RateLimits);
             builder.Bind<UserInterfaceOptions>().ToInstance(appconfig.UserInterface);
             builder.Bind<JitConfigurationOptions>().ToInstance(appconfig.JitConfiguration);

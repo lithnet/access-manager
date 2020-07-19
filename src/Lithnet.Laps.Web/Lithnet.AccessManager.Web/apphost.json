@@ -1,0 +1,20 @@
+{
+  "Hosting": {
+    "Environment": "HttpSys",
+    "HttpSys": {
+      "HttpPort": 5000,
+      "HttpsPort": 5001,
+      "Hostname": "idmd1ss1.idmdev1.local",
+      "Path": null,
+      "MaxAccepts": 100,
+      "EnableResponseCaching": false,
+      "ThrowWriteExceptions": false,
+      "MaxConnections": 100,
+      "RequestQueueLimit": 1000,
+      "MaxRequestBodySize": 2480000,
+      "AllowSynchronousIO": false,
+      "Http503Verbosity": "Limited",
+      "ClientCertificateMethod": "NoCertificate"
+    }
+  }
+}

@@ -1,58 +1,269 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
-using System.IO;
 using System.Linq;
 using System.Net;
-using System.Security.AccessControl;
+using System.Printing;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceProcess;
+using System.Threading;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.Theming;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using SslCertBinding.Net;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class HostingViewModel : Screen, IHaveDisplayName
+    public sealed class HostingViewModel : Screen, IHaveDisplayName
     {
         private const string SddlTemplate = "D:(A;;GX;;;{0})";
-        
-        private readonly HostingOptions model;
+
+        private HostingOptions OriginalModel { get; set; }
+
+        private HostingOptions WorkingModel { get; set; }
 
         private readonly IDialogCoordinator dialogCoordinator;
 
         private readonly IServiceSettingsProvider serviceSettings;
 
-        public HostingViewModel(IApplicationConfig config, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings)
+        private readonly CancellationTokenSource cancellationTokenSource;
+
+        private readonly ILogger<HostingViewModel> logger;
+
+        private readonly IAppPathProvider pathProvider;
+
+        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider)
         {
-            this.model = config.Hosting;
+            this.logger = logger;
+            this.pathProvider = pathProvider;
+            this.OriginalModel = model;
+            this.WorkingModel = this.CloneModel(model);
             this.dialogCoordinator = dialogCoordinator;
             this.serviceSettings = serviceSettings;
-            this.ActiveHttpPort = this.model.HttpSys.HttpPort;
-            this.ActiveHttpsPort = this.model.HttpSys.HttpsPort;
-            this.ActiveHostname = this.model.HttpSys.Hostname;
-            this.ActiveCertificate = this.GetCertificate();
-            this.ActiveServiceAccount = this.serviceSettings.GetServiceAccount();
-            this.ServiceAccount = this.ActiveServiceAccount;
+            this.Certificate = this.GetCertificate();
+            this.OriginalCertificate = this.Certificate;
+            this.ServiceAccount = this.serviceSettings.GetServiceAccount();
+            this.OriginalServiceAccount = this.ServiceAccount;
+            this.ServiceStatus = this.serviceSettings.ServiceController.Status.ToString();
             this.DisplayName = "Web hosting";
+            this.cancellationTokenSource = new CancellationTokenSource();
+            this.AutoValidate = false;
+            this.Validator = validator;
+            _ = this.PollServiceStatus(this.cancellationTokenSource.Token);
         }
+
+        private X509Certificate2 OriginalCertificate { get; set; }
+
+        private SecurityIdentifier OriginalServiceAccount { get; set; }
+
+        private string workingServiceAccountUserName { get; set; }
+
+        private string workingServiceAccountPassword { get; set; }
 
         public string ServiceStatus { get; set; }
 
-        public int HttpPort { get => this.model.HttpSys.HttpPort; set => this.model.HttpSys.HttpPort = value; }
+        public int HttpPort { get => this.WorkingModel.HttpSys.HttpPort; set => this.WorkingModel.HttpSys.HttpPort = value; }
 
-        public int HttpsPort { get => this.model.HttpSys.HttpsPort; set => this.model.HttpSys.HttpsPort = value; }
+        public int HttpsPort { get => this.WorkingModel.HttpSys.HttpsPort; set => this.WorkingModel.HttpSys.HttpsPort = value; }
 
-        public string Hostname { get => this.model.HttpSys.Hostname; set => this.model.HttpSys.Hostname = value; }
+        public string Hostname { get => this.WorkingModel.HttpSys.Hostname; set => this.WorkingModel.HttpSys.Hostname = value; }
 
         public bool IsEditing { get; set; }
 
-        public bool IsReading => !this.IsEditing;
+        public string EditSettingsButtonText { get; set; } = "Edit settings";
+
+        public async Task EditSettings()
+        {
+            if (!this.IsEditing)
+            {
+                this.EditSettingsButtonText = "Commit changes";
+                this.IsEditing = true;
+                this.AutoValidate = true;
+                return;
+            }
+
+            bool updatePrivateKeyPermissions =
+                this.ServiceAccount != this.OriginalServiceAccount ||
+                this.Certificate?.Thumbprint != this.OriginalCertificate?.Thumbprint;
+
+            bool updateHttpReservations =
+                this.WorkingModel.HttpSys.Hostname != this.OriginalModel.HttpSys.Hostname ||
+                this.WorkingModel.HttpSys.HttpPort != this.OriginalModel.HttpSys.HttpPort ||
+                this.WorkingModel.HttpSys.HttpsPort != this.OriginalModel.HttpSys.HttpsPort ||
+                this.ServiceAccount != this.OriginalServiceAccount;
+
+            bool updateConfigFile = updateHttpReservations;
+
+            bool updateCertificateBinding =
+                this.WorkingModel.HttpSys.HttpsPort != this.OriginalModel.HttpSys.HttpsPort ||
+                this.Certificate?.Thumbprint != this.OriginalCertificate?.Thumbprint;
+
+            bool updateServiceAccount = this.workingServiceAccountUserName != null;
+
+            try
+            {
+                if (updatePrivateKeyPermissions)
+                {
+                    this.Certificate.AddPrivateKeyReadPermission(this.ServiceAccount);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Could not add private key permissions");
+                var result = await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred while trying to add permissions for the service account {this.ServiceAccountDisplayName} to read the private key of the specified certificate. Try adding permissions for this manually using the Windows computer certificates MMC console. Do you want to continue with the operation?\r\n{ex.Message}", MessageDialogStyle.AffirmativeAndNegative);
+
+                if (result == MessageDialogResult.Canceled)
+                {
+                    return;
+                }
+            }
+
+            try
+            {
+                if (updateHttpReservations)
+                {
+                   this.CreateNewHttpReservations();
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Error creating HTTP reservations");
+                this.TryRollbackHttpReservations();
+
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not create the HTTP reservations\r\n{ex.Message}");
+                return;
+            }
+
+
+
+            try
+            {
+                if (updateConfigFile)
+                {
+                    this.WorkingModel.Save(pathProvider.HostingConfigFile);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Could not save updated config file");
+                this.TryRollbackConfig();
+                return;
+            }
+
+            try
+            {
+                if (updateCertificateBinding)
+                {
+                    this.UpdateCertificateBinding();
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Error creating certificate binding");
+
+                this.TryRollbackCertificateBinding();
+
+                if (updateHttpReservations)
+                {
+                    this.TryRollbackHttpReservations();
+                }
+
+                if (updateConfigFile)
+                {
+                    this.TryRollbackConfig();
+                }
+
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not bind the certificate to the specified port\r\n{ex.Message}");
+
+                return;
+            }
+
+            try
+            {
+                if (updateServiceAccount)
+                {
+                    this.serviceSettings.SetServiceAccount(this.workingServiceAccountUserName, this.workingServiceAccountPassword);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex,
+                    "Could not change the service account to the specified account {serviceAccountName}",
+                    workingServiceAccountUserName);
+
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The service account could not be changed\r\n{ex.Message}");
+
+                if (updateCertificateBinding)
+                {
+                    this.TryRollbackCertificateBinding();
+                }
+
+                if (updateHttpReservations)
+                {
+                    this.TryRollbackHttpReservations();
+                }
+
+                if (updateConfigFile)
+                {
+                    this.TryRollbackConfig();
+                }
+
+                return;
+            }
+
+            if (updateCertificateBinding || updateHttpReservations || updatePrivateKeyPermissions ||
+                updateServiceAccount || updateConfigFile)
+            {
+                this.OriginalModel = this.CloneModel(this.WorkingModel);
+                this.OriginalCertificate = this.Certificate;
+                this.OriginalServiceAccount = this.ServiceAccount;
+
+                this.ResetEditState();
+
+                await this.dialogCoordinator.ShowMessageAsync(this, "Configuration updated", $"The service configuration has been updated. Restart the service for the new settings to take effect");
+            }
+            else
+            {
+                this.ResetEditState();
+            }
+        }
+
+        private void TryRollbackConfig()
+        {
+            try
+            {
+                this.OriginalModel.Save(pathProvider.HostingConfigFile);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Could not rollback the config file");
+            }
+        }
+        public void CancelSave()
+        {
+            this.ServiceAccount = this.OriginalServiceAccount;
+            this.Certificate = this.OriginalCertificate;
+            this.WorkingModel = this.OriginalModel;
+            this.ResetEditState();
+        }
+
+        private void ResetEditState()
+        {
+            this.AutoValidate = false;
+            this.ClearAllPropertyErrors();
+            this.IsEditing = false;
+            this.EditSettingsButtonText = "Edit settings";
+            this.workingServiceAccountUserName = null;
+            this.workingServiceAccountPassword = null;
+        }
 
         public X509Certificate2 Certificate { get; set; }
 
@@ -60,30 +271,20 @@ namespace Lithnet.AccessManager.Server.UI
 
         public SecurityIdentifier ServiceAccount { get; set; }
 
-        public string ServiceAccountDisplayName { get; set; }
-
-        public string ServiceAccountPassword { get; set; }
-
-        private int ActiveHttpPort { get; set; }
-
-        private int ActiveHttpsPort { get; set; }
-
-        private string ActiveHostname { get; set; }
-
-        private X509Certificate2 ActiveCertificate { get; set; }
-
-        private SecurityIdentifier ActiveServiceAccount { get; set; }
-
-        private bool HasHttpPortChanged => this.ActiveHttpPort != this.HttpPort;
-
-        private bool HasHttpsPortChanged => this.ActiveHttpsPort != this.HttpsPort;
-
-        private bool HasHostnameChanged => this.ActiveHostname != this.Hostname;
-
-        private bool HasCertificateChanged => this.ActiveCertificate != this.Certificate;
-
-        private bool HasServiceAccountChanged => this.ActiveServiceAccount != this.ServiceAccount ||
-            this.ServiceAccountPassword != null;
+        public string ServiceAccountDisplayName
+        {
+            get
+            {
+                try
+                {
+                    return this.ServiceAccount?.Translate(typeof(NTAccount))?.Value ?? "<not set>";
+                }
+                catch
+                {
+                    return this.ServiceAccount?.ToString() ?? "<not set>";
+                }
+            }
+        }
 
         public string CertificateExpiryText
         {
@@ -105,7 +306,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public bool ShowCertificateExpiryWarning => this.Certificate == null ? false : this.Certificate.NotAfter.AddDays(-30) >= DateTime.Now;
+        public bool ShowCertificateExpiryWarning => this.Certificate != null && this.Certificate.NotAfter.AddDays(-30) >= DateTime.Now;
 
         public async Task SelectServiceAccountUser()
         {
@@ -131,28 +332,23 @@ namespace Lithnet.AccessManager.Server.UI
                         throw new DirectoryException("The selected object must be a user");
                     }
 
-                    this.ServiceAccountDisplayName = o.MsDsPrincipalName;
                     this.ServiceAccount = o.Sid;
                 }
                 else
                 {
-                    using (PrincipalContext p = new PrincipalContext(ContextType.Machine))
+                    using PrincipalContext p = new PrincipalContext(ContextType.Machine);
+                    var up = UserPrincipal.FindByIdentity(p, r.Username);
+
+                    if (up == null)
                     {
-                        var up = UserPrincipal.FindByIdentity(p, r.Username);
-
-                        if (up == null)
-                        {
-                            throw new ObjectNotFoundException("The user could not be found");
-                        }
-
-                        this.ServiceAccountDisplayName = up.SamAccountName;
-                        this.ServiceAccount = up.Sid;
-                        var f = (NTAccount)up.Sid.Translate(typeof(NTAccount));
+                        throw new ObjectNotFoundException("The user could not be found");
                     }
+
+                    this.ServiceAccount = up.Sid;
                 }
 
-                this.ServiceAccountPassword = r.Password;
-
+                this.workingServiceAccountUserName = r.Username;
+                this.workingServiceAccountPassword = r.Password;
             }
             catch (Exception ex)
             {
@@ -166,46 +362,51 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task StopService()
         {
-            if (this.CanStopService)
+            try
             {
-                this.serviceSettings.ServiceController.Stop();
-                this.ServiceStatus = "Stopping";
+                if (this.CanStopService)
+                {
+                    this.serviceSettings.ServiceController.Stop();
+                }
             }
-
-            await Task.Run(async () =>
+            catch (Exception ex)
             {
-                try
-                {
-                    this.serviceSettings.ServiceController.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30));
-                }
-                catch (System.ServiceProcess.TimeoutException)
-                {
-                    await dialogCoordinator.ShowMessageAsync(this, "Service control", "The service did not stop in the requested time");
-                }
-            })
-           .ContinueWith((x) => this.ServiceStatus = this.serviceSettings.ServiceController.Status.ToString());
+                await dialogCoordinator.ShowMessageAsync(this, "Service control", $"Could not stop service\r\n{ex.Message}");
+                return;
+            }
+            try
+            {
+                await this.serviceSettings.ServiceController.WaitForStatusAsync(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30), CancellationToken.None);
+            }
+            catch (System.ServiceProcess.TimeoutException)
+            {
+                await dialogCoordinator.ShowMessageAsync(this, "Service control", "The service did not stop in the requested time");
+            }
         }
 
         public async Task StartService()
         {
-            if (this.CanStartService)
+            try
             {
-                this.serviceSettings.ServiceController.Start();
-                this.ServiceStatus = "Starting";
+                if (this.CanStartService)
+                {
+                    this.serviceSettings.ServiceController.Start();
+                }
+            }
+            catch (Exception ex)
+            {
+                await dialogCoordinator.ShowMessageAsync(this, "Service control", $"Could not start service\r\n{ex.Message}");
+                return;
             }
 
-            await Task.Run(async () =>
+            try
             {
-                try
-                {
-                    this.serviceSettings.ServiceController.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30));
-                }
-                catch (System.ServiceProcess.TimeoutException)
-                {
-                    await dialogCoordinator.ShowMessageAsync(this, "Service control", "The service did not start in the requested time");
-                }
-            })
-             .ContinueWith((x) => this.ServiceStatus = this.serviceSettings.ServiceController.Status.ToString());
+                await this.serviceSettings.ServiceController.WaitForStatusAsync(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30), CancellationToken.None);
+            }
+            catch (System.ServiceProcess.TimeoutException)
+            {
+                await dialogCoordinator.ShowMessageAsync(this, "Service control", "The service did not start in the requested time");
+            }
         }
 
         public async Task RestartService()
@@ -280,7 +481,24 @@ namespace Lithnet.AccessManager.Server.UI
             return results.ToList();
         }
 
-        private void ReplaceCertificate(X509Certificate2 cert, int port)
+        private void UpdateCertificateBinding()
+        {
+            this.ReplaceCertificateBinding(this.Certificate, this.WorkingModel.HttpSys.HttpsPort);
+        }
+
+        private void TryRollbackCertificateBinding()
+        {
+            try
+            {
+                this.ReplaceCertificateBinding(this.OriginalCertificate, this.OriginalModel.HttpSys.HttpsPort);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Unable to rollback certificate binding");
+            }
+        }
+
+        private void ReplaceCertificateBinding(X509Certificate2 cert, int port)
         {
             var config = new CertificateBindingConfiguration();
 
@@ -326,28 +544,6 @@ namespace Lithnet.AccessManager.Server.UI
             return certs;
         }
 
-        private void AddPrivateKeyReadPermission(X509Certificate2 cert, SecurityIdentifier sid)
-        {
-            string location = NativeMethods.GetKeyLocation(cert);
-
-            if (location == null)
-            {
-                throw new CertificateNotFoundException("The certificate private key was not found. Manually add permissions for the service account to read this private key");
-            }
-
-            AddFileSecurity(location, sid, FileSystemRights.Read, AccessControlType.Allow);
-        }
-
-        private static void AddFileSecurity(string fileName, IdentityReference account, FileSystemRights rights, AccessControlType controlType)
-        {
-            FileInfo info = new FileInfo(fileName);
-            FileSecurity fSecurity = info.GetAccessControl();
-
-            fSecurity.AddAccessRule(new FileSystemAccessRule(account, rights, controlType));
-
-            info.SetAccessControl(fSecurity);
-        }
-
         private X509Certificate2 GetCertificateFromStore(string storeName, string thumbprint)
         {
             X509Store store = new X509Store(storeName, StoreLocation.LocalMachine, OpenFlags.ReadOnly);
@@ -355,49 +551,67 @@ namespace Lithnet.AccessManager.Server.UI
             return store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false)?[0];
         }
 
-        
 
-        public async Task SaveHostingSettings()
+        private void CreateNewHttpReservations()
         {
-            await this.StopService();
-
-            if (this.HasServiceAccountChanged || this.ServiceAccountPassword != null)
+            if (this.ServiceAccount == null)
             {
-                this.serviceSettings.SetServiceAccount(this.ServiceAccountDisplayName, this.ServiceAccountPassword);
+                return;
             }
 
-            if (this.HasServiceAccountChanged)
-            {
-                // update on disk ACLs
-            }
+            string httpOld = HttpSysHostingOptions.BuildPrefix(this.OriginalModel.HttpSys.Hostname, this.OriginalModel.HttpSys.HttpPort, this.OriginalModel.HttpSys.Path, false);
+            string httpsOld = HttpSysHostingOptions.BuildPrefix(this.OriginalModel.HttpSys.Hostname, this.OriginalModel.HttpSys.HttpsPort, this.OriginalModel.HttpSys.Path, true);
 
-            if (this.HasHttpPortChanged || this.HasHttpsPortChanged || this.HasServiceAccountChanged || this.HasHostnameChanged)
-            {
-                string httpOld = HttpSysHostingOptions.BuildPrefix(this.ActiveHostname, this.ActiveHttpPort, this.model.HttpSys.Path, false);
-                string httpsOld = HttpSysHostingOptions.BuildPrefix(this.ActiveHostname, this.ActiveHttpPort, this.model.HttpSys.Path, true);
+            this.DeleteUrlReservation(httpOld);
+            this.DeleteUrlReservation(httpsOld);
 
-                this.DeleteUrlReservation(httpOld);
-                this.DeleteUrlReservation(httpsOld);
-
-                this.CreateUrlReservation(this.model.HttpSys.BuildHttpUrlPrefix(), this.ServiceAccount);
-                this.CreateUrlReservation(this.model.HttpSys.BuildHttpsUrlPrefix(), this.ServiceAccount);
-            }
-
-            if (this.HasCertificateChanged || this.HasServiceAccountChanged)
-            {
-                this.AddPrivateKeyReadPermission(this.Certificate, this.ServiceAccount);
-            }
-
-            if (this.HasCertificateChanged || this.HasHttpsPortChanged)
-            {
-                this.ReplaceCertificate(this.Certificate, this.HttpsPort);
-            }
-
-
-            // Commit config
-
-            await this.StartService();
+            this.CreateUrlReservation(this.WorkingModel.HttpSys.BuildHttpUrlPrefix(), this.ServiceAccount);
+            this.CreateUrlReservation(this.WorkingModel.HttpSys.BuildHttpsUrlPrefix(), this.ServiceAccount);
         }
+
+        private void TryRollbackHttpReservations()
+        {
+            try
+            {
+
+                string httpOld = HttpSysHostingOptions.BuildPrefix(this.OriginalModel.HttpSys.Hostname,
+                    this.OriginalModel.HttpSys.HttpPort, this.OriginalModel.HttpSys.Path, false);
+                string httpsOld = HttpSysHostingOptions.BuildPrefix(this.OriginalModel.HttpSys.Hostname,
+                    this.OriginalModel.HttpSys.HttpsPort, this.OriginalModel.HttpSys.Path, true);
+
+                this.DeleteUrlReservation(this.WorkingModel.HttpSys.BuildHttpUrlPrefix());
+                this.DeleteUrlReservation(this.WorkingModel.HttpSys.BuildHttpsUrlPrefix());
+
+                this.CreateUrlReservation(httpOld, this.ServiceAccount);
+                this.CreateUrlReservation(httpsOld, this.ServiceAccount);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Unable to rollback HTTP reservations");
+            }
+        }
+
+        private async Task PollServiceStatus(CancellationToken token)
+        {
+            try
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    await Task.Delay(500, CancellationToken.None).ConfigureAwait(false);
+                    this.serviceSettings.ServiceController.Refresh();
+                    this.ServiceStatus = this.serviceSettings.ServiceController.Status.ToString();
+
+                }
+            }
+            catch { }
+        }
+
+
+        private T CloneModel<T>(T model)
+        {
+            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(model));
+        }
+
     }
 }
 

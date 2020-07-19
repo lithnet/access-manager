@@ -13,6 +13,7 @@ namespace Lithnet.AccessManager.Web.Internal
             this.AppPath = env.ContentRootPath;
             this.TemplatesPath = $"{AppPath}\\NotificationTemplates";
             this.ConfigFile = $"{AppPath}\\appsettings.json";
+            this.HostingConfigFile = $"{AppPath}\\apphost.json";
             this.ScriptsPath = $"{AppPath}\\Scripts";
             this.WwwRootPath = $"{AppPath}\\wwwroot";
             this.ImagesPath = $"{AppPath}\\wwwroot\\images";
@@ -29,6 +30,8 @@ namespace Lithnet.AccessManager.Web.Internal
         public string ImagesPath { get; }
 
         public string ConfigFile { get; }
+        
+        public string HostingConfigFile { get; }
 
         public string GetRelativePath(string file, string basePath)
         {
