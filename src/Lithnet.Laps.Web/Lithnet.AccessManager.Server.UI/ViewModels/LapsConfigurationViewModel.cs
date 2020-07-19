@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows;
 using MahApps.Metro.Controls.Dialogs;
+using PropertyChanged;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -44,11 +45,18 @@ namespace Lithnet.AccessManager.Server.UI
             }
 
             this.SelectedForest = this.Forests.FirstOrDefault();
+            this.AvailableCertificates = new BindableCollection<X509Certificate2ViewModel>();
+            this.RefreshAvailableCertificates();
         }
 
         public List<Forest> Forests { get; }
 
         public Forest SelectedForest { get; set; }
+
+        private void OnSelectedForestChanged()
+        {
+            this.RefreshAvailableCertificates();
+        }
 
         public void AttachView(UIElement view)
         {
@@ -60,7 +68,7 @@ namespace Lithnet.AccessManager.Server.UI
         public X509Certificate2ViewModel SelectedCertificate { get; set; }
 
         [PropertyChanged.DependsOn(nameof(SelectedForest))]
-        public BindableCollection<X509Certificate2ViewModel> AvailableCertificates => this.BuildAvailableCertificates(this.SelectedForest);
+        public BindableCollection<X509Certificate2ViewModel> AvailableCertificates { get; }
 
         public bool CanPublishSelectedCertificate => !this.SelectedCertificate?.IsPublished ?? false;
 
@@ -92,6 +100,19 @@ namespace Lithnet.AccessManager.Server.UI
                 if (publishedCert.Thumbprint == this.SelectedCertificate.Model.Thumbprint)
                 {
                     this.SelectedCertificate.IsPublished = true;
+
+                    foreach (var c in this.AvailableCertificates.ToList())
+                    {
+                        if (this.SelectedCertificate != c)
+                        {
+                            c.IsPublished = false;
+                        }
+
+                        if (c.IsOrphaned)
+                        {
+                            this.AvailableCertificates.Remove(c);
+                        }
+                    }
                 }
             }
         }
@@ -102,8 +123,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert(this.SelectedForest.Name);
 
-            using X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
-            store.Open(OpenFlags.ReadWrite);
+            using X509Store store =  this.certificateProvider.OpenServiceStore(Constants.ServiceName, OpenFlags.ReadWrite);
             store.Add(cert);
 
             var vm = this.certificate2ViewModelFactory.CreateViewModel(cert);
@@ -137,17 +157,22 @@ namespace Lithnet.AccessManager.Server.UI
             w.ShowDialog();
         }
 
-        private BindableCollection<X509Certificate2ViewModel> BuildAvailableCertificates(Forest forest)
+        private void RefreshAvailableCertificates()
         {
-            var availableCertificates = new BindableCollection<X509Certificate2ViewModel>();
-
-            if (forest == null)
+            if (this.AvailableCertificates == null)
             {
-                return availableCertificates;
+                return;
+            }
+
+            this.AvailableCertificates.Clear();
+
+            if (this.SelectedForest == null)
+            {
+                return;
             }
 
             var allCertificates = certificateProvider.GetEligibleCertificates(false).OfType<X509Certificate2>();
-            this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert, forest.RootDomain.Name);
+            this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert, this.SelectedForest.RootDomain.Name);
 
             bool foundPublished = false;
 
@@ -161,9 +186,9 @@ namespace Lithnet.AccessManager.Server.UI
                     foundPublished = true;
                 }
 
-                if (certificate.Subject.StartsWith($"CN={forest.RootDomain.Name}", StringComparison.OrdinalIgnoreCase))
+                if (certificate.Subject.StartsWith($"CN={this.SelectedForest.RootDomain.Name}", StringComparison.OrdinalIgnoreCase))
                 {
-                    availableCertificates.Add(vm);
+                    this.AvailableCertificates.Add(vm);
                 }
             }
 
@@ -172,10 +197,8 @@ namespace Lithnet.AccessManager.Server.UI
                 var vm = this.certificate2ViewModelFactory.CreateViewModel(publishedCert);
                 vm.IsOrphaned = true;
                 vm.IsPublished = true;
-                availableCertificates.Add(vm);
+                this.AvailableCertificates.Add(vm);
             }
-
-            return availableCertificates;
         }
 
         public string DisplayName { get; set; } = "Password encryption and history";

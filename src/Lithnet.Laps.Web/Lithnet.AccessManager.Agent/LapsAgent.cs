@@ -140,8 +140,7 @@ namespace Lithnet.AccessManager.Agent
                 {
                     lithnetAdminPasswordProvider.UpdateCurrentPassword(computer,
                         this.encryptionProvider.Encrypt(
-                            this.certificateProvider.FindCertificate(
-                                false, this.settings.CertThumbprint, this.settings.CertPath),
+                            this.certificateProvider.FindEncryptionCertificate(this.settings.CertThumbprint, this.settings.CertPath),
                             newPassword),
                         rotationInstant,
                         expiryDate,

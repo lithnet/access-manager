@@ -29,6 +29,7 @@
                      Margin="5"
                      Text="{Binding ScriptText, Mode=OneWay}"
                      MaxHeight="600"
+                     FontFamily="Consolas,Courier New"
                      IsReadOnly="True"/>
 
             <Button Grid.Row="2"

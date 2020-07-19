@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using Microsoft.Extensions.Logging;
@@ -8,7 +10,7 @@ using NUnit.Framework;
 
 namespace Lithnet.AccessManager.Test
 {
-    public class CertificateResolverTests
+    public class CertificateProviderTests
     {
         private Mock<IAppPathProvider> env;
 
@@ -33,10 +35,10 @@ namespace Lithnet.AccessManager.Test
 
             foreach (var cert in store.Certificates)
             {
-                Assert.AreEqual(cert, provider.FindCertificate(false, cert.Thumbprint));
+                Assert.AreEqual(cert, provider.FindEncryptionCertificate(cert.Thumbprint));
             }
 
-            Assert.Throws<CertificateNotFoundException>(() => provider.FindCertificate(false, "ABCDE"));
+            Assert.Throws<CertificateNotFoundException>(() => provider.FindEncryptionCertificate("ABCDE"));
         }
 
         [TestCase(StoreLocation.CurrentUser)]
@@ -49,15 +51,61 @@ namespace Lithnet.AccessManager.Test
             {
                 if (cert.HasPrivateKey)
                 {
-                    Assert.AreEqual(cert, provider.FindCertificate(true, cert.Thumbprint));
+                    Assert.AreEqual(cert, provider.FindDecryptionCertificate(cert.Thumbprint));
                 }
                 else
                 {
-                    Assert.Throws<CertificateValidationException>(() => provider.FindCertificate(true, cert.Thumbprint));
+                    Assert.Throws<CertificateValidationException>(() => provider.FindDecryptionCertificate(cert.Thumbprint));
                 }
             }
 
-            Assert.Throws<CertificateNotFoundException>(() => provider.FindCertificate(true, "ABCDE"));
+            Assert.Throws<CertificateNotFoundException>(() => provider.FindDecryptionCertificate("ABCDE"));
+        }
+
+        [Test]
+        public void GetDecryptionCertificateFromServiceStore()
+        {
+            var store = this.provider.OpenServiceStore(Constants.ServiceName, OpenFlags.ReadWrite);
+
+            foreach (var cert in store.Certificates)
+            {
+                if (cert.HasPrivateKey)
+                {
+                    Assert.AreEqual(cert, provider.FindDecryptionCertificate(cert.Thumbprint, Constants.ServiceName));
+                }
+                else
+                {
+                    Assert.Throws<CertificateValidationException>(() => provider.FindDecryptionCertificate(cert.Thumbprint));
+                }
+            }
+
+            Assert.Throws<CertificateNotFoundException>(() => provider.FindDecryptionCertificate("ABCDE"));
+        }
+
+
+        [Test]
+        public void AddDecryptionCertificateToServiceStore()
+        {
+            X509Certificate2 cert = null;
+            try
+            {
+                var store = this.provider.OpenServiceStore(Constants.ServiceName, OpenFlags.ReadWrite);
+                cert = this.provider.CreateSelfSignedCert(TestContext.CurrentContext.Random.GetString(10));
+                store.Add(cert);
+                store.Close();
+
+                Assert.AreEqual(cert, provider.FindDecryptionCertificate(cert.Thumbprint, Constants.ServiceName));
+            }
+            finally
+            {
+                if (cert != null)
+                {
+                    var store = this.provider.OpenServiceStore(Constants.ServiceName, OpenFlags.ReadWrite);
+                    store.Remove(cert);
+                    store.Close();
+                }
+            }
+
         }
 
         [TestCase("TestFiles\\DigiCertGlobalRootG3.crt")]
