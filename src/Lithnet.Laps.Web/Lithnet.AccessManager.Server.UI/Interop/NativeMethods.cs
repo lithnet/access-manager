@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceProcess;
@@ -30,6 +31,22 @@ namespace Lithnet.AccessManager.Server.UI.Interop
         private const int CRYPTUI_WIZ_IMPORT_NO_CHANGE_DEST_STORE = 0x00010000;
 
         private const int CRYPTUI_WIZ_IMPORT_TO_LOCALMACHINE = 0x00100000;
+
+
+        [DllImport("AclUI.dll", SetLastError = true, ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool EditSecurity([Optional] IntPtr hwndOwner, ISecurityInformation psi);
+
+        [DllImport("AdvApi32.dll", ExactSpelling = true)]
+        public static extern void MapGenericMask(ref int AccessMask, in GenericMapping GenericMapping);
+
+        [DllImport("AdvApi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool ConvertSecurityDescriptorToStringSecurityDescriptor(IntPtr pSD, int sdRevision, SecurityInfos securityInfo, out IntPtr securityDescriptor, out uint length);
+
+        [DllImport("AdvApi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool ConvertStringSecurityDescriptorToSecurityDescriptor(string securityDescriptor, int sdRevision, out IntPtr pSD, out uint size);
 
         [DllImport("dsuiext.dll", CharSet = CharSet.Unicode)]
         private static extern DsBrowseResult DsBrowseForContainer(IntPtr pInfo);
@@ -196,7 +213,7 @@ namespace Lithnet.AccessManager.Server.UI.Interop
             {
                 var newCertificateList = store.Certificates.OfType<X509Certificate2>().ToList();
 
-                var newItems = newCertificateList.Where(t => !thumbprints.Any(u => u == t.Thumbprint));
+                var newItems = newCertificateList.Where(t => thumbprints.All(u => u != t.Thumbprint));
 
                 foreach (var newItem in newItems)
                 {
@@ -210,6 +227,38 @@ namespace Lithnet.AccessManager.Server.UI.Interop
             return null;
         }
 
+        public static string GetSecurityDescriptor(IntPtr pSD, SecurityInfos requestedInformation)
+        {
+            IntPtr pString = IntPtr.Zero;
+
+            try
+            {
+                if (!ConvertSecurityDescriptorToStringSecurityDescriptor(pSD, 1, requestedInformation, out pString, out uint len))
+                {
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                }
+
+                return Marshal.PtrToStringUni(pString) ?? string.Empty;
+            }
+            finally
+            {
+                if (pString != IntPtr.Zero)
+                {
+                    Marshal.FreeHGlobal(pString);
+                }
+            }
+        }
+
+        public static IntPtr GetSecurityDescriptor(string securityDescriptor, SecurityInfos requestedInformation)
+        {
+            if (!ConvertStringSecurityDescriptorToSecurityDescriptor(securityDescriptor, 1, out IntPtr pSD, out uint size))
+            {
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
+
+            return pSD;
+        }
+
         private static DsopDialogInitializationInfo CreateInitInfo(IntPtr pScopeInitInfo, string targetComputer, int scopeCount, IntPtr attrributesToGet, int attributesToGetCount)
         {
             var initInfo = new DsopDialogInitializationInfo
@@ -220,7 +269,7 @@ namespace Lithnet.AccessManager.Server.UI.Interop
                 ScopeInfo = pScopeInitInfo,
                 Options = 0
             };
-            
+
             initInfo.AttributesToFetchCount = attributesToGetCount;
             initInfo.AttributesToFetch = attrributesToGet;
 

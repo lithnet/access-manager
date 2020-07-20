@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Lithnet.AccessManager.Server.UI": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

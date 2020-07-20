@@ -81,16 +81,6 @@
                             <RowDefinition />
                         </Grid.RowDefinitions>
 
-
-                        <Label Grid.Row="0" Grid.Column="0" 
-                               Content="Security Descriptor"
-                               Margin="5"/>
-
-                        <TextBox Grid.Row="0" Grid.Column="1" 
-                                 Text="{Binding SecurityDescriptor}"
-                                 IsReadOnly="True"
-                                 Margin="5"/>
-
                         <Label Grid.Row="1" Grid.Column="0" 
                                Content="Access control"
                                VerticalAlignment="Top"

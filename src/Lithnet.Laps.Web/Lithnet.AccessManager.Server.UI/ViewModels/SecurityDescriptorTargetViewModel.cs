@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
-using Community.Windows.Forms;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
-using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.SimpleChildWindow;
 using Stylet;
@@ -133,25 +132,17 @@ namespace Lithnet.AccessManager.Server.UI
 
         public void EditPermissions()
         {
-            AccessControlEditorDialog dialog = new AccessControlEditorDialog();
-
-            dialog.PageType = Community.Security.AccessControl.SecurityPageType.BasicPermissions;
-            dialog.AllowEditOwner = false;
-            dialog.AllowEditAudit = false;
-            dialog.AllowDaclInheritanceReset = false;
-            dialog.AllowSaclInheritanceReset = false;
-            dialog.ViewOnly = false;
-
-            if (this.SecurityDescriptor == null)
-            {
-                this.SecurityDescriptor = "O:SYD:";
-            }
-
-            var provider = new AdminAccessTargetProvider();
-            RawSecurityDescriptor sd = new RawSecurityDescriptor(this.SecurityDescriptor);
-            byte[] sdBytes = new byte[sd.BinaryLength];
-            sd.GetBinaryForm(sdBytes, 0);
+            var rights = new List<SiAccess> {
+                new SiAccess(0x00000200, "Laps access", InheritFlags.SiAccessGeneral),
+                new SiAccess(0x00000400, "Laps history", InheritFlags.SiAccessGeneral),
+                new SiAccess(0x00000800, "Just-in-time access", InheritFlags.SiAccessGeneral),
+                new SiAccess(0, "None", 0)
+            };
             
+            this.SecurityDescriptor ??= "O:SYD:";
+
+            RawSecurityDescriptor sd = new RawSecurityDescriptor(this.SecurityDescriptor);
+
             string targetServer = null;
 
             if (this.Type == TargetType.Container)
@@ -166,16 +157,27 @@ namespace Lithnet.AccessManager.Server.UI
                 }
             }
 
-            dialog.Initialize(this.DisplayName, this.DisplayName, false, provider, sdBytes, targetServer);
+            SiObjectInfoFlags flags = SiObjectInfoFlags.EditPermissions;
 
-            var r = dialog.ShowDialog();
+            GenericMapping mapping = new GenericMapping();
+            mapping.GenericAll = 0x200 | 0x400 | 0x800;
 
-            if (r == System.Windows.Forms.DialogResult.OK)
+            BasicSecurityInformation info = new BasicSecurityInformation(
+                flags,
+                this.DisplayName,
+                rights,
+                sd,
+                mapping,
+                targetServer
+            );
+
+            ISecurityInformation d = info;
+
+            if (NativeMethods.EditSecurity(this.GetHandle(), info))
             {
-                RawSecurityDescriptor rsd = new RawSecurityDescriptor(dialog.SDDL);
-                rsd.Owner = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
-                rsd.Group = null;
-                this.SecurityDescriptor = rsd.GetSddlForm(AccessControlSections.All);
+                info.SecurityDescriptor.Owner = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
+                info.SecurityDescriptor.Group = null;
+                this.SecurityDescriptor = info.SecurityDescriptor.GetSddlForm(AccessControlSections.All);
             }
         }
 
@@ -366,6 +368,12 @@ namespace Lithnet.AccessManager.Server.UI
             try
             {
                 RawSecurityDescriptor sd = new RawSecurityDescriptor(securityDescriptor);
+
+                if (sd.DiscretionaryAcl == null)
+                {
+                    return false;
+                }
+
                 foreach (var ace in sd.DiscretionaryAcl.OfType<CommonAce>())
                 {
                     if (ace.AceType == AceType.AccessAllowed && ((ace.AccessMask & (int)mask) == (int)mask))
