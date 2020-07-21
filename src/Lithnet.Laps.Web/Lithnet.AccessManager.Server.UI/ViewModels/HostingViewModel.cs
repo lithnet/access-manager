@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.DirectoryServices.AccountManagement;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Printing;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -14,9 +17,11 @@ using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.IconPacks;
 using MahApps.Metro.Theming;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SslCertBinding.Net;
 using Stylet;
 
@@ -58,6 +63,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.AutoValidate = false;
             this.Validator = validator;
             _ = this.PollServiceStatus(this.cancellationTokenSource.Token);
+            _ = this.TryGetVersion();
         }
 
         private X509Certificate2 OriginalCertificate { get; set; }
@@ -130,7 +136,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 if (updateHttpReservations)
                 {
-                   this.CreateNewHttpReservations();
+                    this.CreateNewHttpReservations();
                 }
             }
             catch (Exception ex)
@@ -236,6 +242,87 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
+        public string CurrentVersion { get; set; }
+
+        public string AvailableVersion { get; set; }
+
+        public bool IsUpToDate { get; set; }
+
+        public bool UpdateAvailable { get; set; }
+
+        public string UpdateLink { get; set; }
+
+        public void DownloadUpdate()
+        {
+            if (this.UpdateLink == null)
+            {
+                return;
+            }
+
+            var psi = new ProcessStartInfo
+            {
+                FileName = this.UpdateLink,
+                UseShellExecute = true
+            };
+
+            Process.Start(psi);
+        }
+
+        public async Task TryGetVersion()
+        {
+            try
+            {
+                var currentVersion = Assembly.GetEntryAssembly().GetName().Version;
+                this.CurrentVersion = currentVersion.ToString();
+
+                string appdata = await DownloadFile(Constants.UrlProductVersionInfo);
+                if (appdata != null)
+                {
+                    var versionInfo = JsonConvert.DeserializeObject<PublishedVersionInfo>(appdata);
+
+                    if (Version.TryParse(versionInfo.CurrentVersion, out Version onlineVersion))
+                    {
+                        this.AvailableVersion = onlineVersion.ToString();
+
+                        if (onlineVersion > currentVersion)
+                        {
+                            this.UpdateAvailable = true;
+                            this.IsUpToDate = false;
+                            this.UpdateLink = versionInfo.UserUrl;
+                        }
+                        else
+                        {
+                            this.UpdateAvailable = false;
+                            this.IsUpToDate = true;
+                            this.UpdateLink = null;
+                        }
+
+                        return;
+                    }
+                }
+            }
+            catch { }
+
+            this.UpdateAvailable = false;
+            this.IsUpToDate = false;
+            this.UpdateLink = null;
+            this.AvailableVersion = null;
+
+        }
+
+        private static async Task<string> DownloadFile(string url)
+        {
+            using var client = new HttpClient();
+            using var result = await client.GetAsync(url);
+
+            if (result.IsSuccessStatusCode)
+            {
+                return await result.Content.ReadAsStringAsync();
+            }
+
+            return null;
+        }
+
         private void TryRollbackConfig()
         {
             try
@@ -286,24 +373,49 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public string CertificateExpiryText
+        public string CertificateExpiryText { get; set; }
+
+        public bool IsCertificateCurrent { get; set; }
+
+        public bool IsCertificateExpiring { get; set; }
+
+        public bool IsCertificateExpired { get; set; }
+
+        public string Glyph { get; set; } = "";
+
+        public PackIconMaterialKind Icon => PackIconMaterialKind.Web;
+
+        public void OnCertificateChanged()
         {
-            get
+            this.IsCertificateCurrent = false;
+            this.IsCertificateExpired = false;
+            this.IsCertificateExpiring = false;
+            
+            if (this.Certificate == null)
             {
-                if (this.Certificate == null)
-                {
-                    return null;
-                }
-
-                TimeSpan remainingTime = this.Certificate.NotAfter.Subtract(DateTime.Now);
-
-                if (remainingTime.Ticks < 0)
-                {
-                    return "The certificate has expired";
-                }
-
-                return string.Format("Certificate expires in {0} days", remainingTime.ToString("%d"));
+                this.CertificateExpiryText = "Select a certificate";
+                return;
             }
+
+            TimeSpan remainingTime = this.Certificate.NotAfter.Subtract(DateTime.Now);
+
+            if (remainingTime.Ticks <= 0)
+            {
+                this.IsCertificateExpired = true;
+                this.CertificateExpiryText = "The certificate has expired";
+                return;
+            }
+
+            if (remainingTime.TotalDays < 30)
+            {
+                this.IsCertificateExpiring = true;
+            }
+            else
+            {
+                this.IsCertificateCurrent = true;
+            }
+
+            this.CertificateExpiryText = $"Certificate expires in {remainingTime:%d} days";
         }
 
         public bool ShowCertificateExpiryWarning => this.Certificate != null && this.Certificate.NotAfter.AddDays(-30) >= DateTime.Now;

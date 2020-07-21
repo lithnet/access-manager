@@ -4,6 +4,15 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
+    <Company>Lithnet</Company>
+    <Product>Access Manager</Product>
+    <Authors>Lithnet</Authors>
+    <Description>Lithnet Access Manager</Description>
+    <Copyright>(c) 2020 Lithnet</Copyright>
+    <PackageProjectUrl>https://github.com/lithnet/laps-web</PackageProjectUrl>
+    <FileVersion>1.0.$([System.DateTime]::UtcNow.Date.Subtract($([System.DateTime]::Parse("2000-01-01"))).TotalDays).$([System.Math]::Floor($([MSBuild]::Divide($([System.DateTime]::UtcNow.TimeOfDay.TotalSeconds), 1.32))))</FileVersion>
+    <Version>1.0.$([System.DateTime]::UtcNow.Date.Subtract($([System.DateTime]::Parse("2000-01-01"))).TotalDays)</Version>
+    <Deterministic>false</Deterministic>
     <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
 
@@ -53,6 +62,9 @@
     <Compile Update="Views\JitGroupMappingView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\HelpView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\ScriptContentView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -91,6 +103,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\JitGroupMappingView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\HelpView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\ScriptContentView.xaml">

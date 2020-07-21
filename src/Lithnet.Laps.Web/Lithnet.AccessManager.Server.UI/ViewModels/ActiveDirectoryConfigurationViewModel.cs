@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using MahApps.Metro.IconPacks;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -10,15 +11,10 @@ namespace Lithnet.AccessManager.Server.UI
             this.DisplayName = "Active Directory";
 
             this.Items.Add(schemaFactory.CreateViewModel());
-            this.Items.Add(lapsFactory.CreateViewModel());
-            this.Items.Add(jitFactory.CreateViewModel());
 
             this.ActiveItem = this.Items.FirstOrDefault();
         }
 
-        public sealed override void ActivateItem(PropertyChangedBase item)
-        {
-            base.ActivateItem(item);
-        }
+        public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.SitemapSolid;
     }
 }

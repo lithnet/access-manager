@@ -117,6 +117,30 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AddDomainGroupMembershipPermissions" xml:space="preserve">
+    <value># Add-DomainGroupMembershipPermissions
+# 
+# This script adds the Access Manager service account to the "Windows Authorization Access Group" and "Access Control Assistance Operators" groups in the specified domain
+#
+# This script requires membership in the Domain Admins group for the domain where permissions need to be added
+#
+# Version 1.0
+
+#-------------------------------------------------------------------------
+# Do not modify below here
+$domain = "{domainDns}"
+$serviceAccountSid = "{serviceAccountSid}"
+
+# Get the Windows Authorization Access Group by it's well-known SID "S-1-5-32-560"
+$de = new-object "System.DirectoryServices.DirectoryEntry" "LDAP://$domain/&lt;SID=S-1-5-32-560&gt;"
+$de.Properties["member"].Add("&lt;SID=$serviceAccountSid&gt;") ## Add our service account as a member
+$de.CommitChanges()
+
+# Get the Access Control Assistance Operators group by it's well-known SID "S-1-5-32-560"
+$de = new-object "System.DirectoryServices.DirectoryEntry" "LDAP://$domain/&lt;SID=S-1-5-32-579&gt;"
+$de.Properties["member"].Add("&lt;SID=$serviceAccountSid&gt;") ## Add our service account as a member
+$de.CommitChanges()</value>
+  </data>
   <data name="AuditScriptTemplate" xml:space="preserve">
     <value>function Write-AuditLog{
 	param(
@@ -329,6 +353,61 @@ $acl.AddAccessRule($propertyAccessRule5)
 $acl.AddAccessRule($propertyAccessRule6)
 $acl.AddAccessRule($propertyAccessRule7)
 $acl.AddAccessRule($propertyAccessRule8)
+set-acl -AclObject $acl -Path $path</value>
+  </data>
+  <data name="GrantMsLapsPermissions" xml:space="preserve">
+    <value># Grant-MsLapsPermissions
+# 
+# This script grants permissions that allow the Lithnet Admin Access Manager service account to read the Microsoft LAPS passwords from Active Directory
+#
+# This script requires membership in the Domain Admins group 
+#
+# Version 1.0
+
+
+#-------------------------------------------------------------------------
+# Set the following values as appropriate for your environment
+#-------------------------------------------------------------------------
+
+# Leave this value blank to apply the permissions at the top level of the domain where this script is being run
+# Otherwise, specify the OU where permissions should be delegated
+$OU = "" 
+
+#-------------------------------------------------------------------------
+# Do not modify below here
+
+Import-Module ActiveDirectory
+
+$ErrorActionPreference = "Stop"
+$InformationPreference = "Continue"
+
+$rootDSE = Get-ADRootDSE
+
+if ([string]::IsNullOrEmpty($ou))
+{
+	$ou = $rootDSE.defaultNamingContext
+}
+
+$schemaNC = $rootDSE.schemaNamingContext
+$computerObjectGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=computer)(objectclass=classSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$msLapsPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=ms-Mcs-AdmPwd)(objectclass=attributeSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$msLapsPasswordExpiryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=ms-Mcs-AdmPwdExpirationTime)(objectclass=attributeSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+
+$serviceAccountSid = new-object System.Security.Principal.SecurityIdentifier "{serviceAccount}"
+
+$propertyAccessRule1 = new-object "System.DirectoryServices.PropertyAccessRule" $serviceAccountSid, "Allow", "Read", $msLapsPasswordGuid, "Descendents", $computerObjectGuid
+$propertyAccessRule2 = new-object "System.DirectoryServices.PropertyAccessRule" $serviceAccountSid, "Allow", "Read", $msLapsPasswordExpiryGuid, "Descendents", $computerObjectGuid
+$propertyAccessRule3 = new-object "System.DirectoryServices.PropertyAccessRule" $serviceAccountSid, "Allow", "Write", $msLapsPasswordExpiryGuid, "Descendents", $computerObjectGuid
+$propertyAccessRule4 = new-object "System.DirectoryServices.ActiveDirectoryAccessRule" $serviceAccountSid, "ExtendedRight", "Allow", $msLapsPasswordGuid, "Descendents", $computerObjectGuid
+
+$path = "AD:\$OU"
+
+$acl = get-acl -Path $path
+$acl.AddAccessRule($propertyAccessRule1)
+$acl.AddAccessRule($propertyAccessRule2)
+$acl.AddAccessRule($propertyAccessRule3)
+$acl.AddAccessRule($propertyAccessRule4)
+
 set-acl -AclObject $acl -Path $path</value>
   </data>
   <data name="GrantServiceAccountPermission" xml:space="preserve">

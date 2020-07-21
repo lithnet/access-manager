@@ -1,4 +1,5 @@
 ﻿using Lithnet.AccessManager.Server.Configuration;
+using MahApps.Metro.IconPacks;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -27,5 +28,7 @@ namespace Lithnet.AccessManager.Server.UI
         public string Password { get => this.model.Password; set => this.model.Password = value; }
 
         public string DisplayName { get; set; } = "Email";
+
+        public PackIconUniconsKind Icon => PackIconUniconsKind.At;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Lithnet.AccessManager.Server.Configuration;
+using MahApps.Metro.IconPacks;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -16,5 +17,7 @@ namespace Lithnet.AccessManager.Server.UI
         public SecurityDescriptorTargetsViewModel Targets { get; }
 
         public string DisplayName { get; set; } = "Authorization";
+
+        public PackIconModernKind Icon => PackIconModernKind.Lock;
     }
 }

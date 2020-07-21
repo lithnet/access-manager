@@ -28,13 +28,16 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.serviceAccountSid = serviceSettings.GetServiceAccount();
 
-            _ = this.Initialize();
+            _ = this.RefreshGroupMembership();
         }
 
-        private async Task Initialize()
+        public async Task RefreshGroupMembership()
         {
             await Task.Run(() =>
             {
+                this.AcaoStatus = "Checking...";
+                this.WaagStatus = "Checking...";
+
                 this.CheckWaagStatus();
                 this.CheckAcaoStatus();
                     
@@ -55,6 +58,28 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string DisplayName => this.domain.Name;
 
+        public async Task ShowADPermissionScript()
+        {
+            var vm = new ScriptContentViewModel(this.dialogCoordinator)
+            {
+                HelpText = "Run the following script with Domain Admins rights to add the service account to the correct groups",
+                ScriptText = ScriptTemplates.AddDomainGroupMembershipPermissions
+                    .Replace("{domainDNS}", this.domain.Name,StringComparison.OrdinalIgnoreCase)
+                    .Replace("{serviceAccountSid}", this.serviceAccountSid.Value, StringComparison.OrdinalIgnoreCase)
+            };
+
+            ExternalDialogWindow w = new ExternalDialogWindow
+            {
+                DataContext = vm,
+                SaveButtonVisible = false,
+                CancelButtonName = "Close"
+            };
+
+            w.ShowDialog();
+
+            await this.RefreshGroupMembership();
+        }
+
         private void CheckAcaoStatus()
         {
             try
@@ -62,6 +87,7 @@ namespace Lithnet.AccessManager.Server.UI
                 if (this.serviceAccountSid == null)
                 {
                     this.IsAcaoMember = false;
+                    this.AcaoStatus = "Could not determine service account";
                     return;
                 }
 
@@ -89,6 +115,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 if (this.serviceAccountSid == null)
                 {
+                    this.WaagStatus = "Could not determine service account";
                     this.IsWaagMember = false;
                     return;
                 }

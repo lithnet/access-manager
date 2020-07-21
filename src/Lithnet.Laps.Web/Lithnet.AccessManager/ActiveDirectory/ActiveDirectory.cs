@@ -303,6 +303,11 @@ namespace Lithnet.AccessManager
 
         private DirectoryEntry DoGcLookup(string objectName, string objectClass, IEnumerable<string> propertiesToGet)
         {
+            if (objectName.TryParseAsSid(out SecurityIdentifier sid))
+            {
+                return NativeMethods.GetDirectoryEntry(sid);
+            }
+
             if (objectClass.Equals("computer", StringComparison.OrdinalIgnoreCase) && !objectName.EndsWith("$"))
             {
                 objectName += "$";
@@ -315,10 +320,6 @@ namespace Lithnet.AccessManager
             else if (objectName.Contains("@"))
             {
                 return NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.UserPrincipalName);
-            }
-            else if (objectName.TryParseAsSid(out SecurityIdentifier sid))
-            {
-                return NativeMethods.GetDirectoryEntry(sid);
             }
             else if (this.IsDistinguishedName(objectName))
             {

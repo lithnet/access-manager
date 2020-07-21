@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Stylet;
+using Vanara.Extensions;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -22,7 +24,10 @@ namespace Lithnet.AccessManager.Server.UI
             AuditingViewModel audit,
             EmailViewModel mail,
             HostingViewModel hosting,
-            ActiveDirectoryConfigurationViewModel ad)
+            ActiveDirectorySchemaViewModel ad,
+            JitConfigurationViewModel jit,
+            LapsConfigurationViewModel laps,
+            HelpViewModel help)
         {
             this.model = model;
             this.dialogCoordinator = dialogCoordinator;
@@ -32,11 +37,20 @@ namespace Lithnet.AccessManager.Server.UI
             this.Items.Add(ad);
             this.Items.Add(audit);
             this.Items.Add(authorization);
+            this.Items.Add(jit);
+            this.Items.Add(laps);
             this.Items.Add(ui);
             this.Items.Add(mail);
             this.Items.Add(rate);
             this.Items.Add(ip);
+
+            this.OptionItems = new BindableCollection<PropertyChangedBase>();
+            this.OptionItems.Add(help);
+
+            this.ActiveItem = this.Items.First();
         }
+        
+        public BindableCollection<PropertyChangedBase> OptionItems { get; }
 
         public void Save()
         {

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows;
 using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.IconPacks;
 using PropertyChanged;
 using Stylet;
 
@@ -123,7 +125,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert(this.SelectedForest.Name);
 
-            using X509Store store =  this.certificateProvider.OpenServiceStore(Constants.ServiceName, OpenFlags.ReadWrite);
+            using X509Store store =  this.certificateProvider.OpenServiceStore(Lithnet.AccessManager.Constants.ServiceName, OpenFlags.ReadWrite);
             store.Add(cert);
 
             var vm = this.certificate2ViewModelFactory.CreateViewModel(cert);
@@ -156,6 +158,47 @@ namespace Lithnet.AccessManager.Server.UI
 
             w.ShowDialog();
         }
+
+        public void OpenAccessManagerAgentDownload()
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = Constants.LinkDownloadAccessManagerAgent,
+                UseShellExecute = true
+            };
+
+            Process.Start(psi);
+        }
+
+        public void OpenMsLapsDownload()
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = Constants.LinkDownloadMsLaps,
+                UseShellExecute = true
+            };
+
+            Process.Start(psi);
+        }
+
+        public void DelegateMsLapsPermission()
+        {
+            var vm = new ScriptContentViewModel(this.dialogCoordinator)
+            {
+                HelpText = "Modify the OU variable in this script, and run it with domain admin rights to assign permissions for the service account to be able to read Microsoft LAPS passwords from the directory",
+                ScriptText = ScriptTemplates.GrantMsLapsPermissions.Replace("{serviceAccount}", this.serviceSettings.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
+            };
+
+            ExternalDialogWindow w = new ExternalDialogWindow
+            {
+                DataContext = vm,
+                SaveButtonVisible = false,
+                CancelButtonName = "Close"
+            };
+
+            w.ShowDialog();
+        }
+
 
         private void RefreshAvailableCertificates()
         {
@@ -201,6 +244,8 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public string DisplayName { get; set; } = "Password encryption and history";
+        public string DisplayName { get; set; } = "Local admin passwords";
+
+        public PackIconUniconsKind Icon => PackIconUniconsKind.Asterisk;
     }
 }

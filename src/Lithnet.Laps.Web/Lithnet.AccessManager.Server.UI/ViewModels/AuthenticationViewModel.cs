@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Lithnet.AccessManager.Server.Configuration;
+using MahApps.Metro.IconPacks;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -56,5 +57,7 @@ namespace Lithnet.AccessManager.Server.UI
         public string WsFedMetadata { get => this.model.WsFed.Metadata; set => this.model.WsFed.Metadata = value; }
 
         public string DisplayName { get; set; } = "Authentication";
+
+        public PackIconUniconsKind Icon => PackIconUniconsKind.User;
     }
 }

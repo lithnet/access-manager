@@ -7,14 +7,12 @@
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
         xmlns:s="https://github.com/canton7/Stylet"
-        Title="Lithnet Admin Access Service Configuration"
+        Title="Lithnet Access Manager Service (AMS) Configuration"
         BorderThickness="1"
-        
         Height="Auto"
         Width="Auto" 
         SizeToContent="Manual"
-        
-        Margin="10">
+        >
 
     <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top">

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.IconPacks;
 using MahApps.Metro.SimpleChildWindow;
 using Newtonsoft.Json;
 using Stylet;
@@ -22,7 +23,11 @@ namespace Lithnet.AccessManager.Server.UI
 
         public UIElement View { get; set; }
 
-        public string DisplayName { get; set; } = "JIT Configuration";
+        public string DisplayName { get; set; } = "Just-in-time access";
+
+        public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.UserClockSolid;
+        //<iconPacks:PathIconMaterial Kind="TimerOutline" />
+        //<iconPacks:PathIconModern Kind="TimerCheck" />
 
         public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IDirectory directory, IJitGroupMappingViewModelFactory groupMappingFactory)
         {

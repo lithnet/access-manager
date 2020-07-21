@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.IconPacks;
 using Microsoft.AspNetCore.HttpOverrides;
 using Stylet;
 
@@ -38,9 +39,17 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public string ForwardedForHeaderName { get => this.model.ForwardedForHeaderName; set => this.model.ForwardedForHeaderName = value; }
+        public string ForwardedForHeaderName
+        {
+            get => this.model.ForwardedForHeaderName;
+            set => this.model.ForwardedForHeaderName = value;
+        }
 
-        public int? ForwardLimit { get => this.model.ForwardLimit; set => this.model.ForwardLimit = value; }
+        public int? ForwardLimit
+        {
+            get => this.model.ForwardLimit;
+            set => this.model.ForwardLimit = value;
+        }
 
         public BindableCollection<string> KnownProxies { get; }
 
@@ -61,7 +70,8 @@ namespace Lithnet.AccessManager.Server.UI
 
             if (this.KnownNetworks.Contains(this.NewNetwork))
             {
-                await this.dialogCoordinator.ShowMessageAsync(this, "Validation", "The specified network range already exists");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Validation",
+                    "The specified network range already exists");
                 return;
             }
 
@@ -69,20 +79,23 @@ namespace Lithnet.AccessManager.Server.UI
 
             if (split.Length != 2)
             {
-                await this.dialogCoordinator.ShowMessageAsync(this, "Validation", "The specified value was not a valid CIDR network range");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Validation",
+                    "The specified value was not a valid CIDR network range");
                 return;
             }
 
             if (!int.TryParse(split[1], out int mask))
             {
-                await this.dialogCoordinator.ShowMessageAsync(this, "Validation", "The specified CIDR mask is not valid");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Validation",
+                    "The specified CIDR mask is not valid");
                 return;
             }
             else
             {
-                if (mask < 0  || mask > 128)
+                if (mask < 0 || mask > 128)
                 {
-                    await this.dialogCoordinator.ShowMessageAsync(this, "Validation", "The specified CIDR mask is not valid");
+                    await this.dialogCoordinator.ShowMessageAsync(this, "Validation",
+                        "The specified CIDR mask is not valid");
                     return;
 
                 }
@@ -90,7 +103,8 @@ namespace Lithnet.AccessManager.Server.UI
 
             if (!IPAddress.TryParse(split[0], out _))
             {
-                await this.dialogCoordinator.ShowMessageAsync(this, "Validation", "The specified value was not a valid IP address");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Validation",
+                    "The specified value was not a valid IP address");
                 return;
             }
 
@@ -100,7 +114,7 @@ namespace Lithnet.AccessManager.Server.UI
         }
 
         public void RemoveNetwork()
-        { 
+        {
             if (this.SelectedNetwork != null)
             {
                 string value = this.SelectedNetwork;
@@ -110,7 +124,7 @@ namespace Lithnet.AccessManager.Server.UI
                 this.SelectedNetwork = this.KnownNetworks.FirstOrDefault();
             }
         }
-        
+
         public bool CanRemoveNetwork => this.Enabled && this.SelectedNetwork != null;
 
         public string SelectedProxy { get; set; }
@@ -126,13 +140,15 @@ namespace Lithnet.AccessManager.Server.UI
 
             if (this.KnownProxies.Contains(this.NewProxy))
             {
-                await this.dialogCoordinator.ShowMessageAsync(this, "Validation", "The specified IP address already exists");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Validation",
+                    "The specified IP address already exists");
                 return;
             }
 
             if (!IPAddress.TryParse(this.NewProxy, out _))
             {
-                await this.dialogCoordinator.ShowMessageAsync(this, "Validation", "The specified value was not a valid IP address");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Validation",
+                    "The specified value was not a valid IP address");
                 return;
             }
 
@@ -159,5 +175,7 @@ namespace Lithnet.AccessManager.Server.UI
         public bool CanRemoveProxy => this.Enabled && this.SelectedProxy != null;
 
         public string DisplayName { get; set; } = "IP address detection";
+
+        public PackIconPicolIconsKind Icon => PackIconPicolIconsKind.NetworkSansSecurity;
     }
 }

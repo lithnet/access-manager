@@ -1,4 +1,5 @@
 ﻿using Lithnet.AccessManager.Server.Configuration;
+using MahApps.Metro.IconPacks;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -27,10 +28,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.Notifications = notificationChannelSelectionViewModelFactory.CreateViewModel(model.GlobalNotifications);
         }
 
-        public sealed override void ActivateItem(PropertyChangedBase item)
-        {
-            base.ActivateItem(item);
-        }
+        public PackIconUniconsKind Icon => PackIconUniconsKind.FileExclamationAlt;
 
         public NotificationChannelSelectionViewModel Notifications { get; }
 

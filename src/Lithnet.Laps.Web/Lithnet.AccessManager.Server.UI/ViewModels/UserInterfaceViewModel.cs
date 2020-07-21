@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.IconPacks;
 using Microsoft.Win32;
 using Stylet;
 
@@ -118,6 +119,8 @@ namespace Lithnet.AccessManager.Server.UI
         }
 
         public string DisplayName { get; set; } = "User interface";
+
+        public PackIconMaterialKind Icon => PackIconMaterialKind.Application;
 
         public UIElement View { get; private set; }
     }

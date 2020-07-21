@@ -61,6 +61,26 @@ namespace Lithnet.AccessManager.Server.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to # Add-DomainGroupMembershipPermissions
+        ///# 
+        ///# This script adds the Access Manager service account to the &quot;Windows Authorization Access Group&quot; and &quot;Access Control Assistance Operators&quot; groups in the specified domain
+        ///#
+        ///# This script requires membership in the Domain Admins group for the domain where permissions need to be added
+        ///#
+        ///# Version 1.0
+        ///
+        ///#-------------------------------------------------------------------------
+        ///# Do not modify below here
+        ///$domain = &quot;{domainDns}&quot;
+        ///$serviceAccountSid = &quot;{serviceAc [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string AddDomainGroupMembershipPermissions {
+            get {
+                return ResourceManager.GetString("AddDomainGroupMembershipPermissions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to function Write-AuditLog{
         ///	param(
         ///	[hashtable]$tokens,
@@ -147,6 +167,28 @@ namespace Lithnet.AccessManager.Server.UI {
         internal static string GrantComputerSelfPermission {
             get {
                 return ResourceManager.GetString("GrantComputerSelfPermission", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to # Grant-MsLapsPermissions
+        ///# 
+        ///# This script grants permissions that allow the Lithnet Admin Access Manager service account to read the Microsoft LAPS passwords from Active Directory
+        ///#
+        ///# This script requires membership in the Domain Admins group 
+        ///#
+        ///# Version 1.0
+        ///
+        ///
+        ///#-------------------------------------------------------------------------
+        ///# Set the following values as appropriate for your environment
+        ///#-------------------------------------------------------------------------
+        ///
+        ///# Leave this value bla [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GrantMsLapsPermissions {
+            get {
+                return ResourceManager.GetString("GrantMsLapsPermissions", resourceCulture);
             }
         }
         

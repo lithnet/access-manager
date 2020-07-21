@@ -1,14 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
+using MahApps.Metro.IconPacks;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
     public class ActiveDirectorySchemaViewModel : PropertyChangedBase , IHaveDisplayName
-    { 
-        public string DisplayName { get; set; } = "Schema and permissions";
-       
+    {
+        public string DisplayName { get; set; } = "Active Directory";
+
+        public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.SitemapSolid;
+
         public ActiveDirectorySchemaViewModel(IActiveDirectoryForestConfigurationViewModelFactory forestFactory)
         {
             this.Forests = new List<ActiveDirectoryForestConfigurationViewModel>();

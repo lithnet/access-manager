@@ -1,4 +1,5 @@
 ﻿using Lithnet.AccessManager.Server.Configuration;
+using MahApps.Metro.IconPacks;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -39,5 +40,7 @@ namespace Lithnet.AccessManager.Server.UI
         public int PerUserRequestsPerDay { get => this.model.PerUser.RequestsPerDay; set => this.model.PerUser.RequestsPerDay = value; }
         
         public string DisplayName { get; set; } = "Rate limits";
+
+        public PackIconMaterialKind Icon => PackIconMaterialKind.Speedometer;
     }
 }

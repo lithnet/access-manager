@@ -19,6 +19,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Label Grid.Row="0" Grid.Column="0"
@@ -91,5 +92,22 @@
                        Margin="5 0 0 0"
                        TextWrapping="Wrap">The built-in "Access Control Assistance Operators" grants permissions that are required for the service account to calculate group membership of users from across a forest trust. This is only required where a trust is in place between forests</TextBlock>
         </Grid>
+
+        <StackPanel Grid.Row="2" Grid.Column="1" 
+                    Orientation="Horizontal">
+            <Button Command="{s:Action ShowADPermissionScript}"
+                    Margin="5" 
+                    VerticalContentAlignment="Center"
+                    HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal" 
+                        VerticalAlignment="Center">
+                    <iconPacks:PackIconMaterial Kind="ScriptOutline" Margin="0 0 2 0"/>
+                    <TextBlock Text="GRANT PERMISSION..." VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Button Command="{s:Action RefreshGroupMembership}"
+                    Margin="5" 
+                    Content="Refresh Status"/>
+        </StackPanel>
     </Grid>
 </UserControl>

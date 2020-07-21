@@ -46,6 +46,7 @@ namespace Lithnet.AccessManager.Server.UI
             builder.Bind<WebhookNotificationChannelDefinitionsViewModel>().ToSelf();
             builder.Bind<WebhookNotificationChannelDefinitionViewModel>().ToSelf();
             builder.Bind<ActiveDirectoryConfigurationViewModel>().ToSelf();
+            builder.Bind<HelpViewModel>().ToSelf();
 
             builder.Bind<IDialogCoordinator>().To<DialogCoordinator>();
             builder.Bind<IDirectory>().To<ActiveDirectory>();

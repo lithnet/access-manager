@@ -29,6 +29,7 @@
                 <GridView>
                     <GridViewColumn Header="Name" DisplayMemberBinding="{Binding DisplayName}" Width="300"/>
                     <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}"/>
+                    <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Description}" Width="Auto"/>
                 </GridView>
             </ListView.View>
         </ListView>
