@@ -390,7 +390,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.IsCertificateCurrent = false;
             this.IsCertificateExpired = false;
             this.IsCertificateExpiring = false;
-            
+
             if (this.Certificate == null)
             {
                 this.CertificateExpiryText = "Select a certificate";
@@ -703,6 +703,8 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
+        public bool ServicePending { get; set; }
+
         private async Task PollServiceStatus(CancellationToken token)
         {
             try
@@ -711,11 +713,40 @@ namespace Lithnet.AccessManager.Server.UI
                 {
                     await Task.Delay(500, CancellationToken.None).ConfigureAwait(false);
                     this.serviceSettings.ServiceController.Refresh();
-                    this.ServiceStatus = this.serviceSettings.ServiceController.Status.ToString();
+                    
+                    switch (this.serviceSettings.ServiceController.Status)
+                    {
+                        case ServiceControllerStatus.StartPending:
+                            this.ServiceStatus = "Starting";
 
+                            break;
+                        case ServiceControllerStatus.StopPending:
+                            this.ServiceStatus = "Stopping";
+                            break;
+                        
+                        case ServiceControllerStatus.ContinuePending:
+                            this.ServiceStatus = "Continue pending";
+
+                            break;
+                        case ServiceControllerStatus.PausePending:
+                            this.ServiceStatus = "Pausing";
+                            break;
+                        
+                        default:
+                            this.ServiceStatus = this.serviceSettings.ServiceController.Status.ToString();
+                            break;
+                    }
+                    this.ServicePending = this.serviceSettings.ServiceController.Status == ServiceControllerStatus.ContinuePending ||
+                                          this.serviceSettings.ServiceController.Status == ServiceControllerStatus.PausePending ||
+                                          this.serviceSettings.ServiceController.Status == ServiceControllerStatus.StartPending ||
+                                          this.serviceSettings.ServiceController.Status == ServiceControllerStatus.StopPending;
                 }
             }
-            catch { }
+            catch
+            {
+                this.ServicePending = false;
+                this.ServiceStatus = "Unknown";
+            }
         }
 
 
