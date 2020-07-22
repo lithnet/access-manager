@@ -118,7 +118,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public PasswordStorageLocation RetrievalLocation { get => this.Model.Laps.RetrievalLocation; set => this.Model.Laps.RetrievalLocation = value; }
 
-        public string DisplayName => this.Type == TargetType.Container ? this.Target : this.TryGetNameFromSid(this.Target);
+        public string DisplayName => this.Type == TargetType.Container ? this.Target : $"{this.TryGetNameFromSid(this.Target)} ({this.Type})";
 
         public bool ShowLapsOptions => this.IsModeScript || SdHasMask(this.SecurityDescriptor, AccessMask.Laps);
 

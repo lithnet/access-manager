@@ -34,7 +34,7 @@ namespace Lithnet.AccessManager.Server.UI
             builder.Bind<HostingViewModel>().ToSelf();
             builder.Bind<AuditingViewModel>().ToSelf();
             builder.Bind<AuthorizationViewModel>().ToSelf();
-            builder.Bind<ActiveDirectorySchemaViewModel>().ToSelf();
+            builder.Bind<ActiveDirectoryConfigurationViewModel>().ToSelf();
 
             builder.Bind<IpDetectionViewModel>().ToSelf();
             builder.Bind<PowershellNotificationChannelDefinitionsViewModel>().ToSelf();
@@ -45,7 +45,6 @@ namespace Lithnet.AccessManager.Server.UI
             builder.Bind<UserInterfaceViewModel>().ToSelf();
             builder.Bind<WebhookNotificationChannelDefinitionsViewModel>().ToSelf();
             builder.Bind<WebhookNotificationChannelDefinitionViewModel>().ToSelf();
-            builder.Bind<ActiveDirectoryConfigurationViewModel>().ToSelf();
             builder.Bind<HelpViewModel>().ToSelf();
 
             builder.Bind<IDialogCoordinator>().To<DialogCoordinator>();
@@ -63,7 +62,7 @@ namespace Lithnet.AccessManager.Server.UI
             builder.Bind<IActiveDirectoryDomainConfigurationViewModelFactory>().To<ActiveDirectoryDomainConfigurationViewModelFactory>();
             builder.Bind<IActiveDirectoryForestConfigurationViewModelFactory>().To<ActiveDirectoryForestConfigurationViewModelFactory>();
             builder.Bind<IX509Certificate2ViewModelFactory>().To<X509Certificate2ViewModelFactory>();
-            builder.Bind<IActiveDirectorySchemaViewModelFactory>().To<ActiveDirectorySchemaViewModelFactory>();
+            builder.Bind<IActiveDirectoryConfigurationViewModelFactory>().To<ActiveDirectoryConfigurationViewModelFactory>();
             builder.Bind<ILapsConfigurationViewModelFactory>().To<LapsConfigurationViewModelFactory>();
             builder.Bind<IJitGroupMappingViewModelFactory>().To<JitGroupMappingViewModelFactory>();
             builder.Bind<IJitConfigurationViewModelFactory>().To<JitConfigurationViewModelFactory>();

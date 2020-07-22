@@ -56,11 +56,14 @@ namespace Lithnet.AccessManager.Server.UI
         }
         public async Task Edit()
         {
+            var item = this.SelectedItem;
+            var model = item.Model;
+
             DialogWindow w = new DialogWindow();
             w.Title = "Edit notification channel";
             w.SaveButtonIsDefault = true;
 
-            var m = JsonConvert.DeserializeObject<TModel>(JsonConvert.SerializeObject(this.SelectedItem.Model));
+            var m = JsonConvert.DeserializeObject<TModel>(JsonConvert.SerializeObject(model));
             var vm = this.factory.CreateViewModel(m);
 
             w.DataContext = vm;
@@ -69,11 +72,11 @@ namespace Lithnet.AccessManager.Server.UI
 
             if (w.Result == MessageDialogResult.Affirmative)
             {
-                this.Model.Remove(this.SelectedItem.Model);
+                this.Model.Remove(model);
 
-                int existingPosition = this.ViewModels.IndexOf(this.SelectedItem);
+                int existingPosition = this.ViewModels.IndexOf(item);
 
-                this.ViewModels.Remove(this.SelectedItem);
+                this.ViewModels.Remove(item);
                 this.Model.Add(m);
                 this.ViewModels.Insert(Math.Min(existingPosition, this.ViewModels.Count), vm);
                 this.SelectedItem = vm;
@@ -90,6 +93,8 @@ namespace Lithnet.AccessManager.Server.UI
                 return;
             }
 
+            var deleting = this.SelectedItem;
+
             MetroDialogSettings s = new MetroDialogSettings
             {
                 AnimateShow = false,
@@ -98,7 +103,6 @@ namespace Lithnet.AccessManager.Server.UI
 
             if (await this.DialogCoordinator.ShowMessageAsync(this, "Confirm", "Are you sure you want to delete this channel?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
             {
-                var deleting = this.SelectedItem;
                 this.Model.Remove(deleting.Model);
                 this.ViewModels.Remove(deleting);
                 this.SelectedItem = this.ViewModels.FirstOrDefault();

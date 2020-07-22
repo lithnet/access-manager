@@ -14,11 +14,11 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="150"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="15*" MinWidth="110"/>
+            <ColumnDefinition Width="85*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -40,22 +40,23 @@
                    TextWrapping="WrapWithOverflow"
                    Margin="5"/>
 
-
         <StackPanel Grid.Row="1" Grid.Column="1"
-                     Orientation="Horizontal">
-            <iconPacks:PackIconFontAwesome Kind="CheckSquareSolid"
-                                           Foreground="DarkGreen" 
-                                           Visibility="{Binding IsMsLapsSchemaPresent, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                           VerticalAlignment="Center"/>
+                    Margin="5 0 0 0"
+                    Orientation="Horizontal">
 
+            <iconPacks:PackIconFontAwesome Kind="CheckCircleRegular" 
+                                           Visibility="{Binding IsMsLapsSchemaPresent, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           Foreground="Green"
+                                           VerticalAlignment="Center"/>
+         
             <iconPacks:PackIconFontAwesome Kind="InfoCircleSolid"
                                            Foreground="Gray" 
                                            Visibility="{Binding IsNotMsLapsSchemaPresent, Converter={StaticResource BooleanToVisibilityConverter}}"
                                            VerticalAlignment="Center"/>
             <Label
                 FontWeight="Bold"
-                Content="{Binding MsLapsSchemaPresentText, Mode=OneWay,FallbackValue='Status unknown'}"
-                Margin="0 5 0 0"/>
+                VerticalAlignment="Center"
+                Content="{Binding MsLapsSchemaPresentText, Mode=OneWay,FallbackValue='Status unknown'}"/>
         </StackPanel>
 
 
@@ -72,9 +73,10 @@
                    Margin="5"/>
 
         <StackPanel Grid.Row="3" Grid.Column="1"
+                    Margin="5 0 0 0"
                     Orientation="Horizontal">
-            <iconPacks:PackIconFontAwesome Kind="CheckSquareSolid"
-                                           Foreground="DarkGreen" 
+            <iconPacks:PackIconFontAwesome Kind="CheckCircleRegular"
+                                           Foreground="Green" 
                                            Visibility="{Binding IsLithnetSchemaPresent, Converter={StaticResource BooleanToVisibilityConverter}}"
                                            VerticalAlignment="Center"/>
 
@@ -84,20 +86,27 @@
                                            VerticalAlignment="Center"/>
             <Label
                 FontWeight="Bold"
-                Content="{Binding LithnetAccessManagerSchemaPresentText, Mode=OneWay,FallbackValue='Status unknown'}"
-                Margin="0 5 0 0"/>
+                VerticalAlignment="Center"
+                Content="{Binding LithnetAccessManagerSchemaPresentText, Mode=OneWay,FallbackValue='Status unknown'}"/>
         </StackPanel>
 
-        <Button Grid.Row="3" Grid.Column="2" 
-                Command="{s:Action ExtendSchemaLithnetAccessManager}"
-                Margin="5" 
-                VerticalContentAlignment="Center">
-            <StackPanel Orientation="Horizontal" 
-                        VerticalAlignment="Center">
-                <iconPacks:PackIconMaterial Kind="ScriptOutline" Margin="0 0 2 0"/>
-                <TextBlock Text="DEPLOY SCHEMA..." VerticalAlignment="Center"/>
-            </StackPanel>
-        </Button>
+        <StackPanel Grid.Row="5" Grid.Column="1" 
+                    Orientation="Horizontal">
+            <Button Command="{s:Action RefreshSchemaStatus}"
+                    Margin="5" 
+                    Content="Refresh Status"/>
+            <Button Command="{s:Action ExtendSchemaLithnetAccessManager}"
+                    Margin="5" 
+                    HorizontalAlignment="Left"
+                    VerticalContentAlignment="Center">
+                <StackPanel Orientation="Horizontal" 
+                            VerticalAlignment="Center">
+                    <iconPacks:PackIconMaterial Kind="ScriptOutline" Margin="0 0 2 0"/>
+                    <TextBlock Text="DEPLOY SCHEMA..." VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+        
 
         <TextBlock Grid.Row="4" Grid.Column="1"
                    Text="If you plan to deploy the Lithnet Access Manager agent to allow the encrypted local admin password and password history features, you'll need to deploy the Lithnet Access Manager schema"

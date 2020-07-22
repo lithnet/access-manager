@@ -24,7 +24,7 @@ namespace Lithnet.AccessManager.Server.UI
             AuditingViewModel audit,
             EmailViewModel mail,
             HostingViewModel hosting,
-            ActiveDirectorySchemaViewModel ad,
+            ActiveDirectoryConfigurationViewModel ad,
             JitConfigurationViewModel jit,
             LapsConfigurationViewModel laps,
             HelpViewModel help)

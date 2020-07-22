@@ -13,8 +13,8 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="15*" MinWidth="110"/>
+            <ColumnDefinition Width="85*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -22,10 +22,11 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Label Grid.Row="0" Grid.Column="0"
-                           Content="Windows Authorization Access Group Membership"
-                           VerticalContentAlignment="Top"
-                           Margin="5"/>
+        <TextBlock Grid.Row="0" Grid.Column="0"
+                   Text="Windows Authorization Access Group Membership"
+                   TextWrapping="Wrap"
+                   Margin="5"/>
+
         <Grid Grid.Row="0" Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
@@ -35,10 +36,13 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <StackPanel  Grid.Row="0"
-                         Orientation="Horizontal">
-                <iconPacks:PackIconFontAwesome Kind="CheckSquareSolid"
-                                               Foreground="DarkGreen" 
+            <StackPanel Grid.Row="0"  
+                        Margin="5 0 0 0"
+                        Orientation="Horizontal">
+                <mah:ProgressRing Height="15" Width="15"
+                                  Visibility="{Binding WaagLookupInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <iconPacks:PackIconFontAwesome Kind="CheckCircleRegular"
+                                               Foreground="Green" 
                                                Visibility="{Binding IsWaagMember, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                VerticalAlignment="Center"/>
 
@@ -48,18 +52,17 @@
                                                VerticalAlignment="Center"/>
                 <Label
                    FontWeight="Bold"
-                   Content="{Binding WaagStatus, Mode=OneWay,FallbackValue='Status unknown'}"
-                   Margin="0 5 0 0"/>
+                   Content="{Binding WaagStatus, Mode=OneWay,FallbackValue='Status unknown'}"/>
             </StackPanel>
 
             <TextBlock Grid.Row="1"
                        Margin="5 0 0 0"
-                       TextWrapping="Wrap">The built-in "Windows Authorization Access Group" grants permissions that are required for the service account to calculate group membership of users within a domain. This is required for all installations.</TextBlock>
+                       TextWrapping="Wrap">The built-in group "Windows Authorization Access Group" grants permissions that are required for the service account to calculate group membership of users within a domain. This is required for all installations.</TextBlock>
         </Grid>
 
-        <Label Grid.Row="1" Grid.Column="0"
-               Content="Access Control Assistance Operators Membership"
-               VerticalAlignment="Top"
+        <TextBlock Grid.Row="1" Grid.Column="0"
+                   Text="Access Control Assistance Operators Membership"
+                   TextWrapping="Wrap"
                Margin="5"/>
         <Grid Grid.Row="1" Grid.Column="1">
             <Grid.ColumnDefinitions>
@@ -72,9 +75,12 @@
             </Grid.RowDefinitions>
 
             <StackPanel  Grid.Row="0"
+                         Margin="5 0 0 0"
                          Orientation="Horizontal">
-                <iconPacks:PackIconFontAwesome Kind="CheckSquareSolid"
-                                               Foreground="DarkGreen" 
+                <mah:ProgressRing Height="15" Width="15"
+                                  Visibility="{Binding AcaoLookupInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <iconPacks:PackIconFontAwesome Kind="CheckCircleRegular"
+                                               Foreground="Green" 
                                                Visibility="{Binding IsAcaoMember, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                VerticalAlignment="Center"/>
 
@@ -85,16 +91,19 @@
                 <Label
                    FontWeight="Bold"
                    Content="{Binding AcaoStatus, Mode=OneWay, FallbackValue='Status unknown'}"
-                   VerticalAlignment="Center"
-                   Margin="0 5 0 0"/>
+                   VerticalAlignment="Center"/>
             </StackPanel>
             <TextBlock Grid.Row="1"
                        Margin="5 0 0 0"
-                       TextWrapping="Wrap">The built-in "Access Control Assistance Operators" grants permissions that are required for the service account to calculate group membership of users from across a forest trust. This is only required where a trust is in place between forests</TextBlock>
+                       TextWrapping="Wrap">The built-in group "Access Control Assistance Operators" grants permissions that are required for the service account to calculate group membership of users from across a forest trust. This is only required where a trust is in place between forests</TextBlock>
         </Grid>
 
         <StackPanel Grid.Row="2" Grid.Column="1" 
+                    Margin="0 5 0 0"
                     Orientation="Horizontal">
+            <Button Command="{s:Action RefreshGroupMembership}"
+                    Margin="5" 
+                    Content="Refresh Status"/>
             <Button Command="{s:Action ShowADPermissionScript}"
                     Margin="5" 
                     VerticalContentAlignment="Center"
@@ -105,9 +114,7 @@
                     <TextBlock Text="GRANT PERMISSION..." VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
-            <Button Command="{s:Action RefreshGroupMembership}"
-                    Margin="5" 
-                    Content="Refresh Status"/>
+            
         </StackPanel>
     </Grid>
 </UserControl>

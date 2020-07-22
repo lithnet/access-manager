@@ -8,35 +8,35 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Margin="5">
     <StackPanel>
-        <GroupBox Header="Email server settings"
-                  Margin="5">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <Label Grid.Row="0" Grid.Column="0" 
+        <Label Style="{DynamicResource DescriptionHeaderStyle}" Content="SMTP Server Settings"/>
+
+        <Grid Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" Grid.Column="0" 
                        Content="SMTP Server"
                        Margin="5"/>
-                <TextBox Grid.Row="0" Grid.Column="1"
+            <TextBox Grid.Row="0" Grid.Column="1"
                          Text="{Binding Host}"
                          Margin="5"/>
 
-                <Label Grid.Row="0" Grid.Column="2" 
+            <Label Grid.Row="0" Grid.Column="2" 
                        Content="Port"
                        Margin="5"/>
-                <mah:NumericUpDown Grid.Row="0" Grid.Column="3" 
+            <mah:NumericUpDown Grid.Row="0" Grid.Column="3" 
                                    Value="{Binding Port}" 
                                    Minimum="1" Maximum="65535" Interval="1" 
                                    HideUpDownButtons="True"
@@ -44,44 +44,43 @@
                                    TextAlignment="Left"
                                    Margin="5"/>
 
-                <Label Grid.Row="2" Grid.Column="0" 
+            <Label Grid.Row="2" Grid.Column="0" 
                        Content="Use TLS" Margin="5"/>
-                <CheckBox Grid.Row="2" Grid.Column="1"
+            <CheckBox Grid.Row="2" Grid.Column="1"
                           IsChecked="{Binding UseSsl}"
                           Margin="5"/>
 
-                <Label Grid.Row="3" Grid.Column="0" 
+            <Label Grid.Row="3" Grid.Column="0" 
                        Content="From address"
                        Margin="5"/>
-                <TextBox Grid.Row="3" Grid.Column="1"
+            <TextBox Grid.Row="3" Grid.Column="1"
                          Text="{Binding FromAddress}"
                          Margin="5"/>
 
-                <Label Grid.Row="4" Grid.Column="0" 
+            <Label Grid.Row="4" Grid.Column="0" 
                        Content="Specify credentials"
                        Margin="5"/>
-                <CheckBox Grid.Row="4" Grid.Column="1" 
+            <CheckBox Grid.Row="4" Grid.Column="1" 
                           IsChecked="{Binding UseSpecifiedCredentials}"
                           Margin="5"/>
 
-                <Label Grid.Row="5" Grid.Column="0" 
+            <Label Grid.Row="5" Grid.Column="0" 
                        Content="Username"
                        Margin="5"/>
-                <TextBox Grid.Row="5" Grid.Column="1" 
+            <TextBox Grid.Row="5" Grid.Column="1" 
                          Text="{Binding Username}" 
                          IsEnabled="{Binding UseSpecifiedCredentials}"
                          Margin="5"/>
 
-                <Label Grid.Row="6" Grid.Column="0"
+            <Label Grid.Row="6" Grid.Column="0"
                        Content="Password"
                        Margin="5"/>
-                <PasswordBox Grid.Row="6" Grid.Column="1" 
+            <PasswordBox Grid.Row="6" Grid.Column="1" 
                              local:PasswordBoxBindingHelper.BindPassword="True" 
                              local:PasswordBoxBindingHelper.BoundPassword="{Binding Path=Password, Mode=TwoWay}"
                              IsEnabled="{Binding UseSpecifiedCredentials}" 
                              Margin="5"/>
 
-            </Grid>
-        </GroupBox>
+        </Grid>
     </StackPanel>
 </UserControl>

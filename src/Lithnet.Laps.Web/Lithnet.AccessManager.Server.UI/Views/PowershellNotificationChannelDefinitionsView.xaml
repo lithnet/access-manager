@@ -23,6 +23,7 @@
                       SelectedItem="{Binding SelectedItem}" 
                       BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" 
                       BorderThickness="1" 
+                      Height="250"
                       Margin="5"
                       MouseDoubleClick="{s:Action Edit}">
           <ListView.View>

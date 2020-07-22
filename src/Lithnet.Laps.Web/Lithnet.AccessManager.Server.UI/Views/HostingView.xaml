@@ -10,18 +10,10 @@
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
-             d:DesignHeight="670" d:DesignWidth="800" 
-             Margin="10 0 10 0">
-    <DockPanel LastChildFill="False">
+             d:DesignHeight="670" d:DesignWidth="800">
+    <DockPanel LastChildFill="False" Margin="5">
         <StackPanel DockPanel.Dock="Top">
-            <StackPanel.Resources>
-                <Style x:Key="DescriptionHeaderStyle"
-                   BasedOn="{StaticResource {x:Type Label}}"
-                   TargetType="{x:Type Label}">
-                    <Setter Property="FontSize" Value="22" />
-                    <Setter Property="HorizontalAlignment" Value="Left" />
-                </Style>
-            </StackPanel.Resources>
+           
 
             <Label Style="{DynamicResource DescriptionHeaderStyle}" Content="Service"/>
 

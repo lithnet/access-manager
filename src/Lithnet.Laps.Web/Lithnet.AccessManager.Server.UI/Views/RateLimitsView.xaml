@@ -6,43 +6,35 @@
              xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" Margin="5">
-    <StackPanel>
-        <Grid>
+             d:DesignHeight="450" d:DesignWidth="800" >
+    <StackPanel Margin="5">
+
+        <Label Style="{DynamicResource DescriptionHeaderStyle}" 
+               Content="Per-user rate limits"/>
+
+        <Grid Margin="5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition/>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
             </Grid.RowDefinitions>
 
-            <GroupBox Grid.Row="0" Grid.Column="0" 
-                      Header="Per user limits"
-                      Margin="5">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-
-                    <Label Grid.Row="0" Grid.Column="0" 
+            <Label Grid.Row="0" Grid.Column="0" 
                            Content="Enabled"
                            Margin="5"/>
-                    <CheckBox Grid.Row="0" Grid.Column="1"
+            <CheckBox Grid.Row="0" Grid.Column="1"
                               IsChecked="{Binding PerUserEnabled}"
                               Margin="5"/>
 
-                    <Label Grid.Row="1" Grid.Column="0" 
+            <Label Grid.Row="1" Grid.Column="0" 
                            Content="Requests per minute"
                            Margin="5"/>
-                    <mah:NumericUpDown Grid.Row="1" Grid.Column="1" 
+            <mah:NumericUpDown Grid.Row="1" Grid.Column="1" 
                                        Value="{Binding PerUserRequestsPerMinute}" 
                                        Minimum="1" 
                                        Interval="1"
@@ -50,10 +42,10 @@
                                        TextAlignment="Left"
                                        Margin="5"/>
 
-                    <Label Grid.Row="2" Grid.Column="0"
+            <Label Grid.Row="2" Grid.Column="0"
                            Content="Requests per minute"
                            Margin="5"/>
-                    <mah:NumericUpDown Grid.Row="2" Grid.Column="1" 
+            <mah:NumericUpDown Grid.Row="2" Grid.Column="1" 
                                        Value="{Binding PerUserRequestsPerHour}" 
                                        Minimum="1"  
                                        Interval="1"
@@ -61,10 +53,10 @@
                                        TextAlignment="Left"
                                        Margin="5"/>
 
-                    <Label Grid.Row="3" Grid.Column="0" 
+            <Label Grid.Row="3" Grid.Column="0" 
                            Content="Requests per minute"
                            Margin="5"/>
-                    <mah:NumericUpDown Grid.Row="3" Grid.Column="1" 
+            <mah:NumericUpDown Grid.Row="3" Grid.Column="1" 
                                        Value="{Binding PerUserRequestsPerDay}" 
                                        Minimum="1"  
                                        Interval="1" 
@@ -72,62 +64,60 @@
                                        TextAlignment="Left"
                                        Margin="5"/>
 
-                </Grid>
-            </GroupBox>
+        </Grid>
 
-            <GroupBox  Grid.Row="0" Grid.Column="1" 
-                       Header="Per IP limits"
-                       Margin="5">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
+        <Label Style="{DynamicResource DescriptionHeaderStyle}" 
+               Content="Per-IP rate limits"/>
 
-                    <Label Grid.Row="0" Grid.Column="0"
+
+        <Grid Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0"
                            Content="Enabled"
                            Margin="5"/>
-                    <CheckBox Grid.Row="0" Grid.Column="1"
+            <CheckBox Grid.Row="0" Grid.Column="1"
                               IsChecked="{Binding PerIPEnabled}"
                               Margin="5"/>
 
-                    <Label Grid.Row="1" Grid.Column="0"
+            <Label Grid.Row="1" Grid.Column="0"
                            Content="Requests per minute"
                            Margin="5"/>
-                    <mah:NumericUpDown Grid.Row="1" Grid.Column="1"
+            <mah:NumericUpDown Grid.Row="1" Grid.Column="1"
                                        Value="{Binding PerIPRequestsPerMinute}" 
                                        Minimum="1" Interval="1"
                                        Width="100" 
                                        TextAlignment="Left"
                                        Margin="5"/>
 
-                    <Label Grid.Row="2" Grid.Column="0"
+            <Label Grid.Row="2" Grid.Column="0"
                            Content="Requests per minute"
                            Margin="5"/>
-                    <mah:NumericUpDown Grid.Row="2" Grid.Column="1" 
+            <mah:NumericUpDown Grid.Row="2" Grid.Column="1" 
                                        Value="{Binding PerIPRequestsPerHour}" 
                                        Minimum="1" Interval="1"
                                        Width="100" 
                                        TextAlignment="Left"
                                        Margin="5"/>
 
-                    <Label Grid.Row="3" Grid.Column="0" 
+            <Label Grid.Row="3" Grid.Column="0" 
                            Content="Requests per minute"
                            Margin="5"/>
-                    <mah:NumericUpDown Grid.Row="3" Grid.Column="1" 
+            <mah:NumericUpDown Grid.Row="3" Grid.Column="1" 
                                        Value="{Binding PerIPRequestsPerDay}"
                                        Minimum="1" Interval="1" 
                                        Width="100" 
                                        TextAlignment="Left"
                                        Margin="5"/>
-                </Grid>
-            </GroupBox>
         </Grid>
     </StackPanel>
 </UserControl>

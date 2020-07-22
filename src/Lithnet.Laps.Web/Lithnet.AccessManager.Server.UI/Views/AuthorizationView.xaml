@@ -10,10 +10,17 @@
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-        <GroupBox Header="Authorization rules">
-            <ContentControl s:View.Model="{Binding Targets}" 
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0"
+               Style="{DynamicResource DescriptionHeaderStyle}" 
+               Content="Authorization rules"/>
+
+        <ContentControl Grid.Row="1"
+            s:View.Model="{Binding Targets}" 
                                     IsTabStop="False"/>
-        </GroupBox>
     </Grid>
 </UserControl>

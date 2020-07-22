@@ -14,6 +14,7 @@
     <Version>1.0.$([System.DateTime]::UtcNow.Date.Subtract($([System.DateTime]::Parse("2000-01-01"))).TotalDays)</Version>
     <Deterministic>false</Deterministic>
     <Platforms>AnyCPU;x86</Platforms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,16 +48,13 @@
     <Compile Update="Views\LapsConfigurationView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\ActiveDirectorySchemaView.xaml.cs">
+    <Compile Update="Views\ActiveDirectoryConfigurationView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\ActiveDirectoryDomainConfigurationView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\ActiveDirectoryForestConfigurationView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\ActiveDirectoryConfigurationView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="Views\JitGroupMappingView.xaml.cs">
@@ -90,16 +88,13 @@
     <Page Update="Views\LapsConfigurationView.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\ActiveDirectorySchemaView.xaml">
+    <Page Update="Views\ActiveDirectoryConfigurationView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\ActiveDirectoryDomainConfigurationView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\ActiveDirectoryForestConfigurationView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\ActiveDirectoryConfigurationView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\JitGroupMappingView.xaml">

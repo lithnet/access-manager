@@ -15,12 +15,15 @@
         >
 
     <DockPanel LastChildFill="True">
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
+        <Menu DockPanel.Dock="Top"
+              BorderBrush="{DynamicResource MahApps.Brushes.Control.Border}"
+              BorderThickness="0,0,0,1">
+            <MenuItem Header="_File" >
                 <MenuItem.ItemsSource>
                     <CompositeCollection>
                         <MenuItem Header="Save" 
-                                      Command="{s:Action Save}" />
+                                      Command="{s:Action Save}"
+                                      />
 
                         <MenuItem Header="Test" 
                                       Command="{s:Action Test}" />
@@ -32,7 +35,8 @@
                 </MenuItem.ItemsSource>
 
             </MenuItem>
-            <MenuItem Header="_Help">
+            <MenuItem Header="_Help"
+                     >
                 <MenuItem.ItemsSource>
                     <CompositeCollection>
                         <MenuItem Header="Online Help"

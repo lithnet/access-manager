@@ -9,7 +9,7 @@
                                d:DesignWidth="300"
                                BorderBrush="{DynamicResource MahApps.Brushes.AccentBase}"
                                BorderThickness="1"
-                               Padding="30"
+                               Padding="75"
                                MinWidth="500"
                                MinHeight="300"
                                MaxHeight="1000"
@@ -17,6 +17,7 @@
                                GlowBrush="{DynamicResource MahApps.Brushes.Accent}"
                                ShowCloseButton="True"
                                xmlns:s="https://github.com/canton7/Stylet"
+                               xmlns:ui="clr-namespace:Lithnet.AccessManager.Server.UI"
                                IsModal="True"
                                IsWindowHostActive="False"
                                AllowFocusElement="True"
@@ -51,7 +52,7 @@
                           VerticalScrollBarVisibility="Auto"
                           Margin="5">
                 <AdornerDecorator>
-                    <ContentControl Grid.Row="0" s:View.Model="{Binding}"/>
+                    <ContentControl s:View.Model="{Binding}"/>
                 </AdornerDecorator>
             </ScrollViewer>
         </DockPanel>

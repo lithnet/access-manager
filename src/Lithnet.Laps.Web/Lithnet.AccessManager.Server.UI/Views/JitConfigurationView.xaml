@@ -10,71 +10,54 @@
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <GroupBox Header="JIT group creation">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+    <StackPanel Margin="5">
+        <Label Style="{DynamicResource DescriptionHeaderStyle}" 
+               Content="JIT Access Group Creation"/>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" 
-                       Margin="5"
-                       TextWrapping="Wrap">Lithnet Access Manager can automatically create a JIT group for each computer in a specified OU based on a templated name.
-            </TextBlock>
+        <TextBlock Margin="10 5 5 5"
+                   TextWrapping="Wrap">Lithnet Access Manager can automatically create a JIT group for each computer in a specified OU based on a templated name.
+        </TextBlock>
 
-            <CheckBox Grid.Row="1" Grid.Column="0"
-                      IsChecked="{Binding EnableJitGroupCreation}"
-                      Margin="5"
+        <CheckBox IsChecked="{Binding EnableJitGroupCreation}"
+                      Margin="10 5 5 5"
                       Content="Enable automatic JIT group creation"/>
 
-            <ListView Grid.Row="3" Grid.Column="0" 
-                                      BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
-                                      ItemsSource="{Binding GroupMappings}"
-                                      SelectedItem="{Binding SelectedGroupMapping}"
-                                      ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                                      Height="300"
-                                      MouseDoubleClick="{s:Action Edit}"
-                                      Margin="5">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Computer OU" 
+        <ListView BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
+                  ItemsSource="{Binding GroupMappings}"
+                  SelectedItem="{Binding SelectedGroupMapping}"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                  Height="300"
+                  MouseDoubleClick="{s:Action Edit}"
+                  Margin="10 5 5 5">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Computer OU" 
                                             DisplayMemberBinding="{Binding ComputerOU}" 
                                             Width="Auto"/>
-                        <GridViewColumn Header="Group OU"
+                    <GridViewColumn Header="Group OU"
                                             DisplayMemberBinding="{Binding GroupOU}" 
                                             Width="Auto"/>
-                        <GridViewColumn Header="Group name template"
+                    <GridViewColumn Header="Group name template"
                                             DisplayMemberBinding="{Binding GroupNameTemplate}" 
                                             Width="Auto"/>
-                        <GridViewColumn Header="Group type"
+                    <GridViewColumn Header="Group type"
                                             DisplayMemberBinding="{Binding GroupType}" 
                                             Width="Auto"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+                </GridView>
+            </ListView.View>
+        </ListView>
 
-            <StackPanel Grid.Row="4" Grid.Column="0"
-                        Orientation="Horizontal">
-                <Button Command="{s:Action Add}" 
+        <StackPanel Orientation="Horizontal"
+                    Margin="10 5 5 5">
+            <Button Command="{s:Action Add}" 
                     Content="Add..." 
                     Margin="5"/>
-                <Button Command="{s:Action Delete}"
+            <Button Command="{s:Action Delete}"
                     Content="Delete selected..."
                     Margin="5"/>
-                <Button Command="{s:Action Edit}"
+            <Button Command="{s:Action Edit}"
                     Content="Edit selected..."
                     Margin="5"/>
-            </StackPanel>
-        </Grid>
-    </GroupBox>
+        </StackPanel>
+    </StackPanel>
 </UserControl>

@@ -9,34 +9,36 @@
              xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" Margin="5">
-    <StackPanel>
-        <GroupBox Header="Proxy settings">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel Margin="5">
 
-                <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
+        <Label Style="{DynamicResource DescriptionHeaderStyle}" 
+               Content="Proxy settings"/>
+
+        <Grid Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
                           IsChecked="{Binding Enabled}" 
                           VerticalAlignment="Center" 
                           Content="Resolve client IP address from X-Forwarded-For headers"
                           Margin="5"/>
 
-                <Label Grid.Row="1" Grid.Column="0"
+            <Label Grid.Row="1" Grid.Column="0"
                        Content="Maximum allowed entries in the header"
                        Margin="5" />
-                <mah:NumericUpDown Grid.Row="1" Grid.Column="1" 
+            <mah:NumericUpDown Grid.Row="1" Grid.Column="1" 
                                    Value="{Binding ForwardLimit}" 
                                    Minimum="0" Maximum="65535" Interval="1"
                                    HideUpDownButtons="True" 
@@ -45,79 +47,69 @@
                                    IsEnabled="{Binding Enabled}"  
                                    Margin="5" />
 
-                <Label Grid.Row="2" Grid.Column="0" 
+            <Label Grid.Row="2" Grid.Column="0" 
                        Content="Known proxy IP addresses"  
                        Margin="5" />
-                <ListBox Grid.Row="2" Grid.Column="1"
+            <ListBox Grid.Row="2" Grid.Column="1"
                          ItemsSource="{Binding KnownProxies}"
                          SelectedItem="{Binding SelectedProxy}" 
                          IsEnabled="{Binding Enabled}"  
                          Margin="5 5 5 2" 
                          MinHeight="75"
+                         Width="200"
+                         HorizontalAlignment="Left"
                          BorderThickness="1"
                          BorderBrush="{StaticResource MahApps.Brushes.Control.Border}"/>
 
-                <Grid Grid.Row="3" Grid.Column="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="75"/>
-                        <ColumnDefinition Width="75"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
+            <StackPanel Grid.Row="3" Grid.Column="1"
+                        Orientation="Horizontal">
 
-                    <TextBox Grid.Column="0" 
-                             Text="{Binding NewProxy, UpdateSourceTrigger=PropertyChanged}" 
+                <TextBox Text="{Binding NewProxy, UpdateSourceTrigger=PropertyChanged}" 
                              IsEnabled="{Binding Enabled}" 
+                             Width="200"
+                             HorizontalAlignment="Left"
                              Margin="5 0 5 5"/>
-                    <Button  Grid.Column="1" 
-                             Command="{s:Action AddProxy}" 
-                             Content="Add"
-                             Margin="5 0 5 5"/>
-                    <Button Grid.Column="2"
-                            Command="{s:Action RemoveProxy}"
-                            Content="Remove"
-                            Margin="5 0 5 5"/>
-                </Grid>
+                <Button  Command="{s:Action AddProxy}" 
+                        MinWidth="60"
+                         Content="Add"
+                         Margin="5 0 5 5"/>
+                <Button Command="{s:Action RemoveProxy}"
+                        MinWidth="60"
+                        Content="Remove"
+                        Margin="5 0 5 5"/>
+            </StackPanel>
 
 
-                <Label Grid.Row="4" Grid.Column="0" 
+            <Label Grid.Row="4" Grid.Column="0" 
                        Content="Known proxy networks"
                        Margin="5"/>
-                <ListBox Grid.Row="4" Grid.Column="1" 
+            <ListBox Grid.Row="4" Grid.Column="1" 
                          ItemsSource="{Binding KnownNetworks}" 
                          SelectedItem="{Binding SelectedNetwork}" 
                          IsEnabled="{Binding Enabled}" 
                          Margin="5 5 5 2" 
                          MinHeight="75"
+                         Width="200"
+                         HorizontalAlignment="Left"
                          BorderThickness="1" 
                          BorderBrush="{StaticResource MahApps.Brushes.Control.Border}"/>
 
-                <Grid Grid.Row="5" Grid.Column="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="75"/>
-                        <ColumnDefinition Width="75"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-
-                    <TextBox Grid.Column="0"
-                             Text="{Binding NewNetwork, UpdateSourceTrigger=PropertyChanged}"
-                             IsEnabled="{Binding Enabled}"
-                             Margin="5 0 5 5"/>
-                    <Button Grid.Column="1" 
-                            Command="{s:Action AddNetwork}" 
-                            Content="Add" 
-                            Margin="5 0 5 5"/>
-                    <Button Grid.Column="2" 
-                            Command="{s:Action RemoveNetwork}" 
-                            Content="Remove" 
-                            Margin="5 0 5 5"/>
-                </Grid>
-            </Grid>
-        </GroupBox>
+            <StackPanel Grid.Row="5" Grid.Column="1"
+                        Orientation="Horizontal">
+                <TextBox Text="{Binding NewNetwork, UpdateSourceTrigger=PropertyChanged}"
+                         IsEnabled="{Binding Enabled}"
+                         Width="200"
+                         HorizontalAlignment="Left"
+                         Margin="5 0 5 5"/>
+                <Button Command="{s:Action AddNetwork}" 
+                        MinWidth="60"
+                        Content="Add" 
+                        Margin="5 0 5 5"/>
+                <Button Command="{s:Action RemoveNetwork}" 
+                        Content="Remove" 
+                        MinWidth="60"
+                        Margin="5 0 5 5"/>
+            </StackPanel>
+        </Grid>
     </StackPanel>
 </UserControl>

@@ -8,13 +8,58 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Margin="5">
     <StackPanel>
-        <StackPanel.Resources>
-            <local:EnumToDisplayConverter x:Key="EnumDescriptionConverter"/>
-        </StackPanel.Resources>
+        <Label Style="{DynamicResource DescriptionHeaderStyle}" 
+               Content="Authentication Provider Setup"/>
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="15*" MinWidth="110"/>
+                <ColumnDefinition Width="85*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" 
+                           Content="Authentication provider"
+                           Margin="5"/>
+            <ComboBox Grid.Row="0" Grid.Column="1" 
+                              ItemsSource="{Binding AuthenticationModeValues, Mode=OneWay}"
+                              SelectedItem="{Binding AuthenticationMode}"
+                              Margin="5">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"></TextBlock>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+        </Grid>
+
+        <Grid Visibility="{Binding Path=IwaVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="15*" MinWidth="110"/>
+                <ColumnDefinition Width="85*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0"
+                           Content="Authentication scheme"
+                           Margin="5"/>
+            <ComboBox Grid.Row="0" Grid.Column="1"
+                              SelectedItem="{Binding IwaAuthenticationSchemes}"
+                              ItemsSource="{Binding IwaAuthenticationSchemesValues}"
+                              Margin="5"
+                              MinWidth="175"/>
+        </Grid>
+
+        <Grid  Visibility="{Binding Path=OidcVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="15*" MinWidth="110"/>
+                <ColumnDefinition Width="85*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition />
@@ -23,140 +68,62 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <GroupBox Grid.Row="0" Grid.ColumnSpan="2"
-                      Header="Provider selection"
-                      Margin="5">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-
-                    <Label Grid.Row="0" Grid.Column="0" 
-                           Content="Authentication provider"
-                           Margin="5"/>
-                    <ComboBox Grid.Row="0" Grid.Column="1" 
-                              ItemsSource="{Binding AuthenticationModeValues, Mode=OneWay}"
-                              SelectedItem="{Binding AuthenticationMode}"
-                              Margin="5">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"></TextBlock>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                </Grid>
-            </GroupBox>
-            <GroupBox Grid.Row="1" Grid.ColumnSpan="2" 
-                      Header="Integrated windows authentication"
-                      Visibility="{Binding Path=IwaVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
-                      Margin="5">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    
-                    <Label Grid.Row="0" Grid.Column="0"
-                           Content="Authentication scheme"
-                           Margin="5"/>
-                    <ComboBox Grid.Row="0" Grid.Column="1"
-                              SelectedItem="{Binding IwaAuthenticationSchemes}"
-                              ItemsSource="{Binding IwaAuthenticationSchemesValues}"
-                              Margin="5"
-                              MinWidth="175"/>
-                </Grid>
-            </GroupBox>
-
-            <GroupBox Grid.Row="2" Grid.ColumnSpan="2" 
-                      Header="OpenID Connect" 
-                      Visibility="{Binding Path=OidcVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
-                      Margin="5">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-
-                    <Label Grid.Row="0" Grid.Column="0"
+            <Label Grid.Row="0" Grid.Column="0"
                            Content="Issuer/Authority"
                            Margin="5"/>
-                    <TextBox Grid.Row="0" Grid.Column="1" 
+            <TextBox Grid.Row="0" Grid.Column="1" 
                              Text="{Binding OidcAuthority}"
                              Margin="5"/>
 
-                    <Label Grid.Row="1" Grid.Column="0" 
+            <Label Grid.Row="1" Grid.Column="0" 
                            Content="Client ID"
                            Margin="5"/>
-                    <TextBox Grid.Row="1" Grid.Column="1"
+            <TextBox Grid.Row="1" Grid.Column="1"
                              Text="{Binding OidcClientID}" 
                              Margin="5"/>
 
-                    <Label Grid.Row="2" Grid.Column="0" 
+            <Label Grid.Row="2" Grid.Column="0" 
                            Content="Secret"
                            Margin="5"/>
-                    <TextBox Grid.Row="2" Grid.Column="1" 
+            <TextBox Grid.Row="2" Grid.Column="1" 
                              Text="{Binding OidcSecret}" 
                              Margin="5"/>
 
-                    <Label Grid.Row="2" Grid.Column="0" 
+            <Label Grid.Row="2" Grid.Column="0" 
                            Content="Secret"
                            Margin="5"/>
-                    <PasswordBox Grid.Row="2" Grid.Column="1" 
+            <PasswordBox Grid.Row="2" Grid.Column="1" 
                                  local:PasswordBoxBindingHelper.BindPassword="True"
                                  local:PasswordBoxBindingHelper.BoundPassword="{Binding Path=OidcSecret, Mode=TwoWay}"
                                  Margin="5"/>
 
-                </Grid>
+        </Grid>
 
-            </GroupBox>
+        <Grid Visibility="{Binding Path=WsFedVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="15*" MinWidth="110"/>
+                <ColumnDefinition Width="85*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
 
-            <GroupBox Grid.Row="3" Grid.ColumnSpan="2" 
-                      Header="WS-Federation" 
-                      Visibility="{Binding Path=WsFedVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
-                      Margin="5">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="150"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-
-                    <Label Grid.Row="0" Grid.Column="0"
+            <Label Grid.Row="0" Grid.Column="0"
                            Content="Metadata URL"
                            Margin="5"/>
-                    <TextBox Grid.Row="0" Grid.Column="1" 
+            <TextBox Grid.Row="0" Grid.Column="1" 
                              Text="{Binding WsFedMetadata}"
                              Margin="5" />
 
-                    <Label Grid.Row="1" Grid.Column="0" 
+            <Label Grid.Row="1" Grid.Column="0" 
                            Content="Realm"
                            Margin="5"/>
-                    <TextBox Grid.Row="1" Grid.Column="1" 
+            <TextBox Grid.Row="1" Grid.Column="1" 
                              Text="{Binding WsFedRealm}" 
                              Margin="5"/>
-                </Grid>
-            </GroupBox>
         </Grid>
     </StackPanel>
 </UserControl>

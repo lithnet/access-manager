@@ -57,8 +57,6 @@ namespace Lithnet.AccessManager.Server.UI
         {
             DialogWindow w = new DialogWindow();
             w.Title = "Edit target";
-            w.HorizontalContentAlignment = HorizontalAlignment.Stretch; 
-            w.VerticalContentAlignment = VerticalAlignment.Stretch;
             w.SaveButtonIsDefault = true;
 
             var m = JsonConvert.DeserializeObject<SecurityDescriptorTarget>(JsonConvert.SerializeObject(this.SelectedItem.Model));

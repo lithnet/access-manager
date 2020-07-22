@@ -14,10 +14,29 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.TabControl.xaml" />
+                <ResourceDictionary>
+                    <Style x:Key="DescriptionHeaderStyle"
+                               BasedOn="{StaticResource {x:Type Label}}"
+                               TargetType="{x:Type Label}">
+                        <Setter Property="FontSize" Value="22" />
+                        <Setter Property="HorizontalAlignment" Value="Left" />
+                        <Setter Property="Margin" Value="0 5 0 0"/>
+                        <Setter Property="Foreground" Value="#CC000000"/>
+                    </Style>
+                    <Style x:Key="SubDescriptionHeaderStyle"
+                           BasedOn="{StaticResource {x:Type Label}}"
+                           TargetType="{x:Type Label}">
+                        <Setter Property="FontSize" Value="18" />
+                        <Setter Property="HorizontalAlignment" Value="Left" />
+                        <Setter Property="Margin" Value="0 0 0 0"/>
+                        <Setter Property="Foreground" Value="#99000000"/>
+                    </Style>
+                    <local:EnumToDisplayConverter x:Key="EnumDescriptionConverter"/>
+                </ResourceDictionary>
             </s:ApplicationLoader.MergedDictionaries>
         </s:ApplicationLoader>
 
-       
-       
+
+
     </Application.Resources>
 </Application>

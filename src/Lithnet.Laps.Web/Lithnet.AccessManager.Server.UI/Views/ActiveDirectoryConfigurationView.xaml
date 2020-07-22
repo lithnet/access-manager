@@ -9,22 +9,71 @@
              xmlns:dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
              dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" Margin="5"
-             >
+             d:DesignHeight="450" d:DesignWidth="800" Margin="5">
+    <StackPanel>
+        <Label Style="{DynamicResource DescriptionHeaderStyle}" 
+               Content="Active Directory"/>
+        <Grid Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="15*" MinWidth="110"/>
+                <ColumnDefinition Width="85*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Grid.Column="0" 
+                   Text="Selected Forest"
+                   Margin="5"/>
+            <ComboBox Grid.Row="0" Grid.Column="1" 
+                      ItemsSource="{Binding Forests, Mode=OneWay}"
+                      SelectedItem="{Binding SelectedForest}"
+                      DisplayMemberPath="Name"
+                      Margin="5"/>
+        </Grid>
+
+        <Label Style="{DynamicResource DescriptionHeaderStyle}" 
+               Content="Schema"/>
+
+        <ContentControl s:View.Model="{Binding SelectedForest}" 
+                                VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 
+                                IsTabStop="False"
+                                Margin="5"/>
 
 
+        <Label Style="{DynamicResource DescriptionHeaderStyle}" 
+               Content="Domain Permissions"/>
 
-    <GroupBox Header="Active Directory">
-        <mah:MetroAnimatedSingleRowTabControl BorderThickness="1"  
-                                                  ItemsSource="{Binding Items}" 
-                                                  SelectedItem="{Binding ActiveItem}"
-                                                  DisplayMemberPath="DisplayName"
-                                                  Margin="5">
-            <TabControl.ContentTemplate>
-                <DataTemplate>
-                    <ContentControl s:View.Model="{Binding}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" IsTabStop="False"/>
-                </DataTemplate>
-            </TabControl.ContentTemplate>
-        </mah:MetroAnimatedSingleRowTabControl>
-    </GroupBox>
+        <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="15*" MinWidth="110"/>
+                <ColumnDefinition Width="85*"/>
+            </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" 
+                           Text="Domain"
+                           Margin="5,5,5,0" Height="26" VerticalAlignment="Top"/>
+                <ComboBox Grid.Row="1" Grid.Column="1" 
+                              DataContext="{Binding SelectedForest}"
+                              ItemsSource="{Binding Domains, Mode=OneWay}"
+                              SelectedItem="{Binding SelectedDomain}"
+                              DisplayMemberPath="DisplayName"
+                              Margin="5">
+                </ComboBox>
+
+                <ContentControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                    DataContext="{Binding SelectedForest}"
+                                    s:View.Model="{Binding SelectedDomain}" 
+                                    VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" 
+                                    IsTabStop="False"
+                                    Margin="5"/>
+            </Grid>
+    </StackPanel>
 </UserControl>

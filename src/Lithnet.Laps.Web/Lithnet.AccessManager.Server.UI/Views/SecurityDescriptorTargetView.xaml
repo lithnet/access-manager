@@ -9,215 +9,248 @@
              xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
-             d:DesignHeight="800" d:DesignWidth="800" Margin="5">
+             Margin="5" >
+
     <AdornerDecorator>
         <StackPanel>
+
+            <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
+                   Content="Target"
+                   Margin="0 5 0 0"/>
+            <Separator Margin="5 0 0 10" Height="1"
+                       Width="Auto"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Top"                   
+                       Background="#11000000" />
+
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="500"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" 
+                               Content="Target"
+                               Margin="5 2 5 2"/>
+                <TextBox Grid.Row="0" Grid.Column="1" 
+                                 Text="{Binding DisplayName, Mode=OneWay}"
+                                 IsReadOnly="True"
+                                 Margin="2"/>
+                <Button Grid.Row="0" Grid.Column="2" 
+                                Command="{s:Action SelectTarget}" 
+                                Content="..."
+                                Width="30"
+                                Margin="2"/>
+
+                <Label Grid.Row="1" Grid.Column="0"
+                               Content="Description"
+                               Margin="5 2 5 2"/>
+                <TextBox Grid.Row="1" Grid.Column="1" 
+                                 Text="{Binding Description}"
+                                 Margin="2"/>
+            </Grid>
+
+
+            <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
+                   Margin="0 20 0 0"
+                   Content="Access control"/>
+            <Separator Margin="5 0 0 10" Height="1"
+                       Width="Auto"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Top"                   
+                       Background="#11000000" />
+
+
+            <Grid IsEnabled="{Binding CanEdit, Mode=OneWay}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="500"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
                 </Grid.RowDefinitions>
 
-                <GroupBox Grid.Row="0" Grid.Column="0"
-                          Header="Target">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-
-                        <Label Grid.Row="0" Grid.Column="0" 
-                               Content="Target"
-                               Margin="5"/>
-                        <TextBox Grid.Row="0" Grid.Column="1" 
-                                 Text="{Binding DisplayName, Mode=OneWay}"
-                                 IsReadOnly="True"
-                                 Margin="5"/>
-                        <Button Grid.Row="0" Grid.Column="2" 
-                                Command="{s:Action SelectTarget}" 
-                                Content="Select target..."
-                                Margin="5"/>
-
-                        <Label Grid.Row="1" Grid.Column="0" 
-                               Content="Type"
-                               Margin="5"/>
-                        <Label Grid.Row="1" Grid.Column="1" 
-                               Content="{Binding Type}"
-                               Margin="5"/>
-
-                        <Label Grid.Row="2" Grid.Column="0"
-                               Content="Description"
-                               Margin="5"/>
-                        <TextBox Grid.Row="2" Grid.Column="1" 
-                                 Text="{Binding Description}"
-                                 Margin="5"/>
-                    </Grid>
-                </GroupBox>
-
-                <GroupBox Grid.Row="1" Grid.Column="0"
-                          IsEnabled="{Binding CanEdit, Mode=OneWay}"
-                          Header="Access control">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-
-                        <Label Grid.Row="1" Grid.Column="0" 
-                               Content="Access control"
+                <Label Grid.Row="0" Grid.Column="0" 
+                               Content="Access control type"
                                VerticalAlignment="Top"
-                               Margin="5"/>
+                               Margin="5 2 5 2"/>
 
-                        <Grid Grid.Row="1" Grid.Column="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
+                <Grid Grid.Row="0" Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
 
-                            <RadioButton Grid.Row="0" Grid.Column="0"
+                    <RadioButton Grid.Row="0" Grid.Column="0"
                              IsChecked="{Binding IsModePermission}" 
                              Content="In-built permissions"
                              IsEnabled="{Binding CanEdit, Mode=OneWay}"
-                                         VerticalAlignment="Top"
                              Background="Transparent"
-                             Margin="5"/>
-                            <Button Grid.Row="0" Grid.Column="1" 
+                             Margin="2 2 5 2"/>
+
+                    <Button Grid.Row="0" Grid.Column="1" 
                                     Command="{s:Action EditPermissions}" 
                                     Content="Edit permissions..."
-                                    VerticalAlignment="Top"
                                     HorizontalAlignment="Left"
-                                    Margin="5"/>
+                                    Margin="2"/>
 
-                            <RadioButton Grid.Row="1" Grid.Column="0"
+                    <RadioButton Grid.Row="1" Grid.Column="0"
                                      IsChecked="{Binding IsModeScript}" 
                                      Content="Use an external script"
-                                     Background="Transparent"
                                      VerticalAlignment="Top"
+                                     Background="Transparent"
                                      IsEnabled="{Binding CanEdit, Mode=OneWay}"
-                                     Margin="5"/>
+                                     Margin="2 2 5 2"/>
 
-
-                            <ContentControl Grid.Row="1" Grid.Column="1"
+                    <ContentControl Grid.Row="1" Grid.Column="1"
                                         s:View.Model="{Binding Script}" 
-                                            VerticalAlignment="Top"
+                                        VerticalAlignment="Top"
                                         IsEnabled="{Binding IsModeScript}"
-                                        Margin="5"/>
-                        </Grid>
-                    </Grid>
-                </GroupBox>
+                                        Margin="2"/>
+                </Grid>
+            </Grid>
 
-                <GroupBox Grid.Row="2" Grid.Column="0"
-                          IsEnabled="{Binding CanEdit, Mode=OneWay}"
-                          Visibility="{Binding ShowLapsOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                          Header="Local admin password access settings">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
+            <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
+                   Visibility="{Binding ShowLapsOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                   Margin="0 20 0 0"
+                   Content="Local admin password access settings"/>
+            <Separator Margin="5 0 0 10" Height="1"
+                       Visibility="{Binding ShowLapsOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                       Width="Auto"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Top"                   
+                       Background="#11000000" />
 
-                        <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
-                                      IsChecked="{Binding ExpireLapsPassword}" 
-                                      Content="Expire the local admin password once it has been accessed"
-                                      Margin="5"/>
+            <Grid IsEnabled="{Binding CanEdit, Mode=OneWay}"
+                  Visibility="{Binding ShowLapsOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-                        <Label Grid.Row="1" Grid.Column="0"
-                                   Content="Expire the password after (minutes)"
+                <Label Grid.Row="0" Grid.Column="0"
+                       Margin="5"
+                       Content="Expiry"/>
+
+                <StackPanel Grid.Row="0" Grid.Column="1"
+                            Orientation="Horizontal">
+                    <CheckBox IsChecked="{Binding ExpireLapsPassword}" 
+                              Margin="0 0 5 0"
+                          Content="Expire the local admin password"/>
+                    <mah:NumericUpDown Value="{Binding LapsExpireMinutes}" 
+                                       Minimum="0" Interval="15" 
+                                       HideUpDownButtons="False"
+                                       Width="100" 
+                                       VerticalAlignment="Center"
+                                       TextAlignment="Left"
+                                       HorizontalAlignment="Left"/>
+                    <Label Content="minutes after it has been accessed"
+                           VerticalAlignment="Center"/>
+                </StackPanel>
+
+            </Grid>
+
+
+            <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
+                   IsEnabled="{Binding CanEdit, Mode=OneWay}"
+                   Visibility="{Binding ShowJitOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                   Margin="0 20 0 0"
+                   Content="Just-in-time access settings"/>
+            <Separator Margin="5 0 0 10" Height="1"
+                       Visibility="{Binding ShowJitOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                       Width="Auto"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Top"                   
+                       Background="#11000000" />
+
+            <Grid IsEnabled="{Binding CanEdit, Mode=OneWay}"
+                  Visibility="{Binding ShowJitOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="500"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0"
+                                   Content="Add user to this group"                       
                                    Margin="5"/>
-                        <mah:NumericUpDown Grid.Row="1" Grid.Column="1" 
-                                   Value="{Binding LapsExpireMinutes}" 
-                                   Minimum="0" Interval="15" 
-                                   HideUpDownButtons="False"
-                                   Width="100" 
-                                   TextAlignment="Left"
-                                   HorizontalAlignment="Left"
-                                   Margin="5"/>
 
-                    </Grid>
-                </GroupBox>
-
-                <GroupBox Grid.Row="3" Grid.Column="0"
-                          IsEnabled="{Binding CanEdit, Mode=OneWay}"
-                          Visibility="{Binding ShowJitOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                          Header="Just-in-time access settings">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Label Grid.Row="0" Grid.Column="0"
-                                   Content="Add user to the following group"                       
-                                   Margin="5"/>
-
-                        <TextBox Grid.Row="0" Grid.Column="1" 
+                <TextBox Grid.Row="0" Grid.Column="1" 
                                      Text="{Binding JitGroupDisplayName}"
-                                     Margin="5"/>
-                        <Button Grid.Row="0" Grid.Column="2" 
+                                     VerticalAlignment="Center"
+                                     Margin="0"/>
+                <Button Grid.Row="0" Grid.Column="2" 
                                     Command="{s:Action SelectJitGroup}" 
                                     Content="..."
                                     Width="30"
                                     HorizontalAlignment="Left"
                                     Margin="5"/>
 
-                        <TextBlock Grid.Row="1" Grid.Column="1"
+                <TextBlock Grid.Row="1" Grid.Column="1"
                                    Text="Select the group to add the user to, or build a template using the {computername} and {computerdomain} placeholders. For example, if you specify '{computerdomain}\G-JIT-{computername}', for a computer in the domain LITHNET with the name PC1, the user will be added to a group called 'LITHNET\G-JIT-PC1'"
                                    TextWrapping="Wrap"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Center"
                                    Margin="5 0 5 5 "/>
 
-                        <Label Grid.Row="2" Grid.Column="0"
-                                   Content="Expire the access after (minutes)"
-                                   Margin="5"/>
-                        <mah:NumericUpDown Grid.Row="2" Grid.Column="1" 
-                                   Value="{Binding JitExpireMinutes}" 
-                                   Minimum="1" Interval="15" 
-                                   HideUpDownButtons="False"
-                                   Width="100" 
-                                   TextAlignment="Left"
-                                   HorizontalAlignment="Left"
+                <Label Grid.Row="2" Grid.Column="0"
+                                   Content="Expiry"
                                    Margin="5"/>
 
-                    </Grid>
-                </GroupBox>
+                <StackPanel Grid.Row="2" Grid.Column="1"
+                            Orientation="Horizontal">
+                    <Label Content="Expire the access after"
+                           VerticalAlignment="Center"
+                           Margin="0 0 5 0"/>
+                    <mah:NumericUpDown Value="{Binding JitExpireMinutes}" 
+                                       Minimum="0" Interval="15" 
+                                       HideUpDownButtons="False"
+                                       Width="100" 
+                                       VerticalAlignment="Center"
+                                       TextAlignment="Left"
+                                       HorizontalAlignment="Left"/>
+                    <Label Content="minutes"
+                                       VerticalAlignment="Center"/>
+                </StackPanel>
 
-                <ContentControl Grid.Row="4"
-                                s:View.Model="{Binding Notifications}" 
-                                VerticalContentAlignment="Stretch"
-                                HorizontalContentAlignment="Stretch"
-                                IsTabStop="False"/>
+                <!--<StackPanel Grid.Row="2" Grid.Column="1" 
+                            Margin="5 2 2 2"
+                            Orientation="Horizontal">
+                    <mah:NumericUpDown 
+                        Value="{Binding JitExpireMinutes}" 
+                        Minimum="0" Interval="15" 
+                        HideUpDownButtons="False"
+                        Width="100" 
+                        TextAlignment="Left"
+                        HorizontalAlignment="Left"
+                        Margin="0 2 2 2"/>
+                    <Label Content="minutes"/>
+                </StackPanel>-->
+            </Grid>
 
+            <Grid Margin="0 20 0 0">
+                <ContentControl s:View.Model="{Binding Notifications}" 
+                            HorizontalAlignment="Left"
+                            
+                            IsTabStop="False"/>
             </Grid>
         </StackPanel>
     </AdornerDecorator>

@@ -25,10 +25,10 @@ namespace Lithnet.AccessManager.Server.UI
             this.dialogCoordinator = dialogCoordinator;
             this.Forest = forest;
 
-            _ = this.Initialize();
+            _ = this.RefreshSchemaStatus();
         }
 
-        private async Task Initialize()
+        public async Task RefreshSchemaStatus()
         {
             await Task.Run(() =>
             {

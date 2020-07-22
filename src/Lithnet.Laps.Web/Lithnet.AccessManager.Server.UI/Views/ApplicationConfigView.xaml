@@ -39,6 +39,13 @@
             </DataTemplate.Triggers>
         </DataTemplate>
         <local:SelectedItemToContentConverter x:Key="SelectedItemToContentConverter" />
+        <!--<mah:MetroWindow.Resources>
+            <Style TargetType="{x:Type ScrollViewer}">
+                <Style.Setters>
+                    <Setter Property="local:ScrollViewerBehavior.FixScrolling" Value="True" />
+                </Style.Setters>
+            </Style>
+        </mah:MetroWindow.Resources>-->
     </UserControl.Resources>
 
     <mah:HamburgerMenu ItemsSource="{Binding Items}" 
@@ -46,21 +53,29 @@
                        IsPaneOpen="True" 
                        SelectedItem="{Binding ActiveItem}"
                        DisplayMode="CompactInline"
-                       HamburgerVisibility="Hidden"
+                       HamburgerVisibility="Collapsed"
                        ItemTemplate="{StaticResource MenuItemTemplate}"
-                       HamburgerHeight="0"
                        OptionsItemTemplate="{StaticResource MenuItemTemplate}">
-                <s:View.Model>
-                    <MultiBinding Converter="{StaticResource SelectedItemToContentConverter}">
-                        <Binding FallbackValue="{x:Null}"
+        <mah:HamburgerMenu.ContentTemplate>
+            <DataTemplate>
+                <ScrollViewer>
+                    <ContentControl s:View.Model="{Binding}" 
+                                Margin="10 0 10 0"
+                                IsTabStop="False"/>
+                </ScrollViewer>
+            </DataTemplate>
+        </mah:HamburgerMenu.ContentTemplate>
+
+        <MultiBinding Converter="{StaticResource SelectedItemToContentConverter}">
+            <Binding FallbackValue="{x:Null}"
                              Mode="OneWay"
                              Path="SelectedItem"
                              RelativeSource="{RelativeSource Self}" />
-                        <Binding FallbackValue="{x:Null}"
+            <Binding FallbackValue="{x:Null}"
                              Mode="OneWay"
                              Path="SelectedOptionsItem"
                              RelativeSource="{RelativeSource Self}" />
-                    </MultiBinding>
-                </s:View.Model>
+        </MultiBinding>
+
     </mah:HamburgerMenu>
 </UserControl>
