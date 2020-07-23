@@ -7,7 +7,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class MainWindowViewModel : Screen, IHandle<ModelChangedEvent>
+    public class MainWindowViewModel : Conductor<ApplicationConfigViewModel>, IHandle<ModelChangedEvent>
     {
         private readonly IEventAggregator eventAggregator;
 
@@ -19,6 +19,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public MainWindowViewModel(ApplicationConfigViewModel c, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger)
         {
+            this.ActiveItem = c;
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
             this.eventAggregator = eventAggregator;

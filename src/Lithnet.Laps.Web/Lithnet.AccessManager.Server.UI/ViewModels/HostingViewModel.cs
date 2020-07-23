@@ -27,7 +27,7 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private const string SddlTemplate = "D:(A;;GX;;;{0})";
 
-        private readonly CancellationTokenSource cancellationTokenSource;
+        private CancellationTokenSource cancellationTokenSource;
 
         private readonly IDialogCoordinator dialogCoordinator;
 
@@ -51,13 +51,28 @@ namespace Lithnet.AccessManager.Server.UI
             this.OriginalServiceAccount = this.ServiceAccount;
             this.ServiceStatus = this.serviceSettings.ServiceController.Status.ToString();
             this.DisplayName = "Web hosting";
-            this.cancellationTokenSource = new CancellationTokenSource();
             this.Validator = validator;
 
             eventPublisher.Register(this);
-
-            _ = this.PollServiceStatus(this.cancellationTokenSource.Token);
+            
             _ = this.TryGetVersion();
+        }
+
+        protected override void OnActivate()
+        {
+            Debug.WriteLine("Poll activate");
+
+            this.cancellationTokenSource = new CancellationTokenSource();
+            _ = this.PollServiceStatus(this.cancellationTokenSource.Token);
+            base.OnActivate();
+        }
+
+        protected override void OnDeactivate()
+        {
+            Debug.WriteLine("Poll stopping");
+            this.cancellationTokenSource.Cancel();
+
+            base.OnDeactivate();
         }
 
         public string AvailableVersion { get; set; }
@@ -266,6 +281,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
 
             if (updateCertificateBinding || updateHttpReservations || updatePrivateKeyPermissions ||
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                 updateServiceAccount || updateConfigFile)
             {
                 this.OriginalModel = this.CloneModel(this.WorkingModel);
@@ -384,7 +400,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The credentials provided could not be validated\r\n{ex.Message}", MessageDialogStyle.Affirmative);
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The credentials provided could not be validated\r\n{ex.Message}");
             }
         }
 
@@ -471,8 +487,8 @@ namespace Lithnet.AccessManager.Server.UI
 
             try
             {
-                var currentVersion = Assembly.GetEntryAssembly().GetName().Version;
-                this.CurrentVersion = currentVersion.ToString();
+                var currentVersion = Assembly.GetEntryAssembly()?.GetName().Version;
+                this.CurrentVersion = currentVersion?.ToString() ?? "Could not determine version";
 
                 string appdata = await DownloadFile(Constants.UrlProductVersionInfo);
                 if (appdata != null)
@@ -495,8 +511,6 @@ namespace Lithnet.AccessManager.Server.UI
                             this.IsUpToDate = true;
                             this.UpdateLink = null;
                         }
-
-                        return;
                     }
                 }
             }
@@ -551,7 +565,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         private void CreateUrlReservation(string url, SecurityIdentifier sid)
         {
-            UrlAcl.Create(url, string.Format(SddlTemplate, sid.ToString()));
+            UrlAcl.Create(url, string.Format(SddlTemplate, sid));
         }
 
         private void DeleteUrlReservation(string url)
@@ -614,13 +628,14 @@ namespace Lithnet.AccessManager.Server.UI
         {
             X509Store store = new X509Store(storeName, StoreLocation.LocalMachine, OpenFlags.ReadOnly);
 
-            return store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false)?[0];
+            return store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false).OfType<X509Certificate2>().FirstOrDefault();
         }
 
         private async Task PollServiceStatus(CancellationToken token)
         {
             try
             {
+                Debug.WriteLine("Poll started");
                 while (!token.IsCancellationRequested)
                 {
                     await Task.Delay(500, CancellationToken.None).ConfigureAwait(false);
@@ -650,10 +665,15 @@ namespace Lithnet.AccessManager.Server.UI
                             this.ServiceStatus = this.serviceSettings.ServiceController.Status.ToString();
                             break;
                     }
-                    this.ServicePending = this.serviceSettings.ServiceController.Status == ServiceControllerStatus.ContinuePending ||
-                                          this.serviceSettings.ServiceController.Status == ServiceControllerStatus.PausePending ||
-                                          this.serviceSettings.ServiceController.Status == ServiceControllerStatus.StartPending ||
-                                          this.serviceSettings.ServiceController.Status == ServiceControllerStatus.StopPending;
+
+                    this.ServicePending = this.serviceSettings.ServiceController.Status ==
+                                          ServiceControllerStatus.ContinuePending ||
+                                          this.serviceSettings.ServiceController.Status ==
+                                          ServiceControllerStatus.PausePending ||
+                                          this.serviceSettings.ServiceController.Status ==
+                                          ServiceControllerStatus.StartPending ||
+                                          this.serviceSettings.ServiceController.Status ==
+                                          ServiceControllerStatus.StopPending;
                 }
             }
             catch
@@ -661,6 +681,8 @@ namespace Lithnet.AccessManager.Server.UI
                 this.ServicePending = false;
                 this.ServiceStatus = "Unknown";
             }
+
+            Debug.WriteLine("Poll stopped");
         }
 
         private void ReplaceCertificateBinding(X509Certificate2 cert, int port)

@@ -50,10 +50,10 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.OptionItems = new BindableCollection<PropertyChangedBase>();
             this.OptionItems.Add(help);
-
+         
             this.ActiveItem = this.Items.First();
         }
-        
+
         public BindableCollection<PropertyChangedBase> OptionItems { get; }
 
         private HostingViewModel hosting { get; }
