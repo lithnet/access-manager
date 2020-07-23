@@ -18,12 +18,6 @@ namespace Lithnet.AccessManager.Server.UI
 
         public TargetType TargetType { get; set; }
 
-        public IEnumerable<TargetType> TargetTypeValues
-        {
-            get
-            {
-                return Enum.GetValues(typeof(TargetType)).Cast<TargetType>();
-            }
-        }
+        public IEnumerable<TargetType> TargetTypeValues => Enum.GetValues(typeof(TargetType)).Cast<TargetType>();
     }
 }

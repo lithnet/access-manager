@@ -7,6 +7,7 @@ using System.Windows.Media.Imaging;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using Stylet;
 
@@ -20,10 +21,13 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IAppPathProvider appPathProvider;
 
-        public UserInterfaceViewModel(UserInterfaceOptions model, IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotifiableEventPublisher eventPublisher)
+        private readonly ILogger<UserInterfaceViewModel> logger;
+
+        public UserInterfaceViewModel(UserInterfaceOptions model, IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotifiableEventPublisher eventPublisher, ILogger<UserInterfaceViewModel> logger)
         {
             this.appPathProvider = appPathProvider;
             this.dialogCoordinator = dialogCoordinator;
+            this.logger = logger;
             this.model = model;
             this.LoadImage();
             eventPublisher.Register(this);
@@ -44,13 +48,7 @@ namespace Lithnet.AccessManager.Server.UI
         [NotifiableProperty]
         public AuditReasonFieldState UserSuppliedReason { get => this.model.UserSuppliedReason; set => this.model.UserSuppliedReason = value; }
 
-        public IEnumerable<AuditReasonFieldState> UserSuppliedReasonValues
-        {
-            get
-            {
-                return Enum.GetValues(typeof(AuditReasonFieldState)).Cast<AuditReasonFieldState>();
-            }
-        }
+        public IEnumerable<AuditReasonFieldState> UserSuppliedReasonValues => Enum.GetValues(typeof(AuditReasonFieldState)).Cast<AuditReasonFieldState>();
 
         public BitmapImage Image { get; set; }
 
@@ -65,6 +63,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
+                this.logger.LogError(ex, "Could not load logo");
                 this.ImageError = $"There was an error loading the logo image\r\n{ex.Message}";
             }
         }
@@ -112,6 +111,7 @@ namespace Lithnet.AccessManager.Server.UI
                 }
                 catch (Exception ex)
                 {
+                    this.logger.LogError(ex, "Could not replace image");
                     this.Image = oldImage;
                     this.ImageError = null;
                     await this.dialogCoordinator.ShowMessageAsync(this, "Cannot open image", $"There was an error replacing the image\r\n{ex.Message}");

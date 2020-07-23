@@ -4,9 +4,11 @@ using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using System.Windows;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
+using Microsoft.Extensions.Logging;
 using PropertyChanged;
 using Stylet;
 
@@ -24,31 +26,47 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IServiceSettingsProvider serviceSettings;
 
-        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IDirectory directory, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IServiceSettingsProvider serviceSettings)
+        private readonly ILogger<LapsConfigurationViewModel> logger;
+
+        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IDirectory directory, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IServiceSettingsProvider serviceSettings, ILogger<LapsConfigurationViewModel> logger)
         {
             this.directory = directory;
             this.certificateProvider = certificateProvider;
             this.certificate2ViewModelFactory = certificate2ViewModelFactory;
             this.dialogCoordinator = dialogCoordinator;
             this.serviceSettings = serviceSettings;
+            this.logger = logger;
 
             this.Forests = new List<Forest>();
-
-            var domain = Domain.GetCurrentDomain();
-            this.Forests.Add(domain.Forest);
-
-            foreach (var trust in domain.Forest.GetAllTrustRelationships().OfType<TrustRelationshipInformation>())
-            {
-                if (trust.TrustDirection == TrustDirection.Inbound || trust.TrustDirection == TrustDirection.Bidirectional)
-                {
-                    var forest = Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, trust.TargetName));
-                    this.Forests.Add(forest);
-                }
-            }
-
+            this.BuildForests();
             this.SelectedForest = this.Forests.FirstOrDefault();
+
             this.AvailableCertificates = new BindableCollection<X509Certificate2ViewModel>();
-            this.RefreshAvailableCertificates();
+            _ = this.RefreshAvailableCertificates();
+        }
+
+        private void BuildForests()
+        {
+            try
+            {
+                var domain = Domain.GetCurrentDomain();
+                this.Forests.Add(domain.Forest);
+
+                foreach (var trust in domain.Forest.GetAllTrustRelationships().OfType<TrustRelationshipInformation>())
+                {
+                    if (trust.TrustDirection == TrustDirection.Inbound ||
+                        trust.TrustDirection == TrustDirection.Bidirectional)
+                    {
+                        var forest =
+                            Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, trust.TargetName));
+                        this.Forests.Add(forest);
+                    }
+                }
+            }catch (Exception ex)
+            {
+                logger.LogError(ex, "Could not build forest list");
+                this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not build the forest list\r\n{ex.Message}").ConfigureAwait(false).GetAwaiter().GetResult();
+            }
         }
 
         public List<Forest> Forests { get; }
@@ -57,7 +75,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         private void OnSelectedForestChanged()
         {
-            this.RefreshAvailableCertificates();
+            _ = this.RefreshAvailableCertificates();
         }
 
         public void AttachView(UIElement view)
@@ -96,42 +114,59 @@ namespace Lithnet.AccessManager.Server.UI
 
             w.ShowDialog();
 
-            if (this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert,
-                this.SelectedForest.RootDomain.Name))
+            try
             {
-                if (publishedCert.Thumbprint == this.SelectedCertificate.Model.Thumbprint)
+                if (this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert,
+                    this.SelectedForest.RootDomain.Name))
                 {
-                    this.SelectedCertificate.IsPublished = true;
-
-                    foreach (var c in this.AvailableCertificates.ToList())
+                    if (publishedCert.Thumbprint == this.SelectedCertificate.Model.Thumbprint)
                     {
-                        if (this.SelectedCertificate != c)
-                        {
-                            c.IsPublished = false;
-                        }
+                        this.SelectedCertificate.IsPublished = true;
 
-                        if (c.IsOrphaned)
+                        foreach (var c in this.AvailableCertificates.ToList())
                         {
-                            this.AvailableCertificates.Remove(c);
+                            if (this.SelectedCertificate != c)
+                            {
+                                c.IsPublished = false;
+                            }
+
+                            if (c.IsOrphaned)
+                            {
+                                this.AvailableCertificates.Remove(c);
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Could not update certificate publication information");
             }
         }
 
         public bool CanGenerateEncryptionCertificate { get; set; } = true;
 
-        public void GenerateEncryptionCertificate()
+        public async Task GenerateEncryptionCertificate()
         {
-            X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert(this.SelectedForest.Name);
+            try
+            {
+                X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert(this.SelectedForest.Name);
 
-            using X509Store store =  this.certificateProvider.OpenServiceStore(Lithnet.AccessManager.Constants.ServiceName, OpenFlags.ReadWrite);
-            store.Add(cert);
+                using X509Store store =
+                    this.certificateProvider.OpenServiceStore(Lithnet.AccessManager.Constants.ServiceName,
+                        OpenFlags.ReadWrite);
+                store.Add(cert);
 
-            var vm = this.certificate2ViewModelFactory.CreateViewModel(cert);
+                var vm = this.certificate2ViewModelFactory.CreateViewModel(cert);
 
-            this.AvailableCertificates.Add(vm);
-            this.SelectedCertificate = vm;
+                this.AvailableCertificates.Add(vm);
+                this.SelectedCertificate = vm;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Could not generate encryption certificate");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not generate the certificate\r\n{ex.Message}");
+            }
         }
 
         public bool CanShowCertificateDialog => this.SelectedCertificate != null;
@@ -159,26 +194,42 @@ namespace Lithnet.AccessManager.Server.UI
             w.ShowDialog();
         }
 
-        public void OpenAccessManagerAgentDownload()
+        public async Task OpenAccessManagerAgentDownload()
         {
-            var psi = new ProcessStartInfo
+            try
             {
-                FileName = Constants.LinkDownloadAccessManagerAgent,
-                UseShellExecute = true
-            };
+                var psi = new ProcessStartInfo
+                {
+                    FileName = Constants.LinkDownloadAccessManagerAgent,
+                    UseShellExecute = true
+                };
 
-            Process.Start(psi);
+                Process.Start(psi);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Could not open link");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not open the default link handler\r\n{ex.Message}");
+            }
         }
 
-        public void OpenMsLapsDownload()
+        public async Task OpenMsLapsDownload()
         {
-            var psi = new ProcessStartInfo
+            try
             {
-                FileName = Constants.LinkDownloadMsLaps,
-                UseShellExecute = true
-            };
+                var psi = new ProcessStartInfo
+                {
+                    FileName = Constants.LinkDownloadMsLaps,
+                    UseShellExecute = true
+                };
 
-            Process.Start(psi);
+                Process.Start(psi);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Could not open link");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not open the default link handler\r\n{ex.Message}");
+            }
         }
 
         public void DelegateMsLapsPermission()
@@ -199,48 +250,57 @@ namespace Lithnet.AccessManager.Server.UI
             w.ShowDialog();
         }
 
-
-        private void RefreshAvailableCertificates()
+        private async Task RefreshAvailableCertificates()
         {
-            if (this.AvailableCertificates == null)
+            try
             {
-                return;
-            }
-
-            this.AvailableCertificates.Clear();
-
-            if (this.SelectedForest == null)
-            {
-                return;
-            }
-
-            var allCertificates = certificateProvider.GetEligibleCertificates(false).OfType<X509Certificate2>();
-            this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert, this.SelectedForest.RootDomain.Name);
-
-            bool foundPublished = false;
-
-            foreach (var certificate in allCertificates)
-            {
-                var vm = this.certificate2ViewModelFactory.CreateViewModel(certificate);
-
-                if (certificate.Thumbprint == publishedCert?.Thumbprint)
+                if (this.AvailableCertificates == null)
                 {
-                    vm.IsPublished = true;
-                    foundPublished = true;
+                    return;
                 }
 
-                if (certificate.Subject.StartsWith($"CN={this.SelectedForest.RootDomain.Name}", StringComparison.OrdinalIgnoreCase))
+                this.AvailableCertificates.Clear();
+
+                if (this.SelectedForest == null)
                 {
+                    return;
+                }
+
+                var allCertificates = certificateProvider.GetEligibleCertificates(false).OfType<X509Certificate2>();
+                this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert,
+                    this.SelectedForest.RootDomain.Name);
+
+                bool foundPublished = false;
+
+                foreach (var certificate in allCertificates)
+                {
+                    var vm = this.certificate2ViewModelFactory.CreateViewModel(certificate);
+
+                    if (certificate.Thumbprint == publishedCert?.Thumbprint)
+                    {
+                        vm.IsPublished = true;
+                        foundPublished = true;
+                    }
+
+                    if (certificate.Subject.StartsWith($"CN={this.SelectedForest.RootDomain.Name}",
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        this.AvailableCertificates.Add(vm);
+                    }
+                }
+
+                if (!foundPublished && publishedCert != null)
+                {
+                    var vm = this.certificate2ViewModelFactory.CreateViewModel(publishedCert);
+                    vm.IsOrphaned = true;
+                    vm.IsPublished = true;
                     this.AvailableCertificates.Add(vm);
                 }
             }
-
-            if (!foundPublished && publishedCert != null)
+            catch (Exception ex)
             {
-                var vm = this.certificate2ViewModelFactory.CreateViewModel(publishedCert);
-                vm.IsOrphaned = true;
-                vm.IsPublished = true;
-                this.AvailableCertificates.Add(vm);
+                logger.LogError(ex, "Could not load certificate list");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not refresh the certificate list\r\n{ex.Message}");
             }
         }
 

@@ -4,7 +4,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class AuditingViewModel : Conductor<PropertyChangedBase>.Collection.OneActive
+    public sealed class AuditingViewModel : Conductor<PropertyChangedBase>.Collection.OneActive
     {
         public AuditingViewModel(AuditOptions model,
             INotificationChannelDefinitionsViewModelFactory<PowershellNotificationChannelDefinition, PowershellNotificationChannelDefinitionViewModel> psFactory,

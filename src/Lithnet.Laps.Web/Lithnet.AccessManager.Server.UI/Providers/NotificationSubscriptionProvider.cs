@@ -12,7 +12,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IEventAggregator eventAggregator;
 
-        private object lockObject = new object();
+        private readonly object lockObject = new object();
 
         public BindableCollection<SubscriptionViewModel> Subscriptions { get; }
 
@@ -53,17 +53,17 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 this.Subscriptions.Clear();
 
-                foreach (var item in this.audit?.NotificationChannels?.Powershell)
+                foreach (var item in this.audit.NotificationChannels.Powershell)
                 {
                     this.Subscriptions.Add(new SubscriptionViewModel(item.Id, item.DisplayName, "PowerShell"));
                 }
 
-                foreach (var item in this.audit?.NotificationChannels?.Smtp)
+                foreach (var item in this.audit.NotificationChannels.Smtp)
                 {
                     this.Subscriptions.Add(new SubscriptionViewModel(item.Id, item.DisplayName, "Smtp"));
                 }
 
-                foreach (var item in this.audit?.NotificationChannels?.Webhooks)
+                foreach (var item in this.audit.NotificationChannels.Webhooks)
                 {
                     this.Subscriptions.Add(new SubscriptionViewModel(item.Id, item.DisplayName, "Webhook"));
                 }

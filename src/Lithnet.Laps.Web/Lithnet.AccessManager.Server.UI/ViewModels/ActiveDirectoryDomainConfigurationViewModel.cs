@@ -6,6 +6,7 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Accessibility;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.Logging;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -22,8 +23,11 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IDialogCoordinator dialogCoordinator;
 
-        public ActiveDirectoryDomainConfigurationViewModel(Domain domain, IServiceSettingsProvider serviceSettings, IDirectory directory, IDialogCoordinator dialogCoordinator)
+        private readonly ILogger logger;
+
+        public ActiveDirectoryDomainConfigurationViewModel(Domain domain, IServiceSettingsProvider serviceSettings, IDirectory directory, IDialogCoordinator dialogCoordinator, ILogger<ActiveDirectoryDomainConfigurationViewModel> logger)
         {
+            this.logger = logger;
             this.domain = domain;
             this.dialogCoordinator = dialogCoordinator;
 
@@ -52,7 +56,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string DisplayName => this.domain.Name;
 
-        public async Task ShowADPermissionScript()
+        public void ShowADPermissionScript()
         {
             var vm = new ScriptContentViewModel(this.dialogCoordinator)
             {
@@ -105,6 +109,7 @@ namespace Lithnet.AccessManager.Server.UI
                 }
                 catch (Exception ex)
                 {
+                    this.logger.LogError(ex, "Group membership lookup error");
                     this.AcaoStatus = "Group membership lookup error";
                     this.IsNotAcaoMember = true;
                 }
@@ -150,6 +155,7 @@ namespace Lithnet.AccessManager.Server.UI
                 }
                 catch (Exception ex)
                 {
+                    this.logger.LogError(ex, "Group membership lookup error");
                     this.WaagStatus = "Group membership lookup error";
                     this.IsNotWaagMember = true;
                 }

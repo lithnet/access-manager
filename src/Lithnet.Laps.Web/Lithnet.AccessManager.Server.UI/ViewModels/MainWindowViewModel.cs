@@ -1,6 +1,8 @@
-﻿using System.Security.AccessControl;
+﻿using System;
+using System.Security.AccessControl;
 using System.Threading.Tasks;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.Logging;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -11,10 +13,13 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IDialogCoordinator dialogCoordinator;
 
+        private readonly ILogger<MainWindowViewModel> logger;
+
         public ApplicationConfigViewModel Config { get; set; }
 
-        public MainWindowViewModel(ApplicationConfigViewModel c, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator)
+        public MainWindowViewModel(ApplicationConfigViewModel c, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger)
         {
+            this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
             this.eventAggregator = eventAggregator;
             this.eventAggregator.Subscribe(this);
@@ -61,15 +66,24 @@ namespace Lithnet.AccessManager.Server.UI
 
                 if (result == MessageDialogResult.Affirmative)
                 {
-                    this.Save();
+                    try
+                    {
+                        this.Save();
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        this.logger.LogError(ex, "Unable to save file");
+                        await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Unable to save file\r\n{ex.Message}");
+                    }
                 }
-                else if (result == MessageDialogResult.Canceled || result == MessageDialogResult.Negative)
+                else if (result == MessageDialogResult.FirstAuxiliary)
                 {
-                    return false;
+                    return true;
                 }
             }
 
-            return true;
+            return false;
         }
 
         public string WindowTitle => $"{this.DisplayName}{(this.IsDirty ? "*" : "")}";
@@ -78,7 +92,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public void Handle(ModelChangedEvent message)
         {
-            System.Diagnostics.Debug.WriteLine($"Model changed event received {message.Sender.GetType()}:{message.PropertyName}");
+            //System.Diagnostics.Debug.WriteLine($"Model changed event received {message.Sender.GetType()}:{message.PropertyName}");
             this.IsDirty = true;
         }
     }

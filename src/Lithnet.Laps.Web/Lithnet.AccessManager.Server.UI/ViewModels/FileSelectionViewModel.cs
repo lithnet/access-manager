@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using Stylet;
 
@@ -21,10 +22,13 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IAppPathProvider appPathProvider;
 
+        private readonly ILogger<FileSelectionViewModel> logger;
+
         private bool shouldValidate = true;
 
-        public FileSelectionViewModel(object model, Expression<Func<string>> property, string basePath, IModelValidator<FileSelectionViewModel> validator, IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider)
+        public FileSelectionViewModel(object model, Expression<Func<string>> property, string basePath, IModelValidator<FileSelectionViewModel> validator, IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, ILogger<FileSelectionViewModel> logger)
         {
+            this.logger = logger;
             this.model = model;
             this.appPathProvider = appPathProvider;
             var expr = (MemberExpression)property.Body;
@@ -38,14 +42,8 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string File
         {
-            get
-            {
-                return this.property.GetValue(model) as string;
-            }
-            set
-            {
-                this.property.SetValue(model, value);
-            }
+            get => this.property.GetValue(model) as string;
+            set => this.property.SetValue(model, value);
         }
 
         public UIElement View { get; set; }
@@ -87,10 +85,13 @@ namespace Lithnet.AccessManager.Server.UI
                 try
                 {
                     string builtPath = this.appPathProvider.GetFullPath(this.File, this.BasePath);
-                    openFileDialog.InitialDirectory = Path.GetDirectoryName(builtPath);
+                    openFileDialog.InitialDirectory = Path.GetDirectoryName(builtPath) ?? string.Empty;
                     openFileDialog.FileName = Path.GetFileName(builtPath);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    this.logger.LogWarning(ex, "Could not determine file path");
+                }
             }
 
             if (string.IsNullOrWhiteSpace(openFileDialog.InitialDirectory))
@@ -120,6 +121,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
+                logger.LogWarning(ex, "Could not open editor");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not start default editor\r\n{ex.Message}");
             }
         }
@@ -146,10 +148,11 @@ namespace Lithnet.AccessManager.Server.UI
 
             try
             {
-                System.IO.File.WriteAllText(dialog.FileName, this.NewFileContent);
+                await System.IO.File.WriteAllTextAsync(dialog.FileName, this.NewFileContent);
             }
             catch (Exception ex)
             {
+                logger.LogError(ex, "Could not write file");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not create the file\r\n{ex.Message}");
                 return;
             }
