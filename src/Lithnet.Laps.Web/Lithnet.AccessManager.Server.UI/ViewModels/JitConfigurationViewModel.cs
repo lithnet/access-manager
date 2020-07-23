@@ -29,13 +29,12 @@ namespace Lithnet.AccessManager.Server.UI
         //<iconPacks:PathIconMaterial Kind="TimerOutline" />
         //<iconPacks:PathIconModern Kind="TimerCheck" />
 
-        public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IDirectory directory, IJitGroupMappingViewModelFactory groupMappingFactory)
+        public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IDirectory directory, IJitGroupMappingViewModelFactory groupMappingFactory, INotifiableEventPublisher eventPublisher)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.directory = directory;
             this.jitOptions = jitOptions;
             this.groupMappingFactory = groupMappingFactory;
-
             this.PopulatePamSupportState();
 
             this.GroupMappings = new BindableCollection<JitGroupMappingViewModel>();
@@ -44,6 +43,8 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 this.GroupMappings.Add(groupMappingFactory.CreateViewModel(m));
             }
+
+            eventPublisher.Register(this);
         }
 
         public void AttachView(UIElement view)
@@ -51,12 +52,14 @@ namespace Lithnet.AccessManager.Server.UI
             this.View = view;
         }
 
+        [NotifiableCollection]
         public BindableCollection<JitGroupMappingViewModel> GroupMappings { get; }
 
         public JitGroupMappingViewModel SelectedGroupMapping { get; set; }
 
         public string PamSupportState { get; set; } = "unknown";
 
+        [NotifiableProperty]
         public bool EnableJitGroupCreation
         {
             get => this.jitOptions.EnableJitGroupCreation;

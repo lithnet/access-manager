@@ -7,8 +7,8 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class SmtpNotificationChannelDefinitionsViewModel : NotificationChannelDefinitionsViewModel<SmtpNotificationChannelDefinition, SmtpNotificationChannelDefinitionViewModel>
     {
-        public SmtpNotificationChannelDefinitionsViewModel(IList<SmtpNotificationChannelDefinition> model, SmtpNotificationChannelDefinitionViewModelFactory factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator) :
-            base(model, factory, dialogCoordinator, eventAggregator)
+        public SmtpNotificationChannelDefinitionsViewModel(IList<SmtpNotificationChannelDefinition> model, SmtpNotificationChannelDefinitionViewModelFactory factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator, INotifiableEventPublisher eventPublisher) :
+            base(model, factory, dialogCoordinator, eventAggregator, eventPublisher)
         {
         }
 

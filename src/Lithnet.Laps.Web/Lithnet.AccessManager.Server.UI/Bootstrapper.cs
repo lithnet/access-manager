@@ -67,6 +67,8 @@ namespace Lithnet.AccessManager.Server.UI
             builder.Bind<IJitGroupMappingViewModelFactory>().To<JitGroupMappingViewModelFactory>();
             builder.Bind<IJitConfigurationViewModelFactory>().To<JitConfigurationViewModelFactory>();
 
+            builder.Bind<INotifiableEventPublisher>().To<NotifiableEventPublisher>();
+
             builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
             builder.Bind(typeof(INotificationChannelDefinitionViewModelFactory<,>)).ToAllImplementations();
 

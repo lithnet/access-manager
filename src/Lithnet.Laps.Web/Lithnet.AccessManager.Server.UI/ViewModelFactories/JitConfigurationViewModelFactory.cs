@@ -9,8 +9,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IDirectory directory;
         private readonly IJitGroupMappingViewModelFactory groupFactory;
+        private readonly INotifiableEventPublisher eventPublisher;
 
-        public JitConfigurationViewModelFactory(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IDirectory directory, IJitGroupMappingViewModelFactory groupFactory)
+        public JitConfigurationViewModelFactory(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IDirectory directory, IJitGroupMappingViewModelFactory groupFactory, INotifiableEventPublisher eventPublisher)
         {
             this.jitOptions = jitOptions;
             this.dialogCoordinator = dialogCoordinator;
@@ -20,7 +21,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public JitConfigurationViewModel CreateViewModel()
         {
-            return new JitConfigurationViewModel(jitOptions, dialogCoordinator, directory, groupFactory);
+            return new JitConfigurationViewModel(jitOptions, dialogCoordinator, directory, groupFactory, eventPublisher);
         }
     }
 }

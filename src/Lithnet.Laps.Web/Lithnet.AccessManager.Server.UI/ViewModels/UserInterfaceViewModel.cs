@@ -20,22 +20,28 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IAppPathProvider appPathProvider;
 
-        public UserInterfaceViewModel(UserInterfaceOptions model, IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider)
+        public UserInterfaceViewModel(UserInterfaceOptions model, IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotifiableEventPublisher eventPublisher)
         {
             this.appPathProvider = appPathProvider;
             this.dialogCoordinator = dialogCoordinator;
             this.model = model;
             this.LoadImage();
+            eventPublisher.Register(this);
         }
 
+        [NotifiableProperty]
         public bool AllowJit { get => this.model.AllowJit; set => this.model.AllowJit = value; }
 
+        [NotifiableProperty]
         public bool AllowLaps { get => this.model.AllowLaps; set => this.model.AllowLaps = value; }
 
+        [NotifiableProperty]
         public bool AllowLapsHistory { get => this.model.AllowLapsHistory; set => this.model.AllowLapsHistory = value; }
 
+        [NotifiableProperty]
         public string Title { get => this.model.Title; set => this.model.Title = value; }
 
+        [NotifiableProperty]
         public AuditReasonFieldState UserSuppliedReason { get => this.model.UserSuppliedReason; set => this.model.UserSuppliedReason = value; }
 
         public IEnumerable<AuditReasonFieldState> UserSuppliedReasonValues

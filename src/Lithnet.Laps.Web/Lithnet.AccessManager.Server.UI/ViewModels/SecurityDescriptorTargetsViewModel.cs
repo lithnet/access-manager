@@ -19,14 +19,16 @@ namespace Lithnet.AccessManager.Server.UI
 
         protected IDialogCoordinator DialogCoordinator { get; }
 
+        [NotifiableCollection]
         public BindableCollection<SecurityDescriptorTargetViewModel> ViewModels { get; }
 
-        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, SecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator)
+        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, SecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator, INotifiableEventPublisher eventPublisher)
         {
             this.factory = factory;
             this.Model = model;
             this.DialogCoordinator = dialogCoordinator;
             this.ViewModels = new BindableCollection<SecurityDescriptorTargetViewModel>(this.Model.Select(factory.CreateViewModel));
+            eventPublisher.Register(this);
         }
 
         protected SecurityDescriptorTarget CreateModel()

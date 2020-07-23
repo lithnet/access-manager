@@ -15,14 +15,16 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IDialogCoordinator dialogCoordinator;
 
-        public IpDetectionViewModel(ForwardedHeadersAppOptions model, IDialogCoordinator dialogCoordinator)
+        public IpDetectionViewModel(ForwardedHeadersAppOptions model, IDialogCoordinator dialogCoordinator, INotifiableEventPublisher eventPublisher)
         {
             this.model = model;
             this.dialogCoordinator = dialogCoordinator;
             this.KnownProxies = new BindableCollection<string>(model.KnownProxies);
             this.KnownNetworks = new BindableCollection<string>(model.KnownNetworks);
+            eventPublisher.Register(this);
         }
 
+        [NotifiableProperty]
         public bool Enabled
         {
             get => this.model.ForwardedHeaders.HasFlag(ForwardedHeaders.XForwardedFor);
@@ -39,20 +41,24 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
+        [NotifiableProperty]
         public string ForwardedForHeaderName
         {
             get => this.model.ForwardedForHeaderName;
             set => this.model.ForwardedForHeaderName = value;
         }
 
+        [NotifiableProperty]
         public int? ForwardLimit
         {
             get => this.model.ForwardLimit;
             set => this.model.ForwardLimit = value;
         }
 
+        [NotifiableCollection]
         public BindableCollection<string> KnownProxies { get; }
 
+        [NotifiableCollection]
         public BindableCollection<string> KnownNetworks { get; }
 
         public string SelectedNetwork { get; set; }

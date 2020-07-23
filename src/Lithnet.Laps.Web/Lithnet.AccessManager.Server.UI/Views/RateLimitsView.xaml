@@ -43,7 +43,7 @@
                                        Margin="5"/>
 
             <Label Grid.Row="2" Grid.Column="0"
-                           Content="Requests per minute"
+                           Content="Requests per hour"
                            Margin="5"/>
             <mah:NumericUpDown Grid.Row="2" Grid.Column="1" 
                                        Value="{Binding PerUserRequestsPerHour}" 
@@ -54,7 +54,7 @@
                                        Margin="5"/>
 
             <Label Grid.Row="3" Grid.Column="0" 
-                           Content="Requests per minute"
+                           Content="Requests per day"
                            Margin="5"/>
             <mah:NumericUpDown Grid.Row="3" Grid.Column="1" 
                                        Value="{Binding PerUserRequestsPerDay}" 
@@ -100,7 +100,7 @@
                                        Margin="5"/>
 
             <Label Grid.Row="2" Grid.Column="0"
-                           Content="Requests per minute"
+                           Content="Requests per hour"
                            Margin="5"/>
             <mah:NumericUpDown Grid.Row="2" Grid.Column="1" 
                                        Value="{Binding PerIPRequestsPerHour}" 
@@ -110,7 +110,7 @@
                                        Margin="5"/>
 
             <Label Grid.Row="3" Grid.Column="0" 
-                           Content="Requests per minute"
+                           Content="Requests per day"
                            Margin="5"/>
             <mah:NumericUpDown Grid.Row="3" Grid.Column="1" 
                                        Value="{Binding PerIPRequestsPerDay}"

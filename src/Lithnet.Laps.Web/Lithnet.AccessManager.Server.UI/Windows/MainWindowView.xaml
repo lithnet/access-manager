@@ -7,10 +7,11 @@
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
         xmlns:s="https://github.com/canton7/Stylet"
-        Title="Lithnet Access Manager Service (AMS) Configuration"
+        Title="{Binding WindowTitle}"
         BorderThickness="1"
         Height="Auto"
         Width="Auto" 
+        controls:DialogParticipation.Register="{Binding}"
         SizeToContent="Manual"
         >
 

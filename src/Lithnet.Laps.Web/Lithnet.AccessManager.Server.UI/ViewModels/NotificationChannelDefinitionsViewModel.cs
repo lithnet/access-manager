@@ -21,15 +21,17 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly NotificationChannelDefinitionViewModelFactory<TModel, TViewModel> factory;
 
+        [NotifiableCollection]
         public BindableCollection<TViewModel> ViewModels { get; }
-
-        protected NotificationChannelDefinitionsViewModel(IList<TModel> model, NotificationChannelDefinitionViewModelFactory<TModel, TViewModel> factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator)
+        
+        protected NotificationChannelDefinitionsViewModel(IList<TModel> model, NotificationChannelDefinitionViewModelFactory<TModel, TViewModel> factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator, INotifiableEventPublisher eventPublisher)
         {
             this.factory = factory;
             this.Model = model;
             this.EventAggregator = eventAggregator;
             this.DialogCoordinator = dialogCoordinator;
             this.ViewModels = new BindableCollection<TViewModel>(this.Model.Select(t => this.factory.CreateViewModel(t)));
+            eventPublisher.Register(this);
         }
 
         public TViewModel SelectedItem { get; set; }

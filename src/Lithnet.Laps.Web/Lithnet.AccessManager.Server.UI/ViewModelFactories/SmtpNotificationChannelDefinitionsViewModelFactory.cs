@@ -11,17 +11,19 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IEventAggregator eventAggregator;
+        private readonly INotifiableEventPublisher eventPublisher;
 
-        public SmtpNotificationChannelDefinitionsViewModelFactory(SmtpNotificationChannelDefinitionViewModelFactory factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator) : base(factory)
+        public SmtpNotificationChannelDefinitionsViewModelFactory(SmtpNotificationChannelDefinitionViewModelFactory factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator, INotifiableEventPublisher eventPublisher) : base(factory)
         {
             this.factory = factory;
             this.dialogCoordinator = dialogCoordinator;
             this.eventAggregator = eventAggregator;
+            this.eventPublisher = eventPublisher;
         }
 
         public override NotificationChannelDefinitionsViewModel<SmtpNotificationChannelDefinition, SmtpNotificationChannelDefinitionViewModel> CreateViewModel(IList<SmtpNotificationChannelDefinition> model)
         {
-            return new SmtpNotificationChannelDefinitionsViewModel(model, this.factory, this.dialogCoordinator, this.eventAggregator);
+            return new SmtpNotificationChannelDefinitionsViewModel(model, this.factory, this.dialogCoordinator, this.eventAggregator, this.eventPublisher);
         }
     }
 }

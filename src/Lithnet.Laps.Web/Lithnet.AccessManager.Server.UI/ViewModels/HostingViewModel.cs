@@ -18,6 +18,7 @@ using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
+using MahApps.Metro.SimpleChildWindow;
 using MahApps.Metro.Theming;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -85,8 +86,24 @@ namespace Lithnet.AccessManager.Server.UI
         public bool IsEditing { get; set; }
 
         public string EditSettingsButtonText { get; set; } = "Edit settings";
-
+        
         public async Task EditSettings()
+        {
+            DialogWindow w = new DialogWindow();
+            w.Title = "Edit hosting settings";
+            w.SaveButtonIsDefault = true;
+
+            w.DataContext = this;
+
+            await this.GetWindow().ShowChildWindowAsync(w);
+
+            if (w.Result == MessageDialogResult.Affirmative)
+            {
+               
+            }
+        }
+
+        public async Task EditSettings2()
         {
             if (!this.IsEditing)
             {

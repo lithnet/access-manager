@@ -8,16 +8,18 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly SecurityDescriptorTargetViewModelFactory factory;
+        private readonly INotifiableEventPublisher eventPublisher;
 
-        public SecurityDescriptorTargetsViewModelFactory(IDialogCoordinator dialogCoordinator, SecurityDescriptorTargetViewModelFactory factory)
+        public SecurityDescriptorTargetsViewModelFactory(IDialogCoordinator dialogCoordinator, SecurityDescriptorTargetViewModelFactory factory,INotifiableEventPublisher eventPublisher)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.factory = factory;
+            this.eventPublisher = eventPublisher;
         }
 
         public SecurityDescriptorTargetsViewModel CreateViewModel(IList<SecurityDescriptorTarget> model)
         {
-            return new SecurityDescriptorTargetsViewModel(model, factory, dialogCoordinator);
+            return new SecurityDescriptorTargetsViewModel(model, factory, dialogCoordinator, eventPublisher);
         }
     }
 }

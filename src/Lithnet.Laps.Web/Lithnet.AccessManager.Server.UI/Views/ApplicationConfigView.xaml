@@ -12,9 +12,10 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <DataTemplate x:Key="MenuItemTemplate">
+        <DataTemplate x:Key="MenuItemTemplate" DataType="{x:Type mah:HamburgerMenuGlyphItem}">
             <Grid x:Name="RootGrid"
                   Height="48"
+                  IsEnabled="False"
                   Background="Transparent">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type mah:HamburgerMenu}}, Path=CompactPaneLength}" />
@@ -36,16 +37,10 @@
                 <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type mah:HamburgerMenu}}, Path=IsPaneOpen}" Value="False">
                     <Setter TargetName="RootGrid" Property="ToolTip" Value="{Binding ToolTip, Mode=OneWay}" />
                 </DataTrigger>
+                
             </DataTemplate.Triggers>
         </DataTemplate>
         <local:SelectedItemToContentConverter x:Key="SelectedItemToContentConverter" />
-        <!--<mah:MetroWindow.Resources>
-            <Style TargetType="{x:Type ScrollViewer}">
-                <Style.Setters>
-                    <Setter Property="local:ScrollViewerBehavior.FixScrolling" Value="True" />
-                </Style.Setters>
-            </Style>
-        </mah:MetroWindow.Resources>-->
     </UserControl.Resources>
 
     <mah:HamburgerMenu ItemsSource="{Binding Items}" 
