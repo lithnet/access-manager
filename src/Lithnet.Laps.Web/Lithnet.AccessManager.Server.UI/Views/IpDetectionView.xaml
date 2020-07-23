@@ -39,7 +39,7 @@
                        Content="Maximum allowed entries in the header"
                        Margin="5" />
             <mah:NumericUpDown Grid.Row="1" Grid.Column="1" 
-                                   Value="{Binding ForwardLimit}" 
+                                   Value="{Binding ForwardLimit, UpdateSourceTrigger=PropertyChanged}" 
                                    Minimum="0" Maximum="65535" Interval="1"
                                    HideUpDownButtons="True" 
                                    Width="50" 

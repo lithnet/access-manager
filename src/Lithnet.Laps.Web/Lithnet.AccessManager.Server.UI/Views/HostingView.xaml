@@ -11,242 +11,202 @@
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
              d:DesignHeight="670" d:DesignWidth="800">
-    <DockPanel LastChildFill="False" Margin="5">
-        <StackPanel DockPanel.Dock="Top">
-           
+    <StackPanel>
+        <Label Style="{DynamicResource DescriptionHeaderStyle}" Content="Service"/>
 
-            <Label Style="{DynamicResource DescriptionHeaderStyle}" Content="Service"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="15*" MinWidth="110"/>
+                <ColumnDefinition Width="85*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="15*" MinWidth="110"/>
-                    <ColumnDefinition Width="85*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <Label Grid.Row="0" Grid.Column="0"
+            <Label Grid.Row="0" Grid.Column="0"
                        Content="Service Account"
                        Margin="5"/>
-                <TextBox Grid.Row="0" Grid.Column="1" 
+            <TextBox Grid.Row="0" Grid.Column="1" 
                          Text="{Binding ServiceAccountDisplayName, Mode=OneWay}" 
                          IsReadOnly="True"
                          Margin="5"/>
-                <Button Grid.Row="1" Grid.Column="1"
+            <Button Grid.Row="1" Grid.Column="1"
                         Height="Auto"
                         HorizontalAlignment="Left"
-                        IsEnabled="{Binding IsEditing}"
                         Command="{s:Action SelectServiceAccountUser}"
                         Content="Change account..."
                         Margin="5"/>
 
-                <Label Grid.Row="2" Grid.Column="0"
+            <Label Grid.Row="2" Grid.Column="0"
                        Content="Service Status"
                        Margin="5"/>
 
-                <StackPanel Grid.Row="2" Grid.Column="1" 
+            <StackPanel Grid.Row="2" Grid.Column="1" 
                         Orientation="Horizontal">
-                    <Label Content="{Binding ServiceStatus}"
+                <Label Content="{Binding ServiceStatus}"
                            Margin="5"/>
-                    <mah:ProgressRing Height="15" Width="15" Margin="5"
+                <mah:ProgressRing Height="15" Width="15" Margin="5"
                                       Visibility="{Binding ServicePending, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                </StackPanel>
+            </StackPanel>
 
-                <StackPanel  Grid.Row="3" Grid.Column="1" 
+            <StackPanel  Grid.Row="3" Grid.Column="1" 
                          Orientation="Horizontal">
-                    <Button Command="{s:Action StartService}"
+                <Button Command="{s:Action StartService}"
                         Content="Start Service"
                         Height="Auto"
                         Margin="5"/>
-                    <Button Command="{s:Action StopService}" 
+                <Button Command="{s:Action StopService}" 
                          Content="Stop Service"
                          Height="Auto"
                          Margin="5"/>
-                </StackPanel>
+            </StackPanel>
 
-                <Label Grid.Row="5" Grid.Column="0"
+            <Label Grid.Row="5" Grid.Column="0"
                    Content="Version"
                    Margin="5"/>
 
-                <StackPanel Grid.Row="5" Grid.Column="1" 
+            <StackPanel Grid.Row="5" Grid.Column="1" 
                             Orientation="Horizontal"
                             VerticalAlignment="Center"
                             Margin="5">
-                    <iconPacks:PackIconFontAwesome Kind="CheckCircleRegular" 
+                <iconPacks:PackIconFontAwesome Kind="CheckCircleRegular" 
                                                    Margin="0 0 5 0"
                                                    Visibility="{Binding IsUpToDate, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                    Foreground="Green"/>
-                    <iconPacks:PackIconFontAwesome Kind="ArrowAltCircleUpRegular"
+                <iconPacks:PackIconFontAwesome Kind="ArrowAltCircleUpRegular"
                                                    Margin="0 0 5 0"
                                                    Visibility="{Binding UpdateAvailable, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                    Foreground="DarkOrange" />
-                    <TextBlock Margin="0 0 5 0"
+                <TextBlock Margin="0 0 5 0"
                                Text="{Binding CurrentVersion, FallbackValue='1.0.0.0'}"/>
 
-                    <TextBlock Margin="0 0 5 0"
+                <TextBlock Margin="0 0 5 0"
                                Visibility="{Binding IsUpToDate, Converter={StaticResource BooleanToVisibilityConverter}}" 
                                Text="Up to date"/>
 
-                    <TextBlock Margin="0 0 5 0"
+                <TextBlock Margin="0 0 5 0"
                                Visibility="{Binding UpdateAvailable, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <Hyperlink Click="{s:Action DownloadUpdate}" ><TextBlock VerticalAlignment="Center">Update available v</TextBlock><TextBlock Text="{Binding AvailableVersion}"/></Hyperlink>
                     </TextBlock>
-                </StackPanel>
+            </StackPanel>
 
 
-                <Label Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+            <Label Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
             Style="{DynamicResource DescriptionHeaderStyle}" Content="TLS/SSL Certificate"/>
 
-                <Label Grid.Row="7" Grid.Column="0"
+            <Label Grid.Row="7" Grid.Column="0"
                        Content="Certificate"
-                       IsEnabled="{Binding IsEditing}"
                        Margin="5"/>
 
-                <TextBox  Grid.Row="7" Grid.Column="1"
+            <TextBox  Grid.Row="7" Grid.Column="1"
                       Text="{Binding CertificateDisplayName, Mode=OneWay}" 
                       IsReadOnly="True"
-                      IsEnabled="{Binding IsEditing}"
                       Margin="5"/>
 
-                <Label Grid.Row="9" Grid.Column="0"
+            <Label Grid.Row="9" Grid.Column="0"
                    Content="Certificate Expiry"
-                   IsEnabled="{Binding IsEditing}"
                    Margin="5"/>
 
-                <StackPanel Grid.Row="9" Grid.Column="1"
+            <StackPanel Grid.Row="9" Grid.Column="1"
                         Orientation="Horizontal"
                         VerticalAlignment="Center"
                         Margin="5">
-                    <iconPacks:PackIconFontAwesome Kind="CheckCircleRegular" 
+                <iconPacks:PackIconFontAwesome Kind="CheckCircleRegular" 
                                                Margin="0 0 5 0"
                                                Visibility="{Binding IsCertificateCurrent, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                Foreground="Green"/>
-                    <iconPacks:PackIconFontAwesome Kind="ExclamationTriangleSolid"
+                <iconPacks:PackIconFontAwesome Kind="ExclamationTriangleSolid"
                                                Margin="0 0 5 0"
                                                Visibility="{Binding IsCertificateExpiring, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                Foreground="DarkOrange"/>
-                    <iconPacks:PackIconFontAwesome Kind="ExclamationTriangleSolid"
+                <iconPacks:PackIconFontAwesome Kind="ExclamationTriangleSolid"
                                                Margin="0 0 5 0"
                                                Visibility="{Binding IsCertificateExpired, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                Foreground="Red"/>
-                    <TextBlock Text="{Binding CertificateExpiryText, FallbackValue='Unknown'}" TextWrapping="Wrap"/>
-                </StackPanel>
+                <TextBlock Text="{Binding CertificateExpiryText, FallbackValue='Unknown'}" TextWrapping="Wrap"/>
+            </StackPanel>
 
 
-                <StackPanel Grid.Row="8" Grid.Column="1"
+            <StackPanel Grid.Row="8" Grid.Column="1"
                         Orientation="Horizontal">
-                    <Button HorizontalAlignment="Left"
+                <Button HorizontalAlignment="Left"
                         Command="{s:Action ShowCertificateDialog}"
                         Content="View certificate..."
                         Height="Auto"
                         Margin="5"/>
-                    <Button IsEnabled="{Binding IsEditing}"
-                        Command="{s:Action ShowSelectCertificateDialog}"
+                <Button Command="{s:Action ShowSelectCertificateDialog}"
                         Height="Auto"
                         Content="Select from store..."
                         Margin="5"/>
-                    <Button Command="{s:Action ShowImportDialog}"
-                    IsEnabled="{Binding IsEditing}"
+                <Button Command="{s:Action ShowImportDialog}"
                     Height="Auto"
                     Content="Import from PFX..."
                     Margin="5"/>
-                </StackPanel>
+            </StackPanel>
 
 
 
-                <Label Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2"
+            <Label Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2"
                Style="{DynamicResource DescriptionHeaderStyle}" Content="Web host"/>
 
-                <Label Grid.Row="12" Grid.Column="0" 
+            <Label Grid.Row="12" Grid.Column="0" 
                    Content="HTTP Port"
-                   IsEnabled="{Binding IsEditing}"
                    Margin="5"/>
-                <mah:NumericUpDown Grid.Row="12" Grid.Column="1" 
-                               Value="{Binding HttpPort}" 
+            <mah:NumericUpDown Grid.Row="12" Grid.Column="1" 
+                               Value="{Binding HttpPort, UpdateSourceTrigger=PropertyChanged}" 
                                Minimum="1" Maximum="65535" Interval="1"
                                HideUpDownButtons="True"
-                               IsEnabled="{Binding IsEditing}"
                                Width="50" 
                                TextAlignment="Left" HorizontalAlignment="Left"
                                Margin="5 5 5 0"/>
-                <TextBlock Grid.Row="13" Grid.Column="1"
+            <TextBlock Grid.Row="13" Grid.Column="1"
                            TextWrapping="Wrap"
                            Text="Enter the HTTP port to listen on (Default 80). Note that all connections on this port are redirected to HTTPS"
-                           IsEnabled="{Binding IsEditing}"
                            Margin="5 0 5 0"/>
 
-                <Label Grid.Row="14" Grid.Column="0" 
+            <Label Grid.Row="14" Grid.Column="0" 
                    Content="HTTPS Port"
-                   IsEnabled="{Binding IsEditing}"
                    Margin="5"/>
-                <mah:NumericUpDown Grid.Row="14" Grid.Column="1" 
-                               Value="{Binding HttpsPort}" 
+            <mah:NumericUpDown Grid.Row="14" Grid.Column="1" 
+                               Value="{Binding HttpsPort, UpdateSourceTrigger=PropertyChanged}" 
                                Minimum="1" Maximum="65535" Interval="1" 
                                HideUpDownButtons="True"
                                Width="50" 
-                               IsEnabled="{Binding IsEditing}"
                                TextAlignment="Left" HorizontalAlignment="Left"
                                Margin="5 5 5 0"/>
-                <TextBlock Grid.Row="15" Grid.Column="1" 
+            <TextBlock Grid.Row="15" Grid.Column="1" 
                    Text="Enter the HTTPS port to listen on (Default 443)"
-                   IsEnabled="{Binding IsEditing}"
                     TextWrapping="Wrap"
                    Margin="5 0 5 0"/>
 
-                <Label Grid.Row="16" Grid.Column="0" 
+            <Label Grid.Row="16" Grid.Column="0" 
                    Content="Hostname"
-                   IsEnabled="{Binding IsEditing}"
                    Margin="5"/>
-                <TextBox Grid.Row="16" Grid.Column="1"
-                     Text="{Binding Hostname}"
-                     IsEnabled="{Binding IsEditing}"
+            <TextBox Grid.Row="16" Grid.Column="1"
+                     Text="{Binding Hostname, UpdateSourceTrigger=PropertyChanged}"
                      Margin="5 5 5 0"/>
-                <TextBlock Grid.Row="17" Grid.Column="1" 
+            <TextBlock Grid.Row="17" Grid.Column="1" 
                    Text="Optionally, enter a specific hostname to listen on. Leave this field blank to listen on all hostnames"
                     TextWrapping="Wrap"
-                   IsEnabled="{Binding IsEditing}"
                    Margin="5 0 5 0"/>
-
-
-            </Grid>
-        </StackPanel>
-
-        <StackPanel DockPanel.Dock="Bottom"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Right"
-                    Margin="10">
-
-            <Button Content="{Binding EditSettingsButtonText, FallbackValue='Edit settings'}"
-                    HorizontalAlignment="Left"
-                    Command="{s:Action EditSettings}"
-                    Height="Auto"
-                    Margin="5"/>
-
-            <Button Content="Revert changes"
-                    Visibility="{Binding IsEditing, Converter={StaticResource BooleanToVisibilityConverter}}"
-                    HorizontalAlignment="Left"
-                    Command="{s:Action CancelSave}"
-                    Height="Auto"
-                    Margin="5"/>
-        </StackPanel>
-    </DockPanel>
+        </Grid>
+    </StackPanel>
 </UserControl>

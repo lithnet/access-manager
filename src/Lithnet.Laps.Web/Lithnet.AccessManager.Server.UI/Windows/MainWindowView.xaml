@@ -5,16 +5,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-        mc:Ignorable="d"
+        mc:Ignorable="d" d:DesignHeight="250" d:DesignWidth="400"
         xmlns:s="https://github.com/canton7/Stylet"
         Title="{Binding WindowTitle}"
         BorderThickness="1"
         Height="Auto"
         Width="Auto" 
-        controls:DialogParticipation.Register="{Binding}"
-        SizeToContent="Manual"
-        >
-
+        controls:DialogParticipation.Register="{Binding}" 
+        SizeToContent="Manual">
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Control"
+                    Key="S"
+                    Command="{s:Action Save}" />
+        <KeyBinding Modifiers="Control"
+                    Key="X"
+                    Command="{s:Action Close}" />
+    </Window.InputBindings>
     <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top"
               BorderBrush="{DynamicResource MahApps.Brushes.Control.Border}"
@@ -24,13 +30,11 @@
                     <CompositeCollection>
                         <MenuItem Header="Save" 
                                       Command="{s:Action Save}"
+                                      InputGestureText="Ctrl+S"
                                       />
-
-                        <MenuItem Header="Test" 
-                                      Command="{s:Action Test}" />
-                        
                         <MenuItem Header="Close" 
-                                      Command="{s:Action Close}" />
+                                      Command="{s:Action Close}"
+                                      InputGestureText="Ctrl+X"/>
 
                     </CompositeCollection>
                 </MenuItem.ItemsSource>

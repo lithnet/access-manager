@@ -26,7 +26,7 @@
                        Content="Web site title"
                        Margin="5"/>
             <TextBox Grid.Row="0" Grid.Column="1" 
-                         Text="{Binding Title}"
+                         Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
                          Margin="5"/>
 
             <Label Grid.Row="1" Grid.Column="0" 

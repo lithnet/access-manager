@@ -27,10 +27,17 @@ namespace Lithnet.AccessManager.Server.UI
             this.Config = c;
         }
 
-        public void Save()
+        public async Task<bool> Save()
         {
-            this.Config.Save();
-            this.IsDirty = false;
+            if (await this.Config.Save())
+            {
+                this.IsDirty = false;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public void Close()
@@ -50,9 +57,12 @@ namespace Lithnet.AccessManager.Server.UI
 
         public override async Task<bool> CanCloseAsync()
         {
-            if (this.IsDirty)
+            if (!this.IsDirty)
             {
-                var result = await this.dialogCoordinator.ShowMessageAsync(this, "Unsaved changed",
+                return true;
+            }
+
+            var result = await this.dialogCoordinator.ShowMessageAsync(this, "Unsaved changed",
                     "Do you want to save your changes?",
                     MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary, new MetroDialogSettings()
                     {
@@ -64,23 +74,21 @@ namespace Lithnet.AccessManager.Server.UI
                         AnimateHide = false
                     });
 
-                if (result == MessageDialogResult.Affirmative)
+            if (result == MessageDialogResult.Affirmative)
+            {
+                try
                 {
-                    try
-                    {
-                        this.Save();
-                        return true;
-                    }
-                    catch (Exception ex)
-                    {
-                        this.logger.LogError(ex, "Unable to save file");
-                        await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Unable to save file\r\n{ex.Message}");
-                    }
+                    return await this.Save();
                 }
-                else if (result == MessageDialogResult.FirstAuxiliary)
+                catch (Exception ex)
                 {
-                    return true;
+                    this.logger.LogError(ex, "Unable to save the configuration");
+                    await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Unable to save the configuration\r\n{ex.Message}");
                 }
+            }
+            else if (result == MessageDialogResult.FirstAuxiliary)
+            {
+                return true;
             }
 
             return false;

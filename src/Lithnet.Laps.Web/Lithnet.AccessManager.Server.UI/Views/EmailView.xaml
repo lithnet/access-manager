@@ -30,14 +30,14 @@
                        Content="SMTP Server"
                        Margin="5"/>
             <TextBox Grid.Row="0" Grid.Column="1"
-                         Text="{Binding Host}"
+                         Text="{Binding Host, UpdateSourceTrigger=PropertyChanged}"
                          Margin="5"/>
 
             <Label Grid.Row="0" Grid.Column="2" 
                        Content="Port"
                        Margin="5"/>
             <mah:NumericUpDown Grid.Row="0" Grid.Column="3" 
-                                   Value="{Binding Port}" 
+                                   Value="{Binding Port, UpdateSourceTrigger=PropertyChanged}" 
                                    Minimum="1" Maximum="65535" Interval="1" 
                                    HideUpDownButtons="True"
                                    Width="50" 
@@ -54,7 +54,7 @@
                        Content="From address"
                        Margin="5"/>
             <TextBox Grid.Row="3" Grid.Column="1"
-                         Text="{Binding FromAddress}"
+                         Text="{Binding FromAddress, UpdateSourceTrigger=PropertyChanged}"
                          Margin="5"/>
 
             <Label Grid.Row="4" Grid.Column="0" 
@@ -69,7 +69,7 @@
                        Margin="5"/>
             <TextBox Grid.Row="5" Grid.Column="1" 
                          Text="{Binding Username}" 
-                         IsEnabled="{Binding UseSpecifiedCredentials}"
+                         IsEnabled="{Binding UseSpecifiedCredentials, UpdateSourceTrigger=PropertyChanged}"
                          Margin="5"/>
 
             <Label Grid.Row="6" Grid.Column="0"
@@ -78,7 +78,7 @@
             <PasswordBox Grid.Row="6" Grid.Column="1" 
                              local:PasswordBoxBindingHelper.BindPassword="True" 
                              local:PasswordBoxBindingHelper.BoundPassword="{Binding Path=Password, Mode=TwoWay}"
-                             IsEnabled="{Binding UseSpecifiedCredentials}" 
+                             IsEnabled="{Binding UseSpecifiedCredentials, UpdateSourceTrigger=PropertyChanged}" 
                              Margin="5"/>
 
         </Grid>

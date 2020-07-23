@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Media.Animation;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.Logging;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -31,6 +34,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.model = model;
             this.dialogCoordinator = dialogCoordinator;
 
+            this.hosting = hosting;
+
             this.Items.Add(hosting);
             this.Items.Add(authentication);
             this.Items.Add(ad);
@@ -51,7 +56,9 @@ namespace Lithnet.AccessManager.Server.UI
         
         public BindableCollection<PropertyChangedBase> OptionItems { get; }
 
-        public void Save()
+        private HostingViewModel hosting { get; }
+
+        public async Task<bool> Save()
         {
             try
             {
@@ -59,7 +66,18 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.dialogCoordinator.ShowMessageAsync(this, "Error saving file", $"The configuration file could not be saved\r\n{ex.Message}");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error saving file", $"The configuration file could not be saved\r\n{ex.Message}");
+                return false;
+            }
+
+            try
+            {
+                return await this.hosting.CommitSettings();
+            }
+            catch (Exception ex)
+            {
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error saving service configuration", $"There was a problem updating the service configuration\r\n{ex.Message}");
+                return false;
             }
         }
     }

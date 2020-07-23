@@ -47,9 +47,12 @@ namespace Lithnet.AccessManager.Server.UI
             Type t = sender.GetType();
             PropertyInfo pi = t.GetProperty(e.PropertyName);
 
-            if (Attribute.IsDefined(pi, typeof(NotifiablePropertyAttribute)))
+            if (pi != null)
             {
-                this.eventAggregator.Publish(new ModelChangedEvent(sender, e.PropertyName));
+                if (Attribute.IsDefined(pi, typeof(NotifiablePropertyAttribute)))
+                {
+                    this.eventAggregator.Publish(new ModelChangedEvent(sender, e.PropertyName));
+                }
             }
         }
     }

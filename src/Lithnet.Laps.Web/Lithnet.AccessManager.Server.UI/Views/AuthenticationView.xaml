@@ -72,21 +72,21 @@
                            Content="Issuer/Authority"
                            Margin="5"/>
             <TextBox Grid.Row="0" Grid.Column="1" 
-                             Text="{Binding OidcAuthority}"
+                             Text="{Binding OidcAuthority, UpdateSourceTrigger=PropertyChanged}"
                              Margin="5"/>
 
             <Label Grid.Row="1" Grid.Column="0" 
                            Content="Client ID"
                            Margin="5"/>
             <TextBox Grid.Row="1" Grid.Column="1"
-                             Text="{Binding OidcClientID}" 
+                             Text="{Binding OidcClientID, UpdateSourceTrigger=PropertyChanged}" 
                              Margin="5"/>
 
             <Label Grid.Row="2" Grid.Column="0" 
                            Content="Secret"
                            Margin="5"/>
             <TextBox Grid.Row="2" Grid.Column="1" 
-                             Text="{Binding OidcSecret}" 
+                             Text="{Binding OidcSecret, UpdateSourceTrigger=PropertyChanged}" 
                              Margin="5"/>
 
             <Label Grid.Row="2" Grid.Column="0" 
@@ -94,7 +94,7 @@
                            Margin="5"/>
             <PasswordBox Grid.Row="2" Grid.Column="1" 
                                  local:PasswordBoxBindingHelper.BindPassword="True"
-                                 local:PasswordBoxBindingHelper.BoundPassword="{Binding Path=OidcSecret, Mode=TwoWay}"
+                                 local:PasswordBoxBindingHelper.BoundPassword="{Binding Path=OidcSecret, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  Margin="5"/>
 
         </Grid>
@@ -115,14 +115,14 @@
                            Content="Metadata URL"
                            Margin="5"/>
             <TextBox Grid.Row="0" Grid.Column="1" 
-                             Text="{Binding WsFedMetadata}"
+                             Text="{Binding WsFedMetadata, UpdateSourceTrigger=PropertyChanged}"
                              Margin="5" />
 
             <Label Grid.Row="1" Grid.Column="0" 
                            Content="Realm"
                            Margin="5"/>
             <TextBox Grid.Row="1" Grid.Column="1" 
-                             Text="{Binding WsFedRealm}" 
+                             Text="{Binding WsFedRealm, UpdateSourceTrigger=PropertyChanged}" 
                              Margin="5"/>
         </Grid>
     </StackPanel>
