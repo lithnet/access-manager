@@ -13,8 +13,7 @@
       "RequestQueueLimit": 1000,
       "MaxRequestBodySize": 2480000,
       "AllowSynchronousIO": false,
-      "Http503Verbosity": "Limited",
-      "ClientCertificateMethod": "NoCertificate"
+      "Http503Verbosity": "Limited"
     }
   }
 }

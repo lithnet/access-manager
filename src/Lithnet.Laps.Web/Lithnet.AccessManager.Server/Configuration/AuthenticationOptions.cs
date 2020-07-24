@@ -13,5 +13,7 @@ namespace Lithnet.AccessManager.Server.Configuration
         public OidcAuthenticationProviderOptions Oidc { get; set; }
 
         public WsFedAuthenticationProviderOptions WsFed { get; set; }
+
+        public CertificateAuthenticationProviderOptions ClientCert { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using Lithnet.AccessManager.Web.Internal;
 using Lithnet.AccessManager.Web.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NLog;
 

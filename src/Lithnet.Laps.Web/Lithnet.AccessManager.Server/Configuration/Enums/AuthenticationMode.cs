@@ -11,6 +11,9 @@ namespace Lithnet.AccessManager.Server.Configuration
         Oidc = 1,
 
         [Description("WS-Federation")]
-        WsFed = 2
+        WsFed = 2,
+
+        [Description("Client certificate/smart card")]
+        Certificate = 3
     }
 }

@@ -32,10 +32,7 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         [JsonConverter(typeof(StringEnumConverter))]
         public Http503VerbosityLevel Http503Verbosity { get; set; }
-
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ClientCertificateMethod ClientCertificateMethod { get; set; }
-
+      
         public string BuildHttpUrlPrefix()
         {
             string host = "+";

@@ -17,19 +17,29 @@ namespace Lithnet.AccessManager.Web.Internal
 
                 builder.UseHttpSys(options =>
                  {
-                     if (config.GetValueOrDefault("Authentication:Mode", AuthenticationMode.Iwa) == AuthenticationMode.Iwa)
+                     var mode = config.GetValueOrDefault("Authentication:Mode", AuthenticationMode.Iwa);
+
+
+                     if (mode == AuthenticationMode.Iwa)
                      {
                          options.Authentication.Schemes = config.GetValueOrDefault("Authentication:Iwa:AuthenticationSchemes", HttpSys.AuthenticationSchemes.Negotiate);
                          options.Authentication.AllowAnonymous = false;
+                         options.ClientCertificateMethod = HttpSys.ClientCertificateMethod.NoCertificate;
+                     }
+                     else if (mode == AuthenticationMode.Certificate)
+                     {
+                         options.Authentication.AllowAnonymous = true;
+                         options.Authentication.Schemes = HttpSys.AuthenticationSchemes.None;
+                         options.ClientCertificateMethod = HttpSys.ClientCertificateMethod.AllowCertificate;
                      }
                      else
                      {
                          options.Authentication.AllowAnonymous = true;
                          options.Authentication.Schemes = HttpSys.AuthenticationSchemes.None;
+                         options.ClientCertificateMethod = HttpSys.ClientCertificateMethod.NoCertificate;
                      }
 
                      options.AllowSynchronousIO = p.AllowSynchronousIO;
-                     options.ClientCertificateMethod = (HttpSys.ClientCertificateMethod)p.ClientCertificateMethod;
                      options.EnableResponseCaching = p.EnableResponseCaching;
                      options.Http503Verbosity = (HttpSys.Http503VerbosityLevel)p.Http503Verbosity;
                      options.MaxAccepts = p.MaxAccepts;
@@ -41,8 +51,7 @@ namespace Lithnet.AccessManager.Web.Internal
                      options.UrlPrefixes.Clear();
                      options.UrlPrefixes.Add(p.BuildHttpUrlPrefix());
                      options.UrlPrefixes.Add(p.BuildHttpsUrlPrefix());
-                 }
-                 );
+                 });
             }
 
             return builder;

@@ -49,6 +49,16 @@ namespace Lithnet.AccessManager.Web.Controllers
 
         public IActionResult Get()
         {
+            try
+            {
+                _ = this.authenticationProvider.GetLoggedInUser() ?? throw new ObjectNotFoundException();
+            }
+            catch (ObjectNotFoundException ex)
+            {
+                this.logger.LogEventError(EventIDs.SsoIdentityNotFound, null, ex);
+                return this.RedirectToAction("AuthNError", "Home", new { messageID = (int)AuthNFailureMessageID.SsoIdentityNotFound });
+            }
+
             return this.View(new LapRequestModel
             {
                 ShowReason = this.userInterfaceSettings.UserSuppliedReason != AuditReasonFieldState.Hidden,
@@ -202,7 +212,7 @@ namespace Lithnet.AccessManager.Web.Controllers
                 Computer = computer,
                 EventID = EventIDs.JitGranted,
                 ComputerExpiryDate = expiryDate.ToString()
-            }) ;
+            });
 
             var jitDetails = new JitDetailsModel(computer.MsDsPrincipalName, user.MsDsPrincipalName, expiryDate);
 

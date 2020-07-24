@@ -37,6 +37,7 @@ namespace Lithnet.AccessManager.Web
             services.TryAddScoped<IIwaAuthenticationProvider, IwaAuthenticationProvider>();
             services.TryAddScoped<IOidcAuthenticationProvider, OidcAuthenticationProvider>();
             services.TryAddScoped<IWsFedAuthenticationProvider, WsFedAuthenticationProvider>();
+            services.TryAddScoped<ICertificateAuthenticationProvider, CertificateAuthenticationProvider>();
 
             services.TryAddScoped<IJsonTargetsProvider, JsonFileTargetsProvider>();
             services.TryAddScoped<IAuthorizationService, SecurityDescriptorAuthorizationService>();
@@ -76,6 +77,12 @@ namespace Lithnet.AccessManager.Web
             services.Configure<EmailOptions>(Configuration.GetSection("Email"));
             services.Configure<AuditOptions>(Configuration.GetSection("Auditing"));
             services.Configure<AuthenticationOptions>(Configuration.GetSection("Authentication"));
+            services.Configure<IwaAuthenticationProviderOptions>(Configuration.GetSection("Authentication:Iwa"));
+            services.Configure<OidcAuthenticationProviderOptions>(Configuration.GetSection("Authentication:Oidc"));
+            services.Configure<WsFedAuthenticationProviderOptions>(Configuration.GetSection("Authentication:WsFed"));
+            services.Configure<CertificateAuthenticationProviderOptions>(Configuration.GetSection("Authentication:ClientCert"));
+
+
             services.Configure<HostingOptions>(Configuration.GetSection("Hosting"));
             services.Configure<AuthorizationOptions>(Configuration.GetSection("Authorization"));
             services.Configure<ForwardedHeadersAppOptions>(Configuration.GetSection("ForwardedHeaders"));
@@ -137,6 +144,10 @@ namespace Lithnet.AccessManager.Web
 
                 case AuthenticationMode.WsFed:
                     authProvider = provider.GetService<IWsFedAuthenticationProvider>();
+                    break;
+
+                case AuthenticationMode.Certificate:
+                    authProvider = provider.GetService<ICertificateAuthenticationProvider>();
                     break;
 
                 default:

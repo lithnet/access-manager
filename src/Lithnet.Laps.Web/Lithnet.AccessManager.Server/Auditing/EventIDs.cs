@@ -14,6 +14,7 @@
         public const int LapsPasswordNotPresent = 402;
         public const int ComputerNameAmbiguous = 403;
         public const int ReasonRequired = 404;
+        public const int CertificateMissingUpn = 405;
 
         public const int AuthZFailedNoReaderPrincipalMatch = 500;
         public const int AuthZFailedNoTargetMatch = 501;
