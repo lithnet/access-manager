@@ -16,14 +16,7 @@ namespace Lithnet.AccessManager.Server.UI
         public DialogWindow()
         {
             InitializeComponent();
-            
-            //this.IsModal = true;
-            //this.AllowFocusElement = true;
-            //this.FocusedElement = this.SaveButton;
-            //this.IsWindowHostActive = false;
-            //this.SaveButton.IsDefault = true;
             this.SaveButton.Focus();
-
         }
 
         public bool CancelButtonIsDefault { get; set; } = true;
@@ -50,9 +43,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         private void Save_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            var vm = this.DataContext as INotifyDataErrorInfo;
-
-            if (vm != null && vm.HasErrors)
+            if (this.DataContext is INotifyDataErrorInfo vm && vm.HasErrors)
             {
                 e.CanExecute = false;
                 return;
