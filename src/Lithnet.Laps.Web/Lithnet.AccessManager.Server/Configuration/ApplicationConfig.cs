@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using Newtonsoft.Json;
 
 namespace Lithnet.AccessManager.Server.Configuration
@@ -7,7 +8,6 @@ namespace Lithnet.AccessManager.Server.Configuration
     {
         [JsonIgnore]
         public string Path { get; set; }
-
                
         public AuthenticationOptions Authentication { get; set; }
         
@@ -24,6 +24,9 @@ namespace Lithnet.AccessManager.Server.Configuration
         public ForwardedHeadersAppOptions ForwardedHeaders { get; set; }
         
         public JitConfigurationOptions JitConfiguration { get; set; }
+
+        [JsonExtensionData]
+        public IDictionary<string, object> OtherData { get; set; }
 
         public void Save(string file)
         {

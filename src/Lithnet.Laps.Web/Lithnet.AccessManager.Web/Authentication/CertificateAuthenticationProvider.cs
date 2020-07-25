@@ -27,7 +27,7 @@ namespace Lithnet.AccessManager.Web.AppSettings
 
         private readonly IDirectory directory;
 
-        private readonly ILogger logger;
+        private readonly ILogger<CertificateAuthenticationProvider> logger;
 
         public CertificateAuthenticationProvider(IOptions<CertificateAuthenticationProviderOptions> options, ILogger<CertificateAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
             : base(httpContextAccessor, directory)
@@ -156,7 +156,6 @@ namespace Lithnet.AccessManager.Web.AppSettings
                 return false;
             }
         }
-
 
         private bool ValidateNtAuthStore(X509Chain chain)
         {

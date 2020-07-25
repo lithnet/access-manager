@@ -298,7 +298,7 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         private IList<SearchResult> GetObjects(string server, string ou, string objectClass, SearchScope scope, long lowUsn, long highUsn)
         {
-            string filter = $"(&(objectClass={objectClass})(uSNCreated<={highUsn})(uSNCreated>{lowUsn}))";
+            string filter = $"(&(objectClass={objectClass})(uSNCreated<={highUsn})(uSNCreated>={lowUsn + 1}))";
             string path = $"LDAP://{server}/{ou}";
             return this.GetObjects(path, scope, filter);
         }
