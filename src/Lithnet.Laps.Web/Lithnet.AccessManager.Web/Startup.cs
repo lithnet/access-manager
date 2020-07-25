@@ -15,7 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using NLog;
 
 namespace Lithnet.AccessManager.Web
 {
@@ -32,8 +31,7 @@ namespace Lithnet.AccessManager.Web
         {
             services.AddControllersWithViews();
             services.AddHttpContextAccessor();
-
-            services.TryAddTransient<ILogger>(_ => LogManager.GetCurrentClassLogger());
+            
             services.TryAddScoped<IIwaAuthenticationProvider, IwaAuthenticationProvider>();
             services.TryAddScoped<IOidcAuthenticationProvider, OidcAuthenticationProvider>();
             services.TryAddScoped<IWsFedAuthenticationProvider, WsFedAuthenticationProvider>();

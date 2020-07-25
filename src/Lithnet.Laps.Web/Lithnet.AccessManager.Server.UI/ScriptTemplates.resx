@@ -146,14 +146,14 @@ $de.CommitChanges()</value>
 	param(
 	[hashtable]$tokens,
 	[bool]$isSuccess,
-	[Nlog.ILogger]$logger
+	[Microsoft.Extensions.Logging.ILogger]$logger
 )
 
-	$logger.Trace("We're in PowerShell for auditing!");
+	$logger.LogTrace("We're in PowerShell for auditing!");
 
 	$tokens.Keys | % {
 		Write-Host "$($_):$($tokens.Item($_))";
-		$logger.Trace( "$($_):$($tokens.Item($_))");
+		$logger.Log(LogLevel.Trace, "$($_):$($tokens.Item($_))");
 		};
 }</value>
   </data>
@@ -162,19 +162,17 @@ $de.CommitChanges()</value>
 	param(
 	[Lithnet.AccessManager.IUser]$user,
 	[Lithnet.AccessManager.IComputer]$computer,
-	[Nlog.ILogger]$logger
+	[Microsoft.Extensions.Logging.ILogger]$logger
 )
 
-	$logger.Trace("We're in PowerShell!");
-	$logger.Trace("Checking if $($user.MsDsPrincipalName) has access to LAPS for $($computer.MsDsPrincipalName)");
+	$logger.Log(LogLevel.Trace,"We're in PowerShell!");
+	$logger.Log(LogLevel.Trace,"Checking if $($user.MsDsPrincipalName) has access to LAPS for $($computer.MsDsPrincipalName)");
 
-	$response = New-Object -TypeName "Lithnet.AccessManager.Web.Authorization.LapsAuthorizationResponse"
+	$response = New-Object -TypeName "Lithnet.AccessManager.Server.Authorization.PowerShellAuthorizationResponse"
 
-	$response.Code = "ExplicitlyDenied";
-	$response.MatchedRuleDescription = "nah mate";
-
-	$logger.Trace($response.ResponseCode);
-
+	# Set IsAllowed to true to allow access, or set IsDenied to explicitly deny access, or leave both as false if no decision was made. This will allow other rules to be evaluated.
+	$response.IsAllowed = $false;
+	$response.IsDenied = $false;
 
 	Write-Output $response;
 }
@@ -183,18 +181,17 @@ function Get-LapsHistoryAuthorizationResponse{
 	param(
 	[Lithnet.AccessManager.IUser]$user,
 	[Lithnet.AccessManager.IComputer]$computer,
-	[Nlog.ILogger]$logger
+	[Microsoft.Extensions.Logging.ILogger]$logger
 )
 
-	$logger.Trace("We're in PowerShell!");
-	$logger.Trace("Checking if $($user.MsDsPrincipalName) has access to LAPS password history for $($computer.MsDsPrincipalName)");
+	$logger.Log(LogLevel.Trace, "We're in PowerShell!");
+	$logger.Log(LogLevel.Trace,"Checking if $($user.MsDsPrincipalName) has access to LAPS password history for $($computer.MsDsPrincipalName)");
 
-	$response = New-Object -TypeName "Lithnet.AccessManager.Web.Authorization.LapsHistoryAuthorizationResponse"
-
-	$response.Code = "ExplicitlyDenied";
-	$response.MatchedRuleDescription = "nah mate";
-
-	$logger.Trace($response.ResponseCode);
+	$response = New-Object -TypeName "Lithnet.AccessManager.Server.Authorization.PowerShellAuthorizationResponse"
+		
+	# Set IsAllowed to true to allow access, or set IsDenied to explicitly deny access, or leave both as false if no decision was made. This will allow other rules to be evaluated.
+	$response.IsAllowed = $false;
+	$response.IsDenied = $false;
 
 	Write-Output $response;
 }
@@ -204,19 +201,17 @@ function Get-JitAuthorizationResponse{
 	param(
 	[Lithnet.AccessManager.IUser]$user,
 	[Lithnet.AccessManager.IComputer]$computer,
-	[Nlog.ILogger]$logger
+	[Microsoft.Extensions.Logging.ILogger]$logger
 )
 
-	$logger.Trace("We're in PowerShell!");
-	$logger.Trace("Checking if $($user.MsDsPrincipalName) can request JIT access to $($computer.MsDsPrincipalName)");
+	$logger.Log(LogLevel.Trace,"We're in PowerShell!");
+	$logger.Log(LogLevel.Trace,"Checking if $($user.MsDsPrincipalName) can request JIT access to $($computer.MsDsPrincipalName)");
 
-	$response = New-Object -TypeName "Lithnet.AccessManager.Web.Authorization.JitAuthorizationResponse"
-
-	$response.Code = "ExplicitlyDenied";
-	$response.MatchedRuleDescription = "no way";
-	$response.AuthorizingGroupName = $null;
-
-	$logger.Trace($response.ResponseCode);
+	$response = New-Object -TypeName "Lithnet.AccessManager.Server.Authorization.PowerShellAuthorizationResponse"
+	
+	# Set IsAllowed to true to allow access, or set IsDenied to explicitly deny access, or leave both as false if no decision was made. This will allow other rules to be evaluated.
+	$response.IsAllowed = $false;
+	$response.IsDenied = $false;
 
 	Write-Output $response;
 }</value>

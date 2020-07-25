@@ -178,6 +178,15 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The certificate was invalid.
+        /// </summary>
+        public static string InvalidCertificate {
+            get {
+                return ResourceManager.GetString("InvalidCertificate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You have been logged out. Please close all browser windows..
         /// </summary>
         public static string LoggedOut {

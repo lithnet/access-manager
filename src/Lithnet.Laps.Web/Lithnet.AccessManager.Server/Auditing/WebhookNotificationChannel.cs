@@ -4,8 +4,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Channels;
 using Lithnet.AccessManager.Server.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NLog;
 
 namespace Lithnet.AccessManager.Server.Auditing
 {
@@ -17,7 +17,7 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         protected override IList<WebhookNotificationChannelDefinition> NotificationChannelDefinitions { get; }
 
-        public WebhookNotificationChannel(ILogger logger, IOptions<AuditOptions> auditSettings, ITemplateProvider templates, ChannelWriter<Action> queue)
+        public WebhookNotificationChannel(ILogger<WebhookNotificationChannel> logger, IOptions<AuditOptions> auditSettings, ITemplateProvider templates, ChannelWriter<Action> queue)
             : base(logger, queue)
         {
             this.NotificationChannelDefinitions = auditSettings.Value.NotificationChannels.Webhooks;

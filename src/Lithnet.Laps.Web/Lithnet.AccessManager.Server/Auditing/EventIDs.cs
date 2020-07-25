@@ -15,6 +15,9 @@
         public const int ComputerNameAmbiguous = 403;
         public const int ReasonRequired = 404;
         public const int CertificateMissingUpn = 405;
+        public const int CertificateIdentityNotFound = 406;
+        public const int CertificateValidationFailed = 407;
+        public const int CertificateValidationError = 408;
 
         public const int AuthZFailedNoReaderPrincipalMatch = 500;
         public const int AuthZFailedNoTargetMatch = 501;
@@ -38,6 +41,8 @@
         public const int AuthNResponseProcessingError = 702;
         public const int AuthNDirectoryLookupError = 703;
         public const int ExternalAuthNAccessDenied = 704;
+        public const int CertificateAuthNAccessDenied = 705;
+        public const int CertificateAuthNError = 706;
 
     }
 }

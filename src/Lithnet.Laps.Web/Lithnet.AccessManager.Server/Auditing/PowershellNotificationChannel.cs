@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Management.Automation;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NLog;
 
 namespace Lithnet.AccessManager.Server.Auditing
 {
@@ -17,13 +18,15 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         private readonly IAppPathProvider env;
 
+        private readonly NLog.ILogger nlogger = NLog.LogManager.GetCurrentClassLogger();
+
         public override string Name => "powershell";
         
         protected override IList<PowershellNotificationChannelDefinition> NotificationChannelDefinitions { get; }
 
         private PowerShell powershell;
 
-        public PowershellNotificationChannel(ILogger logger, IOptions<AuditOptions> auditSettings, IAppPathProvider env, ChannelWriter<Action> queue)
+        public PowershellNotificationChannel(ILogger<PowershellNotificationChannel> logger, IOptions<AuditOptions> auditSettings, IAppPathProvider env, ChannelWriter<Action> queue)
             : base(logger, queue)
         {
             this.logger = logger;
@@ -43,7 +46,7 @@ namespace Lithnet.AccessManager.Server.Auditing
                 .AddCommand("Write-AuditLog")
                     .AddParameter("tokens", tokens)
                     .AddParameter("isSuccess", action.IsSuccess)
-                    .AddParameter("logger", logger);
+                    .AddParameter("logger", nlogger);
 
             Task task = new Task(() =>
             {
@@ -59,7 +62,8 @@ namespace Lithnet.AccessManager.Server.Auditing
 
             if (task.IsFaulted)
             {
-                throw task.Exception;
+                if (task.Exception != null) throw task.Exception;
+                throw new AccessManagerException("The task failed");
             }
         }
 
@@ -82,7 +86,7 @@ namespace Lithnet.AccessManager.Server.Auditing
                 throw new NotSupportedException("The PowerShell script must contain a function called 'Write-AuditLog'");
             }
 
-            this.logger.Trace($"The PowerShell script was successfully initialized");
+            this.logger.LogTrace($"The PowerShell script was successfully initialized");
         }
     }
 }

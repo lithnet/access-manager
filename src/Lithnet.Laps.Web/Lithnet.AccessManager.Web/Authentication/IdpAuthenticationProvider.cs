@@ -7,7 +7,7 @@ using Lithnet.AccessManager.Web.App_LocalResources;
 using Lithnet.AccessManager.Web.Internal;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Web.AppSettings
 {
@@ -79,7 +79,7 @@ namespace Lithnet.AccessManager.Web.AppSettings
 
             if (c != null)
             {
-                this.logger.Trace($"Attempting to find a match in the directory for externally provided claim {c.Type}:{c.Value}");
+                this.logger.LogTrace($"Attempting to find a match in the directory for externally provided claim {c.Type}:{c.Value}");
 
                 try
                 {

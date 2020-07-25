@@ -5,7 +5,7 @@ using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Extensions;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Web.Authorization
 {
@@ -21,7 +21,7 @@ namespace Lithnet.AccessManager.Web.Authorization
 
         private readonly IJitAccessGroupResolver jitResolver;
 
-        public JsonTargetAuthorizationService(IDirectory directory, ILogger logger, IJsonTargetsProvider provider, IAceEvaluator aceEvaluator, IJitAccessGroupResolver jitResolver)
+        public JsonTargetAuthorizationService(IDirectory directory, ILogger<JsonTargetAuthorizationService> logger, IJsonTargetsProvider provider, IAceEvaluator aceEvaluator, IJitAccessGroupResolver jitResolver)
         {
             this.directory = directory;
             this.logger = logger;
@@ -38,7 +38,7 @@ namespace Lithnet.AccessManager.Web.Authorization
 
             if (targets.Count == 0)
             {
-                this.logger.Trace($"User {user.MsDsPrincipalName} is denied access to the password for computer {computer.MsDsPrincipalName} because the computer did not match any of the configured targets");
+                this.logger.LogTrace($"User {user.MsDsPrincipalName} is denied access to the password for computer {computer.MsDsPrincipalName} because the computer did not match any of the configured targets");
                 return BuildAuthZResponseFailed(requestedAccess, AuthorizationResponseCode.NoMatchingRuleForComputer);
             }
 
@@ -48,13 +48,13 @@ namespace Lithnet.AccessManager.Web.Authorization
                 {
                     if (this.aceEvaluator.IsMatchingAce(ace, user, requestedAccess))
                     {
-                        this.logger.Trace($"User {user.MsDsPrincipalName} matches deny ACE {ace.Sid ?? ace.Trustee} and is denied {requestedAccess} access for computer {computer.MsDsPrincipalName} from target {j.Name}");
+                        this.logger.LogTrace($"User {user.MsDsPrincipalName} matches deny ACE {ace.Sid ?? ace.Trustee} and is denied {requestedAccess} access for computer {computer.MsDsPrincipalName} from target {j.Name}");
 
                         return BuildAuthZResponseDenied(requestedAccess, j, ace);
                     }
                     else
                     {
-                        this.logger.Trace($"Denied principal {ace.Sid ?? ace.Trustee} does not match current user {user.MsDsPrincipalName}");
+                        this.logger.LogTrace($"Denied principal {ace.Sid ?? ace.Trustee} does not match current user {user.MsDsPrincipalName}");
                     }
                 }
             }
@@ -67,17 +67,17 @@ namespace Lithnet.AccessManager.Web.Authorization
                 {
                     if (this.aceEvaluator.IsMatchingAce(ace, user, requestedAccess))
                     {
-                        this.logger.Trace($"User {user.MsDsPrincipalName} matches allow ACE {ace.Sid ?? ace.Trustee} and is authorized to read passwords for computer {computer.MsDsPrincipalName} from target {j.Name}");
+                        this.logger.LogTrace($"User {user.MsDsPrincipalName} matches allow ACE {ace.Sid ?? ace.Trustee} and is authorized to read passwords for computer {computer.MsDsPrincipalName} from target {j.Name}");
 
                         return BuildAuthZResponseSuccess(requestedAccess, j, ace, computer);
                     }
 
-                    this.logger.Trace($"Allowed principal {ace.Sid ?? ace.Trustee} does not match current user {user.MsDsPrincipalName}");
+                    this.logger.LogTrace($"Allowed principal {ace.Sid ?? ace.Trustee} does not match current user {user.MsDsPrincipalName}");
                     j.NotificationChannels?.OnFailure?.ForEach(u => failureNotificationRecipients.Add(u));
                 }
             }
 
-            this.logger.Trace($"User {user.MsDsPrincipalName} does not match any target access control lists and is denied {requestedAccess} access to the computer {computer.MsDsPrincipalName}");
+            this.logger.LogTrace($"User {user.MsDsPrincipalName} does not match any target access control lists and is denied {requestedAccess} access to the computer {computer.MsDsPrincipalName}");
 
             return BuildAuthZResponseFailed(requestedAccess, AuthorizationResponseCode.NoMatchingRuleForUser, failureNotificationRecipients);
         }
@@ -168,7 +168,7 @@ namespace Lithnet.AccessManager.Web.Authorization
                     {
                         if (this.directory.IsObjectInOu(computer, target.Name))
                         {
-                            this.logger.Trace($"Matched {computer.MsDsPrincipalName} to target OU {target.Name}");
+                            this.logger.LogTrace($"Matched {computer.MsDsPrincipalName} to target OU {target.Name}");
                             matchingTargets.Add(target);
                         }
                     }
@@ -181,13 +181,13 @@ namespace Lithnet.AccessManager.Web.Authorization
                         }
                         catch (ObjectNotFoundException ex)
                         {
-                            this.logger.Trace(ex, $"Target computer {target.Name} was not found in the directory");
+                            this.logger.LogTrace(ex, $"Target computer {target.Name} was not found in the directory");
                             continue;
                         }
 
                         if (p.Sid == computer.Sid)
                         {
-                            this.logger.Trace($"Matched {computer.MsDsPrincipalName} to target computer {target.Name}");
+                            this.logger.LogTrace($"Matched {computer.MsDsPrincipalName} to target computer {target.Name}");
                             matchingTargets.Add(target);
                         }
                     }
@@ -200,13 +200,13 @@ namespace Lithnet.AccessManager.Web.Authorization
                         }
                         catch (ObjectNotFoundException ex)
                         {
-                            this.logger.Trace(ex, $"Target group {target.Name} was not found in the directory");
+                            this.logger.LogTrace(ex, $"Target group {target.Name} was not found in the directory");
                             continue;
                         }
 
                         if (this.directory.IsSidInPrincipalToken(g.Sid, computer, computer.Sid))
                         {
-                            this.logger.Trace($"Matched {computer.MsDsPrincipalName} to target group {target.Name}");
+                            this.logger.LogTrace($"Matched {computer.MsDsPrincipalName} to target group {target.Name}");
                             matchingTargets.Add(target);
                         }
                     }

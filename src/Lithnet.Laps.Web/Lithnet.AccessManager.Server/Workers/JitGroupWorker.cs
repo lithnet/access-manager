@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Workers;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NLog;
 
 namespace Lithnet.AccessManager.Server.Auditing
 {
@@ -31,7 +31,7 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         private readonly int timerInterval;
 
-        public JitGroupWorker(ILogger logger, IOptions<JitConfigurationOptions> options, IJitAccessGroupResolver groupResolver, IDirectory directory)
+        public JitGroupWorker(ILogger<JitGroupWorker> logger, IOptions<JitConfigurationOptions> options, IJitAccessGroupResolver groupResolver, IDirectory directory)
         {
             this.logger = logger;
             this.options = options.Value;
@@ -50,13 +50,13 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         public override Task StartAsync(CancellationToken cancellationToken)
         {
-            this.logger.Trace("Starting JIT group thread");
+            this.logger.LogTrace("Starting JIT group thread");
             return base.StartAsync(cancellationToken);
         }
 
         public override Task StopAsync(CancellationToken cancellationToken)
         {
-            this.logger.Trace("Stopping JIT group thread");
+            this.logger.LogTrace("Stopping JIT group thread");
             return base.StopAsync(cancellationToken);
         }
 
@@ -94,7 +94,7 @@ namespace Lithnet.AccessManager.Server.Auditing
                 }
                 catch (Exception ex)
                 {
-                    this.logger.Error(ex,
+                    this.logger.LogError(ex,
                         $"There was an unexpected error in the JIT group processing thread for the target {mapping.ComputerOU}");
                 }
             }
@@ -142,7 +142,7 @@ namespace Lithnet.AccessManager.Server.Auditing
 
             if (this.deltaSyncInterval <= 0 || DateTime.UtcNow > usnData.LastFullSync.AddMinutes(this.fullSyncInterval))
             {
-                this.logger.Trace("Resetting for a full sync");
+                this.logger.LogTrace("Resetting for a full sync");
                 usnData.Server = mapping.PreferredDC;
                 usnData.LastUsn = 0;
             }
@@ -151,7 +151,7 @@ namespace Lithnet.AccessManager.Server.Auditing
 
             if (usnData.LastUsn == usnData.HighestUsn)
             {
-                this.logger.Trace($"No directory changes detected on {usnData.Server}");
+                this.logger.LogTrace($"No directory changes detected on {usnData.Server}");
                 return;
             }
 
@@ -170,25 +170,25 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         private void PerformPartialSync(JitGroupMapping mapping, SearchParameters data)
         {
-            this.logger.Trace($"Performing delta JIT group synchronization for domain {data.DnsDomain} against server {data.Server}");
+            this.logger.LogTrace($"Performing delta JIT group synchronization for domain {data.DnsDomain} against server {data.Server}");
             var computers = GetComputers(mapping, data);
 
             var expectedGroupNames = GetExpectedGroupNames(computers, mapping.GroupNameTemplate).ToList();
 
             if (expectedGroupNames.Count > 0)
             {
-                this.logger.Trace($"{expectedGroupNames.Count} groups to create");
+                this.logger.LogTrace($"{expectedGroupNames.Count} groups to create");
                 this.CreateGroups(expectedGroupNames, mapping.GroupOU, mapping.GroupDescription, mapping.GroupType);
             }
             else
             {
-                this.logger.Trace("No groups need to be created");
+                this.logger.LogTrace("No groups need to be created");
             }
         }
 
         private void PerformFullSync(JitGroupMapping mapping, SearchParameters data)
         {
-            this.logger.Trace($"Performing full JIT group synchronization for domain {data.DnsDomain} against server {data.Server}");
+            this.logger.LogTrace($"Performing full JIT group synchronization for domain {data.DnsDomain} against server {data.Server}");
             var computers = GetComputers(mapping, data);
             var groups = GetGroups(mapping);
 
@@ -199,12 +199,12 @@ namespace Lithnet.AccessManager.Server.Auditing
 
             if (groupsToCreate.Count > 0)
             {
-                this.logger.Trace($"{groupsToCreate.Count} groups to create");
+                this.logger.LogTrace($"{groupsToCreate.Count} groups to create");
                 this.CreateGroups(groupsToCreate, mapping.GroupOU, mapping.GroupDescription, mapping.GroupType);
             }
             else
             {
-                this.logger.Trace("No groups need to be created");
+                this.logger.LogTrace("No groups need to be created");
             }
 
             if (mapping.EnableJitGroupDeletion)
@@ -215,12 +215,12 @@ namespace Lithnet.AccessManager.Server.Auditing
 
                 if (groupsToDelete.Count > 0)
                 {
-                    this.logger.Trace($"{groupsToDelete.Count} groups to delete");
+                    this.logger.LogTrace($"{groupsToDelete.Count} groups to delete");
                     this.DeleteGroups(groupsToDelete);
                 }
                 else
                 {
-                    this.logger.Trace("No groups need to be deleted");
+                    this.logger.LogTrace("No groups need to be deleted");
                 }
             }
         }
@@ -231,14 +231,14 @@ namespace Lithnet.AccessManager.Server.Auditing
             {
                 try
                 {
-                    this.logger.Trace($"Creating JIT group {group} in OU {groupOU}");
+                    this.logger.LogTrace($"Creating JIT group {group} in OU {groupOU}");
                     this.directory.CreateGroup(group, groupDescription ?? "JIT access group created by Lithnet Access Manager",
                         groupType, groupOU);
-                    this.logger.Info($"Created JIT group {group} in OU {groupOU}");
+                    this.logger.LogInformation($"Created JIT group {group} in OU {groupOU}");
                 }
                 catch (Exception ex)
                 {
-                    this.logger.Error(ex, $"The JIT group {group} could not be created in OU {groupOU}");
+                    this.logger.LogError(ex, $"The JIT group {group} could not be created in OU {groupOU}");
                 }
             }
         }
@@ -251,13 +251,13 @@ namespace Lithnet.AccessManager.Server.Auditing
 
                 try
                 {
-                    this.logger.Trace($"Deleting JIT group {groupName}");
+                    this.logger.LogTrace($"Deleting JIT group {groupName}");
                     this.directory.DeleteGroup(groupName);
-                    this.logger.Info($"Deleted JIT group {groupName}");
+                    this.logger.LogInformation($"Deleted JIT group {groupName}");
                 }
                 catch (Exception ex)
                 {
-                    this.logger.Error(ex, $"The JIT group {groupName} could not be deleted");
+                    this.logger.LogError(ex, $"The JIT group {groupName} could not be deleted");
                 }
             }
         }
@@ -277,7 +277,7 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         private IList<SearchResult> GetObjects(string path, SearchScope scope, string filter)
         {
-            logger.Trace($"Searching in {path} ({scope}) with filter '{filter}'");
+            logger.LogTrace($"Searching in {path} ({scope}) with filter '{filter}'");
 
             DirectorySearcher d = new DirectorySearcher
             {
@@ -292,7 +292,7 @@ namespace Lithnet.AccessManager.Server.Auditing
 
             SearchResultCollection result = d.FindAll();
 
-            logger.Trace($"{result.Count} items found");
+            logger.LogTrace($"{result.Count} items found");
             return result.OfType<SearchResult>().ToList();
         }
 
@@ -323,7 +323,7 @@ namespace Lithnet.AccessManager.Server.Auditing
             }
             catch (Exception ex)
             {
-                logger.Warn(ex, $"Could not contact {search.Server}. Resetting USN data and attempting against domain {search.DnsDomain}");
+                logger.LogWarning(ex, $"Could not contact {search.Server}. Resetting USN data and attempting against domain {search.DnsDomain}");
                 search.LastUsn = 0;
                 search.Server = search.DnsDomain;
                 this.PopulateUsnData(search);

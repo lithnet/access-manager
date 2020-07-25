@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Web.Controllers
 {
@@ -17,7 +17,7 @@ namespace Lithnet.AccessManager.Web.Controllers
 
         private readonly ILogger logger;
 
-        public HomeController(IAuthenticationProvider authSettings, ILogger logger)
+        public HomeController(IAuthenticationProvider authSettings, ILogger<HomeController> logger)
         {
             this.authSettings = authSettings;
             this.logger = logger;
@@ -32,7 +32,7 @@ namespace Lithnet.AccessManager.Web.Controllers
         {
             ErrorModel model = new ErrorModel();
 
-            logger.Trace($"AuthN error from {this.Request.HttpContext.Connection.RemoteIpAddress}");
+            logger.LogTrace($"AuthN error from {this.Request.HttpContext.Connection.RemoteIpAddress}");
 
             switch (messageID)
             {
@@ -44,6 +44,11 @@ namespace Lithnet.AccessManager.Web.Controllers
                 case AuthNFailureMessageID.ExternalAuthNProviderDenied:
                     model.Heading = UIMessages.AccessDenied;
                     model.Message = UIMessages.ExternalAuthNAccessDenied;
+                    break;
+
+                case AuthNFailureMessageID.InvalidCertificate:
+                    model.Heading = UIMessages.AccessDenied;
+                    model.Message = UIMessages.InvalidCertificate;
                     break;
 
                 case AuthNFailureMessageID.UnknownFailure:

@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NLog;
 
 namespace Lithnet.AccessManager.Web.AppSettings
 {
@@ -12,7 +12,7 @@ namespace Lithnet.AccessManager.Web.AppSettings
     {
         private readonly WsFedAuthenticationProviderOptions options;
 
-        public WsFedAuthenticationProvider(IOptions<WsFedAuthenticationProviderOptions> options, ILogger logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
+        public WsFedAuthenticationProvider(IOptions<WsFedAuthenticationProviderOptions> options, ILogger<WsFedAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
             :base (logger, directory, httpContextAccessor)
         {
             this.options = options.Value;

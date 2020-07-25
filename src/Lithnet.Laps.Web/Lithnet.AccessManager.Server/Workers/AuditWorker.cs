@@ -4,7 +4,7 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.Extensions.Hosting;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.Auditing
 {
@@ -14,7 +14,7 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         private readonly ChannelReader<Action> channel;
 
-        public AuditWorker(ILogger logger, ChannelReader<Action> channel)
+        public AuditWorker(ILogger<AuditWorker> logger, ChannelReader<Action> channel)
         {
             this.logger = logger;
             this.channel = channel;
@@ -22,13 +22,13 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         public override Task StartAsync(CancellationToken cancellationToken)
         {
-            this.logger.Trace("Starting background processing thread");
+            this.logger.LogTrace("Starting audit worker background processing thread");
             return base.StartAsync(cancellationToken);
         }
 
         public override Task StopAsync(CancellationToken cancellationToken)
         {
-            this.logger.Trace("Stopping background processing thread");
+            this.logger.LogTrace("Stopping audit worker background processing thread");
             return base.StopAsync(cancellationToken);
         }
 
@@ -38,7 +38,7 @@ namespace Lithnet.AccessManager.Server.Auditing
             {
                 try
                 {
-                    this.logger.Trace("Processing action from background queue");
+                    this.logger.LogTrace("Processing action from queue");
                     item.Invoke();
                 }
                 catch(OperationCanceledException)
@@ -46,7 +46,7 @@ namespace Lithnet.AccessManager.Server.Auditing
                 }
                 catch (Exception e)
                 {
-                    logger.LogEventError(EventIDs.BackgroundTaskUnhandledError, "An unhandled exception occurred in a background task", e);
+                    logger.LogEventError(EventIDs.BackgroundTaskUnhandledError, "An unhandled exception occurred in an audit worker background task", e);
                 }
             }
         }

@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <PackageReference Include="htmlagilitypack" Version="1.11.24" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Certificate" Version="3.1.6" />
     <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.5" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="6.7.0" />

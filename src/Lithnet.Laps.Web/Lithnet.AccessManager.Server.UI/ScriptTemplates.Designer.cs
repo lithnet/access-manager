@@ -85,14 +85,14 @@ namespace Lithnet.AccessManager.Server.UI {
         ///	param(
         ///	[hashtable]$tokens,
         ///	[bool]$isSuccess,
-        ///	[Nlog.ILogger]$logger
+        ///	[Microsoft.Extensions.Logging.ILogger]$logger
         ///)
         ///
-        ///	$logger.Trace(&quot;We&apos;re in PowerShell for auditing!&quot;);
+        ///	$logger.LogTrace(&quot;We&apos;re in PowerShell for auditing!&quot;);
         ///
         ///	$tokens.Keys | % {
         ///		Write-Host &quot;$($_):$($tokens.Item($_))&quot;;
-        ///		$logger.Trace( &quot;$($_):$($tokens.Item($_))&quot;);
+        ///		$logger.Log(LogLevel.Trace, &quot;$($_):$($tokens.Item($_))&quot;);
         ///		};
         ///}.
         /// </summary>
@@ -107,17 +107,15 @@ namespace Lithnet.AccessManager.Server.UI {
         ///	param(
         ///	[Lithnet.AccessManager.IUser]$user,
         ///	[Lithnet.AccessManager.IComputer]$computer,
-        ///	[Nlog.ILogger]$logger
+        ///	[Microsoft.Extensions.Logging.ILogger]$logger
         ///)
         ///
-        ///	$logger.Trace(&quot;We&apos;re in PowerShell!&quot;);
-        ///	$logger.Trace(&quot;Checking if $($user.MsDsPrincipalName) has access to LAPS for $($computer.MsDsPrincipalName)&quot;);
+        ///	$logger.Log(LogLevel.Trace,&quot;We&apos;re in PowerShell!&quot;);
+        ///	$logger.Log(LogLevel.Trace,&quot;Checking if $($user.MsDsPrincipalName) has access to LAPS for $($computer.MsDsPrincipalName)&quot;);
         ///
-        ///	$response = New-Object -TypeName &quot;Lithnet.AccessManager.Web.Authorization.LapsAuthorizationResponse&quot;
+        ///	$response = New-Object -TypeName &quot;Lithnet.AccessManager.Server.Authorization.PowerShellAuthorizationResponse&quot;
         ///
-        ///	$response.Code = &quot;ExplicitlyDenied&quot;;
-        ///	$response.MatchedRuleDescription = &quot;nah mate&quot;;
-        /// [rest of string was truncated]&quot;;.
+        ///	# Set IsAllowed to true to a [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AuthorizationScriptTemplate {
             get {

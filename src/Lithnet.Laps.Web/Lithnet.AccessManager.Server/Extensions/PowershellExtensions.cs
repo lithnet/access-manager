@@ -1,6 +1,7 @@
 ﻿using System.Management.Automation;
 using System.Text;
 using Lithnet.AccessManager.Server.Exceptions;
+using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.Extensions
 {

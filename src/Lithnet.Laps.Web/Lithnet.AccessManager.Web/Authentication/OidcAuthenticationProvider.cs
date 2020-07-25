@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NLog;
 
 namespace Lithnet.AccessManager.Web.AppSettings
 {
@@ -12,7 +12,7 @@ namespace Lithnet.AccessManager.Web.AppSettings
     {
         private readonly OidcAuthenticationProviderOptions options;
 
-        public OidcAuthenticationProvider(IOptions<OidcAuthenticationProviderOptions> options, ILogger logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
+        public OidcAuthenticationProvider(IOptions<OidcAuthenticationProviderOptions> options, ILogger<OidcAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
             : base(logger, directory, httpContextAccessor)
         {
             this.options = options.Value;

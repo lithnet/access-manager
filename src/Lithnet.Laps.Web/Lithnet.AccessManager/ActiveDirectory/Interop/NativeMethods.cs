@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Lithnet.Security.Authorization;
-using NLog;
 
 namespace Lithnet.AccessManager.Interop
 {
@@ -15,16 +13,9 @@ namespace Lithnet.AccessManager.Interop
     {
         public static int DirectoryReferralLimit { get; set; } = 10;
 
-        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
-
         internal const int InsufficientBuffer = 122;
 
         private const int ErrorMoreData = 234;
-
-
-        internal const string AuthzObjectUuidWithcap = "9a81c2bd-a525-471d-a4ed-49907c0b23da";
-
-        internal const string RcpOverTcpProtocol = "ncacn_ip_tcp";
 
         private static SecurityIdentifier currentDomainSid;
 

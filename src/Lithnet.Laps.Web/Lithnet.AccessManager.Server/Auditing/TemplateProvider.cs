@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using Lithnet.AccessManager.Server.Extensions;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.Auditing
 {
@@ -11,7 +11,7 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         private readonly IAppPathProvider env;
 
-        public TemplateProvider(ILogger logger, IAppPathProvider env)
+        public TemplateProvider(ILogger<TemplateProvider> logger, IAppPathProvider env)
         {
             this.env = env;
             this.logger = logger;

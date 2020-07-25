@@ -1,5 +1,5 @@
 ﻿using System;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.Extensions
 {
@@ -17,16 +17,12 @@ namespace Lithnet.AccessManager.Server.Extensions
 
         public static void LogEventSuccess(this ILogger logger, int eventId, string message)
         {
-            LogEvent(logger, eventId, LogLevel.Info, message, null);
+            LogEvent(logger, eventId, LogLevel.Information, message, null);
         }
 
         public static void LogEvent(this ILogger logger, int eventId, LogLevel logLevel, string message, Exception ex)
         {
-            LogEventInfo logEvent = new LogEventInfo(logLevel, logger.Name, message);
-            logEvent.Properties.Add("EventID", eventId);
-            logEvent.Exception = ex;
-
-            logger.Info(logEvent);
+            logger.Log(logLevel, eventId, ex, message);
         }
     }
 }

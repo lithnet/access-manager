@@ -6,7 +6,7 @@ using System.Threading.Channels;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Exceptions;
 using Lithnet.AccessManager.Server.Extensions;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.Auditing
 {
@@ -36,7 +36,7 @@ namespace Lithnet.AccessManager.Server.Auditing
                 {
                     if (!channel.Enabled)
                     {
-                        this.logger.Trace($"Skipping delivery of audit notification to {channel.Id} as it is currently disabled");
+                        this.logger.LogTrace($"Skipping delivery of audit notification to {channel.Id} as it is currently disabled");
                         continue;
                     }
 
@@ -70,9 +70,9 @@ namespace Lithnet.AccessManager.Server.Auditing
         {
             try
             {
-                this.logger.Trace($"Attempting delivery of audit notification to {channel.Id}");
+                this.logger.LogTrace($"Attempting delivery of audit notification to {channel.Id}");
                 this.Send(action, tokens, channel);
-                this.logger.Trace($"Delivery of audit notification to {channel.Id} successful");
+                this.logger.LogTrace($"Delivery of audit notification to {channel.Id} successful");
             }
             catch (Exception ex)
             {

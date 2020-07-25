@@ -7,8 +7,8 @@ using HtmlAgilityPack;
 using Lithnet.AccessManager.Server.App_LocalResources;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NLog;
 
 namespace Lithnet.AccessManager.Server.Auditing
 {
@@ -24,7 +24,7 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         protected override IList<SmtpNotificationChannelDefinition> NotificationChannelDefinitions { get; }
 
-        public SmtpNotificationChannel(ILogger logger, IOptions<EmailOptions> emailSettings, ITemplateProvider templates, IOptions<AuditOptions> auditSettings, ChannelWriter<Action> queue)
+        public SmtpNotificationChannel(ILogger<SmtpNotificationChannel> logger, IOptions<EmailOptions> emailSettings, ITemplateProvider templates, IOptions<AuditOptions> auditSettings, ChannelWriter<Action> queue)
             : base(logger, queue)
         {
             this.logger = logger;
@@ -74,7 +74,7 @@ namespace Lithnet.AccessManager.Server.Auditing
         {
             if (!this.emailSettings.IsConfigured)
             {
-                this.logger.Trace("SMTP is not configured, discarding mail message");
+                this.logger.LogTrace("SMTP is not configured, discarding mail message");
                 return;
             }
 
@@ -102,7 +102,7 @@ namespace Lithnet.AccessManager.Server.Auditing
 
             if (message.To.Count == 0)
             {
-                this.logger.Trace($"Not sending notification email because there are no recipients");
+                this.logger.LogTrace($"Not sending notification email because there are no recipients");
                 return;
             }
 

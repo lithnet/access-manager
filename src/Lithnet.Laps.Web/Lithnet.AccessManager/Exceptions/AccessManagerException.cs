@@ -18,6 +18,7 @@ namespace Lithnet.AccessManager
         {
         }
 
+
         public AccessManagerException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }

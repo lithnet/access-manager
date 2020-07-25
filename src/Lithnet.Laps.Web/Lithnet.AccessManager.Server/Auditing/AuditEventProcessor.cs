@@ -10,8 +10,8 @@ using Lithnet.AccessManager.Server.Exceptions;
 using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using NLog;
 using Lithnet.AccessManager.Server.Authorization;
+using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Web.Internal
 {
@@ -27,7 +27,7 @@ namespace Lithnet.AccessManager.Web.Internal
 
         private readonly AuditOptions auditSettings;
 
-        public AuditEventProcessor(ILogger logger, ITemplateProvider templates, IEnumerable<INotificationChannel> notificationChannels, IHttpContextAccessor httpContextAccessor, IOptions<AuditOptions> auditSettings)
+        public AuditEventProcessor(ILogger<AuditEventProcessor> logger, ITemplateProvider templates, IEnumerable<INotificationChannel> notificationChannels, IHttpContextAccessor httpContextAccessor, IOptions<AuditOptions> auditSettings)
         {
             this.logger = logger;
             this.templates = templates;
@@ -87,7 +87,7 @@ namespace Lithnet.AccessManager.Web.Internal
 
             message = this.ReplaceTokens(tokens, message, false);
 
-            this.logger.LogEvent(action.EventID, action.IsSuccess ? LogLevel.Info : LogLevel.Error, message, null);
+            this.logger.LogEvent(action.EventID, action.IsSuccess ? LogLevel.Information : LogLevel.Error, message, null);
         }
 
         private Dictionary<string, string> BuildTokenDictionary(AuditableAction action)

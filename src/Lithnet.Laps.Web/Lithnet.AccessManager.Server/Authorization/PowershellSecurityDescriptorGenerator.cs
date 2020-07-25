@@ -6,8 +6,8 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Extensions;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using ILogger = NLog.ILogger;
 
 namespace Lithnet.AccessManager.Server.Authorization
 {
@@ -17,9 +17,11 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         private readonly IAppPathProvider env;
 
+        private readonly NLog.ILogger nlogger = NLog.LogManager.GetCurrentClassLogger();
+
         private PowerShell powershell;
 
-        public PowerShellSecurityDescriptorGenerator(ILogger logger, IAppPathProvider env)
+        public PowerShellSecurityDescriptorGenerator(ILogger<PowerShellSecurityDescriptorGenerator> logger, IAppPathProvider env)
         {
             this.logger = logger;
             this.env = env;
@@ -68,7 +70,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                 .AddCommand("Get-JitAuthorizationResponse")
                     .AddParameter("user", user)
                     .AddParameter("computer", computer)
-                    .AddParameter("logger", logger);
+                    .AddParameter("logger", nlogger);
 
             Task<PowerShellAuthorizationResponse> task = new Task<PowerShellAuthorizationResponse>(() =>
             {
@@ -83,7 +85,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                     }
                     else
                     {
-                        this.logger.Warn($"The powerShell script returned an unsupported object of type {result.BaseObject?.GetType().FullName} to the pipeline");
+                        this.logger.LogWarning($"The powerShell script returned an unsupported object of type {result.BaseObject?.GetType().FullName} to the pipeline");
                     }
                 }
 
@@ -98,16 +100,17 @@ namespace Lithnet.AccessManager.Server.Authorization
 
             if (task.IsFaulted)
             {
-                throw task.Exception;
+                if (task.Exception != null) throw task.Exception;
+                throw new AccessManagerException("The task failed");
             }
 
             if (task.Result != null)
             {
-                this.logger.Trace($"PowerShell script returned the following AuthorizationResponse: {JsonConvert.SerializeObject(task.Result)}");
+                this.logger.LogTrace($"PowerShell script returned the following AuthorizationResponse: {JsonConvert.SerializeObject(task.Result)}");
                 return task.Result;
             }
 
-            this.logger.Warn($"The PowerShell script did not return an AuthorizationResponse");
+            this.logger.LogWarning($"The PowerShell script did not return an AuthorizationResponse");
 
             return new PowerShellAuthorizationResponse();
         }
@@ -119,7 +122,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                 .AddCommand("Get-LapsAuthorizationResponse")
                     .AddParameter("user", user)
                     .AddParameter("computer", computer)
-                    .AddParameter("logger", logger);
+                    .AddParameter("logger", nlogger);
 
             Task<PowerShellAuthorizationResponse> task = new Task<PowerShellAuthorizationResponse>(() =>
             {
@@ -134,7 +137,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                     }
                     else
                     {
-                        this.logger.Warn($"The powerShell script returned an unsupported object of type {result.BaseObject?.GetType().FullName} to the pipeline");
+                        this.logger.LogWarning($"The powerShell script returned an unsupported object of type {result.BaseObject?.GetType().FullName} to the pipeline");
                     }
                 }
 
@@ -149,16 +152,17 @@ namespace Lithnet.AccessManager.Server.Authorization
 
             if (task.IsFaulted)
             {
-                throw task.Exception;
+                if (task.Exception != null) throw task.Exception;
+                throw new AccessManagerException("The task failed");
             }
 
             if (task.Result != null)
             {
-                this.logger.Trace($"PowerShell script returned the following AuthorizationResponse: {JsonConvert.SerializeObject(task.Result)}");
+                this.logger.LogTrace($"PowerShell script returned the following AuthorizationResponse: {JsonConvert.SerializeObject(task.Result)}");
                 return task.Result;
             }
 
-            this.logger.Warn($"The PowerShell script did not return an AuthorizationResponse");
+            this.logger.LogWarning($"The PowerShell script did not return an AuthorizationResponse");
 
             return new PowerShellAuthorizationResponse();
         }
@@ -170,7 +174,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                 .AddCommand("Get-LapsHistoryAuthorizationResponse")
                     .AddParameter("user", user)
                     .AddParameter("computer", computer)
-                    .AddParameter("logger", logger);
+                    .AddParameter("logger", nlogger);
 
             Task<PowerShellAuthorizationResponse> task = new Task<PowerShellAuthorizationResponse>(() =>
             {
@@ -185,7 +189,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                     }
                     else
                     {
-                        this.logger.Warn($"The powerShell script returned an unsupported object of type {result.BaseObject?.GetType().FullName} to the pipeline");
+                        this.logger.LogWarning($"The powerShell script returned an unsupported object of type {result.BaseObject?.GetType().FullName} to the pipeline");
                     }
                 }
 
@@ -200,16 +204,17 @@ namespace Lithnet.AccessManager.Server.Authorization
 
             if (task.IsFaulted)
             {
-                throw task.Exception;
+                if (task.Exception != null) throw task.Exception;
+                throw new AccessManagerException("The task failed");
             }
 
             if (task.Result != null)
             {
-                this.logger.Trace($"PowerShell script returned the following AuthorizationResponse: {JsonConvert.SerializeObject(task.Result)}");
+                this.logger.LogTrace($"PowerShell script returned the following AuthorizationResponse: {JsonConvert.SerializeObject(task.Result)}");
                 return task.Result;
             }
 
-            this.logger.Warn($"The PowerShell script did not return an AuthorizationResponse");
+            this.logger.LogWarning($"The PowerShell script did not return an AuthorizationResponse");
 
             return new PowerShellAuthorizationResponse()
           ;
@@ -243,7 +248,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                 throw new NotSupportedException("The PowerShell script must contain a function called 'Get-JitAuthorizationResponse'");
             }
 
-            this.logger.Trace($"The PowerShell script was successfully initialized");
+            this.logger.LogTrace($"The PowerShell script was successfully initialized");
         }
     }
 }
