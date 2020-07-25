@@ -272,14 +272,10 @@ namespace Lithnet.AccessManager.Server.Test
         public void SerializeIwaAuthenticationProviderOptions()
         {
             IwaAuthenticationProviderOptions s = new IwaAuthenticationProviderOptions();
-            s.ClaimName = TestContext.CurrentContext.Random.GetString();
-            s.IdpLogout = true;
             s.AuthenticationSchemes = AuthenticationSchemes.NTLM;
 
             IwaAuthenticationProviderOptions n = JsonConvert.DeserializeObject<IwaAuthenticationProviderOptions>(JsonConvert.SerializeObject(s));
 
-            Assert.AreEqual(s.ClaimName, n.ClaimName);
-            Assert.AreEqual(s.IdpLogout, n.IdpLogout);
             Assert.AreEqual(s.AuthenticationSchemes, n.AuthenticationSchemes);
         }
 
@@ -288,7 +284,6 @@ namespace Lithnet.AccessManager.Server.Test
         {
             HttpSysHostingOptions s = new HttpSysHostingOptions();
             s.AllowSynchronousIO = true;
-            s.ClientCertificateMethod = ClientCertificateMethod.AllowRenegotation;
             s.EnableResponseCaching = true;
             s.Hostname = TestContext.CurrentContext.Random.GetString();
             s.Http503Verbosity = Http503VerbosityLevel.Full;
@@ -304,7 +299,6 @@ namespace Lithnet.AccessManager.Server.Test
             HttpSysHostingOptions n = JsonConvert.DeserializeObject<HttpSysHostingOptions>(JsonConvert.SerializeObject(s));
 
             Assert.AreEqual(s.AllowSynchronousIO, n.AllowSynchronousIO);
-            Assert.AreEqual(s.ClientCertificateMethod, n.ClientCertificateMethod);
             Assert.AreEqual(s.EnableResponseCaching, n.EnableResponseCaching);
             Assert.AreEqual(s.Hostname, n.Hostname);
             Assert.AreEqual(s.Http503Verbosity, n.Http503Verbosity);

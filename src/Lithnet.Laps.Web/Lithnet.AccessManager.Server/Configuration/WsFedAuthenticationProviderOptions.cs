@@ -8,8 +8,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public string Realm { get; set; }
 
-        public override string ClaimName { get; set; } = ClaimTypes.Upn;
+        public string ClaimName { get; set; } = ClaimTypes.Upn;
 
-        public override bool IdpLogout { get; set; }
+        public bool IdpLogout { get; set; }
     }
 }

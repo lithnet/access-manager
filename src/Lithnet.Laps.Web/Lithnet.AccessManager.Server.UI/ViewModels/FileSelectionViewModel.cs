@@ -77,7 +77,7 @@ namespace Lithnet.AccessManager.Server.UI
             openFileDialog.CheckPathExists = true;
             openFileDialog.DefaultExt = this.DefaultFileExtension;
             openFileDialog.DereferenceLinks = true;
-            openFileDialog.Filter = this.Filter; ;
+            openFileDialog.Filter = this.Filter;
             openFileDialog.Multiselect = false;
 
             if (!string.IsNullOrWhiteSpace(this.File))

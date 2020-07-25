@@ -5,14 +5,15 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:s="https://github.com/canton7/Stylet"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" Margin="5">
+             d:DesignHeight="800" d:DesignWidth="800" Margin="5">
     <StackPanel>
         <Label Style="{DynamicResource DescriptionHeaderStyle}" 
                Content="Authentication Provider Setup"/>
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="15*" MinWidth="110"/>
+                <ColumnDefinition Width="15*" MinWidth="150"/>
                 <ColumnDefinition Width="85*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -38,7 +39,7 @@
 
         <Grid Visibility="{Binding Path=IwaVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="15*" MinWidth="110"/>
+                <ColumnDefinition Width="15*" MinWidth="150"/>
                 <ColumnDefinition Width="85*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -58,7 +59,7 @@
 
         <Grid  Visibility="{Binding Path=OidcVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="15*" MinWidth="110"/>
+                <ColumnDefinition Width="15*" MinWidth="150"/>
                 <ColumnDefinition Width="85*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -101,7 +102,7 @@
 
         <Grid Visibility="{Binding Path=WsFedVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="15*" MinWidth="110"/>
+                <ColumnDefinition Width="15*" MinWidth="150"/>
                 <ColumnDefinition Width="85*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -125,5 +126,113 @@
                              Text="{Binding WsFedRealm, UpdateSourceTrigger=PropertyChanged}" 
                              Margin="5"/>
         </Grid>
+
+        <Grid Visibility="{Binding Path=CertificateVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="15*" MinWidth="150"/>
+                <ColumnDefinition Width="85*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <CheckBox Grid.Row="0" Grid.Column="1"
+                      IsChecked="{Binding RequireSmartCardEku}"
+                      Margin="5"
+                      Content="Require 'Smart Card Logon' extended key usage (1.3.6.1.4.1.311.20.2.2)"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" 
+                       TextWrapping="Wrap"
+                   Text="Additional mandatory EKUs"
+                   Margin="10 5 5 5"/>
+
+            <ListBox Grid.Row="1" Grid.Column="1" 
+                     ItemsSource="{Binding RequiredEkus, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" 
+                     SelectedItem="{Binding SelectedEku}" 
+                     Height="100"
+                     BorderThickness="1"
+                     BorderBrush="{DynamicResource MahApps.Brushes.Control.Border}"
+                     Margin="5"/>
+
+            <Grid Grid.Row="2" Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="75"/>
+                    <ColumnDefinition Width="75"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <TextBox Grid.Column="0" 
+                         Text="{Binding NewEku, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
+                         IsEnabled="{Binding ValidateSpecificEku}"
+                         Margin="5"/>
+                <Button Grid.Column="1" 
+                        Command="{s:Action AddEku}"
+                        IsEnabled="{Binding ValidateSpecificEku}"
+                        Content="Add" 
+                        Margin="5"/>
+                <Button Grid.Column="2" 
+                        Command="{s:Action RemoveEku}" 
+                        IsEnabled="{Binding ValidateSpecificEku}"
+                        Content="Remove"
+                        Margin="5"/>
+            </Grid>
+
+
+            <TextBlock Grid.Row="3" Grid.Column="0" 
+                       TextWrapping="Wrap"
+                       Text="Certificate issuer validation"
+                       Margin="10 5 5 5"/>
+            <StackPanel Grid.Row="3" Grid.Column="1">
+                <RadioButton IsChecked="{Binding ValidateAnyTrustedIssuer}"
+                          Margin="5"
+                          Content="Trust any certificate issuer trusted by this machine"/>
+                <RadioButton IsChecked="{Binding ValidateToNTAuth}"
+                          Margin="5"
+                          Content="Trust only Enterprise CAs registered in this domain's 'NTAuth' store"/>
+                <RadioButton IsChecked="{Binding ValidateSpecificIssuer}"
+                             Margin="5"
+                             Content="Trust only these specific issuers"/>
+            </StackPanel>
+            <Label Grid.Row="4" Grid.Column="0" 
+                   Content="Trusted issuers"
+                   Margin="5"/>
+
+            <ListBox Grid.Row="4" Grid.Column="1" 
+                     ItemsSource="{Binding TrustedIssuers, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" 
+                     SelectedItem="{Binding SelectedIssuer}" 
+                     IsEnabled="{Binding ValidateSpecificIssuer}"
+                     DisplayMemberPath="Subject"
+                     Height="100"
+                     BorderThickness="1"
+                     BorderBrush="{DynamicResource MahApps.Brushes.Control.Border}"
+                     Margin="5"/>
+
+            <StackPanel Grid.Row="5" Grid.Column="1"
+                        Orientation="Horizontal" 
+                        HorizontalAlignment="Right">
+
+                <Button 
+                        Command="{s:Action AddIssuer}"
+                        IsEnabled="{Binding ValidateSpecificIssuer}"
+                        Width="75"
+                        Content="Import..." 
+                        Margin="5"/>
+                <Button 
+                        Command="{s:Action RemoveIssuer}" 
+                        IsEnabled="{Binding ValidateSpecificIssuer}"
+                        Width="75"
+                        Content="Remove"
+                        Margin="5"/>
+            </StackPanel>
+        </Grid>
+
     </StackPanel>
 </UserControl>

@@ -1,20 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Security.Claims;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Lithnet.AccessManager.Server.Configuration
 {
     public class CertificateAuthenticationProviderOptions : AuthenticationProviderOptions
     {
-        public override string ClaimName { get; set; } = ClaimTypes.PrimarySid;
+        public List<string> RequiredEkus { get; set; } = new List<string>();
 
-        public override bool IdpLogout { get; set; } = false;
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ClientCertificateValidationMethod ValidationMethod { get; set; } = ClientCertificateValidationMethod.NtAuthStore;
 
-        public string RequiredCustomEku { get; set; }
+        public bool RequireSmartCardLogonEku { get; set; } = true;
 
-        public bool MustValidateToNTAuth { get; set; }
-
-        public bool RequireSmartCardLogonEku { get; set; }
-
-        public List<string> IssuerThumbprints { get; set; }
+        public List<string> TrustedIssuers { get; set; } = new List<string>();
     }
 }

@@ -80,6 +80,9 @@
                 <ListBox Grid.Row="5" Grid.Column="1" 
                          ItemsSource="{Binding EmailAddresses, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}" 
                          SelectedItem="{Binding SelectedRecipient}" 
+                         Height="100"
+                         BorderThickness="1"
+                         BorderBrush="{DynamicResource MahApps.Brushes.Control.Border}"
                          Margin="5"/>
 
                 <Grid Grid.Row="6" Grid.Column="1">

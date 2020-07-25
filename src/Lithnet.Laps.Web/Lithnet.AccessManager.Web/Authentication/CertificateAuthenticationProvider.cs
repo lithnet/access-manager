@@ -160,7 +160,7 @@ namespace Lithnet.AccessManager.Web.AppSettings
 
         private bool ValidateNtAuthStore(X509Chain chain)
         {
-            if (!this.options.MustValidateToNTAuth)
+            if (this.options.ValidationMethod !=  ClientCertificateValidationMethod.NtAuthStore)
             {
                 return true;
             }
@@ -193,9 +193,12 @@ namespace Lithnet.AccessManager.Web.AppSettings
                 chainPolicy.ApplicationPolicy.Add(smartCardOid);
             }
 
-            if (!string.IsNullOrWhiteSpace(this.options.RequiredCustomEku))
+            if (this.options.RequiredEkus?.Count > 0)
             {
-                chainPolicy.ApplicationPolicy.Add(new Oid(this.options.RequiredCustomEku));
+                foreach (var eku in this.options.RequiredEkus)
+                {
+                    chainPolicy.ApplicationPolicy.Add(new Oid(eku));
+                }
             }
 
             return chainPolicy;
@@ -203,21 +206,38 @@ namespace Lithnet.AccessManager.Web.AppSettings
 
         private bool ValidateIssuer(X509Chain chain)
         {
-            if (this.options.IssuerThumbprints == null || this.options.IssuerThumbprints.Count == 0)
+            if (this.options.ValidationMethod != ClientCertificateValidationMethod.SpecificIssuer)
             {
                 return true;
             }
 
-            foreach (var issuer in this.options.IssuerThumbprints)
+            if (this.options.TrustedIssuers == null || this.options.TrustedIssuers.Count == 0)
             {
-                foreach (var item in chain.ChainElements)
+                return false;
+            }
+
+            int count = 0;
+
+            foreach (var issuerEncoded in this.options.TrustedIssuers)
+            {
+                count++;
+
+                try
                 {
-                    if (string.Equals(item.Certificate.Thumbprint, issuer, StringComparison.OrdinalIgnoreCase))
+                    X509Certificate2 issuer = new X509Certificate2(Convert.FromBase64String(issuerEncoded));
+
+                    foreach (var item in chain.ChainElements)
                     {
-                        return true;
+                        if (string.Equals(item.Certificate.Thumbprint, issuer.Thumbprint, StringComparison.OrdinalIgnoreCase))
+                        {
+                            return true;
+                        }
                     }
                 }
-
+                catch(Exception ex)
+                {
+                    this.logger.LogError(ex, $"Unable to parse trusted issuer certificate at index {count}");
+                }
             }
 
             return false;
