@@ -11,5 +11,7 @@ namespace Lithnet.AccessManager.Server.Configuration
         public int? FullSyncInterval { get; set; }
 
         public int? DeltaSyncInterval { get; set; }
+
+        public IList<JitDynamicGroupMapping> DynamicGroupMappings { get; set; } = new List<JitDynamicGroupMapping>();
     }
 }

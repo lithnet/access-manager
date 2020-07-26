@@ -47,7 +47,7 @@ namespace Lithnet.AccessManager.Web
             services.TryAddScoped<ITemplateProvider, TemplateProvider>();
             services.TryAddScoped<IRateLimiter, RateLimiter>();
             services.TryAddScoped<IAceEvaluator, AceEvaluator>();
-            services.TryAddScoped<IJitProvider, AdGroupJitProvider>();
+            services.TryAddScoped<IJitAccessProvider, JitAccessProvider>();
             services.TryAddScoped<IPhoneticPasswordTextProvider, PhoneticStringProvider>();
             services.TryAddScoped<IHtmlPasswordProvider, HtmlPasswordProvider>();
             services.TryAddScoped<ILithnetAdminPasswordProvider, LithnetAdminPasswordProvider>();

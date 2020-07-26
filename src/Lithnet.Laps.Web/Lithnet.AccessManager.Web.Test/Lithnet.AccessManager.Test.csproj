@@ -9,10 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="NLog.config" />
     <None Remove="TestFiles\DigiCertGlobalRootG3.crt" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="TestFiles\DigiCertGlobalRootG3.crt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

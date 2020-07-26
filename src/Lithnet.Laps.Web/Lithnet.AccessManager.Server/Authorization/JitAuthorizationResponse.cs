@@ -15,6 +15,8 @@ namespace Lithnet.AccessManager.Server.Authorization
         /// </summary>
         public string AuthorizingGroup { get; set; }
 
+        public bool AllowExtension { get; set; }
+
         public override AccessMask EvaluatedAccess { get => AccessMask.Jit; }
     }
 }

@@ -137,7 +137,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                 response = new JitAuthorizationResponse()
                 {
                     ExpireAfter = j.Jit.ExpireAfter,
-                    AuthorizingGroup = this.jitResolver.GetJitGroup(computer, j.Jit.AuthorizingGroup).MsDsPrincipalName
+                    AuthorizingGroup = this.jitResolver.GetJitGroup(computer, j.Jit.AuthorizingGroup).MsDsPrincipalName,
                 };
             }
             else
@@ -173,7 +173,7 @@ namespace Lithnet.AccessManager.Server.Authorization
         {
             List<SecurityDescriptorTarget> matchingTargets = new List<SecurityDescriptorTarget>();
 
-            foreach (var target in this.options.Targets.OrderBy(t => (int)t.Type))
+            foreach (var target in this.options.Targets.OrderBy(t => (int)t.Type).ThenByDescending(t => t.Id.Length))
             {
                 try
                 {

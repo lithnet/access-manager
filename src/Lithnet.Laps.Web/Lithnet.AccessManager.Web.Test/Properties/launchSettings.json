@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Lithnet.AccessManager.Test": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

@@ -14,7 +14,7 @@ namespace Lithnet.AccessManager
 
         string GetDomainNameNetBiosFromSid(SecurityIdentifier sid);
 
-        void CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl);
+        IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl);
 
         IComputer GetComputer(string name);
 

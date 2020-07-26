@@ -31,10 +31,11 @@ namespace Lithnet.AccessManager.Web.Controllers
         private readonly UserInterfaceOptions userInterfaceSettings;
         private readonly IAuthenticationProvider authenticationProvider;
         private readonly IPasswordProvider passwordProvider;
-        private readonly IJitProvider jitProvider;
+
+        private readonly IJitAccessProvider jitAccessProvider;
 
         public LapController(IAuthorizationService authorizationService, ILogger<LapController> logger, IDirectory directory,
-            IAuditEventProcessor reporting, IRateLimiter rateLimiter, IOptions<UserInterfaceOptions> userInterfaceSettings, IAuthenticationProvider authenticationProvider, IPasswordProvider passwordProvider, IJitProvider jitProvider)
+            IAuditEventProcessor reporting, IRateLimiter rateLimiter, IOptions<UserInterfaceOptions> userInterfaceSettings, IAuthenticationProvider authenticationProvider, IPasswordProvider passwordProvider, IJitAccessProvider jitAccessProvider)
         {
             this.authorizationService = authorizationService;
             this.logger = logger;
@@ -44,7 +45,7 @@ namespace Lithnet.AccessManager.Web.Controllers
             this.userInterfaceSettings = userInterfaceSettings.Value;
             this.authenticationProvider = authenticationProvider;
             this.passwordProvider = passwordProvider;
-            this.jitProvider = jitProvider;
+            this.jitAccessProvider = jitAccessProvider;
         }
 
         public IActionResult Get()
@@ -198,21 +199,39 @@ namespace Lithnet.AccessManager.Web.Controllers
 
         private IActionResult GrantJitAccess(LapRequestModel model, IUser user, IComputer computer, JitAuthorizationResponse authResponse)
         {
-            this.jitProvider.GrantJitAccess(computer, this.directory.GetGroup(authResponse.AuthorizingGroup), user, authResponse.ExpireAfter);
+            TimeSpan grantedAccessLength = this.jitAccessProvider.GrantJitAccess(this.directory.GetGroup(authResponse.AuthorizingGroup), user, authResponse.AllowExtension, authResponse.ExpireAfter, out Action undo);
 
-            DateTime expiryDate = DateTime.Now.Add(authResponse.ExpireAfter);
+            DateTime expiryDate = DateTime.Now.Add(grantedAccessLength);
 
-            this.reporting.GenerateAuditEvent(new AuditableAction
+            try
             {
-                AuthzResponse = authResponse,
-                RequestedComputerName = model.ComputerName,
-                RequestReason = model.UserRequestReason,
-                IsSuccess = true,
-                User = user,
-                Computer = computer,
-                EventID = EventIDs.JitGranted,
-                ComputerExpiryDate = expiryDate.ToString()
-            });
+                this.reporting.GenerateAuditEvent(new AuditableAction
+                {
+                    AuthzResponse = authResponse,
+                    RequestedComputerName = model.ComputerName,
+                    RequestReason = model.UserRequestReason,
+                    IsSuccess = true,
+                    User = user,
+                    Computer = computer,
+                    EventID = EventIDs.JitGranted,
+                    ComputerExpiryDate = expiryDate.ToString(CultureInfo.CurrentCulture)
+                });
+            }
+            catch
+            {
+                this.logger.LogWarning("Rolling back JIT access due to exception in audit process");
+
+                try
+                {
+                    undo();
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(ex, "Unable to rollback JIT access");
+                }
+
+                throw;
+            }
 
             var jitDetails = new JitDetailsModel(computer.MsDsPrincipalName, user.MsDsPrincipalName, expiryDate);
 

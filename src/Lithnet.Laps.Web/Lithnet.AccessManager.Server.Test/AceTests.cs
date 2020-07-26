@@ -114,7 +114,7 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase("extdev1\\G-UG-3", "extdev1\\user3")]
         public void TestAceMatch(string acePrincipal, string requestor)
         {
-            ActiveDirectory d = new  ActiveDirectory();
+            ActiveDirectory d = new ActiveDirectory();
             Assert.IsTrue(this.IsMatch(acePrincipal, requestor, null));
         }
 
@@ -169,8 +169,8 @@ namespace Lithnet.AccessManager.Server.Test
             }
 
             AuthorizationContext c = new AuthorizationContext(user.Sid, serverName);
-            
-            return c.AccessCheck(sd, (int) AccessMask.Jit);
+
+            return c.AccessCheck(sd, (int)AccessMask.Jit);
         }
     }
 }

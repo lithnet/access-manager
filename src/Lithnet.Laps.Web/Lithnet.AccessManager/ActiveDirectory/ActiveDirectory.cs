@@ -173,7 +173,7 @@ namespace Lithnet.AccessManager
             return NativeMethods.CrackNames(nameFormat, requiredFormat, name, dnsDomainName).Name;
         }
 
-        public void CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl)
+        public IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl)
         {
             DirectoryEntry container = new DirectoryEntry($"LDAP://{ou}");
             dynamic[] objectClasses = new dynamic[] { "dynamicObject", "group" };
@@ -187,6 +187,8 @@ namespace Lithnet.AccessManager
             group.Properties["groupType"].Add(-2147483644);
             group.Properties["entryTTL"].Add((int)ttl.TotalSeconds);
             group.CommitChanges();
+
+            return new ActiveDirectoryGroup(group);
         }
 
         public bool IsPamFeatureEnabled(SecurityIdentifier domainSid)
@@ -217,7 +219,7 @@ namespace Lithnet.AccessManager
             return result;
         }
 
-        private string GetContextDn(string contextName, string dnsDomain)
+        internal string GetContextDn(string contextName, string dnsDomain)
         {
             var rootDse = new DirectoryEntry($"LDAP://{dnsDomain}/rootDSE");
 
