@@ -3,12 +3,45 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using Lithnet.AccessManager.Server.Configuration;
 
 namespace Lithnet.AccessManager.Server.Extensions
 {
     public static class Extensions
     {
+        public static string GetSecret(this EncryptedData data)
+        {
+            try
+            {
+                if (data?.Data == null)
+                {
+                    return null;
+                }
+
+                if (data.Mode == 0)
+                {
+                    return data.Data;
+                }
+
+                if (data.Mode != 1)
+                {
+                    throw new ConfigurationException("The data was protected with an encryption mechanism not known to this version of the application");
+                }
+
+                byte[] salt = Convert.FromBase64String(data.Salt);
+                byte[] protectedData = Convert.FromBase64String(data.Data);
+                byte[] unprotectedData = ProtectedData.Unprotect(protectedData, salt, DataProtectionScope.LocalMachine);
+
+                return Encoding.UTF8.GetString(unprotectedData);
+            }
+            catch (Exception ex)
+            {
+                throw new ConfigurationException("Unable to decrypt the encrypted data from the configuration file. Use the configuration manager application to re-enter the secret, and try again", ex);
+            }
+        }
+
         public static void ValidateAccessMask(this AccessMask requestedAccess)
         {
             if (requestedAccess == 0)

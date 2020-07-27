@@ -118,33 +118,13 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         private NetworkCredential GetCredentials()
         {
-            try
+
+            if (!this.emailSettings.UseDefaultCredentials && !string.IsNullOrWhiteSpace(this.emailSettings.Username))
             {
-                if (!this.emailSettings.UseDefaultCredentials && !string.IsNullOrWhiteSpace(this.emailSettings.Username))
-                {
-                    return null;
-                }
-
-                if (this.emailSettings.Password?.Data == null)
-                {
-                    return new NetworkCredential(this.emailSettings.Username, (string)null);
-                }
-
-                if (!this.emailSettings.Password.IsEncrypted)
-                {
-                    return new NetworkCredential(this.emailSettings.Username, this.emailSettings.Password.Data);
-                }
-
-                byte[] salt = Convert.FromBase64String(this.emailSettings.Password.Salt);
-                byte[] protectedData = Convert.FromBase64String(this.emailSettings.Password.Data);
-                byte[] unprotectedData = ProtectedData.Unprotect(protectedData, salt, DataProtectionScope.LocalMachine);
-
-                return new NetworkCredential(this.emailSettings.Username, Encoding.UTF8.GetString(unprotectedData));
+                return null;
             }
-            catch (Exception ex)
-            {
-                throw new ConfigurationException("Unable to obtain the SMTP credentials from the configuration file. Use the configuration manager application to re-enter the password, and try again", ex);
-            }
+
+            return new NetworkCredential(this.emailSettings.Username, this.emailSettings.Password?.GetSecret());
         }
     }
 }

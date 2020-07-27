@@ -54,8 +54,8 @@ namespace Lithnet.AccessManager.Server.UI
                     }
 
                     this.model.Password = new EncryptedData();
-                    this.model.Password.IsEncrypted = true;
-                    byte[] salt = new byte[64];
+                    this.model.Password.Mode = 1;
+                    byte[] salt = new byte[128];
                     rng.GetBytes(salt);
                     this.model.Password.Salt = Convert.ToBase64String(salt);
                     this.model.Password.Data = Convert.ToBase64String(ProtectedData.Protect(Encoding.UTF8.GetBytes(value), null, DataProtectionScope.LocalMachine));

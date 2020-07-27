@@ -94,6 +94,7 @@
                            Content="Secret"
                            Margin="5"/>
             <PasswordBox Grid.Row="2" Grid.Column="1" 
+                         GotFocus="{s:Action OidcSecretFocus}"
                                  local:PasswordBoxBindingHelper.BindPassword="True"
                                  local:PasswordBoxBindingHelper.BoundPassword="{Binding Path=OidcSecret, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  Margin="5"/>

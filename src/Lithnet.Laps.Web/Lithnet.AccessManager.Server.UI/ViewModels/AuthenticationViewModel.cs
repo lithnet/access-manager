@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Lithnet.AccessManager.Server.Configuration;
@@ -22,13 +24,15 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IX509Certificate2ViewModelFactory x509ViewModelFactory;
         private readonly ILogger logger;
+        private readonly RandomNumberGenerator rng;
 
-        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifiableEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory)
+        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifiableEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, RandomNumberGenerator rng)
         {
             this.model = model;
             this.dialogCoordinator = dialogCoordinator;
             this.x509ViewModelFactory = x509ViewModelFactory;
             this.logger = logger;
+            this.rng = rng;
 
             model.Iwa ??= new IwaAuthenticationProviderOptions();
             model.Oidc ??= new OidcAuthenticationProviderOptions();
@@ -102,7 +106,33 @@ namespace Lithnet.AccessManager.Server.UI
         public string OidcClientID { get => this.model.Oidc.ClientID; set => this.model.Oidc.ClientID = value; }
 
         [NotifiableProperty]
-        public string OidcSecret { get => this.model.Oidc.Secret; set => this.model.Oidc.Secret = value; }
+        public string OidcSecret
+        {
+            get => this.model.Oidc.Secret?.Data == null ? null : "-placeholder-";
+            set
+            {
+                if (value != "-placeholder-")
+                {
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        this.model.Oidc.Secret = null;
+                        return;
+                    }
+
+                    this.model.Oidc.Secret = new EncryptedData();
+                    this.model.Oidc.Secret.Mode = 1;
+                    byte[] salt = new byte[128];
+                    rng.GetBytes(salt);
+                    this.model.Oidc.Secret.Salt = Convert.ToBase64String(salt);
+                    this.model.Oidc.Secret.Data = Convert.ToBase64String(ProtectedData.Protect(Encoding.UTF8.GetBytes(value), null, DataProtectionScope.LocalMachine));
+                }
+            }
+        }
+
+        public void OidcSecretFocus()
+        {
+            this.OidcSecret = null;
+        }
 
         [NotifiableProperty]
         public string WsFedRealm { get => this.model.WsFed.Realm; set => this.model.WsFed.Realm = value; }

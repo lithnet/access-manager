@@ -12,7 +12,7 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public string ResponseType { get; set; } = OpenIdConnectResponseType.CodeIdToken;
 
-        public string Secret { get; set; }
+        public EncryptedData Secret { get; set; }
 
         public string ClaimName { get; set; } = ClaimTypes.Upn;
 

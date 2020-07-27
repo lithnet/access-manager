@@ -1,4 +1,9 @@
-﻿using Lithnet.AccessManager.Server.Configuration;
+﻿using System;
+using System.Net;
+using System.Security.Cryptography;
+using System.Text;
+using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
@@ -26,49 +31,49 @@ namespace Lithnet.AccessManager.Web.AppSettings
 
         public override void Configure(IServiceCollection services)
         {
-            services.AddAuthentication(options =>
+            services.AddAuthentication(authenticationOptions =>
             {
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                authenticationOptions.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                authenticationOptions.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                authenticationOptions.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
-             .AddOpenIdConnect("laps", options =>
+             .AddOpenIdConnect("laps", openIdConnectOptions =>
              {
-                 options.Authority = this.options.Authority;
-                 options.ClientId = this.options.ClientID;
-                 options.ClientSecret = this.options.Secret;
-                 options.CallbackPath = "/auth";
-                 options.SignedOutCallbackPath = "/auth/logout";
-                 options.SignedOutRedirectUri = "/Home/LoggedOut";
-                 options.ResponseType = this.options.ResponseType;
-                 options.SaveTokens = true;
-                 options.GetClaimsFromUserInfoEndpoint = true;
-                 options.UseTokenLifetime = true;
-                 options.Events = new OpenIdConnectEvents()
+                 openIdConnectOptions.Authority = this.options.Authority;
+                 openIdConnectOptions.ClientId = this.options.ClientID;
+                 openIdConnectOptions.ClientSecret = this.options.Secret?.GetSecret();
+                 openIdConnectOptions.CallbackPath = "/auth";
+                 openIdConnectOptions.SignedOutCallbackPath = "/auth/logout";
+                 openIdConnectOptions.SignedOutRedirectUri = "/Home/LoggedOut";
+                 openIdConnectOptions.ResponseType = this.options.ResponseType;
+                 openIdConnectOptions.SaveTokens = true;
+                 openIdConnectOptions.GetClaimsFromUserInfoEndpoint = true;
+                 openIdConnectOptions.UseTokenLifetime = true;
+                 openIdConnectOptions.Events = new OpenIdConnectEvents()
                  {
                      OnTokenValidated = this.FindClaimIdentityInDirectoryOrFail,
                      OnRemoteFailure = this.HandleRemoteFailure,
                      OnAccessDenied = this.HandleAuthNFailed,
                  };
 
-                 options.Scope.Clear();
+                 openIdConnectOptions.Scope.Clear();
                  if (this.options?.Scopes.Count == 0)
                  {
-                     options.Scope.Add("openid");
-                     options.Scope.Add("profile");
+                     openIdConnectOptions.Scope.Add("openid");
+                     openIdConnectOptions.Scope.Add("profile");
                  }
                  else
                  {
                      foreach (var scope in this.options.Scopes)
                      {
-                         options.Scope.Add(scope);
+                         openIdConnectOptions.Scope.Add(scope);
                      }
                  }
              })
-             .AddCookie(options =>
+             .AddCookie(cookieAuthenticationOptions =>
              {
-                 options.LoginPath = "/Home/Login";
-                 options.LogoutPath = "/Home/Logout";
+                 cookieAuthenticationOptions.LoginPath = "/Home/Login";
+                 cookieAuthenticationOptions.LogoutPath = "/Home/Logout";
              });
         }
     }
