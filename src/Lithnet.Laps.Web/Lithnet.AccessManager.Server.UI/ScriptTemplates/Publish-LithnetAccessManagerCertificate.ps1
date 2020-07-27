@@ -20,6 +20,8 @@ $publicKeyObjectName = "AccessManagerConfig";
 $servicesContainerDN = "CN=Services,{configurationNamingContext}";
 $lithnetContainerDN = "CN=$lithnetContainerName,$servicesContainerDN";
 $keyContainerDN = "CN=$publicKeyObjectName,$lithnetContainerDN";
+$forest = "{forest}"
+$server = (Get-ADDomainController -DomainName $forest -Discover -ForceDiscover -Writable).HostName[0]
 
 $certificateContent = @"
 {certificateData}
@@ -32,27 +34,27 @@ $certBytes = [System.Convert]::FromBase64String($certificateContent);
 try
 {
     Write-Information "Attempting to get container $lithnetContainerDN";
-    $object = Get-ADObject $lithnetContainerDN;
+    $object = Get-ADObject $lithnetContainerDN -Server $server;
     Write-Information "Found container in directory $lithnetContainerDN";
 }
 catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException]
 {
     Write-Warning "$lithnetContainerDN doesn't exist. Creating"
-    New-ADObject -Name $lithnetContainerName -Path $servicesContainerDN -Type "container"
+    New-ADObject -Name $lithnetContainerName -Path $servicesContainerDN -Type "container" -Server $server
     Write-Information "Created container $keyContainerDN";
 }
 
 try
 {
     Write-Information "Attempting to get public key container $keyContainerDN";
-    $object = Get-ADObject $keyContainerDN;
+    $object = Get-ADObject $keyContainerDN -Server $server;
     Write-Information "Found public key container $keyContainerDN";
-    Set-ADObject -Identity $keyContainerDN -Replace @{"caCertificate"=$certBytes}
+    Set-ADObject -Identity $keyContainerDN -Replace @{"caCertificate"=$certBytes} -Server $server
     Write-Information "Successfully published certificate to directory";
 }
 catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException]
 {
     Write-Warning "$publicKeyObjectName doesn't exist. Creating"
-    New-ADObject -Name $publicKeyObjectName -Path $lithnetContainerDN -Type "lithnetAccessManagerConfig" -OtherAttributes @{"appSchemaVersion"="1"; "caCertificate"=$certBytes}
+    New-ADObject -Name $publicKeyObjectName -Path $lithnetContainerDN -Type "lithnetAccessManagerConfig" -OtherAttributes @{"appSchemaVersion"="1"; "caCertificate"=$certBytes} -Server $server
     Write-Information "Created Public key container $keyContainerDN";
 }

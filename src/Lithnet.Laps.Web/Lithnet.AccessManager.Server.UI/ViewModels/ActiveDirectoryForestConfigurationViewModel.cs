@@ -108,6 +108,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 HelpText = "Run the following script as an account that is a member of the 'Schema Admins' group",
                 ScriptText = ScriptTemplates.UpdateAdSchemaTemplate
+                    .Replace("{forest}", this.Forest.Name)
             };
 
             ExternalDialogWindow w = new ExternalDialogWindow

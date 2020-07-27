@@ -103,6 +103,7 @@ namespace Lithnet.AccessManager.Server.UI
                 ScriptText = ScriptTemplates.PublishCertificateTemplate
                     .Replace("{configurationNamingContext}", de.GetPropertyString("distinguishedName"))
                     .Replace("{certificateData}", certData)
+                    .Replace("{forest}", this.SelectedForest.Name)
             };
 
             ExternalDialogWindow w = new ExternalDialogWindow

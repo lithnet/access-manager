@@ -292,11 +292,10 @@ namespace Lithnet.AccessManager.Server.UI {
         ///$ErrorActionPreference = &quot;Stop&quot;
         ///$InformationPreference = &quot;Continue&quot;
         ///
-        ///Import-Module ActiveDirectory    
-        ///    
-        ///$rootDSE = Get-ADRootDSE
-        ///$schemaNC = $rootDSE.schemaNamingContext
-        ///$schemaMaster = Get-ADObject $schemaNC [rest of string was truncated]&quot;;.
+        ///Import-Module ActiveDirectory
+        ///
+        ///$forest = &quot;{forest}&quot;
+        ///$server = (Get-ADDomainController -DomainName $forest -Discover -ForceDiscover -Writable).Ho [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string UpdateAdSchemaTemplate {
             get {

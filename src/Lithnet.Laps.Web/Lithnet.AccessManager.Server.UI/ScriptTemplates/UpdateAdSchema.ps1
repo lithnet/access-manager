@@ -11,10 +11,12 @@ $ErrorActionPreference = "Stop"
 $InformationPreference = "Continue"
 
 Import-Module ActiveDirectory
-    
-$rootDSE = Get-ADRootDSE
+
+$forest = "{forest}"
+$server = (Get-ADDomainController -DomainName $forest -Discover -ForceDiscover -Writable).HostName[0]
+$rootDSE = Get-ADRootDSE -Server $server
 $schemaNC = $rootDSE.schemaNamingContext
-$schemaMaster = Get-ADObject $schemaNC -Properties fSMORoleOwner | Get-ADDomainController -Identity { $_.fSMORoleOwner }
+$schemaMaster = Get-ADObject $schemaNC -Properties fSMORoleOwner -server $server | Get-ADDomainController -Identity { $_.fSMORoleOwner } -Server $server
 $schemaMasterRootDse = [ADSI]::new("LDAP://$($schemaMaster.HostName)/RootDSE")
 
 if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&(ldapDisplayName=lithnetAdminPassword)(objectclass=attributeSchema))"))
