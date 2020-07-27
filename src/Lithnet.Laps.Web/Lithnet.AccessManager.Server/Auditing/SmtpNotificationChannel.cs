@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Mail;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading.Channels;
 using HtmlAgilityPack;
 using Lithnet.AccessManager.Server.App_LocalResources;
@@ -20,14 +23,17 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         private readonly ITemplateProvider templates;
 
+        private readonly RandomNumberGenerator rng;
+
         public override string Name => "smtp";
 
         protected override IList<SmtpNotificationChannelDefinition> NotificationChannelDefinitions { get; }
 
-        public SmtpNotificationChannel(ILogger<SmtpNotificationChannel> logger, IOptions<EmailOptions> emailSettings, ITemplateProvider templates, IOptions<AuditOptions> auditSettings, ChannelWriter<Action> queue)
+        public SmtpNotificationChannel(ILogger<SmtpNotificationChannel> logger, IOptions<EmailOptions> emailSettings, ITemplateProvider templates, IOptions<AuditOptions> auditSettings, ChannelWriter<Action> queue, RandomNumberGenerator rng)
             : base(logger, queue)
         {
             this.logger = logger;
+            this.rng = rng;
             this.emailSettings = emailSettings.Value;
             this.templates = templates;
             this.NotificationChannelDefinitions = auditSettings.Value.NotificationChannels.Smtp;
@@ -78,17 +84,15 @@ namespace Lithnet.AccessManager.Server.Auditing
                 return;
             }
 
-            using SmtpClient client = new SmtpClient(this.emailSettings.Host, this.emailSettings.Port)
+            using SmtpClient client = new SmtpClient()
             {
+                Host = this.emailSettings.Host,
+                Port = this.emailSettings.Port,
                 UseDefaultCredentials = this.emailSettings.UseDefaultCredentials,
                 DeliveryMethod = SmtpDeliveryMethod.Network,
-                EnableSsl = this.emailSettings.UseSsl
+                EnableSsl = this.emailSettings.UseSsl,
+                Credentials = this.GetCredentials()
             };
-
-            if (!this.emailSettings.UseDefaultCredentials && !string.IsNullOrWhiteSpace(this.emailSettings.Username))
-            {
-                client.Credentials = new NetworkCredential(this.emailSettings.Username, this.emailSettings.Password);
-            }
 
             using MailMessage message = new MailMessage
             {
@@ -110,6 +114,37 @@ namespace Lithnet.AccessManager.Server.Auditing
             message.Subject = subject;
             message.Body = body;
             client.Send(message);
+        }
+
+        private NetworkCredential GetCredentials()
+        {
+            try
+            {
+                if (!this.emailSettings.UseDefaultCredentials && !string.IsNullOrWhiteSpace(this.emailSettings.Username))
+                {
+                    return null;
+                }
+
+                if (this.emailSettings.Password?.Data == null)
+                {
+                    return new NetworkCredential(this.emailSettings.Username, (string)null);
+                }
+
+                if (!this.emailSettings.Password.IsEncrypted)
+                {
+                    return new NetworkCredential(this.emailSettings.Username, this.emailSettings.Password.Data);
+                }
+
+                byte[] salt = Convert.FromBase64String(this.emailSettings.Password.Salt);
+                byte[] protectedData = Convert.FromBase64String(this.emailSettings.Password.Data);
+                byte[] unprotectedData = ProtectedData.Unprotect(protectedData, salt, DataProtectionScope.LocalMachine);
+
+                return new NetworkCredential(this.emailSettings.Username, Encoding.UTF8.GetString(unprotectedData));
+            }
+            catch (Exception ex)
+            {
+                throw new ConfigurationException("Unable to obtain the SMTP credentials from the configuration file. Use the configuration manager application to re-enter the password, and try again", ex);
+            }
         }
     }
 }

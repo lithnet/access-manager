@@ -1,5 +1,6 @@
 using System;
 using System.Configuration;
+using System.Security.Cryptography;
 using System.Threading.Channels;
 using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Authorization;
@@ -56,7 +57,8 @@ namespace Lithnet.AccessManager.Web
             services.TryAddScoped<IEncryptionProvider, EncryptionProvider>();
             services.TryAddScoped<ICertificateProvider, CertificateProvider>();
             services.TryAddScoped<IAppPathProvider, WebAppPathProvider>();
-            
+
+            services.TryAddSingleton<RandomNumberGenerator>(RandomNumberGenerator.Create());
             services.TryAddSingleton<IJitAccessGroupResolver, JitAccessGroupResolver>();
 
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();

@@ -216,6 +216,28 @@ function Get-JitAuthorizationResponse{
 	Write-Output $response;
 }</value>
   </data>
+  <data name="EnablePamFeature" xml:space="preserve">
+    <value># Enable-PamFeature
+# 
+# This script enabled the 'Privileged Access Management' optional feature in a forest
+#
+# This script requires membership in the Domain Admins group of the forest root domain or Enterprise Admins
+#
+# Version 1.0
+
+#-------------------------------------------------------------------------
+# Do not modify below here
+#-------------------------------------------------------------------------
+
+Import-Module ActiveDirectory
+
+$ErrorActionPreference = "Stop"
+$InformationPreference = "Continue"
+
+$domain = "{domain}"
+
+Get-ADOptionalFeature 'Privileged Access Management Feature' -Server $domain | Enable-ADOptionalFeature -Scope ForestOrConfigurationSet -Target $domain</value>
+  </data>
   <data name="GrantAccessManagerPermissions" xml:space="preserve">
     <value># Grant-AccessManagerPermissions
 # 
@@ -348,6 +370,52 @@ $acl.AddAccessRule($propertyAccessRule5)
 $acl.AddAccessRule($propertyAccessRule6)
 $acl.AddAccessRule($propertyAccessRule7)
 $acl.AddAccessRule($propertyAccessRule8)
+set-acl -AclObject $acl -Path $path</value>
+  </data>
+  <data name="GrantGroupPermissions" xml:space="preserve">
+    <value># Grant-GroupPermissions
+# 
+# This script grants permissions for the AMS service account to create, delete, and manage groups in the specified OU
+#
+# This script requires membership in the Domain Admins group 
+# 
+#
+# Version 1.0
+
+#-------------------------------------------------------------------------
+# Do not modify below here
+#-------------------------------------------------------------------------
+
+Import-Module ActiveDirectory
+
+$ErrorActionPreference = "Stop"
+$InformationPreference = "Continue"
+
+$domain = "{domain}"
+$server = (Get-ADDomainController -DomainName $domain -Discover -ForceDiscover -Writable).HostName[0]
+
+$rootDSE = Get-ADRootDSE -Server $server
+$schemaNC = $rootDSE.schemaNamingContext
+$groupObjectGuid = New-Object Guid @(,(Get-ADObject -Server $server -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=group)(objectclass=classSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+
+$sid = new-object System.Security.Principal.SecurityIdentifier "{serviceAccount}"
+$ou = "{ou}"
+
+$ace1user = new-object System.DirectoryServices.ActiveDirectoryAccessRule $sid, "CreateChild,DeleteChild", "Allow", $groupObjectGuid, "None"
+$ace2user = new-object System.DirectoryServices.ActiveDirectoryAccessRule $sid, "GenericAll", "Allow", "Children", $groupObjectGuid
+ 
+if ((Get-PSDrive -Name AD_AMS -ErrorAction SilentlyContinue) -ne $null)
+{
+    Remove-PSDrive -Name AD_AMS
+}
+
+New-PSDrive -Name AD_AMS -PSProvider ActiveDirectory -Server $server -root "//RootDSE/" | out-null
+
+$path = "AD_AMS:\$OU"
+
+$acl = get-acl -Path $path 
+$acl.AddAccessRule($ace1user)
+$acl.AddAccessRule($ace2user)
 set-acl -AclObject $acl -Path $path</value>
   </data>
   <data name="GrantMsLapsPermissions" xml:space="preserve">

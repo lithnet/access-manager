@@ -66,7 +66,7 @@ namespace Lithnet.AccessManager.Server.UI.Interop
         [DllImport("cryptui.dll", SetLastError = true)]
         private static extern bool CryptUIWizImport(int dwFlags, IntPtr hwndParent, [MarshalAs(UnmanagedType.LPWStr)] string pwszWizardTitle, IntPtr pImportSrc, IntPtr hDestCertStore);
 
-        public static string ShowContainerDialog(IntPtr hwnd, string dialogTitle = null, string treeViewTitle = null, AdsFormat pathFormat = AdsFormat.X500Dn)
+        public static string ShowContainerDialog(IntPtr hwnd, string dialogTitle = null, string treeViewTitle = null, string basePath = null, string initialPath = null, AdsFormat pathFormat = AdsFormat.X500Dn)
         {
             IntPtr pInfo = IntPtr.Zero;
 
@@ -78,12 +78,31 @@ namespace Lithnet.AccessManager.Server.UI.Interop
                 info.DialogCaption = dialogTitle;
                 info.TreeViewTitle = treeViewTitle;
                 info.DialogOwner = hwnd;
-                info.Path = new string(new char[MAX_PATH]);
-                info.PathSize = info.Path.Length;
-                info.Flags = DsBrowseInfoFlags.EntireDirectory | DsBrowseInfoFlags.ReturnFormat | DsBrowseInfoFlags.ReturnObjectClass;
-                info.ReturnFormat = pathFormat;
+
+                if (string.IsNullOrWhiteSpace(basePath))
+                {
+                    info.Flags |= DsBrowseInfoFlags.EntireDirectory;
+                }
+                else
+                {
+                    info.RootPath = basePath;
+                }
+
+                if (!string.IsNullOrWhiteSpace(initialPath))
+                {
+                    info.Flags |= DsBrowseInfoFlags.ExpandOnOpen;
+                    info.Path = initialPath.PadRight(MAX_PATH - initialPath.Length, '\0');
+                }
+                else
+                {
+                    info.Path = new string(new char[MAX_PATH]);
+                }
+
+                info.Flags |= DsBrowseInfoFlags.ReturnFormat | DsBrowseInfoFlags.ReturnObjectClass;
+                info.ReturnFormat = pathFormat ;
                 info.ObjectClass = new string(new char[MAX_PATH]);
                 info.ObjectClassSize = MAX_PATH;
+                info.PathSize = info.Path.Length;
 
                 pInfo = Marshal.AllocHGlobal(Marshal.SizeOf<DSBrowseInfo>());
                 Marshal.StructureToPtr(info, pInfo, false);

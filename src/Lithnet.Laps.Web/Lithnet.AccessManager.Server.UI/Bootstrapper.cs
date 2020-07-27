@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using System.Windows.Threading;
 using FluentValidation;
 using Lithnet.AccessManager.Server.Configuration;
@@ -70,7 +71,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<RateLimitOptions>().ToInstance(appconfig.RateLimits);
                 builder.Bind<UserInterfaceOptions>().ToInstance(appconfig.UserInterface);
                 builder.Bind<JitConfigurationOptions>().ToInstance(appconfig.JitConfiguration);
-
+                builder.Bind<RandomNumberGenerator>().ToInstance(RandomNumberGenerator.Create());
                 builder.Bind<ApplicationConfigViewModel>().ToSelf();
                 builder.Bind<AuthenticationViewModel>().ToSelf();
                 builder.Bind<EmailViewModel>().ToSelf();
@@ -110,6 +111,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IX509Certificate2ViewModelFactory>().To<X509Certificate2ViewModelFactory>();
                 builder.Bind<IActiveDirectoryConfigurationViewModelFactory>().To<ActiveDirectoryConfigurationViewModelFactory>();
                 builder.Bind<IJitGroupMappingViewModelFactory>().To<JitGroupMappingViewModelFactory>();
+                builder.Bind<IJitDomainStatusViewModelFactory>().To<JitDomainStatusViewModelFactory>();
 
                 builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
                 builder.Bind(typeof(INotificationChannelDefinitionViewModelFactory<,>)).ToAllImplementations();

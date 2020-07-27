@@ -1,4 +1,8 @@
-﻿using Lithnet.AccessManager.Server.Configuration;
+﻿using System;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Unicode;
+using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.IconPacks;
 using Stylet;
 
@@ -8,9 +12,12 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly EmailOptions model;
 
-        public EmailViewModel(EmailOptions model, INotifiableEventPublisher eventPublisher)
+        private readonly RandomNumberGenerator rng;
+
+        public EmailViewModel(EmailOptions model, RandomNumberGenerator rng, INotifiableEventPublisher eventPublisher)
         {
             this.model = model;
+            this.rng = rng;
             eventPublisher.Register(this);
         }
 
@@ -33,7 +40,33 @@ namespace Lithnet.AccessManager.Server.UI
         public string Username { get => this.model.Username; set => this.model.Username = value; }
 
         [NotifiableProperty]
-        public string Password { get => this.model.Password; set => this.model.Password = value; }
+        public string Password
+        {
+            get => this.model.Password?.Data == null ? null : "-placeholder-";
+            set
+            {
+                if (value != "-placeholder-")
+                {
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        this.model.Password = null;
+                        return;
+                    }
+
+                    this.model.Password = new EncryptedData();
+                    this.model.Password.IsEncrypted = true;
+                    byte[] salt = new byte[64];
+                    rng.GetBytes(salt);
+                    this.model.Password.Salt = Convert.ToBase64String(salt);
+                    this.model.Password.Data = Convert.ToBase64String(ProtectedData.Protect(Encoding.UTF8.GetBytes(value), null, DataProtectionScope.LocalMachine));
+                }
+            }
+        }
+
+        public void PasswordFocus()
+        {
+            this.Password = null;
+        }
 
         public string DisplayName { get; set; } = "Email";
 

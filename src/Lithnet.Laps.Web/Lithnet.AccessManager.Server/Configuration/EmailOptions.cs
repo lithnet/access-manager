@@ -17,7 +17,7 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public string Username { get; set; }
 
-        public string Password { get; set; }
+        public EncryptedData Password { get; set; }
 
         public string FromAddress { get; set; }
     }

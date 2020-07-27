@@ -9,5 +9,7 @@
         public string Description { get; set; }
         
         public string Domain { get; set; }
+
+        public int? OverrideMode { get; set; }
     }
 }

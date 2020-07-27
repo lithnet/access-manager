@@ -290,7 +290,8 @@ namespace Lithnet.AccessManager.Server.UI
                 if (vm.TargetType == TargetType.Container)
                 {
                     var container =
-                        NativeMethods.ShowContainerDialog(this.GetHandle(), "Select domain", "Select domain");
+                        NativeMethods.ShowContainerDialog(this.GetHandle(), "Select container", "Select container");
+
                     if (container != null)
                     {
                         this.Target = container;

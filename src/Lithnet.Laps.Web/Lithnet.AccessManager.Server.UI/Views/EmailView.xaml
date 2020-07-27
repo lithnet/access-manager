@@ -5,6 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:s="https://github.com/canton7/Stylet"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Margin="5">
     <StackPanel>
@@ -76,6 +77,7 @@
                        Content="Password"
                        Margin="5"/>
             <PasswordBox Grid.Row="6" Grid.Column="1" 
+                         GotFocus="{s:Action PasswordFocus}"
                              local:PasswordBoxBindingHelper.BindPassword="True" 
                              local:PasswordBoxBindingHelper.BoundPassword="{Binding Path=Password, Mode=TwoWay}"
                              IsEnabled="{Binding UseSpecifiedCredentials, UpdateSourceTrigger=PropertyChanged}" 

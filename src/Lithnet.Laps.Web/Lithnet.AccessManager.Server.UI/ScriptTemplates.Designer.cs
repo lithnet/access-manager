@@ -124,6 +124,30 @@ namespace Lithnet.AccessManager.Server.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to # Enable-PamFeature
+        ///# 
+        ///# This script enabled the &apos;Privileged Access Management&apos; optional feature in a forest
+        ///#
+        ///# This script requires membership in the Domain Admins group of the forest root domain or Enterprise Admins
+        ///#
+        ///# Version 1.0
+        ///
+        ///#-------------------------------------------------------------------------
+        ///# Do not modify below here
+        ///#-------------------------------------------------------------------------
+        ///
+        ///Import-Module ActiveDirectory
+        ///
+        ///$ErrorActionPreference = &quot;Stop&quot;
+        ///$InformationPreferen [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string EnablePamFeature {
+            get {
+                return ResourceManager.GetString("EnablePamFeature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to # Grant-AccessManagerPermissions
         ///# 
         ///# This script grants permissions for computer objects to write their encrypted password details to the directory, and allows the Lithnet Access Manager service account to read that data
@@ -165,6 +189,31 @@ namespace Lithnet.AccessManager.Server.UI {
         internal static string GrantComputerSelfPermission {
             get {
                 return ResourceManager.GetString("GrantComputerSelfPermission", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to # Grant-GroupPermissions
+        ///# 
+        ///# This script grants permissions for the AMS service account to create, delete, and manage groups in the specified OU
+        ///#
+        ///# This script requires membership in the Domain Admins group 
+        ///# 
+        ///#
+        ///# Version 1.0
+        ///
+        ///#-------------------------------------------------------------------------
+        ///# Do not modify below here
+        ///#-------------------------------------------------------------------------
+        ///
+        ///Import-Module ActiveDirectory
+        ///
+        ///$ErrorActionPreference = &quot;Stop&quot;
+        ///$InformationPreference =  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GrantGroupPermissions {
+            get {
+                return ResourceManager.GetString("GrantGroupPermissions", resourceCulture);
             }
         }
         

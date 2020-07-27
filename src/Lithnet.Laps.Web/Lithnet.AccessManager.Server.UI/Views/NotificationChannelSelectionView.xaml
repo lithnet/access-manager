@@ -7,6 +7,7 @@
              xmlns:s="https://github.com/canton7/Stylet"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -28,11 +29,12 @@
                           SelectedItem="{Binding SelectedSuccessSubscription}"
                           ScrollViewer.VerticalScrollBarVisibility="Auto" 
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                          PreviewMouseWheel="ListView_PreviewMouseWheel"
                           Height="100"
                           Margin="5"
                           Width="350">
-
+                    <b:Interaction.Behaviors>
+                        <local:ListViewScrollBarBehavior />
+                    </b:Interaction.Behaviors>
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="Name" 
@@ -84,10 +86,12 @@
                           SelectedItem="{Binding SelectedFailureSubscription}"
                           ScrollViewer.VerticalScrollBarVisibility="Auto" 
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                          PreviewMouseWheel="ListView_PreviewMouseWheel" 
                           Height="100"
                           Width="350"
                           Margin="5">
+                    <b:Interaction.Behaviors>
+                        <local:ListViewScrollBarBehavior />
+                    </b:Interaction.Behaviors>
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="Name" 
