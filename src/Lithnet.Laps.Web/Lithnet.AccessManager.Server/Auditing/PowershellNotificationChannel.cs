@@ -26,7 +26,7 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         private PowerShell powershell;
 
-        public PowershellNotificationChannel(ILogger<PowershellNotificationChannel> logger, IOptions<AuditOptions> auditSettings, IAppPathProvider env, ChannelWriter<Action> queue)
+        public PowershellNotificationChannel(ILogger<PowershellNotificationChannel> logger, IOptionsSnapshot<AuditOptions> auditSettings, IAppPathProvider env, ChannelWriter<Action> queue)
             : base(logger, queue)
         {
             this.logger = logger;

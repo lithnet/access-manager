@@ -83,7 +83,7 @@ namespace Lithnet.AccessManager.Web.Internal
 
         private readonly PhoneticSettings settings;
 
-        public PhoneticStringProvider(IOptions<UserInterfaceOptions> options)
+        public PhoneticStringProvider(IOptionsSnapshot<UserInterfaceOptions> options)
         {
             this.settings = options.Value.PhoneticSettings ?? new PhoneticSettings()
             {

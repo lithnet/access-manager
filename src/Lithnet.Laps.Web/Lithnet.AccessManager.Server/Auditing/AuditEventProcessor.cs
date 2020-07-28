@@ -27,7 +27,7 @@ namespace Lithnet.AccessManager.Web.Internal
 
         private readonly AuditOptions auditSettings;
 
-        public AuditEventProcessor(ILogger<AuditEventProcessor> logger, ITemplateProvider templates, IEnumerable<INotificationChannel> notificationChannels, IHttpContextAccessor httpContextAccessor, IOptions<AuditOptions> auditSettings)
+        public AuditEventProcessor(ILogger<AuditEventProcessor> logger, ITemplateProvider templates, IEnumerable<INotificationChannel> notificationChannels, IHttpContextAccessor httpContextAccessor, IOptionsSnapshot<AuditOptions> auditSettings)
         {
             this.logger = logger;
             this.templates = templates;

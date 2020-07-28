@@ -11,7 +11,7 @@ namespace Lithnet.AccessManager.Web.Internal
         private readonly RateLimitOptions rateLimits;
         private readonly IMemoryCache memoryCache;
 
-        public RateLimiter(IOptions<RateLimitOptions> rateLimits, IMemoryCache memoryCache)
+        public RateLimiter(IOptionsSnapshot<RateLimitOptions> rateLimits, IMemoryCache memoryCache)
         {
             this.rateLimits = rateLimits.Value;
             this.memoryCache = memoryCache;

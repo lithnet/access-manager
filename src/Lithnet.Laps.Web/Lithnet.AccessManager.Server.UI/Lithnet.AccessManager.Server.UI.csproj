@@ -64,12 +64,6 @@
     <Compile Update="Views\ActiveDirectoryConfigurationView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Views\ActiveDirectoryDomainConfigurationView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\ActiveDirectoryForestConfigurationView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Update="Views\JitGroupMappingView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -102,12 +96,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\ActiveDirectoryConfigurationView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\ActiveDirectoryDomainConfigurationView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\ActiveDirectoryForestConfigurationView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\JitGroupMappingView.xaml">

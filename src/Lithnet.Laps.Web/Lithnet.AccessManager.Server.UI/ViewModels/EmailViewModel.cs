@@ -58,7 +58,7 @@ namespace Lithnet.AccessManager.Server.UI
                     byte[] salt = new byte[128];
                     rng.GetBytes(salt);
                     this.model.Password.Salt = Convert.ToBase64String(salt);
-                    this.model.Password.Data = Convert.ToBase64String(ProtectedData.Protect(Encoding.UTF8.GetBytes(value), null, DataProtectionScope.LocalMachine));
+                    this.model.Password.Data = Convert.ToBase64String(ProtectedData.Protect(Encoding.UTF8.GetBytes(value), salt, DataProtectionScope.LocalMachine));
                 }
             }
         }

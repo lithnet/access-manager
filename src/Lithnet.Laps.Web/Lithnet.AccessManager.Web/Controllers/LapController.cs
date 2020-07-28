@@ -35,7 +35,7 @@ namespace Lithnet.AccessManager.Web.Controllers
         private readonly IJitAccessProvider jitAccessProvider;
 
         public LapController(IAuthorizationService authorizationService, ILogger<LapController> logger, IDirectory directory,
-            IAuditEventProcessor reporting, IRateLimiter rateLimiter, IOptions<UserInterfaceOptions> userInterfaceSettings, IAuthenticationProvider authenticationProvider, IPasswordProvider passwordProvider, IJitAccessProvider jitAccessProvider)
+            IAuditEventProcessor reporting, IRateLimiter rateLimiter, IOptionsSnapshot<UserInterfaceOptions> userInterfaceSettings, IAuthenticationProvider authenticationProvider, IPasswordProvider passwordProvider, IJitAccessProvider jitAccessProvider)
         {
             this.authorizationService = authorizationService;
             this.logger = logger;

@@ -15,7 +15,7 @@ namespace Lithnet.AccessManager
 
         private readonly JitConfigurationOptions options;
 
-        public JitAccessProvider(IDirectory directory, ILogger<JitAccessProvider> logger, IOptions<JitConfigurationOptions> options)
+        public JitAccessProvider(IDirectory directory, ILogger<JitAccessProvider> logger, IOptionsSnapshot<JitConfigurationOptions> options)
         {
             this.directory = directory;
             this.logger = logger;

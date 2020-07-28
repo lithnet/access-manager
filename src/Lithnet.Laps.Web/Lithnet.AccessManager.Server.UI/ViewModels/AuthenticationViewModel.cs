@@ -124,7 +124,7 @@ namespace Lithnet.AccessManager.Server.UI
                     byte[] salt = new byte[128];
                     rng.GetBytes(salt);
                     this.model.Oidc.Secret.Salt = Convert.ToBase64String(salt);
-                    this.model.Oidc.Secret.Data = Convert.ToBase64String(ProtectedData.Protect(Encoding.UTF8.GetBytes(value), null, DataProtectionScope.LocalMachine));
+                    this.model.Oidc.Secret.Data = Convert.ToBase64String(ProtectedData.Protect(Encoding.UTF8.GetBytes(value), salt, DataProtectionScope.LocalMachine));
                 }
             }
         }

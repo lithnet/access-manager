@@ -43,8 +43,8 @@ namespace Lithnet.AccessManager.Web
                 var env = hostingContext.HostingEnvironment;
                 config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                     .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
-                    .AddJsonFile("appsecrets.json", optional: true)
-                    .AddJsonFile("apphost.json", optional: false)
+                    .AddJsonFile("appsecrets.json", optional: true, reloadOnChange: true)
+                    .AddJsonFile("apphost.json", optional: false, reloadOnChange: true)
                     .AddEnvironmentVariables("AccessManagerService");
 
                 if (args != null)
@@ -79,7 +79,11 @@ namespace Lithnet.AccessManager.Web
                 if (isWindows)
                 {
                     // Add the EventLogLoggerProvider on windows machines
-                    logging.AddEventLog();
+                    logging.AddEventLog(eventLogSettings =>
+                    {
+                        eventLogSettings.LogName = "Lithnet Access Manager";
+                        eventLogSettings.SourceName = "Lithnet Access Manager Service";
+                    });
                 }
             });
 

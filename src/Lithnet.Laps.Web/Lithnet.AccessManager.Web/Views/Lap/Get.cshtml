@@ -1,7 +1,7 @@
 ﻿@using Lithnet.AccessManager.Server.Configuration;
 @using Microsoft.Extensions.Options;
 
-@inject IOptions<UserInterfaceOptions> uiSettings
+@inject IOptionsSnapshot<UserInterfaceOptions> uiSettings
 
 @{
     ViewBag.Title = UIMessages.HeadingRequestAccess;

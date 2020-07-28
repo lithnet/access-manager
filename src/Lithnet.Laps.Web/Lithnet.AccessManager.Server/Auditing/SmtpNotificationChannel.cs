@@ -29,7 +29,7 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         protected override IList<SmtpNotificationChannelDefinition> NotificationChannelDefinitions { get; }
 
-        public SmtpNotificationChannel(ILogger<SmtpNotificationChannel> logger, IOptions<EmailOptions> emailSettings, ITemplateProvider templates, IOptions<AuditOptions> auditSettings, ChannelWriter<Action> queue, RandomNumberGenerator rng)
+        public SmtpNotificationChannel(ILogger<SmtpNotificationChannel> logger, IOptionsSnapshot<EmailOptions> emailSettings, ITemplateProvider templates, IOptionsSnapshot<AuditOptions> auditSettings, ChannelWriter<Action> queue, RandomNumberGenerator rng)
             : base(logger, queue)
         {
             this.logger = logger;
@@ -119,7 +119,7 @@ namespace Lithnet.AccessManager.Server.Auditing
         private NetworkCredential GetCredentials()
         {
 
-            if (!this.emailSettings.UseDefaultCredentials && !string.IsNullOrWhiteSpace(this.emailSettings.Username))
+            if (this.emailSettings.UseDefaultCredentials || string.IsNullOrWhiteSpace(this.emailSettings.Username))
             {
                 return null;
             }

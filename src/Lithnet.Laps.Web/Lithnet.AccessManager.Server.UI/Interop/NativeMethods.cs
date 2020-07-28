@@ -85,6 +85,7 @@ namespace Lithnet.AccessManager.Server.UI.Interop
                 }
                 else
                 {
+                    info.Flags |= DsBrowseInfoFlags.EntireDirectory;
                     info.RootPath = basePath;
                 }
 

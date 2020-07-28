@@ -17,7 +17,7 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         protected override IList<WebhookNotificationChannelDefinition> NotificationChannelDefinitions { get; }
 
-        public WebhookNotificationChannel(ILogger<WebhookNotificationChannel> logger, IOptions<AuditOptions> auditSettings, ITemplateProvider templates, ChannelWriter<Action> queue)
+        public WebhookNotificationChannel(ILogger<WebhookNotificationChannel> logger, IOptionsSnapshot<AuditOptions> auditSettings, ITemplateProvider templates, ChannelWriter<Action> queue)
             : base(logger, queue)
         {
             this.NotificationChannelDefinitions = auditSettings.Value.NotificationChannels.Webhooks;

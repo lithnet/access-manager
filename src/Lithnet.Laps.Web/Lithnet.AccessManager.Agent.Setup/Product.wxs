@@ -46,7 +46,7 @@
                                ErrorControl="normal"
                                Start="auto"
                                Type="ownProcess"
-                               Description="Lithnet Access Manager agent for manging local admin password and JIT access"
+                               Description="Lithnet Access Manager agent for managing local admin password and JIT access"
                                Vital="yes"
                                Interactive="no">
         </ServiceInstall>

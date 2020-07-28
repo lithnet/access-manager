@@ -13,7 +13,7 @@ namespace Lithnet.AccessManager.Web.Authorization
 
         private readonly IWebHostEnvironment env;
 
-        public JsonFileTargetsProvider(IOptions<JsonFileTargetsProviderOptions> options, IWebHostEnvironment env)
+        public JsonFileTargetsProvider(IOptionsSnapshot<JsonFileTargetsProviderOptions> options, IWebHostEnvironment env)
         {
             this.options = options.Value;
             this.env = env;

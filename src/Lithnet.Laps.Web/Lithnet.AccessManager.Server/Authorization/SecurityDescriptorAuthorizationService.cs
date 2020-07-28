@@ -24,7 +24,7 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         private readonly IPowerShellSecurityDescriptorGenerator powershell;
 
-        public SecurityDescriptorAuthorizationService(IOptions<BuiltInProviderOptions> options, IDirectory directory, ILogger<SecurityDescriptorAuthorizationService> logger, IJitAccessGroupResolver jitResolver, IPowerShellSecurityDescriptorGenerator powershell)
+        public SecurityDescriptorAuthorizationService(IOptionsSnapshot<BuiltInProviderOptions> options, IDirectory directory, ILogger<SecurityDescriptorAuthorizationService> logger, IJitAccessGroupResolver jitResolver, IPowerShellSecurityDescriptorGenerator powershell)
         {
             this.directory = directory;
             this.logger = logger;

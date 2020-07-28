@@ -323,9 +323,9 @@ namespace Lithnet.AccessManager.Server.Test
             directory.IsSidInPrincipalToken(user.Sid, jitGroup.Sid);
         }
 
-        private IOptions<JitConfigurationOptions> GetOptions()
+        private IOptionsSnapshot<JitConfigurationOptions> GetOptions()
         {
-            Mock<IOptions<JitConfigurationOptions>> ioptions = new Mock<IOptions<JitConfigurationOptions>>();
+            Mock<IOptionsSnapshot<JitConfigurationOptions>> ioptions = new Mock<IOptionsSnapshot<JitConfigurationOptions>>();
             ioptions.SetupGet(t => t.Value).Returns(options);
 
             return ioptions.Object;

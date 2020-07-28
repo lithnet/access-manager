@@ -12,7 +12,7 @@ namespace Lithnet.AccessManager.Web.Authorization
 
         private readonly AuthorizationOptions options;
 
-        public BuiltInAuthorizationService(IOptions<AuthorizationOptions> options, JsonTargetAuthorizationService jsonService)
+        public BuiltInAuthorizationService(IOptionsSnapshot<AuthorizationOptions> options, JsonTargetAuthorizationService jsonService)
         {
             this.enabledProviders = new List<IAuthorizationService>();
             this.options = options.Value;

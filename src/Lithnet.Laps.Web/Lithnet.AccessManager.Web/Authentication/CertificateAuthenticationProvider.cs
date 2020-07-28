@@ -29,7 +29,7 @@ namespace Lithnet.AccessManager.Web.AppSettings
 
         private readonly ILogger<CertificateAuthenticationProvider> logger;
 
-        public CertificateAuthenticationProvider(IOptions<CertificateAuthenticationProviderOptions> options, ILogger<CertificateAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
+        public CertificateAuthenticationProvider(IOptionsSnapshot<CertificateAuthenticationProviderOptions> options, ILogger<CertificateAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
             : base(httpContextAccessor, directory)
         {
             this.directory = directory;
@@ -50,44 +50,61 @@ namespace Lithnet.AccessManager.Web.AppSettings
                 o.RevocationMode = X509RevocationMode.Online;
                 o.ValidateCertificateUse = true;
                 o.ValidateValidityPeriod = true;
-                
+
                 o.Events = new CertificateAuthenticationEvents
                 {
                     OnCertificateValidated = context =>
                     {
-                        if (!ValidateCertificate(context))
+                        var claims = (context.Principal?.Identity as ClaimsIdentity)?.ToClaimList();
+
+                        try
                         {
+                            this.ValidateCertificate(context);
+                        }
+                        catch (Exception ex)
+                        {
+                            context.Fail(ex);
                             context.Principal = null;
+                            this.logger.LogEventError(EventIDs.CertificateValidationError, $"The certificate could not be validated. {ex.Message}\r\n\r\n{claims}\r\n{context.HttpContext.Connection.ClientCertificate}", ex);
                             return Task.CompletedTask;
                         }
 
-                        if (!ResolveIdentity(context))
+                        try
                         {
+                            this.ResolveIdentity(context);
+                        }
+                        catch (Exception ex)
+                        {
+                            context.Fail(ex);
                             context.Principal = null;
+                            this.logger.LogEventError(EventIDs.CertificateIdentityNotFound, $"The identity represented by the certificate could not be resolved. {ex.Message}\r\n\r\n{claims}\r\n{context.HttpContext.Connection.ClientCertificate}", ex);
                             return Task.CompletedTask;
                         }
 
+                        var updatedClaims = (context.Principal?.Identity as ClaimsIdentity)?.ToClaimList();
+
+                        this.logger.LogEventSuccess(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, updatedClaims));
                         context.Success();
                         return Task.CompletedTask;
                     },
                     OnAuthenticationFailed = context =>
                     {
-                        this.logger.LogEventError(EventIDs.CertificateAuthNError, LogMessages.AuthNAccessDenied, context.Exception);
+                        this.logger.LogEventError(EventIDs.CertificateAuthNError, string.Format(LogMessages.CertificateAuthNGenericFailure, context.HttpContext.Connection.ClientCertificate), context.Exception);
                         context.Response.Redirect($"/Home/AuthNError?messageID={(int)AuthNFailureMessageID.InvalidCertificate}");
                         return Task.CompletedTask;
                     },
                     OnChallenge = context =>
-                    {
-                        this.logger.LogEventError(EventIDs.CertificateAuthNAccessDenied, LogMessages.AuthNAccessDenied);
+                    { 
+                        this.logger.LogEventError(EventIDs.CertificateAuthNAccessDenied, string.Format(LogMessages.CertificateAuthNValidationFailure, context.HttpContext.Connection.ClientCertificate));
                         context.HandleResponse();
-                        context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.InvalidCertificate}");
+                        context.Response.Redirect($"/Home/AuthNError?messageID={(int)AuthNFailureMessageID.InvalidCertificate}");
                         return Task.CompletedTask;
                     }
                 };
             });
         }
 
-        private bool ValidateCertificate(CertificateValidatedContext context)
+        private void ValidateCertificate(CertificateValidatedContext context)
         {
             X509Chain chain = new X509Chain
             {
@@ -96,70 +113,43 @@ namespace Lithnet.AccessManager.Web.AppSettings
 
             if (!chain.Build(context.ClientCertificate))
             {
-                context.Fail(new CertificateValidationException("The certificate did not contain the required EKUs"));
-                return false;
+                throw new CertificateValidationException("The certificate did not contain the required EKUs");
             }
 
             if (!this.ValidateIssuer(chain))
             {
-                context.Fail(new CertificateValidationException("One of the required issuers was not found in the certificate chain"));
-                return false;
+                throw new CertificateValidationException("One of the required issuers was not found in the certificate chain");
             }
 
-            try
+            if (!this.ValidateNtAuthStore(chain))
             {
-                if (!this.ValidateNtAuthStore(chain))
-                {
-                    context.Fail(new CertificateValidationException("The certificate chain did not validate to an issuer that is trusted by the enterprise to issue smart card certificates"));
-                    return false;
-                }
+                throw new CertificateValidationException("The certificate chain did not validate to an issuer that is trusted by the enterprise to issue smart card certificates");
             }
-            catch (CertificateValidationException ex)
-            {
-                context.Fail(ex);
-                return false;
-            }
-
-            return true;
         }
 
-        private bool ResolveIdentity(CertificateValidatedContext context)
+        private void ResolveIdentity(CertificateValidatedContext context)
         {
-            try
+            ClaimsIdentity user = context.Principal.Identity as ClaimsIdentity;
+            Claim c = user?.FindFirst(ClaimTypes.Upn);
+
+            if (c?.Value == null)
             {
-                ClaimsIdentity user = context.Principal.Identity as ClaimsIdentity;
-                Claim c = user?.FindFirst(ClaimTypes.Upn);
-
-                if (c?.Value == null)
-                {
-                    this.logger.LogEventError(EventIDs.CertificateMissingUpn, $"The certificate for subject '{context.ClientCertificate.Subject}' did not contain an alternate subject name containing the user's UPN");
-                    context.Fail("The subject's UPN was not found");
-                    return false;
-                }
-
-                if (!this.directory.TryGetUser(c.Value, out IUser u))
-                {
-                    string message = string.Format(LogMessages.UserNotFoundInDirectory, user.ToClaimList());
-                    this.logger.LogEventError(EventIDs.CertificateIdentityNotFound, message, null);
-                    context.Fail("The user was not found in the directory");
-                    return false;
-                }
-
-                user.AddClaim(new Claim(ClaimTypes.PrimarySid, u.Sid.ToString(), context.Options.ClaimsIssuer));
-                this.logger.LogEventSuccess(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, user.ToClaimList()));
-                return true;
+                string message = $"The certificate for subject '{context.ClientCertificate.Subject}' did not contain an alternate subject name containing the user's UPN";
+                throw new CertificateIdentityNotFoundException(message);
             }
-            catch (Exception ex)
+
+            if (!this.directory.TryGetUser(c.Value, out IUser u))
             {
-                this.logger.LogEventError(EventIDs.AuthNResponseProcessingError, LogMessages.AuthNResponseProcessingError, ex);
-                context.Fail("Error resolving identity from certificate");
-                return false;
+                string message = string.Format(LogMessages.UserNotFoundInDirectory, user.ToClaimList());
+                throw new CertificateIdentityNotFoundException(message);
             }
+
+            user.AddClaim(new Claim(ClaimTypes.PrimarySid, u.Sid.ToString(), context.Options.ClaimsIssuer));
         }
 
         private bool ValidateNtAuthStore(X509Chain chain)
         {
-            if (this.options.ValidationMethod !=  ClientCertificateValidationMethod.NtAuthStore)
+            if (this.options.ValidationMethod != ClientCertificateValidationMethod.NtAuthStore)
             {
                 return true;
             }
@@ -177,7 +167,7 @@ namespace Lithnet.AccessManager.Web.AppSettings
 
             if (status.dwError != 0)
             {
-                throw new CertificateValidationException("The certificate could not be validated against the NTAuth store. Ensure the issuer is from a trusted enterprise smart-card issuing CA", new Win32Exception((int) status.dwError));
+                throw new CertificateValidationException("The certificate could not be validated against the NTAuth store. Ensure the issuer is from a trusted enterprise smart-card issuing CA", new Win32Exception((int)status.dwError));
             }
 
             return true;
@@ -233,7 +223,7 @@ namespace Lithnet.AccessManager.Web.AppSettings
                         }
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     this.logger.LogError(ex, $"Unable to parse trusted issuer certificate at index {count}");
                 }

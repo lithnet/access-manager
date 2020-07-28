@@ -143,6 +143,28 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The certificate could not be validated due to an unexpected error
+        ///
+        ///{0}.
+        /// </summary>
+        internal static string CertificateAuthNGenericFailure {
+            get {
+                return ResourceManager.GetString("CertificateAuthNGenericFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The certificate presented by the client could not be validated. Check for prior log messages for additional context. If there are no previous log messages related to this authentication attempt, then ensure the certificate was not self-signed, is issued by a certificate authority trusted by this computer, and contains the client authentication EKU
+        ///
+        ///{0}.
+        /// </summary>
+        internal static string CertificateAuthNValidationFailure {
+            get {
+                return ResourceManager.GetString("CertificateAuthNValidationFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No user claim was found with the type {0}.
         /// </summary>
         internal static string ClaimNotFound {

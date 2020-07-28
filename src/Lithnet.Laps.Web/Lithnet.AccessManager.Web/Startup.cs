@@ -81,13 +81,10 @@ namespace Lithnet.AccessManager.Web
             services.Configure<OidcAuthenticationProviderOptions>(Configuration.GetSection("Authentication:Oidc"));
             services.Configure<WsFedAuthenticationProviderOptions>(Configuration.GetSection("Authentication:WsFed"));
             services.Configure<CertificateAuthenticationProviderOptions>(Configuration.GetSection("Authentication:ClientCert"));
-
-
             services.Configure<HostingOptions>(Configuration.GetSection("Hosting"));
             services.Configure<AuthorizationOptions>(Configuration.GetSection("Authorization"));
             services.Configure<ForwardedHeadersAppOptions>(Configuration.GetSection("ForwardedHeaders"));
             services.Configure<JitConfigurationOptions>(Configuration.GetSection("JitConfiguration"));
-            
             services.Configure<BuiltInProviderOptions>(Configuration.GetSection("Authorization:BuiltInProvider"));
 
             this.ConfigureAuthentication(services);

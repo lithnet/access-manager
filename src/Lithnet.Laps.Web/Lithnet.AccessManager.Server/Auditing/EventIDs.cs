@@ -43,6 +43,5 @@
         public const int ExternalAuthNAccessDenied = 704;
         public const int CertificateAuthNAccessDenied = 705;
         public const int CertificateAuthNError = 706;
-
     }
 }

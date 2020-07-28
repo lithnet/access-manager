@@ -22,15 +22,15 @@ namespace Lithnet.AccessManager.Server.UI
         {
             loggerFactory = LoggerFactory.Create(builder =>
             {
-                builder.SetMinimumLevel(LogLevel.Information);
-                builder.AddConsole();
-                builder.AddDebug();
                 builder.AddNLog();
+                builder.SetMinimumLevel(LogLevel.Information);
+                builder.AddDebug();
                 builder.AddEventLog(new EventLogSettings()
                 {
-                    SourceName = Constants.EventSourceName
+                    SourceName = Constants.EventSourceName,
+                    LogName = Constants.EventLogName,
+                    Filter = (x, y) => y >= LogLevel.Warning
                 });
-                builder.AddEventSourceLogger();
             });
 
             logger = loggerFactory.CreateLogger<Bootstrapper>();
@@ -61,6 +61,7 @@ namespace Lithnet.AccessManager.Server.UI
                 var appconfig = ApplicationConfig.Load(pathProvider.ConfigFile);
                 var hosting = HostingOptions.Load(pathProvider.HostingConfigFile);
 
+                //Config
                 builder.Bind<IApplicationConfig>().ToInstance(appconfig);
                 builder.Bind<AuthenticationOptions>().ToInstance(appconfig.Authentication);
                 builder.Bind<AuditOptions>().ToInstance(appconfig.Auditing);
@@ -71,7 +72,8 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<RateLimitOptions>().ToInstance(appconfig.RateLimits);
                 builder.Bind<UserInterfaceOptions>().ToInstance(appconfig.UserInterface);
                 builder.Bind<JitConfigurationOptions>().ToInstance(appconfig.JitConfiguration);
-                builder.Bind<RandomNumberGenerator>().ToInstance(RandomNumberGenerator.Create());
+
+                // ViewModels
                 builder.Bind<ApplicationConfigViewModel>().ToSelf();
                 builder.Bind<AuthenticationViewModel>().ToSelf();
                 builder.Bind<EmailViewModel>().ToSelf();
@@ -79,7 +81,6 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<AuditingViewModel>().ToSelf();
                 builder.Bind<AuthorizationViewModel>().ToSelf();
                 builder.Bind<ActiveDirectoryConfigurationViewModel>().ToSelf();
-
                 builder.Bind<IpDetectionViewModel>().ToSelf();
                 builder.Bind<PowershellNotificationChannelDefinitionsViewModel>().ToSelf();
                 builder.Bind<PowershellNotificationChannelDefinitionViewModel>().ToSelf();
@@ -93,6 +94,21 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<LapsConfigurationViewModel>().ToSelf();
                 builder.Bind<JitConfigurationViewModel>().ToSelf();
 
+                // ViewModel factories
+                builder.Bind<INotificationChannelSelectionViewModelFactory>().To<NotificationChannelSelectionViewModelFactory>();
+                builder.Bind<ISecurityDescriptorTargetViewModelFactory>().To<SecurityDescriptorTargetViewModelFactory>();
+                builder.Bind<ISecurityDescriptorTargetsViewModelFactory>().To<SecurityDescriptorTargetsViewModelFactory>();
+                builder.Bind<IFileSelectionViewModelFactory>().To<FileSelectionViewModelFactory>();
+                builder.Bind<IActiveDirectoryDomainPermissionViewModelFactory>().To<ActiveDirectoryDomainPermissionViewModelFactory>();
+                builder.Bind<IActiveDirectoryForestSchemaViewModelFactory>().To<ActiveDirectoryForestSchemaViewModelFactory>();
+                builder.Bind<IX509Certificate2ViewModelFactory>().To<X509Certificate2ViewModelFactory>();
+                builder.Bind<IJitGroupMappingViewModelFactory>().To<JitGroupMappingViewModelFactory>();
+                builder.Bind<IJitDomainStatusViewModelFactory>().To<JitDomainStatusViewModelFactory>();
+                builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
+                builder.Bind(typeof(INotificationChannelDefinitionViewModelFactory<,>)).ToAllImplementations();
+
+                // Services
+                builder.Bind<RandomNumberGenerator>().ToInstance(RandomNumberGenerator.Create());
                 builder.Bind<IDialogCoordinator>().To<DialogCoordinator>();
                 builder.Bind<IDirectory>().To<ActiveDirectory>();
                 builder.Bind<IServiceSettingsProvider>().To<ServiceSettingsProvider>();
@@ -101,26 +117,11 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<ICertificateProvider>().To<CertificateProvider>();
                 builder.Bind<IAppPathProvider>().To<AppPathProvider>();
                 builder.Bind<INotifiableEventPublisher>().To<NotifiableEventPublisher>();
-
-                builder.Bind<INotificationChannelSelectionViewModelFactory>().To<NotificationChannelSelectionViewModelFactory>();
-                builder.Bind<ISecurityDescriptorTargetViewModelFactory>().To<SecurityDescriptorTargetViewModelFactory>();
-                builder.Bind<ISecurityDescriptorTargetsViewModelFactory>().To<SecurityDescriptorTargetsViewModelFactory>();
-                builder.Bind<IFileSelectionViewModelFactory>().To<FileSelectionViewModelFactory>();
-                builder.Bind<IActiveDirectoryDomainConfigurationViewModelFactory>().To<ActiveDirectoryDomainConfigurationViewModelFactory>();
-                builder.Bind<IActiveDirectoryForestConfigurationViewModelFactory>().To<ActiveDirectoryForestConfigurationViewModelFactory>();
-                builder.Bind<IX509Certificate2ViewModelFactory>().To<X509Certificate2ViewModelFactory>();
-                builder.Bind<IActiveDirectoryConfigurationViewModelFactory>().To<ActiveDirectoryConfigurationViewModelFactory>();
-                builder.Bind<IJitGroupMappingViewModelFactory>().To<JitGroupMappingViewModelFactory>();
-                builder.Bind<IJitDomainStatusViewModelFactory>().To<JitDomainStatusViewModelFactory>();
-
-                builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
-                builder.Bind(typeof(INotificationChannelDefinitionViewModelFactory<,>)).ToAllImplementations();
-
                 builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentModelValidator<>));
                 builder.Bind(typeof(IValidator<>)).ToAllImplementations();
-
                 builder.Bind<ILoggerFactory>().ToInstance(this.loggerFactory);
                 builder.Bind(typeof(ILogger<>)).To(typeof(Logger<>));
+
                 base.ConfigureIoC(builder);
             }
             catch (Exception ex)

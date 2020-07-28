@@ -267,7 +267,17 @@ namespace Lithnet.AccessManager.Server.UI
                 vm.AvailableForests = new List<string>();
                 var domain = Domain.GetCurrentDomain();
                 vm.AvailableForests.Add(domain.Forest.Name);
-                vm.SelectedForest = domain.Forest.Name;
+
+                if (this.Type == TargetType.Container && !string.IsNullOrWhiteSpace(this.Target))
+                {
+                    try
+                    {
+                        vm.SelectedForest = directory.GetDomainNameDnsFromDn(this.Target);
+                    }
+                    catch { }
+                }
+                 
+                vm.SelectedForest ??= domain.Forest.Name;
 
                 foreach (var trust in domain.Forest.GetAllTrustRelationships().OfType<TrustRelationshipInformation>())
                 {
@@ -290,7 +300,7 @@ namespace Lithnet.AccessManager.Server.UI
                 if (vm.TargetType == TargetType.Container)
                 {
                     var container =
-                        NativeMethods.ShowContainerDialog(this.GetHandle(), "Select container", "Select container");
+                        NativeMethods.ShowContainerDialog(this.GetHandle(), "Select container", "Select container", $"LDAP://{vm.SelectedForest}", $"LDAP://{vm.SelectedForest}/{this.Target}");
 
                     if (container != null)
                     {

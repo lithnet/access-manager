@@ -4,14 +4,12 @@ using System.DirectoryServices.AccountManagement;
 using System.DirectoryServices.ActiveDirectory;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using Accessibility;
-using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class ActiveDirectoryDomainConfigurationViewModel : PropertyChangedBase
+    public class ActiveDirectoryDomainPermissionViewModel : PropertyChangedBase
     {
         private readonly Domain domain;
 
@@ -21,18 +19,13 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly SecurityIdentifier serviceAccountSid;
 
-        private readonly IDialogCoordinator dialogCoordinator;
-
         private readonly ILogger logger;
 
-        public ActiveDirectoryDomainConfigurationViewModel(Domain domain, IServiceSettingsProvider serviceSettings, IDirectory directory, IDialogCoordinator dialogCoordinator, ILogger<ActiveDirectoryDomainConfigurationViewModel> logger)
+        public ActiveDirectoryDomainPermissionViewModel(Domain domain, IServiceSettingsProvider serviceSettings, ILogger<ActiveDirectoryDomainPermissionViewModel> logger)
         {
             this.logger = logger;
             this.domain = domain;
-            this.dialogCoordinator = dialogCoordinator;
-
             this.serviceAccountSid = serviceSettings.GetServiceAccount();
-
             this.RefreshGroupMembership();
         }
 
@@ -54,29 +47,9 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool IsNotAcaoMember { get; set; }
 
-        public string DisplayName => this.domain.Name;
+        public string Name => this.domain.Name;
 
-        public void ShowADPermissionScript()
-        {
-            var vm = new ScriptContentViewModel(this.dialogCoordinator)
-            {
-                HelpText = "Run the following script with Domain Admins rights to add the service account to the correct groups",
-                ScriptText = ScriptTemplates.AddDomainGroupMembershipPermissions
-                    .Replace("{domainDNS}", this.domain.Name, StringComparison.OrdinalIgnoreCase)
-                    .Replace("{serviceAccountSid}", this.serviceAccountSid.Value, StringComparison.OrdinalIgnoreCase)
-            };
-
-            ExternalDialogWindow w = new ExternalDialogWindow
-            {
-                DataContext = vm,
-                SaveButtonVisible = false,
-                CancelButtonName = "Close"
-            };
-
-            w.ShowDialog();
-
-            this.RefreshGroupMembership();
-        }
+        public string ForestName => this.domain.Forest.Name;
 
         private async Task CheckAcaoStatus()
         {

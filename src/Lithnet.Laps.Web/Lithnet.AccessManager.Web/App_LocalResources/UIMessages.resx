@@ -199,6 +199,6 @@
     <value>Just-in-time access request</value>
   </data>
   <data name="InvalidCertificate" xml:space="preserve">
-    <value>The certificate was invalid</value>
+    <value>The client certificate could not be validated</value>
   </data>
 </root>

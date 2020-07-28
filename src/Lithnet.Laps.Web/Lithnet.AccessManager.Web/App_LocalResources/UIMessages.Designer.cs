@@ -178,7 +178,7 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The certificate was invalid.
+        ///   Looks up a localized string similar to The client certificate could not be validated.
         /// </summary>
         public static string InvalidCertificate {
             get {
