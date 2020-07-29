@@ -127,7 +127,7 @@
     <value>The user {0} requested access to computer {1} but no targets exist for this computer</value>
   </data>
   <data name="NoLapsPassword" xml:space="preserve">
-    <value>The computer {0} requested by {1} did not have a LAPS password in the directory</value>
+    <value>The computer {0} requested by {1} did not have a local admin password in the directory</value>
   </data>
   <data name="AuthZFailedNoReaderPrincipalMatch" xml:space="preserve">
     <value>The user {0} requested access to computer {1} but does not match any of the reader principals that are allowed access to this computer</value>
@@ -194,5 +194,38 @@
     <value>The certificate presented by the client could not be validated. Check for prior log messages for additional context. If there are no previous log messages related to this authentication attempt, then ensure the certificate was not self-signed, is issued by a certificate authority trusted by this computer, and contains the client authentication EKU
 
 {0}</value>
+  </data>
+  <data name="UserHasRequestedAccessToComputer" xml:space="preserve">
+    <value>{0} has requested access to computer {1}</value>
+  </data>
+  <data name="IdentityDiscoveryError" xml:space="preserve">
+    <value>The request failed because the information about the authenticated user could not be found</value>
+  </data>
+  <data name="ComputerDiscoveryError" xml:space="preserve">
+    <value>An unexpected error occurred while trying to find a computer named {0}</value>
+  </data>
+  <data name="JitRollbackFailed" xml:space="preserve">
+    <value>An error occurred when trying to rollback the JIT access</value>
+  </data>
+  <data name="JitRollbackInProgress" xml:space="preserve">
+    <value>Rolling back JIT access due to an exception in the audit process</value>
+  </data>
+  <data name="JitError" xml:space="preserve">
+    <value>An error occurred when trying to grant JIT access to {0} for user {1}</value>
+  </data>
+  <data name="NoLapsPasswordHistory" xml:space="preserve">
+    <value>The computer {0} requested by {1} did not have any historical local admin passwords in the directory</value>
+  </data>
+  <data name="PreAuthZError" xml:space="preserve">
+    <value>An unexpected error occurred during the pre-authorization process for user {0} attempting to access {1}</value>
+  </data>
+  <data name="AuthZError" xml:space="preserve">
+    <value>An unexpected error occurred during the authorization process for user {0} trying to access computer {1}</value>
+  </data>
+  <data name="LapsPasswordError" xml:space="preserve">
+    <value>An error occurred when trying to get the password for computer {0) as requested by user {1}</value>
+  </data>
+  <data name="LapsPasswordHistoryError" xml:space="preserve">
+    <value>An error occurred when trying to get the password history for computer {0) as requested by user {1}</value>
   </data>
 </root>

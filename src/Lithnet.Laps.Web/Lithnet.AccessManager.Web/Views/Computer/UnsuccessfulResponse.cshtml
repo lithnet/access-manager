@@ -1,0 +1,28 @@
+﻿@{
+   // ViewBag.Title = "Access Manager";
+}
+
+@model Lithnet.AccessManager.Web.Models.ErrorModel
+
+<div class="form-container">
+
+    <header>
+        @Model.Heading
+    </header>
+    <fieldset>
+        <section>
+            <div class="input-group">
+                <label>@Model.Message</label>
+            </div>
+        </section>
+    </fieldset>
+
+    <footer>
+        <div class="center-content">
+            @using (Html.BeginForm("AccessRequest", "Computer", FormMethod.Get))
+            {
+                <button type="submit" class="btn btn-primary">@UIMessages.ButtonNewRequest</button>
+            }
+        </div>
+    </footer>
+</div>

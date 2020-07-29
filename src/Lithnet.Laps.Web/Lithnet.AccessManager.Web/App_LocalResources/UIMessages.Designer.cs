@@ -79,6 +79,24 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An unexpected error occurred during the authorization process.
+        /// </summary>
+        public static string AuthZError {
+            get {
+                return ResourceManager.GetString("AuthZError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to grant the requested access, as one or more audit notifications could not be delivered.
+        /// </summary>
+        public static string AuthZFailedAuditError {
+            get {
+                return ResourceManager.GetString("AuthZFailedAuditError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to New request.
         /// </summary>
         public static string ButtonNewRequest {
@@ -93,6 +111,15 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         public static string ButtonRequestAccess {
             get {
                 return ResourceManager.GetString("ButtonRequestAccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unexpected error occurred while trying to find the requested computer.
+        /// </summary>
+        public static string ComputerDiscoveryError {
+            get {
+                return ResourceManager.GetString("ComputerDiscoveryError", resourceCulture);
             }
         }
         
@@ -178,11 +205,47 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your request could not be processed as your user information is not recognized.
+        /// </summary>
+        public static string IdentityDiscoveryError {
+            get {
+                return ResourceManager.GetString("IdentityDiscoveryError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The client certificate could not be validated.
         /// </summary>
         public static string InvalidCertificate {
             get {
                 return ResourceManager.GetString("InvalidCertificate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Just-in-time access could not be granted because an unexpected error occurred.
+        /// </summary>
+        public static string JitError {
+            get {
+                return ResourceManager.GetString("JitError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred while trying to access the local admin password.
+        /// </summary>
+        public static string LapsPasswordError {
+            get {
+                return ResourceManager.GetString("LapsPasswordError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred while trying to access the local admin password history.
+        /// </summary>
+        public static string LapsPasswordHistoryError {
+            get {
+                return ResourceManager.GetString("LapsPasswordHistoryError", resourceCulture);
             }
         }
         
@@ -205,11 +268,20 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The requested computer does not have a LAPS password.
+        ///   Looks up a localized string similar to The requested computer does not have a local admin password.
         /// </summary>
         public static string NoLapsPassword {
             get {
                 return ResourceManager.GetString("NoLapsPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The requested computer does not have any historical local admin passwords.
+        /// </summary>
+        public static string NoLapsPasswordHistory {
+            get {
+                return ResourceManager.GetString("NoLapsPasswordHistory", resourceCulture);
             }
         }
         
@@ -237,6 +309,15 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         public static string Password {
             get {
                 return ResourceManager.GetString("Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unexpected error occurred during the pre-authorization process.
+        /// </summary>
+        public static string PreAuthZError {
+            get {
+                return ResourceManager.GetString("PreAuthZError", resourceCulture);
             }
         }
         
@@ -273,6 +354,24 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         public static string SsoIdentityNotFound {
             get {
                 return ResourceManager.GetString("SsoIdentityNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to grant access.
+        /// </summary>
+        public static string UnableToGrantAccess {
+            get {
+                return ResourceManager.GetString("UnableToGrantAccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to process request.
+        /// </summary>
+        public static string UnableToProcessRequest {
+            get {
+                return ResourceManager.GetString("UnableToProcessRequest", resourceCulture);
             }
         }
         

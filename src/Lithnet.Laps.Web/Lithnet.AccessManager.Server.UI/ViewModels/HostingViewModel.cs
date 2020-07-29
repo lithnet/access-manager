@@ -54,7 +54,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.Validator = validator;
 
             eventPublisher.Register(this);
-            
+
             _ = this.TryGetVersion();
         }
 
@@ -542,7 +542,9 @@ namespace Lithnet.AccessManager.Server.UI
         private void CreateCertificateBinding(X509Certificate2 cert, int port)
         {
             var config = new CertificateBindingConfiguration();
-            CertificateBinding binding = new CertificateBinding(cert.Thumbprint, "My", new IPEndPoint(IPAddress.Parse("0.0.0.0"), port), HttpSysHostingOptions.AppId);
+            CertificateBinding binding = new CertificateBinding(cert.Thumbprint, "My", new IPEndPoint(IPAddress.Parse("0.0.0.0"), port), HttpSysHostingOptions.AppId, new BindingOptions
+            {
+            });
             config.Bind(binding);
         }
 

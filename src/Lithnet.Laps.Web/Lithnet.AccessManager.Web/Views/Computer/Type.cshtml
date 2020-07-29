@@ -1,0 +1,72 @@
+﻿@using Lithnet.AccessManager.Server.Configuration;
+@using Microsoft.Extensions.Options;
+
+@inject IOptionsSnapshot<UserInterfaceOptions> uiSettings
+
+@{
+    ViewBag.Title = UIMessages.HeadingRequestAccess;
+}
+
+@model Lithnet.AccessManager.Web.Models.AccessRequestModel
+
+<div class="form-container">
+    @using (Html.BeginForm("AccessResponse", "Computer", FormMethod.Post))
+    {
+        <header>
+            @UIMessages.HeadingRequestAccess
+        </header>
+        <fieldset>
+            <section>
+                <label class="title">@UIMessages.ComputerName*</label>
+                <label class="input">
+                    <i class="icon-append fa fa-desktop"></i>
+                    @Html.TextBoxFor(m => m.ComputerName, new { @class = "dataEntry", @readonly = "readonly" })
+                </label>
+            </section>
+
+            @if (Model.UserRequestReason != null)
+            {
+                <section>
+                    <label class="title">@($"{UIMessages.UserReasonPrompt}{(Model.ReasonRequired ? "*" : string.Empty)}")</label>
+                    <label class="input">
+                        @Html.TextAreaFor(m => m.UserRequestReason, new { @class = "dataEntryLarge", @required = "required" })
+                    </label>
+                </section>
+            }
+
+            <section>
+                <label class="title">Request type</label>
+                <div class="form-check">
+                    @if (Model.AllowedRequestTypes.HasFlag(AccessMask.Laps))
+                    {
+                        @Html.RadioButtonFor(m => m.RequestType, "Laps", new { @class = "form-check-input", @id = "lapscheck" })
+                        <label class="form-check-label" for="lapscheck">Current local admin password</label>
+
+                    }
+                </div>
+                <div class="form-check">
+                    @if (Model.AllowedRequestTypes.HasFlag(AccessMask.LapsHistory))
+                    {
+                        @Html.RadioButtonFor(m => m.RequestType, "LapsHistory", new { @class = "form-check-input", @id = "lapshistorycheck" })
+                        <label class="form-check-label" for="lapshistorycheck">Previous local admin passwords</label>
+                    }
+                </div>
+                <div class="form-check">
+                    @if (Model.AllowedRequestTypes.HasFlag(AccessMask.Jit))
+                    {
+                        @Html.RadioButtonFor(m => m.RequestType, "Jit", new { @class = "form-check-input", @id = "jitcheck" })
+                        <label class="form-check-label" for="jitcheck">Just-in-time access</label>
+                    }
+                </div>
+            </section>
+
+        </fieldset>
+
+        <footer>
+            <div class="center-content">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-primary">@UIMessages.ButtonRequestAccess</button>
+            </div>
+        </footer>
+    }
+</div>

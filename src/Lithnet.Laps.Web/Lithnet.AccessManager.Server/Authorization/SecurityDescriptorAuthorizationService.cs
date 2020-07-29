@@ -7,6 +7,7 @@ using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Extensions;
 using Lithnet.Security.Authorization;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -24,6 +25,8 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         private readonly IPowerShellSecurityDescriptorGenerator powershell;
 
+        private static readonly IMemoryCache cache = new MemoryCache(new MemoryCacheOptions());
+
         public SecurityDescriptorAuthorizationService(IOptionsSnapshot<BuiltInProviderOptions> options, IDirectory directory, ILogger<SecurityDescriptorAuthorizationService> logger, IJitAccessGroupResolver jitResolver, IPowerShellSecurityDescriptorGenerator powershell)
         {
             this.directory = directory;
@@ -33,31 +36,259 @@ namespace Lithnet.AccessManager.Server.Authorization
             this.powershell = powershell;
         }
 
+        //public AuthorizationResponse GetPreAuthorization(IUser user, IComputer computer)
+        //{
+        //    var targets = this.GetMatchingTargetsForComputer(computer);
+
+        //    if (targets.Count == 0)
+        //    {
+        //        return new PreAuthorizationResponse(AccessMask.Undefined)
+        //        {
+        //            Code = AuthorizationResponseCode.NoMatchingRuleForComputer,
+        //        };
+        //    }
+
+        //    List<string> failureNotificationRecipients = new List<string>();
+        //    List<GenericSecurityDescriptor> sds = new List<GenericSecurityDescriptor>();
+        //    AuthorizationContext c = new AuthorizationContext(user.Sid, this.GetAuthorizationContextTarget(user, computer));
+
+        //    foreach (var target in targets.Where(t => t.AuthorizationMode == AuthorizationMode.PowershellScript))
+        //    {
+        //        var response = this.powershell.GenerateSecurityDescriptor(user, computer, target.Script, 30);
+        //        target.SecurityDescriptor = response?.GetSddlForm(AccessControlSections.All);
+        //    }
+
+        //    foreach (var target in targets)
+        //    {
+        //        if (string.IsNullOrWhiteSpace(target.SecurityDescriptor))
+        //        {
+        //            this.logger.LogTrace($"Ignoring target {target.Id} with empty security descriptor");
+        //            continue;
+        //        }
+
+        //        RawSecurityDescriptor sd = new RawSecurityDescriptor(target.SecurityDescriptor);
+        //        sds.Add(sd);
+
+        //        // If the ACE did not grant any permissions to the user, consider it a failure response
+        //        if (!c.AccessCheck(sd, (int)AccessMask.Laps) &&
+        //            !c.AccessCheck(sd, (int)AccessMask.LapsHistory) &&
+        //            !c.AccessCheck(sd, (int)AccessMask.Jit))
+        //        {
+        //            target.Notifications?.OnFailure?.ForEach(u => failureNotificationRecipients.Add(u));
+        //        }
+        //    }
+
+        //    AccessMask allowed = 0;
+
+        //    allowed |= c.AccessCheck(sds, (int)AccessMask.Laps) ? AccessMask.Laps : 0;
+        //    allowed |= c.AccessCheck(sds, (int)AccessMask.Jit) ? AccessMask.Jit : 0;
+        //    allowed |= c.AccessCheck(sds, (int)AccessMask.LapsHistory) ? AccessMask.LapsHistory : 0;
+
+        //    if (allowed > 0)
+        //    {
+        //        return new PreAuthorizationResponse(allowed)
+        //        {
+        //            Code = AuthorizationResponseCode.Success,
+        //        };
+        //    }
+        //    else
+        //    {
+        //        return new PreAuthorizationResponse(AccessMask.Undefined)
+        //        {
+        //            Code = AuthorizationResponseCode.NoMatchingRuleForUser,
+        //            NotificationChannels = failureNotificationRecipients
+        //        };
+        //    }
+        //}
+
+        //public AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer, AccessMask requestedAccess)
+        //{
+        //    requestedAccess.ValidateAccessMask();
+
+        //    var targets = this.GetMatchingTargetsForComputer(computer);
+
+        //    if (targets.Count == 0)
+        //    {
+        //        this.logger.LogTrace($"User {user.MsDsPrincipalName} is denied access to the password for computer {computer.MsDsPrincipalName} because the computer did not match any of the configured targets");
+        //        return BuildAuthZResponseFailed(requestedAccess, AuthorizationResponseCode.NoMatchingRuleForComputer);
+        //    }
+
+        //    List<GenericSecurityDescriptor> sds = new List<GenericSecurityDescriptor>();
+        //    List<string> failureNotificationRecipients = new List<string>();
+
+        //    AuthorizationContext c = new AuthorizationContext(user.Sid, this.GetAuthorizationContextTarget(user, computer));
+        //    List<SecurityDescriptorTarget> successfulTargets = new List<SecurityDescriptorTarget>();
+
+        //    foreach (var target in targets.Where(t => t.AuthorizationMode == AuthorizationMode.PowershellScript))
+        //    {
+        //        var response = this.powershell.GenerateSecurityDescriptor(user, computer, target.Script, 30);
+        //        target.SecurityDescriptor = response?.GetSddlForm(AccessControlSections.All);
+        //    }
+
+        //    foreach (var target in targets)
+        //    {
+        //        if (string.IsNullOrWhiteSpace(target.SecurityDescriptor))
+        //        {
+        //            this.logger.LogTrace($"Ignoring target {target.Id} with empty security descriptor");
+        //            continue;
+        //        }
+
+        //        RawSecurityDescriptor sd = new RawSecurityDescriptor(target.SecurityDescriptor);
+        //        sds.Add(sd);
+
+        //        if (c.AccessCheck(sd, (int)requestedAccess))
+        //        {
+        //            successfulTargets.Add(target);
+        //        }
+        //        else
+        //        {
+        //            target.Notifications?.OnFailure?.ForEach(u => failureNotificationRecipients.Add(u));
+        //        }
+        //    }
+
+        //    if (successfulTargets.Count == 0 || !c.AccessCheck(sds, (int)requestedAccess))
+        //    {
+        //        this.logger.LogTrace($"User {user.MsDsPrincipalName} is denied {requestedAccess} access for computer {computer.MsDsPrincipalName}");
+        //        return BuildAuthZResponseFailed(requestedAccess, AuthorizationResponseCode.NoMatchingRuleForUser, failureNotificationRecipients);
+        //    }
+        //    else
+        //    {
+        //        var j = successfulTargets[0];
+        //        this.logger.LogTrace($"User {user.MsDsPrincipalName} is authorized for {requestedAccess} access to computer {computer.MsDsPrincipalName} from target {j.Id}");
+
+        //        return BuildAuthZResponseSuccess(requestedAccess, j, computer);
+        //    }
+        //}
+
         public AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer, AccessMask requestedAccess)
         {
-            requestedAccess.ValidateAccessMask();
-
-            var targets = this.GetMatchingTargetsForComputer(computer);
-
-            if (targets.Count == 0)
+            try
             {
-                this.logger.LogTrace($"User {user.MsDsPrincipalName} is denied access to the password for computer {computer.MsDsPrincipalName} because the computer did not match any of the configured targets");
-                return BuildAuthZResponseFailed(requestedAccess, AuthorizationResponseCode.NoMatchingRuleForComputer);
+                requestedAccess.ValidateAccessMask();
+
+                var info = GetAuthorizationInformation(user, computer);
+
+                if (info.MatchedTargets.Count == 0)
+                {
+                    this.logger.LogTrace($"User {user.MsDsPrincipalName} is denied access to the password for computer {computer.MsDsPrincipalName} because the computer did not match any of the configured targets");
+                    return BuildAuthZResponseFailed(requestedAccess, AuthorizationResponseCode.NoMatchingRuleForComputer);
+                }
+
+                IList<SecurityDescriptorTarget> successTargets;
+
+                if (requestedAccess.HasFlag(AccessMask.Laps))
+                {
+                    successTargets = info.SuccessfulLapsTargets;
+                }
+                else if (requestedAccess.HasFlag(AccessMask.LapsHistory))
+                {
+                    successTargets = info.SuccessfulLapsHistoryTargets;
+                }
+                else if (requestedAccess.HasFlag(AccessMask.Jit))
+                {
+                    successTargets = info.SuccessfulJitTargets;
+                }
+                else
+                {
+                    throw new AccessManagerException($"An invalid access mask combination was requested: {requestedAccess}");
+                }
+
+                if (successTargets.Count == 0 || !(info.EffectiveAccess.HasFlag(requestedAccess)))
+                {
+                    this.logger.LogTrace($"User {user.MsDsPrincipalName} is denied {requestedAccess} access for computer {computer.MsDsPrincipalName}");
+
+                    return BuildAuthZResponseFailed(
+                        requestedAccess,
+                        AuthorizationResponseCode.NoMatchingRuleForUser,
+                        GetNotificationRecipients(info.FailedTargets, false));
+                }
+                else
+                {
+                    var j = successTargets[0];
+                    this.logger.LogTrace($"User {user.MsDsPrincipalName} is authorized for {requestedAccess} access to computer {computer.MsDsPrincipalName} from target {j.Id}");
+
+                    return BuildAuthZResponseSuccess(requestedAccess, j, computer);
+                }
+            }
+            finally
+            {
+                this.ClearCache(user, computer);
+            }
+        }
+
+        internal void ClearCache(IUser user, IComputer computer)
+        {
+            string key = $"{user.Sid}-{computer.Sid}";
+            cache.Remove(key);
+        }
+
+        internal AuthorizationInformation GetAuthorizationInformation(IUser user, IComputer computer)
+        {
+            string key = $"{user.Sid}-{computer.Sid}";
+
+            if (cache.TryGetValue<AuthorizationInformation>(key, out AuthorizationInformation info))
+            {
+                this.logger.LogTrace($"Cached authorization information found for {key}");
+                return info;
             }
 
-            List<GenericSecurityDescriptor> sds = new List<GenericSecurityDescriptor>();
-            List<string> failureNotificationRecipients = new List<string>();
+            this.logger.LogTrace($"Building authorization information for {key}");
+            info = this.BuildAuthorizationInformation(user, computer);
+
+            cache.Set(key, info, TimeSpan.FromMinutes(2));
+
+            return info;
+        }
+
+        public AuthorizationResponse GetPreAuthorization(IUser user, IComputer computer)
+        {
+            var info = this.GetAuthorizationInformation(user, computer);
+
+            if (info.MatchedTargets.Count == 0)
+            {
+                return new PreAuthorizationResponse(AccessMask.None)
+                {
+                    Code = AuthorizationResponseCode.NoMatchingRuleForComputer,
+                };
+            }
+
+            if (info.EffectiveAccess > 0)
+            {
+                return new PreAuthorizationResponse(info.EffectiveAccess)
+                {
+                    Code = AuthorizationResponseCode.Success,
+                };
+            }
+            else
+            {
+                return new PreAuthorizationResponse(AccessMask.None)
+                {
+                    Code = AuthorizationResponseCode.NoMatchingRuleForUser,
+                    NotificationChannels = GetNotificationRecipients(info.FailedTargets, false)
+                };
+            }
+        }
+
+        internal AuthorizationInformation BuildAuthorizationInformation(IUser user, IComputer computer)
+        {
+            AuthorizationInformation info = new AuthorizationInformation();
+
+            info.MatchedTargets = this.GetMatchingTargetsForComputer(computer);
+
+            if (info.MatchedTargets.Count == 0)
+            {
+                return info;
+            }
 
             AuthorizationContext c = new AuthorizationContext(user.Sid, this.GetAuthorizationContextTarget(user, computer));
-            List<SecurityDescriptorTarget> successfulTargets = new List<SecurityDescriptorTarget>();
 
-            foreach (var target in targets.Where(t => t.AuthorizationMode == AuthorizationMode.PowershellScript))
+            foreach (var target in info.MatchedTargets.Where(t => t.AuthorizationMode == AuthorizationMode.PowershellScript))
             {
-                var response = this.powershell.GenerateSecurityDescriptor(user, computer, requestedAccess, target.Script, 30);
+                var response = this.powershell.GenerateSecurityDescriptor(user, computer, target.Script, 30);
                 target.SecurityDescriptor = response?.GetSddlForm(AccessControlSections.All);
             }
 
-            foreach (var target in targets)
+            foreach (var target in info.MatchedTargets)
             {
                 if (string.IsNullOrWhiteSpace(target.SecurityDescriptor))
                 {
@@ -66,30 +297,42 @@ namespace Lithnet.AccessManager.Server.Authorization
                 }
 
                 RawSecurityDescriptor sd = new RawSecurityDescriptor(target.SecurityDescriptor);
-                sds.Add(sd);
+                info.SecurityDescriptors.Add(sd);
 
-                if (c.AccessCheck(sd, (int)requestedAccess))
+                bool hasLaps = c.AccessCheck(sd, (int)AccessMask.Laps);
+                bool hasLapsHistory = c.AccessCheck(sd, (int)AccessMask.LapsHistory);
+                bool hasJit = c.AccessCheck(sd, (int)AccessMask.Jit);
+
+                if (hasJit)
                 {
-                    successfulTargets.Add(target);
+                    info.SuccessfulJitTargets.Add(target);
                 }
-                else
+
+                if (hasLaps)
                 {
-                    target.Notifications?.OnFailure?.ForEach(u => failureNotificationRecipients.Add(u));
+                    info.SuccessfulLapsTargets.Add(target);
+                }
+
+                if (hasLapsHistory)
+                {
+                    info.SuccessfulLapsHistoryTargets.Add(target);
+                }
+
+                // If the ACE did not grant any permissions to the user, consider it a failure response
+                if (!hasLaps &&
+                    !hasLapsHistory &&
+                    !hasJit)
+                {
+                    info.FailedTargets.Add(target);
                 }
             }
 
-            if (successfulTargets.Count == 0 || !c.AccessCheck(sds, (int)requestedAccess))
-            {
-                this.logger.LogTrace($"User {user.MsDsPrincipalName} is denied {requestedAccess} access for computer {computer.MsDsPrincipalName}");
-                return BuildAuthZResponseFailed(requestedAccess, AuthorizationResponseCode.NoMatchingRuleForUser, failureNotificationRecipients);
-            }
-            else
-            {
-                var j = successfulTargets[0];
-                this.logger.LogTrace($"User {user.MsDsPrincipalName} is authorized for {requestedAccess} access to computer {computer.MsDsPrincipalName} from target {j.Id}");
+            info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptors, (int)AccessMask.Laps) ? AccessMask.Laps : 0;
+            info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptors, (int)AccessMask.Jit) ? AccessMask.Jit : 0;
+            info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptors, (int)AccessMask.LapsHistory) ? AccessMask.LapsHistory : 0;
 
-                return BuildAuthZResponseSuccess(requestedAccess, j, computer);
-            }
+            this.logger.LogTrace($"User {user.MsDsPrincipalName} has effective access of {info.EffectiveAccess} on computer {computer.MsDsPrincipalName}");
+            return info;
         }
 
         private string GetAuthorizationContextTarget(IUser user, IComputer computer)
@@ -107,7 +350,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             }
         }
 
-        private static AuthorizationResponse BuildAuthZResponseFailed(AccessMask requestedAccess, AuthorizationResponseCode code, List<string> failureNotificationRecipients = null)
+        private static AuthorizationResponse BuildAuthZResponseFailed(AccessMask requestedAccess, AuthorizationResponseCode code, IList<string> failureNotificationRecipients = null)
         {
             AuthorizationResponse response = AuthorizationResponse.CreateAuthorizationResponse(requestedAccess);
             response.Code = code;
@@ -168,6 +411,23 @@ namespace Lithnet.AccessManager.Server.Authorization
             return list;
         }
 
+        private IList<string> GetNotificationRecipients(IList<SecurityDescriptorTarget> targets, bool success)
+        {
+            List<string> list = new List<string>();
+
+            if (targets == null || targets.Count == 0)
+            {
+                return list;
+            }
+
+            foreach (var target in targets)
+            {
+                list.AddRange(GetNotificationRecipients(target.Notifications, success));
+            }
+
+            return list;
+        }
+
 
         private IList<SecurityDescriptorTarget> GetMatchingTargetsForComputer(IComputer computer)
         {
@@ -187,18 +447,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                     }
                     else if (target.Type == TargetType.Computer)
                     {
-                        IComputer p;
-                        try
-                        {
-                            p = this.directory.GetComputer(target.GetTargetAsSid());
-                        }
-                        catch (ObjectNotFoundException ex)
-                        {
-                            this.logger.LogTrace(ex, $"Target computer {target.Target} was not found in the directory");
-                            continue;
-                        }
-
-                        if (p.Sid == computer.Sid)
+                        if (target.GetTargetAsSid() == computer.Sid)
                         {
                             this.logger.LogTrace($"Matched {computer.MsDsPrincipalName} to target {target.Id}");
                             matchingTargets.Add(target);
@@ -206,18 +455,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                     }
                     else
                     {
-                        IGroup g;
-                        try
-                        {
-                            g = this.directory.GetGroup(target.GetTargetAsSid());
-                        }
-                        catch (ObjectNotFoundException ex)
-                        {
-                            this.logger.LogTrace(ex, $"Target group {target.Target} was not found in the directory");
-                            continue;
-                        }
-
-                        if (this.directory.IsSidInPrincipalToken(g.Sid, computer, computer.Sid))
+                        if (this.directory.IsSidInPrincipalToken(target.GetTargetAsSid(), computer, computer.Sid))
                         {
                             this.logger.LogTrace($"Matched {computer.MsDsPrincipalName} to target {target.Id}");
                             matchingTargets.Add(target);

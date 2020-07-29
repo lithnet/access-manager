@@ -6,7 +6,6 @@ using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Web.AppSettings;
-using Lithnet.AccessManager.Web.Authorization;
 using Lithnet.AccessManager.Web.Extensions;
 using Lithnet.AccessManager.Web.Internal;
 using Microsoft.AspNetCore.Builder;
@@ -38,16 +37,13 @@ namespace Lithnet.AccessManager.Web
             services.TryAddScoped<IWsFedAuthenticationProvider, WsFedAuthenticationProvider>();
             services.TryAddScoped<ICertificateAuthenticationProvider, CertificateAuthenticationProvider>();
 
-            services.TryAddScoped<IJsonTargetsProvider, JsonFileTargetsProvider>();
             services.TryAddScoped<IAuthorizationService, SecurityDescriptorAuthorizationService>();
             services.TryAddScoped<SecurityDescriptorAuthorizationService>();
             services.TryAddScoped<IPowerShellSecurityDescriptorGenerator, PowerShellSecurityDescriptorGenerator>();
-            services.TryAddScoped<JsonTargetAuthorizationService, JsonTargetAuthorizationService>();
             services.TryAddSingleton<IDirectory, ActiveDirectory>();
             services.TryAddScoped<IAuditEventProcessor, AuditEventProcessor>();
             services.TryAddScoped<ITemplateProvider, TemplateProvider>();
             services.TryAddScoped<IRateLimiter, RateLimiter>();
-            services.TryAddScoped<IAceEvaluator, AceEvaluator>();
             services.TryAddScoped<IJitAccessProvider, JitAccessProvider>();
             services.TryAddScoped<IPhoneticPasswordTextProvider, PhoneticStringProvider>();
             services.TryAddScoped<IHtmlPasswordProvider, HtmlPasswordProvider>();
@@ -56,10 +52,11 @@ namespace Lithnet.AccessManager.Web
             services.TryAddScoped<IMsMcsAdmPwdProvider, MsMcsAdmPwdProvider>();
             services.TryAddScoped<IEncryptionProvider, EncryptionProvider>();
             services.TryAddScoped<ICertificateProvider, CertificateProvider>();
-            services.TryAddScoped<IAppPathProvider, WebAppPathProvider>();
-
+            
+            services.TryAddSingleton<IAppPathProvider, WebAppPathProvider>();
             services.TryAddSingleton<RandomNumberGenerator>(RandomNumberGenerator.Create());
             services.TryAddSingleton<IJitAccessGroupResolver, JitAccessGroupResolver>();
+            services.TryAddSingleton<IPowerShellSessionProvider, CachedPowerShellSessionProvider>();
 
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();

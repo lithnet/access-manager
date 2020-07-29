@@ -5,6 +5,16 @@ namespace Lithnet.AccessManager.Server.Extensions
 {
     public static class LogExtensions
     {
+        public static void LogEventWarning(this ILogger logger, int eventId, string logMessage)
+        {
+            LogEventError(logger, eventId, logMessage, null);
+        }
+
+        public static void LogEventWarning(this ILogger logger, int eventId, string message, Exception ex)
+        {
+            LogEvent(logger, eventId, LogLevel.Warning, message, ex);
+        }
+
         public static void LogEventError(this ILogger logger, int eventId, string logMessage)
         {
             LogEventError(logger, eventId, logMessage, null);

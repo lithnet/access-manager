@@ -34,15 +34,6 @@ namespace Lithnet.AccessManager.Server.UI
         }
 
         [NotifiableProperty]
-        public bool AllowJit { get => this.model.AllowJit; set => this.model.AllowJit = value; }
-
-        [NotifiableProperty]
-        public bool AllowLaps { get => this.model.AllowLaps; set => this.model.AllowLaps = value; }
-
-        [NotifiableProperty]
-        public bool AllowLapsHistory { get => this.model.AllowLapsHistory; set => this.model.AllowLapsHistory = value; }
-
-        [NotifiableProperty]
         public string Title { get => this.model.Title; set => this.model.Title = value; }
 
         [NotifiableProperty]

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -7,6 +7,20 @@
 
     <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="TestData\Scripts\AuthZTestDenyLapsJitGrantLapsHistory.ps1" />
+    <None Remove="TestData\Scripts\AuthZTestGrantLapsJit.ps1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="TestData\Scripts\AuthZTestDenyLapsJitGrantLapsHistory.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\Scripts\AuthZTestGrantLapsJit.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.6" />

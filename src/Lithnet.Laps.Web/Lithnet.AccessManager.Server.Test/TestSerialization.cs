@@ -71,9 +71,6 @@ namespace Lithnet.AccessManager.Server.Test
             UserInterfaceOptions s = new UserInterfaceOptions();
             s.Title = TestContext.CurrentContext.Random.GetString();
             s.UserSuppliedReason = AuditReasonFieldState.Required;
-            s.AllowJit = true;
-            s.AllowLaps = true;
-            s.AllowLapsHistory = true;
             s.PhoneticSettings.GroupSize = 5;
             s.PhoneticSettings.LowerPrefix = TestContext.CurrentContext.Random.GetString();
             s.PhoneticSettings.UpperPrefix = TestContext.CurrentContext.Random.GetString();
@@ -86,9 +83,6 @@ namespace Lithnet.AccessManager.Server.Test
 
             Assert.AreEqual(s.Title, n.Title);
             Assert.AreEqual(s.UserSuppliedReason, n.UserSuppliedReason);
-            Assert.AreEqual(s.AllowJit, n.AllowJit);
-            Assert.AreEqual(s.AllowLaps, n.AllowLaps);
-            Assert.AreEqual(s.AllowLapsHistory, n.AllowLapsHistory);
             Assert.AreEqual(s.PhoneticSettings.GroupSize, n.PhoneticSettings.GroupSize);
             Assert.AreEqual(s.PhoneticSettings.LowerPrefix, n.PhoneticSettings.LowerPrefix);
             Assert.AreEqual(s.PhoneticSettings.UpperPrefix, n.PhoneticSettings.UpperPrefix);
@@ -195,7 +189,13 @@ namespace Lithnet.AccessManager.Server.Test
             s.Authority = TestContext.CurrentContext.Random.GetString();
             s.ClientID = TestContext.CurrentContext.Random.GetString();
             s.ResponseType = TestContext.CurrentContext.Random.GetString();
-            s.Secret = TestContext.CurrentContext.Random.GetString();
+            s.Secret = new EncryptedData()
+            {
+                Data = TestContext.CurrentContext.Random.GetString(),
+                Mode = TestContext.CurrentContext.Random.Next(),
+                Salt = TestContext.CurrentContext.Random.GetString()
+            };
+
             s.Scopes = new List<string>
             {
                 TestContext.CurrentContext.Random.GetString()
@@ -208,7 +208,9 @@ namespace Lithnet.AccessManager.Server.Test
             Assert.AreEqual(s.Authority, n.Authority);
             Assert.AreEqual(s.ClientID, n.ClientID);
             Assert.AreEqual(s.ResponseType, n.ResponseType);
-            Assert.AreEqual(s.Secret, n.Secret);
+            Assert.AreEqual(s.Secret.Mode, n.Secret.Mode);
+            Assert.AreEqual(s.Secret.Data, n.Secret.Data);
+            Assert.AreEqual(s.Secret.Salt, n.Secret.Salt);
             CollectionAssert.AreEqual(s.Scopes, n.Scopes);
         }
 
@@ -417,7 +419,12 @@ namespace Lithnet.AccessManager.Server.Test
             EmailOptions s = new EmailOptions();
             s.FromAddress = TestContext.CurrentContext.Random.GetString();
             s.Host = TestContext.CurrentContext.Random.GetString();
-            s.Password = TestContext.CurrentContext.Random.GetString();
+            s.Password = new EncryptedData()
+            {
+                Data = TestContext.CurrentContext.Random.GetString(),
+                Mode = TestContext.CurrentContext.Random.Next(),
+                Salt = TestContext.CurrentContext.Random.GetString()
+            };
             s.Port = TestContext.CurrentContext.Random.Next();
             s.UseDefaultCredentials = true;
             s.Username = TestContext.CurrentContext.Random.GetString();
@@ -427,7 +434,9 @@ namespace Lithnet.AccessManager.Server.Test
 
             Assert.AreEqual(s.FromAddress, n.FromAddress);
             Assert.AreEqual(s.Host, n.Host);
-            Assert.AreEqual(s.Password, n.Password);
+            Assert.AreEqual(s.Password.Salt, n.Password.Salt);
+            Assert.AreEqual(s.Password.Mode, n.Password.Mode);
+            Assert.AreEqual(s.Password.Data, n.Password.Data);
             Assert.AreEqual(s.Port, n.Port);
             Assert.AreEqual(s.UseDefaultCredentials, n.UseDefaultCredentials);
             Assert.AreEqual(s.Username, n.Username);

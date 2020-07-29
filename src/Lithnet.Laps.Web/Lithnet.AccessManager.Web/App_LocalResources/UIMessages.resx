@@ -127,7 +127,7 @@
     <value>Your request could not be processed because your SSO identity could not be found in the directory</value>
   </data>
   <data name="NoLapsPassword" xml:space="preserve">
-    <value>The requested computer does not have a LAPS password</value>
+    <value>The requested computer does not have a local admin password</value>
   </data>
   <data name="UnexpectedError" xml:space="preserve">
     <value>An unexpected error occurred</value>
@@ -200,5 +200,38 @@
   </data>
   <data name="InvalidCertificate" xml:space="preserve">
     <value>The client certificate could not be validated</value>
+  </data>
+  <data name="IdentityDiscoveryError" xml:space="preserve">
+    <value>Your request could not be processed as your user information is not recognized</value>
+  </data>
+  <data name="ComputerDiscoveryError" xml:space="preserve">
+    <value>An unexpected error occurred while trying to find the requested computer</value>
+  </data>
+  <data name="JitError" xml:space="preserve">
+    <value>Just-in-time access could not be granted because an unexpected error occurred</value>
+  </data>
+  <data name="UnableToGrantAccess" xml:space="preserve">
+    <value>Unable to grant access</value>
+  </data>
+  <data name="AuthZFailedAuditError" xml:space="preserve">
+    <value>Unable to grant the requested access, as one or more audit notifications could not be delivered</value>
+  </data>
+  <data name="NoLapsPasswordHistory" xml:space="preserve">
+    <value>The requested computer does not have any historical local admin passwords</value>
+  </data>
+  <data name="PreAuthZError" xml:space="preserve">
+    <value>An unexpected error occurred during the pre-authorization process</value>
+  </data>
+  <data name="UnableToProcessRequest" xml:space="preserve">
+    <value>Unable to process request</value>
+  </data>
+  <data name="AuthZError" xml:space="preserve">
+    <value>An unexpected error occurred during the authorization process</value>
+  </data>
+  <data name="LapsPasswordError" xml:space="preserve">
+    <value>An error occurred while trying to access the local admin password</value>
+  </data>
+  <data name="LapsPasswordHistoryError" xml:space="preserve">
+    <value>An error occurred while trying to access the local admin password history</value>
   </data>
 </root>

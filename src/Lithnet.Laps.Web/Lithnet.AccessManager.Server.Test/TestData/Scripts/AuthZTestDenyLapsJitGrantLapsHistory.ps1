@@ -11,14 +11,14 @@ function Get-AuthorizationResponse{
 	$response = New-Object -TypeName "Lithnet.AccessManager.Server.Authorization.PowerShellAuthorizationResponse"
 
 	# Set IsAllowed to true to allow access, or set IsDenied to explicitly deny access, or leave both as false if no decision was made. This will allow other rules to be evaluated.
-	$response.IsLocalAdminPasswordAllowed = $false;
-	$response.IsLocalAdminPasswordDenied = $false;
+	$response.IsLocalAdminPasswordAllowed = $true;
+	$response.IsLocalAdminPasswordDenied = $true;
 	
-	$response.IsLocalAdminPasswordHistoryAllowed = $false;
+	$response.IsLocalAdminPasswordHistoryAllowed = $true;
 	$response.IsLocalAdminPasswordHistoryDenied = $false;
 	
-	$response.IsJitAllowed = $false;
-	$response.IsJitDenied = $false;
+	$response.IsJitAllowed = $true;
+	$response.IsJitDenied = $true;
 
 	Write-Output $response;
 }

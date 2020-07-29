@@ -15,67 +15,97 @@ namespace Lithnet.AccessManager.Server.Authorization
     {
         private readonly ILogger logger;
 
-        private readonly IAppPathProvider env;
-
         private readonly NLog.ILogger nlogger = NLog.LogManager.GetCurrentClassLogger();
 
-        private PowerShell powershell;
+        private readonly IPowerShellSessionProvider sessionProvider;
 
-        public PowerShellSecurityDescriptorGenerator(ILogger<PowerShellSecurityDescriptorGenerator> logger, IAppPathProvider env)
+        public PowerShellSecurityDescriptorGenerator(ILogger<PowerShellSecurityDescriptorGenerator> logger, IPowerShellSessionProvider sessionProvider)
         {
+            this.sessionProvider = sessionProvider;
             this.logger = logger;
-            this.env = env;
         }
 
-        public CommonSecurityDescriptor GenerateSecurityDescriptor(IUser user, IComputer computer, AccessMask requestedAccess, string script, int timeout)
+        public CommonSecurityDescriptor GenerateSecurityDescriptor(IUser user, IComputer computer, string script, int timeout)
         {
-            requestedAccess.ValidateAccessMask();
-            this.InitializePowerShellSession(script);
+            PowerShellAuthorizationResponse result = this.GetAuthorizationResponse(script, user, computer, timeout);
+            return GenerateSecurityDescriptor(user.Sid, result);
+        }
 
-            PowerShellAuthorizationResponse result;
+        public CommonSecurityDescriptor GenerateSecurityDescriptor(SecurityIdentifier sid, PowerShellAuthorizationResponse result)
+        {
+            AccessMask allowedAccess = 0;
+            AccessMask deniedAccess = 0;
 
-            if (requestedAccess == AccessMask.Laps)
+            if (result.IsLocalAdminPasswordAllowed)
             {
-                result = this.GetLapsAuthorizationResponse(user, computer, timeout);
+                allowedAccess |= AccessMask.Laps;
             }
-            else if (requestedAccess == AccessMask.LapsHistory)
+
+            if (result.IsLocalAdminPasswordHistoryAllowed)
             {
-                result = this.GetLapsHistoryAuthorizationResponse(user, computer, timeout);
+                allowedAccess |= AccessMask.LapsHistory;
             }
-            else if (requestedAccess == AccessMask.Jit)
+
+            if (result.IsJitAllowed)
             {
-                result = this.GetJitAuthorizationResponse(user, computer, timeout);
+                allowedAccess |= AccessMask.Jit;
+            }
+
+            if (result.IsLocalAdminPasswordDenied)
+            {
+                deniedAccess |= AccessMask.Laps;
+            }
+
+            if (result.IsLocalAdminPasswordHistoryDenied)
+            {
+                deniedAccess |= AccessMask.LapsHistory;
+            }
+
+            if (result.IsJitDenied)
+            {
+                deniedAccess |= AccessMask.Jit;
+            }
+
+            DiscretionaryAcl dacl;
+
+            if (allowedAccess > 0 && deniedAccess > 0)
+            {
+                dacl = new DiscretionaryAcl(false, false, 2);
+            }
+            else if (allowedAccess > 0 || deniedAccess > 0)
+            {
+                dacl = new DiscretionaryAcl(false, false, 1);
             }
             else
             {
-                throw new ArgumentException("The requested access type was unknown");
+                dacl = new DiscretionaryAcl(false, false, 0);
             }
 
-            if (result.IsAllowed || result.IsAllowed)
+            if (allowedAccess > 0)
             {
-                DiscretionaryAcl dacl = new DiscretionaryAcl(false, false, 1);
-                dacl.AddAccess(result.IsDenied ? AccessControlType.Deny : AccessControlType.Allow, user.Sid, (int)requestedAccess, InheritanceFlags.None, PropagationFlags.None);
-                return new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, dacl);
+                dacl.AddAccess(AccessControlType.Allow, sid, (int) allowedAccess, InheritanceFlags.None, PropagationFlags.None);
             }
-            else
+
+            if (deniedAccess > 0)
             {
-                return null;
+                dacl.AddAccess(AccessControlType.Deny, sid, (int) deniedAccess, InheritanceFlags.None, PropagationFlags.None);
             }
+
+            return new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, dacl);
         }
 
-        private PowerShellAuthorizationResponse GetJitAuthorizationResponse(IUser user, IComputer computer, int timeout)
+        private PowerShellAuthorizationResponse GetAuthorizationResponse(string script, IUser user, IComputer computer, int timeout)
         {
-            this.powershell.ResetState();
-            this.powershell
-                .AddCommand("Get-JitAuthorizationResponse")
-                    .AddParameter("user", user)
-                    .AddParameter("computer", computer)
-                    .AddParameter("logger", nlogger);
+            PowerShell powershell = this.sessionProvider.GetSession(script, "Get-AuthorizationResponse");
+            powershell.AddCommand("Get-AuthorizationResponse")
+                .AddParameter("user", user)
+                .AddParameter("computer", computer)
+                .AddParameter("logger", nlogger);
 
             Task<PowerShellAuthorizationResponse> task = new Task<PowerShellAuthorizationResponse>(() =>
             {
-                var results = this.powershell.Invoke();
-                this.powershell.ThrowOnPipelineError();
+                var results = powershell.Invoke();
+                powershell.ThrowOnPipelineError();
 
                 foreach (PSObject result in results)
                 {
@@ -113,142 +143,6 @@ namespace Lithnet.AccessManager.Server.Authorization
             this.logger.LogWarning($"The PowerShell script did not return an AuthorizationResponse");
 
             return new PowerShellAuthorizationResponse();
-        }
-
-        private PowerShellAuthorizationResponse GetLapsAuthorizationResponse(IUser user, IComputer computer, int timeout)
-        {
-            this.powershell.ResetState();
-            this.powershell
-                .AddCommand("Get-LapsAuthorizationResponse")
-                    .AddParameter("user", user)
-                    .AddParameter("computer", computer)
-                    .AddParameter("logger", nlogger);
-
-            Task<PowerShellAuthorizationResponse> task = new Task<PowerShellAuthorizationResponse>(() =>
-            {
-                var results = this.powershell.Invoke();
-                this.powershell.ThrowOnPipelineError();
-
-                foreach (PSObject result in results)
-                {
-                    if (result.BaseObject is PowerShellAuthorizationResponse res)
-                    {
-                        return res;
-                    }
-                    else
-                    {
-                        this.logger.LogWarning($"The powerShell script returned an unsupported object of type {result.BaseObject?.GetType().FullName} to the pipeline");
-                    }
-                }
-
-                return null;
-            });
-
-            task.Start();
-            if (!task.Wait(TimeSpan.FromSeconds(timeout)))
-            {
-                throw new TimeoutException("The PowerShell script did not complete within the configured time");
-            }
-
-            if (task.IsFaulted)
-            {
-                if (task.Exception != null) throw task.Exception;
-                throw new AccessManagerException("The task failed");
-            }
-
-            if (task.Result != null)
-            {
-                this.logger.LogTrace($"PowerShell script returned the following AuthorizationResponse: {JsonConvert.SerializeObject(task.Result)}");
-                return task.Result;
-            }
-
-            this.logger.LogWarning($"The PowerShell script did not return an AuthorizationResponse");
-
-            return new PowerShellAuthorizationResponse();
-        }
-
-        private PowerShellAuthorizationResponse GetLapsHistoryAuthorizationResponse(IUser user, IComputer computer, int timeout)
-        {
-            this.powershell.ResetState();
-            this.powershell
-                .AddCommand("Get-LapsHistoryAuthorizationResponse")
-                    .AddParameter("user", user)
-                    .AddParameter("computer", computer)
-                    .AddParameter("logger", nlogger);
-
-            Task<PowerShellAuthorizationResponse> task = new Task<PowerShellAuthorizationResponse>(() =>
-            {
-                var results = this.powershell.Invoke();
-                this.powershell.ThrowOnPipelineError();
-
-                foreach (PSObject result in results)
-                {
-                    if (result.BaseObject is PowerShellAuthorizationResponse res)
-                    {
-                        return res;
-                    }
-                    else
-                    {
-                        this.logger.LogWarning($"The powerShell script returned an unsupported object of type {result.BaseObject?.GetType().FullName} to the pipeline");
-                    }
-                }
-
-                return null;
-            });
-
-            task.Start();
-            if (!task.Wait(TimeSpan.FromSeconds(timeout)))
-            {
-                throw new TimeoutException("The PowerShell script did not complete within the configured time");
-            }
-
-            if (task.IsFaulted)
-            {
-                if (task.Exception != null) throw task.Exception;
-                throw new AccessManagerException("The task failed");
-            }
-
-            if (task.Result != null)
-            {
-                this.logger.LogTrace($"PowerShell script returned the following AuthorizationResponse: {JsonConvert.SerializeObject(task.Result)}");
-                return task.Result;
-            }
-
-            this.logger.LogWarning($"The PowerShell script did not return an AuthorizationResponse");
-
-            return new PowerShellAuthorizationResponse()
-          ;
-        }
-
-        private void InitializePowerShellSession(string script)
-        {
-            string path = this.env.GetFullPath(script, this.env.ScriptsPath);
-
-            if (path == null || !File.Exists(path))
-            {
-                throw new FileNotFoundException($"The PowerShell script was not found: {path}");
-            }
-
-            powershell = PowerShell.Create();
-            powershell.AddScript(File.ReadAllText(path));
-            powershell.Invoke();
-
-            if (powershell.Runspace.SessionStateProxy.InvokeCommand.GetCommand("Get-LapsAuthorizationResponse", CommandTypes.All) == null)
-            {
-                throw new NotSupportedException("The PowerShell script must contain a function called 'Get-LapsAuthorizationResponse'");
-            }
-
-            if (powershell.Runspace.SessionStateProxy.InvokeCommand.GetCommand("Get-LapsHistoryAuthorizationResponse", CommandTypes.All) == null)
-            {
-                throw new NotSupportedException("The PowerShell script must contain a function called 'Get-LapsHistoryAuthorizationResponse'");
-            }
-
-            if (powershell.Runspace.SessionStateProxy.InvokeCommand.GetCommand("Get-JitAuthorizationResponse", CommandTypes.All) == null)
-            {
-                throw new NotSupportedException("The PowerShell script must contain a function called 'Get-JitAuthorizationResponse'");
-            }
-
-            this.logger.LogTrace($"The PowerShell script was successfully initialized");
         }
     }
 }

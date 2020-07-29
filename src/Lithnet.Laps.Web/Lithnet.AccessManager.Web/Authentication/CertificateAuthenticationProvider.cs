@@ -12,6 +12,7 @@ using Lithnet.AccessManager.Web.App_LocalResources;
 using Lithnet.AccessManager.Web.Internal;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -29,11 +30,18 @@ namespace Lithnet.AccessManager.Web.AppSettings
 
         private readonly ILogger<CertificateAuthenticationProvider> logger;
 
+        private readonly IMemoryCache cache;
+
         public CertificateAuthenticationProvider(IOptionsSnapshot<CertificateAuthenticationProviderOptions> options, ILogger<CertificateAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
             : base(httpContextAccessor, directory)
         {
             this.directory = directory;
             this.logger = logger;
+            this.cache = new MemoryCache(new MemoryCacheOptions
+            {
+                 
+            });
+
             this.options = options.Value;
         }
 
@@ -55,6 +63,13 @@ namespace Lithnet.AccessManager.Web.AppSettings
                 {
                     OnCertificateValidated = context =>
                     {
+                        if(this.cache.TryGetValue(context.ClientCertificate.Thumbprint, out ClaimsPrincipal identity))
+                        {
+                            context.Principal = identity;
+                            context.Success();
+                            return Task.CompletedTask;
+                        }
+
                         var claims = (context.Principal?.Identity as ClaimsIdentity)?.ToClaimList();
 
                         try
@@ -85,6 +100,8 @@ namespace Lithnet.AccessManager.Web.AppSettings
 
                         this.logger.LogEventSuccess(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, updatedClaims));
                         context.Success();
+
+                        this.cache.Set(context.ClientCertificate.Thumbprint, context.Principal, TimeSpan.FromMinutes(30));
                         return Task.CompletedTask;
                     },
                     OnAuthenticationFailed = context =>

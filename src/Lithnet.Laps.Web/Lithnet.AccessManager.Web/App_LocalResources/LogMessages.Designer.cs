@@ -125,6 +125,15 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An unexpected error occurred during the authorization process for user {0} trying to access computer {1}.
+        /// </summary>
+        internal static string AuthZError {
+            get {
+                return ResourceManager.GetString("AuthZError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The user {0} requested access to computer {1} which was authorized, but one or more audit notification channels failed to deliver the audit response, and were configured to deny access to the password when auditing fails.
         /// </summary>
         internal static string AuthZFailedAuditError {
@@ -174,6 +183,15 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An unexpected error occurred while trying to find a computer named {0}.
+        /// </summary>
+        internal static string ComputerDiscoveryError {
+            get {
+                return ResourceManager.GetString("ComputerDiscoveryError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The user {0} requested the password for computer {1}, but multiple computers matching that name were found in the directory.
         /// </summary>
         internal static string ComputerNameAmbiguous {
@@ -192,11 +210,74 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The computer {0} requested by {1} did not have a LAPS password in the directory.
+        ///   Looks up a localized string similar to The request failed because the information about the authenticated user could not be found.
+        /// </summary>
+        internal static string IdentityDiscoveryError {
+            get {
+                return ResourceManager.GetString("IdentityDiscoveryError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred when trying to grant JIT access to {0} for user {1}.
+        /// </summary>
+        internal static string JitError {
+            get {
+                return ResourceManager.GetString("JitError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred when trying to rollback the JIT access.
+        /// </summary>
+        internal static string JitRollbackFailed {
+            get {
+                return ResourceManager.GetString("JitRollbackFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rolling back JIT access due to an exception in the audit process.
+        /// </summary>
+        internal static string JitRollbackInProgress {
+            get {
+                return ResourceManager.GetString("JitRollbackInProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred when trying to get the password for computer {0) as requested by user {1}.
+        /// </summary>
+        internal static string LapsPasswordError {
+            get {
+                return ResourceManager.GetString("LapsPasswordError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred when trying to get the password history for computer {0) as requested by user {1}.
+        /// </summary>
+        internal static string LapsPasswordHistoryError {
+            get {
+                return ResourceManager.GetString("LapsPasswordHistoryError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The computer {0} requested by {1} did not have a local admin password in the directory.
         /// </summary>
         internal static string NoLapsPassword {
             get {
                 return ResourceManager.GetString("NoLapsPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The computer {0} requested by {1} did not have any historical local admin passwords in the directory.
+        /// </summary>
+        internal static string NoLapsPasswordHistory {
+            get {
+                return ResourceManager.GetString("NoLapsPasswordHistory", resourceCulture);
             }
         }
         
@@ -206,6 +287,15 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         internal static string NoTargetsExist {
             get {
                 return ResourceManager.GetString("NoTargetsExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unexpected error occurred during the pre-authorization process for user {0} attempting to access {1}.
+        /// </summary>
+        internal static string PreAuthZError {
+            get {
+                return ResourceManager.GetString("PreAuthZError", resourceCulture);
             }
         }
         
@@ -260,6 +350,15 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         internal static string UnknownComputerPlaceholder {
             get {
                 return ResourceManager.GetString("UnknownComputerPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} has requested access to computer {1}.
+        /// </summary>
+        internal static string UserHasRequestedAccessToComputer {
+            get {
+                return ResourceManager.GetString("UserHasRequestedAccessToComputer", resourceCulture);
             }
         }
         

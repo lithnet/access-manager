@@ -8,9 +8,10 @@
         public const int UserAuthorizedForComputer = 203;
         public const int JitGranted = 204;
         public const int PasswordHistoryAccessed = 205;
+        public const int UserRequestedAccess = 207;
 
         public const int SsoIdentityNotFound = 400;
-        public const int ComputerNotFound = 401;
+        public const int ComputerNotFoundInDirectory = 401;
         public const int LapsPasswordNotPresent = 402;
         public const int ComputerNameAmbiguous = 403;
         public const int ReasonRequired = 404;
@@ -18,6 +19,9 @@
         public const int CertificateIdentityNotFound = 406;
         public const int CertificateValidationFailed = 407;
         public const int CertificateValidationError = 408;
+        public const int IdentityDiscoveryError = 409;
+        public const int ComputerDiscoveryError = 410;
+        public const int NoLapsPasswordHistory = 411;
 
         public const int AuthZFailedNoReaderPrincipalMatch = 500;
         public const int AuthZFailedNoTargetMatch = 501;
@@ -35,6 +39,13 @@
         public const int NotificationChannelError = 604;
         public const int BackgroundTaskUnhandledError = 605;
         public const int TargetRuleProcessingError = 606;
+        public const int JitRollbackInProgress = 607;
+        public const int JitRollbackFailed = 608;
+        public const int JitError = 609;
+        public const int PreAuthZError = 610;
+        public const int LapsPasswordHistoryError = 611;
+        public const int LapsPasswordError = 612;
+        public const int AuthZError = 613;
 
         public const int OidcAuthZCodeError = 700;
         public const int ExternalAuthNProviderError = 701;

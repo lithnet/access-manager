@@ -4,7 +4,7 @@
     "HttpSys": {
       "HttpPort": 5000,
       "HttpsPort": 5001,
-      "Hostname": "localhost",
+      "Hostname": "",
       "Path": null,
       "MaxAccepts": 100,
       "EnableResponseCaching": false,

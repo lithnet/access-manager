@@ -9,7 +9,7 @@ namespace Lithnet.AccessManager.Server.Configuration
     [Flags]
     public enum AccessMask
     {
-        Undefined = 0,
+        None = 0,
 
         [Description("Active local admin password")]
         Laps = 0x200,

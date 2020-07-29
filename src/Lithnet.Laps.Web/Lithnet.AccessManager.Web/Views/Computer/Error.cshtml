@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "Authentication failed";
+    ViewBag.Title = "Error";
 }
 
 @model Lithnet.AccessManager.Web.Models.ErrorModel
@@ -15,4 +15,13 @@
             <p class="text-center">@Model.Message</p>
         </section>
     </fieldset>
+
+    <footer>
+        <div class="center-content">
+            @using (Html.BeginForm("AccessRequest", "Computer", FormMethod.Get))
+            {
+                <button type="submit" class="btn btn-primary">@UIMessages.ButtonNewRequest</button>
+            }
+        </div>
+    </footer>
 </div>

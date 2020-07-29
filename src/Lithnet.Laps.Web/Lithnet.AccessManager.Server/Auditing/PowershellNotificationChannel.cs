@@ -5,6 +5,7 @@ using System.IO;
 using System.Management.Automation;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.Extensions.Logging;
@@ -14,44 +15,34 @@ namespace Lithnet.AccessManager.Server.Auditing
 {
     public class PowershellNotificationChannel : NotificationChannel<PowershellNotificationChannelDefinition>
     {
-        private readonly ILogger logger;
-
-        private readonly IAppPathProvider env;
-
         private readonly NLog.ILogger nlogger = NLog.LogManager.GetCurrentClassLogger();
 
         public override string Name => "powershell";
-        
+
         protected override IList<PowershellNotificationChannelDefinition> NotificationChannelDefinitions { get; }
 
-        private PowerShell powershell;
+        private readonly IPowerShellSessionProvider sessionProvider;
 
-        public PowershellNotificationChannel(ILogger<PowershellNotificationChannel> logger, IOptionsSnapshot<AuditOptions> auditSettings, IAppPathProvider env, ChannelWriter<Action> queue)
+        public PowershellNotificationChannel(ILogger<PowershellNotificationChannel> logger, IOptionsSnapshot<AuditOptions> auditSettings, ChannelWriter<Action> queue, IPowerShellSessionProvider sessionProvider)
             : base(logger, queue)
         {
-            this.logger = logger;
             this.NotificationChannelDefinitions = auditSettings.Value.NotificationChannels.Powershell;
-            this.env = env;
+            this.sessionProvider = sessionProvider;
         }
 
         protected override void Send(AuditableAction action, Dictionary<string, string> tokens, PowershellNotificationChannelDefinition settings)
         {
-            if (powershell == null)
-            {
-                this.InitializePowerShellSession(settings);
-            }
+            PowerShell powershell = this.sessionProvider.GetSession(settings.Script, "Write-AuditLog");
 
-            this.powershell.ResetState();
-            this.powershell
-                .AddCommand("Write-AuditLog")
-                    .AddParameter("tokens", tokens)
-                    .AddParameter("isSuccess", action.IsSuccess)
-                    .AddParameter("logger", nlogger);
+            powershell.AddCommand("Write-AuditLog")
+                .AddParameter("tokens", tokens)
+                .AddParameter("isSuccess", action.IsSuccess)
+                .AddParameter("logger", nlogger);
 
             Task task = new Task(() =>
             {
-                var results = this.powershell.Invoke();
-                this.powershell.ThrowOnPipelineError();
+                powershell.Invoke();
+                powershell.ThrowOnPipelineError();
             });
 
             task.Start();
@@ -65,28 +56,6 @@ namespace Lithnet.AccessManager.Server.Auditing
                 if (task.Exception != null) throw task.Exception;
                 throw new AccessManagerException("The task failed");
             }
-        }
-
-
-        private void InitializePowerShellSession(PowershellNotificationChannelDefinition settings)
-        {
-            string path = this.env.GetFullPath(settings.Script, env.ScriptsPath);
-
-            if (path == null || !File.Exists(path))
-            {
-                throw new FileNotFoundException("The PowerShell script was not found", path);
-            }
-
-            powershell = PowerShell.Create();
-            powershell.AddScript(File.ReadAllText(path));
-            powershell.Invoke();
-
-            if (powershell.Runspace.SessionStateProxy.InvokeCommand.GetCommand("Write-AuditLog", CommandTypes.All) == null)
-            {
-                throw new NotSupportedException("The PowerShell script must contain a function called 'Write-AuditLog'");
-            }
-
-            this.logger.LogTrace($"The PowerShell script was successfully initialized");
         }
     }
 }

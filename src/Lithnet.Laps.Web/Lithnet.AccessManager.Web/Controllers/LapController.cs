@@ -64,7 +64,7 @@ namespace Lithnet.AccessManager.Web.Controllers
             {
                 ShowReason = this.userInterfaceSettings.UserSuppliedReason != AuditReasonFieldState.Hidden,
                 ReasonRequired = this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required,
-                RequestType = this.userInterfaceSettings.AllowLaps ? AccessMask.Laps : AccessMask.Jit
+                RequestType = AccessMask.Laps 
             });
         }
 
@@ -74,7 +74,7 @@ namespace Lithnet.AccessManager.Web.Controllers
         {
             model.ShowReason = this.userInterfaceSettings.UserSuppliedReason != AuditReasonFieldState.Hidden;
             model.ReasonRequired = this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required;
-            model.RequestType = model.RequestType == 0 ? this.userInterfaceSettings.AllowLaps ? AccessMask.Laps : AccessMask.Jit : model.RequestType;
+            model.RequestType = model.RequestType == 0 ? AccessMask.Laps : model.RequestType;
 
             if (!this.ModelState.IsValid)
             {
@@ -134,7 +134,7 @@ namespace Lithnet.AccessManager.Web.Controllers
                 }
                 catch (ObjectNotFoundException ex)
                 {
-                    this.logger.LogEventError(EventIDs.ComputerNotFound, string.Format(LogMessages.ComputerNotFoundInDirectory, user.MsDsPrincipalName, model.ComputerName), ex);
+                    this.logger.LogEventError(EventIDs.ComputerNotFoundInDirectory, string.Format(LogMessages.ComputerNotFoundInDirectory, user.MsDsPrincipalName, model.ComputerName), ex);
 
                     model.FailureReason = UIMessages.ComputerNotFoundInDirectory;
                     return this.View("Get", model);
@@ -187,13 +187,6 @@ namespace Lithnet.AccessManager.Web.Controllers
 
         private void ThrowOnInvalidRequestType(AccessMask requestType)
         {
-            if (!userInterfaceSettings.AllowJit && requestType.HasFlag(AccessMask.Jit) ||
-                !userInterfaceSettings.AllowLaps && requestType.HasFlag(AccessMask.Laps) ||
-                !userInterfaceSettings.AllowLapsHistory && requestType.HasFlag(AccessMask.LapsHistory))
-            {
-                throw new ArgumentException("The user requested an access type that was not allowed by the application configuration");
-            }
-
             requestType.ValidateAccessMask();
         }
 

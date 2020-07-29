@@ -10,12 +10,6 @@ namespace Lithnet.AccessManager.Server.Configuration
         [JsonConverter(typeof(StringEnumConverter))]
         public AuditReasonFieldState UserSuppliedReason { get; set; } = AuditReasonFieldState.Optional;
 
-        public bool AllowLaps { get; set; } = true;
-
-        public bool AllowJit { get; set; } = true;
-
-        public bool AllowLapsHistory { get; set; } = true;
-
         public PhoneticSettings PhoneticSettings { get; set; } = new PhoneticSettings();
     }
 }

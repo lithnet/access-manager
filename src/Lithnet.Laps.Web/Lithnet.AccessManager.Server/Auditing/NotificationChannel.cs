@@ -42,7 +42,7 @@ namespace Lithnet.AccessManager.Server.Auditing
 
                     try
                     {
-                        if (channel.Mandatory)
+                        if (channel.Mandatory && action.IsSuccess)
                         {
                             Send(action, tokens, channel, true);
                         }

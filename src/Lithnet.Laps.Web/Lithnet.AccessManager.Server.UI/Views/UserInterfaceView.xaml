@@ -76,21 +76,6 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <CheckBox Grid.Row="0" Grid.Column="0" 
-                          IsChecked="{Binding AllowLaps}" 
-                          Content="Allow local admin password requests"
-                          Margin="10 5 5 5"/>
-
-            <CheckBox Grid.Row="1" Grid.Column="0" 
-                          IsChecked="{Binding AllowLapsHistory}"
-                          Content="Allow local admin password history requests"
-                          Margin="10 5 5 5"/>
-
-            <CheckBox Grid.Row="2" Grid.Column="0" 
-                          IsChecked="{Binding AllowJit}"
-                          Content="Allow JIT requests"
-                          Margin="10 5 5 5"/>
-
             <StackPanel Grid.Row="3" Grid.Column="0" 
                             Orientation="Horizontal"
                             ToolTip="Specify if a reason for requesting admin access is required, optional, or not shown at all"

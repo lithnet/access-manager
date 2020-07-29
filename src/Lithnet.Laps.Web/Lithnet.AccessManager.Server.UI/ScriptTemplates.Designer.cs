@@ -103,19 +103,19 @@ namespace Lithnet.AccessManager.Server.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to function Get-LapsAuthorizationResponse{
+        ///   Looks up a localized string similar to function Get-AuthorizationResponse{
         ///	param(
         ///	[Lithnet.AccessManager.IUser]$user,
         ///	[Lithnet.AccessManager.IComputer]$computer,
-        ///	[Microsoft.Extensions.Logging.ILogger]$logger
+        ///	[Nlog.ILogger]$logger
         ///)
         ///
-        ///	$logger.Log(LogLevel.Trace,&quot;We&apos;re in PowerShell!&quot;);
-        ///	$logger.Log(LogLevel.Trace,&quot;Checking if $($user.MsDsPrincipalName) has access to LAPS for $($computer.MsDsPrincipalName)&quot;);
+        ///	$logger.Trace(&quot;We&apos;re in PowerShell!&quot;);
+        ///	$logger.Trace(&quot;Checking if $($user.MsDsPrincipalName) is allowed administrative access to $($computer.MsDsPrincipalName)&quot;);
         ///
         ///	$response = New-Object -TypeName &quot;Lithnet.AccessManager.Server.Authorization.PowerShellAuthorizationResponse&quot;
         ///
-        ///	# Set IsAllowed to true to a [rest of string was truncated]&quot;;.
+        ///	# Set IsAllowed to true to allow access, or set IsDenied to explicitl [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AuthorizationScriptTemplate {
             get {

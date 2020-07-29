@@ -25,7 +25,7 @@ namespace Lithnet.AccessManager.Web.Controllers
 
         public IActionResult Index()
         {
-            return this.RedirectToAction("Get", "Lap");
+            return this.RedirectToAction("AccessRequest", "Computer");
         }
 
         public IActionResult AuthNError(AuthNFailureMessageID messageID)
