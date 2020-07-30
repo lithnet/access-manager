@@ -57,6 +57,7 @@ namespace Lithnet.AccessManager.Web
             services.TryAddSingleton<RandomNumberGenerator>(RandomNumberGenerator.Create());
             services.TryAddSingleton<IJitAccessGroupResolver, JitAccessGroupResolver>();
             services.TryAddSingleton<IPowerShellSessionProvider, CachedPowerShellSessionProvider>();
+            services.TryAddSingleton<IAuthorizationInformationMemoryCache, AuthorizationInformationMemoryCache>();
 
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();

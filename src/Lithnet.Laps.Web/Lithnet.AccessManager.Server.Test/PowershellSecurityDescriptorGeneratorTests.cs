@@ -15,13 +15,20 @@ namespace Lithnet.AccessManager.Server.Test
 
         private PowerShellSecurityDescriptorGenerator generator;
 
+        private ILogger<PowerShellSecurityDescriptorGenerator> psLogger;
+
+        private ILogger<CachedPowerShellSessionProvider> sessionLogger;
+
         [SetUp()]
         public void TestInitialize()
         {
             directory = new ActiveDirectory();
+            psLogger = Global.LogFactory.CreateLogger<PowerShellSecurityDescriptorGenerator>();
+            sessionLogger = Global.LogFactory.CreateLogger<CachedPowerShellSessionProvider>();
+
             var provider = new TestPathProvider();
-            var sessionp = new CachedPowerShellSessionProvider(provider, Mock.Of<ILogger<CachedPowerShellSessionProvider>>());
-            generator = new PowerShellSecurityDescriptorGenerator(Mock.Of<ILogger<PowerShellSecurityDescriptorGenerator>>(), sessionp);
+            var sessionp = new CachedPowerShellSessionProvider(provider, sessionLogger);
+            generator = new PowerShellSecurityDescriptorGenerator(psLogger, sessionp);
         }
 
         [Test]

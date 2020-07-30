@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.AccessControl;
 using System.Security.Principal;
-using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Extensions;
-using Lithnet.Security.Authorization;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Server.Authorization
 {
@@ -19,21 +13,16 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         private readonly ILogger logger;
 
-        private readonly BuiltInProviderOptions options;
-
         private readonly IJitAccessGroupResolver jitResolver;
 
-        private readonly IPowerShellSecurityDescriptorGenerator powershell;
+        private readonly IAuthorizationInformationBuilder authzBuilder;
 
-        private static readonly IMemoryCache cache = new MemoryCache(new MemoryCacheOptions());
-
-        public SecurityDescriptorAuthorizationService(IOptionsSnapshot<BuiltInProviderOptions> options, IDirectory directory, ILogger<SecurityDescriptorAuthorizationService> logger, IJitAccessGroupResolver jitResolver, IPowerShellSecurityDescriptorGenerator powershell)
+        public SecurityDescriptorAuthorizationService(IDirectory directory, ILogger<SecurityDescriptorAuthorizationService> logger, IJitAccessGroupResolver jitResolver, IAuthorizationInformationBuilder authzBuilder)
         {
             this.directory = directory;
             this.logger = logger;
-            this.options = options.Value;
             this.jitResolver = jitResolver;
-            this.powershell = powershell;
+            this.authzBuilder = authzBuilder;
         }
 
         //public AuthorizationResponse GetPreAuthorization(IUser user, IComputer computer)
@@ -166,7 +155,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             {
                 requestedAccess.ValidateAccessMask();
 
-                var info = GetAuthorizationInformation(user, computer);
+                var info = this.authzBuilder.GetAuthorizationInformation(user, computer);
 
                 if (info.MatchedTargets.Count == 0)
                 {
@@ -212,37 +201,13 @@ namespace Lithnet.AccessManager.Server.Authorization
             }
             finally
             {
-                this.ClearCache(user, computer);
+                this.authzBuilder.ClearCache(user, computer);
             }
-        }
-
-        internal void ClearCache(IUser user, IComputer computer)
-        {
-            string key = $"{user.Sid}-{computer.Sid}";
-            cache.Remove(key);
-        }
-
-        internal AuthorizationInformation GetAuthorizationInformation(IUser user, IComputer computer)
-        {
-            string key = $"{user.Sid}-{computer.Sid}";
-
-            if (cache.TryGetValue<AuthorizationInformation>(key, out AuthorizationInformation info))
-            {
-                this.logger.LogTrace($"Cached authorization information found for {key}");
-                return info;
-            }
-
-            this.logger.LogTrace($"Building authorization information for {key}");
-            info = this.BuildAuthorizationInformation(user, computer);
-
-            cache.Set(key, info, TimeSpan.FromMinutes(2));
-
-            return info;
         }
 
         public AuthorizationResponse GetPreAuthorization(IUser user, IComputer computer)
         {
-            var info = this.GetAuthorizationInformation(user, computer);
+            var info = this.authzBuilder.GetAuthorizationInformation(user, computer);
 
             if (info.MatchedTargets.Count == 0)
             {
@@ -266,87 +231,6 @@ namespace Lithnet.AccessManager.Server.Authorization
                     Code = AuthorizationResponseCode.NoMatchingRuleForUser,
                     NotificationChannels = GetNotificationRecipients(info.FailedTargets, false)
                 };
-            }
-        }
-
-        internal AuthorizationInformation BuildAuthorizationInformation(IUser user, IComputer computer)
-        {
-            AuthorizationInformation info = new AuthorizationInformation();
-
-            info.MatchedTargets = this.GetMatchingTargetsForComputer(computer);
-
-            if (info.MatchedTargets.Count == 0)
-            {
-                return info;
-            }
-
-            AuthorizationContext c = new AuthorizationContext(user.Sid, this.GetAuthorizationContextTarget(user, computer));
-
-            foreach (var target in info.MatchedTargets.Where(t => t.AuthorizationMode == AuthorizationMode.PowershellScript))
-            {
-                var response = this.powershell.GenerateSecurityDescriptor(user, computer, target.Script, 30);
-                target.SecurityDescriptor = response?.GetSddlForm(AccessControlSections.All);
-            }
-
-            foreach (var target in info.MatchedTargets)
-            {
-                if (string.IsNullOrWhiteSpace(target.SecurityDescriptor))
-                {
-                    this.logger.LogTrace($"Ignoring target {target.Id} with empty security descriptor");
-                    continue;
-                }
-
-                RawSecurityDescriptor sd = new RawSecurityDescriptor(target.SecurityDescriptor);
-                info.SecurityDescriptors.Add(sd);
-
-                bool hasLaps = c.AccessCheck(sd, (int)AccessMask.Laps);
-                bool hasLapsHistory = c.AccessCheck(sd, (int)AccessMask.LapsHistory);
-                bool hasJit = c.AccessCheck(sd, (int)AccessMask.Jit);
-
-                if (hasJit)
-                {
-                    info.SuccessfulJitTargets.Add(target);
-                }
-
-                if (hasLaps)
-                {
-                    info.SuccessfulLapsTargets.Add(target);
-                }
-
-                if (hasLapsHistory)
-                {
-                    info.SuccessfulLapsHistoryTargets.Add(target);
-                }
-
-                // If the ACE did not grant any permissions to the user, consider it a failure response
-                if (!hasLaps &&
-                    !hasLapsHistory &&
-                    !hasJit)
-                {
-                    info.FailedTargets.Add(target);
-                }
-            }
-
-            info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptors, (int)AccessMask.Laps) ? AccessMask.Laps : 0;
-            info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptors, (int)AccessMask.Jit) ? AccessMask.Jit : 0;
-            info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptors, (int)AccessMask.LapsHistory) ? AccessMask.LapsHistory : 0;
-
-            this.logger.LogTrace($"User {user.MsDsPrincipalName} has effective access of {info.EffectiveAccess} on computer {computer.MsDsPrincipalName}");
-            return info;
-        }
-
-        private string GetAuthorizationContextTarget(IUser user, IComputer computer)
-        {
-            switch (this.options.AccessControlEvaluationLocation)
-            {
-                case AclEvaluationLocation.ComputerDomain:
-                    return this.directory.GetDomainNameDnsFromSid(computer.Sid);
-
-                case AclEvaluationLocation.UserDomain:
-                    return this.directory.GetDomainNameDnsFromSid(user.Sid);
-
-                default:
-                    return null;
             }
         }
 
@@ -426,49 +310,6 @@ namespace Lithnet.AccessManager.Server.Authorization
             }
 
             return list;
-        }
-
-
-        private IList<SecurityDescriptorTarget> GetMatchingTargetsForComputer(IComputer computer)
-        {
-            List<SecurityDescriptorTarget> matchingTargets = new List<SecurityDescriptorTarget>();
-
-            foreach (var target in this.options.Targets.OrderBy(t => (int)t.Type).ThenByDescending(t => t.Id.Length))
-            {
-                try
-                {
-                    if (target.Type == TargetType.Container)
-                    {
-                        if (this.directory.IsObjectInOu(computer, target.Target))
-                        {
-                            this.logger.LogTrace($"Matched {computer.MsDsPrincipalName} to target OU {target.Target}");
-                            matchingTargets.Add(target);
-                        }
-                    }
-                    else if (target.Type == TargetType.Computer)
-                    {
-                        if (target.GetTargetAsSid() == computer.Sid)
-                        {
-                            this.logger.LogTrace($"Matched {computer.MsDsPrincipalName} to target {target.Id}");
-                            matchingTargets.Add(target);
-                        }
-                    }
-                    else
-                    {
-                        if (this.directory.IsSidInPrincipalToken(target.GetTargetAsSid(), computer, computer.Sid))
-                        {
-                            this.logger.LogTrace($"Matched {computer.MsDsPrincipalName} to target {target.Id}");
-                            matchingTargets.Add(target);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    this.logger.LogEventError(EventIDs.TargetRuleProcessingError, $"An error occurred processing the target {target.Id}:{target.Type}:{target.Target}", ex);
-                }
-            }
-
-            return matchingTargets;
         }
 
         private string TryGetNameIfSid(string sid)

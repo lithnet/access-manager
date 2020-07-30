@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using Lithnet.AccessManager.Server.Configuration;
@@ -152,6 +153,57 @@ namespace Lithnet.AccessManager.Server.Test
         {
             Assert.Throws<ObjectNotFoundException>(() => this.IsMatch(trustee, requestor, null, AccessControlType.Deny));
         }
+
+        [TestCase("idmdev1\\G-UG-1", "idmdev1\\user1")]
+        public void TestDeniedSingleSd(string trustee, string requestor)
+        {
+            ActiveDirectory d = new ActiveDirectory();
+            var user = d.GetUser(requestor);
+            var p = d.GetPrincipal(trustee);
+
+            DiscretionaryAcl dacl = new DiscretionaryAcl(false, false, 2);
+            dacl.AddAccess(AccessControlType.Allow, p.Sid, (int)AccessMask.Jit, InheritanceFlags.None, PropagationFlags.None);
+            dacl.AddAccess(AccessControlType.Deny, p.Sid, (int)AccessMask.Jit, InheritanceFlags.None, PropagationFlags.None);
+
+            CommonSecurityDescriptor sd = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, dacl);
+
+            AuthorizationContext c = new AuthorizationContext(user.Sid);
+
+            Assert.IsFalse(c.AccessCheck(sd, (int)AccessMask.Jit));
+        }
+
+        [TestCase("idmdev1\\G-UG-1", "idmdev1\\user1")]
+        public void TestDeniedMultipleSd(string trustee, string requestor)
+        {
+            ActiveDirectory d = new ActiveDirectory();
+            var user1 = d.GetUser(requestor);
+            var user2 = d.GetUser("IDMDEV1\\user2");
+            var p = d.GetPrincipal(trustee);
+
+            List<GenericSecurityDescriptor> sds = new List<GenericSecurityDescriptor>();
+
+            var dacl1 = new DiscretionaryAcl(false, false, 1);
+            dacl1.AddAccess(AccessControlType.Allow, user2.Sid, (int)AccessMask.Jit, InheritanceFlags.None, PropagationFlags.None);
+            var sd1 = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, dacl1);
+            sds.Add(sd1);
+            
+            var dacl2 = new DiscretionaryAcl(false, false, 1);
+            dacl2.AddAccess(AccessControlType.Allow, user1.Sid, (int)AccessMask.Jit, InheritanceFlags.None, PropagationFlags.None);
+            var sd2 = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, dacl2);
+            sds.Add(sd2);
+            
+            var dacl3 = new DiscretionaryAcl(false, false, 1);
+            dacl3.AddAccess(AccessControlType.Deny, user1.Sid, (int)AccessMask.Jit, InheritanceFlags.None, PropagationFlags.None);
+            var sd3 = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, dacl3);
+            sds.Add(sd3);
+
+            sd3.GetSddlForm(AccessControlSections.Access);
+            
+            AuthorizationContext c = new AuthorizationContext(user1.Sid);
+
+            Assert.IsFalse(c.AccessCheck(sds, (int)AccessMask.Jit));
+        }
+
 
         private bool IsMatch(string trustee, string requestor, string serverName, AccessControlType aceType = AccessControlType.Allow)
         {

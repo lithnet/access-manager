@@ -18,37 +18,12 @@ namespace Lithnet.AccessManager.Server.Test
 
         private JitAccessProvider provider;
 
-        private readonly ILogger<JitAccessProvider> logger;
+        private ILogger<JitAccessProvider> logger;
 
         private JitConfigurationOptions options;
 
         public JitAccessProviderTests()
         {
-            var config = new NLog.Config.LoggingConfiguration();
-
-            // Targets where to log to: File and Console
-            var logfile = new NLog.Targets.FileTarget("logfile") { FileName = "unit-test.log" };
-            var logconsole = new NLog.Targets.ConsoleTarget("logconsole");
-
-            // Rules for mapping loggers to targets            
-            config.AddRule(NLog.LogLevel.Info, NLog.LogLevel.Fatal, logconsole);
-            config.AddRule(NLog.LogLevel.Trace, NLog.LogLevel.Fatal, logfile);
-
-            // Apply config           
-            NLog.LogManager.Configuration = config;
-
-
-            var serviceProvider = new ServiceCollection()
-                .AddLogging(logger =>
-                {
-                    logger.SetMinimumLevel(LogLevel.Trace);
-                })
-             .BuildServiceProvider();
-
-            var factory = serviceProvider.GetService<ILoggerFactory>();
-            factory.AddNLog();
-
-            logger = factory.CreateLogger<JitAccessProvider>();
         }
 
         [SetUp()]
@@ -59,6 +34,8 @@ namespace Lithnet.AccessManager.Server.Test
             {
                 DynamicGroupMappings = new List<JitDynamicGroupMapping>()
             };
+         
+            logger = Global.LogFactory.CreateLogger<JitAccessProvider>();
         }
 
         [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]

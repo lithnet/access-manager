@@ -6,7 +6,7 @@ using Lithnet.AccessManager.Server.Configuration;
 
 namespace Lithnet.AccessManager.Server.Authorization
 {
-    internal class AuthorizationInformation
+    public class AuthorizationInformation
     {
         public IUser User { get; set; }
 
