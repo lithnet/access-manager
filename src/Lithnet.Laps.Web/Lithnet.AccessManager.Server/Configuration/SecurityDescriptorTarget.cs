@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Diagnostics;
+using System.DirectoryServices;
+using System.Security.Cryptography.Pkcs;
 using System.Security.Principal;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Lithnet.AccessManager.Server.Configuration
 {
+    [DebuggerDisplay("{Id} - {Target}")]
     public class SecurityDescriptorTarget
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
@@ -29,15 +34,9 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public AuditNotificationChannels Notifications { get; set; } = new AuditNotificationChannels();
 
-        public SecurityIdentifier GetTargetAsSid()
+        public override string ToString()
         {
-            if (this.Target == null)
-            {
-                throw new ArgumentNullException(nameof(this.Target), "The target ID was null");
-            }
-
-            SecurityIdentifier s = new SecurityIdentifier(this.Target);
-            return s;
+            return this.Id;
         }
     }
 }

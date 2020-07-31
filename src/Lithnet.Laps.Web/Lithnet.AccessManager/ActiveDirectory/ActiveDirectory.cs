@@ -95,7 +95,8 @@ namespace Lithnet.AccessManager
             {
                 SearchRoot = new DirectoryEntry($"GC://{ou}"),
                 SearchScope = SearchScope.Subtree,
-                Filter = $"objectGuid={o.Guid.ToOctetString()}"
+                Filter = $"objectGuid={o.Guid.ToOctetString()}",
+                PropertyNamesOnly = true
             };
 
             return d.FindOne() != null;
@@ -161,6 +162,21 @@ namespace Lithnet.AccessManager
         public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, SecurityIdentifier principal, SecurityIdentifier targetDomainSid)
         {
             return NativeMethods.CheckForSidInToken(principal, sidToFindInToken, targetDomainSid);
+        }
+
+        public IEnumerable<SecurityIdentifier> GetTokenGroups(ISecurityPrincipal principal)
+        {
+            return this.GetTokenGroups(principal, null);
+        }
+
+        public IEnumerable<SecurityIdentifier> GetTokenGroups(ISecurityPrincipal principal, SecurityIdentifier targetDomainSid)
+        {
+            return NativeMethods.GetTokenGroups(principal.Sid, targetDomainSid);
+        }
+
+        public bool IsSidInPrincipalToken(SecurityIdentifier sidToFind, IEnumerable<SecurityIdentifier> tokenSids)
+        {
+            return tokenSids.Any(t => sidToFind == t);
         }
 
         public string TranslateName(string name, DsNameFormat nameFormat, DsNameFormat requiredFormat)

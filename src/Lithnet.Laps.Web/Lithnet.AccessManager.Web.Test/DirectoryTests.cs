@@ -49,7 +49,7 @@ namespace Lithnet.AccessManager.Test
             list.Add(csd);
             list.Add(csd2);
 
-            AuthorizationContext c = new AuthorizationContext(WindowsIdentity.GetCurrent().AccessToken);
+            using AuthorizationContext c = new AuthorizationContext(WindowsIdentity.GetCurrent().AccessToken);
             Assert.IsTrue(c.AccessCheck(csd, 0x200));
             Assert.IsTrue(c.AccessCheck(list, 0x400));
             Assert.IsTrue(c.AccessCheck(list, 0x600));
@@ -75,7 +75,7 @@ namespace Lithnet.AccessManager.Test
             list.Add(csd);
             list.Add(csd2);
 
-            AuthorizationContext c = new AuthorizationContext(WindowsIdentity.GetCurrent().User);
+            using AuthorizationContext c = new AuthorizationContext(WindowsIdentity.GetCurrent().User);
             Assert.IsTrue(c.AccessCheck(csd, 0x200));
             Assert.IsTrue(c.AccessCheck(list, 0x400));
             Assert.IsTrue(c.AccessCheck(list, 0x600));

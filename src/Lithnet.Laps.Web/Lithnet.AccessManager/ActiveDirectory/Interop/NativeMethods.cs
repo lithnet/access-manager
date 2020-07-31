@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Lithnet.Security.Authorization;
@@ -395,8 +396,31 @@ namespace Lithnet.AccessManager.Interop
                 server = NativeMethods.GetDomainControllerForDnsDomain(dnsDomain);
             }
 
-            AuthorizationContext context = new AuthorizationContext(principalSid, server);
+            using AuthorizationContext context = new AuthorizationContext(principalSid, server);
             return context.ContainsSid(sidToCheck);
+        }
+
+        public static IEnumerable<SecurityIdentifier> GetTokenGroups(SecurityIdentifier principalSid,  SecurityIdentifier requestContext = null)
+        {
+            if (principalSid == null)
+            {
+                throw new ArgumentNullException(nameof(principalSid));
+            }
+
+            string server;
+
+            if (requestContext == null || requestContext.IsEqualDomainSid(NativeMethods.CurrentDomainSid))
+            {
+                server = null;
+            }
+            else
+            {
+                string dnsDomain = NativeMethods.GetDnsDomainNameFromSid(requestContext.AccountDomainSid);
+                server = NativeMethods.GetDomainControllerForDnsDomain(dnsDomain);
+            }
+
+            using AuthorizationContext context = new AuthorizationContext(principalSid, server);
+            return context.GetTokenGroups().ToList(); // Force the enumeration now before the context goes out of scope
         }
 
         private static string GetDomainControllerForDnsDomain(string dnsDomain, bool forceRediscovery = false)

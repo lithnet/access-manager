@@ -12,7 +12,7 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         public IComputer Computer { get; set; }
 
-        public IList<SecurityDescriptorTarget> MatchedTargets { get; set;  } = new List<SecurityDescriptorTarget>();
+        public IList<SecurityDescriptorTarget> MatchedComputerTargets { get; set;  } = new List<SecurityDescriptorTarget>();
 
         public AccessMask EffectiveAccess { get; set; }
 
@@ -24,6 +24,6 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         public IList<SecurityDescriptorTarget> SuccessfulJitTargets { get; set; } = new List<SecurityDescriptorTarget>();
 
-        public List<GenericSecurityDescriptor> SecurityDescriptors { get; set; } = new List<GenericSecurityDescriptor>();
+        public GenericSecurityDescriptor SecurityDescriptor { get; set; }
     }
 }

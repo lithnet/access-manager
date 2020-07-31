@@ -23,16 +23,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="lithnet.security.authorization" Version="1.0.7516.5" />
+    <PackageReference Include="lithnet.security.authorization" Version="1.0.7517.60139" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.6" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
     <PackageReference Include="moq" Version="4.14.5" />
     <PackageReference Include="nlog" Version="4.7.2" />
     <PackageReference Include="NLog.Extensions.Logging" Version="1.6.4" />
     <PackageReference Include="nunit" Version="3.12.0" />
-    <PackageReference Include="nunit3testadapter" Version="3.16.1">
+    <PackageReference Include="nunit3testadapter" Version="3.17.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

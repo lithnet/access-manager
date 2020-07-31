@@ -65,8 +65,11 @@ namespace Lithnet.AccessManager
         {
             CertificateRequest request = new CertificateRequest($"CN={subject},OU=Access Manager,O=Lithnet", RSA.Create(4096), HashAlgorithmName.SHA384, RSASignaturePadding.Pss);
 
-            var enhancedKeyUsage = new OidCollection();
-            enhancedKeyUsage.Add(new Oid(LithnetAccessManagerEku, "Lithnet Access Manager Encryption"));
+            var enhancedKeyUsage = new OidCollection
+            {
+                new Oid(LithnetAccessManagerEku, "Lithnet Access Manager Encryption")
+            };
+
             request.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(enhancedKeyUsage, critical: true));
             request.CertificateExtensions.Add(new X509KeyUsageExtension(X509KeyUsageFlags.KeyEncipherment, true));
             request.CertificateExtensions.Add(new X509BasicConstraintsExtension(false, false, 0, true));
@@ -238,7 +241,7 @@ namespace Lithnet.AccessManager
                     return this.TryGetCertificateFromUrl(u, out cert);
                 }
             }
-            else if (Uri.TryCreate(path, UriKind.Relative, out Uri p))
+            else if (Uri.TryCreate(path, UriKind.Relative, out _))
             {
                 var testPath = Path.Combine(this.appPathProvider.AppPath, path);
                 return this.TryGetCertificateFromFile(testPath, out cert);
@@ -335,7 +338,7 @@ namespace Lithnet.AccessManager
 
         private static bool GetServiceStatus()
         {
-            AuthorizationContext c = new AuthorizationContext(WindowsIdentity.GetCurrent().AccessToken);
+            using AuthorizationContext c = new AuthorizationContext(WindowsIdentity.GetCurrent().AccessToken);
             return c.ContainsSid(new SecurityIdentifier("S-1-5-6"));
         }
 

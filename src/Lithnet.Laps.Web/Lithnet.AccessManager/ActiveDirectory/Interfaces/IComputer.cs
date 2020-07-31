@@ -1,4 +1,6 @@
-﻿using System.DirectoryServices;
+﻿using System;
+using System.Collections.Generic;
+using System.DirectoryServices;
 
 namespace Lithnet.AccessManager
 {
@@ -9,5 +11,7 @@ namespace Lithnet.AccessManager
         string DisplayName { get; }
 
         DirectoryEntry DirectoryEntry { get; }
+
+        IEnumerable<Guid> GetParentGuids();
     }
 }

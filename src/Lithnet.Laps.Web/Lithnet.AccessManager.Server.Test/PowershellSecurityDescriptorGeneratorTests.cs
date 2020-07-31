@@ -38,7 +38,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var sd = generator.GenerateSecurityDescriptor(user, null, "AuthZTestGrantLapsJit.ps1", 30);
 
-            AuthorizationContext context = new AuthorizationContext(user.Sid);
+            using AuthorizationContext context = new AuthorizationContext(user.Sid);
             Assert.IsTrue(context.AccessCheck(sd, (int)AccessMask.Jit));
             Assert.IsTrue(context.AccessCheck(sd, (int)AccessMask.Laps));
             Assert.IsFalse(context.AccessCheck(sd, (int)AccessMask.LapsHistory));
@@ -51,7 +51,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var sd = generator.GenerateSecurityDescriptor(user, null, "AuthZTestDenyLapsJitGrantLapsHistory.ps1", 30);
 
-            AuthorizationContext context = new AuthorizationContext(user.Sid);
+            using AuthorizationContext context = new AuthorizationContext(user.Sid);
             Assert.IsFalse(context.AccessCheck(sd, (int)AccessMask.Jit));
             Assert.IsFalse(context.AccessCheck(sd, (int)AccessMask.Laps));
             Assert.IsTrue(context.AccessCheck(sd, (int)AccessMask.LapsHistory));
@@ -72,7 +72,7 @@ namespace Lithnet.AccessManager.Server.Test
             PowerShellAuthorizationResponse response = this.AccessMaskToPowerShellAuthorizationResponse(allowedAccess, deniedAccess);
             var sd = generator.GenerateSecurityDescriptor(user, response);
 
-            AuthorizationContext context = new AuthorizationContext(user);
+            using AuthorizationContext context = new AuthorizationContext(user);
 
             Assert.AreEqual(response.IsJitAllowed && !response.IsJitDenied, context.AccessCheck(sd, (int)AccessMask.Jit));
             Assert.AreEqual(response.IsLocalAdminPasswordAllowed && !response.IsLocalAdminPasswordDenied, context.AccessCheck(sd, (int)AccessMask.Laps));
@@ -94,7 +94,7 @@ namespace Lithnet.AccessManager.Server.Test
             PowerShellAuthorizationResponse response = this.AccessMaskToPowerShellAuthorizationResponse(allowedAccess, deniedAccess);
             var sd = generator.GenerateSecurityDescriptor(user, response);
 
-            AuthorizationContext context = new AuthorizationContext(user);
+            using AuthorizationContext context = new AuthorizationContext(user);
 
             Assert.AreEqual(expectedResult, context.AccessCheck(sd, (int)AccessMask.Laps));
         }
@@ -114,7 +114,7 @@ namespace Lithnet.AccessManager.Server.Test
             PowerShellAuthorizationResponse response = this.AccessMaskToPowerShellAuthorizationResponse(allowedAccess, deniedAccess);
             var sd = generator.GenerateSecurityDescriptor(user, response);
 
-            AuthorizationContext context = new AuthorizationContext(user);
+            using AuthorizationContext context = new AuthorizationContext(user);
 
             Assert.AreEqual(expectedResult, context.AccessCheck(sd, (int)AccessMask.LapsHistory));
         }
@@ -134,7 +134,7 @@ namespace Lithnet.AccessManager.Server.Test
             PowerShellAuthorizationResponse response = this.AccessMaskToPowerShellAuthorizationResponse(allowedAccess, deniedAccess);
             var sd = generator.GenerateSecurityDescriptor(user, response);
 
-            AuthorizationContext context = new AuthorizationContext(user);
+            using AuthorizationContext context = new AuthorizationContext(user);
 
             Assert.AreEqual(expectedResult, context.AccessCheck(sd, (int)AccessMask.Jit));
         }

@@ -16,13 +16,13 @@
 
   <ItemGroup>
     <PackageReference Include="htmlagilitypack" Version="1.11.24" />
-    <PackageReference Include="lithnet.security.authorization" Version="1.0.7516.5" />
+    <PackageReference Include="lithnet.security.authorization" Version="1.0.7517.60139" />
     <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.6" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.5" />
-    <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="6.7.0" />
-    <PackageReference Include="microsoft.powershell.sdk" Version="7.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.6" />
+    <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="6.7.1" />
+    <PackageReference Include="microsoft.powershell.sdk" Version="7.0.3" />
     <PackageReference Include="newtonsoft.json" Version="12.0.3" />
   </ItemGroup>
 

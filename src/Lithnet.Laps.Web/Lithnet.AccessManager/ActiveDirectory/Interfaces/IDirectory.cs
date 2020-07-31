@@ -70,7 +70,13 @@ namespace Lithnet.AccessManager
             SecurityIdentifier targetDomainSid);
 
         bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, SecurityIdentifier principal);
-     
+
+        bool IsSidInPrincipalToken(SecurityIdentifier sidToFind, IEnumerable<SecurityIdentifier> tokenSids);
+
+        IEnumerable<SecurityIdentifier> GetTokenGroups(ISecurityPrincipal principal, SecurityIdentifier targetDomainSid);
+
+        IEnumerable<SecurityIdentifier> GetTokenGroups(ISecurityPrincipal principal);
+
         string TranslateName(string name, DsNameFormat nameFormat, DsNameFormat requiredFormat, string dnsDomainName);
 
         string TranslateName(string name, DsNameFormat nameFormat, DsNameFormat requiredFormat);

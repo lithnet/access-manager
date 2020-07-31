@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.AccessControl;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
 using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Extensions;
@@ -22,28 +24,32 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         private readonly IPowerShellSecurityDescriptorGenerator powershell;
 
-        private readonly IAuthorizationInformationMemoryCache cache;
+        private readonly IAuthorizationInformationMemoryCache authzCache;
 
-        public AuthorizationInformationBuilder(IOptionsSnapshot<BuiltInProviderOptions> options, IDirectory directory, ILogger<AuthorizationInformationBuilder> logger, IPowerShellSecurityDescriptorGenerator powershell, IAuthorizationInformationMemoryCache cache)
+        private readonly ITargetDataProvider targetDataProvider;
+
+
+        public AuthorizationInformationBuilder(IOptionsSnapshot<BuiltInProviderOptions> options, IDirectory directory, ILogger<AuthorizationInformationBuilder> logger, IPowerShellSecurityDescriptorGenerator powershell, IAuthorizationInformationMemoryCache authzCache, ITargetDataProvider targetDataProvider)
         {
             this.directory = directory;
             this.logger = logger;
             this.options = options.Value;
             this.powershell = powershell;
-            this.cache = cache;
+            this.authzCache = authzCache;
+            this.targetDataProvider = targetDataProvider;
         }
 
         public void ClearCache(IUser user, IComputer computer)
         {
             string key = $"{user.Sid}-{computer.Sid}";
-            cache.Remove(key);
+            authzCache.Remove(key);
         }
 
         public AuthorizationInformation GetAuthorizationInformation(IUser user, IComputer computer)
         {
             string key = $"{user.Sid}-{computer.Sid}";
 
-            if (cache.TryGetValue(key, out AuthorizationInformation info))
+            if (authzCache.TryGetValue(key, out AuthorizationInformation info))
             {
                 this.logger.LogTrace($"Cached authorization information found for {key}");
                 return info;
@@ -54,7 +60,7 @@ namespace Lithnet.AccessManager.Server.Authorization
 
             if (options.AuthZCacheDuration >= 0)
             {
-                cache.Set(key, info, TimeSpan.FromSeconds(Math.Max(options.AuthZCacheDuration, 60)));
+                authzCache.Set(key, info, TimeSpan.FromSeconds(Math.Max(options.AuthZCacheDuration, 60)));
             }
 
             return info;
@@ -64,19 +70,26 @@ namespace Lithnet.AccessManager.Server.Authorization
         {
             AuthorizationInformation info = new AuthorizationInformation
             {
-                MatchedTargets = this.GetMatchingTargetsForComputer(computer)
+                MatchedComputerTargets = this.GetMatchingTargetsForComputer(computer),
+                EffectiveAccess = 0,
+                Computer = computer,
+                User = user
             };
 
-            if (info.MatchedTargets.Count == 0)
+            if (info.MatchedComputerTargets.Count == 0)
             {
                 return info;
             }
 
-            AuthorizationContext c = new AuthorizationContext(user.Sid, this.GetAuthorizationContextTarget(user, computer));
+            using AuthorizationContext c = new AuthorizationContext(user.Sid, this.GetAuthorizationContextTarget(user, computer));
 
-            foreach (var target in info.MatchedTargets)
+            DiscretionaryAcl masterDacl = new DiscretionaryAcl(false, false, info.MatchedComputerTargets.Count);
+
+            int matchedTargetCount = 0;
+
+            foreach (var target in info.MatchedComputerTargets)
             {
-                GenericSecurityDescriptor sd;
+                CommonSecurityDescriptor sd;
 
                 if (target.AuthorizationMode == AuthorizationMode.PowershellScript)
                 {
@@ -90,7 +103,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                         continue;
                     }
 
-                    sd = new RawSecurityDescriptor(target.SecurityDescriptor);
+                    sd = new CommonSecurityDescriptor(false, false, new RawSecurityDescriptor(target.SecurityDescriptor));
                 }
 
                 if (sd == null)
@@ -99,70 +112,85 @@ namespace Lithnet.AccessManager.Server.Authorization
                     continue;
                 }
 
-                info.SecurityDescriptors.Add(sd);
-
-                bool hasLaps = c.AccessCheck(sd, (int)AccessMask.Laps);
-                bool hasLapsHistory = c.AccessCheck(sd, (int)AccessMask.LapsHistory);
-                bool hasJit = c.AccessCheck(sd, (int)AccessMask.Jit);
-
-                if (hasJit)
+                foreach (var ace in sd.DiscretionaryAcl.OfType<CommonAce>())
                 {
-                    info.SuccessfulJitTargets.Add(target);
+                    masterDacl.AddAccess(
+                        (AccessControlType) ace.AceType,
+                        ace.SecurityIdentifier,
+                        ace.AccessMask,
+                        ace.InheritanceFlags,
+                        ace.PropagationFlags);
                 }
 
-                if (hasLaps)
+                int i = matchedTargetCount;
+
+                if (c.AccessCheck(sd, (int) AccessMask.Laps))
                 {
                     info.SuccessfulLapsTargets.Add(target);
+                    matchedTargetCount++;
                 }
 
-                if (hasLapsHistory)
+                if (c.AccessCheck(sd, (int) AccessMask.LapsHistory))
                 {
                     info.SuccessfulLapsHistoryTargets.Add(target);
+                    matchedTargetCount++;
+                }
+
+                if (c.AccessCheck(sd, (int) AccessMask.Jit))
+                {
+                    info.SuccessfulJitTargets.Add(target);
+                    matchedTargetCount++;
                 }
 
                 // If the ACE did not grant any permissions to the user, consider it a failure response
-                if (!hasLaps &&
-                    !hasLapsHistory &&
-                    !hasJit)
+                if (i == matchedTargetCount)
                 {
                     info.FailedTargets.Add(target);
                 }
             }
 
-            info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptors, (int)AccessMask.Laps) ? AccessMask.Laps : 0;
-            info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptors, (int)AccessMask.Jit) ? AccessMask.Jit : 0;
-            info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptors, (int)AccessMask.LapsHistory) ? AccessMask.LapsHistory : 0;
+            if (matchedTargetCount > 0)
+            {
+                info.SecurityDescriptor = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, masterDacl);
+
+                this.logger.LogTrace($"Resultant security descriptor for computer {computer.MsDsPrincipalName}: {info.SecurityDescriptor.GetSddlForm(AccessControlSections.All)}");
+
+                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int) AccessMask.Laps) ? AccessMask.Laps : 0;
+                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int) AccessMask.Jit) ? AccessMask.Jit : 0;
+                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int) AccessMask.LapsHistory) ? AccessMask.LapsHistory : 0;
+            }
 
             this.logger.LogTrace($"User {user.MsDsPrincipalName} has effective access of {info.EffectiveAccess} on computer {computer.MsDsPrincipalName}");
+
             return info;
         }
 
         private string GetAuthorizationContextTarget(IUser user, IComputer computer)
         {
-            switch (this.options.AccessControlEvaluationLocation)
+            return this.options.AccessControlEvaluationLocation switch
             {
-                case AclEvaluationLocation.ComputerDomain:
-                    return this.directory.GetDomainNameDnsFromSid(computer.Sid);
-
-                case AclEvaluationLocation.UserDomain:
-                    return this.directory.GetDomainNameDnsFromSid(user.Sid);
-
-                default:
-                    return null;
-            }
+                AclEvaluationLocation.ComputerDomain => this.directory.GetDomainNameDnsFromSid(computer.Sid),
+                AclEvaluationLocation.UserDomain => this.directory.GetDomainNameDnsFromSid(user.Sid),
+                _ => null
+            };
         }
 
         public IList<SecurityDescriptorTarget> GetMatchingTargetsForComputer(IComputer computer)
         {
             List<SecurityDescriptorTarget> matchingTargets = new List<SecurityDescriptorTarget>();
 
-            foreach (var target in this.options.Targets.OrderBy(t => (int)t.Type).ThenByDescending(t => t.Id.Length))
+            Lazy<List<SecurityIdentifier>> computerTokenSids = new Lazy<List<SecurityIdentifier>>(() => this.directory.GetTokenGroups(computer, computer.Sid.AccountDomainSid).ToList());
+            Lazy<List<Guid>> computerParents = new Lazy<List<Guid>>(() => computer.GetParentGuids().ToList());
+
+            foreach (var target in this.options.Targets.OrderBy(t => (int) t.Type).ThenByDescending(this.targetDataProvider.GetSortOrder))
             {
+                TargetData data = this.targetDataProvider.GetTargetData(target);
+
                 try
                 {
                     if (target.Type == TargetType.Container)
                     {
-                        if (this.directory.IsObjectInOu(computer, target.Target))
+                        if (computerParents.Value.Any(t => t == data.ContainerGuid))
                         {
                             this.logger.LogTrace($"Matched {computer.MsDsPrincipalName} to target OU {target.Target}");
                             matchingTargets.Add(target);
@@ -170,7 +198,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                     }
                     else if (target.Type == TargetType.Computer)
                     {
-                        if (target.GetTargetAsSid() == computer.Sid)
+                        if (data.Sid == computer.Sid)
                         {
                             this.logger.LogTrace($"Matched {computer.MsDsPrincipalName} to target {target.Id}");
                             matchingTargets.Add(target);
@@ -178,7 +206,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                     }
                     else
                     {
-                        if (this.directory.IsSidInPrincipalToken(target.GetTargetAsSid(), computer, computer.Sid))
+                        if (this.directory.IsSidInPrincipalToken(data.Sid, computerTokenSids.Value))
                         {
                             this.logger.LogTrace($"Matched {computer.MsDsPrincipalName} to target {target.Id}");
                             matchingTargets.Add(target);

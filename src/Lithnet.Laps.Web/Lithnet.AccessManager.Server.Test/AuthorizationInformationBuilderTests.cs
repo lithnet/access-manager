@@ -23,7 +23,7 @@ namespace Lithnet.AccessManager.Server.Test
 
         private IPowerShellSecurityDescriptorGenerator powershell;
 
-        private Mock<IOptionsSnapshot<BuiltInProviderOptions>> optionsSnapshot;
+        private ITargetDataProvider targetDataProvider;
 
         [SetUp()]
         public void TestInitialize()
@@ -32,7 +32,7 @@ namespace Lithnet.AccessManager.Server.Test
             cache = new AuthorizationInformationMemoryCache();
             logger = Global.LogFactory.CreateLogger<AuthorizationInformationBuilder>();
             powershell = Mock.Of<IPowerShellSecurityDescriptorGenerator>();
-            optionsSnapshot = new Mock<IOptionsSnapshot<BuiltInProviderOptions>>();
+            targetDataProvider = new TargetDataProvider(new TargetDataCache(), Global.LogFactory.CreateLogger<TargetDataProvider>());
         }
 
         [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.Laps, AccessMask.None, AccessMask.Laps)]
@@ -53,12 +53,12 @@ namespace Lithnet.AccessManager.Server.Test
             IUser user = directory.GetUser(username);
             IComputer computer = directory.GetComputer(computerName);
 
-            SetupOptionsForComputerTarget(allowed, denied, computer, user);
+            var options = SetupOptionsForComputerTarget(allowed, denied, computer, user);
 
-            builder = new AuthorizationInformationBuilder(optionsSnapshot.Object, directory, logger, powershell, cache);
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
             var result = builder.GetAuthorizationInformation(user, computer);
 
-            Assert.AreEqual(result.EffectiveAccess, expected);
+            Assert.AreEqual(expected, result.EffectiveAccess);
         }
 
         [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", "OU=Computers,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", AccessMask.Laps, AccessMask.None, AccessMask.Laps)]
@@ -69,89 +69,313 @@ namespace Lithnet.AccessManager.Server.Test
             IUser user = directory.GetUser(username);
             IComputer computer = directory.GetComputer(computerName);
 
-            SetupOptionsForOUTarget(allowed, denied, targetOU, user);
+            var options = SetupOptionsForOUTarget(allowed, denied, targetOU, user);
 
-            builder = new AuthorizationInformationBuilder(optionsSnapshot.Object, directory, logger, powershell, cache);
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
             var result = builder.GetAuthorizationInformation(user, computer);
 
-            Assert.AreEqual(result.EffectiveAccess, expected);
+            Assert.AreEqual(expected, result.EffectiveAccess);
+        }
+
+
+        [TestCase("IDMDEV1")]
+        [TestCase("SUBDEV1")]
+        [TestCase("EXTDEV1")]
+        public void GetMatchingTargetsForComputer(string targetDomain)
+        {
+            ISecurityPrincipal trustee = directory.GetPrincipal($"{targetDomain}\\user1");
+
+            IComputer computer1 = directory.GetComputer($"{targetDomain}\\PC1");
+            IComputer computer2 = directory.GetComputer($"{targetDomain}\\PC2");
+            IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
+            IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
+
+            var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
+
+            var t1 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t3 = CreateTarget(AccessMask.Laps, AccessMask.None, $"{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t5 = CreateTarget(AccessMask.Laps, AccessMask.None, computer1, trustee);
+            var t6 = CreateTarget(AccessMask.Laps, AccessMask.None, computer2, trustee);
+            var t7 = CreateTarget(AccessMask.Laps, AccessMask.None, group1, trustee);
+            var t8 = CreateTarget(AccessMask.Laps, AccessMask.None, group2, trustee);
+
+            var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
+
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
+
+            CollectionAssert.AreEquivalent(new[] { t1, t2, t3, t5, t7 }, builder.GetMatchingTargetsForComputer(computer1));
         }
 
         [Test]
-        public void TestMatchingTargetsAllow()
+        public void ValidateTargetSortOrder()
         {
-            IUser user = directory.GetUser("IDMDEV1\\user1");
+            ISecurityPrincipal trustee = directory.GetPrincipal("IDMDEV1\\user1");
             IComputer computer1 = directory.GetComputer("IDMDEV1\\PC1");
-            IComputer computer2 = directory.GetComputer("IDMDEV1\\PC2");
-            IGroup group1 = directory.GetGroup("IDMDEV1\\G-DL-PC1");
-            IGroup group2 = directory.GetGroup("IDMDEV1\\G-DL-PC2");
 
-            var t1 = CreateTarget(AccessMask.Laps, AccessMask.None, "OU=Computers,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", user);
-            var t2 = CreateTarget(AccessMask.Laps, AccessMask.None, "OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", user);
-            var t3 = CreateTarget(AccessMask.Laps, AccessMask.None, "DC=IDMDEV1,DC=LOCAL", user);
-            var t4 = CreateTarget(AccessMask.Laps, AccessMask.None, "OU=JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", user);
-            var t5 = CreateTarget(AccessMask.Laps, AccessMask.None, computer1, user);
-            var t6 = CreateTarget(AccessMask.Laps, AccessMask.None, computer2, user);
-            var t7 = CreateTarget(AccessMask.Laps, AccessMask.None, group1, user);
-            var t8 = CreateTarget(AccessMask.Laps, AccessMask.None, group2, user);
+            var t1 = CreateTarget(AccessMask.Laps, AccessMask.None, "OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", trustee);
+            var t2 = CreateTarget(AccessMask.Laps, AccessMask.None, "DC=IDMDEV1,DC=LOCAL", trustee);
+            var t3 = CreateTarget(AccessMask.Laps, AccessMask.None, "OU=Computers,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", trustee);
+            var t4 = CreateTarget(AccessMask.Laps, AccessMask.None, "OU=JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", trustee);
 
-            SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
+            var options = SetupOptions(t1, t2, t3, t4);
 
-            builder = new AuthorizationInformationBuilder(optionsSnapshot.Object, directory, logger, powershell, cache);
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
 
-            CollectionAssert.AreEquivalent(builder.GetMatchingTargetsForComputer(computer1), new[] { t1, t2, t3, t5 ,t7 });
-
-            var result = builder.GetAuthorizationInformation(user, computer1);
-            CollectionAssert.AreEquivalent(result.SuccessfulLapsTargets, new[] { t1, t2, t3, t5, t7 });
+            CollectionAssert.AreEqual(new[] { t3, t1, t2 }, builder.GetMatchingTargetsForComputer(computer1));
         }
 
-        [Test]
-        public void TestMatchingTargetsDenyOnOU()
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "IDMDEV1")]
+        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "IDMDEV1")]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "SUBDEV1")]
+        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "SUBDEV1")]
+        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "SUBDEV1")]
+        [TestCase("SUBDEV1\\G-UG-1", "SUBDEV1\\user1", "SUBDEV1")]
+        [TestCase("EXTDEV1\\user1", "EXTDEV1\\user1", "EXTDEV1")]
+        [TestCase("EXTDEV1\\G-UG-1", "EXTDEV1\\user1", "EXTDEV1")]
+        public void AllowTrusteeOnComputerTarget(string trusteeName, string requestorName, string targetDomain)
         {
-            IUser user = directory.GetUser("IDMDEV1\\user1");
-            IComputer computer1 = directory.GetComputer("IDMDEV1\\PC1");
-            IComputer computer2 = directory.GetComputer("IDMDEV1\\PC2");
-            IGroup group1 = directory.GetGroup("IDMDEV1\\G-DL-PC1");
-            IGroup group2 = directory.GetGroup("IDMDEV1\\G-DL-PC2");
+            ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
+            IUser requestor = directory.GetUser(requestorName);
 
-            var t1 = CreateTarget(AccessMask.Laps, AccessMask.None, "OU=Computers,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", user);
-            var t2 = CreateTarget(AccessMask.Laps, AccessMask.None, "OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", user);
-            var t3 = CreateTarget(AccessMask.None, AccessMask.Laps, "DC=IDMDEV1,DC=LOCAL", user);
-            var t4 = CreateTarget(AccessMask.Laps, AccessMask.None, "OU=JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", user);
-            var t5 = CreateTarget(AccessMask.Laps, AccessMask.None, computer1, user);
-            var t6 = CreateTarget(AccessMask.Laps, AccessMask.None, computer2, user);
-            var t7 = CreateTarget(AccessMask.Laps, AccessMask.None, group1, user);
-            var t8 = CreateTarget(AccessMask.Laps, AccessMask.None, group2, user);
+            IComputer computer1 = directory.GetComputer($"{targetDomain}\\PC1");
+            IComputer computer2 = directory.GetComputer($"{targetDomain}\\PC2");
+            IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
+            IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
 
-            SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
+            var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
 
-            builder = new AuthorizationInformationBuilder(optionsSnapshot.Object, directory, logger, powershell, cache);
+            var t1 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t3 = CreateTarget(AccessMask.None, AccessMask.None, $"{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t5 = CreateTarget(AccessMask.Laps, AccessMask.None, computer1, trustee);
+            var t6 = CreateTarget(AccessMask.None, AccessMask.None, computer2, trustee);
+            var t7 = CreateTarget(AccessMask.None, AccessMask.None, group1, trustee);
+            var t8 = CreateTarget(AccessMask.None, AccessMask.None, group2, trustee);
 
-            CollectionAssert.AreEquivalent(builder.GetMatchingTargetsForComputer(computer1), new[] { t1, t2, t3, t5, t7 });
+            var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
-            var result = builder.GetAuthorizationInformation(user, computer1);
-            CollectionAssert.AreEquivalent(result.SuccessfulLapsTargets, new[] { t1, t2, t5, t7 });
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
+            var result = builder.GetAuthorizationInformation(requestor, computer1);
+
+            Assert.AreEqual(AccessMask.Laps, result.EffectiveAccess);
+
+            CollectionAssert.AreEquivalent(new[] { t5 }, result.SuccessfulLapsTargets);
+        }
+
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "IDMDEV1")]
+        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "IDMDEV1")]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "SUBDEV1")]
+        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "SUBDEV1")]
+        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "SUBDEV1")]
+        [TestCase("SUBDEV1\\G-UG-1", "SUBDEV1\\user1", "SUBDEV1")]
+        [TestCase("EXTDEV1\\user1", "EXTDEV1\\user1", "EXTDEV1")]
+        [TestCase("EXTDEV1\\G-UG-1", "EXTDEV1\\user1", "EXTDEV1")]
+        public void AllowTrusteeOnGroupTarget(string trusteeName, string requestorName, string targetDomain)
+        {
+            ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
+            IUser requestor = directory.GetUser(requestorName);
+
+            IComputer computer1 = directory.GetComputer($"{targetDomain}\\PC1");
+            IComputer computer2 = directory.GetComputer($"{targetDomain}\\PC2");
+            IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
+            IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
+
+            var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
+
+            var t1 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t3 = CreateTarget(AccessMask.None, AccessMask.None, $"{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t5 = CreateTarget(AccessMask.None, AccessMask.None, computer1, trustee);
+            var t6 = CreateTarget(AccessMask.None, AccessMask.None, computer2, trustee);
+            var t7 = CreateTarget(AccessMask.Laps, AccessMask.None, group1, trustee);
+            var t8 = CreateTarget(AccessMask.None, AccessMask.None, group2, trustee);
+
+            var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
+
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
+            var result = builder.GetAuthorizationInformation(requestor, computer1);
+
+            Assert.AreEqual(AccessMask.Laps, result.EffectiveAccess);
+
+            CollectionAssert.AreEquivalent(new[] { t7 }, result.SuccessfulLapsTargets);
+        }
+
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "IDMDEV1")]
+        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "IDMDEV1")]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "SUBDEV1")]
+        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "SUBDEV1")]
+        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "SUBDEV1")]
+        [TestCase("SUBDEV1\\G-UG-1", "SUBDEV1\\user1", "SUBDEV1")]
+        [TestCase("EXTDEV1\\user1", "EXTDEV1\\user1", "EXTDEV1")]
+        [TestCase("EXTDEV1\\G-UG-1", "EXTDEV1\\user1", "EXTDEV1")]
+        public void AllowTrusteeOnOUTarget(string trusteeName, string requestorName, string targetDomain)
+        {
+            ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
+            IUser requestor = directory.GetUser(requestorName);
+
+            IComputer computer1 = directory.GetComputer($"{targetDomain}\\PC1");
+            IComputer computer2 = directory.GetComputer($"{targetDomain}\\PC2");
+            IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
+            IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
+
+            var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
+
+            var t1 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t3 = CreateTarget(AccessMask.Laps, AccessMask.None, $"{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t5 = CreateTarget(AccessMask.None, AccessMask.None, computer1, trustee);
+            var t6 = CreateTarget(AccessMask.None, AccessMask.None, computer2, trustee);
+            var t7 = CreateTarget(AccessMask.None, AccessMask.None, group1, trustee);
+            var t8 = CreateTarget(AccessMask.None, AccessMask.None, group2, trustee);
+
+            var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
+
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
+            var result = builder.GetAuthorizationInformation(requestor, computer1);
+
+            Assert.AreEqual(AccessMask.Laps, result.EffectiveAccess);
+
+            CollectionAssert.AreEquivalent(new[] { t3 }, result.SuccessfulLapsTargets);
+        }
+
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "IDMDEV1")]
+        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "IDMDEV1")]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "SUBDEV1")]
+        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "SUBDEV1")]
+        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "SUBDEV1")]
+        [TestCase("SUBDEV1\\G-UG-1", "SUBDEV1\\user1", "SUBDEV1")]
+        [TestCase("EXTDEV1\\user1", "EXTDEV1\\user1", "EXTDEV1")]
+        [TestCase("EXTDEV1\\G-UG-1", "EXTDEV1\\user1", "EXTDEV1")]
+        public void DenyTrusteeOnComputerTarget(string trusteeName, string requestorName, string targetDomain)
+        {
+            ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
+            IUser requestor = directory.GetUser(requestorName);
+
+            IComputer computer1 = directory.GetComputer($"{targetDomain}\\PC1");
+            IComputer computer2 = directory.GetComputer($"{targetDomain}\\PC2");
+            IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
+            IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
+
+            var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
+
+            var t1 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t3 = CreateTarget(AccessMask.Laps, AccessMask.None, $"{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t5 = CreateTarget(AccessMask.None, AccessMask.Laps, computer1, trustee);
+            var t6 = CreateTarget(AccessMask.Laps, AccessMask.None, computer2, trustee);
+            var t7 = CreateTarget(AccessMask.Laps, AccessMask.None, group1, trustee);
+            var t8 = CreateTarget(AccessMask.Laps, AccessMask.None, group2, trustee);
+
+            var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
+
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
+            var result = builder.GetAuthorizationInformation(requestor, computer1);
+            Assert.AreEqual(AccessMask.None, result.EffectiveAccess);
+            CollectionAssert.AreEquivalent(new[] { t1, t2, t3, t7 }, result.SuccessfulLapsTargets);
+        }
+
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "IDMDEV1")]
+        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "IDMDEV1")]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "SUBDEV1")]
+        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "SUBDEV1")]
+        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "SUBDEV1")]
+        [TestCase("SUBDEV1\\G-UG-1", "SUBDEV1\\user1", "SUBDEV1")]
+        [TestCase("EXTDEV1\\user1", "EXTDEV1\\user1", "EXTDEV1")]
+        [TestCase("EXTDEV1\\G-UG-1", "EXTDEV1\\user1", "EXTDEV1")]
+        public void DenyTrusteeOnOUTarget(string trusteeName, string requestorName, string targetDomain)
+        {
+            ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
+            IUser requestor = directory.GetUser(requestorName);
+
+            IComputer computer1 = directory.GetComputer($"{targetDomain}\\PC1");
+            IComputer computer2 = directory.GetComputer($"{targetDomain}\\PC2");
+            IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
+            IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
+
+            var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
+
+            var t1 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.Laps, AccessMask.Laps, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t3 = CreateTarget(AccessMask.Laps, AccessMask.None, $"{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t5 = CreateTarget(AccessMask.Laps, AccessMask.None, computer1, trustee);
+            var t6 = CreateTarget(AccessMask.Laps, AccessMask.None, computer2, trustee);
+            var t7 = CreateTarget(AccessMask.Laps, AccessMask.None, group1, trustee);
+            var t8 = CreateTarget(AccessMask.Laps, AccessMask.None, group2, trustee);
+
+            var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
+
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
+            var result = builder.GetAuthorizationInformation(requestor, computer1);
+            CollectionAssert.AreEquivalent(new[] { t1, t3, t5, t7 }, result.SuccessfulLapsTargets);
             Assert.AreEqual(AccessMask.None, result.EffectiveAccess);
         }
 
-        private void SetupOptionsForOUTarget(AccessMask allowed, AccessMask denied, string ou, IUser user)
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "IDMDEV1")]
+        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "IDMDEV1")]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "SUBDEV1")]
+        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "SUBDEV1")]
+        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "SUBDEV1")]
+        [TestCase("SUBDEV1\\G-UG-1", "SUBDEV1\\user1", "SUBDEV1")]
+        [TestCase("EXTDEV1\\user1", "EXTDEV1\\user1", "EXTDEV1")]
+        [TestCase("EXTDEV1\\G-UG-1", "EXTDEV1\\user1", "EXTDEV1")]
+        public void DenyTrusteeOnGroupTarget(string trusteeName, string requestorName, string targetDomain)
         {
-            SetupOptions(CreateTarget(allowed, denied, ou, user));
+            ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
+            IUser requestor = directory.GetUser(requestorName);
+
+            IComputer computer1 = directory.GetComputer($"{targetDomain}\\PC1");
+            IComputer computer2 = directory.GetComputer($"{targetDomain}\\PC2");
+            IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
+            IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
+
+            var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
+
+            var t1 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t3 = CreateTarget(AccessMask.Laps, AccessMask.None, $"{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t5 = CreateTarget(AccessMask.Laps, AccessMask.None, computer1, trustee);
+            var t6 = CreateTarget(AccessMask.Laps, AccessMask.None, computer2, trustee);
+            var t7 = CreateTarget(AccessMask.None, AccessMask.Laps, group1, trustee);
+            var t8 = CreateTarget(AccessMask.Laps, AccessMask.None, group2, trustee);
+
+            var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
+
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
+            var result = builder.GetAuthorizationInformation(requestor, computer1);
+            CollectionAssert.AreEquivalent(new[] { t1, t2, t5, t3 }, result.SuccessfulLapsTargets);
+            Assert.AreEqual(AccessMask.None, result.EffectiveAccess);
         }
 
-        private void SetupOptionsForComputerTarget(AccessMask allowed, AccessMask denied, IComputer computer, IUser user)
+
+        private IOptionsSnapshot<BuiltInProviderOptions> SetupOptionsForOUTarget(AccessMask allowed, AccessMask denied, string ou, ISecurityPrincipal trustee)
         {
-            SetupOptions(CreateTarget(allowed, denied, computer, user));
+            return SetupOptions(CreateTarget(allowed, denied, ou, trustee));
         }
 
-        private void SetupOptions(params SecurityDescriptorTarget[] targets)
+        private IOptionsSnapshot<BuiltInProviderOptions> SetupOptionsForComputerTarget(AccessMask allowed, AccessMask denied, IComputer computer, ISecurityPrincipal trustee)
+        {
+            return SetupOptions(CreateTarget(allowed, denied, computer, trustee));
+        }
+
+        private IOptionsSnapshot<BuiltInProviderOptions> SetupOptions(params SecurityDescriptorTarget[] targets)
         {
             BuiltInProviderOptions options = new BuiltInProviderOptions();
             options.Targets = new List<SecurityDescriptorTarget>(targets);
+
+            Mock<IOptionsSnapshot<BuiltInProviderOptions>> optionsSnapshot = new Mock<IOptionsSnapshot<BuiltInProviderOptions>>();
             optionsSnapshot.SetupGet(t => t.Value).Returns((BuiltInProviderOptions)options);
+            return optionsSnapshot.Object;
         }
 
-        private SecurityDescriptorTarget CreateTarget(AccessMask allowed, AccessMask denied, string ou, IUser user)
+        private SecurityDescriptorTarget CreateTarget(AccessMask allowed, AccessMask denied, string ou, ISecurityPrincipal trustee)
         {
             return new SecurityDescriptorTarget
             {
@@ -159,46 +383,39 @@ namespace Lithnet.AccessManager.Server.Test
                 Id = Guid.NewGuid().ToString(),
                 Target = ou,
                 Type = TargetType.Container,
-                SecurityDescriptor = this.CreateSecurityDescriptor(user, allowed, denied)
+                SecurityDescriptor = this.CreateSecurityDescriptor(trustee, allowed, denied)
             };
         }
 
-        private SecurityDescriptorTarget CreateTarget(AccessMask allowed, AccessMask denied, IComputer computer, IUser user)
+        private SecurityDescriptorTarget CreateTarget(AccessMask allowed, AccessMask denied, ISecurityPrincipal principal, ISecurityPrincipal trustee)
         {
             return new SecurityDescriptorTarget
             {
                 AuthorizationMode = AuthorizationMode.SecurityDescriptor,
                 Id = Guid.NewGuid().ToString(),
-                Target = computer.Sid.ToString(),
-                Type = TargetType.Computer,
-                SecurityDescriptor = this.CreateSecurityDescriptor(user, allowed, denied)
+                Target = principal.Sid.ToString(),
+                Type = principal switch
+                {
+                    IGroup _ => TargetType.Group,
+                    IComputer _ => TargetType.Computer,
+                    _ => throw new NotImplementedException(),
+                },
+                SecurityDescriptor = this.CreateSecurityDescriptor(trustee, allowed, denied)
             };
         }
 
-        private SecurityDescriptorTarget CreateTarget(AccessMask allowed, AccessMask denied, IGroup group, IUser user)
-        {
-            return new SecurityDescriptorTarget
-            {
-                AuthorizationMode = AuthorizationMode.SecurityDescriptor,
-                Id = Guid.NewGuid().ToString(),
-                Target = group.Sid.ToString(),
-                Type = TargetType.Group,
-                SecurityDescriptor = this.CreateSecurityDescriptor(user, allowed, denied)
-            };
-        }
-
-        private string CreateSecurityDescriptor(ISecurityPrincipal principal, AccessMask allowed, AccessMask denied)
+        private string CreateSecurityDescriptor(ISecurityPrincipal trustee, AccessMask allowed, AccessMask denied)
         {
             DiscretionaryAcl dacl = new DiscretionaryAcl(false, false, 2);
 
             if (allowed > 0)
             {
-                dacl.AddAccess(AccessControlType.Allow, principal.Sid, (int)allowed, InheritanceFlags.None, PropagationFlags.None);
+                dacl.AddAccess(AccessControlType.Allow, trustee.Sid, (int)allowed, InheritanceFlags.None, PropagationFlags.None);
             }
 
             if (denied > 0)
             {
-                dacl.AddAccess(AccessControlType.Deny, principal.Sid, (int)denied, InheritanceFlags.None, PropagationFlags.None);
+                dacl.AddAccess(AccessControlType.Deny, trustee.Sid, (int)denied, InheritanceFlags.None, PropagationFlags.None);
             }
 
             var sd = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, dacl);

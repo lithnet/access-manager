@@ -46,7 +46,7 @@ namespace Lithnet.AccessManager.Web
                     .AddJsonFile("appsecrets.json", optional: true, reloadOnChange: true)
                     .AddJsonFile("apphost.json", optional: false, reloadOnChange: true)
                     .AddEnvironmentVariables("AccessManagerService");
-
+                
                 if (args != null)
                 {
                     config.AddCommandLine(args);

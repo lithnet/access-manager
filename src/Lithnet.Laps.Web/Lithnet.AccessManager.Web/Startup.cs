@@ -52,12 +52,15 @@ namespace Lithnet.AccessManager.Web
             services.TryAddScoped<IMsMcsAdmPwdProvider, MsMcsAdmPwdProvider>();
             services.TryAddScoped<IEncryptionProvider, EncryptionProvider>();
             services.TryAddScoped<ICertificateProvider, CertificateProvider>();
-            
+            services.TryAddScoped<IAuthorizationInformationBuilder, AuthorizationInformationBuilder>();
+            services.TryAddScoped<ITargetDataProvider, TargetDataProvider>();
+
             services.TryAddSingleton<IAppPathProvider, WebAppPathProvider>();
             services.TryAddSingleton<RandomNumberGenerator>(RandomNumberGenerator.Create());
             services.TryAddSingleton<IJitAccessGroupResolver, JitAccessGroupResolver>();
             services.TryAddSingleton<IPowerShellSessionProvider, CachedPowerShellSessionProvider>();
             services.TryAddSingleton<IAuthorizationInformationMemoryCache, AuthorizationInformationMemoryCache>();
+            services.TryAddSingleton<ITargetDataCache, TargetDataCache>();
 
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();
@@ -104,7 +107,6 @@ namespace Lithnet.AccessManager.Web
             }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
@@ -112,6 +114,7 @@ namespace Lithnet.AccessManager.Web
             app.UseContentSecurityPolicy();
             app.UseReferrerPolicy();
             app.UseContentTypeOptions();
+            app.UseStaticFiles();
 
             app.UseEndpoints(endpoints =>
             {
@@ -125,29 +128,15 @@ namespace Lithnet.AccessManager.Web
         {
             var provider = services.BuildServiceProvider();
             var authSettings = provider.GetService<IOptions<AuthenticationOptions>>();
-            IAuthenticationProvider authProvider;
 
-            switch (authSettings.Value.Mode)
+            IAuthenticationProvider authProvider = authSettings.Value.Mode switch
             {
-                case AuthenticationMode.Iwa:
-                    authProvider = provider.GetService<IIwaAuthenticationProvider>();
-                    break;
-
-                case AuthenticationMode.Oidc:
-                    authProvider = provider.GetService<IOidcAuthenticationProvider>();
-                    break;
-
-                case AuthenticationMode.WsFed:
-                    authProvider = provider.GetService<IWsFedAuthenticationProvider>();
-                    break;
-
-                case AuthenticationMode.Certificate:
-                    authProvider = provider.GetService<ICertificateAuthenticationProvider>();
-                    break;
-
-                default:
-                    throw new ConfigurationErrorsException("The authentication mode setting in the configuration file was unknown");
-            }
+                AuthenticationMode.Iwa => provider.GetService<IIwaAuthenticationProvider>(),
+                AuthenticationMode.Oidc => provider.GetService<IOidcAuthenticationProvider>(),
+                AuthenticationMode.WsFed => provider.GetService<IWsFedAuthenticationProvider>(),
+                AuthenticationMode.Certificate => provider.GetService<ICertificateAuthenticationProvider>(),
+                _ => throw new ConfigurationErrorsException("The authentication mode setting in the configuration file was unknown")
+            };
 
             authProvider.Configure(services);
             services.TryAddSingleton<IAuthenticationProvider>(authProvider);
