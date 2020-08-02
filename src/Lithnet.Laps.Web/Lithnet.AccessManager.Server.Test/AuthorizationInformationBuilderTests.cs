@@ -25,6 +25,9 @@ namespace Lithnet.AccessManager.Server.Test
 
         private ITargetDataProvider targetDataProvider;
 
+        private IAuthorizationContextProvider authorizationContextProvider;
+
+
         [SetUp()]
         public void TestInitialize()
         {
@@ -33,6 +36,7 @@ namespace Lithnet.AccessManager.Server.Test
             logger = Global.LogFactory.CreateLogger<AuthorizationInformationBuilder>();
             powershell = Mock.Of<IPowerShellSecurityDescriptorGenerator>();
             targetDataProvider = new TargetDataProvider(new TargetDataCache(), Global.LogFactory.CreateLogger<TargetDataProvider>());
+            authorizationContextProvider = new AuthorizationContextProvider(Mock.Of<IOptions<BuiltInProviderOptions>>(), directory, Global.LogFactory.CreateLogger<AuthorizationContextProvider>());
         }
 
         [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.Laps, AccessMask.None, AccessMask.Laps)]
@@ -55,7 +59,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptionsForComputerTarget(allowed, denied, computer, user);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
             var result = builder.GetAuthorizationInformation(user, computer);
 
             Assert.AreEqual(expected, result.EffectiveAccess);
@@ -71,7 +75,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptionsForOUTarget(allowed, denied, targetOU, user);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
             var result = builder.GetAuthorizationInformation(user, computer);
 
             Assert.AreEqual(expected, result.EffectiveAccess);
@@ -103,7 +107,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
 
             CollectionAssert.AreEquivalent(new[] { t1, t2, t3, t5, t7 }, builder.GetMatchingTargetsForComputer(computer1));
         }
@@ -121,7 +125,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1, t2, t3, t4);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
 
             CollectionAssert.AreEqual(new[] { t3, t1, t2 }, builder.GetMatchingTargetsForComputer(computer1));
         }
@@ -157,7 +161,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
             var result = builder.GetAuthorizationInformation(requestor, computer1);
 
             Assert.AreEqual(AccessMask.Laps, result.EffectiveAccess);
@@ -196,7 +200,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
             var result = builder.GetAuthorizationInformation(requestor, computer1);
 
             Assert.AreEqual(AccessMask.Laps, result.EffectiveAccess);
@@ -235,7 +239,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
             var result = builder.GetAuthorizationInformation(requestor, computer1);
 
             Assert.AreEqual(AccessMask.Laps, result.EffectiveAccess);
@@ -274,7 +278,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
             var result = builder.GetAuthorizationInformation(requestor, computer1);
             Assert.AreEqual(AccessMask.None, result.EffectiveAccess);
             CollectionAssert.AreEquivalent(new[] { t1, t2, t3, t7 }, result.SuccessfulLapsTargets);
@@ -311,7 +315,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
             var result = builder.GetAuthorizationInformation(requestor, computer1);
             CollectionAssert.AreEquivalent(new[] { t1, t3, t5, t7 }, result.SuccessfulLapsTargets);
             Assert.AreEqual(AccessMask.None, result.EffectiveAccess);
@@ -348,10 +352,95 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider);
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
             var result = builder.GetAuthorizationInformation(requestor, computer1);
             CollectionAssert.AreEquivalent(new[] { t1, t2, t5, t3 }, result.SuccessfulLapsTargets);
             Assert.AreEqual(AccessMask.None, result.EffectiveAccess);
+        }
+
+
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "IDMDEV1\\PC1")]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "SUBDEV1\\PC1")]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "EXTDEV1\\PC1")]
+        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "IDMDEV1\\PC1")]
+        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "SUBDEV1\\PC1")]
+        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "EXTDEV1\\PC1")]
+        [TestCase("EXTDEV1\\user1", "EXTDEV1\\user1", "EXTDEV1\\PC1")]
+        public void UserCanAccessComputer(string requestorName, string trusteeName, string computerName)
+        {
+            IUser requestor = directory.GetUser(requestorName);
+            ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
+            IComputer computer = directory.GetComputer(computerName);
+
+            var t1 = CreateTarget(AccessMask.Laps, AccessMask.None, computer, trustee);
+
+            var options = SetupOptions(t1);
+
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
+            var result = builder.GetAuthorizationInformation(requestor, computer);
+            CollectionAssert.AreEquivalent(new[] { t1 }, result.SuccessfulLapsTargets);
+            Assert.AreEqual(AccessMask.Laps, result.EffectiveAccess);
+        }
+
+        // IDMDEV1\\user1 can access PCs in all domains via global groups in their home domain
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\G-GG-1", "IDMDEV1\\PC1")]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\G-GG-1", "SUBDEV1\\PC1")]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\G-GG-1", "EXTDEV1\\PC1")]
+
+        // IDMDEV1\\user1 can access PCs in all domains via universal groups in their own forest
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\G-UG-1", "IDMDEV1\\PC1")]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\G-UG-1", "SUBDEV1\\PC1")]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\G-UG-1", "EXTDEV1\\PC1")]
+        [TestCase("IDMDEV1\\user1", "SUBDEV1\\G-UG-1", "IDMDEV1\\PC1")]
+        [TestCase("IDMDEV1\\user1", "SUBDEV1\\G-UG-1", "SUBDEV1\\PC1")]
+        [TestCase("IDMDEV1\\user1", "SUBDEV1\\G-UG-1", "EXTDEV1\\PC1")]
+
+        // IDMDEV1\\user1 can access PCs in their own forest via domain local groups in each domain
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\G-DL-1", "IDMDEV1\\PC1")]
+        [TestCase("IDMDEV1\\user1", "SUBDEV1\\G-DL-1", "SUBDEV1\\PC1")]
+
+
+        // SUBDEV1\\user1 can access PCs in all domains via global groups in their home domain
+        [TestCase("SUBDEV1\\user1", "SUBDEV1\\G-GG-1", "IDMDEV1\\PC1")]
+        [TestCase("SUBDEV1\\user1", "SUBDEV1\\G-GG-1", "SUBDEV1\\PC1")]
+        [TestCase("SUBDEV1\\user1", "SUBDEV1\\G-GG-1", "EXTDEV1\\PC1")]
+
+        // SUBDEV1\\user1 can access PCs in all domains via universal groups in their own forest
+        [TestCase("SUBDEV1\\user1", "IDMDEV1\\G-UG-1", "IDMDEV1\\PC1")]
+        [TestCase("SUBDEV1\\user1", "IDMDEV1\\G-UG-1", "SUBDEV1\\PC1")]
+        [TestCase("SUBDEV1\\user1", "IDMDEV1\\G-UG-1", "EXTDEV1\\PC1")]
+        [TestCase("SUBDEV1\\user1", "SUBDEV1\\G-UG-1", "IDMDEV1\\PC1")]
+        [TestCase("SUBDEV1\\user1", "SUBDEV1\\G-UG-1", "SUBDEV1\\PC1")]
+        [TestCase("SUBDEV1\\user1", "SUBDEV1\\G-UG-1", "EXTDEV1\\PC1")]
+
+        // SUBDEV1\\user1 can access PCs in their own forest via domain local groups in each domain
+        [TestCase("SUBDEV1\\user1", "IDMDEV1\\G-DL-1", "IDMDEV1\\PC1")]
+        [TestCase("SUBDEV1\\user1", "SUBDEV1\\G-DL-1", "SUBDEV1\\PC1")]
+
+        // EXTDEV1\\user1 can access PCs via global groups only in their home domain
+        [TestCase("EXTDEV1\\user1", "EXTDEV1\\G-GG-1", "EXTDEV1\\PC1")]
+        
+        // EXTDEV1\\user1 can access PCs via universal groups in their home domain forest
+        [TestCase("EXTDEV1\\user1", "EXTDEV1\\G-UG-1", "EXTDEV1\\PC1")]
+        
+        // EXTDEV1\\user1 can access PCs in their own forest via domain local groups
+        [TestCase("EXTDEV1\\user1", "EXTDEV1\\G-DL-1", "EXTDEV1\\PC1")]
+
+        public void GroupCanAccessComputer(string requestorName, string trusteeName, string computerName)
+        {
+            IUser requestor = directory.GetUser(requestorName);
+            ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
+            IComputer computer = directory.GetComputer(computerName);
+
+            var t1 = CreateTarget(AccessMask.Laps, AccessMask.None, computer, trustee);
+
+            var options = SetupOptions(t1);
+
+            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
+            var result = builder.GetAuthorizationInformation(requestor, computer);
+
+            CollectionAssert.AreEquivalent(new[] { t1 }, result.SuccessfulLapsTargets);
+            Assert.AreEqual(AccessMask.Laps, result.EffectiveAccess);
         }
 
 

@@ -5,6 +5,7 @@ using System.Threading.Channels;
 using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.AccessManager.Server.Workers;
 using Lithnet.AccessManager.Web.AppSettings;
 using Lithnet.AccessManager.Web.Extensions;
 using Lithnet.AccessManager.Web.Internal;
@@ -61,6 +62,7 @@ namespace Lithnet.AccessManager.Web
             services.TryAddSingleton<IPowerShellSessionProvider, CachedPowerShellSessionProvider>();
             services.TryAddSingleton<IAuthorizationInformationMemoryCache, AuthorizationInformationMemoryCache>();
             services.TryAddSingleton<ITargetDataCache, TargetDataCache>();
+            services.TryAddSingleton<IAuthorizationContextProvider, AuthorizationContextProvider>();
 
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();

@@ -6,6 +6,6 @@ namespace Lithnet.AccessManager
 {
     public static class Constants
     {
-        public const string ServiceName = "lithnetadminaccesservice";
+        public const string ServiceName = "lithnetams";
     }
 }

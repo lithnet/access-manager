@@ -223,9 +223,9 @@
     <value>An unexpected error occurred during the authorization process for user {0} trying to access computer {1}</value>
   </data>
   <data name="LapsPasswordError" xml:space="preserve">
-    <value>An error occurred when trying to get the password for computer {0) as requested by user {1}</value>
+    <value>An error occurred when trying to get the password for computer {0} as requested by user {1}</value>
   </data>
   <data name="LapsPasswordHistoryError" xml:space="preserve">
-    <value>An error occurred when trying to get the password history for computer {0) as requested by user {1}</value>
+    <value>An error occurred when trying to get the password history for computer {0} as requested by user {1}</value>
   </data>
 </root>

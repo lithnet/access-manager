@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.DirectoryServices;
+using System.DirectoryServices.ActiveDirectory;
 using System.Security.Principal;
 using Lithnet.AccessManager.Interop;
 
@@ -13,6 +14,10 @@ namespace Lithnet.AccessManager
         string GetDomainNameDnsFromSid(SecurityIdentifier sid);
 
         string GetDomainNameNetBiosFromSid(SecurityIdentifier sid);
+
+        string GetDomainControllerForDomain(string domainDns);
+
+        string GetDomainControllerForDomain(string domainDns, bool forceRediscovery);
 
         IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl);
 
@@ -33,10 +38,14 @@ namespace Lithnet.AccessManager
         bool TryGetGroup(SecurityIdentifier sid, out IGroup group);
 
         bool TryGetGroup(string name, out IGroup group);
-     
+
         ISecurityPrincipal GetPrincipal(string principalName);
 
+        ISecurityPrincipal GetPrincipal(SecurityIdentifier sid);
+        
         bool TryGetPrincipal(string name, out ISecurityPrincipal principal);
+
+        bool TryGetPrincipal(SecurityIdentifier sid, out ISecurityPrincipal principal);
 
         IUser GetUser(string userName);
 
@@ -47,11 +56,11 @@ namespace Lithnet.AccessManager
         bool IsObjectInOu(IDirectoryObject computer, string ou);
 
         bool IsContainer(DirectoryEntry path);
-        
+
         DirectoryEntry GetConfigurationNamingContext(SecurityIdentifier domain);
 
         DirectoryEntry GetConfigurationNamingContext(string dnsDomain);
-        
+
         DirectoryEntry GetSchemaNamingContext(SecurityIdentifier domain);
 
         DirectoryEntry GetSchemaNamingContext(string dnsDomain);

@@ -5,12 +5,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.Workers;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Lithnet.AccessManager.Server.Auditing
+namespace Lithnet.AccessManager.Server.Workers
 {
     public class JitGroupWorker : BackgroundService
     {

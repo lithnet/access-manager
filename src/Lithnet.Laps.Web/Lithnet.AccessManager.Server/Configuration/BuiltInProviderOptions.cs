@@ -4,7 +4,7 @@ namespace Lithnet.AccessManager.Server.Configuration
 {
     public class BuiltInProviderOptions
     {
-        public AclEvaluationLocation AccessControlEvaluationLocation { get; set; } 
+        public List<AuthorizationServerMapping> AuthorizationServerMapping { get; set; } = new List<AuthorizationServerMapping>();
 
         public IList<SecurityDescriptorTarget> Targets { get; set; }
 

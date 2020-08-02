@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
+using System.Management.Automation;
 using System.Security.AccessControl;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
@@ -28,8 +30,9 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         private readonly ITargetDataProvider targetDataProvider;
 
+        private readonly IAuthorizationContextProvider authorizationContextProvider;
 
-        public AuthorizationInformationBuilder(IOptionsSnapshot<BuiltInProviderOptions> options, IDirectory directory, ILogger<AuthorizationInformationBuilder> logger, IPowerShellSecurityDescriptorGenerator powershell, IAuthorizationInformationMemoryCache authzCache, ITargetDataProvider targetDataProvider)
+        public AuthorizationInformationBuilder(IOptionsSnapshot<BuiltInProviderOptions> options, IDirectory directory, ILogger<AuthorizationInformationBuilder> logger, IPowerShellSecurityDescriptorGenerator powershell, IAuthorizationInformationMemoryCache authzCache, ITargetDataProvider targetDataProvider, IAuthorizationContextProvider authorizationContextProvider)
         {
             this.directory = directory;
             this.logger = logger;
@@ -37,6 +40,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             this.powershell = powershell;
             this.authzCache = authzCache;
             this.targetDataProvider = targetDataProvider;
+            this.authorizationContextProvider = authorizationContextProvider;
         }
 
         public void ClearCache(IUser user, IComputer computer)
@@ -81,7 +85,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                 return info;
             }
 
-            using AuthorizationContext c = new AuthorizationContext(user.Sid, this.GetAuthorizationContextTarget(user, computer));
+            using AuthorizationContext c = authorizationContextProvider.GetAuthorizationContext(user, computer);
 
             DiscretionaryAcl masterDacl = new DiscretionaryAcl(false, false, info.MatchedComputerTargets.Count);
 
@@ -115,7 +119,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                 foreach (var ace in sd.DiscretionaryAcl.OfType<CommonAce>())
                 {
                     masterDacl.AddAccess(
-                        (AccessControlType) ace.AceType,
+                        (AccessControlType)ace.AceType,
                         ace.SecurityIdentifier,
                         ace.AccessMask,
                         ace.InheritanceFlags,
@@ -124,19 +128,19 @@ namespace Lithnet.AccessManager.Server.Authorization
 
                 int i = matchedTargetCount;
 
-                if (c.AccessCheck(sd, (int) AccessMask.Laps))
+                if (c.AccessCheck(sd, (int)AccessMask.Laps))
                 {
                     info.SuccessfulLapsTargets.Add(target);
                     matchedTargetCount++;
                 }
 
-                if (c.AccessCheck(sd, (int) AccessMask.LapsHistory))
+                if (c.AccessCheck(sd, (int)AccessMask.LapsHistory))
                 {
                     info.SuccessfulLapsHistoryTargets.Add(target);
                     matchedTargetCount++;
                 }
 
-                if (c.AccessCheck(sd, (int) AccessMask.Jit))
+                if (c.AccessCheck(sd, (int)AccessMask.Jit))
                 {
                     info.SuccessfulJitTargets.Add(target);
                     matchedTargetCount++;
@@ -155,24 +159,14 @@ namespace Lithnet.AccessManager.Server.Authorization
 
                 this.logger.LogTrace($"Resultant security descriptor for computer {computer.MsDsPrincipalName}: {info.SecurityDescriptor.GetSddlForm(AccessControlSections.All)}");
 
-                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int) AccessMask.Laps) ? AccessMask.Laps : 0;
-                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int) AccessMask.Jit) ? AccessMask.Jit : 0;
-                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int) AccessMask.LapsHistory) ? AccessMask.LapsHistory : 0;
+                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.Laps) ? AccessMask.Laps : 0;
+                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.Jit) ? AccessMask.Jit : 0;
+                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.LapsHistory) ? AccessMask.LapsHistory : 0;
             }
 
             this.logger.LogTrace($"User {user.MsDsPrincipalName} has effective access of {info.EffectiveAccess} on computer {computer.MsDsPrincipalName}");
 
             return info;
-        }
-
-        private string GetAuthorizationContextTarget(IUser user, IComputer computer)
-        {
-            return this.options.AccessControlEvaluationLocation switch
-            {
-                AclEvaluationLocation.ComputerDomain => this.directory.GetDomainNameDnsFromSid(computer.Sid),
-                AclEvaluationLocation.UserDomain => this.directory.GetDomainNameDnsFromSid(user.Sid),
-                _ => null
-            };
         }
 
         public IList<SecurityDescriptorTarget> GetMatchingTargetsForComputer(IComputer computer)
@@ -182,15 +176,15 @@ namespace Lithnet.AccessManager.Server.Authorization
             Lazy<List<SecurityIdentifier>> computerTokenSids = new Lazy<List<SecurityIdentifier>>(() => this.directory.GetTokenGroups(computer, computer.Sid.AccountDomainSid).ToList());
             Lazy<List<Guid>> computerParents = new Lazy<List<Guid>>(() => computer.GetParentGuids().ToList());
 
-            foreach (var target in this.options.Targets.OrderBy(t => (int) t.Type).ThenByDescending(this.targetDataProvider.GetSortOrder))
+            foreach (var target in this.options.Targets.OrderBy(t => (int)t.Type).ThenByDescending(this.targetDataProvider.GetSortOrder))
             {
-                TargetData data = this.targetDataProvider.GetTargetData(target);
+                TargetData targetData = this.targetDataProvider.GetTargetData(target);
 
                 try
                 {
                     if (target.Type == TargetType.Container)
                     {
-                        if (computerParents.Value.Any(t => t == data.ContainerGuid))
+                        if (computerParents.Value.Any(t => t == targetData.ContainerGuid))
                         {
                             this.logger.LogTrace($"Matched {computer.MsDsPrincipalName} to target OU {target.Target}");
                             matchingTargets.Add(target);
@@ -198,7 +192,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                     }
                     else if (target.Type == TargetType.Computer)
                     {
-                        if (data.Sid == computer.Sid)
+                        if (targetData.Sid == computer.Sid)
                         {
                             this.logger.LogTrace($"Matched {computer.MsDsPrincipalName} to target {target.Id}");
                             matchingTargets.Add(target);
@@ -206,7 +200,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                     }
                     else
                     {
-                        if (this.directory.IsSidInPrincipalToken(data.Sid, computerTokenSids.Value))
+                        if (this.directory.IsSidInPrincipalToken(targetData.Sid, computerTokenSids.Value))
                         {
                             this.logger.LogTrace($"Matched {computer.MsDsPrincipalName} to target {target.Id}");
                             matchingTargets.Add(target);

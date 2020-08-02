@@ -4,12 +4,8 @@ using Newtonsoft.Json.Converters;
 namespace Lithnet.AccessManager.Server.Configuration
 {
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum AclEvaluationLocation
+    public enum AuthorizationServerType
     {
-        ComputerDomain = 0,
-
-        UserDomain = 1,
-
-        WebAppDomain = 2,
+        Default = 0,
     }
 }

@@ -154,12 +154,9 @@ namespace Lithnet.AccessManager.Server.UI
                 {
                     targetServer = this.directory.GetDomainNameDnsFromDn(this.Target);
                 }
-                else
+                else if (this.Target.TryParseAsSid(out SecurityIdentifier sid))
                 {
-                    if (this.Target.TryParseAsSid(out SecurityIdentifier sid))
-                    {
-                        targetServer = this.directory.GetDomainNameDnsFromSid(sid);
-                    }
+                    targetServer = this.directory.GetDomainNameDnsFromSid(sid);
                 }
 
                 SiObjectInfoFlags flags = SiObjectInfoFlags.EditPermissions;
@@ -175,8 +172,6 @@ namespace Lithnet.AccessManager.Server.UI
                     mapping,
                     targetServer
                 );
-
-                ISecurityInformation d = info;
 
                 if (NativeMethods.EditSecurity(this.GetHandle(), info))
                 {
@@ -228,9 +223,9 @@ namespace Lithnet.AccessManager.Server.UI
                 scope.Filter = new DsFilterFlags();
 
                 scope.Filter.UpLevel.BothModeFilter = DsopObjectFilterFlags.DSOP_FILTER_DOMAIN_LOCAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_GLOBAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_UNIVERSAL_GROUPS_SE;
-                
+
                 scope.ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_ENTERPRISE_DOMAIN | DsopScopeTypeFlags.DSOP_SCOPE_TYPE_USER_ENTERED_UPLEVEL_SCOPE | DsopScopeTypeFlags.DSOP_SCOPE_TYPE_EXTERNAL_UPLEVEL_DOMAIN;
-                
+
                 scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS | DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
 
                 string target = vm.SelectedForest == domain.Forest.Name ? null : vm.SelectedForest;
@@ -276,9 +271,12 @@ namespace Lithnet.AccessManager.Server.UI
                     {
                         vm.SelectedForest = directory.GetDomainNameDnsFromDn(this.Target);
                     }
-                    catch { }
+                    catch
+                    {
+                        // ignore
+                    }
                 }
-                 
+
                 vm.SelectedForest ??= domain.Forest.Name;
 
                 foreach (var trust in domain.Forest.GetAllTrustRelationships().OfType<TrustRelationshipInformation>())
@@ -368,15 +366,15 @@ namespace Lithnet.AccessManager.Server.UI
 
             try
             {
-                SecurityIdentifier s = new SecurityIdentifier(sid);
-                if (this.directory.TryGetPrincipal(sid, out ISecurityPrincipal principal))
+                if (sid.TryParseAsSid(out SecurityIdentifier s))
                 {
-                    return principal.MsDsPrincipalName;
+                    if (this.directory.TryGetPrincipal(s, out ISecurityPrincipal principal))
+                    {
+                        return principal.MsDsPrincipalName;
+                    }
                 }
-                else
-                {
-                    return sid;
-                }
+
+                return sid;
             }
             catch (Exception)
             {
@@ -427,7 +425,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                 foreach (var ace in sd.DiscretionaryAcl.OfType<CommonAce>())
                 {
-                    if (ace.AceType == AceType.AccessAllowed && ((ace.AccessMask & (int) mask) == (int) mask))
+                    if (ace.AceType == AceType.AccessAllowed && ((ace.AccessMask & (int)mask) == (int)mask))
                     {
                         return true;
                     }

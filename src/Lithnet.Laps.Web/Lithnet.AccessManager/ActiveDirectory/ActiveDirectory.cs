@@ -47,6 +47,28 @@ namespace Lithnet.AccessManager
             return DirectoryExtensions.TryGet(() => this.GetComputer(name), out computer);
         }
 
+        public ISecurityPrincipal GetPrincipal(SecurityIdentifier sid)
+        {
+            var result = NativeMethods.GetDirectoryEntry(sid);
+
+            if (result.HasPropertyValue("objectClass", "computer"))
+            {
+                return new ActiveDirectoryComputer(result);
+            }
+
+            if (result.HasPropertyValue("objectClass", "group"))
+            {
+                return new ActiveDirectoryGroup(result);
+            }
+
+            if (result.HasPropertyValue("objectClass", "user"))
+            {
+                return new ActiveDirectoryUser(result);
+            }
+
+            throw new UnsupportedPrincipalTypeException($"The object '{sid}' was of an unknown type: {result.GetPropertyCommaSeparatedString("objectClass")}");
+        }
+
         public ISecurityPrincipal GetPrincipal(string name)
         {
             var result = this.DoGcLookup(name, "*", ActiveDirectoryComputer.PropertiesToGet);
@@ -72,6 +94,10 @@ namespace Lithnet.AccessManager
         public bool TryGetPrincipal(string name, out ISecurityPrincipal principal)
         {
             return DirectoryExtensions.TryGet(() => this.GetPrincipal(name), out principal);
+        }
+        public bool TryGetPrincipal(SecurityIdentifier sid, out ISecurityPrincipal principal)
+        {
+            return DirectoryExtensions.TryGet(() => this.GetPrincipal(sid), out principal);
         }
 
         public bool IsContainer(DirectoryEntry de)
@@ -264,6 +290,17 @@ namespace Lithnet.AccessManager
             var result = NativeMethods.CrackNames(DsNameFormat.DistinguishedName, DsNameFormat.DistinguishedName, dn);
             return result.Domain;
         }
+
+        public string GetDomainControllerForDomain(string domainDns)
+        {
+            return this.GetDomainControllerForDomain(domainDns, false);
+        }
+
+        public string GetDomainControllerForDomain(string domainDns, bool forceRediscovery)
+        {
+            return NativeMethods.GetDomainControllerForDnsDomain(domainDns, forceRediscovery);
+        }
+
 
         public DirectoryEntry GetConfigurationNamingContext(SecurityIdentifier domain)
         {

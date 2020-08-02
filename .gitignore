@@ -263,3 +263,7 @@ __pycache__/
 appsecrets.json
 secrets.config
 *.dev.config
+output/
+*-cache/
+*-SetupFiles/
+*.back*.aip

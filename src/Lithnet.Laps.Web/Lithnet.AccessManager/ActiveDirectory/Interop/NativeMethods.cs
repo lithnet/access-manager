@@ -423,7 +423,7 @@ namespace Lithnet.AccessManager.Interop
             return context.GetTokenGroups().ToList(); // Force the enumeration now before the context goes out of scope
         }
 
-        private static string GetDomainControllerForDnsDomain(string dnsDomain, bool forceRediscovery = false)
+        public static string GetDomainControllerForDnsDomain(string dnsDomain, bool forceRediscovery = false)
         {
             IntPtr pdcInfo = IntPtr.Zero;
 
@@ -434,7 +434,9 @@ namespace Lithnet.AccessManager.Interop
                     dnsDomain,
                     IntPtr.Zero,
                     null,
-                    DsGetDcNameFlags.DS_DIRECTORY_SERVICE_8_REQUIRED | (forceRediscovery ? DsGetDcNameFlags.DS_FORCE_REDISCOVERY : 0),
+                    DsGetDcNameFlags.DS_DIRECTORY_SERVICE_8_REQUIRED |
+                    DsGetDcNameFlags.DS_RETURN_DNS_NAME |
+                    (forceRediscovery ? DsGetDcNameFlags.DS_FORCE_REDISCOVERY : 0),
                     out pdcInfo);
 
                 if (result != 0)

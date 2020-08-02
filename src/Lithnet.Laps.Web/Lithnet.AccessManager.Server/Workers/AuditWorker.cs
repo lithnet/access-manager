@@ -2,11 +2,12 @@
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Lithnet.AccessManager.Server.Auditing
+namespace Lithnet.AccessManager.Server.Workers
 {
     public class AuditWorker : BackgroundService
     {

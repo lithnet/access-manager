@@ -246,7 +246,7 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error occurred when trying to get the password for computer {0) as requested by user {1}.
+        ///   Looks up a localized string similar to An error occurred when trying to get the password for computer {0} as requested by user {1}.
         /// </summary>
         internal static string LapsPasswordError {
             get {
@@ -255,7 +255,7 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error occurred when trying to get the password history for computer {0) as requested by user {1}.
+        ///   Looks up a localized string similar to An error occurred when trying to get the password history for computer {0} as requested by user {1}.
         /// </summary>
         internal static string LapsPasswordHistoryError {
             get {

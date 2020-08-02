@@ -7,14 +7,12 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class ServiceSettingsProvider : IServiceSettingsProvider
     {
-        public const string ServiceName = "lithnetadminaccesservice";
-
-        public ServiceController ServiceController { get; } = new ServiceController(ServiceName);
+        public ServiceController ServiceController { get; } = new ServiceController(AccessManager.Constants.ServiceName);
 
 
         public SecurityIdentifier GetServiceAccount()
         {
-            RegistryKey key = Registry.LocalMachine.OpenSubKey($@"SYSTEM\CurrentControlSet\Services\{ServiceName}", false);
+            RegistryKey key = Registry.LocalMachine.OpenSubKey($@"SYSTEM\CurrentControlSet\Services\{AccessManager.Constants.ServiceName}", false);
 
             if (key == null)
             {
@@ -34,7 +32,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public void SetServiceAccount(string username, string password)
         {
-            NativeMethods.ChangeServiceCredentials(ServiceName, username, password);
+            NativeMethods.ChangeServiceCredentials(AccessManager.Constants.ServiceName, username, password);
         }
     }
 }
