@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using System.Windows.Media.Animation;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
@@ -16,42 +18,53 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IDialogCoordinator dialogCoordinator;
 
-        public ApplicationConfigViewModel(
-            IApplicationConfig model,
-            IDialogCoordinator dialogCoordinator,
-            AuthenticationViewModel authentication,
-            AuthorizationViewModel authorization,
-            UserInterfaceViewModel ui,
-            RateLimitsViewModel rate,
-            IpDetectionViewModel ip,
-            AuditingViewModel audit,
-            EmailViewModel mail,
-            HostingViewModel hosting,
-            ActiveDirectoryConfigurationViewModel ad,
-            JitConfigurationViewModel jit,
-            LapsConfigurationViewModel laps,
-            HelpViewModel help)
+        private readonly List<PropertyChangedBase> suspendedModels;
+
+        public ApplicationConfigViewModel(IApplicationConfig model, IDialogCoordinator dialogCoordinator, AuthenticationViewModel authentication,
+            AuthorizationViewModel authorization, UserInterfaceViewModel ui, RateLimitsViewModel rate, IpDetectionViewModel ip,
+            AuditingViewModel audit, EmailViewModel mail, HostingViewModel hosting, ActiveDirectoryConfigurationViewModel ad,
+            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help)
         {
             this.model = model;
             this.dialogCoordinator = dialogCoordinator;
 
             this.hosting = hosting;
-
             this.Items.Add(hosting);
-            this.Items.Add(authentication);
-            this.Items.Add(ad);
-            this.Items.Add(audit);
-            this.Items.Add(authorization);
-            this.Items.Add(jit);
-            this.Items.Add(laps);
-            this.Items.Add(ui);
-            this.Items.Add(mail);
-            this.Items.Add(rate);
-            this.Items.Add(ip);
+
+            this.suspendedModels = new List<PropertyChangedBase>();
+
+            RegistryKey key = Registry.LocalMachine.OpenSubKey(AccessManager.Constants.BaseKey);
+            bool currentlyUnconfigured = !(key?.GetValue("Configured", 0) is int value) || value == 0; 
+            if (currentlyUnconfigured)
+            {
+                this.suspendedModels.Add(authentication);
+                this.suspendedModels.Add(ad);
+                this.suspendedModels.Add(audit);
+                this.suspendedModels.Add(authorization);
+                this.suspendedModels.Add(jit);
+                this.suspendedModels.Add(laps);
+                this.suspendedModels.Add(ui);
+                this.suspendedModels.Add(mail);
+                this.suspendedModels.Add(rate);
+                this.suspendedModels.Add(ip);
+            }
+            else
+            {
+                this.Items.Add(authentication);
+                this.Items.Add(ad);
+                this.Items.Add(audit);
+                this.Items.Add(authorization);
+                this.Items.Add(jit);
+                this.Items.Add(laps);
+                this.Items.Add(ui);
+                this.Items.Add(mail);
+                this.Items.Add(rate);
+                this.Items.Add(ip);
+            }
 
             this.OptionItems = new BindableCollection<PropertyChangedBase>();
             this.OptionItems.Add(help);
-         
+
             this.ActiveItem = this.Items.First();
         }
 
@@ -88,6 +101,12 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 RegistryKey key = Registry.LocalMachine.CreateSubKey(AccessManager.Constants.BaseKey, true);
                 key.SetValue("Configured", 1);
+
+                if (this.suspendedModels.Count > 0)
+                {
+                    this.Items.AddRange(this.suspendedModels);
+                    this.suspendedModels.Clear();
+                }
             }
             catch (Exception ex)
             {

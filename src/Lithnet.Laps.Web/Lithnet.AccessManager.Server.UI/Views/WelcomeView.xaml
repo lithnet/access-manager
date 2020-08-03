@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.WelcomeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+             xmlns:s="https://github.com/canton7/Stylet"
+             mc:Ignorable="d" d:DesignWidth="800">
+    <StackPanel>
+        <Label Style="{DynamicResource DescriptionHeaderStyle}" 
+               Content="Welcome"/>
+
+        <TextBlock Margin="5">Thanks for choosing Lithnet Access Manager!</TextBlock>
+
+        <TextBlock Margin="5" TextWrapping="Wrap">In order to get started, you need to configure the web host by choosing an SSL certificate, config your ports, and save your configuration. After restarting the service, the web site will be active.</TextBlock>
+
+        <TextBlock Margin="5" TextWrapping="Wrap">You'll then have access to edit all the application settings</TextBlock>
+
+        <TextBlock Margin="5" TextWrapping="Wrap">Visit <Hyperlink Click="{s:Action OpenGettingStarted}">our website</Hyperlink> to read our getting started guide - there's a lot to learn, so we've created some quick-start guides to get you going</TextBlock>
+
+    </StackPanel>
+    
+</UserControl>

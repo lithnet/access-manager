@@ -22,7 +22,7 @@ namespace Lithnet.AccessManager.Web
         {
             RegistryKey key = Registry.LocalMachine.OpenSubKey(Constants.BaseKey, false);
 
-            if (key?.GetValue("Configured", 0) is int configured && configured == 0)
+            if (!(key?.GetValue("Configured", 0) is int value) || value == 0)
             {
                 return Host.CreateDefaultBuilder().ConfigureServices((hostContext, services) =>
                     {

@@ -12,6 +12,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="670" d:DesignWidth="800">
     <StackPanel>
+
         <Label Style="{DynamicResource DescriptionHeaderStyle}" Content="Service"/>
 
         <Grid>

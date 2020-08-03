@@ -3,7 +3,7 @@
     "Environment": "HttpSys",
     "HttpSys": {
       "HttpPort": 80,
-      "HttpsPort": 44337,
+      "HttpsPort": 443,
       "Hostname": null,
       "Path": null,
       "MaxAccepts": 100,

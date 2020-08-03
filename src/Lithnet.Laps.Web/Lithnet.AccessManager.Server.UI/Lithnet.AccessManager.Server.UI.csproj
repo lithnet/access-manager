@@ -91,6 +91,9 @@
     <Compile Update="Views\SelectForestView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\SelectTargetTypeView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Windows\ExternalDialogWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -123,6 +126,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\SelectForestView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\SelectTargetTypeView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Windows\ExternalDialogWindow.xaml">

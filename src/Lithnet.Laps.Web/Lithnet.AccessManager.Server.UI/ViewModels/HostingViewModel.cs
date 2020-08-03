@@ -214,7 +214,10 @@ namespace Lithnet.AccessManager.Server.UI
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "Error creating HTTP reservations");
-                this.TryRollbackHttpReservations();
+                if (!currentlyUnconfigured)
+                {
+                    this.TryRollbackHttpReservations();
+                }
 
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not create the HTTP reservations\r\n{ex.Message}");
                 return false;
@@ -260,9 +263,12 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 this.logger.LogError(ex, "Error creating certificate binding");
 
-                this.TryRollbackCertificateBinding();
+                if (!currentlyUnconfigured)
+                {
+                    this.TryRollbackCertificateBinding();
+                }
 
-                if (updateHttpReservations)
+                if (!currentlyUnconfigured && updateHttpReservations)
                 {
                     this.TryRollbackHttpReservations();
                 }
@@ -292,12 +298,12 @@ namespace Lithnet.AccessManager.Server.UI
 
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The service account could not be changed\r\n{ex.Message}");
 
-                if (updateCertificateBinding)
+                if (!currentlyUnconfigured && updateCertificateBinding)
                 {
                     this.TryRollbackCertificateBinding();
                 }
 
-                if (updateHttpReservations)
+                if (!currentlyUnconfigured && updateHttpReservations)
                 {
                     this.TryRollbackHttpReservations();
                 }
@@ -583,8 +589,8 @@ namespace Lithnet.AccessManager.Server.UI
                 return;
             }
 
-            string httpOld = HttpSysHostingOptions.BuildPrefix(this.OriginalModel.HttpSys.Hostname, this.OriginalModel.HttpSys.HttpPort, this.OriginalModel.HttpSys.Path, false);
-            string httpsOld = HttpSysHostingOptions.BuildPrefix(this.OriginalModel.HttpSys.Hostname, this.OriginalModel.HttpSys.HttpsPort, this.OriginalModel.HttpSys.Path, true);
+            string httpOld = this.OriginalModel.HttpSys.BuildHttpUrlPrefix();
+            string httpsOld = this.OriginalModel.HttpSys.BuildHttpsUrlPrefix();
 
             this.DeleteUrlReservation(httpOld);
             this.DeleteUrlReservation(httpsOld);
