@@ -1,28 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <DOCUMENT Type="Advanced Installer" CreateVersion="17.1.2" version="17.3" Modules="enterprise" RootPath="." Language="en" Id="{8ADA5C46-1F9D-45B3-A39D-37B0D337D0DD}">
   <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
+    <ROW Name="Application_WorkingDir" Value="APPDIR"/>
     <ROW Name="MigrationUninstallCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
-    <ROW Property="AI_BOOTSTRAPPER_CHECK_LC" Value="1"/>
     <ROW Property="AI_FINDEXE_TITLE" Value="Select the installation package for [|ProductName]" ValueLocId="AI.Property.FindExeTitle"/>
     <ROW Property="AI_LOGON_AS_SERVICE_ACCOUNTS" Value="[USER_NAME]"/>
-    <ROW Property="AI_PREDEF_LCONDS_PROPS" Value="AI_DETECTED_DOTNET_CORE_VERSION"/>
-    <ROW Property="AI_REQUIRED_DOTNET_CORE_DISPLAY" MultiBuildValue="DefaultBuild:3.1" ValueLocId="-"/>
-    <ROW Property="AI_REQUIRED_DOTNET_CORE_VERSION" MultiBuildValue="DefaultBuild:3.1" ValueLocId="-"/>
+    <ROW Property="AI_PREDEF_LCONDS_PROPS" Value="AI_DETECTED_INTERNET_CONNECTION"/>
+    <ROW Property="AI_PRODUCTNAME_ARP" Value="[|Manufacturer] [|ProductName]"/>
     <ROW Property="AI_RUN_AS_ADMIN" Value="1"/>
     <ROW Property="AI_ThemeStyle" Value="aero" MsiKey="AI_ThemeStyle"/>
+    <ROW Property="AI_UNINSTALLER" Value="msiexec.exe"/>
     <ROW Property="AI_USER_IGNORE_FULLNAME" Value="1"/>
     <ROW Property="ALLUSERS" Value="1"/>
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
-    <ROW Property="ARPNOREPAIR" MultiBuildValue="DefaultBuild:1"/>
+    <ROW Property="ARPNOREPAIR" Value="1" MultiBuildValue="DefaultBuild:1"/>
+    <ROW Property="ARPSYSTEMCOMPONENT" Value="1"/>
     <ROW Property="CTRLS" Value="2"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
-    <ROW Property="ProductCode" Value="1033:{1D3E93EF-004E-4C94-AA4E-11C7A4A4DC46} " Type="16"/>
+    <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
+    <ROW Property="ProductCode" Value="1033:{99BCCED7-F28F-45CF-B5E8-2962F44EE676} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.0" Type="32"/>
+    <ROW Property="ProductVersion" Value="1.0.7520.13873" Type="32" TargetFile="Lithnet.AccessManager.Web.exe"/>
     <ROW Property="RUNAPPLICATION" Value="1" Type="4"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
@@ -41,6 +43,7 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiDirsComponent">
     <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
+    <ROW Directory="Assets" Directory_Parent="TARGETDIR" DefaultDir="Assets" IsPseudoRoot="1"/>
     <ROW Directory="CimCmdlets_Dir" Directory_Parent="Modules_1_Dir" DefaultDir="CIMCMD~1|CimCmdlets"/>
     <ROW Directory="Lithnet_Dir" Directory_Parent="ProgramMenuFolder" DefaultDir="Lithnet"/>
     <ROW Directory="Logs_Dir" Directory_Parent="APPDIR" DefaultDir="Logs"/>
@@ -91,7 +94,8 @@
     <ROW Directory="wwwroot_Dir" Directory_Parent="APPDIR" DefaultDir="wwwroot"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
-    <ROW Component="AI_ExePath" ComponentId="{DD793248-8EF7-44DC-8429-AD06901D6DEA}" Directory_="APPDIR" Attributes="260" KeyPath="AI_ExePath"/>
+    <ROW Component="AI_CustomARPName" ComponentId="{8130B310-C027-4D58-8B72-0B4FA6121DB4}" Directory_="APPDIR" Attributes="260" KeyPath="DisplayName" Options="1"/>
+    <ROW Component="AI_ExePath" ComponentId="{4D8B5B6C-3E7B-471D-9714-1E19B19F3517}" Directory_="APPDIR" Attributes="260" KeyPath="AI_ExePath"/>
     <ROW Component="APIMSWinCoreKernel32PrivateL111.dll" ComponentId="{6F90331F-7354-4952-91CC-DE10200B8792}" Directory_="APPDIR" Attributes="256" KeyPath="APIMSWinCoreKernel32PrivateL111.dll"/>
     <ROW Component="APIMSWinCoreKernel32PrivateL112.dll" ComponentId="{2C548621-9C52-4ADC-AD6C-CFB82660F670}" Directory_="APPDIR" Attributes="256" KeyPath="APIMSWinCoreKernel32PrivateL112.dll"/>
     <ROW Component="APIMSWindevicesconfigL111.dll" ComponentId="{1993B835-07BE-4362-BED7-9E60C69E7BD7}" Directory_="APPDIR" Attributes="256" KeyPath="APIMSWindevicesconfigL111.dll"/>
@@ -101,9 +105,11 @@
     <ROW Component="ControlzEx.dll" ComponentId="{7A657910-F2F0-4733-83E6-C4A51B024D3F}" Directory_="APPDIR" Attributes="0" KeyPath="ControlzEx.dll"/>
     <ROW Component="Diagnostics.format.ps1xml" ComponentId="{BB25EE07-1937-49B5-A660-D7C1A6FA7152}" Directory_="Microsoft.PowerShell.Diagnostic_Dir" Attributes="0" KeyPath="Diagnostics.format.ps1xml" Type="0"/>
     <ROW Component="EmailAuditFailure.html" ComponentId="{52B0A45E-1DB6-4FE5-9F13-6F9E26735B3C}" Directory_="NotificationTemplates_Dir" Attributes="0" KeyPath="EmailAuditFailure.html" Type="0"/>
+    <ROW Component="EventLogMessages.dll" ComponentId="{CC7CC44A-3874-498B-9545-DEB5C8710543}" Directory_="APPDIR" Attributes="256" KeyPath="EventLogMessages.dll"/>
     <ROW Component="FluentValidation.dll" ComponentId="{2874C855-E840-4878-9ECC-C4FDF1EB2E37}" Directory_="APPDIR" Attributes="0" KeyPath="FluentValidation.dll"/>
     <ROW Component="HtmlAgilityPack.dll" ComponentId="{8505AA5C-23A4-4869-9C25-E396707B78B8}" Directory_="APPDIR" Attributes="0" KeyPath="HtmlAgilityPack.dll"/>
     <ROW Component="InconsolataRegular.ttf" ComponentId="{60E9B5EF-335A-416B-B107-70FAF8F883D5}" Directory_="fonts_Dir" Attributes="0" Type="0"/>
+    <ROW Component="Interop.NetFwTypeLib.dll" ComponentId="{436E36AF-36E4-4632-B66A-AD5E249F0BC9}" Directory_="APPDIR" Attributes="256" KeyPath="Interop.NetFwTypeLib.dll"/>
     <ROW Component="LICENSE" ComponentId="{E965B07A-D2D5-452E-8AB2-70E7B47CC427}" Directory_="bootstrap_Dir" Attributes="0" KeyPath="LICENSE" Type="0"/>
     <ROW Component="LICENSE.md" ComponentId="{994736CB-4FE6-4414-9FF0-A745F0A4B170}" Directory_="jqueryvalidation_Dir" Attributes="0" KeyPath="LICENSE.md" Type="0"/>
     <ROW Component="LICENSE.txt" ComponentId="{248F0E09-CC3D-4836-88D8-C4F4EB106C5C}" Directory_="jquery_Dir" Attributes="0" KeyPath="LICENSE.txt" Type="0"/>
@@ -230,6 +236,7 @@
     <ROW Component="ProductInformation" ComponentId="{EF48E22B-B87F-4609-BCA9-10F3D3A555BF}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
     <ROW Component="PropertyChanged.dll" ComponentId="{FF66DE3C-9C37-49E6-92EE-80D055A29457}" Directory_="APPDIR" Attributes="0" KeyPath="PropertyChanged.dll"/>
     <ROW Component="SslCertBinding.Net.dll" ComponentId="{7FE2A2A2-033D-4F3B-8A5B-0B57B371F647}" Directory_="APPDIR" Attributes="0" KeyPath="SslCertBinding.Net.dll"/>
+    <ROW Component="Store50x50Logo.scale100.png" ComponentId="{0C17C3C0-290F-455E-B53C-4BEB93A5FD3F}" Directory_="Assets" Attributes="0" KeyPath="Store50x50Logo.scale100.png" Type="0"/>
     <ROW Component="Stylet.dll" ComponentId="{B6B232FC-A3D8-40D0-801F-9CCAC092D193}" Directory_="APPDIR" Attributes="0" KeyPath="Stylet.dll"/>
     <ROW Component="System.AppContext.dll" ComponentId="{1B762BFF-41E7-42C3-9A1B-202A716CF768}" Directory_="ref_Dir" Attributes="0" KeyPath="System.AppContext.dll"/>
     <ROW Component="System.Buffers.dll" ComponentId="{0130FA7C-409A-4431-A7F5-66DBDEE2C1CB}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Buffers.dll"/>
@@ -456,6 +463,7 @@
     <ROW Component="sni.dll" ComponentId="{15294EE1-F821-4E74-9296-5705719624DD}" Directory_="APPDIR" Attributes="256" KeyPath="sni.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
+    <ROW Feature="AiAppXAssets" Title="AiAppXAssets" Description="Description" Display="3" Level="0" Directory_="APPDIR" Attributes="0" Options="271" Builds="Build_MSIX_APPX"/>
     <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0"/>
     <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
   </COMPONENT>
@@ -912,12 +920,27 @@
     <ROW File="SslCertBinding.Net.dll" Component_="SslCertBinding.Net.dll" FileName="SSLCER~1.DLL|SslCertBinding.Net.dll" Attributes="0" SourcePath="output\SslCertBinding.Net.dll" SelfReg="false"/>
     <ROW File="Stylet.dll" Component_="Stylet.dll" FileName="Stylet.dll" Attributes="0" SourcePath="output\Stylet.dll" SelfReg="false"/>
     <ROW File="System.Text.Json.dll_1" Component_="System.Text.Json.dll_1" FileName="SYSTE~34.DLL|System.Text.Json.dll" Attributes="0" SourcePath="output\System.Text.Json.dll" SelfReg="false"/>
+    <ROW File="Store50x50Logo.scale100.png" Component_="Store50x50Logo.scale100.png" FileName="STORE5~2.PNG|Store50x50Logo.scale-100.png" Attributes="0" SourcePath="&lt;AI_RES&gt;appx\StoreLogo.png" SelfReg="false"/>
+    <ROW File="LithnetAccessManagerServiceConfigurationSquare44x44Logo.scale100.png" Component_="Store50x50Logo.scale100.png" FileName="LITHNE~1.PNG|LithnetAccessManagerServiceConfigurationSquare44x44Logo.scale-100.png" Attributes="0" SourcePath="&lt;AI_RES&gt;appx\SmallLogo10.png" SelfReg="false"/>
+    <ROW File="LithnetAccessManagerServiceConfigurationSquare150x150Logo.scale100.pn" Component_="Store50x50Logo.scale100.png" FileName="LITHNE~2.PNG|LithnetAccessManagerServiceConfigurationSquare150x150Logo.scale-100.png" Attributes="0" SourcePath="&lt;AI_RES&gt;appx\Logo.png" SelfReg="false"/>
+    <ROW File="LithnetAccessManagerHelp.urlSquare44x44Logo.scale100.png" Component_="Store50x50Logo.scale100.png" FileName="LITHNE~3.PNG|LithnetAccessManagerHelp.urlSquare44x44Logo.scale-100.png" Attributes="0" SourcePath="&lt;AI_RES&gt;appx\SmallLogo10.png" SelfReg="false"/>
+    <ROW File="LithnetAccessManagerHelp.urlSquare150x150Logo.scale100.png" Component_="Store50x50Logo.scale100.png" FileName="LITHNE~4.PNG|LithnetAccessManagerHelp.urlSquare150x150Logo.scale-100.png" Attributes="0" SourcePath="&lt;AI_RES&gt;appx\Logo.png" SelfReg="false"/>
+    <ROW File="LithnetAccessManagerServiceSquare44x44Logo.scale100.png" Component_="Store50x50Logo.scale100.png" FileName="LITHNE~5.PNG|LithnetAccessManagerServiceSquare44x44Logo.scale-100.png" Attributes="0" SourcePath="&lt;AI_RES&gt;appx\SmallLogo10.png" SelfReg="false"/>
+    <ROW File="LithnetAccessManagerServiceSquare150x150Logo.scale100.png" Component_="Store50x50Logo.scale100.png" FileName="LITHNE~6.PNG|LithnetAccessManagerServiceSquare150x150Logo.scale-100.png" Attributes="0" SourcePath="&lt;AI_RES&gt;appx\Logo.png" SelfReg="false"/>
+    <ROW File="EventLogMessages.dll" Component_="EventLogMessages.dll" FileName="EVENTL~1.DLL|EventLogMessages.dll" Attributes="0" SourcePath="C:\Windows\Microsoft.NET\Framework64\v4.0.30319\EventLogMessages.dll" SelfReg="false"/>
+    <ROW File="Interop.NetFwTypeLib.dll" Component_="Interop.NetFwTypeLib.dll" FileName="INTERO~1.DLL|Interop.NetFwTypeLib.dll" Attributes="0" SourcePath="output\Interop.NetFwTypeLib.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.AiPersistentDataComponent">
     <ROW PersistentRow="appsettings.json" Type="0" Condition="1"/>
     <ROW PersistentRow="apphost.json" Type="0" Condition="1"/>
     <ROW PersistentRow="NotificationTemplates_Dir" Type="1" Condition="1"/>
     <ROW PersistentRow="Scripts_Dir" Type="1" Condition="1"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.AiRemoveRegComponent">
+    <ROW RemoveReg="Configured" InstallMode="2"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.AppXCfgComponent">
+    <ROW ID="Configuration" Order="1" ManifestFile="AppxManifest.xml" TargetOs="4" AutoUpdatesFrequency="0" AutoUpdatesOptions="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
@@ -926,6 +949,8 @@
     <ROW Action="AI_DetectSoftware" Sequence="151"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
+    <ROW BuildKey="Build_MSIX_APPX" BuildName="Build_MSIX_APPX" BuildOrder="2" BuildType="7" PackageFolder="Build_MSIX_APPXSetupFiles" Languages="en" UwpTargetDesktop="TargetDeviceFamily"/>
+    <ROW BuildKey="Build_MSIX_APPXSubBuild" BuildName="x64" BuildOrder="3" BuildType="8" ParentBuild="Build_MSIX_APPX"/>
     <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="1" Languages="en" InstallationType="4" CabsLocation="1" PackageType="1" FilesInsideExe="true" ExtractionFolder="[AppDataFolder][|Manufacturer]\[|ProductName] [|ProductVersion]\install" ExtUI="true" UseLargeSchema="true" MsiPackageType="x64" UACExecutionLevel="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
@@ -954,9 +979,109 @@
     <ROW Fragment="WelcomeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\WelcomeDlg.aip"/>
     <ROW Fragment="WelcomePrereqDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\WelcomePrereqDlg.aip"/>
   </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.GenericXmlAttributeComponent">
+    <ROW XmlAttribute="AppListEntry" XmlElement="VisualElements_2" Name="AppListEntry" Flags="0" Order="0" Value="none"/>
+    <ROW XmlAttribute="BackgroundColor" XmlElement="VisualElements" Name="BackgroundColor" Flags="0" Order="0" Value="transparent"/>
+    <ROW XmlAttribute="BackgroundColor_1" XmlElement="VisualElements_1" Name="BackgroundColor" Flags="0" Order="0" Value="transparent"/>
+    <ROW XmlAttribute="BackgroundColor_2" XmlElement="VisualElements_2" Name="BackgroundColor" Flags="0" Order="0" Value="transparent"/>
+    <ROW XmlAttribute="Category" XmlElement="Extension" Name="Category" Flags="0" Order="0" Value="windows.desktopAppMigration"/>
+    <ROW XmlAttribute="Category_1" XmlElement="Extension_1" Name="Category" Flags="0" Order="0" Value="windows.service"/>
+    <ROW XmlAttribute="Description" XmlElement="VisualElements" Name="Description" Flags="0" Order="0" Value="Lithnet Access Manager Service Configuration"/>
+    <ROW XmlAttribute="Description_1" XmlElement="VisualElements_1" Name="Description" Flags="0" Order="0" Value="Lithnet Access Manager Help.url"/>
+    <ROW XmlAttribute="Description_2" XmlElement="VisualElements_2" Name="Description" Flags="0" Order="0" Value="Hosts the Lithnet Access Manager web service"/>
+    <ROW XmlAttribute="DisplayName" XmlElement="VisualElements" Name="DisplayName" Flags="0" Order="0" Value="Lithnet Access Manager Service Configuration"/>
+    <ROW XmlAttribute="DisplayName_1" XmlElement="VisualElements_1" Name="DisplayName" Flags="0" Order="0" Value="Lithnet Access Manager Help.url"/>
+    <ROW XmlAttribute="DisplayName_2" XmlElement="VisualElements_2" Name="DisplayName" Flags="0" Order="0" Value="Lithnet Access Manager Service"/>
+    <ROW XmlAttribute="EntryPoint" XmlElement="Application" Name="EntryPoint" Flags="0" Order="0" Value="Windows.FullTrustApplication"/>
+    <ROW XmlAttribute="EntryPoint_1" XmlElement="Extension" Name="EntryPoint" Flags="0" Order="0" Value="Windows.FullTrustApplication"/>
+    <ROW XmlAttribute="EntryPoint_2" XmlElement="Application_2" Name="EntryPoint" Flags="0" Order="0" Value="Windows.FullTrustApplication"/>
+    <ROW XmlAttribute="EntryPoint_3" XmlElement="Extension_1" Name="EntryPoint" Flags="0" Order="0" Value="Windows.FullTrustApplication"/>
+    <ROW XmlAttribute="Executable" XmlElement="Application" Name="Executable" Flags="0" Order="0" FileId="Lithnet.AccessManager.Server.UI.exe"/>
+    <ROW XmlAttribute="Executable_1" XmlElement="Extension" Name="Executable" Flags="0" Order="0" FileId="Lithnet.AccessManager.Server.UI.exe"/>
+    <ROW XmlAttribute="Executable_2" XmlElement="Application_2" Name="Executable" Flags="0" Order="0" FileId="Lithnet.AccessManager.Web.exe"/>
+    <ROW XmlAttribute="Executable_3" XmlElement="Extension_1" Name="Executable" Flags="0" Order="0" FileId="Lithnet.AccessManager.Web.exe"/>
+    <ROW XmlAttribute="Id" XmlElement="Application" Name="Id" Flags="0" Order="0" Value="LithnetAccessManagerServiceConfiguration"/>
+    <ROW XmlAttribute="Id_1" XmlElement="Application_1" Name="Id" Flags="0" Order="0" Value="LithnetAccessManagerHelp.url"/>
+    <ROW XmlAttribute="Id_2" XmlElement="Application_2" Name="Id" Flags="0" Order="0" Value="LithnetAccessManagerService"/>
+    <ROW XmlAttribute="Language" XmlElement="Resource" Name="Language" Flags="0" Order="0" Value="en-US"/>
+    <ROW XmlAttribute="MaxVersionTested" XmlElement="TargetDeviceFamily" Name="MaxVersionTested" Flags="0" Order="0" Value="10.0.19041.0"/>
+    <ROW XmlAttribute="MinVersion" XmlElement="TargetDeviceFamily" Name="MinVersion" Flags="0" Order="0" Value="10.0.17763.0"/>
+    <ROW XmlAttribute="Name" XmlElement="Identity" Name="Name" Flags="0" Order="0" Value="Lithnet.AccessManagerService"/>
+    <ROW XmlAttribute="Name_1" XmlElement="TargetDeviceFamily" Name="Name" Flags="0" Order="0" Value="Windows.Desktop"/>
+    <ROW XmlAttribute="Name_2" XmlElement="Capability" Name="Name" Flags="0" Order="0" Value="runFullTrust"/>
+    <ROW XmlAttribute="Name_3" XmlElement="Capability_1" Name="Name" Flags="0" Order="0" Value="allowElevation"/>
+    <ROW XmlAttribute="Name_4" XmlElement="Service" Name="Name" Flags="0" Order="0" Value="lithnetams"/>
+    <ROW XmlAttribute="Name_5" XmlElement="Capability_2" Name="Name" Flags="0" Order="0" Value="localSystemServices"/>
+    <ROW XmlAttribute="Name_6" XmlElement="Capability_3" Name="Name" Flags="0" Order="0" Value="packagedServices"/>
+    <ROW XmlAttribute="Preference" XmlElement="Rotation" Name="Preference" Flags="0" Order="0" Value="portrait"/>
+    <ROW XmlAttribute="Preference_1" XmlElement="Rotation_1" Name="Preference" Flags="0" Order="0" Value="landscape"/>
+    <ROW XmlAttribute="Preference_2" XmlElement="Rotation_2" Name="Preference" Flags="0" Order="0" Value="portrait"/>
+    <ROW XmlAttribute="Preference_3" XmlElement="Rotation_3" Name="Preference" Flags="0" Order="0" Value="landscape"/>
+    <ROW XmlAttribute="ProcessorArchitecture" XmlElement="Identity" Name="ProcessorArchitecture" Flags="0" Order="0" Value="x64"/>
+    <ROW XmlAttribute="Publisher" XmlElement="Identity" Name="Publisher" Flags="0" Order="0" Value="CN=Lithnet"/>
+    <ROW XmlAttribute="Scale" XmlElement="Resource_1" Name="Scale" Flags="0" Order="0" Value="100"/>
+    <ROW XmlAttribute="ShortcutPath" XmlElement="DesktopApp" Name="ShortcutPath" Flags="0" Order="0" Value="%APPDATA%\Microsoft\Windows\Start Menu\Programs\Lithnet\Lithnet Access Manager Service Configuration.lnk"/>
+    <ROW XmlAttribute="ShortcutPath_1" XmlElement="DesktopApp_1" Name="ShortcutPath" Flags="0" Order="0" Value="%PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Lithnet\Lithnet Access Manager Service Configuration.lnk"/>
+    <ROW XmlAttribute="Square150x150Logo" XmlElement="VisualElements" Name="Square150x150Logo" Flags="0" Order="0" FileId="LithnetAccessManagerServiceConfigurationSquare150x150Logo.scale100.pn"/>
+    <ROW XmlAttribute="Square150x150Logo_1" XmlElement="VisualElements_1" Name="Square150x150Logo" Flags="0" Order="0" FileId="LithnetAccessManagerHelp.urlSquare150x150Logo.scale100.png"/>
+    <ROW XmlAttribute="Square150x150Logo_2" XmlElement="VisualElements_2" Name="Square150x150Logo" Flags="0" Order="0" FileId="LithnetAccessManagerServiceSquare150x150Logo.scale100.png"/>
+    <ROW XmlAttribute="Square44x44Logo" XmlElement="VisualElements" Name="Square44x44Logo" Flags="0" Order="0" FileId="LithnetAccessManagerServiceConfigurationSquare44x44Logo.scale100.png"/>
+    <ROW XmlAttribute="Square44x44Logo_1" XmlElement="VisualElements_1" Name="Square44x44Logo" Flags="0" Order="0" FileId="LithnetAccessManagerHelp.urlSquare44x44Logo.scale100.png"/>
+    <ROW XmlAttribute="Square44x44Logo_2" XmlElement="VisualElements_2" Name="Square44x44Logo" Flags="0" Order="0" FileId="LithnetAccessManagerServiceSquare44x44Logo.scale100.png"/>
+    <ROW XmlAttribute="StartPage" XmlElement="Application_1" Name="StartPage" Flags="0" Order="0" Value="https://github.com/lithnet/laps-web"/>
+    <ROW XmlAttribute="StartupType" XmlElement="Service" Name="StartupType" Flags="0" Order="0" Value="auto"/>
+    <ROW XmlAttribute="Version" XmlElement="Identity" Name="Version" Flags="0" Order="0" Value="1.0.7519.61211"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.GenericXmlElementComponent">
+    <ROW XmlElement="Application" ParentElement="Applications" Name="Application" Order="0" Flags="0" Type="4"/>
+    <ROW XmlElement="Application_1" ParentElement="Applications" Name="Application" Order="1" Flags="0" Type="4"/>
+    <ROW XmlElement="Application_2" ParentElement="Applications" Name="Application" Order="2" Flags="0" Type="4"/>
+    <ROW XmlElement="Applications" ParentElement="Package" Name="Applications" Order="4" Flags="0" Type="3"/>
+    <ROW XmlElement="Capabilities" ParentElement="Package" Name="Capabilities" Order="5" Flags="0" Type="0"/>
+    <ROW XmlElement="Capability" ParentElement="Capabilities" Name="Capability" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="Capability_1" ParentElement="Capabilities" Name="Capability" Order="1" Flags="0" Type="0"/>
+    <ROW XmlElement="Capability_2" ParentElement="Capabilities" Name="Capability" Order="2" Flags="0" Type="0"/>
+    <ROW XmlElement="Capability_3" ParentElement="Capabilities" Name="Capability" Order="3" Flags="0" Type="0"/>
+    <ROW XmlElement="Dependencies" ParentElement="Package" Name="Dependencies" Order="1" Flags="0" Type="0"/>
+    <ROW XmlElement="DesktopApp" ParentElement="DesktopAppMigration" Name="DesktopApp" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="DesktopAppMigration" ParentElement="Extension" Name="DesktopAppMigration" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="DesktopApp_1" ParentElement="DesktopAppMigration" Name="DesktopApp" Order="1" Flags="0" Type="0"/>
+    <ROW XmlElement="DisplayName" ParentElement="Properties" Name="DisplayName" Order="1" Flags="0" Text="Access Manager Service" Type="0"/>
+    <ROW XmlElement="Extension" ParentElement="Extensions" Name="Extension" Order="0" Flags="0" Type="55"/>
+    <ROW XmlElement="Extension_1" ParentElement="Extensions_1" Name="Extension" Order="0" Flags="0" Type="110"/>
+    <ROW XmlElement="Extensions" ParentElement="Application" Name="Extensions" Order="1" Flags="0" Type="0"/>
+    <ROW XmlElement="Extensions_1" ParentElement="Application_2" Name="Extensions" Order="1" Flags="0" Type="0"/>
+    <ROW XmlElement="Identity" ParentElement="Package" Name="Identity" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="InitialRotationPreference" ParentElement="VisualElements" Name="InitialRotationPreference" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="InitialRotationPreference_1" ParentElement="VisualElements_1" Name="InitialRotationPreference" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="Logo" ParentElement="Properties" Name="Logo" Order="2" Flags="0" FileId="Store50x50Logo.scale100.png" Type="0"/>
+    <ROW XmlElement="Package" Name="Package" Order="0" Flags="0" Type="6"/>
+    <ROW XmlElement="Properties" ParentElement="Package" Name="Properties" Order="3" Flags="0" Type="0"/>
+    <ROW XmlElement="PublisherDisplayName" ParentElement="Properties" Name="PublisherDisplayName" Order="0" Flags="0" Text="Lithnet" Type="0"/>
+    <ROW XmlElement="Resource" ParentElement="Resources" Name="Resource" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="Resource_1" ParentElement="Resources" Name="Resource" Order="1" Flags="0" Type="0"/>
+    <ROW XmlElement="Resources" ParentElement="Package" Name="Resources" Order="2" Flags="0" Type="0"/>
+    <ROW XmlElement="Rotation" ParentElement="InitialRotationPreference" Name="Rotation" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="Rotation_1" ParentElement="InitialRotationPreference" Name="Rotation" Order="1" Flags="0" Type="0"/>
+    <ROW XmlElement="Rotation_2" ParentElement="InitialRotationPreference_1" Name="Rotation" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="Rotation_3" ParentElement="InitialRotationPreference_1" Name="Rotation" Order="1" Flags="0" Type="0"/>
+    <ROW XmlElement="Service" ParentElement="Extension_1" Name="Service" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="TargetDeviceFamily" ParentElement="Dependencies" Name="TargetDeviceFamily" Order="0" Flags="0" Type="28"/>
+    <ROW XmlElement="VisualElements" ParentElement="Application" Name="VisualElements" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="VisualElements_1" ParentElement="Application_1" Name="VisualElements" Order="0" Flags="0" Type="0"/>
+    <ROW XmlElement="VisualElements_2" ParentElement="Application_2" Name="VisualElements" Order="0" Flags="0" Type="0"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.GenericXmlFileComponent">
+    <ROW XmlFile="AppxManifest.xml" FileName="AppxManifest.xml" RootElement="Package" Flags="89" Version="1.0" Encoding="UTF-8" IndentUnits="2"/>
+  </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiActionTextComponent">
     <ROW Action="AI_AiBackupImmediate" Description="Preparing backup operation" DescriptionLocId="ActionText.Description.AI_AiBackupImmediate" Template="Path: [1]" TemplateLocId="ActionText.Template.AI_AiBackupImmediate"/>
     <ROW Action="AI_AiBackupRollback" Description="Rollback backup" DescriptionLocId="ActionText.Description.AI_AiBackupRollback" Template="Path: [1]" TemplateLocId="ActionText.Template.AI_AiBackupRollback"/>
+    <ROW Action="AI_AiRemoveRegsCommit" Description="Executing registry removal operations." DescriptionLocId="ActionText.Description.AI_AiRemoveRegsCommit" Template="Removing registry entry: [1]" TemplateLocId="ActionText.Template.AI_AiRemoveRegsCommit"/>
+    <ROW Action="AI_AiRemoveRegsCommitUser" Description="Executing registry removal operations." DescriptionLocId="ActionText.Description.AI_AiRemoveRegsCommit" Template="Removing registry entry: [1]" TemplateLocId="ActionText.Template.AI_AiRemoveRegsCommit"/>
+    <ROW Action="AI_AiRemoveRegsDeferred" Description="Executing registry removal operations." DescriptionLocId="ActionText.Description.AI_AiRemoveRegsDeferred" Template="Removing registry entry: [1]" TemplateLocId="ActionText.Template.AI_AiRemoveRegsDeferred"/>
+    <ROW Action="AI_AiRemoveRegsDeferredUser" Description="Executing registry removal operations." DescriptionLocId="ActionText.Description.AI_AiRemoveRegsDeferred" Template="Removing registry entry: [1]" TemplateLocId="ActionText.Template.AI_AiRemoveRegsDeferred"/>
+    <ROW Action="AI_AiRemoveRegsImmediate" Description="Generating actions to remove registry entries." DescriptionLocId="ActionText.Description.AI_AiRemoveRegsImmediate"/>
     <ROW Action="AI_AiRestoreDeferred" Description="Executing restore operation" DescriptionLocId="ActionText.Description.AI_AiRestoreDeferred" Template="Path: [1]" TemplateLocId="ActionText.Template.AI_AiRestoreDeferred"/>
     <ROW Action="AI_AiRestoreDeferredImpersonate" Description="Executing restore operation" DescriptionLocId="ActionText.Description.AI_AiRestoreDeferred" Template="Path: [1]" TemplateLocId="ActionText.Template.AI_AiRestoreDeferred"/>
     <ROW Action="AI_AiRestoreRollback" Description="Rollback restore" DescriptionLocId="ActionText.Description.AI_AiRestoreRollback" Template="Path: [1]" TemplateLocId="ActionText.Template.AI_AiRestoreRollback"/>
@@ -966,10 +1091,12 @@
     <ROW Action="AI_ExtractLzma" Description="Extracting files from archive" DescriptionLocId="ActionText.Description.AI_ExtractLzma" TemplateLocId="-"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiAppSearchComponent">
+    <ROW Property="USER_NAME" Signature_="AppSearchSign"/>
     <ROW Property="AI_SETUPEXEPATH" Signature_="AI_EXE_PATH_LM" Builds="DefaultBuild"/>
     <ROW Property="AI_SETUPEXEPATH" Signature_="AI_EXE_PATH_CU" Builds="DefaultBuild"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiBinaryComponent">
+    <ROW Name="PowerShellScriptLauncher.dll" SourcePath="&lt;AI_CUSTACTS&gt;PowerShellScriptLauncher.dll"/>
     <ROW Name="Prereq.dll" SourcePath="&lt;AI_CUSTACTS&gt;Prereq.dll"/>
     <ROW Name="ResourceCleaner.dll" SourcePath="&lt;AI_CUSTACTS&gt;ResourceCleaner.dll"/>
     <ROW Name="SoftwareDetector.dll" SourcePath="&lt;AI_CUSTACTS&gt;SoftwareDetector.dll"/>
@@ -978,86 +1105,37 @@
     <ROW Name="userAccounts.dll" SourcePath="&lt;AI_CUSTACTS&gt;userAccounts.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiControlComponent">
-    <ROW Dialog_="ExitDialog" Control="LaunchProdText" Type="Text" X="148" Y="170" Width="220" Height="20" Attributes="196611" Text="Launch [ProductName] Configuration" Order="800" MsiKey="ExitDialog#LaunchProdText"/>
-    <ROW Dialog_="LogonInformationDlg" Control="PasswordLabel" Type="Text" X="50" Y="151" Width="100" Height="11" Attributes="3" Text="&amp;Password:" Order="1200" TextLocId="Control.Text.LogonInformationDlg#PasswordLabel" MsiKey="LogonInformationDlg#PasswordLabel"/>
-    <ROW Dialog_="LogonInformationDlg" Control="PassworEdit" Type="Edit" X="50" Y="164" Width="269" Height="18" Attributes="2097155" Property="USER_PASSWORD" Text="{80}" Order="1300" TextLocId="Control.Text.LogonInformationDlg#PasswordEdit" MsiKey="LogonInformationDlg#PassworEdit"/>
-    <ROW Dialog_="NewDialog" Control="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Next]" Order="100" Options="1"/>
-    <ROW Dialog_="NewDialog" Control="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Cancel]" Order="200" Options="1"/>
-    <ROW Dialog_="NewDialog" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Back]" Order="300" Options="1"/>
-    <ROW Dialog_="NewDialog" Control="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Attributes="1048577" Text="[BannerBitmap]" Order="400"/>
-    <ROW Dialog_="NewDialog" Control="BannerLine" Type="Line" X="0" Y="44" Width="372" Height="0" Attributes="1" Order="500"/>
-    <ROW Dialog_="NewDialog" Control="BottomLine" Type="Line" X="5" Y="234" Width="368" Height="0" Attributes="1" Order="600"/>
-    <ROW Dialog_="NewDialog" Control="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Attributes="196611" Text="New Dialog Description..." Order="700"/>
-    <ROW Dialog_="NewDialog" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Advanced Installer" Order="800"/>
-    <ROW Dialog_="NewDialog" Control="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Attributes="196611" Text="New Dialog" TextStyle="[DlgTitleFont]" Order="900"/>
-    <ROW Dialog_="NewDialog_2" Control="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Next]" Order="100" Options="1"/>
-    <ROW Dialog_="NewDialog_2" Control="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Cancel]" Order="200" Options="1"/>
-    <ROW Dialog_="NewDialog_2" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Back]" Order="300" Options="1"/>
-    <ROW Dialog_="NewDialog_2" Control="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Attributes="1048577" Text="[BannerBitmap]" Order="400"/>
-    <ROW Dialog_="NewDialog_2" Control="BannerLine" Type="Line" X="0" Y="44" Width="372" Height="0" Attributes="1" Order="500"/>
-    <ROW Dialog_="NewDialog_2" Control="BottomLine" Type="Line" X="5" Y="234" Width="368" Height="0" Attributes="1" Order="600"/>
-    <ROW Dialog_="NewDialog_2" Control="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Attributes="196611" Text="New Dialog Description..." Order="700"/>
-    <ROW Dialog_="NewDialog_2" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Advanced Installer" Order="800"/>
-    <ROW Dialog_="NewDialog_2" Control="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Attributes="196611" Text="New Dialog" TextStyle="[DlgTitleFont]" Order="900"/>
-    <ROW Dialog_="NewSeqDialog" Control="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Next]" Order="100" Options="1"/>
-    <ROW Dialog_="NewSeqDialog" Control="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Cancel]" Order="200" Options="1"/>
-    <ROW Dialog_="NewSeqDialog" Control="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" Attributes="1048577" Text="[DialogBitmap]" Order="300"/>
-    <ROW Dialog_="NewSeqDialog" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="1" Text="[ButtonText_Back]" Order="400" Options="1"/>
-    <ROW Dialog_="NewSeqDialog" Control="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Attributes="196611" Text="New Dialog" TextStyle="VerdanaBold13" Order="500"/>
-    <ROW Dialog_="NewSeqDialog" Control="Description" Type="Text" X="135" Y="86" Width="220" Height="60" Attributes="196611" Text="New Dialog Description..." Order="600"/>
-    <ROW Dialog_="NewSeqDialog" Control="BottomLine" Type="Line" X="0" Y="234" Width="372" Height="0" Attributes="1" Order="700"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Next]" Order="100" Options="1"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Cancel]" Order="200" Options="1"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" Attributes="1048577" Text="[DialogBitmap]" Order="300"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="1" Text="[ButtonText_Back]" Order="400" Options="1"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Attributes="196611" Text="New Dialog" TextStyle="VerdanaBold13" Order="500"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="Description" Type="Text" X="135" Y="86" Width="220" Height="60" Attributes="196611" Text="New Dialog Description..." Order="600"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="BottomLine" Type="Line" X="0" Y="234" Width="372" Height="0" Attributes="1" Order="700"/>
-    <ROW Dialog_="NewSeqDialog_2" Control="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Next]" Order="100" Options="1"/>
-    <ROW Dialog_="NewSeqDialog_2" Control="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Cancel]" Order="200" Options="1"/>
-    <ROW Dialog_="NewSeqDialog_2" Control="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" Attributes="1048577" Text="[DialogBitmap]" Order="300"/>
-    <ROW Dialog_="NewSeqDialog_2" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="1" Text="[ButtonText_Back]" Order="400" Options="1"/>
-    <ROW Dialog_="NewSeqDialog_2" Control="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Attributes="196611" Text="New Dialog" TextStyle="VerdanaBold13" Order="500"/>
-    <ROW Dialog_="NewSeqDialog_2" Control="Description" Type="Text" X="135" Y="86" Width="220" Height="60" Attributes="196611" Text="New Dialog Description..." Order="600"/>
-    <ROW Dialog_="NewSeqDialog_2" Control="BottomLine" Type="Line" X="0" Y="234" Width="372" Height="0" Attributes="1" Order="700"/>
-    <ROW Dialog_="NewSeqDialog_3" Control="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Next]" Order="100" Options="1"/>
-    <ROW Dialog_="NewSeqDialog_3" Control="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Cancel]" Order="200" Options="1"/>
-    <ROW Dialog_="NewSeqDialog_3" Control="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" Attributes="1048577" Text="[DialogBitmap]" Order="300"/>
-    <ROW Dialog_="NewSeqDialog_3" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="1" Text="[ButtonText_Back]" Order="400" Options="1"/>
-    <ROW Dialog_="NewSeqDialog_3" Control="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Attributes="196611" Text="New Dialog" TextStyle="VerdanaBold13" Order="500"/>
-    <ROW Dialog_="NewSeqDialog_3" Control="Description" Type="Text" X="135" Y="86" Width="220" Height="60" Attributes="196611" Text="New Dialog Description..." Order="600"/>
-    <ROW Dialog_="NewSeqDialog_3" Control="BottomLine" Type="Line" X="0" Y="234" Width="372" Height="0" Attributes="1" Order="700"/>
-    <ROW Dialog_="NewSeqDialog_4" Control="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Next]" Order="100" Options="1"/>
-    <ROW Dialog_="NewSeqDialog_4" Control="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Cancel]" Order="200" Options="1"/>
-    <ROW Dialog_="NewSeqDialog_4" Control="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" Attributes="1048577" Text="[DialogBitmap]" Order="300"/>
-    <ROW Dialog_="NewSeqDialog_4" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="1" Text="[ButtonText_Back]" Order="400" Options="1"/>
-    <ROW Dialog_="NewSeqDialog_4" Control="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Attributes="196611" Text="New Dialog" TextStyle="VerdanaBold13" Order="500"/>
-    <ROW Dialog_="NewSeqDialog_4" Control="Description" Type="Text" X="135" Y="86" Width="220" Height="60" Attributes="196611" Text="New Dialog Description..." Order="600"/>
-    <ROW Dialog_="NewSeqDialog_4" Control="BottomLine" Type="Line" X="0" Y="234" Width="372" Height="0" Attributes="1" Order="700"/>
-    <ROW Dialog_="NewSeqDialog_5" Control="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Next]" Order="100" Options="1"/>
-    <ROW Dialog_="NewSeqDialog_5" Control="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Cancel]" Order="200" Options="1"/>
-    <ROW Dialog_="NewSeqDialog_5" Control="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" Attributes="1048577" Text="[DialogBitmap]" Order="300"/>
-    <ROW Dialog_="NewSeqDialog_5" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="1" Text="[ButtonText_Back]" Order="400" Options="1"/>
-    <ROW Dialog_="NewSeqDialog_5" Control="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Attributes="196611" Text="New Dialog" TextStyle="VerdanaBold13" Order="500"/>
-    <ROW Dialog_="NewSeqDialog_5" Control="Description" Type="Text" X="135" Y="86" Width="220" Height="60" Attributes="196611" Text="New Dialog Description..." Order="600"/>
-    <ROW Dialog_="NewSeqDialog_5" Control="BottomLine" Type="Line" X="0" Y="234" Width="372" Height="0" Attributes="1" Order="700"/>
+    <ROW Dialog_="ExitDialog" Control="LaunchProdText" Type="Text" X="148" Y="170" Width="220" Height="20" Attributes="196611" Text="Launch [ProductName] Configuration Utility" Order="800" MsiKey="ExitDialog#LaunchProdText"/>
+    <ROW Dialog_="LogonInformationDlg" Control="NameLabel" Type="Text" X="50" Y="88" Width="100" Height="11" Attributes="3" Text="&amp;User Name:" Order="100" TextLocId="Control.Text.LogonInformationDlg#NameLabel" MsiKey="LogonInformationDlg#NameLabel"/>
+    <ROW Dialog_="LogonInformationDlg" Control="PasswordLabel" Type="Text" X="50" Y="128" Width="100" Height="11" Attributes="3" Text="&amp;Password:" Order="200" TextLocId="Control.Text.LogonInformationDlg#PasswordLabel" MsiKey="LogonInformationDlg#PasswordLabel"/>
+    <ROW Dialog_="LogonInformationDlg" Control="Text_1" Type="Text" X="50" Y="167" Width="100" Height="11" Attributes="3" Text="C&amp;onfirm Password:" Order="300"/>
+    <ROW Dialog_="LogonInformationDlg" Control="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Next]" Order="400" TextLocId="-" MsiKey="LogonInformationDlg#Next" Options="1"/>
+    <ROW Dialog_="LogonInformationDlg" Control="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Cancel]" Order="500" TextLocId="-" MsiKey="LogonInformationDlg#Cancel" Options="1"/>
+    <ROW Dialog_="LogonInformationDlg" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Back]" Order="600" TextLocId="-" MsiKey="LogonInformationDlg#Back" Options="1"/>
+    <ROW Dialog_="LogonInformationDlg" Control="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Attributes="1048577" Text="[BannerBitmap]" Order="700" MsiKey="LogonInformationDlg#BannerBitmap"/>
+    <ROW Dialog_="LogonInformationDlg" Control="BannerLine" Type="Line" X="0" Y="44" Width="372" Height="0" Attributes="1" Order="800" MsiKey="LogonInformationDlg#BannerLine"/>
+    <ROW Dialog_="LogonInformationDlg" Control="BottomLine" Type="Line" X="5" Y="234" Width="368" Height="0" Attributes="1" Order="900" MsiKey="LogonInformationDlg#BottomLine"/>
+    <ROW Dialog_="LogonInformationDlg" Control="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Attributes="196611" Text="Specify user account information" Order="1000" TextLocId="Control.Text.LogonInformationDlg#Description" MsiKey="LogonInformationDlg#Description"/>
+    <ROW Dialog_="LogonInformationDlg" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Advanced Installer" Order="1100" TextLocId="Control.Text.LogonInformationDlg#Logo" MsiKey="LogonInformationDlg#Logo"/>
+    <ROW Dialog_="LogonInformationDlg" Control="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Attributes="196611" Text="Logon Information" TextStyle="[DlgTitleFont]" Order="1200" TextLocId="Control.Text.LogonInformationDlg#Title" MsiKey="LogonInformationDlg#Title"/>
+    <ROW Dialog_="LogonInformationDlg" Control="NameEdit" Type="Edit" X="50" Y="100" Width="269" Height="18" Attributes="3" Property="USER_NAME" Text="{80}" Order="1300" TextLocId="Control.Text.LogonInformationDlg#NameEdit" MsiKey="LogonInformationDlg#NameEdit"/>
+    <ROW Dialog_="LogonInformationDlg" Control="PassworEdit" Type="Edit" X="50" Y="139" Width="269" Height="18" Attributes="2097155" Property="USER_PASSWORD" Text="{80}" Order="1400" TextLocId="Control.Text.LogonInformationDlg#PasswordEdit" MsiKey="LogonInformationDlg#PassworEdit"/>
+    <ROW Dialog_="LogonInformationDlg" Control="Edit_1" Type="Edit" X="50" Y="178" Width="269" Height="18" Attributes="2097155" Property="USER_PASSWORD_CONFIRM" Text="{80}" Order="1500" TextLocId="Control.Text.LogonInformationDlg#PasswordEdit"/>
+    <ROW Dialog_="LogonInformationDlg" Control="Text_3" Type="Text" X="15" Y="56" Width="337" Height="23" Attributes="65539" Property="TEXT_3_PROP_1" Text="Enter the credentials for the service account. For a group-managed service account, ensure the username ends with a &apos;$&apos;, and leave the password field blank. " Order="1600"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Next]" Order="100" Options="1"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Cancel]" Order="200" Options="1"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Back]" Order="300" Options="1"/>
     <ROW Dialog_="ServiceAccountDialog" Control="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Attributes="1048577" Text="[BannerBitmap]" Order="400"/>
     <ROW Dialog_="ServiceAccountDialog" Control="BannerLine" Type="Line" X="0" Y="44" Width="372" Height="0" Attributes="1" Order="500"/>
     <ROW Dialog_="ServiceAccountDialog" Control="BottomLine" Type="Line" X="5" Y="234" Width="368" Height="0" Attributes="1" Order="600"/>
-    <ROW Dialog_="ServiceAccountDialog" Control="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Attributes="196611" Text="Specify service account" Order="700"/>
+    <ROW Dialog_="ServiceAccountDialog" Control="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Attributes="196611" Text="Choosing a service account" Order="700"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Advanced Installer" Order="800"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Attributes="196611" Text="Service Configuration" TextStyle="[DlgTitleFont]" Order="900"/>
-    <ROW Dialog_="ServiceAccountDialog" Control="Text_1" Type="Text" X="23" Y="85" Width="60" Height="8" Attributes="65539" Property="TEXT_1_PROP" Text="Username" Order="1000"/>
-    <ROW Dialog_="ServiceAccountDialog" Control="Text_2" Type="Text" X="23" Y="103" Width="60" Height="8" Attributes="65539" Property="TEXT_2_PROP" Text="Password" Order="1100"/>
-    <ROW Dialog_="ServiceAccountDialog" Control="Text_3" Type="Text" X="15" Y="55" Width="337" Height="23" Attributes="65539" Property="TEXT_3_PROP" Text="Enter the credentials for the service account. For a group-managed service account, ensure the username ends with a &apos;$&apos;, and leave the password field blank. " Order="1200"/>
-    <ROW Dialog_="ServiceAccountDialog" Control="Text_4" Type="Text" X="25" Y="183" Width="243" Height="14" Attributes="65539" Property="TEXT_4_PROP" Text="1. Use a group-managed service account" Order="1300"/>
-    <ROW Dialog_="ServiceAccountDialog" Control="Text_5" Type="Text" X="25" Y="196" Width="243" Height="13" Attributes="65539" Property="TEXT_5_PROP" Text="2. Add the service account to the &apos;Protected Users&apos; group in your AD" Order="1400"/>
-    <ROW Dialog_="ServiceAccountDialog" Control="Hyperlink_2" Type="Hyperlink" X="271" Y="194" Width="73" Height="17" Attributes="65539" Property="HYPERLINK_2_PROP" Text="&lt;a href=&quot;https://github.com/lithnet/&quot;&gt;More details...&lt;/a&gt;" Order="1500"/>
-    <ROW Dialog_="ServiceAccountDialog" Control="Text_6" Type="Text" X="15" Y="130" Width="337" Height="30" Attributes="65539" Property="TEXT_6_PROP" Text="Lithnet Access Manager should never be run as a privileged account (eg Domain Admins), the configuration utility will guide you through the process of delegating the minimum necessary permissions." Order="1600"/>
-    <ROW Dialog_="ServiceAccountDialog" Control="Text_7" Type="Text" X="15" Y="170" Width="316" Height="15" Attributes="65539" Property="TEXT_7_PROP" Text="To keep your service account as safe as possible, we recommend doing the following" Order="1700"/>
+    <ROW Dialog_="ServiceAccountDialog" Control="Text_4" Type="Text" X="25" Y="128" Width="243" Height="14" Attributes="65539" Property="TEXT_4_PROP" Text="1. Use a group-managed service account" Order="1000"/>
+    <ROW Dialog_="ServiceAccountDialog" Control="Text_5" Type="Text" X="25" Y="142" Width="243" Height="13" Attributes="65539" Property="TEXT_5_PROP" Text="2. Add the service account to the &apos;Protected Users&apos; group in your AD" Order="1100"/>
+    <ROW Dialog_="ServiceAccountDialog" Control="Hyperlink_2" Type="Hyperlink" X="15" Y="168" Width="310" Height="17" Attributes="65539" Property="HYPERLINK_2_PROP" Text="&lt;a href=&quot;https://github.com/lithnet/&quot;&gt;More details...&lt;/a&gt;" Order="1200"/>
+    <ROW Dialog_="ServiceAccountDialog" Control="Text_6" Type="Text" X="15" Y="62" Width="337" Height="30" Attributes="65539" Property="TEXT_6_PROP" Text="Lithnet Access Manager should never be run as a privileged account (eg Domain Admins), the configuration utility will guide you through the process of delegating the minimum necessary permissions." Order="1300"/>
+    <ROW Dialog_="ServiceAccountDialog" Control="Text_7" Type="Text" X="15" Y="109" Width="316" Height="15" Attributes="65539" Property="TEXT_7_PROP" Text="To keep your service account as safe as possible, we recommend doing the following" Order="1400"/>
     <ROW Dialog_="ShowGsmaScript" Control="OK" Type="PushButton" X="256" Y="158" Width="56" Height="17" Attributes="3" Text="[ButtonText_OK]" Order="100"/>
     <ROW Dialog_="ShowGsmaScript" Control="Edit_1" Type="Edit" X="14" Y="22" Width="298" Height="119" Attributes="65539" Property="EDIT_1_PROP" Text="[#apphost.json]" Order="200" ExtAttributes="521"/>
     <ATTRIBUTE name="DeletedRows" value="LogonInformationDlg#DomainEdit@LogonInformationDlg#DomainLabel"/>
@@ -1069,7 +1147,7 @@
     <ROW Dialog_="WelcomeDlg" Control_="Next" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="1"/>
     <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_INSTALL" Ordering="197"/>
     <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="LogonInformationDlg" Condition="AI_INSTALL" Ordering="201"/>
-    <ROW Dialog_="FolderDlg" Control_="Next" Event="NewDialog" Argument="ServiceAccountDialog" Condition="AI_INSTALL" Ordering="201"/>
+    <ROW Dialog_="FolderDlg" Control_="Next" Event="NewDialog" Argument="ServiceAccountDialog" Condition="AI_INSTALL AND ( NOT USER_NAME )" Ordering="204"/>
     <ROW Dialog_="FolderDlg" Control_="Back" Event="NewDialog" Argument="WelcomeDlg" Condition="AI_INSTALL" Ordering="1"/>
     <ROW Dialog_="MaintenanceWelcomeDlg" Control_="Next" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="99"/>
     <ROW Dialog_="CustomizeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_MAINT" Ordering="101"/>
@@ -1090,20 +1168,19 @@
     <ROW Dialog_="ResumeDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_RESUME" Ordering="299"/>
     <ROW Dialog_="FatalError" Control_="Finish" Event="DoAction" Argument="AI_AiBackupCleanup" Condition="1" Ordering="102"/>
     <ROW Dialog_="UserExit" Control_="Finish" Event="DoAction" Argument="AI_AiBackupCleanup" Condition="1" Ordering="101"/>
-    <ROW Dialog_="NewSeqDialog" Control_="Cancel" Event="SpawnDialog" Argument="CancelDlg" Condition="1" Ordering="100"/>
-    <ROW Dialog_="NewDialog" Control_="Cancel" Event="SpawnDialog" Argument="CancelDlg" Condition="1" Ordering="100"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="Cancel" Event="SpawnDialog" Argument="CancelDlg" Condition="1" Ordering="100"/>
-    <ROW Dialog_="NewSeqDialog_2" Control_="Cancel" Event="SpawnDialog" Argument="CancelDlg" Condition="1" Ordering="100"/>
-    <ROW Dialog_="NewSeqDialog_3" Control_="Cancel" Event="SpawnDialog" Argument="CancelDlg" Condition="1" Ordering="100"/>
     <ROW Dialog_="ServiceAccountDialog" Control_="Cancel" Event="SpawnDialog" Argument="CancelDlg" Condition="1" Ordering="100"/>
-    <ROW Dialog_="NewSeqDialog_4" Control_="Cancel" Event="SpawnDialog" Argument="CancelDlg" Condition="1" Ordering="100"/>
     <ROW Dialog_="ServiceAccountDialog" Control_="Next" Event="NewDialog" Argument="LogonInformationDlg" Condition="AI_INSTALL" Ordering="1"/>
     <ROW Dialog_="ServiceAccountDialog" Control_="Back" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="1"/>
-    <ROW Dialog_="NewSeqDialog_5" Control_="Cancel" Event="SpawnDialog" Argument="CancelDlg" Condition="1" Ordering="100"/>
-    <ROW Dialog_="NewDialog_2" Control_="Cancel" Event="SpawnDialog" Argument="CancelDlg" Condition="1" Ordering="100"/>
     <ROW Dialog_="ShowGsmaScript" Control_="OK" Event="EndDialog" Argument="Return" Condition="1" Ordering="100"/>
-    <ROW Dialog_="LogonInformationDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="LogonInformationDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_INSTALL AND ( (USER_PASSWORD = USER_PASSWORD_CONFIRM) AND USER_EXISTS = &quot;1&quot; )" Ordering="9"/>
     <ROW Dialog_="LogonInformationDlg" Control_="Back" Event="NewDialog" Argument="ServiceAccountDialog" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="LogonInformationDlg" Control_="Next" Event="DoAction" Argument="ValidateUserName" Condition="AI_INSTALL AND ( (USER_PASSWORD = USER_PASSWORD_CONFIRM) AND NOT NO_USER_CHECK = &quot;1&quot; )" Ordering="6"/>
+    <ROW Dialog_="LogonInformationDlg" Control_="Next" Event="DoAction" Argument="AI_DATA_SETTER_4" Condition="AI_INSTALL AND ( (USER_PASSWORD = USER_PASSWORD_CONFIRM) AND NOT NO_USER_CHECK = &quot;1&quot; )" Ordering="5"/>
+    <ROW Dialog_="LogonInformationDlg" Control_="Next" Event="DoAction" Argument="UserNotFoundMessage" Condition="AI_INSTALL AND ( (USER_PASSWORD = USER_PASSWORD_CONFIRM) AND NOT USER_EXISTS = &quot;1&quot; )" Ordering="8"/>
+    <ROW Dialog_="LogonInformationDlg" Control_="Next" Event="DoAction" Argument="AI_DATA_SETTER_3" Condition="AI_INSTALL AND ( (USER_PASSWORD = USER_PASSWORD_CONFIRM) AND NOT USER_EXISTS = &quot;1&quot; )" Ordering="7"/>
+    <ROW Dialog_="LogonInformationDlg" Control_="Next" Event="DoAction" Argument="PasswordsDontMatchMessage" Condition="AI_INSTALL AND ( NOT (USER_PASSWORD = USER_PASSWORD_CONFIRM) )" Ordering="4"/>
+    <ROW Dialog_="LogonInformationDlg" Control_="Next" Event="DoAction" Argument="AI_DATA_SETTER_5" Condition="AI_INSTALL AND ( NOT (USER_PASSWORD = USER_PASSWORD_CONFIRM) )" Ordering="3"/>
+    <ROW Dialog_="FolderDlg" Control_="Next" Event="NewDialog" Argument="LogonInformationDlg" Condition="AI_INSTALL AND ( USER_NAME )" Ordering="203"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
     <ROW Directory_="APPDIR" Component_="APPDIR" ManualDelete="true"/>
@@ -1115,6 +1192,11 @@
     <ROW Action="AI_AiBackupCleanup" Type="1" Source="ResourceCleaner.dll" Target="OnAiBackupCleanup" WithoutSeq="true"/>
     <ROW Action="AI_AiBackupImmediate" Type="1" Source="ResourceCleaner.dll" Target="OnAiBackupImmediate"/>
     <ROW Action="AI_AiBackupRollback" Type="11521" Source="ResourceCleaner.dll" Target="OnAiBackupRollback"/>
+    <ROW Action="AI_AiRemoveRegsCommit" Type="11777" Source="ResourceCleaner.dll" Target="OnAiRemoveRegs" WithoutSeq="true"/>
+    <ROW Action="AI_AiRemoveRegsCommitUser" Type="9729" Source="ResourceCleaner.dll" Target="OnAiRemoveRegs" WithoutSeq="true"/>
+    <ROW Action="AI_AiRemoveRegsDeferred" Type="11265" Source="ResourceCleaner.dll" Target="OnAiRemoveRegs" WithoutSeq="true"/>
+    <ROW Action="AI_AiRemoveRegsDeferredUser" Type="9217" Source="ResourceCleaner.dll" Target="OnAiRemoveRegs" WithoutSeq="true"/>
+    <ROW Action="AI_AiRemoveRegsImmediate" Type="1" Source="ResourceCleaner.dll" Target="OnAiRemoveRegsImmediate"/>
     <ROW Action="AI_AiRestoreDeferred" Type="11265" Source="ResourceCleaner.dll" Target="OnAiRestoreDeferred"/>
     <ROW Action="AI_AiRestoreDeferredImpersonate" Type="9217" Source="ResourceCleaner.dll" Target="OnAiRestoreDeferredImpersonate"/>
     <ROW Action="AI_AiRestoreRollback" Type="11521" Source="ResourceCleaner.dll" Target="OnAiRestoreRollback" WithoutSeq="true"/>
@@ -1124,7 +1206,12 @@
     <ROW Action="AI_DATA_SETTER" Type="51" Source="AI_ExtractFiles" Target="[AI_SETUPEXEPATH]"/>
     <ROW Action="AI_DATA_SETTER_1" Type="51" Source="AI_SetLogOnAsService" Target="[AI_LOGON_AS_SERVICE_ACCOUNTS]"/>
     <ROW Action="AI_DATA_SETTER_2" Type="51" Source="CustomActionData" Target="[~]"/>
-    <ROW Action="AI_DATA_SETTER_3" Type="51" Source="CustomActionData" Target="AI_USER_CHECK_PASSWORD&#2;[AI_USER_CHECK_PASSWORD]&#1;AI_USER_IGNORE_FULLNAME&#2;[AI_USER_IGNORE_FULLNAME]&#1;AI_USER_IGNORE_MSI&#2;[AI_USER_IGNORE_MSI]&#1;AI_USER_IS_GROUP&#2;[AI_USER_IS_GROUP]&#1;DOMAIN_NAME&#2;[DOMAIN_NAME]&#1;USER_NAME&#2;[USER_NAME]&#1;USER_PASSWORD&#2;[USER_PASSWORD]"/>
+    <ROW Action="AI_DATA_SETTER_3" Type="51" Source="CustomActionData" Target="The specified user cannot be found |Error |MB_OK,MB_ICONWARNING,MB_DEFBUTTON1|BTN_PRESSED|[CLIENTPROCESSID]"/>
+    <ROW Action="AI_DATA_SETTER_4" Type="51" Source="CustomActionData" Target="AEQAaQBnAGkAdABhAGwAbAB5AFMAaQBnAG4AUwBjAHIAaQBwAHQAAgAxAAEARgBsAGEAZwBzAAIANgABAFAAYQByAGEAbQBzAAIAAQBTAGMAcgBpAHAAdAACACMAIABCAGwAbwBjAGsAIABmAG8AcgAgAGQAZQBjAGwAYQByAGkAbgBnACAAdABoAGUAIABzAGMAcgBpAHAAdAAgAHAAYQByAGEAbQBlAHQAZQByAHMALgANAAoAUABhAHIAYQBtACgAKQANAAoADQAKAHQAcgB5AA0ACgBbAFwAewBdAA0ACgANAAoACQANAAoACQAkAHUAcwBlAHIAbgBhAG0AZQAgAD0AIABBAEkAXwBHAGUAdABNAHMAaQBQAHIAbwBwAGUAcgB0AHkAIABVAFMARQBSAF8ATgBBAE0ARQANAAoACQAkAGEAYwBjAG8AdQBuAHQAIAA9ACAATgBlAHcALQBPAGIAagBlAGMAdAAgACIAUwB5AHMAdABlAG0ALgBTAGUAYwB1AHIAaQB0AHkALgBQAHIAaQBuAGMAaQBwAGEAbAAuAE4AVABBAGMAYwBvAHUAbgB0ACIAIAAkAHUAcwBlAHIAbgBhAG0AZQANAAoACQAkAHMAaQBkACAAPQAgACQAYQBjAGMAbwB1AG4AdAAuAFQAcgBhAG4AcwBsAGEAdABlACgAWwBcAFsAXQBTAHkAcwB0AGUAbQAuAFMAZQBjAHUAcgBpAHQAeQAuAFAAcgBpAG4AYwBpAHAAYQBsAC4AUwBlAGMAdQByAGkAdAB5AEkAZABlAG4AdABpAGYAaQBlAHIAWwBcAF0AXQApAA0ACgANAAoACQBpAGYAIAAoACQAcwBpAGQAIAAtAG4AZQAgACQAbgB1AGwAbAApAA0ACgAJAFsAXAB7AF0ADQAKAAkACQBBAEkAXwBTAGUAdABNAHMAaQBQAHIAbwBwAGUAcgB0AHkAIABVAFMARQBSAF8ARQBYAEkAUwBUAFMAIAAxAA0ACgAJAAkAQQBJAF8AUwBlAHQATQBzAGkAUAByAG8AcABlAHIAdAB5ACAAVQBTAEUAUgBfAFMASQBEACAAJABzAGkAZAAuAFQAbwBTAHQAcgBpAG4AZwAoACkADQAKAAkAWwBcAH0AXQANAAoAWwBcAH0AXQANAAoAYwBhAHQAYwBoAA0ACgBbAFwAewBdAA0ACgAJAEEASQBfAFMAZQB0AE0AcwBpAFAAcgBvAHAAZQByAHQAeQAgAFUAUwBFAFIAXwBFAFgASQBTAFQAUwAgADAADQAKAFsAXAB9AF0AAQBTAGMAcgBpAHAAdABQAHIAZQBhAG0AYgBsAGUAAgBwAGEAcgBhAG0AKAANAAoAIAAgAFsAXABbAF0AYQBsAGkAYQBzACgAIgBwAHIAbwBwAEYAaQBsAGUAIgApAFsAXABdAF0AIAAgACAAIAAgACAAWwBcAFsAXQBQAGEAcgBhAG0AZQB0AGUAcgAoAE0AYQBuAGQAYQB0AG8AcgB5AD0AJAB0AHIAdQBlACkAWwBcAF0AXQAgAFsAXABbAF0AcwB0AHIAaQBuAGcAWwBcAF0AXQAgACQAbQBzAGkAUAByAG8AcABPAHUAdABGAGkAbABlAFAAYQB0AGgADQAKACAALABbAFwAWwBdAGEAbABpAGEAcwAoACIAcAByAG8AcABTAGUAcAAiACkAWwBcAF0AXQAgACAAIAAgACAAIAAgAFsAXABbAF0AUABhAHIAYQBtAGUAdABlAHIAKABNAGEAbgBkAGEAdABvAHIAeQA9ACQAdAByAHUAZQApAFsAXABdAF0AIABbAFwAWwBdAHMAdAByAGkAbgBnAFsAXABdAF0AIAAkAG0AcwBpAFAAcgBvAHAASwBWAFMAZQBwAGEAcgBhAHQAbwByAA0ACgAgACwAWwBcAFsAXQBhAGwAaQBhAHMAKAAiAHMAYwByAGkAcAB0AEYAaQBsAGUAIgApAFsAXABdAF0AIAAgACAAIABbAFwAWwBdAFAAYQByAGEAbQBlAHQAZQByACgATQBhAG4AZABhAHQAbwByAHkAPQAkAHQAcgB1AGUAKQBbAFwAXQBdACAAWwBcAFsAXQBzAHQAcgBpAG4AZwBbAFwAXQBdACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAANAAoAIAAsAFsAXABbAF0AYQBsAGkAYQBzACgAIgBzAGMAcgBpAHAAdABBAHIAZwBzAEYAaQBsAGUAIgApAFsAXABdAF0AWwBcAFsAXQBQAGEAcgBhAG0AZQB0AGUAcgAoAE0AYQBuAGQAYQB0AG8AcgB5AD0AJABmAGEAbABzAGUAKQBbAFwAXQBdAFsAXABbAF0AcwB0AHIAaQBuAGcAWwBcAF0AXQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABBAHIAZwBzAEYAaQBsAGUAUABhAHQAaAANAAoAIAAsAFsAXABbAF0AUABhAHIAYQBtAGUAdABlAHIAKABNAGEAbgBkAGEAdABvAHIAeQA9ACQAdAByAHUAZQApAFsAXABdAF0AIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgAFsAXABbAF0AcwB0AHIAaQBuAGcAWwBcAF0AXQAgACQAdABlAHMAdABQAHIAZQBmAGkAeAANAAoAIAAsAFsAXABbAF0AcwB3AGkAdABjAGgAWwBcAF0AXQAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQAaQBzAFQAZQBzAHQADQAKACAAKQANAAoADQAKAEYAdQBuAGMAdABpAG8AbgAgAEEASQBfAEcAZQB0AE0AcwBpAFAAcgBvAHAAZQByAHQAeQAoACAAWwBcAFsAXQBQAGEAcgBhAG0AZQB0AGUAcgAoAE0AYQBuAGQAYQB0AG8AcgB5AD0AJAB0AHIAdQBlACkAWwBcAF0AXQAgACAAWwBcAFsAXQBzAHQAcgBpAG4AZwBbAFwAXQBdACAAJABuAGEAbQBlAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAALAAgAFsAXABbAF0AUABhAHIAYQBtAGUAdABlAHIAKABNAGEAbgBkAGEAdABvAHIAeQA9ACQAZgBhAGwAcwBlACkAWwBcAF0AXQAgACQAdABlAHMAdABWAGEAbAB1AGUAIAA9ACAAJABuAHUAbABsAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAKQANAAoAWwBcAHsAXQANAAoAIAAgAGkAZgAgACgAJABpAHMAVABlAHMAdAAgAC0AYQBuAGQAIAAoACQAdABlAHMAdABWAGEAbAB1AGUAIAAtAG4AZQAgACQAbgB1AGwAbAApACkADQAKACAAIABbAFwAewBdAA0ACgAgACAAIAAiACAAJAB0AGUAcwB0AFAAcgBlAGYAaQB4ACQAbgBhAG0AZQAgACQAbQBzAGkAUAByAG8AcABLAFYAUwBlAHAAYQByAGEAdABvAHIAIAAkAHQAZQBzAHQAVgBhAGwAdQBlACIAIAA+AD4AIAAkAG0AcwBpAFAAcgBvAHAATwB1AHQARgBpAGwAZQBQAGEAdABoADsADQAKACAAIAAgAHIAZQB0AHUAcgBuACAAJAB0AGUAcwB0AFYAYQBsAHUAZQANAAoAIAAgAFsAXAB9AF0ADQAKACAAIABbAFwAWwBdAGEAcgByAGEAeQBbAFwAXQBdACAAJABjAG8AbgB0AGUAbgB0ACAAPQAgAEcAZQB0AC0AQwBvAG4AdABlAG4AdAAgACQAbQBzAGkAUAByAG8AcABPAHUAdABGAGkAbABlAFAAYQB0AGgADQAKACAAIABbAFwAWwBdAGEAcgByAGEAeQBbAFwAXQBdADoAOgBSAGUAdgBlAHIAcwBlACgAJABjAG8AbgB0AGUAbgB0ACkADQAKACAAIABGAG8AcgBFAGEAYwBoACAAKAAkAGwAaQBuAGUAIABpAG4AIAAkAGMAbwBuAHQAZQBuAHQAKQANAAoAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAJABsAGkAbgBlAFQAbwBrAGUAbgBzACAAPQAgACQAbABpAG4AZQAgAC0AcwBwAGwAaQB0ACAAJABtAHMAaQBQAHIAbwBwAEsAVgBTAGUAcABhAHIAYQB0AG8AcgANAAoAIAAgACAAIABpAGYAIAAoACQAbABpAG4AZQBUAG8AawBlAG4AcwAuAEMAbwB1AG4AdAAgAC0AZwB0ACAAMQAgAC0AYQBuAGQAIAAkAGwAaQBuAGUAVABvAGsAZQBuAHMAWwBcAFsAXQAwAFsAXABdAF0AIAAtAGUAcQAgACQAbgBhAG0AZQApAA0ACgAgACAAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAIAAgAHIAZQB0AHUAcgBuACAAJABsAGkAbgBlAFQAbwBrAGUAbgBzAFsAXABbAF0AMQBbAFwAXQBdAA0ACgAgACAAIAAgAFsAXAB9AF0ADQAKACAAIABbAFwAfQBdAA0ACgAgACAAcgBlAHQAdQByAG4AIAAnACcADQAKAFsAXAB9AF0ADQAKAA0ACgBGAHUAbgBjAHQAaQBvAG4AIABBAEkAXwBTAGUAdABNAHMAaQBQAHIAbwBwAGUAcgB0AHkAKAAgAFsAXABbAF0AUABhAHIAYQBtAGUAdABlAHIAKABNAGEAbgBkAGEAdABvAHIAeQA9ACQAdAByAHUAZQApAFsAXABdAF0AIAAkAG4AYQBtAGUADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAsACAAWwBcAFsAXQBQAGEAcgBhAG0AZQB0AGUAcgAoAE0AYQBuAGQAYQB0AG8AcgB5AD0AJABmAGEAbABzAGUAKQBbAFwAXQBdACAAJAB2AGEAbAB1AGUADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAApAA0ACgBbAFwAewBdAA0ACgAgACAAaQBmACAAKAAkAHYAYQBsAHUAZQAgAC0AZQBxACAAJABuAHUAbABsACkADQAKACAAIABbAFwAewBdAA0ACgAgACAAIAAgAFcAcgBpAHQAZQAtAE8AdQB0AHAAdQB0ACAAIgBQAE8AVABFAE4AVABJAEEATABfAEIAVQBHADoAIABNAFMASQAgAHAAcgBvAHAAZQByAHQAeQAgACQAbgBhAG0AZQAgAHMAZQB0ACAAdABvACAAYQBuACAAdQBuAGkAbgBpAHQAaQBhAGwAaQB6AGUAZAAvAG4AdQBsAGwAIAB2AGEAcgBpAGEAYgBsAGUALgAgAEkAbgBpAHQAaQBhAGwAaQB6AGUAIABlAG0AcAB0AHkAIAB2AGEAcgBpAGEAYgBsAGUAcwAgAHUAcwBpAG4AZwAgAGUAbQBwAHQAeQAgAHEAdQBvAHQAZQBzAC4AIgANAAoAIAAgAFsAXAB9AF0ADQAKACAAIAAiACQAbgBhAG0AZQAkAG0AcwBpAFAAcgBvAHAASwBWAFMAZQBwAGEAcgBhAHQAbwByACQAdgBhAGwAdQBlACIAIAA+AD4AIAAkAG0AcwBpAFAAcgBvAHAATwB1AHQARgBpAGwAZQBQAGEAdABoADsADQAKAFsAXAB9AF0ADQAKAA0ACgB0AHIAeQANAAoAWwBcAHsAXQANAAoAIAAgAFsAXABbAF0AcwB0AHIAaQBuAGcAWwBcAF0AXQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABBAHIAZwBzACAAPQAgAEcAZQB0AC0AQwBvAG4AdABlAG4AdAAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABBAHIAZwBzAEYAaQBsAGUAUABhAHQAaAANAAoAIAAgAA0ACgAgACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAgAD0AIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoAC4AUgBlAHAAbABhAGMAZQAoACcAIAAnACwAIAAnAGAAIAAnACkADQAKACAAIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoACAAPQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgALgBSAGUAcABsAGEAYwBlACgAJwAkACcALAAgACcAYAAkACcAKQANAAoAIAAgACMAIABTAGkAbQBwAGwAZQAgAHEAdQBvAHQAZQBzACAAYQByAGUAIABwAHIAbwBiAGwAZQBtAGEAdABpAGMALAAgAGUAcwBwAGUAYwBpAGEAbABsAHkAIAB3AGgAZQBuACAAbQBvAHIAZQAgAGkAbgAgAGEAIABzAHUAYwBjAGUAcwBzAGkAbwBuAA0ACgAgACAAIwAgAGUALgBnAC4AIABpAG4AIABhACAAdQBzAGUAcgBuAGEAbQBlAC4AIABXAGUAIABuAGUAZQBkACAAdABvACAAZQBuAGMAbABvAHMAZQAgAGUAYQBjAGgAIABiAHUAbgBkAGwAZQAgAG8AZgAgAHQAaABlAG0AIABpAG4AIABhACAAcwBpAG0AcABsAGUAIABxAHUAbwB0AGUAZAAgAHMAdAByAGkAbgBnAA0ACgAgACAAIwAgAHcAaQB0AGgAIABlAGEAYwBoACAAYwBvAG4AdABhAGkAbgBlAGQAIABzAGkAbQBwAGwAZQAgAHEAdQBvAHQAZQAgAGIAZQBpAG4AZwAgAGUAcwBjAGEAcABlAGQAIABiAHkAIABkAG8AdQBiAGwAaQBuAGcALgAgAE4AIABpAG4AaQB0AGkAYQBsACAAcQB1AG8AdABlAHMAIAA9AD4AIAAoAE4AKwAxACkAKgAyACAAZgBpAG4AYQBsACAAcQB1AG8AdABlAHMADQAKACAAIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoACAAPQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgALgBSAGUAcABsAGEAYwBlACgAIgAnACcAJwAnACIALAAgACIAPwA/AD8APwA/AD8APwA/AD8APwAiACkADQAKACAAIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoACAAPQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgALgBSAGUAcABsAGEAYwBlACgAIgAnACcAJwAiACwAIAAgACIAPwA/AD8APwA/AD8APwA/ACIAKQANAAoAIAAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgAIAA9ACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAuAFIAZQBwAGwAYQBjAGUAKAAiACcAJwAiACwAIAAgACAAIgA/AD8APwA/AD8APwAiACkADQAKACAAIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoACAAPQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgALgBSAGUAcABsAGEAYwBlACgAIgAnACIALAAgACAAIAAgACIAPwA/AD8APwAiACkADQAKACAAIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoACAAPQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgALgBSAGUAcABsAGEAYwBlACgAJwA/ACcALAAgACAAIAAgACIAJwAiACkADQAKACAAIAANAAoAIAAgAEkAbgB2AG8AawBlAC0ARQB4AHAAcgBlAHMAcwBpAG8AbgAgACIAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABBAHIAZwBzACIADQAKAA0ACgAgACAAaQBmACAAKAAkAEwAYQBzAHQARQB4AGkAdABDAG8AZABlACAALQBuAGUAIAAkAG4AdQBsAGwAKQANAAoAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAZQB4AGkAdAAgACQATABhAHMAdABFAHgAaQB0AEMAbwBkAGUAOwANAAoAIAAgAFsAXAB9AF0ADQAKAFsAXAB9AF0ADQAKAGMAYQB0AGMAaAANAAoAWwBcAHsAXQANAAoAIAAgACAAVwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIAAiAEUAUgBSAE8AUgA6ACAAJAAoACQAXwAuAEUAeABjAGUAcAB0AGkAbwBuAC4ATQBlAHMAcwBhAGcAZQApACIADQAKACAAIAAgAEUAeABpAHQAIAAwAHgAMgAzAEUAIAAjAEUAUgBSAE8AUgBfAFUATgBIAEEATgBEAEwARQBEAF8ARQBYAEMARQBQAFQASQBPAE4ADQAKAFsAXAB9AF0ADQAK"/>
+    <ROW Action="AI_DATA_SETTER_5" Type="51" Source="CustomActionData" Target="The passwords do not match |Error |MB_OK,MB_ICONWARNING,MB_DEFBUTTON1|BTN_PRESSED|[CLIENTPROCESSID]"/>
+    <ROW Action="AI_DATA_SETTER_6" Type="51" Source="CustomActionData" Target="AEQAaQBnAGkAdABhAGwAbAB5AFMAaQBnAG4AUwBjAHIAaQBwAHQAAgAxAAEARgBsAGEAZwBzAAIANgABAFAAYQByAGEAbQBzAAIAAQBTAGMAcgBpAHAAdAACAFAAYQByAGEAbQAoACkADQAKAA0ACgB0AHIAeQANAAoAWwBcAHsAXQANAAoAIAAgACAAIABnAGUAdAAtAGUAdgBlAG4AdABsAG8AZwAgAC0AcwBvAHUAcgBjAGUAIAAiAEwAaQB0AGgAbgBlAHQAIABBAGMAYwBlAHMAcwAgAE0AYQBuAGEAZwBlAHIAIABTAGUAcgB2AGkAYwBlACIAIAAtAEwAbwBnAE4AYQBtAGUAIAAiAEwAaQB0AGgAbgBlAHQAIABBAGMAYwBlAHMAcwAgAE0AYQBuAGEAZwBlAHIAIgAgAC0ATgBlAHcAZQBzAHQAIAAxACAAfAAgAG8AdQB0AC0AbgB1AGwAbAA7AA0ACgBbAFwAfQBdAA0ACgBjAGEAdABjAGgADQAKAFsAXAB7AF0ADQAKACAAIAAgACAAJABwAGEAdABoACAAPQAgAEEASQBfAEcAZQB0AE0AcwBpAFAAcgBvAHAAZQByAHQAeQAgAEEAUABQAEQASQBSAA0ACgAgACAAIAAgAE4AZQB3AC0ARQB2AGUAbgB0AEwAbwBnACAALQBzAG8AdQByAGMAZQAgACIATABpAHQAaABuAGUAdAAgAEEAYwBjAGUAcwBzACAATQBhAG4AYQBnAGUAcgAgAFMAZQByAHYAaQBjAGUAIgAgAC0ATABvAGcATgBhAG0AZQAgACIATABpAHQAaABuAGUAdAAgAEEAYwBjAGUAcwBzACAATQBhAG4AYQBnAGUAcgAiACAALQBNAGUAcwBzAGEAZwBlAFIAZQBzAG8AdQByAGMAZQBGAGkAbABlACAAIgAkAHAAYQB0AGgAXABFAHYAZQBuAHQATABvAGcATQBlAHMAcwBhAGcAZQBzAC4AZABsAGwAIgANAAoAWwBcAH0AXQABAFMAYwByAGkAcAB0AFAAcgBlAGEAbQBiAGwAZQACAHAAYQByAGEAbQAoAA0ACgAgACAAWwBcAFsAXQBhAGwAaQBhAHMAKAAiAHAAcgBvAHAARgBpAGwAZQAiACkAWwBcAF0AXQAgACAAIAAgACAAIABbAFwAWwBdAFAAYQByAGEAbQBlAHQAZQByACgATQBhAG4AZABhAHQAbwByAHkAPQAkAHQAcgB1AGUAKQBbAFwAXQBdACAAWwBcAFsAXQBzAHQAcgBpAG4AZwBbAFwAXQBdACAAJABtAHMAaQBQAHIAbwBwAE8AdQB0AEYAaQBsAGUAUABhAHQAaAANAAoAIAAsAFsAXABbAF0AYQBsAGkAYQBzACgAIgBwAHIAbwBwAFMAZQBwACIAKQBbAFwAXQBdACAAIAAgACAAIAAgACAAWwBcAFsAXQBQAGEAcgBhAG0AZQB0AGUAcgAoAE0AYQBuAGQAYQB0AG8AcgB5AD0AJAB0AHIAdQBlACkAWwBcAF0AXQAgAFsAXABbAF0AcwB0AHIAaQBuAGcAWwBcAF0AXQAgACQAbQBzAGkAUAByAG8AcABLAFYAUwBlAHAAYQByAGEAdABvAHIADQAKACAALABbAFwAWwBdAGEAbABpAGEAcwAoACIAcwBjAHIAaQBwAHQARgBpAGwAZQAiACkAWwBcAF0AXQAgACAAIAAgAFsAXABbAF0AUABhAHIAYQBtAGUAdABlAHIAKABNAGEAbgBkAGEAdABvAHIAeQA9ACQAdAByAHUAZQApAFsAXABdAF0AIABbAFwAWwBdAHMAdAByAGkAbgBnAFsAXABdAF0AIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoAA0ACgAgACwAWwBcAFsAXQBhAGwAaQBhAHMAKAAiAHMAYwByAGkAcAB0AEEAcgBnAHMARgBpAGwAZQAiACkAWwBcAF0AXQBbAFwAWwBdAFAAYQByAGEAbQBlAHQAZQByACgATQBhAG4AZABhAHQAbwByAHkAPQAkAGYAYQBsAHMAZQApAFsAXABdAF0AWwBcAFsAXQBzAHQAcgBpAG4AZwBbAFwAXQBdACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEEAcgBnAHMARgBpAGwAZQBQAGEAdABoAA0ACgAgACwAWwBcAFsAXQBQAGEAcgBhAG0AZQB0AGUAcgAoAE0AYQBuAGQAYQB0AG8AcgB5AD0AJAB0AHIAdQBlACkAWwBcAF0AXQAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAWwBcAFsAXQBzAHQAcgBpAG4AZwBbAFwAXQBdACAAJAB0AGUAcwB0AFAAcgBlAGYAaQB4AA0ACgAgACwAWwBcAFsAXQBzAHcAaQB0AGMAaABbAFwAXQBdACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJABpAHMAVABlAHMAdAANAAoAIAApAA0ACgANAAoARgB1AG4AYwB0AGkAbwBuACAAQQBJAF8ARwBlAHQATQBzAGkAUAByAG8AcABlAHIAdAB5ACgAIABbAFwAWwBdAFAAYQByAGEAbQBlAHQAZQByACgATQBhAG4AZABhAHQAbwByAHkAPQAkAHQAcgB1AGUAKQBbAFwAXQBdACAAIABbAFwAWwBdAHMAdAByAGkAbgBnAFsAXABdAF0AIAAkAG4AYQBtAGUADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAsACAAWwBcAFsAXQBQAGEAcgBhAG0AZQB0AGUAcgAoAE0AYQBuAGQAYQB0AG8AcgB5AD0AJABmAGEAbABzAGUAKQBbAFwAXQBdACAAJAB0AGUAcwB0AFYAYQBsAHUAZQAgAD0AIAAkAG4AdQBsAGwADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAApAA0ACgBbAFwAewBdAA0ACgAgACAAaQBmACAAKAAkAGkAcwBUAGUAcwB0ACAALQBhAG4AZAAgACgAJAB0AGUAcwB0AFYAYQBsAHUAZQAgAC0AbgBlACAAJABuAHUAbABsACkAKQANAAoAIAAgAFsAXAB7AF0ADQAKACAAIAAgACIAIAAkAHQAZQBzAHQAUAByAGUAZgBpAHgAJABuAGEAbQBlACAAJABtAHMAaQBQAHIAbwBwAEsAVgBTAGUAcABhAHIAYQB0AG8AcgAgACQAdABlAHMAdABWAGEAbAB1AGUAIgAgAD4APgAgACQAbQBzAGkAUAByAG8AcABPAHUAdABGAGkAbABlAFAAYQB0AGgAOwANAAoAIAAgACAAcgBlAHQAdQByAG4AIAAkAHQAZQBzAHQAVgBhAGwAdQBlAA0ACgAgACAAWwBcAH0AXQANAAoAIAAgAFsAXABbAF0AYQByAHIAYQB5AFsAXABdAF0AIAAkAGMAbwBuAHQAZQBuAHQAIAA9ACAARwBlAHQALQBDAG8AbgB0AGUAbgB0ACAAJABtAHMAaQBQAHIAbwBwAE8AdQB0AEYAaQBsAGUAUABhAHQAaAANAAoAIAAgAFsAXABbAF0AYQByAHIAYQB5AFsAXABdAF0AOgA6AFIAZQB2AGUAcgBzAGUAKAAkAGMAbwBuAHQAZQBuAHQAKQANAAoAIAAgAEYAbwByAEUAYQBjAGgAIAAoACQAbABpAG4AZQAgAGkAbgAgACQAYwBvAG4AdABlAG4AdAApAA0ACgAgACAAWwBcAHsAXQANAAoAIAAgACAAIAAkAGwAaQBuAGUAVABvAGsAZQBuAHMAIAA9ACAAJABsAGkAbgBlACAALQBzAHAAbABpAHQAIAAkAG0AcwBpAFAAcgBvAHAASwBWAFMAZQBwAGEAcgBhAHQAbwByAA0ACgAgACAAIAAgAGkAZgAgACgAJABsAGkAbgBlAFQAbwBrAGUAbgBzAC4AQwBvAHUAbgB0ACAALQBnAHQAIAAxACAALQBhAG4AZAAgACQAbABpAG4AZQBUAG8AawBlAG4AcwBbAFwAWwBdADAAWwBcAF0AXQAgAC0AZQBxACAAJABuAGEAbQBlACkADQAKACAAIAAgACAAWwBcAHsAXQANAAoAIAAgACAAIAAgACAAcgBlAHQAdQByAG4AIAAkAGwAaQBuAGUAVABvAGsAZQBuAHMAWwBcAFsAXQAxAFsAXABdAF0ADQAKACAAIAAgACAAWwBcAH0AXQANAAoAIAAgAFsAXAB9AF0ADQAKACAAIAByAGUAdAB1AHIAbgAgACcAJwANAAoAWwBcAH0AXQANAAoADQAKAEYAdQBuAGMAdABpAG8AbgAgAEEASQBfAFMAZQB0AE0AcwBpAFAAcgBvAHAAZQByAHQAeQAoACAAWwBcAFsAXQBQAGEAcgBhAG0AZQB0AGUAcgAoAE0AYQBuAGQAYQB0AG8AcgB5AD0AJAB0AHIAdQBlACkAWwBcAF0AXQAgACQAbgBhAG0AZQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACwAIABbAFwAWwBdAFAAYQByAGEAbQBlAHQAZQByACgATQBhAG4AZABhAHQAbwByAHkAPQAkAGYAYQBsAHMAZQApAFsAXABdAF0AIAAkAHYAYQBsAHUAZQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACkADQAKAFsAXAB7AF0ADQAKACAAIABpAGYAIAAoACQAdgBhAGwAdQBlACAALQBlAHEAIAAkAG4AdQBsAGwAKQANAAoAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAVwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIAAiAFAATwBUAEUATgBUAEkAQQBMAF8AQgBVAEcAOgAgAE0AUwBJACAAcAByAG8AcABlAHIAdAB5ACAAJABuAGEAbQBlACAAcwBlAHQAIAB0AG8AIABhAG4AIAB1AG4AaQBuAGkAdABpAGEAbABpAHoAZQBkAC8AbgB1AGwAbAAgAHYAYQByAGkAYQBiAGwAZQAuACAASQBuAGkAdABpAGEAbABpAHoAZQAgAGUAbQBwAHQAeQAgAHYAYQByAGkAYQBiAGwAZQBzACAAdQBzAGkAbgBnACAAZQBtAHAAdAB5ACAAcQB1AG8AdABlAHMALgAiAA0ACgAgACAAWwBcAH0AXQANAAoAIAAgACIAJABuAGEAbQBlACQAbQBzAGkAUAByAG8AcABLAFYAUwBlAHAAYQByAGEAdABvAHIAJAB2AGEAbAB1AGUAIgAgAD4APgAgACQAbQBzAGkAUAByAG8AcABPAHUAdABGAGkAbABlAFAAYQB0AGgAOwANAAoAWwBcAH0AXQANAAoADQAKAHQAcgB5AA0ACgBbAFwAewBdAA0ACgAgACAAWwBcAFsAXQBzAHQAcgBpAG4AZwBbAFwAXQBdACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEEAcgBnAHMAIAA9ACAARwBlAHQALQBDAG8AbgB0AGUAbgB0ACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEEAcgBnAHMARgBpAGwAZQBQAGEAdABoAA0ACgAgACAADQAKACAAIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoACAAPQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgALgBSAGUAcABsAGEAYwBlACgAJwAgACcALAAgACcAYAAgACcAKQANAAoAIAAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgAIAA9ACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAuAFIAZQBwAGwAYQBjAGUAKAAnACQAJwAsACAAJwBgACQAJwApAA0ACgAgACAAIwAgAFMAaQBtAHAAbABlACAAcQB1AG8AdABlAHMAIABhAHIAZQAgAHAAcgBvAGIAbABlAG0AYQB0AGkAYwAsACAAZQBzAHAAZQBjAGkAYQBsAGwAeQAgAHcAaABlAG4AIABtAG8AcgBlACAAaQBuACAAYQAgAHMAdQBjAGMAZQBzAHMAaQBvAG4ADQAKACAAIAAjACAAZQAuAGcALgAgAGkAbgAgAGEAIAB1AHMAZQByAG4AYQBtAGUALgAgAFcAZQAgAG4AZQBlAGQAIAB0AG8AIABlAG4AYwBsAG8AcwBlACAAZQBhAGMAaAAgAGIAdQBuAGQAbABlACAAbwBmACAAdABoAGUAbQAgAGkAbgAgAGEAIABzAGkAbQBwAGwAZQAgAHEAdQBvAHQAZQBkACAAcwB0AHIAaQBuAGcADQAKACAAIAAjACAAdwBpAHQAaAAgAGUAYQBjAGgAIABjAG8AbgB0AGEAaQBuAGUAZAAgAHMAaQBtAHAAbABlACAAcQB1AG8AdABlACAAYgBlAGkAbgBnACAAZQBzAGMAYQBwAGUAZAAgAGIAeQAgAGQAbwB1AGIAbABpAG4AZwAuACAATgAgAGkAbgBpAHQAaQBhAGwAIABxAHUAbwB0AGUAcwAgAD0APgAgACgATgArADEAKQAqADIAIABmAGkAbgBhAGwAIABxAHUAbwB0AGUAcwANAAoAIAAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgAIAA9ACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAuAFIAZQBwAGwAYQBjAGUAKAAiACcAJwAnACcAIgAsACAAIgA/AD8APwA/AD8APwA/AD8APwA/ACIAKQANAAoAIAAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgAIAA9ACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAuAFIAZQBwAGwAYQBjAGUAKAAiACcAJwAnACIALAAgACAAIgA/AD8APwA/AD8APwA/AD8AIgApAA0ACgAgACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAgAD0AIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoAC4AUgBlAHAAbABhAGMAZQAoACIAJwAnACIALAAgACAAIAAiAD8APwA/AD8APwA/ACIAKQANAAoAIAAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgAIAA9ACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAuAFIAZQBwAGwAYQBjAGUAKAAiACcAIgAsACAAIAAgACAAIgA/AD8APwA/ACIAKQANAAoAIAAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgAIAA9ACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAuAFIAZQBwAGwAYQBjAGUAKAAnAD8AJwAsACAAIAAgACAAIgAnACIAKQANAAoAIAAgAA0ACgAgACAASQBuAHYAbwBrAGUALQBFAHgAcAByAGUAcwBzAGkAbwBuACAAIgAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEEAcgBnAHMAIgANAAoADQAKACAAIABpAGYAIAAoACQATABhAHMAdABFAHgAaQB0AEMAbwBkAGUAIAAtAG4AZQAgACQAbgB1AGwAbAApAA0ACgAgACAAWwBcAHsAXQANAAoAIAAgACAAIABlAHgAaQB0ACAAJABMAGEAcwB0AEUAeABpAHQAQwBvAGQAZQA7AA0ACgAgACAAWwBcAH0AXQANAAoAWwBcAH0AXQANAAoAYwBhAHQAYwBoAA0ACgBbAFwAewBdAA0ACgAgACAAIABXAHIAaQB0AGUALQBPAHUAdABwAHUAdAAgACIARQBSAFIATwBSADoAIAAkACgAJABfAC4ARQB4AGMAZQBwAHQAaQBvAG4ALgBNAGUAcwBzAGEAZwBlACkAIgANAAoAIAAgACAARQB4AGkAdAAgADAAeAAyADMARQAgACMARQBSAFIATwBSAF8AVQBOAEgAQQBOAEQATABFAEQAXwBFAFgAQwBFAFAAVABJAE8ATgANAAoAWwBcAH0AXQANAAo="/>
+    <ROW Action="AI_DATA_SETTER_7" Type="51" Source="CustomActionData" Target="AEQAaQBnAGkAdABhAGwAbAB5AFMAaQBnAG4AUwBjAHIAaQBwAHQAAgAxAAEARgBsAGEAZwBzAAIANgABAFAAYQByAGEAbQBzAAIAAQBTAGMAcgBpAHAAdAACAFAAYQByAGEAbQAoACkADQAKAA0ACgAkAHAAYQB0AGgAIAA9ACAAQQBJAF8ARwBlAHQATQBzAGkAUAByAG8AcABlAHIAdAB5ACAAQQBQAFAARABJAFIADQAKAHQAcgB5AA0ACgBbAFwAewBdAA0ACgAJAFIAZQBtAG8AdgBlAC0ARQB2AGUAbgB0AEwAbwBnACAALQBzAG8AdQByAGMAZQAgACIATABpAHQAaABuAGUAdAAgAEEAYwBjAGUAcwBzACAATQBhAG4AYQBnAGUAcgAgAFMAZQByAHYAaQBjAGUAIgAgAC0ATABvAGcATgBhAG0AZQAgACIATABpAHQAaABuAGUAdAAgAEEAYwBjAGUAcwBzACAATQBhAG4AYQBnAGUAcgAiAA0ACgBbAFwAfQBdAA0ACgBjAGEAdABjAGgAIAANAAoAWwBcAHsAXQANAAoAWwBcAH0AXQANAAoAAQBTAGMAcgBpAHAAdABQAHIAZQBhAG0AYgBsAGUAAgBwAGEAcgBhAG0AKAANAAoAIAAgAFsAXABbAF0AYQBsAGkAYQBzACgAIgBwAHIAbwBwAEYAaQBsAGUAIgApAFsAXABdAF0AIAAgACAAIAAgACAAWwBcAFsAXQBQAGEAcgBhAG0AZQB0AGUAcgAoAE0AYQBuAGQAYQB0AG8AcgB5AD0AJAB0AHIAdQBlACkAWwBcAF0AXQAgAFsAXABbAF0AcwB0AHIAaQBuAGcAWwBcAF0AXQAgACQAbQBzAGkAUAByAG8AcABPAHUAdABGAGkAbABlAFAAYQB0AGgADQAKACAALABbAFwAWwBdAGEAbABpAGEAcwAoACIAcAByAG8AcABTAGUAcAAiACkAWwBcAF0AXQAgACAAIAAgACAAIAAgAFsAXABbAF0AUABhAHIAYQBtAGUAdABlAHIAKABNAGEAbgBkAGEAdABvAHIAeQA9ACQAdAByAHUAZQApAFsAXABdAF0AIABbAFwAWwBdAHMAdAByAGkAbgBnAFsAXABdAF0AIAAkAG0AcwBpAFAAcgBvAHAASwBWAFMAZQBwAGEAcgBhAHQAbwByAA0ACgAgACwAWwBcAFsAXQBhAGwAaQBhAHMAKAAiAHMAYwByAGkAcAB0AEYAaQBsAGUAIgApAFsAXABdAF0AIAAgACAAIABbAFwAWwBdAFAAYQByAGEAbQBlAHQAZQByACgATQBhAG4AZABhAHQAbwByAHkAPQAkAHQAcgB1AGUAKQBbAFwAXQBdACAAWwBcAFsAXQBzAHQAcgBpAG4AZwBbAFwAXQBdACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAANAAoAIAAsAFsAXABbAF0AYQBsAGkAYQBzACgAIgBzAGMAcgBpAHAAdABBAHIAZwBzAEYAaQBsAGUAIgApAFsAXABdAF0AWwBcAFsAXQBQAGEAcgBhAG0AZQB0AGUAcgAoAE0AYQBuAGQAYQB0AG8AcgB5AD0AJABmAGEAbABzAGUAKQBbAFwAXQBdAFsAXABbAF0AcwB0AHIAaQBuAGcAWwBcAF0AXQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABBAHIAZwBzAEYAaQBsAGUAUABhAHQAaAANAAoAIAAsAFsAXABbAF0AUABhAHIAYQBtAGUAdABlAHIAKABNAGEAbgBkAGEAdABvAHIAeQA9ACQAdAByAHUAZQApAFsAXABdAF0AIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgAFsAXABbAF0AcwB0AHIAaQBuAGcAWwBcAF0AXQAgACQAdABlAHMAdABQAHIAZQBmAGkAeAANAAoAIAAsAFsAXABbAF0AcwB3AGkAdABjAGgAWwBcAF0AXQAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQAaQBzAFQAZQBzAHQADQAKACAAKQANAAoADQAKAEYAdQBuAGMAdABpAG8AbgAgAEEASQBfAEcAZQB0AE0AcwBpAFAAcgBvAHAAZQByAHQAeQAoACAAWwBcAFsAXQBQAGEAcgBhAG0AZQB0AGUAcgAoAE0AYQBuAGQAYQB0AG8AcgB5AD0AJAB0AHIAdQBlACkAWwBcAF0AXQAgACAAWwBcAFsAXQBzAHQAcgBpAG4AZwBbAFwAXQBdACAAJABuAGEAbQBlAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAALAAgAFsAXABbAF0AUABhAHIAYQBtAGUAdABlAHIAKABNAGEAbgBkAGEAdABvAHIAeQA9ACQAZgBhAGwAcwBlACkAWwBcAF0AXQAgACQAdABlAHMAdABWAGEAbAB1AGUAIAA9ACAAJABuAHUAbABsAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAKQANAAoAWwBcAHsAXQANAAoAIAAgAGkAZgAgACgAJABpAHMAVABlAHMAdAAgAC0AYQBuAGQAIAAoACQAdABlAHMAdABWAGEAbAB1AGUAIAAtAG4AZQAgACQAbgB1AGwAbAApACkADQAKACAAIABbAFwAewBdAA0ACgAgACAAIAAiACAAJAB0AGUAcwB0AFAAcgBlAGYAaQB4ACQAbgBhAG0AZQAgACQAbQBzAGkAUAByAG8AcABLAFYAUwBlAHAAYQByAGEAdABvAHIAIAAkAHQAZQBzAHQAVgBhAGwAdQBlACIAIAA+AD4AIAAkAG0AcwBpAFAAcgBvAHAATwB1AHQARgBpAGwAZQBQAGEAdABoADsADQAKACAAIAAgAHIAZQB0AHUAcgBuACAAJAB0AGUAcwB0AFYAYQBsAHUAZQANAAoAIAAgAFsAXAB9AF0ADQAKACAAIABbAFwAWwBdAGEAcgByAGEAeQBbAFwAXQBdACAAJABjAG8AbgB0AGUAbgB0ACAAPQAgAEcAZQB0AC0AQwBvAG4AdABlAG4AdAAgACQAbQBzAGkAUAByAG8AcABPAHUAdABGAGkAbABlAFAAYQB0AGgADQAKACAAIABbAFwAWwBdAGEAcgByAGEAeQBbAFwAXQBdADoAOgBSAGUAdgBlAHIAcwBlACgAJABjAG8AbgB0AGUAbgB0ACkADQAKACAAIABGAG8AcgBFAGEAYwBoACAAKAAkAGwAaQBuAGUAIABpAG4AIAAkAGMAbwBuAHQAZQBuAHQAKQANAAoAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAJABsAGkAbgBlAFQAbwBrAGUAbgBzACAAPQAgACQAbABpAG4AZQAgAC0AcwBwAGwAaQB0ACAAJABtAHMAaQBQAHIAbwBwAEsAVgBTAGUAcABhAHIAYQB0AG8AcgANAAoAIAAgACAAIABpAGYAIAAoACQAbABpAG4AZQBUAG8AawBlAG4AcwAuAEMAbwB1AG4AdAAgAC0AZwB0ACAAMQAgAC0AYQBuAGQAIAAkAGwAaQBuAGUAVABvAGsAZQBuAHMAWwBcAFsAXQAwAFsAXABdAF0AIAAtAGUAcQAgACQAbgBhAG0AZQApAA0ACgAgACAAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAIAAgAHIAZQB0AHUAcgBuACAAJABsAGkAbgBlAFQAbwBrAGUAbgBzAFsAXABbAF0AMQBbAFwAXQBdAA0ACgAgACAAIAAgAFsAXAB9AF0ADQAKACAAIABbAFwAfQBdAA0ACgAgACAAcgBlAHQAdQByAG4AIAAnACcADQAKAFsAXAB9AF0ADQAKAA0ACgBGAHUAbgBjAHQAaQBvAG4AIABBAEkAXwBTAGUAdABNAHMAaQBQAHIAbwBwAGUAcgB0AHkAKAAgAFsAXABbAF0AUABhAHIAYQBtAGUAdABlAHIAKABNAGEAbgBkAGEAdABvAHIAeQA9ACQAdAByAHUAZQApAFsAXABdAF0AIAAkAG4AYQBtAGUADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAsACAAWwBcAFsAXQBQAGEAcgBhAG0AZQB0AGUAcgAoAE0AYQBuAGQAYQB0AG8AcgB5AD0AJABmAGEAbABzAGUAKQBbAFwAXQBdACAAJAB2AGEAbAB1AGUADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAApAA0ACgBbAFwAewBdAA0ACgAgACAAaQBmACAAKAAkAHYAYQBsAHUAZQAgAC0AZQBxACAAJABuAHUAbABsACkADQAKACAAIABbAFwAewBdAA0ACgAgACAAIAAgAFcAcgBpAHQAZQAtAE8AdQB0AHAAdQB0ACAAIgBQAE8AVABFAE4AVABJAEEATABfAEIAVQBHADoAIABNAFMASQAgAHAAcgBvAHAAZQByAHQAeQAgACQAbgBhAG0AZQAgAHMAZQB0ACAAdABvACAAYQBuACAAdQBuAGkAbgBpAHQAaQBhAGwAaQB6AGUAZAAvAG4AdQBsAGwAIAB2AGEAcgBpAGEAYgBsAGUALgAgAEkAbgBpAHQAaQBhAGwAaQB6AGUAIABlAG0AcAB0AHkAIAB2AGEAcgBpAGEAYgBsAGUAcwAgAHUAcwBpAG4AZwAgAGUAbQBwAHQAeQAgAHEAdQBvAHQAZQBzAC4AIgANAAoAIAAgAFsAXAB9AF0ADQAKACAAIAAiACQAbgBhAG0AZQAkAG0AcwBpAFAAcgBvAHAASwBWAFMAZQBwAGEAcgBhAHQAbwByACQAdgBhAGwAdQBlACIAIAA+AD4AIAAkAG0AcwBpAFAAcgBvAHAATwB1AHQARgBpAGwAZQBQAGEAdABoADsADQAKAFsAXAB9AF0ADQAKAA0ACgB0AHIAeQANAAoAWwBcAHsAXQANAAoAIAAgAFsAXABbAF0AcwB0AHIAaQBuAGcAWwBcAF0AXQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABBAHIAZwBzACAAPQAgAEcAZQB0AC0AQwBvAG4AdABlAG4AdAAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABBAHIAZwBzAEYAaQBsAGUAUABhAHQAaAANAAoAIAAgAA0ACgAgACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAgAD0AIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoAC4AUgBlAHAAbABhAGMAZQAoACcAIAAnACwAIAAnAGAAIAAnACkADQAKACAAIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoACAAPQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgALgBSAGUAcABsAGEAYwBlACgAJwAkACcALAAgACcAYAAkACcAKQANAAoAIAAgACMAIABTAGkAbQBwAGwAZQAgAHEAdQBvAHQAZQBzACAAYQByAGUAIABwAHIAbwBiAGwAZQBtAGEAdABpAGMALAAgAGUAcwBwAGUAYwBpAGEAbABsAHkAIAB3AGgAZQBuACAAbQBvAHIAZQAgAGkAbgAgAGEAIABzAHUAYwBjAGUAcwBzAGkAbwBuAA0ACgAgACAAIwAgAGUALgBnAC4AIABpAG4AIABhACAAdQBzAGUAcgBuAGEAbQBlAC4AIABXAGUAIABuAGUAZQBkACAAdABvACAAZQBuAGMAbABvAHMAZQAgAGUAYQBjAGgAIABiAHUAbgBkAGwAZQAgAG8AZgAgAHQAaABlAG0AIABpAG4AIABhACAAcwBpAG0AcABsAGUAIABxAHUAbwB0AGUAZAAgAHMAdAByAGkAbgBnAA0ACgAgACAAIwAgAHcAaQB0AGgAIABlAGEAYwBoACAAYwBvAG4AdABhAGkAbgBlAGQAIABzAGkAbQBwAGwAZQAgAHEAdQBvAHQAZQAgAGIAZQBpAG4AZwAgAGUAcwBjAGEAcABlAGQAIABiAHkAIABkAG8AdQBiAGwAaQBuAGcALgAgAE4AIABpAG4AaQB0AGkAYQBsACAAcQB1AG8AdABlAHMAIAA9AD4AIAAoAE4AKwAxACkAKgAyACAAZgBpAG4AYQBsACAAcQB1AG8AdABlAHMADQAKACAAIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoACAAPQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgALgBSAGUAcABsAGEAYwBlACgAIgAnACcAJwAnACIALAAgACIAPwA/AD8APwA/AD8APwA/AD8APwAiACkADQAKACAAIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoACAAPQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgALgBSAGUAcABsAGEAYwBlACgAIgAnACcAJwAiACwAIAAgACIAPwA/AD8APwA/AD8APwA/ACIAKQANAAoAIAAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgAIAA9ACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAuAFIAZQBwAGwAYQBjAGUAKAAiACcAJwAiACwAIAAgACAAIgA/AD8APwA/AD8APwAiACkADQAKACAAIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoACAAPQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgALgBSAGUAcABsAGEAYwBlACgAIgAnACIALAAgACAAIAAgACIAPwA/AD8APwAiACkADQAKACAAIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoACAAPQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgALgBSAGUAcABsAGEAYwBlACgAJwA/ACcALAAgACAAIAAgACIAJwAiACkADQAKACAAIAANAAoAIAAgAEkAbgB2AG8AawBlAC0ARQB4AHAAcgBlAHMAcwBpAG8AbgAgACIAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABBAHIAZwBzACIADQAKAA0ACgAgACAAaQBmACAAKAAkAEwAYQBzAHQARQB4AGkAdABDAG8AZABlACAALQBuAGUAIAAkAG4AdQBsAGwAKQANAAoAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAZQB4AGkAdAAgACQATABhAHMAdABFAHgAaQB0AEMAbwBkAGUAOwANAAoAIAAgAFsAXAB9AF0ADQAKAFsAXAB9AF0ADQAKAGMAYQB0AGMAaAANAAoAWwBcAHsAXQANAAoAIAAgACAAVwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIAAiAEUAUgBSAE8AUgA6ACAAJAAoACQAXwAuAEUAeABjAGUAcAB0AGkAbwBuAC4ATQBlAHMAcwBhAGcAZQApACIADQAKACAAIAAgAEUAeABpAHQAIAAwAHgAMgAzAEUAIAAjAEUAUgBSAE8AUgBfAFUATgBIAEEATgBEAEwARQBEAF8ARQBYAEMARQBQAFQASQBPAE4ADQAKAFsAXAB9AF0ADQAK"/>
+    <ROW Action="AI_DATA_SETTER_8" Type="51" Source="PowerShellScriptInline" Target="AEQAaQBnAGkAdABhAGwAbAB5AFMAaQBnAG4AUwBjAHIAaQBwAHQAAgAxAAEARgBsAGEAZwBzAAIANgABAFAAYQByAGEAbQBzAAIAAQBTAGMAcgBpAHAAdAACAFAAYQByAGEAbQAoACkADQAKAA0ACgAkAGYAaQByAGUAdwBhAGwAbABQAG8AbABpAGMAeQAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAALQBDAG8AbQBPAGIAagBlAGMAdAAgACIASABOAGUAdABDAGYAZwAuAEYAdwBQAG8AbABpAGMAeQAyACIAOwANAAoAJABmAGkAcgBlAHcAYQBsAGwAUABvAGwAaQBjAHkALgBSAHUAbABlAHMALgBSAGUAbQBvAHYAZQAoACIATABpAHQAaABuAGUAdAAgAEEAYwBjAGUAcwBzACAATQBhAG4AYQBnAGUAcgAgAFcAZQBiACAAUwBlAHIAdgBpAGMAZQAgACgASABUAFQAUAAvAEgAVABUAFAAUwAtAEkAbgApACIAKQA7AAEAUwBjAHIAaQBwAHQAUAByAGUAYQBtAGIAbABlAAIAcABhAHIAYQBtACgADQAKACAAIABbAFwAWwBdAGEAbABpAGEAcwAoACIAcAByAG8AcABGAGkAbABlACIAKQBbAFwAXQBdACAAIAAgACAAIAAgAFsAXABbAF0AUABhAHIAYQBtAGUAdABlAHIAKABNAGEAbgBkAGEAdABvAHIAeQA9ACQAdAByAHUAZQApAFsAXABdAF0AIABbAFwAWwBdAHMAdAByAGkAbgBnAFsAXABdAF0AIAAkAG0AcwBpAFAAcgBvAHAATwB1AHQARgBpAGwAZQBQAGEAdABoAA0ACgAgACwAWwBcAFsAXQBhAGwAaQBhAHMAKAAiAHAAcgBvAHAAUwBlAHAAIgApAFsAXABdAF0AIAAgACAAIAAgACAAIABbAFwAWwBdAFAAYQByAGEAbQBlAHQAZQByACgATQBhAG4AZABhAHQAbwByAHkAPQAkAHQAcgB1AGUAKQBbAFwAXQBdACAAWwBcAFsAXQBzAHQAcgBpAG4AZwBbAFwAXQBdACAAJABtAHMAaQBQAHIAbwBwAEsAVgBTAGUAcABhAHIAYQB0AG8AcgANAAoAIAAsAFsAXABbAF0AYQBsAGkAYQBzACgAIgBzAGMAcgBpAHAAdABGAGkAbABlACIAKQBbAFwAXQBdACAAIAAgACAAWwBcAFsAXQBQAGEAcgBhAG0AZQB0AGUAcgAoAE0AYQBuAGQAYQB0AG8AcgB5AD0AJAB0AHIAdQBlACkAWwBcAF0AXQAgAFsAXABbAF0AcwB0AHIAaQBuAGcAWwBcAF0AXQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgADQAKACAALABbAFwAWwBdAGEAbABpAGEAcwAoACIAcwBjAHIAaQBwAHQAQQByAGcAcwBGAGkAbABlACIAKQBbAFwAXQBdAFsAXABbAF0AUABhAHIAYQBtAGUAdABlAHIAKABNAGEAbgBkAGEAdABvAHIAeQA9ACQAZgBhAGwAcwBlACkAWwBcAF0AXQBbAFwAWwBdAHMAdAByAGkAbgBnAFsAXABdAF0AIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQAQQByAGcAcwBGAGkAbABlAFAAYQB0AGgADQAKACAALABbAFwAWwBdAFAAYQByAGEAbQBlAHQAZQByACgATQBhAG4AZABhAHQAbwByAHkAPQAkAHQAcgB1AGUAKQBbAFwAXQBdACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIABbAFwAWwBdAHMAdAByAGkAbgBnAFsAXABdAF0AIAAkAHQAZQBzAHQAUAByAGUAZgBpAHgADQAKACAALABbAFwAWwBdAHMAdwBpAHQAYwBoAFsAXABdAF0AIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAkAGkAcwBUAGUAcwB0AA0ACgAgACkADQAKAA0ACgBGAHUAbgBjAHQAaQBvAG4AIABBAEkAXwBHAGUAdABNAHMAaQBQAHIAbwBwAGUAcgB0AHkAKAAgAFsAXABbAF0AUABhAHIAYQBtAGUAdABlAHIAKABNAGEAbgBkAGEAdABvAHIAeQA9ACQAdAByAHUAZQApAFsAXABdAF0AIAAgAFsAXABbAF0AcwB0AHIAaQBuAGcAWwBcAF0AXQAgACQAbgBhAG0AZQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACwAIABbAFwAWwBdAFAAYQByAGEAbQBlAHQAZQByACgATQBhAG4AZABhAHQAbwByAHkAPQAkAGYAYQBsAHMAZQApAFsAXABdAF0AIAAkAHQAZQBzAHQAVgBhAGwAdQBlACAAPQAgACQAbgB1AGwAbAANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACkADQAKAFsAXAB7AF0ADQAKACAAIABpAGYAIAAoACQAaQBzAFQAZQBzAHQAIAAtAGEAbgBkACAAKAAkAHQAZQBzAHQAVgBhAGwAdQBlACAALQBuAGUAIAAkAG4AdQBsAGwAKQApAA0ACgAgACAAWwBcAHsAXQANAAoAIAAgACAAIgAgACQAdABlAHMAdABQAHIAZQBmAGkAeAAkAG4AYQBtAGUAIAAkAG0AcwBpAFAAcgBvAHAASwBWAFMAZQBwAGEAcgBhAHQAbwByACAAJAB0AGUAcwB0AFYAYQBsAHUAZQAiACAAPgA+ACAAJABtAHMAaQBQAHIAbwBwAE8AdQB0AEYAaQBsAGUAUABhAHQAaAA7AA0ACgAgACAAIAByAGUAdAB1AHIAbgAgACQAdABlAHMAdABWAGEAbAB1AGUADQAKACAAIABbAFwAfQBdAA0ACgAgACAAWwBcAFsAXQBhAHIAcgBhAHkAWwBcAF0AXQAgACQAYwBvAG4AdABlAG4AdAAgAD0AIABHAGUAdAAtAEMAbwBuAHQAZQBuAHQAIAAkAG0AcwBpAFAAcgBvAHAATwB1AHQARgBpAGwAZQBQAGEAdABoAA0ACgAgACAAWwBcAFsAXQBhAHIAcgBhAHkAWwBcAF0AXQA6ADoAUgBlAHYAZQByAHMAZQAoACQAYwBvAG4AdABlAG4AdAApAA0ACgAgACAARgBvAHIARQBhAGMAaAAgACgAJABsAGkAbgBlACAAaQBuACAAJABjAG8AbgB0AGUAbgB0ACkADQAKACAAIABbAFwAewBdAA0ACgAgACAAIAAgACQAbABpAG4AZQBUAG8AawBlAG4AcwAgAD0AIAAkAGwAaQBuAGUAIAAtAHMAcABsAGkAdAAgACQAbQBzAGkAUAByAG8AcABLAFYAUwBlAHAAYQByAGEAdABvAHIADQAKACAAIAAgACAAaQBmACAAKAAkAGwAaQBuAGUAVABvAGsAZQBuAHMALgBDAG8AdQBuAHQAIAAtAGcAdAAgADEAIAAtAGEAbgBkACAAJABsAGkAbgBlAFQAbwBrAGUAbgBzAFsAXABbAF0AMABbAFwAXQBdACAALQBlAHEAIAAkAG4AYQBtAGUAKQANAAoAIAAgACAAIABbAFwAewBdAA0ACgAgACAAIAAgACAAIAByAGUAdAB1AHIAbgAgACQAbABpAG4AZQBUAG8AawBlAG4AcwBbAFwAWwBdADEAWwBcAF0AXQANAAoAIAAgACAAIABbAFwAfQBdAA0ACgAgACAAWwBcAH0AXQANAAoAIAAgAHIAZQB0AHUAcgBuACAAJwAnAA0ACgBbAFwAfQBdAA0ACgANAAoARgB1AG4AYwB0AGkAbwBuACAAQQBJAF8AUwBlAHQATQBzAGkAUAByAG8AcABlAHIAdAB5ACgAIABbAFwAWwBdAFAAYQByAGEAbQBlAHQAZQByACgATQBhAG4AZABhAHQAbwByAHkAPQAkAHQAcgB1AGUAKQBbAFwAXQBdACAAJABuAGEAbQBlAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAALAAgAFsAXABbAF0AUABhAHIAYQBtAGUAdABlAHIAKABNAGEAbgBkAGEAdABvAHIAeQA9ACQAZgBhAGwAcwBlACkAWwBcAF0AXQAgACQAdgBhAGwAdQBlAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAKQANAAoAWwBcAHsAXQANAAoAIAAgAGkAZgAgACgAJAB2AGEAbAB1AGUAIAAtAGUAcQAgACQAbgB1AGwAbAApAA0ACgAgACAAWwBcAHsAXQANAAoAIAAgACAAIABXAHIAaQB0AGUALQBPAHUAdABwAHUAdAAgACIAUABPAFQARQBOAFQASQBBAEwAXwBCAFUARwA6ACAATQBTAEkAIABwAHIAbwBwAGUAcgB0AHkAIAAkAG4AYQBtAGUAIABzAGUAdAAgAHQAbwAgAGEAbgAgAHUAbgBpAG4AaQB0AGkAYQBsAGkAegBlAGQALwBuAHUAbABsACAAdgBhAHIAaQBhAGIAbABlAC4AIABJAG4AaQB0AGkAYQBsAGkAegBlACAAZQBtAHAAdAB5ACAAdgBhAHIAaQBhAGIAbABlAHMAIAB1AHMAaQBuAGcAIABlAG0AcAB0AHkAIABxAHUAbwB0AGUAcwAuACIADQAKACAAIABbAFwAfQBdAA0ACgAgACAAIgAkAG4AYQBtAGUAJABtAHMAaQBQAHIAbwBwAEsAVgBTAGUAcABhAHIAYQB0AG8AcgAkAHYAYQBsAHUAZQAiACAAPgA+ACAAJABtAHMAaQBQAHIAbwBwAE8AdQB0AEYAaQBsAGUAUABhAHQAaAA7AA0ACgBbAFwAfQBdAA0ACgANAAoAdAByAHkADQAKAFsAXAB7AF0ADQAKACAAIABbAFwAWwBdAHMAdAByAGkAbgBnAFsAXABdAF0AIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQAQQByAGcAcwAgAD0AIABHAGUAdAAtAEMAbwBuAHQAZQBuAHQAIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQAQQByAGcAcwBGAGkAbABlAFAAYQB0AGgADQAKACAAIAANAAoAIAAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgAIAA9ACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAuAFIAZQBwAGwAYQBjAGUAKAAnACAAJwAsACAAJwBgACAAJwApAA0ACgAgACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAgAD0AIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoAC4AUgBlAHAAbABhAGMAZQAoACcAJAAnACwAIAAnAGAAJAAnACkADQAKACAAIAAjACAAUwBpAG0AcABsAGUAIABxAHUAbwB0AGUAcwAgAGEAcgBlACAAcAByAG8AYgBsAGUAbQBhAHQAaQBjACwAIABlAHMAcABlAGMAaQBhAGwAbAB5ACAAdwBoAGUAbgAgAG0AbwByAGUAIABpAG4AIABhACAAcwB1AGMAYwBlAHMAcwBpAG8AbgANAAoAIAAgACMAIABlAC4AZwAuACAAaQBuACAAYQAgAHUAcwBlAHIAbgBhAG0AZQAuACAAVwBlACAAbgBlAGUAZAAgAHQAbwAgAGUAbgBjAGwAbwBzAGUAIABlAGEAYwBoACAAYgB1AG4AZABsAGUAIABvAGYAIAB0AGgAZQBtACAAaQBuACAAYQAgAHMAaQBtAHAAbABlACAAcQB1AG8AdABlAGQAIABzAHQAcgBpAG4AZwANAAoAIAAgACMAIAB3AGkAdABoACAAZQBhAGMAaAAgAGMAbwBuAHQAYQBpAG4AZQBkACAAcwBpAG0AcABsAGUAIABxAHUAbwB0AGUAIABiAGUAaQBuAGcAIABlAHMAYwBhAHAAZQBkACAAYgB5ACAAZABvAHUAYgBsAGkAbgBnAC4AIABOACAAaQBuAGkAdABpAGEAbAAgAHEAdQBvAHQAZQBzACAAPQA+ACAAKABOACsAMQApACoAMgAgAGYAaQBuAGEAbAAgAHEAdQBvAHQAZQBzAA0ACgAgACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAgAD0AIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoAC4AUgBlAHAAbABhAGMAZQAoACIAJwAnACcAJwAiACwAIAAiAD8APwA/AD8APwA/AD8APwA/AD8AIgApAA0ACgAgACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAgAD0AIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoAC4AUgBlAHAAbABhAGMAZQAoACIAJwAnACcAIgAsACAAIAAiAD8APwA/AD8APwA/AD8APwAiACkADQAKACAAIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoACAAPQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgALgBSAGUAcABsAGEAYwBlACgAIgAnACcAIgAsACAAIAAgACIAPwA/AD8APwA/AD8AIgApAA0ACgAgACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAgAD0AIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoAC4AUgBlAHAAbABhAGMAZQAoACIAJwAiACwAIAAgACAAIAAiAD8APwA/AD8AIgApAA0ACgAgACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAgAD0AIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoAC4AUgBlAHAAbABhAGMAZQAoACcAPwAnACwAIAAgACAAIAAiACcAIgApAA0ACgAgACAADQAKACAAIABJAG4AdgBvAGsAZQAtAEUAeABwAHIAZQBzAHMAaQBvAG4AIAAiACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgAIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQAQQByAGcAcwAiAA0ACgANAAoAIAAgAGkAZgAgACgAJABMAGEAcwB0AEUAeABpAHQAQwBvAGQAZQAgAC0AbgBlACAAJABuAHUAbABsACkADQAKACAAIABbAFwAewBdAA0ACgAgACAAIAAgAGUAeABpAHQAIAAkAEwAYQBzAHQARQB4AGkAdABDAG8AZABlADsADQAKACAAIABbAFwAfQBdAA0ACgBbAFwAfQBdAA0ACgBjAGEAdABjAGgADQAKAFsAXAB7AF0ADQAKACAAIAAgAFcAcgBpAHQAZQAtAE8AdQB0AHAAdQB0ACAAIgBFAFIAUgBPAFIAOgAgACQAKAAkAF8ALgBFAHgAYwBlAHAAdABpAG8AbgAuAE0AZQBzAHMAYQBnAGUAKQAiAA0ACgAgACAAIABFAHgAaQB0ACAAMAB4ADIAMwBFACAAIwBFAFIAUgBPAFIAXwBVAE4ASABBAE4ARABMAEUARABfAEUAWABDAEUAUABUAEkATwBOAA0ACgBbAFwAfQBdAA0ACg=="/>
     <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
     <ROW Action="AI_DeleteCadLzma" Type="51" Source="AI_DeleteLzma" Target="[AI_SETUPEXEPATH]"/>
     <ROW Action="AI_DeleteLzma" Type="1025" Source="lzmaextractor.dll" Target="DeleteLZMAFiles"/>
@@ -1138,6 +1225,7 @@
     <ROW Action="AI_ExtractFiles" Type="1025" Source="Prereq.dll" Target="ExtractSourceFiles" AdditionalSeq="AI_DATA_SETTER"/>
     <ROW Action="AI_ExtractLzma" Type="1025" Source="lzmaextractor.dll" Target="ExtractLZMAFiles"/>
     <ROW Action="AI_FindExeLzma" Type="1" Source="lzmaextractor.dll" Target="FindEXE"/>
+    <ROW Action="AI_GetArpIconPath" Type="1" Source="aicustact.dll" Target="GetArpIconPath"/>
     <ROW Action="AI_InstallModeCheck" Type="1" Source="aicustact.dll" Target="UpdateInstallMode" WithoutSeq="true"/>
     <ROW Action="AI_LaunchApp" Type="1" Source="aicustact.dll" Target="[#Lithnet.AccessManager.Server.UI.exe]"/>
     <ROW Action="AI_PREPARE_UPGRADE" Type="65" Source="aicustact.dll" Target="PrepareUpgrade"/>
@@ -1151,20 +1239,17 @@
     <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
     <ROW Action="AI_SetLogOnAsService" Type="3073" Source="aicustact.dll" Target="LogOnAsAService" AdditionalSeq="AI_DATA_SETTER_1"/>
     <ROW Action="AI_SetPermissions" Type="11265" Source="userAccounts.dll" Target="OnSetPermissions" WithoutSeq="true"/>
-    <ROW Action="CheckIfUserExists" Type="1" Source="aicustact.dll" Target="CheckIfUserExists" Options="1" AdditionalSeq="AI_DATA_SETTER_3"/>
-    <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="DefaultBuild:[ProgramFiles64Folder][Manufacturer]\[ProductName]"/>
+    <ROW Action="CreateEventSource" Type="1" Source="PowerShellScriptLauncher.dll" Target="RunPowerShellScript" Options="1" AdditionalSeq="AI_DATA_SETTER_6"/>
+    <ROW Action="PasswordsDontMatchMessage" Type="65" Source="aicustact.dll" Target="MsgBox" WithoutSeq="true" Options="1" AdditionalSeq="AI_DATA_SETTER_5"/>
+    <ROW Action="PowerShellScriptInline" Type="3137" Source="PowerShellScriptLauncher.dll" Target="RunPowerShellScript" Options="1" AdditionalSeq="AI_DATA_SETTER_8"/>
+    <ROW Action="RemoveEventSource" Type="65" Source="PowerShellScriptLauncher.dll" Target="RunPowerShellScript" Options="1" AdditionalSeq="AI_DATA_SETTER_7"/>
+    <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="DefaultBuild:[ProgramFiles64Folder][Manufacturer]\[ProductName]#Build_MSIX_APPX:"/>
     <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]"/>
     <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
+    <ROW Action="UserNotFoundMessage" Type="65" Source="aicustact.dll" Target="MsgBox" WithoutSeq="true" Options="1" AdditionalSeq="AI_DATA_SETTER_3"/>
+    <ROW Action="ValidateUserName" Type="65" Source="PowerShellScriptLauncher.dll" Target="RunPowerShellScript" WithoutSeq="true" Options="1" AdditionalSeq="AI_DATA_SETTER_4"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiDialogComponent">
-    <ROW Dialog="NewDialog" HCentering="50" VCentering="50" Width="370" Height="270" Attributes="3" Title="[ProductName] [Setup]" Control_Default="Next" Control_Cancel="Cancel"/>
-    <ROW Dialog="NewDialog_2" HCentering="50" VCentering="50" Width="370" Height="270" Attributes="3" Title="[ProductName] [Setup]" Control_Default="Next" Control_Cancel="Cancel"/>
-    <ROW Dialog="NewSeqDialog" HCentering="50" VCentering="50" Width="370" Height="270" Attributes="3" Title="[ProductName] [Setup]" Control_Default="Next" Control_Cancel="Cancel"/>
-    <ROW Dialog="NewSeqDialog_1" HCentering="50" VCentering="50" Width="370" Height="270" Attributes="3" Title="[ProductName] [Setup]" Control_Default="Next" Control_Cancel="Cancel"/>
-    <ROW Dialog="NewSeqDialog_2" HCentering="50" VCentering="50" Width="370" Height="270" Attributes="3" Title="[ProductName] [Setup]" Control_Default="Next" Control_Cancel="Cancel"/>
-    <ROW Dialog="NewSeqDialog_3" HCentering="50" VCentering="50" Width="370" Height="270" Attributes="3" Title="[ProductName] [Setup]" Control_Default="Next" Control_Cancel="Cancel"/>
-    <ROW Dialog="NewSeqDialog_4" HCentering="50" VCentering="50" Width="370" Height="270" Attributes="3" Title="[ProductName] [Setup]" Control_Default="Next" Control_Cancel="Cancel"/>
-    <ROW Dialog="NewSeqDialog_5" HCentering="50" VCentering="50" Width="370" Height="270" Attributes="3" Title="[ProductName] [Setup]" Control_Default="Next" Control_Cancel="Cancel"/>
     <ROW Dialog="ServiceAccountDialog" HCentering="50" VCentering="50" Width="370" Height="270" Attributes="3" Title="[ProductName] [Setup]" Control_Default="Next" Control_Cancel="Cancel"/>
     <ROW Dialog="ShowGsmaScript" HCentering="50" VCentering="50" Width="329" Height="184" Attributes="3" Title="[ProductName] [Setup]" Control_Default="OK" Control_Cancel="OK"/>
   </COMPONENT>
@@ -1280,7 +1365,6 @@
     <ROW Feature_="MainFeature" Component_="Vanara.Core.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Cryptography.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Shared.dll"/>
-    <ROW Feature_="MainFeature" Component_="AI_ExePath"/>
     <ROW Feature_="MainFeature" Component_="Logs"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.CSharp.dll"/>
     <ROW Feature_="MainFeature" Component_="NotificationTemplates"/>
@@ -1532,6 +1616,11 @@
     <ROW Feature_="MainFeature" Component_="Stylet.dll"/>
     <ROW Feature_="MainFeature" Component_="System.Text.Json.dll_1"/>
     <ROW Feature_="MainFeature" Component_="Lithnet"/>
+    <ROW Feature_="AiAppXAssets" Component_="Store50x50Logo.scale100.png"/>
+    <ROW Feature_="MainFeature" Component_="AI_ExePath"/>
+    <ROW Feature_="MainFeature" Component_="AI_CustomARPName"/>
+    <ROW Feature_="MainFeature" Component_="EventLogMessages.dll"/>
+    <ROW Feature_="MainFeature" Component_="Interop.NetFwTypeLib.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIniFileComponent">
     <ROW IniFile="URL" FileName="LITHNE~1.URL|Lithnet Access Manager Help.url" DirProperty="Lithnet_Dir" Section="InternetShortcut" Key="URL" Value="https://github.com/lithnet/laps-web" Action="0" Component_="Lithnet.AccessManager.Server.UI.exe"/>
@@ -1547,13 +1636,16 @@
     <ROW Action="AI_AppSearchEx" Sequence="103"/>
     <ROW Action="AI_DetectSoftware" Sequence="102"/>
     <ROW Action="RemoveExistingProducts" Condition="AI_UPGRADE&lt;&gt;&quot;No&quot;" Sequence="6501" SeqType="0" MsiKey="RemoveExistingProducts"/>
-    <ROW Action="AI_AiBackupImmediate" Sequence="1401"/>
+    <ROW Action="AI_AiBackupImmediate" Sequence="1402"/>
     <ROW Action="AI_AiBackupRollback" Sequence="1501"/>
     <ROW Action="AI_AiRestoreDeferredImpersonate" Sequence="6597"/>
     <ROW Action="AI_AiRestoreDeferred" Sequence="6598"/>
     <ROW Action="AI_SetLogOnAsService" Condition="NOT Installed" Sequence="4002"/>
     <ROW Action="AI_DATA_SETTER_1" Condition="NOT Installed" Sequence="4001"/>
     <ROW Action="AI_ResolveLogOnAsService" Condition="NOT Installed" Sequence="1001"/>
+    <ROW Action="AI_ConfigPermissions" Condition="REMOVE &lt;&gt; &quot;ALL&quot;" Sequence="5852"/>
+    <ROW Action="AI_DATA_SETTER_2" Condition="REMOVE &lt;&gt; &quot;ALL&quot;" Sequence="5851"/>
+    <ROW Action="AI_PrepareRevokePermissions" Condition="REMOVE = &quot;ALL&quot;" Sequence="1699"/>
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="99" Builds="DefaultBuild"/>
     <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="101" Builds="DefaultBuild"/>
     <ROW Action="AI_DeleteCadLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="199" Builds="DefaultBuild"/>
@@ -1566,9 +1658,14 @@
     <ROW Action="AI_ExtractFiles" Sequence="3998" Builds="DefaultBuild"/>
     <ROW Action="AI_DATA_SETTER" Sequence="3997"/>
     <ROW Action="AI_EstimateExtractFiles" Sequence="3999" Builds="DefaultBuild"/>
-    <ROW Action="AI_ConfigPermissions" Condition="REMOVE &lt;&gt; &quot;ALL&quot;" Sequence="5852"/>
-    <ROW Action="AI_DATA_SETTER_2" Condition="REMOVE &lt;&gt; &quot;ALL&quot;" Sequence="5851"/>
-    <ROW Action="AI_PrepareRevokePermissions" Condition="REMOVE = &quot;ALL&quot;" Sequence="1699"/>
+    <ROW Action="AI_GetArpIconPath" Sequence="1401"/>
+    <ROW Action="CreateEventSource" Condition="( NOT Installed ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6406"/>
+    <ROW Action="AI_DATA_SETTER_6" Condition="( NOT Installed ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6405"/>
+    <ROW Action="RemoveEventSource" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6404"/>
+    <ROW Action="AI_DATA_SETTER_7" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6403"/>
+    <ROW Action="PowerShellScriptInline" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6402"/>
+    <ROW Action="AI_DATA_SETTER_8" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6401"/>
+    <ROW Action="AI_AiRemoveRegsImmediate" Sequence="2599"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstallUISequenceComponent">
     <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="749"/>
@@ -1579,9 +1676,6 @@
     <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="103"/>
     <ROW Action="AI_AppSearchEx" Sequence="102"/>
     <ROW Action="AI_DetectSoftware" Sequence="101"/>
-    <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND" Sequence="201"/>
-    <ROW Action="CheckIfUserExists" Condition="( NOT Installed )" Sequence="1298"/>
-    <ROW Action="AI_DATA_SETTER_3" Condition="( NOT Installed )" Sequence="1297"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiLaunchConditionsComponent">
     <ROW Condition="( Version9X OR ( NOT VersionNT64 ) OR ( VersionNT64 AND ((VersionNT64 &lt;&gt; 600) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 600) OR (MsiNTProductType = 1)) AND ((VersionNT64 &lt;&gt; 601) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 601) OR (MsiNTProductType = 1)) AND ((VersionNT64 &lt;&gt; 602) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 602) OR (MsiNTProductType = 1)) AND ((VersionNT64 &lt;&gt; 603) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 1000) OR (MsiNTProductType &lt;&gt; 1)) ) )" Description="[ProductName] cannot be installed on the following Windows versions: [WindowsTypeNT64Display]." DescriptionLocId="AI.LaunchCondition.NoSpecificNT64" IsPredefined="true" Builds="DefaultBuild"/>
@@ -1589,20 +1683,43 @@
     <ROW Condition="((VersionNT &lt;&gt; 501) AND (VersionNT &lt;&gt; 502))" Description="[ProductName] cannot be installed on [WindowsTypeNT5XDisplay]." DescriptionLocId="AI.LaunchCondition.NoNT5X" IsPredefined="true" Builds="DefaultBuild"/>
     <ROW Condition="(VersionNT &lt;&gt; 400)" Description="[ProductName] cannot be installed on [WindowsTypeNT40Display]." DescriptionLocId="AI.LaunchCondition.NoNT40" IsPredefined="true" Builds="DefaultBuild"/>
     <ROW Condition="(VersionNT &lt;&gt; 500)" Description="[ProductName] cannot be installed on [WindowsTypeNT50Display]." DescriptionLocId="AI.LaunchCondition.NoNT50" IsPredefined="true" Builds="DefaultBuild"/>
-    <ROW Condition="AI_DETECTED_DOTNET_CORE_VERSION &gt;= AI_REQUIRED_DOTNET_CORE_VERSION" Description="[ProductName] cannot be installed on systems with .NET Core version lower than [AI_REQUIRED_DOTNET_CORE_DISPLAY]." DescriptionLocId="AI.LaunchCondition.DotNETCore" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="AI_DETECTED_INTERNET_CONNECTION" Description="[ProductName] requires an active Internet connection for installation. Please check your network configuration and proxy settings." DescriptionLocId="AI.LaunchCondition.Internet" IsPredefined="true" Builds="DefaultBuild"/>
     <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]." DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiLockPermComponent">
     <ROW LockObject="Logs_Dir" Table="CreateFolder" User="[USER_NAME]" Permission="1610809791" Flags="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRegLocatorComponent">
-    <ROW Signature_="AI_EXE_PATH_CU" Root="1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="2"/>
-    <ROW Signature_="AI_EXE_PATH_LM" Root="2" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="2"/>
+    <ROW Signature_="AI_EXE_PATH_CU" Root="1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="18"/>
+    <ROW Signature_="AI_EXE_PATH_LM" Root="2" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="18"/>
+    <ROW Signature_="AppSearchSign" Root="2" Key="SYSTEM\CurrentControlSet\Services\lithnetams" Name="ObjectName" Type="18"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
     <ROW Registry="AI_ExePath" Root="-1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Value="[AI_SETUPEXEPATH]" Component_="AI_ExePath"/>
+    <ROW Registry="Comments" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="Comments" Value="[ARPCOMMENTS]" Component_="AI_CustomARPName"/>
+    <ROW Registry="Contact" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="Contact" Value="[ARPCONTACT]" Component_="AI_CustomARPName"/>
+    <ROW Registry="DisplayIcon" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="DisplayIcon" Value="[ARP_ICON_PATH]" Component_="AI_CustomARPName"/>
+    <ROW Registry="DisplayName" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="DisplayName" Value="[AI_PRODUCTNAME_ARP]" Component_="AI_CustomARPName"/>
+    <ROW Registry="DisplayVersion" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="DisplayVersion" Value="[ProductVersion]" Component_="AI_CustomARPName"/>
+    <ROW Registry="EstimatedSize" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="EstimatedSize" Value="#[AI_ARP_SIZE]" Component_="AI_CustomARPName"/>
+    <ROW Registry="HelpLink" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="HelpLink" Value="[ARPHELPLINK]" Component_="AI_CustomARPName"/>
+    <ROW Registry="HelpTelephone" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="HelpTelephone" Value="[ARPHELPTELEPHONE]" Component_="AI_CustomARPName"/>
+    <ROW Registry="InstallLocation" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="InstallLocation" Value="[APPDIR]" Component_="AI_CustomARPName"/>
+    <ROW Registry="ModifyPath" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="ModifyPath" Value="[AI_UNINSTALLER] /i [ProductCode] AI_UNINSTALLER_CTP=1" Component_="AI_CustomARPName"/>
+    <ROW Registry="NoRepair" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="NoRepair" Value="#1" Component_="AI_CustomARPName"/>
     <ROW Registry="Path" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Path" Value="[APPDIR]" Component_="ProductInformation"/>
+    <ROW Registry="Publisher" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="Publisher" Value="[Manufacturer]" Component_="AI_CustomARPName"/>
+    <ROW Registry="Readme" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="Readme" Value="[ARPREADME]" Component_="AI_CustomARPName"/>
+    <ROW Registry="URLInfoAbout" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="URLInfoAbout" Value="[ARPURLINFOABOUT]" Component_="AI_CustomARPName"/>
+    <ROW Registry="URLUpdateInfo" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="URLUpdateInfo" Value="[ARPURLUPDATEINFO]" Component_="AI_CustomARPName"/>
+    <ROW Registry="UninstallPath" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="UninstallPath" Value="[AI_UNINSTALLER] /x [ProductCode] AI_UNINSTALLER_CTP=1" Component_="AI_CustomARPName"/>
+    <ROW Registry="UninstallString" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="UninstallString" Value="[AI_UNINSTALLER] /x [ProductCode] AI_UNINSTALLER_CTP=1" Component_="AI_CustomARPName"/>
     <ROW Registry="Version" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
+    <ROW Registry="VersionMajor" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="VersionMajor" Value="#1" Component_="AI_CustomARPName"/>
+    <ROW Registry="VersionMinor" Root="-1" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\[ProductName] [ProductVersion]" Name="VersionMinor" Value="#0" Component_="AI_CustomARPName"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiRemoveRegComponent">
+    <ROW RemoveRegistry="Configured" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Configured" Component_="Lithnet.AccessManager.Web.exe"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiServCtrlComponent">
     <ROW ServiceControl="Lithnet.AccessManager.Web.exe" Name="lithnetams" Event="161" Wait="1" Component_="Lithnet.AccessManager.Web.exe"/>
@@ -1621,11 +1738,13 @@
     <ROW UpgradeCode="[|UpgradeCode]" VersionMin="[|ProductVersion]" Attributes="2" ActionProperty="AI_NEWERPRODUCTFOUND"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.PreReqComponent">
-    <ROW PrereqKey="C6FE8A2F0943D2B7A0CB204E12F1F4" DisplayName="ASP.NET Core Runtime 3.1.4 x64" VersionMin="3.1" SetupFileUrl="https://download.visualstudio.microsoft.com/download/pr/f9598bd0-060a-46c1-b5ce-65f1663f6204/afb4dd9e1377f63a5c124d60fb119764/aspnetcore-runtime-3.1.4-win-x64.exe" Location="1" ExactSize="7829704" WinNTVersions="Windows 9x/ME/NT/2000/XP/Vista/Windows 7/Windows 8 x86/Windows 8.1 x86/Windows 10 x86" WinNT64Versions="Windows Vista x64, Windows Server 2008 x64, Windows 7 RTM x64, Windows Server 2008 R2 x64, Windows 8 x64, Windows Server 2012 x64, Windows 10 version 1507 x64, Windows 10 version 1511 x64" Operator="1" NoUiComLine="/q /norestart" Options="xy" MD5="b1f068dcfcea78ec654cd3d120e1ebb7" TargetName="ASP.NET Core 3.1"/>
-    <ATTRIBUTE name="PrereqsOrder" value="C6FE8A2F0943D2B7A0CB204E12F1F4"/>
+    <ROW PrereqKey="C6FE8A2F0943D2B7A0CB204E12F1F4" DisplayName="ASP.NET Core Runtime 3.1.4 x64" VersionMin="3.1" SetupFileUrl="https://download.visualstudio.microsoft.com/download/pr/f9598bd0-060a-46c1-b5ce-65f1663f6204/afb4dd9e1377f63a5c124d60fb119764/aspnetcore-runtime-3.1.4-win-x64.exe" Location="1" ExactSize="7829704" WinNTVersions="Windows 9x/ME/NT/2000/XP/Vista/Windows 7/Windows 8 x86/Windows 8.1 x86/Windows 10 x86" WinNT64Versions="Windows Vista x64, Windows Server 2008 x64, Windows 7 RTM x64, Windows Server 2008 R2 x64, Windows 8 x64, Windows Server 2012 x64, Windows 10 version 1507 x64, Windows 10 version 1511 x64" Operator="1" NoUiComLine="/q /norestart" Options="xym" MD5="b1f068dcfcea78ec654cd3d120e1ebb7" TargetName="ASP.NET Core 3.1"/>
+    <ROW PrereqKey="D0156DFD814047AB868D49D0D15F8245" DisplayName=".NET Core Desktop Runtime 3.1.4 x64" VersionMin="3.1" SetupFileUrl="https://download.visualstudio.microsoft.com/download/pr/d8cf1fe3-21c2-4baf-988f-f0152996135e/0c00b94713ee93e7ad5b4f82e2b86607/windowsdesktop-runtime-3.1.4-win-x64.exe" Location="1" ExactSize="54480864" WinNTVersions="Windows 9x/ME/NT/2000/XP/Vista/Windows 7/Windows 8 x86/Windows 8.1 x86/Windows 10 x86" WinNT64Versions="Windows Vista x64, Windows Server 2008 x64, Windows 7 RTM x64, Windows Server 2008 R2 x64, Windows 8 x64, Windows Server 2012 x64, Windows 10 version 1507 x64, Windows 10 version 1511 x64" Operator="1" NoUiComLine="/q /norestart" Options="xym" MD5="7f402d44cf352d91fd29ac45e174b546" TargetName=".NET Core 3.1"/>
+    <ATTRIBUTE name="PrereqsOrder" value="C6FE8A2F0943D2B7A0CB204E12F1F4 D0156DFD814047AB868D49D0D15F8245"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.PreReqSearchComponent">
     <ROW SearchKey="C6FE8A2F0943D2B7A0CB204E12F1F4ASP.N" Prereq="C6FE8A2F0943D2B7A0CB204E12F1F4" SearchType="1" SearchString="HKLM\SOFTWARE\Microsoft\ASP.NET Core\Shared Framework\v3.1" VerMin="3.1.4" Order="1" Property="PreReqSearch_C6FE8A2F0943D2B7A0CB20"/>
+    <ROW SearchKey="D0156DFD814047AB868D49D0D15F8245Mic" Prereq="D0156DFD814047AB868D49D0D15F8245" SearchType="0" SearchString="[ProgramFiles64Folder]dotnet\shared\Microsoft.WindowsDesktop.App\3.1.4\Microsoft.WindowsDesktop.App.runtimeconfig.json" Order="1" Property="PreReqSearch_D0156DFD814047AB868D49"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.SynchronizedFolderComponent">
     <ROW Directory_="NotificationTemplates_Dir" SourcePath="..\Lithnet.AccessManager.Web\NotificationTemplates" Feature="MainFeature" ExcludePattern="*~|#*#|%*%|._|CVS|.cvsignore|SCCS|vssver.scc|mssccprj.scc|vssver2.scc|.svn|.DS_Store" ExcludeFlags="6"/>

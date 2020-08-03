@@ -46,6 +46,7 @@
         public const int LapsPasswordHistoryError = 611;
         public const int LapsPasswordError = 612;
         public const int AuthZError = 613;
+        public const int AppNotConfigured = 614;
 
         public const int OidcAuthZCodeError = 700;
         public const int ExternalAuthNProviderError = 701;

@@ -15,9 +15,9 @@ namespace Lithnet.AccessManager.Server.Authorization
         private readonly IDirectory directory;
         private readonly ILogger<AuthorizationContextProvider> logger;
         private readonly ConcurrentDictionary<SecurityIdentifier, AuthorizationContextDomainDetails> domainCache;
-        private readonly BuiltInProviderOptions options;
+        private readonly AuthorizationOptions options;
 
-        public AuthorizationContextProvider(IOptions<BuiltInProviderOptions> options, IDirectory directory, ILogger<AuthorizationContextProvider> logger)
+        public AuthorizationContextProvider(IOptions<AuthorizationOptions> options, IDirectory directory, ILogger<AuthorizationContextProvider> logger)
         {
             this.directory = directory;
             this.logger = logger;

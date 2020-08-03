@@ -1,0 +1,136 @@
+﻿<html>
+<head>
+    <title>Access to {computer.MsDsPrincipalName} was granted for {user.MsDsPrincipalName}</title>
+</head>
+<body style="font-family: Arial, Helvetica, sans-serif; color: #666; font-size: 14px">
+    <table style="font-family: Arial, Helvetica, sans-serif; color: #666; font-size: 14px; background: #fafafa; margin: 10px; border: #ccc 1px solid; border-radius: 3px; text-align: left">
+        <tbody>
+            <tr>
+                <th style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; text-align: left; background: #eaebec">
+                    Date
+                </th>
+                <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
+                    {datetime}
+                </td>
+            </tr>
+            <tr>
+                <th style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; text-align: left; background: #eaebec">
+                    Access type
+                </th>
+                <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
+                    {authZResult.AccessType}
+                </td>
+            </tr>
+            <tr>
+                <th style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; text-align: left; background: #eaebec">
+                    User name
+                </th>
+                <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
+                    {user.MsDsPrincipalName}
+                </td>
+            </tr>
+            <tr>
+                <th style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; text-align: left; background: #eaebec">
+                    User diplay name
+                </th>
+                <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
+                    {user.DisplayName}
+                </td>
+            </tr>
+            <tr>
+                <th style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; text-align: left; background: #eaebec">
+                    User DN
+                </th>
+                <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
+                    {user.DistinguishedName}
+                </td>
+            </tr>
+            <tr>
+                <th style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; text-align: left; background: #eaebec">
+                    User principal name
+                </th>
+                <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
+                    {user.UserPrincipalName}
+                </td>
+            </tr>
+            <tr>
+                <th style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; text-align: left; background: #eaebec">
+                    User SID
+                </th>
+                <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
+                    {user.Sid}
+                </td>
+            </tr>
+
+            <tr>
+                <th style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; text-align: left; background: #eaebec">
+                    User IP
+                </th>
+                <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
+                    {request.IPAddress}
+                </td>
+            </tr>
+
+            <tr>
+                <th style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; text-align: left; background: #eaebec">
+                    User Hostname
+                </th>
+                <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
+                    {request.HostName}
+                </td>
+            </tr>
+
+            <tr>
+                <th style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; text-align: left; background: #eaebec">
+                    Computer name
+                </th>
+                <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
+                    {computer.MsDsPrincipalName}
+                </td>
+            </tr>
+            <tr>
+                <th style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; text-align: left; background: #eaebec">
+                    Computer DN
+                </th>
+                <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
+                    {computer.DistinguishedName}
+                </td>
+            </tr>
+
+            <tr>
+                <th style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; text-align: left; background: #eaebec">
+                    Password expiry
+                </th>
+                <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
+                    {computer.LapsExpiryDate}
+                </td>
+            </tr>
+
+            <tr>
+                <th style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; text-align: left; background: #eaebec">
+                    Matched rule description
+                </th>
+                <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
+                    {AuthzResult.MatchedRuleDescription}
+                </td>
+            </tr>
+            <tr>
+                <th style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; text-align: left; background: #eaebec">
+                    Matched rule ID
+                </th>
+                <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
+                    {AuthzResult.MatchedRule}
+                </td>
+            </tr>
+            <tr>
+                <th style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; text-align: left; background: #eaebec">
+                    User-supplied request reason
+                </th>
+                <td style="padding: 1px; padding-left: 9px; padding-right: 9px; margin: 0px; background: #fafafa">
+                    {request.Reason}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

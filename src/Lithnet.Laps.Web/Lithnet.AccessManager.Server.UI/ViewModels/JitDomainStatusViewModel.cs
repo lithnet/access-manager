@@ -91,7 +91,7 @@ namespace Lithnet.AccessManager.Server.UI
                 try
                 {
 #if DEBUG
-                    if (Mapping.OverrideMode == 1)
+                    if (Mapping?.OverrideMode == 1)
                     {
                         this.PamStatus = "Enabled";
                         this.IsPamEnabled = true;
@@ -99,14 +99,14 @@ namespace Lithnet.AccessManager.Server.UI
                         this.DynamicGroupOU = null;
                         return;
                     }
-                    else if (Mapping.OverrideMode == 2)
+                    else if (Mapping?.OverrideMode == 2)
                     {
                         this.PamStatus = "Not supported";
                         this.IsPamNotSupported = true;
                         this.JitType = "Dynamic group";
                         return;
                     }
-                    else if (Mapping.OverrideMode == 3)
+                    else if (Mapping?.OverrideMode == 3)
                     {
                         this.PamStatus = "Available, but not enabled";
                         this.JitType = "Dynamic group";

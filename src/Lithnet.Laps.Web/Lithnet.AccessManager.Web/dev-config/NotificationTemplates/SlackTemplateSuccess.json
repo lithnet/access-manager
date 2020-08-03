@@ -1,0 +1,48 @@
+{
+  "blocks": [
+    {
+      "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": ":heavy_check_mark: *Access to a computer was granted*"
+      }
+    },
+    {
+      "type": "section",
+      "fields": [
+        {
+          "type": "mrkdwn",
+          "text": "*Access type:*\n{authZResult.AccessType}"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Name:*\n{user.DisplayName}"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*User name:*\n{user.MsDsPrincipalName}"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Computer:*\n{computer.MsDsPrincipalName}"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Password expiry:*\n{computer.LapsExpiryDate}"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Matched rule description:*\n{AuthzResult.MatchedRuleDescription}"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Matched rule ID:*\n{AuthzResult.MatchedRule}"
+        },
+        {
+          "type": "mrkdwn",
+          "text": "*Request reason:*\n{request.Reason}"
+        }
+      ]
+    }
+  ]
+}

@@ -15,11 +15,23 @@
     <Deterministic>false</Deterministic>
     <Platforms>AnyCPU;x86</Platforms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="NLog.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <COMReference Include="NetFwTypeLib.dll">
+      <Guid>58fbcf7c-e7a9-467c-80b3-fc65e8fcca08</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+    </COMReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -117,5 +129,9 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="&quot;C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe&quot; sign /sha1 &quot;$(CSCERTTHUMBPRINT)&quot; /t http://timestamp.digicert.com /fd sha256 /v &quot;$(TargetPath)&quot;&#xD;&#xA;&quot;C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\symstore&quot; add /f &quot;$(TargetDir)*.pdb&quot; /s \\localhost\symbols /t &quot;$(ProjectName)&quot; /v &quot;@(VersionNumber)&quot;&#xD;&#xA;" />
+  </Target>
 
 </Project>

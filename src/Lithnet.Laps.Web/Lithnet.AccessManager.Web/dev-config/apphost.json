@@ -2,9 +2,9 @@
   "Hosting": {
     "Environment": "HttpSys",
     "HttpSys": {
-      "HttpPort": 80,
-      "HttpsPort": 44337,
-      "Hostname": null,
+      "HttpPort": 5000,
+      "HttpsPort": 5001,
+      "Hostname": "",
       "Path": null,
       "MaxAccepts": 100,
       "EnableResponseCaching": false,

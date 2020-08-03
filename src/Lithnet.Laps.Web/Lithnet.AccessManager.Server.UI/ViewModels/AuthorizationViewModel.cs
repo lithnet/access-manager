@@ -11,7 +11,7 @@ namespace Lithnet.AccessManager.Server.UI
         public AuthorizationViewModel(AuthorizationOptions model, SecurityDescriptorTargetsViewModelFactory factory)
         {
             this.model = model;
-            this.Targets = factory.CreateViewModel(model.BuiltInProvider.Targets);
+            this.Targets = factory.CreateViewModel(model.Targets);
         }
 
         public SecurityDescriptorTargetsViewModel Targets { get; }

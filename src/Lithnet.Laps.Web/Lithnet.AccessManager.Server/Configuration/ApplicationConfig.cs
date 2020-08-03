@@ -8,22 +8,22 @@ namespace Lithnet.AccessManager.Server.Configuration
     {
         [JsonIgnore]
         public string Path { get; set; }
-               
-        public AuthenticationOptions Authentication { get; set; }
-        
-        public AuthorizationOptions Authorization { get; set; }
 
-        public AuditOptions Auditing { get; set; }
+        public AuthenticationOptions Authentication { get; set; } = new AuthenticationOptions();
 
-        public EmailOptions Email { get; set; }
+        public AuthorizationOptions Authorization { get; set; } = new AuthorizationOptions();
 
-        public RateLimitOptions RateLimits { get; set; }
+        public AuditOptions Auditing { get; set; } = new AuditOptions();
 
-        public UserInterfaceOptions UserInterface { get; set; }
+        public EmailOptions Email { get; set; } = new EmailOptions();
 
-        public ForwardedHeadersAppOptions ForwardedHeaders { get; set; }
-        
-        public JitConfigurationOptions JitConfiguration { get; set; }
+        public RateLimitOptions RateLimits { get; set; } = new RateLimitOptions();
+
+        public UserInterfaceOptions UserInterface { get; set; } = new UserInterfaceOptions();
+
+        public ForwardedHeadersAppOptions ForwardedHeaders { get; set; } = new ForwardedHeadersAppOptions();
+
+        public JitConfigurationOptions JitConfiguration { get; set; } = new JitConfigurationOptions();
 
         [JsonExtensionData]
         public IDictionary<string, object> OtherData { get; set; }

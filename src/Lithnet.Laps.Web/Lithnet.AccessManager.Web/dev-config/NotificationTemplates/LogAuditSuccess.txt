@@ -1,0 +1,16 @@
+﻿AUDIT: SUCCESS
+Access type:               {AuthzResult.AccessType}
+Username:                  {user.MsDsPrincipalName}
+Name:                      {user.DisplayName}
+UPN:                       {user.UserPrincipalName}
+SID:                       {user.Sid}
+User DN:                   {user.DistinguishedName}
+Requestor IP:              {request.IPAddress}
+Requestor Hostname:        {request.HostName}
+Computer name:             {computer.MsDsPrincipalName}
+Computer DN:               {computer.DistinguishedName}
+Password expiry:           {computer.LapsExpiryDate}
+Matched rule:              {AuthzResult.MatchedRule}
+Matched rule description:  {AuthzResult.MatchedRuleDescription}
+AuthZ response:            {AuthzResult.ResponseCode}
+Request reason:            {request.Reason}

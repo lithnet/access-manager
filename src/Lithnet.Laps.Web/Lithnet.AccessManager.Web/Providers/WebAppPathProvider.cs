@@ -1,16 +1,18 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Win32;
 
 namespace Lithnet.AccessManager.Web.Internal
 {
     public class WebAppPathProvider : IAppPathProvider
     {
-        private readonly IHostEnvironment env;
-
         public WebAppPathProvider(IHostEnvironment env)
         {
-            this.env = env;
-            this.AppPath = env.ContentRootPath;
+            RegistryKey key = Registry.LocalMachine.OpenSubKey(Constants.BaseKey, false);
+            string appPath = key?.GetValue("BasePath", null) as string ?? env.ContentRootPath;
+
+            this.AppPath = appPath.TrimEnd('\\');
             this.TemplatesPath = $"{AppPath}\\NotificationTemplates";
             this.ConfigFile = $"{AppPath}\\appsettings.json";
             this.HostingConfigFile = $"{AppPath}\\apphost.json";

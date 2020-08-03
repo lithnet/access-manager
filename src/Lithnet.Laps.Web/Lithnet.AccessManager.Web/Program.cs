@@ -1,17 +1,14 @@
 using System.IO;
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using Lithnet.AccessManager.Web.Internal;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.EventLog;
+using Microsoft.Win32;
 using NLog.Web;
 
 [assembly: InternalsVisibleTo("Lithnet.AccessManager.Test")]
-
 namespace Lithnet.AccessManager.Web
 {
     public class Program
@@ -23,9 +20,23 @@ namespace Lithnet.AccessManager.Web
 
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
+            RegistryKey key = Registry.LocalMachine.OpenSubKey(Constants.BaseKey, false);
+
+            if (key?.GetValue("Configured", 0) is int configured && configured == 0)
+            {
+                return Host.CreateDefaultBuilder().ConfigureServices((hostContext, services) =>
+                    {
+                        services.AddHostedService<UnconfiguredHost>();
+                    })
+                    .UseWindowsService()
+                    .ConfigureAccessManagerLogging();
+            }
+
             var host = new HostBuilder();
 
             host.UseContentRoot(Directory.GetCurrentDirectory());
+
+            string basePath = key?.GetValue("BasePath") as string;
 
             host.ConfigureHostConfiguration(config =>
             {
@@ -40,52 +51,15 @@ namespace Lithnet.AccessManager.Web
 
             host.ConfigureAppConfiguration((hostingContext, config) =>
             {
-                var env = hostingContext.HostingEnvironment;
-                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
-                    .AddJsonFile("appsecrets.json", optional: true, reloadOnChange: true)
-                    .AddJsonFile("apphost.json", optional: false, reloadOnChange: true)
-                    .AddEnvironmentVariables("AccessManagerService");
-                
+                config.ConfigureAppSettings();
+
                 if (args != null)
                 {
                     config.AddCommandLine(args);
                 }
             });
 
-            host.ConfigureLogging((hostingContext, logging) =>
-            {
-                var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-                var env = hostingContext.HostingEnvironment;
-
-                // IMPORTANT: This needs to be added *before* configuration is loaded, this lets
-                // the defaults be overridden by the configuration.
-                if (isWindows)
-                {
-                    // Default the EventLogLoggerProvider to warning or above
-                    logging.AddFilter<EventLogLoggerProvider>(level => level >= LogLevel.Warning);
-                }
-
-                logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
-
-                if (env.IsDevelopment())
-                {
-                    logging.AddConsole();
-                    logging.AddDebug();
-                }
-
-                logging.AddEventSourceLogger();
-
-                if (isWindows)
-                {
-                    // Add the EventLogLoggerProvider on windows machines
-                    logging.AddEventLog(eventLogSettings =>
-                    {
-                        eventLogSettings.LogName = "Lithnet Access Manager";
-                        eventLogSettings.SourceName = "Lithnet Access Manager Service";
-                    });
-                }
-            });
+            host.ConfigureAccessManagerLogging();
 
             host.UseDefaultServiceProvider((context, options) =>
             {
@@ -96,13 +70,8 @@ namespace Lithnet.AccessManager.Web
 
             host.ConfigureWebHostDefaults(webBuilder =>
             {
-                var httpsysConfig = new ConfigurationBuilder()
-                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                    .AddJsonFile("apphost.json", optional: false)
-                    .AddEnvironmentVariables("AccessManagerService")
-                    .AddCommandLine(args)
-                    .Build();
-
+                var httpsysConfig = new ConfigurationBuilder().ConfigureAppSettings().Build();
+                    
                 webBuilder.UseHttpSys(httpsysConfig);
                 webBuilder.UseStartup<Startup>();
             });

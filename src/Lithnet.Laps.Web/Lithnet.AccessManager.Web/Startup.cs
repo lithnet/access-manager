@@ -88,7 +88,6 @@ namespace Lithnet.AccessManager.Web
             services.Configure<AuthorizationOptions>(Configuration.GetSection("Authorization"));
             services.Configure<ForwardedHeadersAppOptions>(Configuration.GetSection("ForwardedHeaders"));
             services.Configure<JitConfigurationOptions>(Configuration.GetSection("JitConfiguration"));
-            services.Configure<BuiltInProviderOptions>(Configuration.GetSection("Authorization:BuiltInProvider"));
 
             this.ConfigureAuthentication(services);
         }
@@ -139,7 +138,7 @@ namespace Lithnet.AccessManager.Web
                 AuthenticationMode.Certificate => provider.GetService<ICertificateAuthenticationProvider>(),
                 _ => throw new ConfigurationErrorsException("The authentication mode setting in the configuration file was unknown")
             };
-
+            
             authProvider.Configure(services);
             services.TryAddSingleton<IAuthenticationProvider>(authProvider);
         }

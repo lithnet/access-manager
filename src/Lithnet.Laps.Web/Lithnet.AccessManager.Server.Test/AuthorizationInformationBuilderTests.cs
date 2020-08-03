@@ -36,7 +36,7 @@ namespace Lithnet.AccessManager.Server.Test
             logger = Global.LogFactory.CreateLogger<AuthorizationInformationBuilder>();
             powershell = Mock.Of<IPowerShellSecurityDescriptorGenerator>();
             targetDataProvider = new TargetDataProvider(new TargetDataCache(), Global.LogFactory.CreateLogger<TargetDataProvider>());
-            authorizationContextProvider = new AuthorizationContextProvider(Mock.Of<IOptions<BuiltInProviderOptions>>(), directory, Global.LogFactory.CreateLogger<AuthorizationContextProvider>());
+            authorizationContextProvider = new AuthorizationContextProvider(Mock.Of<IOptions<AuthorizationOptions>>(), directory, Global.LogFactory.CreateLogger<AuthorizationContextProvider>());
         }
 
         [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.Laps, AccessMask.None, AccessMask.Laps)]
@@ -444,23 +444,23 @@ namespace Lithnet.AccessManager.Server.Test
         }
 
 
-        private IOptionsSnapshot<BuiltInProviderOptions> SetupOptionsForOUTarget(AccessMask allowed, AccessMask denied, string ou, ISecurityPrincipal trustee)
+        private IOptionsSnapshot<AuthorizationOptions> SetupOptionsForOUTarget(AccessMask allowed, AccessMask denied, string ou, ISecurityPrincipal trustee)
         {
             return SetupOptions(CreateTarget(allowed, denied, ou, trustee));
         }
 
-        private IOptionsSnapshot<BuiltInProviderOptions> SetupOptionsForComputerTarget(AccessMask allowed, AccessMask denied, IComputer computer, ISecurityPrincipal trustee)
+        private IOptionsSnapshot<AuthorizationOptions> SetupOptionsForComputerTarget(AccessMask allowed, AccessMask denied, IComputer computer, ISecurityPrincipal trustee)
         {
             return SetupOptions(CreateTarget(allowed, denied, computer, trustee));
         }
 
-        private IOptionsSnapshot<BuiltInProviderOptions> SetupOptions(params SecurityDescriptorTarget[] targets)
+        private IOptionsSnapshot<AuthorizationOptions> SetupOptions(params SecurityDescriptorTarget[] targets)
         {
-            BuiltInProviderOptions options = new BuiltInProviderOptions();
+            AuthorizationOptions options = new AuthorizationOptions();
             options.Targets = new List<SecurityDescriptorTarget>(targets);
 
-            Mock<IOptionsSnapshot<BuiltInProviderOptions>> optionsSnapshot = new Mock<IOptionsSnapshot<BuiltInProviderOptions>>();
-            optionsSnapshot.SetupGet(t => t.Value).Returns((BuiltInProviderOptions)options);
+            Mock<IOptionsSnapshot<AuthorizationOptions>> optionsSnapshot = new Mock<IOptionsSnapshot<AuthorizationOptions>>();
+            optionsSnapshot.SetupGet(t => t.Value).Returns((AuthorizationOptions)options);
             return optionsSnapshot.Object;
         }
 

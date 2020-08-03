@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using Microsoft.Win32;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -6,7 +8,10 @@ namespace Lithnet.AccessManager.Server.UI
     {
         public AppPathProvider()
         {
-            this.AppPath = @"D:\dev\git\lithnet\laps-web\src\Lithnet.Laps.Web\Lithnet.AccessManager.Web";
+            RegistryKey key = Registry.LocalMachine.OpenSubKey(AccessManager.Constants.BaseKey, false);
+            string appPath = key?.GetValue("BasePath", null) as string ?? key?.GetValue("Path", null) as string ?? Environment.CurrentDirectory;
+
+            this.AppPath = appPath.TrimEnd('\\');
             this.TemplatesPath = $"{AppPath}\\NotificationTemplates";
             this.ConfigFile = $"{AppPath}\\appsettings.json";
             this.HostingConfigFile = $"{AppPath}\\apphost.json";

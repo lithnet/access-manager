@@ -22,7 +22,7 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         private readonly ILogger logger;
 
-        private readonly BuiltInProviderOptions options;
+        private readonly AuthorizationOptions options;
 
         private readonly IPowerShellSecurityDescriptorGenerator powershell;
 
@@ -32,7 +32,7 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         private readonly IAuthorizationContextProvider authorizationContextProvider;
 
-        public AuthorizationInformationBuilder(IOptionsSnapshot<BuiltInProviderOptions> options, IDirectory directory, ILogger<AuthorizationInformationBuilder> logger, IPowerShellSecurityDescriptorGenerator powershell, IAuthorizationInformationMemoryCache authzCache, ITargetDataProvider targetDataProvider, IAuthorizationContextProvider authorizationContextProvider)
+        public AuthorizationInformationBuilder(IOptionsSnapshot<AuthorizationOptions> options, IDirectory directory, ILogger<AuthorizationInformationBuilder> logger, IPowerShellSecurityDescriptorGenerator powershell, IAuthorizationInformationMemoryCache authzCache, ITargetDataProvider targetDataProvider, IAuthorizationContextProvider authorizationContextProvider)
         {
             this.directory = directory;
             this.logger = logger;

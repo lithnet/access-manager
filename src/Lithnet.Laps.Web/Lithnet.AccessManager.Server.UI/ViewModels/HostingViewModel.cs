@@ -17,6 +17,8 @@ using Lithnet.AccessManager.Server.UI.Interop;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
+using NetFwTypeLib;
 using Newtonsoft.Json;
 using SslCertBinding.Net;
 using Stylet;
@@ -153,21 +155,34 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task<bool> CommitSettings()
         {
+            if (this.Certificate == null)
+            {
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", "You must select a HTTPS certificate");
+                return false;
+            }
+
+            RegistryKey key = Registry.LocalMachine.OpenSubKey(AccessManager.Constants.BaseKey, false);
+
+            bool currentlyUnconfigured = !(key?.GetValue("Configured", 0) is int value) || value == 0;
+
             bool updatePrivateKeyPermissions =
                 this.ServiceAccount != this.OriginalServiceAccount ||
-                this.Certificate?.Thumbprint != this.OriginalCertificate?.Thumbprint;
+                this.Certificate?.Thumbprint != this.OriginalCertificate?.Thumbprint ||
+                currentlyUnconfigured;
 
             bool updateHttpReservations =
                 this.WorkingModel.HttpSys.Hostname != this.OriginalModel.HttpSys.Hostname ||
                 this.WorkingModel.HttpSys.HttpPort != this.OriginalModel.HttpSys.HttpPort ||
                 this.WorkingModel.HttpSys.HttpsPort != this.OriginalModel.HttpSys.HttpsPort ||
-                this.ServiceAccount != this.OriginalServiceAccount;
+                this.ServiceAccount != this.OriginalServiceAccount ||
+                currentlyUnconfigured;
 
             bool updateConfigFile = updateHttpReservations;
 
             bool updateCertificateBinding =
                 this.WorkingModel.HttpSys.HttpsPort != this.OriginalModel.HttpSys.HttpsPort ||
-                this.Certificate?.Thumbprint != this.OriginalCertificate?.Thumbprint;
+                this.Certificate?.Thumbprint != this.OriginalCertificate?.Thumbprint ||
+                currentlyUnconfigured;
 
             bool updateServiceAccount = this.workingServiceAccountUserName != null;
 
@@ -202,6 +217,21 @@ namespace Lithnet.AccessManager.Server.UI
                 this.TryRollbackHttpReservations();
 
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not create the HTTP reservations\r\n{ex.Message}");
+                return false;
+            }
+
+            try
+            {
+                if (updateHttpReservations)
+                {
+                    this.ReplaceFirewallRules();
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Error updating the firewall rules");
+
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not update the firewall rules. Please manually update them to ensure your users can access the application\r\n{ex.Message}");
                 return false;
             }
 
@@ -542,9 +572,7 @@ namespace Lithnet.AccessManager.Server.UI
         private void CreateCertificateBinding(X509Certificate2 cert, int port)
         {
             var config = new CertificateBindingConfiguration();
-            CertificateBinding binding = new CertificateBinding(cert.Thumbprint, "My", new IPEndPoint(IPAddress.Parse("0.0.0.0"), port), HttpSysHostingOptions.AppId, new BindingOptions
-            {
-            });
+            CertificateBinding binding = new CertificateBinding(cert.Thumbprint, "My", new IPEndPoint(IPAddress.Parse("0.0.0.0"), port), HttpSysHostingOptions.AppId, new BindingOptions());
             config.Bind(binding);
         }
 
@@ -631,6 +659,57 @@ namespace Lithnet.AccessManager.Server.UI
             X509Store store = new X509Store(storeName, StoreLocation.LocalMachine, OpenFlags.ReadOnly);
 
             return store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false).OfType<X509Certificate2>().FirstOrDefault();
+        }
+
+        private void ReplaceFirewallRules()
+        {
+            var firewallPolicyType = Type.GetTypeFromProgID("HNetCfg.FwPolicy2");
+
+            if (firewallPolicyType == null)
+            {
+                throw new InvalidOperationException("Unable to find type 'HNetCfg.FwPolicy2'");
+            }
+
+            INetFwPolicy2 firewallPolicy = (INetFwPolicy2)Activator.CreateInstance(firewallPolicyType);
+
+            if (firewallPolicy == null)
+            {
+                throw new InvalidOperationException("Unable to create type 'HNetCfg.FwPolicy2'");
+            }
+
+            try
+            {
+                firewallPolicy.Rules.Remove(Constants.FirewallRuleName);
+            }
+            catch
+            {
+                // ignore
+            }
+
+            var firewallRuleType = Type.GetTypeFromProgID("HNetCfg.FWRule");
+
+            if (firewallRuleType == null)
+            {
+                throw new InvalidOperationException("Unable to find type 'HNetCfg.FWRule'");
+            }
+
+            INetFwRule firewallRule = (INetFwRule)Activator.CreateInstance(firewallRuleType);
+
+            if (firewallRule == null)
+            {
+                throw new InvalidOperationException("Unable to create type 'HNetCfg.FWRule'");
+            }
+
+            firewallRule.ApplicationName = this.pathProvider.GetFullPath(Constants.ServiceExeName, this.pathProvider.AppPath);
+            firewallRule.Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW;
+            firewallRule.Description = "Permits access to the Lithnet Access Manager Web Service";
+            firewallRule.Enabled = true;
+            firewallRule.Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN;
+            firewallRule.Protocol = 6; //TCP
+            firewallRule.LocalPorts = $"{this.HttpPort},{this.HttpsPort}";
+            firewallRule.InterfaceTypes = "All";
+            firewallRule.Name = Constants.FirewallRuleName;
+            firewallPolicy.Rules.Add(firewallRule);
         }
 
         private async Task PollServiceStatus(CancellationToken token)

@@ -13,7 +13,7 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public bool UseSsl { get; set; }
 
-        public bool UseDefaultCredentials { get; set; }
+        public bool UseDefaultCredentials { get; set; } = true;
 
         public string Username { get; set; }
 

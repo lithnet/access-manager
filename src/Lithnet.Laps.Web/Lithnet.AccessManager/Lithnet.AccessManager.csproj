@@ -12,8 +12,10 @@
     <Version>1.0.$([System.DateTime]::UtcNow.Date.Subtract($([System.DateTime]::Parse("2000-01-01"))).TotalDays)</Version>
     <Deterministic>false</Deterministic>
     <Platforms>AnyCPU;x86</Platforms>
+    <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="lithnet.security.authorization" Version="1.0.7518.2238" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.6" />

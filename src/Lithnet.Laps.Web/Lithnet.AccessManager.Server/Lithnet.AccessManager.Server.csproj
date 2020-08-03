@@ -12,8 +12,10 @@
     <Version>1.0.$([System.DateTime]::UtcNow.Date.Subtract($([System.DateTime]::Parse("2000-01-01"))).TotalDays)</Version>
     <Deterministic>false</Deterministic>
     <Platforms>AnyCPU;x86</Platforms>
+    <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
-
+ 
   <ItemGroup>
     <PackageReference Include="htmlagilitypack" Version="1.11.24" />
     <PackageReference Include="lithnet.security.authorization" Version="1.0.7518.2238" />
@@ -45,5 +47,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="&quot;C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe&quot; sign /sha1 &quot;$(CSCERTTHUMBPRINT)&quot; /t http://timestamp.digicert.com /fd sha256 /v &quot;$(TargetPath)&quot;&#xD;&#xA;&quot;C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\symstore&quot; add /f &quot;$(TargetDir)*.pdb&quot; /s \\localhost\symbols /t &quot;$(ProjectName)&quot; /v &quot;@(VersionNumber)&quot;&#xD;&#xA;" />
+  </Target>
 
 </Project>

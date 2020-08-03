@@ -8,9 +8,9 @@ namespace Lithnet.AccessManager.Server.Configuration
         [JsonConverter(typeof(StringEnumConverter))]
         public AuthenticationMode Mode { get; set; }
 
-        public IwaAuthenticationProviderOptions Iwa { get; set; }
+        public IwaAuthenticationProviderOptions Iwa { get; set; } 
 
-        public OidcAuthenticationProviderOptions Oidc { get; set; }
+        public OidcAuthenticationProviderOptions Oidc { get; set; } 
 
         public WsFedAuthenticationProviderOptions WsFed { get; set; }
 

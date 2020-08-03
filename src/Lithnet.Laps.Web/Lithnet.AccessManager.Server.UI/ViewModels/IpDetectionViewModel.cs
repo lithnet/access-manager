@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
@@ -19,6 +21,8 @@ namespace Lithnet.AccessManager.Server.UI
         {
             this.model = model;
             this.dialogCoordinator = dialogCoordinator;
+            this.model.KnownNetworks ??= new List<string>();
+            this.model.KnownProxies ??= new List<string>();
             this.KnownProxies = new BindableCollection<string>(model.KnownProxies);
             this.KnownNetworks = new BindableCollection<string>(model.KnownNetworks);
             eventPublisher.Register(this);

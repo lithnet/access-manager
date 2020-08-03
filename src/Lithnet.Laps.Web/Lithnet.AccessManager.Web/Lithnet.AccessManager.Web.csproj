@@ -17,6 +17,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="dev-config\apphost.json" />
+    <Content Remove="dev-config\appsecrets.json" />
+    <Content Remove="dev-config\appsettings.json" />
+    <Content Remove="dev-config\NotificationTemplates\SlackTemplateFailure.json" />
+    <Content Remove="dev-config\NotificationTemplates\SlackTemplateSuccess.json" />
+    <Content Remove="dev-config\NotificationTemplates\TeamsTemplateFailure.json" />
+    <Content Remove="dev-config\NotificationTemplates\TeamsTemplateSuccess.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="NotificationTemplates\EmailAuditFailure.html" />
     <None Remove="NotificationTemplates\EmailAuditSuccess.html" />
     <None Remove="NotificationTemplates\LogAuditFailure.txt" />
@@ -48,6 +58,13 @@
 
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="dev-config\apphost.json" />
+    <None Include="dev-config\appsecrets.json" />
+    <None Include="dev-config\appsettings.json" />
+    <None Include="dev-config\NotificationTemplates\SlackTemplateFailure.json" />
+    <None Include="dev-config\NotificationTemplates\SlackTemplateSuccess.json" />
+    <None Include="dev-config\NotificationTemplates\TeamsTemplateFailure.json" />
+    <None Include="dev-config\NotificationTemplates\TeamsTemplateSuccess.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -96,13 +113,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="appsecrets.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </Content>
-    <Content Update="apphost.Development.json">
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </Content>
     <Content Update="libman.json" CopyToPublishDirectory="Never" CopyToOutputDirectory="Never">
     </Content>
     <Content Update="wwwroot\images\custom.png">

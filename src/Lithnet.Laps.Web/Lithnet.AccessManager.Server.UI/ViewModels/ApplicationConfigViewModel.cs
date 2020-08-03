@@ -5,6 +5,7 @@ using System.Windows.Media.Animation;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -72,13 +73,29 @@ namespace Lithnet.AccessManager.Server.UI
 
             try
             {
-                return await this.hosting.CommitSettings();
+                if (!await this.hosting.CommitSettings())
+                {
+                    return false;
+                }
             }
             catch (Exception ex)
             {
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error saving service configuration", $"There was a problem updating the service configuration\r\n{ex.Message}");
                 return false;
             }
+
+            try
+            {
+                RegistryKey key = Registry.LocalMachine.CreateSubKey(AccessManager.Constants.BaseKey, true);
+                key.SetValue("Configured", 1);
+            }
+            catch (Exception ex)
+            {
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error writing to registry", $"There was a problem writing the updated config to the registry\r\n{ex.Message}");
+                return false;
+            }
+
+            return true;
         }
     }
 }

@@ -206,19 +206,5 @@
             </Button>
 
         </StackPanel>
-
-
-        <Expander Style="{x:Null}" 
-                  Header="Permission information"
-                  Margin="5">
-            <StackPanel>
-
-                <TextBlock Margin="5"
-                           TextWrapping="Wrap">The built-in group "Windows Authorization Access Group" grants permissions that are required for the service account to calculate group membership of users within a domain. This is required for all installations.</TextBlock>
-                <TextBlock Margin="5"
-                           TextWrapping="Wrap">The built-in group "Access Control Assistance Operators" grants permissions that are required for the service account to calculate group membership of users from across a forest trust. This is only required where a trust is in place between forests</TextBlock>
-
-            </StackPanel>
-        </Expander>
     </StackPanel>
 </UserControl>
