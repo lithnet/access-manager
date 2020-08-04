@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
@@ -208,17 +209,38 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 if (updateHttpReservations)
                 {
+                    string httpOld = this.OriginalModel.HttpSys.BuildHttpUrlPrefix();
+                    string httpsOld = this.OriginalModel.HttpSys.BuildHttpsUrlPrefix();
+                    string httpNew = this.WorkingModel.HttpSys.BuildHttpUrlPrefix();
+                    string httpsNew = this.WorkingModel.HttpSys.BuildHttpsUrlPrefix();
+
+                    if (this.IsReservationInUse(currentlyUnconfigured, httpOld, httpNew, out string user))
+                    {
+                        var result = await this.dialogCoordinator.ShowMessageAsync(this, "Warning", $"The HTTP URL '{this.WorkingModel.HttpSys.BuildHttpUrlPrefix()}' is already registered to user {user}. Do you want to overwrite it?", MessageDialogStyle.AffirmativeAndNegative);
+
+                        if (result == MessageDialogResult.Negative)
+                        {
+                            return false;
+                        }
+                    }
+
+                    if (this.IsReservationInUse(currentlyUnconfigured, httpsOld, httpsNew, out user))
+                    {
+                        var result = await this.dialogCoordinator.ShowMessageAsync(this, "Warning", $"The HTTPS URL '{this.WorkingModel.HttpSys.BuildHttpsUrlPrefix()}' is already registered to user {user}. Do you want to overwrite it?", MessageDialogStyle.AffirmativeAndNegative);
+
+                        if (result == MessageDialogResult.Negative)
+                        {
+                            return false;
+                        }
+                    }
+
                     this.CreateNewHttpReservations();
                 }
             }
             catch (Exception ex)
             {
                 this.logger.LogError(ex, "Error creating HTTP reservations");
-                if (!currentlyUnconfigured)
-                {
-                    this.TryRollbackHttpReservations();
-                }
-
+                this.TryRollbackHttpReservations(currentlyUnconfigured);
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not create the HTTP reservations\r\n{ex.Message}");
                 return false;
             }
@@ -227,11 +249,13 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 if (updateHttpReservations)
                 {
-                    this.ReplaceFirewallRules();
+                    this.ReplaceFirewallRules(this.HttpPort, this.HttpsPort);
                 }
             }
             catch (Exception ex)
             {
+                this.TryRollbackFirewallRules(currentlyUnconfigured);
+
                 this.logger.LogError(ex, "Error updating the firewall rules");
 
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not update the firewall rules. Please manually update them to ensure your users can access the application\r\n{ex.Message}");
@@ -263,14 +287,12 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 this.logger.LogError(ex, "Error creating certificate binding");
 
-                if (!currentlyUnconfigured)
-                {
-                    this.TryRollbackCertificateBinding();
-                }
+                this.TryRollbackCertificateBinding(currentlyUnconfigured);
 
-                if (!currentlyUnconfigured && updateHttpReservations)
+                if (updateHttpReservations)
                 {
-                    this.TryRollbackHttpReservations();
+                    this.TryRollbackHttpReservations(currentlyUnconfigured);
+                    this.TryRollbackFirewallRules(currentlyUnconfigured);
                 }
 
                 if (updateConfigFile)
@@ -298,14 +320,15 @@ namespace Lithnet.AccessManager.Server.UI
 
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The service account could not be changed\r\n{ex.Message}");
 
-                if (!currentlyUnconfigured && updateCertificateBinding)
+                if (updateCertificateBinding)
                 {
-                    this.TryRollbackCertificateBinding();
+                    this.TryRollbackCertificateBinding(currentlyUnconfigured);
                 }
 
-                if (!currentlyUnconfigured && updateHttpReservations)
+                if (updateHttpReservations)
                 {
-                    this.TryRollbackHttpReservations();
+                    this.TryRollbackHttpReservations(currentlyUnconfigured);
+                    this.TryRollbackFirewallRules(currentlyUnconfigured);
                 }
 
                 if (updateConfigFile)
@@ -582,6 +605,54 @@ namespace Lithnet.AccessManager.Server.UI
             config.Bind(binding);
         }
 
+        private bool IsReservationInUse(bool currentlyUnconfigured, string oldurl, string newurl, out string user)
+        {
+            user = null;
+
+            if (!currentlyUnconfigured && oldurl == newurl)
+            {
+                return false;
+            }
+
+            var acl = this.GetUrlReservation(newurl);
+
+            if (acl == null)
+            {
+                return false;
+            }
+
+            SecurityIdentifier currentOwner = null;
+
+            CommonSecurityDescriptor sd = new CommonSecurityDescriptor(false, false, acl.Sddl);
+            foreach (var dacl in sd.DiscretionaryAcl.OfType<CommonAce>())
+            {
+                if (dacl.SecurityIdentifier == this.ServiceAccount ||
+                    dacl.SecurityIdentifier == this.OriginalServiceAccount)
+                {
+                    return false;
+                }
+
+                currentOwner = dacl.SecurityIdentifier;
+            }
+
+            if (currentOwner == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                user = ((NTAccount)currentOwner.Translate(typeof(NTAccount))).Value;
+            }
+            catch
+            {
+                user = currentOwner.ToString();
+            }
+
+            return true;
+        }
+
+
         private void CreateNewHttpReservations()
         {
             if (this.ServiceAccount == null)
@@ -591,12 +662,16 @@ namespace Lithnet.AccessManager.Server.UI
 
             string httpOld = this.OriginalModel.HttpSys.BuildHttpUrlPrefix();
             string httpsOld = this.OriginalModel.HttpSys.BuildHttpsUrlPrefix();
+            string httpNew = this.WorkingModel.HttpSys.BuildHttpUrlPrefix();
+            string httpsNew = this.WorkingModel.HttpSys.BuildHttpsUrlPrefix();
 
             this.DeleteUrlReservation(httpOld);
             this.DeleteUrlReservation(httpsOld);
+            this.DeleteUrlReservation(httpNew);
+            this.DeleteUrlReservation(httpsNew);
 
-            this.CreateUrlReservation(this.WorkingModel.HttpSys.BuildHttpUrlPrefix(), this.ServiceAccount);
-            this.CreateUrlReservation(this.WorkingModel.HttpSys.BuildHttpsUrlPrefix(), this.ServiceAccount);
+            this.CreateUrlReservation(httpNew, this.ServiceAccount);
+            this.CreateUrlReservation(httpsNew, this.ServiceAccount);
         }
 
         private void CreateUrlReservation(string url, SecurityIdentifier sid)
@@ -608,11 +683,24 @@ namespace Lithnet.AccessManager.Server.UI
         {
             foreach (var acl in UrlAcl.GetAllBindings())
             {
-                if (acl.Prefix == url)
+                if (string.Equals(acl.Prefix, url, StringComparison.OrdinalIgnoreCase))
                 {
                     UrlAcl.Delete(acl.Prefix);
                 }
             }
+        }
+
+        private UrlAcl GetUrlReservation(string url)
+        {
+            foreach (var acl in UrlAcl.GetAllBindings())
+            {
+                if (string.Equals(acl.Prefix, url, StringComparison.OrdinalIgnoreCase))
+                {
+                    return acl;
+                }
+            }
+
+            return null;
         }
 
         private X509Certificate2Collection GetAvailableCertificateCollection()
@@ -667,31 +755,27 @@ namespace Lithnet.AccessManager.Server.UI
             return store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false).OfType<X509Certificate2>().FirstOrDefault();
         }
 
-        private void ReplaceFirewallRules()
+        private void ReplaceFirewallRules(int httpPort, int httpsPort)
         {
-            var firewallPolicyType = Type.GetTypeFromProgID("HNetCfg.FwPolicy2");
+            this.DeleteFirewallRules();
 
-            if (firewallPolicyType == null)
-            {
-                throw new InvalidOperationException("Unable to find type 'HNetCfg.FwPolicy2'");
-            }
+            INetFwPolicy2 firewallPolicy = GetFirewallPolicyObject();
+            INetFwRule firewallRule = CreateFirewallRuleInstance();
 
-            INetFwPolicy2 firewallPolicy = (INetFwPolicy2)Activator.CreateInstance(firewallPolicyType);
+            firewallRule.ApplicationName = this.pathProvider.GetFullPath(Constants.ServiceExeName, this.pathProvider.AppPath);
+            firewallRule.Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW;
+            firewallRule.Description = "Permits access to the Lithnet Access Manager Web Service";
+            firewallRule.Enabled = true;
+            firewallRule.Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN;
+            firewallRule.Protocol = 6; //TCP
+            firewallRule.LocalPorts = $"{httpPort},{httpsPort}";
+            firewallRule.InterfaceTypes = "All";
+            firewallRule.Name = Constants.FirewallRuleName;
+            firewallPolicy.Rules.Add(firewallRule);
+        }
 
-            if (firewallPolicy == null)
-            {
-                throw new InvalidOperationException("Unable to create type 'HNetCfg.FwPolicy2'");
-            }
-
-            try
-            {
-                firewallPolicy.Rules.Remove(Constants.FirewallRuleName);
-            }
-            catch
-            {
-                // ignore
-            }
-
+        private static INetFwRule CreateFirewallRuleInstance()
+        {
             var firewallRuleType = Type.GetTypeFromProgID("HNetCfg.FWRule");
 
             if (firewallRuleType == null)
@@ -706,16 +790,59 @@ namespace Lithnet.AccessManager.Server.UI
                 throw new InvalidOperationException("Unable to create type 'HNetCfg.FWRule'");
             }
 
-            firewallRule.ApplicationName = this.pathProvider.GetFullPath(Constants.ServiceExeName, this.pathProvider.AppPath);
-            firewallRule.Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW;
-            firewallRule.Description = "Permits access to the Lithnet Access Manager Web Service";
-            firewallRule.Enabled = true;
-            firewallRule.Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN;
-            firewallRule.Protocol = 6; //TCP
-            firewallRule.LocalPorts = $"{this.HttpPort},{this.HttpsPort}";
-            firewallRule.InterfaceTypes = "All";
-            firewallRule.Name = Constants.FirewallRuleName;
-            firewallPolicy.Rules.Add(firewallRule);
+            return firewallRule;
+        }
+
+        private static INetFwPolicy2 GetFirewallPolicyObject()
+        {
+            var firewallPolicyType = Type.GetTypeFromProgID("HNetCfg.FwPolicy2");
+
+            if (firewallPolicyType == null)
+            {
+                throw new InvalidOperationException("Unable to find type 'HNetCfg.FwPolicy2'");
+            }
+
+            INetFwPolicy2 firewallPolicy = (INetFwPolicy2)Activator.CreateInstance(firewallPolicyType);
+
+            if (firewallPolicyType == null)
+            {
+                throw new InvalidOperationException("Unable to find type 'HNetCfg.FwPolicy2'");
+            }
+
+            return firewallPolicy;
+        }
+
+        private void DeleteFirewallRules()
+        {
+            INetFwPolicy2 firewallPolicy = GetFirewallPolicyObject();
+
+            try
+            {
+                firewallPolicy.Rules.Remove(Constants.FirewallRuleName);
+            }
+            catch
+            {
+                // ignore
+            }
+        }
+
+        private void TryRollbackFirewallRules(bool currentlyUnconfigured)
+        {
+            try
+            {
+                if (currentlyUnconfigured)
+                {
+                    this.DeleteFirewallRules();
+                }
+                else
+                {
+                    this.ReplaceFirewallRules(this.OriginalModel.HttpSys.HttpPort, this.OriginalModel.HttpSys.HttpsPort);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Unable to rollback firewall rules");
+            }
         }
 
         private async Task PollServiceStatus(CancellationToken token)
@@ -774,6 +901,12 @@ namespace Lithnet.AccessManager.Server.UI
 
         private void ReplaceCertificateBinding(X509Certificate2 cert, int port)
         {
+            this.DeleteCertificateBinding();
+            this.CreateCertificateBinding(cert, port);
+        }
+
+        private void DeleteCertificateBinding()
+        {
             var config = new CertificateBindingConfiguration();
 
             foreach (var b in config.Query())
@@ -783,15 +916,20 @@ namespace Lithnet.AccessManager.Server.UI
                     config.Delete(b.IpPort);
                 }
             }
-
-            this.CreateCertificateBinding(cert, port);
         }
 
-        private void TryRollbackCertificateBinding()
+        private void TryRollbackCertificateBinding(bool currentlyUnconfigured)
         {
             try
             {
-                this.ReplaceCertificateBinding(this.OriginalCertificate, this.OriginalModel.HttpSys.HttpsPort);
+                if (currentlyUnconfigured)
+                {
+                    this.DeleteCertificateBinding();
+                }
+                else
+                {
+                    this.ReplaceCertificateBinding(this.OriginalCertificate, this.OriginalModel.HttpSys.HttpsPort);
+                }
             }
             catch (Exception ex)
             {
@@ -811,20 +949,21 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        private void TryRollbackHttpReservations()
+        private void TryRollbackHttpReservations(bool currentlyUnconfigured)
         {
             try
             {
-                string httpOld = HttpSysHostingOptions.BuildPrefix(this.OriginalModel.HttpSys.Hostname,
-                    this.OriginalModel.HttpSys.HttpPort, this.OriginalModel.HttpSys.Path, false);
-                string httpsOld = HttpSysHostingOptions.BuildPrefix(this.OriginalModel.HttpSys.Hostname,
-                    this.OriginalModel.HttpSys.HttpsPort, this.OriginalModel.HttpSys.Path, true);
-
                 this.DeleteUrlReservation(this.WorkingModel.HttpSys.BuildHttpUrlPrefix());
                 this.DeleteUrlReservation(this.WorkingModel.HttpSys.BuildHttpsUrlPrefix());
 
-                this.CreateUrlReservation(httpOld, this.ServiceAccount);
-                this.CreateUrlReservation(httpsOld, this.ServiceAccount);
+                if (!currentlyUnconfigured)
+                {
+                    string httpOld = this.OriginalModel.HttpSys.BuildHttpUrlPrefix();
+                    string httpsOld = this.OriginalModel.HttpSys.BuildHttpsUrlPrefix();
+
+                    this.CreateUrlReservation(httpOld, this.ServiceAccount);
+                    this.CreateUrlReservation(httpsOld, this.ServiceAccount);
+                }
             }
             catch (Exception ex)
             {
