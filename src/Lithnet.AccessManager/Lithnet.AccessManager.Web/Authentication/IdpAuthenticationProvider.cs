@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Auditing;
+using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Extensions;
 using Lithnet.AccessManager.Web.App_LocalResources;
 using Lithnet.AccessManager.Web.Internal;
@@ -19,8 +20,8 @@ namespace Lithnet.AccessManager.Web.AppSettings
 
         protected abstract string ClaimName { get; }
 
-        protected IdpAuthenticationProvider(ILogger logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
-            : base(httpContextAccessor, directory)
+        protected IdpAuthenticationProvider(ILogger logger, IDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider)
+            : base(httpContextAccessor, directory, authzContextProvider)
         {
             this.logger = logger;
             this.directory = directory;
@@ -49,7 +50,8 @@ namespace Lithnet.AccessManager.Web.AppSettings
             try
             {
                 ClaimsIdentity user = context.Principal.Identity as ClaimsIdentity;
-                string sid = this.FindUserByClaim(user, this.ClaimName)?.Sid?.Value;
+                var directoryUser = this.FindUserByClaim(user, this.ClaimName);
+                string sid = directoryUser?.Sid?.Value;
 
                 if (sid == null)
                 {
@@ -61,6 +63,7 @@ namespace Lithnet.AccessManager.Web.AppSettings
                 }
 
                 user.AddClaim(new Claim(ClaimTypes.PrimarySid, sid));
+                this.AddAuthZClaims(directoryUser, user);
                 this.logger.LogEventSuccess(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, user.ToClaimList()));
                 return Task.CompletedTask;
             }

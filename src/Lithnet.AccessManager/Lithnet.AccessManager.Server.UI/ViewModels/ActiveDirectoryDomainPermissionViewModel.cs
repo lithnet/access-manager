@@ -26,13 +26,17 @@ namespace Lithnet.AccessManager.Server.UI
             this.logger = logger;
             this.domain = domain;
             this.serviceAccountSid = serviceSettings.GetServiceAccount();
-            this.RefreshGroupMembership();
         }
 
         public void RefreshGroupMembership()
         {
-            _ = this.CheckWaagStatus();
-            _ = this.CheckAcaoStatus();
+            this.CheckWaagStatus();
+            this.CheckAcaoStatus();
+        }
+
+        public async Task RefreshGroupMembershipAsync()
+        {
+            await Task.Run(this.RefreshGroupMembership);
         }
 
         public string WaagStatus { get; set; }
@@ -51,92 +55,86 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string ForestName => this.domain.Forest.Name;
 
-        private async Task CheckAcaoStatus()
+        private void CheckAcaoStatus()
         {
-            await Task.Run(() =>
+            try
             {
-                try
+                this.AcaoLookupInProgress = true;
+                this.IsAcaoMember = false;
+                this.IsNotAcaoMember = false;
+                this.AcaoStatus = "Checking...";
+
+                if (this.serviceAccountSid == null)
                 {
-                    this.AcaoLookupInProgress = true;
-                    this.IsAcaoMember = false;
-                    this.IsNotAcaoMember = false;
-                    this.AcaoStatus = "Checking...";
-
-                    if (this.serviceAccountSid == null)
-                    {
-                        this.IsNotAcaoMember = true;
-                        this.AcaoStatus = "Could not determine service account";
-                        return;
-                    }
-
-                    if (this.IsGroupMember(this.acaoSid, this.serviceAccountSid))
-                    {
-                        this.AcaoStatus = "Group membership confirmed";
-                        this.IsAcaoMember = true;
-                    }
-                    else
-                    {
-                        this.AcaoStatus = "Group membership not found";
-                        this.IsNotAcaoMember = true;
-                    }
+                    this.IsNotAcaoMember = true;
+                    this.AcaoStatus = "Could not determine service account";
+                    return;
                 }
-                catch (Exception ex)
+
+                if (this.IsGroupMember(this.acaoSid, this.serviceAccountSid))
                 {
-                    this.logger.LogError(ex, "Group membership lookup error");
-                    this.AcaoStatus = "Group membership lookup error";
+                    this.AcaoStatus = "Group membership confirmed";
+                    this.IsAcaoMember = true;
+                }
+                else
+                {
+                    this.AcaoStatus = "Group membership not found";
                     this.IsNotAcaoMember = true;
                 }
-                finally
-                {
-                    this.AcaoLookupInProgress = false;
-                }
-            }).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Group membership lookup error");
+                this.AcaoStatus = "Group membership lookup error";
+                this.IsNotAcaoMember = true;
+            }
+            finally
+            {
+                this.AcaoLookupInProgress = false;
+            }
         }
 
         public bool WaagLookupInProgress { get; set; }
 
         public bool AcaoLookupInProgress { get; set; }
 
-        private async Task CheckWaagStatus()
+        private void CheckWaagStatus()
         {
-            await Task.Run(() =>
+            try
             {
-                try
-                {
-                    this.IsWaagMember = false;
-                    this.IsNotWaagMember = false;
-                    this.WaagLookupInProgress = true;
-                    this.WaagStatus = "Checking...";
+                this.IsWaagMember = false;
+                this.IsNotWaagMember = false;
+                this.WaagLookupInProgress = true;
+                this.WaagStatus = "Checking...";
 
-                    if (this.serviceAccountSid == null)
-                    {
-                        this.WaagStatus = "Could not determine service account";
-                        this.IsNotWaagMember = true;
-                        return;
-                    }
-
-                    if (this.IsGroupMember(this.waagSid, this.serviceAccountSid))
-                    {
-                        this.WaagStatus = "Group membership confirmed";
-                        this.IsWaagMember = true;
-                    }
-                    else
-                    {
-                        this.WaagStatus = "Group membership not found";
-                        this.IsNotWaagMember = false;
-                    }
-                }
-                catch (Exception ex)
+                if (this.serviceAccountSid == null)
                 {
-                    this.logger.LogError(ex, "Group membership lookup error");
-                    this.WaagStatus = "Group membership lookup error";
+                    this.WaagStatus = "Could not determine service account";
                     this.IsNotWaagMember = true;
+                    return;
                 }
-                finally
+
+                if (this.IsGroupMember(this.waagSid, this.serviceAccountSid))
                 {
-                    this.WaagLookupInProgress = false;
+                    this.WaagStatus = "Group membership confirmed";
+                    this.IsWaagMember = true;
                 }
-            }).ConfigureAwait(false);
+                else
+                {
+                    this.WaagStatus = "Group membership not found";
+                    this.IsNotWaagMember = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Group membership lookup error");
+                this.WaagStatus = "Group membership lookup error";
+                this.IsNotWaagMember = true;
+            }
+            finally
+            {
+                this.WaagLookupInProgress = false;
+            }
         }
 
         private bool IsGroupMember(SecurityIdentifier groupSid, SecurityIdentifier userSid)

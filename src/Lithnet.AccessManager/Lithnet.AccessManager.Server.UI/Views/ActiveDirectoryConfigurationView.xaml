@@ -95,7 +95,7 @@
             </ListView>
 
             <StackPanel DataContext="{Binding SelectedForest}"  Orientation="Horizontal">
-                <Button Command="{s:Action RefreshSchemaStatus}"
+                <Button Command="{s:Action RefreshSchemaStatusAsync}"
                         Margin="5" 
                         Content="Refresh Status"/>
                 <Button Command="{s:Action ExtendSchemaLithnetAccessManager}"
@@ -191,7 +191,7 @@
         </ListView>
         <StackPanel Margin="5"
                     Orientation="Horizontal">
-            <Button Command="{s:Action RefreshGroupMembership}"
+            <Button Command="{s:Action RefreshGroupMembershipAsync}"
                     Margin="5" 
                     Content="Refresh Status"/>
             <Button Command="{s:Action ShowADPermissionScript}"

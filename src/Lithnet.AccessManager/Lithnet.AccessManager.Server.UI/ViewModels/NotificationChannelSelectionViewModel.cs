@@ -7,14 +7,11 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class NotificationChannelSelectionViewModel : PropertyChangedBase, IHandle<NotificationSubscriptionChangedEvent>, IViewAware
     {
-        private readonly IEventAggregator eventAggregator;
-
         public AuditNotificationChannels Model { get; }
 
         public NotificationChannelSelectionViewModel(AuditNotificationChannels model, INotificationSubscriptionProvider subscriptionProvider, IEventAggregator eventAggregator, INotifiableEventPublisher eventPublisher)
         {
             this.Model = model;
-            this.eventAggregator = eventAggregator;
 
             this.SuccessSubscriptions = subscriptionProvider.GetSubscriptions(this.Model.OnSuccess);
             this.FailureSubscriptions = subscriptionProvider.GetSubscriptions(this.Model.OnFailure);
@@ -22,7 +19,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.AvailableSuccessSubscriptions = new BindableCollection<SubscriptionViewModel>(subscriptionProvider.Subscriptions.Except(this.SuccessSubscriptions));
             this.AvailableFailureSubscriptions = new BindableCollection<SubscriptionViewModel>(subscriptionProvider.Subscriptions.Except(this.FailureSubscriptions));
 
-            this.eventAggregator.Subscribe(this);
+            eventAggregator.Subscribe(this);
             eventPublisher.Register(this);
         }
         

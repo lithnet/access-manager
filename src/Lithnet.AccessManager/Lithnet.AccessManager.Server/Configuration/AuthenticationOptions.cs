@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Lithnet.AccessManager.Server.Configuration
@@ -7,6 +8,8 @@ namespace Lithnet.AccessManager.Server.Configuration
     {
         [JsonConverter(typeof(StringEnumConverter))]
         public AuthenticationMode Mode { get; set; }
+
+        public List<string> AllowedPrincipals { get; set; } = new List<string>();
 
         public IwaAuthenticationProviderOptions Iwa { get; set; } 
 

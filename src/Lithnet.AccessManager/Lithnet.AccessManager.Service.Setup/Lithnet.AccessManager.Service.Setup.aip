@@ -1724,7 +1724,7 @@
     <ROW ServiceControl="Lithnet.AccessManager.Web.exe" Name="lithnetams" Event="161" Wait="1" Component_="Lithnet.AccessManager.Web.exe"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiServInstComponent">
-    <ROW ServiceInstall="Lithnet.AccessManager.Web.exe" Name="lithnetams" DisplayName="Lithnet Access Manager Service" ServiceType="16" StartType="2" ErrorControl="32769" StartName="[USER_NAME]" Password="63998AA4F793C703378093538F428611E8FB587A92802300A596BE070168" Component_="Lithnet.AccessManager.Web.exe" Description="Hosts the Lithnet Access Manager web service"/>
+    <ROW ServiceInstall="Lithnet.AccessManager.Web.exe" Name="lithnetams" DisplayName="Lithnet Access Manager Service" ServiceType="16" StartType="2" ErrorControl="32769" Dependencies="http" StartName="[USER_NAME]" Password="63998AA4F793C703378093538F428611E8FB587A92802300A596BE070168" Component_="Lithnet.AccessManager.Web.exe" Description="Hosts the Lithnet Access Manager web service"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
     <ROW Shortcut="LithnetAccessManagerServiceConfigur" Directory_="Lithnet_Dir" Name="LITHNE~1|Lithnet Access Manager Service Configuration" Component_="Lithnet.AccessManager.Server.UI.exe" Target="[#Lithnet.AccessManager.Server.UI.exe]" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>

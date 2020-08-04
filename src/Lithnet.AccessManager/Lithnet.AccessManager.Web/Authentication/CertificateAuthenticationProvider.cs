@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Auditing;
+using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Extensions;
 using Lithnet.AccessManager.Web.App_LocalResources;
@@ -32,8 +33,8 @@ namespace Lithnet.AccessManager.Web.AppSettings
 
         private readonly IMemoryCache cache;
 
-        public CertificateAuthenticationProvider(IOptionsSnapshot<CertificateAuthenticationProviderOptions> options, ILogger<CertificateAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
-            : base(httpContextAccessor, directory)
+        public CertificateAuthenticationProvider(IOptionsSnapshot<CertificateAuthenticationProviderOptions> options, ILogger<CertificateAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider)
+            : base(httpContextAccessor, directory, authzContextProvider)
         {
             this.directory = directory;
             this.logger = logger;
@@ -162,6 +163,7 @@ namespace Lithnet.AccessManager.Web.AppSettings
             }
 
             user.AddClaim(new Claim(ClaimTypes.PrimarySid, u.Sid.ToString(), context.Options.ClaimsIssuer));
+            this.AddAuthZClaims(u, user);
         }
 
         private bool ValidateNtAuthStore(X509Chain chain)

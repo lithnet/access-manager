@@ -12,21 +12,13 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class HelpViewModel : PropertyChangedBase, IHaveDisplayName, IViewAware
+    public class HelpViewModel : Screen
     {
         public HelpViewModel()
         {
+            this.DisplayName = "Help";
         }
-
-        public void AttachView(UIElement view)
-        {
-            this.View = view;
-        }
-
-        public string DisplayName { get; set; } = "Help";
 
         public PackIconUniconsKind Icon => PackIconUniconsKind.QuestionCircle;
-        
-        public UIElement View { get; private set; }
     }
 }

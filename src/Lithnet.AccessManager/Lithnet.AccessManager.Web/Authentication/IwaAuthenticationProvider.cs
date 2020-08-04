@@ -1,4 +1,10 @@
-﻿using Lithnet.AccessManager.Server.Configuration;
+﻿using System.Security.Claims;
+using System.Security.Principal;
+using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.Authorization;
+using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.Security.Authorization;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,8 +16,8 @@ namespace Lithnet.AccessManager.Web.AppSettings
     {
         private readonly IwaAuthenticationProviderOptions options;
 
-        public IwaAuthenticationProvider(IOptions<IwaAuthenticationProviderOptions> options, IDirectory directory, IHttpContextAccessor httpContextAccessor)
-            :base (httpContextAccessor, directory)
+        public IwaAuthenticationProvider(IOptions<IwaAuthenticationProviderOptions> options, IDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider)
+            : base(httpContextAccessor, directory, authzContextProvider)
         {
             this.options = options.Value;
         }

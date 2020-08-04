@@ -85,7 +85,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                 return info;
             }
 
-            using AuthorizationContext c = authorizationContextProvider.GetAuthorizationContext(user, computer);
+            using AuthorizationContext c = authorizationContextProvider.GetAuthorizationContext(user, computer.Sid);
 
             DiscretionaryAcl masterDacl = new DiscretionaryAcl(false, false, info.MatchedComputerTargets.Count);
 

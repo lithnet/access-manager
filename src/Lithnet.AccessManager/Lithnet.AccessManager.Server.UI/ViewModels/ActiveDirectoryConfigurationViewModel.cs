@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
+using Markdig.Extensions.TaskLists;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -21,7 +22,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.SitemapSolid;
 
-        public ActiveDirectoryConfigurationViewModel(IActiveDirectoryForestSchemaViewModelFactory forestFactory, IActiveDirectoryDomainPermissionViewModelFactory domainFactory,  IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings)
+        public ActiveDirectoryConfigurationViewModel(IActiveDirectoryForestSchemaViewModelFactory forestFactory, IActiveDirectoryDomainPermissionViewModelFactory domainFactory, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.domainFactory = domainFactory;
@@ -29,21 +30,17 @@ namespace Lithnet.AccessManager.Server.UI
             this.serviceSettings = serviceSettings;
             this.DisplayName = "Active Directory";
 
-            this.Forests = new List<ActiveDirectoryForestSchemaViewModel>();
-            this.Domains = new List<ActiveDirectoryDomainPermissionViewModel>();
+            this.Forests = new BindableCollection<ActiveDirectoryForestSchemaViewModel>();
+            this.Domains = new BindableCollection<ActiveDirectoryDomainPermissionViewModel>();
         }
 
-        protected override void OnActivate()
+        protected override void OnInitialActivate()
         {
-            this.PopulateForestsAndDomains();
-            //this.SelectedForest = this.Forests.FirstOrDefault();
+            Task.Run(this.PopulateForestsAndDomains);
         }
 
         private void PopulateForestsAndDomains()
         {
-            this.Forests.Clear();
-            this.Domains.Clear();
-
             var currentDomain = Domain.GetCurrentDomain();
             this.Forests.Add(forestFactory.CreateViewModel(currentDomain.Forest));
 
@@ -65,13 +62,28 @@ namespace Lithnet.AccessManager.Server.UI
                     }
                 }
             }
+
+            this.RefreshData();
         }
 
-        public List<ActiveDirectoryForestSchemaViewModel> Forests { get;  }
+        private void RefreshData()
+        {
+            foreach (var forest in this.Forests)
+            {
+                _ = forest.RefreshSchemaStatusAsync();
+            }
+
+            foreach (var domain in this.Domains)
+            {
+                _ = domain.RefreshGroupMembershipAsync();
+            }
+        }
+
+        public BindableCollection<ActiveDirectoryForestSchemaViewModel> Forests { get; }
 
         public ActiveDirectoryForestSchemaViewModel SelectedForest { get; set; }
 
-        public List<ActiveDirectoryDomainPermissionViewModel> Domains { get;}
+        public BindableCollection<ActiveDirectoryDomainPermissionViewModel> Domains { get; }
 
         public ActiveDirectoryDomainPermissionViewModel SelectedDomain { get; set; }
 
@@ -100,19 +112,19 @@ namespace Lithnet.AccessManager.Server.UI
             await Task.Run(() => current.RefreshSchemaStatus()).ConfigureAwait(false);
         }
 
-        public void RefreshSchemaStatus()
+        public async Task RefreshSchemaStatusAsync()
         {
             foreach (var vm in this.Forests)
             {
-                Task.Run(() => vm.RefreshSchemaStatus());
+                await vm.RefreshSchemaStatusAsync();
             }
         }
 
-        public void RefreshGroupMembership()
+        public async Task RefreshGroupMembershipAsync()
         {
             foreach (var vm in this.Domains)
             {
-                Task.Run(() => vm.RefreshGroupMembership());
+                await vm.RefreshGroupMembershipAsync();
             }
         }
 

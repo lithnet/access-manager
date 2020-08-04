@@ -1,22 +1,32 @@
-﻿using Lithnet.AccessManager.Server.Configuration;
+﻿using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.IconPacks;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class AuthorizationViewModel : PropertyChangedBase, IHaveDisplayName
+    public class AuthorizationViewModel : Screen
     {
         private readonly AuthorizationOptions model;
+
+        private readonly SecurityDescriptorTargetsViewModelFactory factory;
 
         public AuthorizationViewModel(AuthorizationOptions model, SecurityDescriptorTargetsViewModelFactory factory)
         {
             this.model = model;
-            this.Targets = factory.CreateViewModel(model.Targets);
+            this.factory = factory;
+            this.DisplayName = "Authorization";
         }
 
-        public SecurityDescriptorTargetsViewModel Targets { get; }
+        protected override void OnInitialActivate()
+        {
+            Task.Run(() =>
+            {
+                this.Targets = this.factory.CreateViewModel(model.Targets);
+            });
+        }
 
-        public string DisplayName { get; set; } = "Authorization";
+        public SecurityDescriptorTargetsViewModel Targets { get; set; }
 
         public PackIconModernKind Icon => PackIconModernKind.Lock;
     }

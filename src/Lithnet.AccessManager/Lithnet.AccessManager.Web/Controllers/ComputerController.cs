@@ -19,7 +19,8 @@ using IAuthorizationService = Lithnet.AccessManager.Server.Authorization.IAuthor
 
 namespace Lithnet.AccessManager.Web.Controllers
 {
-    [Authorize]
+
+    [Authorize(Policy = "RequireAuthorizedUser")]
     [Localizable(true)]
     public class ComputerController : Controller
     {
@@ -373,7 +374,7 @@ namespace Lithnet.AccessManager.Web.Controllers
                 }
 
                 model.AllowedRequestTypes = authResponse.EvaluatedAccess;
-                
+
                 if (model.AllowedRequestTypes.HasFlag(AccessMask.Laps))
                 {
                     model.RequestType = AccessMask.Laps;

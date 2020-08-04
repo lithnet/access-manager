@@ -25,13 +25,18 @@ namespace Lithnet.AccessManager.Server.Authorization
             this.domainCache = new ConcurrentDictionary<SecurityIdentifier, AuthorizationContextDomainDetails>();
         }
 
-        public AuthorizationContext GetAuthorizationContext(IUser user, IComputer computer)
+        public AuthorizationContext GetAuthorizationContext(IUser user)
         {
-            var domainDetails = this.GetAuthorizationContextDomainDetails(user, computer);
+            return this.GetAuthorizationContext(user, user.Sid.AccountDomainSid);
+        }
+
+        public AuthorizationContext GetAuthorizationContext(IUser user, SecurityIdentifier resourceDomain)
+        {
+            var domainDetails = this.GetAuthorizationContextDomainDetails(user.Sid, resourceDomain.AccountDomainSid);
 
             try
             {
-                return this.GetContext(user, computer, domainDetails);
+                return this.GetContext(user, resourceDomain.AccountDomainSid, domainDetails);
             }
             catch
             {
@@ -50,7 +55,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             }
         }
 
-        public AuthorizationContext GetContext(IUser user, IComputer computer, AuthorizationContextDomainDetails domainDetails)
+        public AuthorizationContext GetContext(IUser user, SecurityIdentifier resourceDomain, AuthorizationContextDomainDetails domainDetails)
         {
             AuthorizationServer server = domainDetails.GetServer(false);
 
@@ -61,7 +66,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             {
                 try
                 {
-                    this.logger.LogTrace("Attempting to create AuthorizationContext against server {server} in domain {domain} for user {user} requesting access to computer {computer} ", server.Name, domainDetails.DomainDnsName, user.MsDsPrincipalName, computer.MsDsPrincipalName);
+                    this.logger.LogTrace("Attempting to create AuthorizationContext against server {server} in domain {domain} for user {user} requesting access to resource in domain {domain} ", server.Name, domainDetails.DomainDnsName, user.MsDsPrincipalName, resourceDomain);
                     return new AuthorizationContext(user.Sid, server.Name, domainDetails.Mapping.DoNotRequireS4U ? AuthzInitFlags.Default : AuthzInitFlags.RequireS4ULogon);
                 }
                 catch (AuthorizationContextException ex) when (ex.InnerException is Win32Exception we && we.HResult == -2147467259) //RPC_NOT_AVAILABLE
@@ -80,10 +85,10 @@ namespace Lithnet.AccessManager.Server.Authorization
             throw lastException ?? new Exception("Unable to create authorization context");
         }
 
-        public AuthorizationContextDomainDetails GetAuthorizationContextDomainDetails(IUser user, IComputer computer)
+        public AuthorizationContextDomainDetails GetAuthorizationContextDomainDetails(SecurityIdentifier userSid, SecurityIdentifier resourceDomainSid)
         {
-            var userDomain = this.GetDomainDetails(user.Sid);
-            var computerDomain = this.GetDomainDetails(computer.Sid);
+            var userDomain = this.GetDomainDetails(userSid);
+            var computerDomain = this.GetDomainDetails(resourceDomainSid);
 
             if (userDomain.IsInCurrentForest && computerDomain.IsRemoteOneWayTrust)
             {

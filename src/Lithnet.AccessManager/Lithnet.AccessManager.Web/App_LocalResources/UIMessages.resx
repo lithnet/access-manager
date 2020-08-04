@@ -234,4 +234,10 @@
   <data name="LapsPasswordHistoryError" xml:space="preserve">
     <value>An error occurred while trying to access the local admin password history</value>
   </data>
+  <data name="Http403Heading" xml:space="preserve">
+    <value>403 Not authorized</value>
+  </data>
+  <data name="Http403Message" xml:space="preserve">
+    <value>You are not authorized to access this application</value>
+  </data>
 </root>

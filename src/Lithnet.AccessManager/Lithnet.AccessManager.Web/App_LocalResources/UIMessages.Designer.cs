@@ -205,6 +205,24 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 403 Not authorized.
+        /// </summary>
+        public static string Http403Heading {
+            get {
+                return ResourceManager.GetString("Http403Heading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are not authorized to access this application.
+        /// </summary>
+        public static string Http403Message {
+            get {
+                return ResourceManager.GetString("Http403Message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Your request could not be processed as your user information is not recognized.
         /// </summary>
         public static string IdentityDiscoveryError {

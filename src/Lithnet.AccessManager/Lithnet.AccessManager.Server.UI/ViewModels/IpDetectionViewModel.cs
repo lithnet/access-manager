@@ -11,7 +11,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class IpDetectionViewModel : PropertyChangedBase, IHaveDisplayName
+    public class IpDetectionViewModel : Screen
     {
         private readonly ForwardedHeadersAppOptions model;
 
@@ -19,6 +19,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public IpDetectionViewModel(ForwardedHeadersAppOptions model, IDialogCoordinator dialogCoordinator, INotifiableEventPublisher eventPublisher)
         {
+            this.DisplayName = "IP address detection";
             this.model = model;
             this.dialogCoordinator = dialogCoordinator;
             this.model.KnownNetworks ??= new List<string>();
@@ -184,7 +185,6 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool CanRemoveProxy => this.Enabled && this.SelectedProxy != null;
 
-        public string DisplayName { get; set; } = "IP address detection";
 
         public PackIconPicolIconsKind Icon => PackIconPicolIconsKind.NetworkSansSecurity;
     }

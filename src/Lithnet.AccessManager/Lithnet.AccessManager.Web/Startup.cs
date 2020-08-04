@@ -1,5 +1,7 @@
 using System;
 using System.Configuration;
+using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Threading.Channels;
 using Lithnet.AccessManager.Server.Auditing;
@@ -9,6 +11,7 @@ using Lithnet.AccessManager.Server.Workers;
 using Lithnet.AccessManager.Web.AppSettings;
 using Lithnet.AccessManager.Web.Extensions;
 using Lithnet.AccessManager.Web.Internal;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -32,7 +35,7 @@ namespace Lithnet.AccessManager.Web
         {
             services.AddControllersWithViews();
             services.AddHttpContextAccessor();
-            
+
             services.TryAddScoped<IIwaAuthenticationProvider, IwaAuthenticationProvider>();
             services.TryAddScoped<IOidcAuthenticationProvider, OidcAuthenticationProvider>();
             services.TryAddScoped<IWsFedAuthenticationProvider, WsFedAuthenticationProvider>();
@@ -90,12 +93,14 @@ namespace Lithnet.AccessManager.Web
             services.Configure<JitConfigurationOptions>(Configuration.GetSection("JitConfiguration"));
 
             this.ConfigureAuthentication(services);
+            this.ConfigureAuthorization(services);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider provider)
         {
             var fwdOptions = provider.GetRequiredService<IOptions<ForwardedHeadersAppOptions>>().Value;
             app.UseForwardedHeaders(fwdOptions.ToNativeOptions());
+            app.UseStatusCodePagesWithReExecute("/StatusCode", "?code={0}");
 
             if (env.IsDevelopment())
             {
@@ -138,9 +143,35 @@ namespace Lithnet.AccessManager.Web
                 AuthenticationMode.Certificate => provider.GetService<ICertificateAuthenticationProvider>(),
                 _ => throw new ConfigurationErrorsException("The authentication mode setting in the configuration file was unknown")
             };
-            
+
             authProvider.Configure(services);
             services.TryAddSingleton<IAuthenticationProvider>(authProvider);
+        }
+
+        private void ConfigureAuthorization(IServiceCollection services)
+        {
+            var provider = services.BuildServiceProvider();
+            var authSettings = provider.GetService<IOptions<AuthenticationOptions>>().Value;
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireAuthorizedUser", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireClaim(ClaimTypes.PrimarySid);
+
+                    if (authSettings.AllowedPrincipals?.Count > 0)
+                    {
+                        policy.RequireAssertion(context =>
+                        {
+                            return (context.User.Claims.Any(
+                                       c => string.Equals(c.Type, ClaimTypes.PrimarySid, StringComparison.OrdinalIgnoreCase) && authSettings.AllowedPrincipals.Contains(c.Value, StringComparer.Ordinal))) ||
+                                   (context.User.Claims.Any(
+                                       c => string.Equals(c.Type, ClaimTypes.GroupSid, StringComparison.OrdinalIgnoreCase) && authSettings.AllowedPrincipals.Contains(c.Value, StringComparer.Ordinal)));
+                        });
+                    }
+                });
+            });
         }
     }
 }

@@ -9,12 +9,11 @@ using System.Windows;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Microsoft.Extensions.Logging;
-using PropertyChanged;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class LapsConfigurationViewModel : PropertyChangedBase, IViewAware, IHaveDisplayName
+    public class LapsConfigurationViewModel : Screen
     {
         private readonly ICertificateProvider certificateProvider;
 
@@ -36,13 +35,19 @@ namespace Lithnet.AccessManager.Server.UI
             this.dialogCoordinator = dialogCoordinator;
             this.serviceSettings = serviceSettings;
             this.logger = logger;
-
             this.Forests = new List<Forest>();
-            this.BuildForests();
-            this.SelectedForest = this.Forests.FirstOrDefault();
-
             this.AvailableCertificates = new BindableCollection<X509Certificate2ViewModel>();
-            _ = this.RefreshAvailableCertificates();
+            this.DisplayName = "Local admin passwords";
+        }
+
+        protected override void OnInitialActivate()
+        {
+            Task.Run(async () =>
+            {
+                this.BuildForests();
+                this.SelectedForest = this.Forests.FirstOrDefault();
+                await this.RefreshAvailableCertificates();
+            });
         }
 
         private void BuildForests()
@@ -62,7 +67,8 @@ namespace Lithnet.AccessManager.Server.UI
                         this.Forests.Add(forest);
                     }
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logger.LogError(ex, "Could not build forest list");
                 this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not build the forest list\r\n{ex.Message}").ConfigureAwait(false).GetAwaiter().GetResult();
@@ -77,13 +83,6 @@ namespace Lithnet.AccessManager.Server.UI
         {
             _ = this.RefreshAvailableCertificates();
         }
-
-        public void AttachView(UIElement view)
-        {
-            this.View = view;
-        }
-
-        public UIElement View { get; set; }
 
         public X509Certificate2ViewModel SelectedCertificate { get; set; }
 
@@ -304,8 +303,6 @@ namespace Lithnet.AccessManager.Server.UI
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not refresh the certificate list\r\n{ex.Message}");
             }
         }
-
-        public string DisplayName { get; set; } = "Local admin passwords";
 
         public PackIconUniconsKind Icon => PackIconUniconsKind.Asterisk;
     }

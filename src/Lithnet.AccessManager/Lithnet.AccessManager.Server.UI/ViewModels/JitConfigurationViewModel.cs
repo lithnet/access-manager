@@ -3,36 +3,25 @@ using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using System.Windows;
-using ControlzEx.Standard;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using MahApps.Metro.SimpleChildWindow;
-using Microsoft.PowerShell.Commands;
 using Newtonsoft.Json;
 using Stylet;
 using NativeMethods = Lithnet.AccessManager.Server.UI.Interop.NativeMethods;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class JitConfigurationViewModel : PropertyChangedBase, IViewAware, IHaveDisplayName
+    public class JitConfigurationViewModel : Screen
     {
         private readonly JitConfigurationOptions jitOptions;
-
         private readonly IDirectory directory;
-
         private readonly IDialogCoordinator dialogCoordinator;
-
         private readonly IJitGroupMappingViewModelFactory groupMappingFactory;
-
         private readonly IJitDomainStatusViewModelFactory jitDomainStatusFactory;
-
         private readonly IServiceSettingsProvider serviceSettings;
-
-        public UIElement View { get; set; }
-
-        public string DisplayName { get; set; } = "Just-in-time access";
+        private readonly INotifiableEventPublisher eventPublisher;
 
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.UserClockSolid;
 
@@ -44,19 +33,26 @@ namespace Lithnet.AccessManager.Server.UI
             this.groupMappingFactory = groupMappingFactory;
             this.jitDomainStatusFactory = jitDomainStatusFactory;
             this.serviceSettings = serviceSettings;
-
+            this.eventPublisher = eventPublisher;
+            this.DisplayName = "Just-in-time access";
             this.GroupMappings = new BindableCollection<JitGroupMappingViewModel>();
-
-            foreach (var m in this.jitOptions.JitGroupMappings)
-            {
-                this.GroupMappings.Add(groupMappingFactory.CreateViewModel(m));
-            }
-
             this.Domains = new BindableCollection<JitDomainStatusViewModel>();
 
-            this.BuildDomainList();
+        }
 
-            eventPublisher.Register(this);
+        protected override void OnInitialActivate()
+        {
+            Task.Run(() =>
+            {
+                foreach (var m in this.jitOptions.JitGroupMappings)
+                {
+                    this.GroupMappings.Add(groupMappingFactory.CreateViewModel(m));
+                }
+
+                this.BuildDomainList();
+
+                this.eventPublisher.Register(this);
+            });
         }
 
         private void BuildDomainList()
@@ -97,11 +93,6 @@ namespace Lithnet.AccessManager.Server.UI
             }
 
             return null;
-        }
-
-        public void AttachView(UIElement view)
-        {
-            this.View = view;
         }
 
         [NotifiableCollection]

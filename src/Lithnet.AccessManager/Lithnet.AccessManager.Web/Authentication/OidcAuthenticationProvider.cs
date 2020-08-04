@@ -2,6 +2,7 @@
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -17,8 +18,8 @@ namespace Lithnet.AccessManager.Web.AppSettings
     {
         private readonly OidcAuthenticationProviderOptions options;
 
-        public OidcAuthenticationProvider(IOptions<OidcAuthenticationProviderOptions> options, ILogger<OidcAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
-            : base(logger, directory, httpContextAccessor)
+        public OidcAuthenticationProvider(IOptions<OidcAuthenticationProviderOptions> options, ILogger<OidcAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider)
+            : base(logger, directory, httpContextAccessor, authzContextProvider)
         {
             this.options = options.Value;
         }

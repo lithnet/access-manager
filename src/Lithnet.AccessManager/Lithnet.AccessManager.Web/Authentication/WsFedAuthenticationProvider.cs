@@ -1,4 +1,5 @@
-﻿using Lithnet.AccessManager.Server.Configuration;
+﻿using Lithnet.AccessManager.Server.Authorization;
+using Lithnet.AccessManager.Server.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.WsFederation;
 using Microsoft.AspNetCore.Http;
@@ -12,8 +13,8 @@ namespace Lithnet.AccessManager.Web.AppSettings
     {
         private readonly WsFedAuthenticationProviderOptions options;
 
-        public WsFedAuthenticationProvider(IOptions<WsFedAuthenticationProviderOptions> options, ILogger<WsFedAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor)
-            :base (logger, directory, httpContextAccessor)
+        public WsFedAuthenticationProvider(IOptions<WsFedAuthenticationProviderOptions> options, ILogger<WsFedAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider)
+            :base (logger, directory, httpContextAccessor, authzContextProvider)
         {
             this.options = options.Value;
         }

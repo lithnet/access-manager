@@ -1,38 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.AccessManager.Server.UI.Interop;
+using Lithnet.AccessManager.Server.UI.ViewModels;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Microsoft.Extensions.Logging;
-using Microsoft.PowerShell.Commands;
 using Microsoft.Win32;
 using PropertyChanged;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class AuthenticationViewModel : PropertyChangedBase, IHaveDisplayName, IViewAware
+    public class AuthenticationViewModel : Screen
     {
         private readonly AuthenticationOptions model;
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IX509Certificate2ViewModelFactory x509ViewModelFactory;
         private readonly ILogger logger;
+        private readonly IDirectory directory;
         private readonly RandomNumberGenerator rng;
+        private readonly INotifiableEventPublisher eventPublisher;
 
-        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifiableEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, RandomNumberGenerator rng)
+        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifiableEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, RandomNumberGenerator rng, IDirectory directory)
         {
             this.model = model;
             this.dialogCoordinator = dialogCoordinator;
             this.x509ViewModelFactory = x509ViewModelFactory;
             this.logger = logger;
             this.rng = rng;
+            this.directory = directory;
+            this.eventPublisher = eventPublisher;
+
+            this.DisplayName = "Authentication";
 
             model.Iwa ??= new IwaAuthenticationProviderOptions();
             model.Oidc ??= new OidcAuthenticationProviderOptions();
@@ -40,16 +47,159 @@ namespace Lithnet.AccessManager.Server.UI
             model.ClientCert ??= new CertificateAuthenticationProviderOptions();
             model.ClientCert.TrustedIssuers ??= new List<string>();
             model.ClientCert.RequiredEkus ??= new List<string>();
+            model.AllowedPrincipals ??= new List<string>();
 
             this.TrustedIssuers = new BindableCollection<X509Certificate2ViewModel>();
-            this.BuildTrustedIssuers();
             this.RequiredEkus = new BindableCollection<string>(model.ClientCert.RequiredEkus);
-
-            eventPublisher.Register(this);
+            this.AllowedPrincipals = new BindableCollection<SecurityIdentifierViewModel>();
         }
+
+        protected override void OnInitialActivate()
+        {
+            Task.Run(() =>
+            {
+                this.BuildAllowedToAuthenticateList();
+                this.BuildTrustedIssuers();
+                this.eventPublisher.Register(this);
+            });
+        }
+
+        private void BuildAllowedToAuthenticateList()
+        {
+            this.AllowedPrincipals.Clear();
+
+            foreach (var item in this.model.AllowedPrincipals)
+            {
+                if (item.TryParseAsSid(out SecurityIdentifier sid))
+                {
+                    SecurityIdentifierViewModel vm = new SecurityIdentifierViewModel
+                    {
+                        Sid = sid.ToString(),
+                        DisplayName = this.GetSidDisplayName(sid)
+                    };
+
+                    this.AllowedPrincipals.Add(vm);
+                }
+            }
+        }
+
+        public SecurityIdentifierViewModel SelectedAllowedPrincipal { get; set; }
+
+        public bool CanRemoveAllowedPrincipal => this.SelectedAllowedPrincipal != null;
+
+        public void RemoveAllowedPrincipal()
+        {
+            SecurityIdentifierViewModel selected = this.SelectedAllowedPrincipal;
+
+            if (selected == null)
+            {
+                return;
+            }
+
+            this.model.AllowedPrincipals.Remove(selected.Sid);
+            this.AllowedPrincipals.Remove(selected);
+        }
+
+        public async Task AddAllowedPrincipal()
+        {
+            try
+            {
+                ExternalDialogWindow w = new ExternalDialogWindow();
+                w.Title = "Select forest";
+                var vm = new SelectForestViewModel();
+                w.DataContext = vm;
+                w.SaveButtonName = "Next...";
+                w.SaveButtonIsDefault = true;
+                vm.AvailableForests = new List<string>();
+                var domain = Domain.GetCurrentDomain();
+                vm.AvailableForests.Add(domain.Forest.Name);
+                vm.SelectedForest = domain.Forest.Name;
+
+                foreach (var trust in domain.Forest.GetAllTrustRelationships().OfType<TrustRelationshipInformation>())
+                {
+                    if (trust.TrustDirection == TrustDirection.Inbound || trust.TrustDirection == TrustDirection.Bidirectional)
+                    {
+                        vm.AvailableForests.Add(trust.TargetName);
+                    }
+                }
+
+                w.Owner = this.GetWindow();
+
+                if (!w.ShowDialog() ?? false)
+                {
+                    return;
+                }
+
+                DsopScopeInitInfo scope = new DsopScopeInitInfo();
+                scope.Filter = new DsFilterFlags();
+
+                scope.Filter.UpLevel.BothModeFilter = DsopObjectFilterFlags.DSOP_FILTER_DOMAIN_LOCAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_GLOBAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_UNIVERSAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_USERS | DsopObjectFilterFlags.DSOP_FILTER_WELL_KNOWN_PRINCIPALS;
+
+                scope.ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_ENTERPRISE_DOMAIN | DsopScopeTypeFlags.DSOP_SCOPE_TYPE_USER_ENTERED_UPLEVEL_SCOPE | DsopScopeTypeFlags.DSOP_SCOPE_TYPE_EXTERNAL_UPLEVEL_DOMAIN;
+
+                scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS | DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
+
+                string target = vm.SelectedForest == domain.Forest.Name ? null : vm.SelectedForest;
+
+                var result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), target, scope, "objectClass", "objectSid").FirstOrDefault();
+
+                if (result != null)
+                {
+                    byte[] sidraw = result.Attributes["objectSid"] as byte[];
+                    if (sidraw == null)
+                    {
+                        return;
+                    }
+
+                    SecurityIdentifierViewModel sidvm = new SecurityIdentifierViewModel();
+                    var sid = new SecurityIdentifier(sidraw, 0);
+                    sidvm.Sid = sid.ToString();
+
+                    if (this.model.AllowedPrincipals.Any(t => string.Equals(t, sidvm.Sid, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        return;
+                    }
+
+                    sidvm.DisplayName = this.GetSidDisplayName(sid);
+
+                    this.model.AllowedPrincipals.Add(sidvm.Sid);
+                    this.AllowedPrincipals.Add(sidvm);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Select group error");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred when processing the request\r\n{ex.Message}");
+            }
+        }
+
+        private string GetSidDisplayName(SecurityIdentifier sid)
+        {
+            try
+            {
+                NTAccount adminGroup = (NTAccount)sid.Translate(typeof(NTAccount));
+                return adminGroup.Value;
+            }
+            catch
+            {
+                try
+                {
+                    return this.directory.TranslateName(sid.ToString(), AccessManager.Interop.DsNameFormat.SecurityIdentifier, AccessManager.Interop.DsNameFormat.Nt4Name);
+                }
+                catch
+                {
+                    return sid.ToString(); ;
+                }
+            }
+        }
+
+        [NotifiableCollection]
+        public BindableCollection<SecurityIdentifierViewModel> AllowedPrincipals { get; }
 
         private void BuildTrustedIssuers()
         {
+            this.TrustedIssuers.Clear();
+
             int count = 0;
 
             foreach (string cert in this.model.ClientCert.TrustedIssuers)
@@ -269,17 +419,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.model.ClientCert.RequiredEkus.Remove(removing);
         }
 
-        public void AttachView(UIElement view)
-        {
-            this.View = view;
-        }
-
         public bool CanRemoveEku => this.SelectedEku != null;
 
-        public string DisplayName { get; set; } = "Authentication";
-
         public PackIconUniconsKind Icon => PackIconUniconsKind.User;
-
-        public UIElement View { get; set; }
     }
 }

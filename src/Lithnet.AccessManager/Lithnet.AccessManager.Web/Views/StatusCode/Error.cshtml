@@ -1,0 +1,18 @@
+﻿@{
+    ViewBag.Title = "Error";
+}
+
+@model Lithnet.AccessManager.Web.Models.ErrorModel
+
+<div class="form-container">
+    <fieldset>
+        <section>
+            <b class="error alert-heading">
+                <i class="fas fa-exclamation-circle"></i> @Model.Heading
+            </b>
+        </section>
+        <section>
+            <p class="text-center">@Model.Message</p>
+        </section>
+    </fieldset>
+</div>
