@@ -90,7 +90,7 @@ namespace Lithnet.AccessManager.Server.UI
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogWarning(ex, "Could not determine file path");
+                    this.logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not determine file path");
                 }
             }
 
@@ -121,7 +121,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, "Could not open editor");
+                logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not open editor");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not start default editor\r\n{ex.Message}");
             }
         }
@@ -152,7 +152,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Could not write file");
+                logger.LogError(EventIDs.UIGenericError, ex, "Could not write file");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not create the file\r\n{ex.Message}");
                 return;
             }

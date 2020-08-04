@@ -93,8 +93,7 @@ namespace Lithnet.AccessManager.Server.Workers
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError(ex,
-                        $"There was an unexpected error in the JIT group processing thread for the target {mapping.ComputerOU}");
+                    this.logger.LogError(EventIDs.JitWorkerUnexpectedError, ex, $"There was an unexpected error in the JIT group processing thread for the target {mapping.ComputerOU}");
                 }
             }
         }
@@ -233,11 +232,11 @@ namespace Lithnet.AccessManager.Server.Workers
                     this.logger.LogTrace($"Creating JIT group {group} in OU {groupOU}");
                     this.directory.CreateGroup(group, groupDescription ?? "JIT access group created by Lithnet Access Manager",
                         groupType, groupOU);
-                    this.logger.LogInformation($"Created JIT group {group} in OU {groupOU}");
+                    this.logger.LogInformation(EventIDs.JitWorkerGroupCreated, $"Created JIT group {group} in OU {groupOU}");
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError(ex, $"The JIT group {group} could not be created in OU {groupOU}");
+                    this.logger.LogError(EventIDs.JitWorkerGroupCreateError, ex, $"The JIT group {group} could not be created in OU {groupOU}");
                 }
             }
         }
@@ -252,11 +251,11 @@ namespace Lithnet.AccessManager.Server.Workers
                 {
                     this.logger.LogTrace($"Deleting JIT group {groupName}");
                     this.directory.DeleteGroup(groupName);
-                    this.logger.LogInformation($"Deleted JIT group {groupName}");
+                    this.logger.LogInformation(EventIDs.JitWorkerGroupDeleted, $"Deleted JIT group {groupName}");
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError(ex, $"The JIT group {groupName} could not be deleted");
+                    this.logger.LogError(EventIDs.JitWorkerGroupDeleteError, ex, $"The JIT group {groupName} could not be deleted");
                 }
             }
         }
@@ -322,7 +321,7 @@ namespace Lithnet.AccessManager.Server.Workers
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, $"Could not contact {search.Server}. Resetting USN data and attempting against domain {search.DnsDomain}");
+                logger.LogWarning(EventIDs.JitWorkerUsnFallback, ex, $"Could not contact {search.Server}. Resetting USN data and attempting against domain {search.DnsDomain}");
                 search.LastUsn = 0;
                 search.Server = search.DnsDomain;
                 this.PopulateUsnData(search);

@@ -70,7 +70,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Could not build forest list");
+                logger.LogError(EventIDs.UIGenericError, ex, "Could not build forest list");
                 this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not build the forest list\r\n{ex.Message}").ConfigureAwait(false).GetAwaiter().GetResult();
             }
         }
@@ -140,7 +140,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, "Could not update certificate publication information");
+                logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not update certificate publication information");
             }
         }
 
@@ -164,7 +164,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Could not generate encryption certificate");
+                logger.LogError(EventIDs.UIGenericError, ex, "Could not generate encryption certificate");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not generate the certificate\r\n{ex.Message}");
             }
         }
@@ -208,7 +208,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, "Could not open link");
+                logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not open link");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not open the default link handler\r\n{ex.Message}");
             }
         }
@@ -227,7 +227,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, "Could not open link");
+                logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not open link");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not open the default link handler\r\n{ex.Message}");
             }
         }
@@ -299,7 +299,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Could not load certificate list");
+                logger.LogError(EventIDs.UIGenericError, ex, "Could not load certificate list");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not refresh the certificate list\r\n{ex.Message}");
             }
         }

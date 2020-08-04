@@ -54,7 +54,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Could not load logo");
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not load logo");
                 this.ImageError = $"There was an error loading the logo image\r\n{ex.Message}";
             }
         }
@@ -102,7 +102,7 @@ namespace Lithnet.AccessManager.Server.UI
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError(ex, "Could not replace image");
+                    this.logger.LogError(EventIDs.UIGenericError, ex, "Could not replace image");
                     this.Image = oldImage;
                     this.ImageError = null;
                     await this.dialogCoordinator.ShowMessageAsync(this, "Cannot open image", $"There was an error replacing the image\r\n{ex.Message}");

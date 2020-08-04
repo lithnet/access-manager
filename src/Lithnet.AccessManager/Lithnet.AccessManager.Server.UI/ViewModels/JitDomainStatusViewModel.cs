@@ -137,7 +137,7 @@ namespace Lithnet.AccessManager.Server.UI
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError(ex, "Could not determine JIT capability");
+                    this.logger.LogError(EventIDs.UIGenericError, ex, "Could not determine JIT capability");
                     this.PamStatus = "Error determining functional levels";
                 }
             }).ConfigureAwait(false);

@@ -182,7 +182,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Edit security error");
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Edit security error");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred when processing the object security\r\n{ex.Message}");
             }
         }
@@ -245,7 +245,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Select JIT group error");
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Select JIT group error");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred when processing the request\r\n{ex.Message}");
             }
         }
@@ -350,7 +350,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Select target error");
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Select target error");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred when processing the request\r\n{ex.Message}");
             }
         }
@@ -433,7 +433,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogWarning(ex, "Error processing security descriptor");
+                this.logger.LogWarning(EventIDs.UIGenericWarning, ex, "Error processing security descriptor");
             }
 
             return false;

@@ -83,7 +83,7 @@ namespace Lithnet.AccessManager.Server.UI
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError(ex, "Unable to save the configuration");
+                    this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Unable to save the configuration");
                     await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Unable to save the configuration\r\n{ex.Message}");
                 }
             }

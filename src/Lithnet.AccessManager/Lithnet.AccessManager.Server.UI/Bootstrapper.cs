@@ -126,7 +126,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Initialization error");
+                this.logger.LogError(EventIDs.UIInitializationError, ex, "Initialization error");
                 throw;
             }
         }

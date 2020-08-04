@@ -244,7 +244,7 @@ namespace Lithnet.AccessManager.Web.AppSettings
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError(ex, $"Unable to parse trusted issuer certificate at index {count}");
+                    this.logger.LogError(EventIDs.CertificateTrustChainParsingIssue, ex, $"Unable to parse trusted issuer certificate at index {count}");
                 }
             }
 

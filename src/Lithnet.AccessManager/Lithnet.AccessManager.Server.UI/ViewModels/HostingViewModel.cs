@@ -57,7 +57,10 @@ namespace Lithnet.AccessManager.Server.UI
             this.Validator = validator;
 
             eventPublisher.Register(this);
+        }
 
+        protected override void OnInitialActivate()
+        {
             _ = this.TryGetVersion();
         }
 
@@ -196,7 +199,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Could not add private key permissions");
+                this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Could not add private key permissions");
                 var result = await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred while trying to add permissions for the service account {this.ServiceAccountDisplayName} to read the private key of the specified certificate. Try adding permissions for this manually using the Windows computer certificates MMC console. Do you want to continue with the operation?\r\n{ex.Message}", MessageDialogStyle.AffirmativeAndNegative);
 
                 if (result == MessageDialogResult.Canceled)
@@ -239,7 +242,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Error creating HTTP reservations");
+                this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Error creating HTTP reservations");
                 this.TryRollbackHttpReservations(currentlyUnconfigured);
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not create the HTTP reservations\r\n{ex.Message}");
                 return false;
@@ -256,7 +259,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 this.TryRollbackFirewallRules(currentlyUnconfigured);
 
-                this.logger.LogError(ex, "Error updating the firewall rules");
+                this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Error updating the firewall rules");
 
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not update the firewall rules. Please manually update them to ensure your users can access the application\r\n{ex.Message}");
                 return false;
@@ -271,7 +274,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Could not save updated config file");
+                this.logger.LogError(EventIDs.UIConfigurationSaveError,ex, "Could not save updated config file");
                 this.TryRollbackConfig();
                 return false;
             }
@@ -285,7 +288,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Error creating certificate binding");
+                this.logger.LogError(EventIDs.UIConfigurationSaveError,ex, "Error creating certificate binding");
 
                 this.TryRollbackCertificateBinding(currentlyUnconfigured);
 
@@ -314,7 +317,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex,
+                this.logger.LogError(EventIDs.UIConfigurationSaveError, ex,
                     "Could not change the service account to the specified account {serviceAccountName}",
                     workingServiceAccountUserName);
 
@@ -372,7 +375,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, "Could not open editor");
+                logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not open editor");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not start default browser\r\n{ex.Message}");
             }
         }
@@ -575,7 +578,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                logger.LogWarning(ex, "Could not get version update");
+                logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not get version update");
                 this.AvailableVersion = "Unable to determine latest application version";
             }
         }
@@ -841,7 +844,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Unable to rollback firewall rules");
+                this.logger.LogError(EventIDs.UIConfigurationRollbackError, ex, "Unable to rollback firewall rules");
             }
         }
 
@@ -933,7 +936,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Unable to rollback certificate binding");
+                this.logger.LogError(EventIDs.UIConfigurationRollbackError, ex, "Unable to rollback certificate binding");
             }
         }
 
@@ -945,7 +948,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Could not rollback the config file");
+                this.logger.LogError(EventIDs.UIConfigurationRollbackError, ex, "Could not rollback the config file");
             }
         }
 
@@ -967,7 +970,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Unable to rollback HTTP reservations");
+                this.logger.LogError(EventIDs.UIConfigurationRollbackError, ex, "Unable to rollback HTTP reservations");
             }
         }
 

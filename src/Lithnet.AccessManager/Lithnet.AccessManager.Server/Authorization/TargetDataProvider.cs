@@ -56,7 +56,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, $"Could not find GUID for target {target.Target}");
+                this.logger.LogError(EventIDs.TargetDirectoryLookupError, ex, $"Could not find GUID for target {target.Target}");
                 return Guid.Empty;
             }
         }
@@ -93,7 +93,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             }
             catch (Exception ex)
             {
-                this.logger.LogWarning(ex, $"Unable to parse DN {target.Target}. Using default sort order of 0");
+                this.logger.LogWarning(EventIDs.DNParseError, ex, $"Unable to parse DN {target.Target}. Using default sort order of 0");
             }
 
             return 0;

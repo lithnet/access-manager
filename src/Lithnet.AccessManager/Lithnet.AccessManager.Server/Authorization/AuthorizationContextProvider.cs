@@ -45,7 +45,7 @@ namespace Lithnet.AccessManager.Server.Authorization
 
                 if (!domainDetails.IsRemoteOneWayTrust && !domainDetails.Mapping.DisableLocalFallback)
                 {
-                    logger.LogWarning("Unable to establish authorization context for user {user} against an appropriate target server. The authorization context will be built locally, but information about membership in domain local groups in the target domain may missed", user.MsDsPrincipalName);
+                    logger.LogWarning(EventIDs.AuthZContextFallback, "Unable to establish authorization context for user {user} against an appropriate target server. The authorization context will be built locally, but information about membership in domain local groups in the target domain may missed", user.MsDsPrincipalName);
                     return new AuthorizationContext(user.Sid);
                 }
                 else
@@ -72,13 +72,13 @@ namespace Lithnet.AccessManager.Server.Authorization
                 catch (AuthorizationContextException ex) when (ex.InnerException is Win32Exception we && we.HResult == -2147467259) //RPC_NOT_AVAILABLE
                 {
                     lastException = ex;
-                    this.logger.LogWarning(ex, "Unable to connect to server {server}", server.Name);
+                    this.logger.LogWarning(EventIDs.AuthZContextServerCantConnect, ex, "Unable to connect to server {server}", server.Name);
                     server = domainDetails.GetServer(true);
                 }
                 catch (Exception ex)
                 {
                     lastException = ex;
-                    this.logger.LogError(ex, "Unable to create AuthorizationContext against server {server} in domain {domain}", server.Name, domainDetails.DomainDnsName);
+                    this.logger.LogError(EventIDs.AuthZContextCreateError , ex, "Unable to create AuthorizationContext against server {server} in domain {domain}", server.Name, domainDetails.DomainDnsName);
                 }
             }
 

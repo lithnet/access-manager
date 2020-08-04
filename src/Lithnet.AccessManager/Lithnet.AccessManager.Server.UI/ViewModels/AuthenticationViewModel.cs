@@ -168,7 +168,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Select group error");
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Select group error");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred when processing the request\r\n{ex.Message}");
             }
         }
@@ -214,7 +214,7 @@ namespace Lithnet.AccessManager.Server.UI
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError(ex, $"The trusted issuer certificate at position {count} could not be parsed");
+                    this.logger.LogError(EventIDs.UIGenericError, ex, $"The trusted issuer certificate at position {count} could not be parsed");
                 }
             }
         }

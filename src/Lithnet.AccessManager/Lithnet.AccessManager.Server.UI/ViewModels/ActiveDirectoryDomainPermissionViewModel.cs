@@ -84,7 +84,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Group membership lookup error");
+                this.logger.LogError(EventIDs.UIGroupMembershipLookupError, ex, "Group membership lookup error");
                 this.AcaoStatus = "Group membership lookup error";
                 this.IsNotAcaoMember = true;
             }
@@ -127,7 +127,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Group membership lookup error");
+                this.logger.LogError(EventIDs.UIGroupMembershipLookupError, ex, "Group membership lookup error");
                 this.WaagStatus = "Group membership lookup error";
                 this.IsNotWaagMember = true;
             }

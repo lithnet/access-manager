@@ -69,11 +69,11 @@ namespace Lithnet.AccessManager
                     try
                     {
                         this.AddLocalGroupMember(groupName, member);
-                        this.logger.LogInformation(EventIDs.AddedGroupMember, "Added member {member} to group {groupName}", member, groupName);
+                        this.logger.LogInformation(EventIDs.LocalSamGroupMemberAdded, "Added member {member} to group {groupName}", member, groupName);
                     }
                     catch (Exception ex)
                     {
-                        this.logger.LogError(EventIDs.FailedToAddGroupMember, ex, "Failed to add member {member} to group {groupName}", member, groupName);
+                        this.logger.LogError(EventIDs.LocalSamGroupMemberAddFailed, ex, "Failed to add member {member} to group {groupName}", member, groupName);
                         if (!ignoreErrors)
                         {
                             throw;
@@ -89,11 +89,11 @@ namespace Lithnet.AccessManager
                     try
                     {
                         this.RemoveLocalGroupMember(groupName, member);
-                        this.logger.LogInformation(EventIDs.RemovedGroupMember, "Removed member {member} from group {groupName}", member, groupName);
+                        this.logger.LogInformation(EventIDs.LocalSamGroupMemberRemoved, "Removed member {member} from group {groupName}", member, groupName);
                     }
                     catch (Exception ex)
                     {
-                        this.logger.LogError(EventIDs.FailedToRemoveGroupMember, ex, "Failed to remove member {member} from group {groupName}", member, groupName);
+                        this.logger.LogError(EventIDs.LocalSamGroupMemberRemoveFailed, ex, "Failed to remove member {member} from group {groupName}", member, groupName);
                         if (!ignoreErrors)
                         {
                             throw;

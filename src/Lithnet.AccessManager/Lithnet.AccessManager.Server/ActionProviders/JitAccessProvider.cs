@@ -62,8 +62,9 @@ namespace Lithnet.AccessManager
             }
             else
             {
-                this.logger.LogInformation("Creating a new dynamic group {groupName} in {ou} with ttl of {ttl}", groupName, mapping.GroupOU, grantedExpiry);
+                this.logger.LogTrace("Creating a new dynamic group {groupName} in {ou} with ttl of {ttl}", groupName, mapping.GroupOU, grantedExpiry);
                 dynamicGroup = this.directory.CreateTtlGroup(groupName, groupName, description, mapping.GroupOU, grantedExpiry);
+                this.logger.LogInformation(EventIDs.JitDynamicGroupCreated, "Created a new dynamic group {groupName} in {ou} with ttl of {ttl}", groupName, mapping.GroupOU, grantedExpiry);
             }
 
             this.logger.LogTrace("Adding user {user} to dynamic group {dynamicGroup}", user.MsDsPrincipalName, dynamicGroup.MsDsPrincipalName);
@@ -74,8 +75,9 @@ namespace Lithnet.AccessManager
 
             undo = () =>
             {
-                this.logger.LogInformation("Rolling back JIT access by deleting dynamic group {dynamicGroup} created for {user} to become a member of {group}", dynamicGroup.MsDsPrincipalName, user.MsDsPrincipalName, group.MsDsPrincipalName);
+                this.logger.LogTrace("Rolling back JIT access by deleting dynamic group {dynamicGroup} created for {user} to become a member of {group}", dynamicGroup.MsDsPrincipalName, user.MsDsPrincipalName, group.MsDsPrincipalName);
                 this.directory.DeleteGroup(fqGroupName);
+                this.logger.LogInformation(EventIDs.JitDynamicGroupDeleted, "Rolled back JIT access by deleting dynamic group {dynamicGroup} created for {user} to become a member of {group}", dynamicGroup.MsDsPrincipalName, user.MsDsPrincipalName, group.MsDsPrincipalName);
             };
 
             return grantedExpiry;
@@ -84,7 +86,7 @@ namespace Lithnet.AccessManager
         public TimeSpan GrantJitAccessPam(IGroup group, IUser user, bool canExtend, TimeSpan requestedExpiry, out Action undo)
         {
             TimeSpan? existingTtl = group.GetMemberTtl(user);
-            
+
             if (existingTtl != null)
             {
                 this.logger.LogTrace("User {user} is already a member of {group} with {ttl} left remaining on their membership", user.MsDsPrincipalName, group.MsDsPrincipalName, existingTtl.Value);
@@ -98,12 +100,14 @@ namespace Lithnet.AccessManager
             }
 
             group.AddMember(user, requestedExpiry);
-            this.logger.LogInformation("User {user} was added to group {group} with a membership expiry of {ttl}", user.MsDsPrincipalName, group.MsDsPrincipalName, requestedExpiry);
+            this.logger.LogInformation(EventIDs.JitPamAccessGranted, "User {user} was added to group {group} with a membership expiry of {ttl}", user.MsDsPrincipalName, group.MsDsPrincipalName, requestedExpiry);
 
             undo = () =>
             {
-                this.logger.LogInformation("Rolling back JIT access by removing {user} from {group}", user.MsDsPrincipalName, group.MsDsPrincipalName);
+                this.logger.LogTrace("Rolling back JIT access by removing {user} from {group}", user.MsDsPrincipalName, group.MsDsPrincipalName);
                 group.RemoveMember(user);
+                this.logger.LogInformation(EventIDs.JitPamAccessRevoked, "Rolled back JIT access by removing {user} from {group}", user.MsDsPrincipalName, group.MsDsPrincipalName);
+
             };
 
             return requestedExpiry;
@@ -141,7 +145,7 @@ namespace Lithnet.AccessManager
             {
                 if (!items.Domain.TryParseAsSid(out SecurityIdentifier sid))
                 {
-                    this.logger.LogError("The domain value in the JIT dynamic group mapping could not be converted to a SID: {providedValue}", items.Domain);
+                    this.logger.LogError(EventIDs.JitDynamicGroupInvalidDomain, "The domain value in the JIT dynamic group mapping could not be converted to a SID: {domain}", items.Domain);
                     continue;
                 }
 

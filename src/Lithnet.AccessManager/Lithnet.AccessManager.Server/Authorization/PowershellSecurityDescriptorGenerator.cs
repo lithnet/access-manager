@@ -113,10 +113,6 @@ namespace Lithnet.AccessManager.Server.Authorization
                     {
                         return res;
                     }
-                    else
-                    {
-                        this.logger.LogWarning($"The powerShell script returned an unsupported object of type {result.BaseObject?.GetType().FullName} to the pipeline");
-                    }
                 }
 
                 return null;
@@ -140,7 +136,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                 return task.Result;
             }
 
-            this.logger.LogWarning($"The PowerShell script did not return an AuthorizationResponse");
+            this.logger.LogWarning(EventIDs.PowerShellSDGeneratorInvalidResponse, $"The PowerShell script did not return an AuthorizationResponse");
 
             return new PowerShellAuthorizationResponse();
         }

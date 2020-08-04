@@ -80,7 +80,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Could not determine Lithnet Access Manager schema status");
+                this.logger.LogError(EventIDs.UISchemaLookupError, ex, "Could not determine Lithnet Access Manager schema status");
                 this.IsNotLithnetSchemaPresent = true;
                 this.LithnetAccessManagerSchemaPresentText = "Error looking up schema";
             }
@@ -111,7 +111,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "Could not determine Microsoft LAPS schema status");
+                this.logger.LogError(EventIDs.UISchemaLookupError, ex, "Could not determine Microsoft LAPS schema status");
                 this.IsNotMsLapsSchemaPresent = true;
                 this.MsLapsSchemaPresentText = "Error looking up schema";
             }

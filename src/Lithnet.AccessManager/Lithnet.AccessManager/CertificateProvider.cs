@@ -258,7 +258,7 @@ namespace Lithnet.AccessManager
             {
                 if (path.Scheme != "https")
                 {
-                    logger.LogError(EventIDs.UnsupportedUriScheme, "Can not obtain certificate from URL, as only https URLs are supported: {path}", path);
+                    logger.LogError(EventIDs.CertProviderInvalidUnsupportedUriScheme, "Can not obtain certificate from URL, as only https URLs are supported: {path}", path);
                     return false;
                 }
 

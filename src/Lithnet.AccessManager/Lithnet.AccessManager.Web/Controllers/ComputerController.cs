@@ -19,7 +19,6 @@ using IAuthorizationService = Lithnet.AccessManager.Server.Authorization.IAuthor
 
 namespace Lithnet.AccessManager.Web.Controllers
 {
-
     [Authorize(Policy = "RequireAuthorizedUser")]
     [Localizable(true)]
     public class ComputerController : Controller
@@ -34,7 +33,7 @@ namespace Lithnet.AccessManager.Web.Controllers
         private readonly IAuditEventProcessor reporting;
         private readonly UserInterfaceOptions userInterfaceSettings;
 
-        public ComputerController(IAuthorizationService authorizationService, ILogger<LapController> logger, IDirectory directory,
+        public ComputerController(IAuthorizationService authorizationService, ILogger<ComputerController> logger, IDirectory directory,
             IAuditEventProcessor reporting, IRateLimiter rateLimiter, IOptionsSnapshot<UserInterfaceOptions> userInterfaceSettings, IAuthenticationProvider authenticationProvider, IPasswordProvider passwordProvider, IJitAccessProvider jitAccessProvider)
         {
             this.authorizationService = authorizationService;
@@ -85,7 +84,7 @@ namespace Lithnet.AccessManager.Web.Controllers
                     return actionResult;
                 }
 
-                this.logger.LogEventSuccess(EventIDs.UserRequestedAccess, string.Format(LogMessages.UserHasRequestedAccessToComputer, user.MsDsPrincipalName, model.ComputerName));
+                this.logger.LogEventSuccess(EventIDs.UserRequestedAccessToComputer, string.Format(LogMessages.UserHasRequestedAccessToComputer, user.MsDsPrincipalName, model.ComputerName));
 
                 if (!ValidateRequestReason(model, user, out actionResult))
                 {
@@ -135,7 +134,7 @@ namespace Lithnet.AccessManager.Web.Controllers
                     return actionResult;
                 }
 
-                this.logger.LogEventSuccess(EventIDs.UserRequestedAccess, string.Format(LogMessages.UserHasRequestedAccessToComputer, user.MsDsPrincipalName, model.ComputerName));
+                this.logger.LogEventSuccess(EventIDs.UserRequestedAccessToComputer, string.Format(LogMessages.UserHasRequestedAccessToComputer, user.MsDsPrincipalName, model.ComputerName));
 
                 if (!ValidateRateLimit(model, user, out actionResult))
                 {
@@ -266,7 +265,7 @@ namespace Lithnet.AccessManager.Web.Controllers
                     IsSuccess = true,
                     User = user,
                     Computer = computer,
-                    EventID = EventIDs.PasswordAccessed,
+                    EventID = EventIDs.ComputerPasswordActiveAccessGranted,
                     ComputerExpiryDate = current.ExpiryDate?.ToLocalTime().ToString(CultureInfo.CurrentUICulture)
                 });
 
@@ -335,7 +334,7 @@ namespace Lithnet.AccessManager.Web.Controllers
                     IsSuccess = true,
                     User = user,
                     Computer = computer,
-                    EventID = EventIDs.PasswordHistoryAccessed
+                    EventID = EventIDs.ComputerPasswordHistoryAccessGranted
                 });
 
                 return this.View("PasswordHistory", new PasswordHistoryModel
@@ -420,7 +419,7 @@ namespace Lithnet.AccessManager.Web.Controllers
                     IsSuccess = true,
                     User = user,
                     Computer = computer,
-                    EventID = EventIDs.JitGranted,
+                    EventID = EventIDs.ComputerJitAccessGranted,
                     ComputerExpiryDate = expiryDate.ToString(CultureInfo.CurrentCulture)
                 });
 
