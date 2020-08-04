@@ -13,7 +13,10 @@ namespace Lithnet.AccessManager.Web.Extensions
         {
             return app.Use(async (context, next) =>
                 {
-                    context.Response.Headers.Add("Feature-Policy", policy);
+                    if (!context.Response.Headers.ContainsKey("Feature-Policy"))
+                    {
+                        context.Response.Headers.Add("Feature-Policy", policy);
+                    }
                     await next.Invoke();
                 });
         }
@@ -27,7 +30,11 @@ namespace Lithnet.AccessManager.Web.Extensions
         {
             return app.Use(async (context, next) =>
              {
-                 context.Response.Headers.Add("Content-Security-Policy", csp);
+                 if (!context.Response.Headers.ContainsKey("Content-Security-Policy"))
+                 {
+                     context.Response.Headers.Add("Content-Security-Policy", csp);
+                 }
+
                  await next.Invoke();
              });
         }
@@ -41,7 +48,11 @@ namespace Lithnet.AccessManager.Web.Extensions
         {
             return app.Use(async (context, next) =>
             {
-                context.Response.Headers.Add("X-Content-Type-Options", options);
+                if (!context.Response.Headers.ContainsKey("X-Content-Type-Options"))
+                {
+                    context.Response.Headers.Add("X-Content-Type-Options", options);
+                }
+
                 await next.Invoke();
             });
         }
@@ -55,7 +66,11 @@ namespace Lithnet.AccessManager.Web.Extensions
         {
             return app.Use(async (context, next) =>
             {
-                context.Response.Headers.Add("Referrer-Policy", policy);
+                if (!context.Response.Headers.ContainsKey("Referrer-Policy"))
+                {
+                    context.Response.Headers.Add("Referrer-Policy", policy);
+                }
+
                 await next.Invoke();
             });
         }
