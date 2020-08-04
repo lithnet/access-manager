@@ -175,15 +175,14 @@ namespace Lithnet.AccessManager.Web.Controllers
                 IsSuccess = false,
                 RequestedComputerName = model.ComputerName,
                 RequestReason = model.UserRequestReason,
-                Message = string.Format(LogMessages.AuthorizationFailed, user.MsDsPrincipalName, model.ComputerName)
-            };
-
-            action.EventID = authorizationResponse.Code switch
-            {
-                AuthorizationResponseCode.NoMatchingRuleForComputer => EventIDs.AuthZFailedNoTargetMatch,
-                AuthorizationResponseCode.NoMatchingRuleForUser => EventIDs.AuthZFailedNoReaderPrincipalMatch,
-                AuthorizationResponseCode.ExplicitlyDenied => EventIDs.AuthZExplicitlyDenied,
-                _ => EventIDs.AuthZFailed,
+                Message = string.Format(LogMessages.AuthorizationFailed, user.MsDsPrincipalName, model.ComputerName),
+                EventID = authorizationResponse.Code switch
+                {
+                    AuthorizationResponseCode.NoMatchingRuleForComputer => EventIDs.AuthZFailedNoTargetMatch,
+                    AuthorizationResponseCode.NoMatchingRuleForUser => EventIDs.AuthZFailedNoReaderPrincipalMatch,
+                    AuthorizationResponseCode.ExplicitlyDenied => EventIDs.AuthZExplicitlyDenied,
+                    _ => EventIDs.AuthZFailed,
+                }
             };
 
             this.reporting.GenerateAuditEvent(action);

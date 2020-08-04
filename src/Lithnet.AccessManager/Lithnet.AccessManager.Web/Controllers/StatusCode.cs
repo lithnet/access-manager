@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Lithnet.AccessManager.Web.App_LocalResources;
+﻿using Lithnet.AccessManager.Web.App_LocalResources;
 using Lithnet.AccessManager.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;

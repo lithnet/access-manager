@@ -58,7 +58,7 @@ namespace Lithnet.AccessManager.Web.Controllers
                     break;
             }
 
-            return this.View(model);
+            return this.View("Error", model);
         }
 
         public async Task Login(string returnUrl = "/")
