@@ -4,16 +4,18 @@ namespace Lithnet.AccessManager.Agent
 {
     public class LapsRegistrySettings : ILapsSettings
     {
-        private const string policyKeyName = "SOFTWARE\\Policies\\Lithnet\\AccessManager\\Agent\\Password";
-        private const string settingsKeyName = "SOFTWARE\\Lithnet\\AccessManager\\Agent\\Password";
+        private const string policyKeyName = "SOFTWARE\\Policies\\Lithnet\\Access Manager Agent\\Password";
+        private const string settingsKeyName = "SOFTWARE\\Lithnet\\Access Manager Agent\\Password";
 
         private readonly RegistryKey policyKey;
 
         private readonly RegistryKey settingsKey;
 
-        public LapsRegistrySettings() :
-            this(Registry.LocalMachine.OpenSubKey(policyKeyName, false), Registry.LocalMachine.CreateSubKey(settingsKeyName, true))
+        public LapsRegistrySettings() 
         {
+            var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+            policyKey = baseKey.OpenSubKey(policyKeyName);
+            settingsKey = baseKey.OpenSubKey(settingsKeyName);
         }
 
         public LapsRegistrySettings(RegistryKey policyKey, RegistryKey settingsKey)
@@ -25,10 +27,6 @@ namespace Lithnet.AccessManager.Agent
         public PasswordStorageLocation StorageMode => (PasswordStorageLocation)(this.policyKey.GetValue<int>("StorageMode", 0));
 
         public string CertThumbprint => this.policyKey.GetValue<string>("CertThumbprint") ?? this.settingsKey.GetValue<string>("CertThumbprint");
-
-        public string CertPath => this.policyKey.GetValue<string>("CertPath") ?? this.settingsKey.GetValue<string>("CertPath") ?? "encryption.cer";
-
-        public bool CertDirectoryLookup => this.policyKey.GetValue<int>("CertDirectoryLookup", 1) == 1;
 
         public bool Enabled => this.policyKey.GetValue<int>("Enabled", 0) == 1;
 
@@ -44,7 +42,7 @@ namespace Lithnet.AccessManager.Agent
 
         public bool UseNumeric => this.policyKey.GetValue<int>("UseNumeric", 0) == 1;
 
-        public bool UseReadibilitySeparator => this.policyKey.GetValue<int>("UseReadibilitySeparator", 0) == 1;
+        public bool UseReadabilitySeparator => this.policyKey.GetValue<int>("UseReadabilitySeparator", 0) == 1;
 
         public string ReadabilitySeparator => this.policyKey.GetValue<string>("ReadabilitySeparator", "-");
 

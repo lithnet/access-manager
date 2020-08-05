@@ -5,7 +5,7 @@ namespace Lithnet.AccessManager.Agent.Test
 {
     public class LapsRegistryTests
     {
-        private const string policyKeyName = "SOFTWARE\\Lithnet\\UnitTest\\AccessManager\\Agent\\Laps";
+        private const string policyKeyName = "SOFTWARE\\Lithnet\\UnitTest\\Access Manager Agent\\Laps";
 
         private RegistryKey policyKey;
 
@@ -125,13 +125,13 @@ namespace Lithnet.AccessManager.Agent.Test
         [Test]
         public void UseReadibilitySeparator()
         {
-            Assert.AreEqual(false, this.registrySettings.UseReadibilitySeparator);
+            Assert.AreEqual(false, this.registrySettings.UseReadabilitySeparator);
 
             policyKey.SetValue("UseReadibilitySeparator", 1);
-            Assert.AreEqual(true, this.registrySettings.UseReadibilitySeparator);
+            Assert.AreEqual(true, this.registrySettings.UseReadabilitySeparator);
 
             policyKey.SetValue("UseReadibilitySeparator", 0);
-            Assert.AreEqual(false, this.registrySettings.UseReadibilitySeparator);
+            Assert.AreEqual(false, this.registrySettings.UseReadabilitySeparator);
         }
 
         [Test]

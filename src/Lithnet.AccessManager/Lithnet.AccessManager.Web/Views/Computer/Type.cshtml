@@ -24,18 +24,28 @@
                 </label>
             </section>
 
-            @if (Model.UserRequestReason != null)
+            @if (Model.ShowReason)
             {
                 <section>
                     <label class="title">@($"{UIMessages.UserReasonPrompt}{(Model.ReasonRequired ? "*" : string.Empty)}")</label>
                     <label class="input">
-                        @Html.TextAreaFor(m => m.UserRequestReason, new { @class = "dataEntryLarge", @required = "required" })
+
+                        @if (Model.ReasonRequired)
+                        {
+                            @Html.TextAreaFor(m => m.UserRequestReason, new { @class = "dataEntryLarge", @required = "required" })
+                        }
+                        else
+                        {
+                            @Html.TextAreaFor(m => m.UserRequestReason, new { @class = "dataEntryLarge" })
+                        }
+
+                        @Html.ValidationMessageFor(m => m.UserRequestReason)
                     </label>
                 </section>
             }
 
             <section>
-                <label class="title">Request type</label>
+                <label class="title">Access type</label>
                 <div class="form-check">
                     @if (Model.AllowedRequestTypes.HasFlag(AccessMask.Laps))
                     {

@@ -4,8 +4,6 @@
     {
         string CertThumbprint { get; }
 
-        string CertPath { get; }
-
         bool Enabled { get; }
 
         int PasswordLength { get; }
@@ -20,7 +18,7 @@
 
         bool UseNumeric { get; }
 
-        bool UseReadibilitySeparator { get; }
+        bool UseReadabilitySeparator { get; }
 
         string ReadabilitySeparator { get; }
 

@@ -25,6 +25,8 @@ namespace Lithnet.AccessManager.Agent
 
         private readonly IMsMcsAdmPwdProvider msMcsAdmPwdProvider;
 
+        private bool mslapsInstaled;
+
         public LapsAgent(ILogger<LapsAgent> logger, IDirectory directory, ILapsSettings settings, IPasswordGenerator passwordGenerator, IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider, ILocalSam sam, ILithnetAdminPasswordProvider lithnetAdminPasswordProvider, IMsMcsAdmPwdProvider msMcsAdmPwdProvider)
         {
             this.logger = logger;
@@ -56,8 +58,21 @@ namespace Lithnet.AccessManager.Agent
 
                 if (this.IsMsLapsInstalled())
                 {
-                    logger.LogWarning(EventIDs.LapsConflict, "The Microsoft LAPS client is installed and enabled. Disable the Microsoft LAPS agent via group policy or uninstall it to allow this tool to manage the local administrator password");
+                    if (!this.mslapsInstaled)
+                    {
+                        logger.LogWarning(EventIDs.LapsConflict, "The Microsoft LAPS client is installed and enabled. Disable the Microsoft LAPS agent via group policy or uninstall it to allow this tool to manage the local administrator password");
+                        mslapsInstaled = true;
+                    }
+
                     return;
+                }
+                else
+                {
+                    if (mslapsInstaled)
+                    {
+                        mslapsInstaled = false;
+                        logger.LogInformation(EventIDs.LapsConflictResolved, "The Microsoft LAPS client has been removed or disabled. Lithnet Access Manager will now set the local admin password for this machine");
+                    }
                 }
 
                 IComputer computer = this.directory.GetComputer(this.sam.GetMachineNTAccountName());
@@ -66,6 +81,10 @@ namespace Lithnet.AccessManager.Agent
                 {
                     logger.LogTrace(EventIDs.PasswordExpired, "Password has expired and needs to be changed");
                     this.ChangePassword(computer);
+                }
+                else
+                {
+                    logger.LogTrace(EventIDs.PasswordChangeNotRequired, "Password does not need to be changed");
                 }
             }
             catch (Exception ex)
@@ -76,14 +95,15 @@ namespace Lithnet.AccessManager.Agent
 
         public bool IsMsLapsInstalled()
         {
-            RegistryKey r = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UpgradeCodes\77F1646A33805F848A7A683CFB6B88A7", false);
+            var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+            RegistryKey r = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UpgradeCodes\77F1646A33805F848A7A683CFB6B88A7", false);
 
             if (r == null)
             {
                 return false;
             }
 
-            r = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Policies\Microsoft Services\AdmPwd", false);
+            r = baseKey.OpenSubKey(@"SOFTWARE\Policies\Microsoft Services\AdmPwd", false);
 
             return r?.GetValue<int>("AdmPwdEnabled", 0) == 1;
         }
@@ -140,7 +160,7 @@ namespace Lithnet.AccessManager.Agent
                 {
                     lithnetAdminPasswordProvider.UpdateCurrentPassword(computer,
                         this.encryptionProvider.Encrypt(
-                            this.certificateProvider.FindEncryptionCertificate(this.settings.CertThumbprint, this.settings.CertPath),
+                            this.certificateProvider.FindEncryptionCertificate(this.settings.CertThumbprint),
                             newPassword),
                         rotationInstant,
                         expiryDate,

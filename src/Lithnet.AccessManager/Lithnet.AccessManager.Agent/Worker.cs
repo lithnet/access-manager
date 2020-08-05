@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -32,6 +33,8 @@ namespace Lithnet.AccessManager.Agent
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            logger.LogInformation(EventIDs.AgentStarted, "Lithnet Access Manager Agent has started. v{version} {bits}", Assembly.GetEntryAssembly()?.GetName().Version, IntPtr.Size == 4 ? "(32-bit)" : "(64-bit)");
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 logger.LogTrace("Worker running at: {time}", DateTimeOffset.Now);
@@ -42,10 +45,10 @@ namespace Lithnet.AccessManager.Agent
                     this.appLifetime.StopApplication();
                     return;
                 }
-                
+
                 this.RunCheck();
 
-                await Task.Delay(TimeSpan.FromMinutes(Math.Max(this.settings.Interval, 5)), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(Math.Max(this.settings.Interval, 1)), stoppingToken);
             }
         }
 
@@ -53,6 +56,8 @@ namespace Lithnet.AccessManager.Agent
         {
             try
             {
+                Thread.Sleep(15000);
+
                 if (!this.settings.Enabled)
                 {
                     logger.LogTrace(EventIDs.AgentDisabled, "Lithnet Access Manager agent is not enabled");
@@ -63,7 +68,7 @@ namespace Lithnet.AccessManager.Agent
                 {
                     this.jitAgent.DoCheck();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     this.logger.LogError(EventIDs.JitUnexpectedException, ex, "The JIT worker encountered an exception");
                 }

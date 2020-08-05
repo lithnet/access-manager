@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 using System.Threading.Channels;
 using HtmlAgilityPack;
 using Lithnet.AccessManager.Server.App_LocalResources;
@@ -23,17 +21,14 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         private readonly ITemplateProvider templates;
 
-        private readonly RandomNumberGenerator rng;
-
         public override string Name => "smtp";
 
         protected override IList<SmtpNotificationChannelDefinition> NotificationChannelDefinitions { get; }
 
-        public SmtpNotificationChannel(ILogger<SmtpNotificationChannel> logger, IOptionsSnapshot<EmailOptions> emailSettings, ITemplateProvider templates, IOptionsSnapshot<AuditOptions> auditSettings, ChannelWriter<Action> queue, RandomNumberGenerator rng)
+        public SmtpNotificationChannel(ILogger<SmtpNotificationChannel> logger, IOptionsSnapshot<EmailOptions> emailSettings, ITemplateProvider templates, IOptionsSnapshot<AuditOptions> auditSettings, ChannelWriter<Action> queue)
             : base(logger, queue)
         {
             this.logger = logger;
-            this.rng = rng;
             this.emailSettings = emailSettings.Value;
             this.templates = templates;
             this.NotificationChannelDefinitions = auditSettings.Value.NotificationChannels.Smtp;

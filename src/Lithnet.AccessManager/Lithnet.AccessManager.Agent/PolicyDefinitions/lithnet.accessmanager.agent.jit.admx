@@ -23,7 +23,7 @@
             class="Machine"
             displayName="$(string.pol_enableJit)"
             explainText="$(string.pol_enableJit_help)"
-            key="Software\Policies\Lithnet\AccessManager\Agent\Jit"
+            key="Software\Policies\Lithnet\Access Manager Agent\Jit"
             valueName="Enabled"
            presentation="$(presentation.pol_enableJit)">
       <parentCategory ref="cat_lithnet_accessManagerAgent_jit" />
@@ -39,31 +39,11 @@
       </elements>
     </policy>
 
-    <policy name="pol_createJitGroup"
-           class="Machine"
-           displayName="$(string.pol_createJitGroup)"
-           explainText="$(string.pol_createJitGroup_help)"
-           key="Software\Policies\Lithnet\AccessManager\Agent\Jit"
-           valueName="CreateJitGroup"
-          presentation="$(presentation.pol_createJitGroup)">
-      <parentCategory ref="cat_lithnet_accessManagerAgent_jit" />
-      <supportedOn ref="TS_SUPPORTED_OS" />
-      <enabledValue>
-        <decimal value="1" />
-      </enabledValue>
-      <disabledValue>
-        <decimal value="0" />
-      </disabledValue>
-      <elements>
-        <text id="txt_jitGroupOU" valueName="JitGroupCreationOU" required="true"/>
-      </elements>
-    </policy>
-
     <policy name="pol_restrictAdmins"
           class="Machine"
           displayName="$(string.pol_restrictAdmins)"
           explainText="$(string.pol_restrictAdmins_help)"
-          key="Software\Policies\Lithnet\AccessManager\Agent\Jit"
+          key="Software\Policies\Lithnet\Access Manager Agent\Jit"
           valueName="RestrictAdmins"
          presentation="$(presentation.pol_restrictAdmins)">
       <parentCategory ref="cat_lithnet_accessManagerAgent_jit" />

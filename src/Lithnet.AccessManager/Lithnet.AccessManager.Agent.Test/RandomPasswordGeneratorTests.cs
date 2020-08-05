@@ -123,7 +123,7 @@ namespace Lithnet.AccessManager.Agent.Test
         [Test]
         public void TestPasswordUseReadibilitySeparator()
         {
-            settings.SetupGet(t => t.UseReadibilitySeparator).Returns(true);
+            settings.SetupGet(t => t.UseReadabilitySeparator).Returns(true);
             settings.SetupGet(t => t.ReadabilitySeparatorInterval).Returns(3);
             settings.SetupGet(t => t.ReadabilitySeparator).Returns("_");
             settings.SetupGet(t => t.PasswordLength).Returns(12);

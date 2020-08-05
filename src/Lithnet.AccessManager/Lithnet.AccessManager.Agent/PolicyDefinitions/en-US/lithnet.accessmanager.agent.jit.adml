@@ -21,12 +21,6 @@ For example, if you set the group name to "{domain}\JIT-GROUP-{computerName}", a
       
  If this policy is disabled or not configured, the JIT agent does not modify the membership of the local administrators group.</string>
 
-      <string id="pol_createJitGroup">Allow the computer to create the JIT group if it doesn't exist</string>
-      <string id="pol_createJitGroup_help">When this policy is enabled, the computer will attempt to create the JIT group if it doesn't exist in the directory. In order for this process to be successful, the computer account must have rights to create group objects in the specified OU.
-      
-If this policy is disabled or not configured, the group must be created in the directory by an external process.
-      </string>
-
       <string id="pol_restrictAdmins">Restrict the membership of the local administrators group</string>
       <string id="pol_restrictAdmins_help">When this policy is enabled, the members of the local administrator group are restricted to 
  
@@ -45,13 +39,6 @@ If this policy is disabled or not configured, the group must be created in the d
         <text>Specify the name, or SID of the group used to provide JIT access to this machine. See the help section for details on variables that can be used when providing a group name</text>
         <textBox refId="txt_jitGroup">
           <label>JIT group</label>
-        </textBox>
-      </presentation>
-
-      <presentation id="pol_createJitGroup">
-        <text>Specify the full distinguished name (DN) of the organizational unit where the computer has rights to create group objects</text>
-        <textBox refId="txt_jitGroupOU">
-          <label>OU distinguished name</label>
         </textBox>
       </presentation>
 

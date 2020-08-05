@@ -26,9 +26,11 @@ namespace Lithnet.AccessManager.Agent
                     services.AddTransient<IAgentSettings, AgentRegistrySettings>();
                     services.AddTransient<IJitSettings, JitRegistrySettings>();
                     services.AddTransient<IJitAgent, JitAgent>();
+                    services.AddTransient<IJitAccessGroupResolver, JitAccessGroupResolver>();
                     services.AddTransient<ILapsSettings, LapsRegistrySettings>();
                     services.AddTransient<ILapsAgent, LapsAgent>();
                     services.AddTransient<ILocalSam, LocalSam>();
+                    services.AddTransient<IAppPathProvider, AgentAppPathProvider>();
                     services.AddTransient<IPasswordGenerator, RandomPasswordGenerator>();
                     services.AddSingleton<RNGCryptoServiceProvider>();
                     services.AddTransient<IEncryptionProvider, EncryptionProvider>();

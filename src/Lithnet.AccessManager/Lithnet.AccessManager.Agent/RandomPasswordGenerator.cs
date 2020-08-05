@@ -44,7 +44,7 @@ namespace Lithnet.AccessManager.Agent
 
             string rawString = GenerateRandomString(length, selectedChars);
 
-            if (this.settings.UseReadibilitySeparator)
+            if (this.settings.UseReadabilitySeparator)
             {
                 var split = this.Split(rawString, Math.Max(this.settings.ReadabilitySeparatorInterval, 3));
                 rawString = string.Join(this.settings.ReadabilitySeparator, split);
@@ -95,7 +95,7 @@ namespace Lithnet.AccessManager.Agent
                 selectedChars.AddRange(SymbolCharacterSet);
             }
 
-            if (this.settings.UseReadibilitySeparator)
+            if (this.settings.UseReadabilitySeparator)
             {
                 foreach (char c in this.settings.ReadabilitySeparator)
                 {

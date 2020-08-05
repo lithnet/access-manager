@@ -7,11 +7,14 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Lithnet.Security.Authorization;
+using Vanara.PInvoke;
 
 namespace Lithnet.AccessManager.Interop
 {
     internal static class NativeMethods
     {
+        private static SecurityIdentifier localMachineSid;
+
         public static int DirectoryReferralLimit { get; set; } = 10;
 
         internal const int InsufficientBuffer = 122;
@@ -59,27 +62,27 @@ namespace Lithnet.AccessManager.Interop
         private static extern int NetApiBufferFree(IntPtr buffer);
 
         [DllImport("NetAPI32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        private extern static int NetLocalGroupGetMembers([MarshalAs(UnmanagedType.LPWStr)] string servername, [MarshalAs(UnmanagedType.LPWStr)] string localgroupname, int level, out IntPtr bufptr, int prefmaxlen, out int entriesread, out int totalentries, IntPtr resume_handle);
+        private static extern int NetLocalGroupGetMembers([MarshalAs(UnmanagedType.LPWStr)] string servername, [MarshalAs(UnmanagedType.LPWStr)] string localgroupname, int level, out IntPtr bufptr, int prefmaxlen, out int entriesread, out int totalentries, IntPtr resume_handle);
 
         [DllImport("netapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        private extern static int NetLocalGroupAddMember(string server, string groupName, IntPtr sid);
+        private static extern int NetLocalGroupAddMember(string server, string groupName, IntPtr sid);
 
         [DllImport("netapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        private extern static int NetLocalGroupDelMember(string server, string groupName, IntPtr sid);
+        private static extern int NetLocalGroupDelMember(string server, string groupName, IntPtr sid);
 
-        [DllImport("advapi32.dll", SetLastError = true)]
-        private extern static bool CreateWellKnownSid(WellKnownSidType wellKnownSidType, IntPtr domainSid, IntPtr pSid, ref int cbSid);
+        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        private static extern bool CreateWellKnownSid(WellKnownSidType wellKnownSidType, IntPtr domainSid, IntPtr pSid, ref int cbSid);
 
-        [DllImport("Advapi32.dll", SetLastError = true, PreserveSig = true)]
+        [DllImport("Advapi32.dll", SetLastError = true, PreserveSig = true, CharSet = CharSet.Unicode)]
         private static extern int LsaQueryInformationPolicy(IntPtr pPolicyHandle, PolicyInformationClass informationClass, out IntPtr pData);
 
-        [DllImport("advapi32.dll", SetLastError = true, PreserveSig = true)]
-        private static extern int LsaOpenPolicy(IntPtr pSystemName, ref LsaObjectAttributes objectAttributes, LsaAccessPolicy desiredAccess, out IntPtr pPolicyHandle);
+        [DllImport("advapi32.dll", SetLastError = true, PreserveSig = true, CharSet = CharSet.Unicode)]
+        private static extern int LsaOpenPolicy([In] in IntPtr pSystemName, [In] in LsaObjectAttributes objectAttributes, LsaAccessPolicy desiredAccess, out IntPtr pPolicyHandle);
 
         [DllImport("advapi32.dll", CharSet = CharSet.Unicode)]
         private static extern int LsaClose(IntPtr hPolicy);
 
-        [DllImport("advapi32.dll", SetLastError = true)]
+        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern int LsaNtStatusToWinError(int status);
 
         [DllImport("advapi32.dll", SetLastError = true)]
@@ -87,6 +90,11 @@ namespace Lithnet.AccessManager.Interop
 
         public static SecurityIdentifier GetLocalMachineAuthoritySid()
         {
+            if (localMachineSid != null)
+            {
+                return localMachineSid;
+            }
+
             IntPtr pPolicyHandle = IntPtr.Zero;
             IntPtr pPolicyData = IntPtr.Zero;
 
@@ -94,7 +102,7 @@ namespace Lithnet.AccessManager.Interop
             {
                 LsaObjectAttributes lsaObjectAttributes = new LsaObjectAttributes();
 
-                var result = LsaOpenPolicy(IntPtr.Zero, ref lsaObjectAttributes, LsaAccessPolicy.PolicyViewLocalInformation, out pPolicyHandle);
+                var result = LsaOpenPolicy(in IntPtr.Zero, in lsaObjectAttributes, LsaAccessPolicy.PolicyViewLocalInformation, out pPolicyHandle);
 
                 if (result != 0)
                 {
@@ -112,7 +120,9 @@ namespace Lithnet.AccessManager.Interop
 
                 PolicyAccountDomainInfo info = Marshal.PtrToStructure<PolicyAccountDomainInfo>(pPolicyData);
 
-                return new SecurityIdentifier(info.DomainSid);
+                localMachineSid = new SecurityIdentifier(info.DomainSid);
+
+                return localMachineSid;
             }
             finally
             {
@@ -130,60 +140,60 @@ namespace Lithnet.AccessManager.Interop
 
         public static SecurityIdentifier CreateWellKnownSid(WellKnownSidType sidType)
         {
-            return CreateWellKnownSid(sidType, GetLocalMachineAuthoritySid());
+            return new SecurityIdentifier(sidType, GetLocalMachineAuthoritySid());
         }
 
-        public static SecurityIdentifier CreateWellKnownSid(WellKnownSidType sidType, SecurityIdentifier domainSid)
-        {
-            IntPtr pSid = IntPtr.Zero;
-            IntPtr pDomainSid = IntPtr.Zero;
+        //public static SecurityIdentifier CreateWellKnownSid(WellKnownSidType sidType, SecurityIdentifier domainSid)
+        //{
+        //    IntPtr pSid = IntPtr.Zero;
+        //    IntPtr pDomainSid = IntPtr.Zero;
+            
+        //    try
+        //    {
+        //        int pSidLength = 0;
+        //        string sidString = string.Empty;
 
-            try
-            {
-                int pSidLength = 0;
-                string sidString = string.Empty;
+        //        pDomainSid = Marshal.AllocHGlobal(domainSid.BinaryLength);
+        //        byte[] bDomainSid = new byte[domainSid.BinaryLength];
+        //        domainSid.GetBinaryForm(bDomainSid, 0);
+        //        Marshal.Copy(bDomainSid, 0, pDomainSid, bDomainSid.Length);
 
-                pDomainSid = Marshal.AllocHGlobal(domainSid.BinaryLength);
-                byte[] bDomainSid = new byte[domainSid.BinaryLength];
-                domainSid.GetBinaryForm(bDomainSid, 0);
-                Marshal.Copy(bDomainSid, 0, pDomainSid, bDomainSid.Length);
+        //        if (!CreateWellKnownSid(sidType, pDomainSid, pSid, ref pSidLength))
+        //        {
+        //            var result = Marshal.GetLastWin32Error();
 
-                if (!CreateWellKnownSid(sidType, pDomainSid, pSid, ref pSidLength))
-                {
-                    var result = Marshal.GetLastWin32Error();
+        //            if (result != InsufficientBuffer)
+        //            {
+        //                throw new DirectoryException("CreateWellKnownSid failed", new Win32Exception(result));
+        //            }
+        //        }
+        //        else
+        //        {
+        //            throw new DirectoryException("CreateWellKnownSid should have failed");
+        //        }
 
-                    if (result != InsufficientBuffer)
-                    {
-                        throw new DirectoryException("CreateWellKnownSid failed", new Win32Exception(result));
-                    }
-                }
-                else
-                {
-                    throw new DirectoryException("CreateWellKnownSid should have failed");
-                }
+        //        pSid = Marshal.AllocHGlobal(pSidLength);
+        //        if (!NativeMethods.CreateWellKnownSid(sidType, pDomainSid, pSid, ref pSidLength))
+        //        {
+        //            throw new DirectoryException("CreateWellKnownSid failed", new Win32Exception(Marshal.GetLastWin32Error()));
+        //        }
 
-                pSid = Marshal.AllocHGlobal(pSidLength);
-                if (!NativeMethods.CreateWellKnownSid(sidType, pDomainSid, pSid, ref pSidLength))
-                {
-                    throw new DirectoryException("CreateWellKnownSid failed", new Win32Exception(Marshal.GetLastWin32Error()));
-                }
+        //        return new SecurityIdentifier(pSid);
+        //    }
+        //    finally
+        //    {
+        //        if (pDomainSid != IntPtr.Zero)
+        //        {
+        //            Marshal.FreeHGlobal(pDomainSid);
+        //        }
 
-                return new SecurityIdentifier(pSid);
-            }
-            finally
-            {
-                if (pDomainSid != IntPtr.Zero)
-                {
-                    Marshal.FreeHGlobal(pDomainSid);
-                }
+        //        if (pSid != IntPtr.Zero)
+        //        {
+        //            Marshal.FreeHGlobal(pSid);
+        //        }
+        //    }
 
-                if (pSid != IntPtr.Zero)
-                {
-                    Marshal.FreeHGlobal(pSid);
-                }
-            }
-
-        }
+        //}
 
         public static void AddLocalGroupMember(string groupName, SecurityIdentifier sid)
         {
@@ -400,7 +410,7 @@ namespace Lithnet.AccessManager.Interop
             return context.ContainsSid(sidToCheck);
         }
 
-        public static IEnumerable<SecurityIdentifier> GetTokenGroups(SecurityIdentifier principalSid,  SecurityIdentifier requestContext = null)
+        public static IEnumerable<SecurityIdentifier> GetTokenGroups(SecurityIdentifier principalSid, SecurityIdentifier requestContext = null)
         {
             if (principalSid == null)
             {

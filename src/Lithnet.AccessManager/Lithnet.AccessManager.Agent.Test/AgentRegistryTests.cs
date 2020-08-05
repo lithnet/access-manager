@@ -5,7 +5,7 @@ namespace Lithnet.AccessManager.Agent.Test
 {
     public class AgentRegistryTests
     {
-        private const string policyKeyName = "SOFTWARE\\Lithnet\\UnitTest\\AccessManager\\Agent";
+        private const string policyKeyName = "SOFTWARE\\Lithnet\\UnitTest\\Access Manager Agent";
 
         private RegistryKey policyKey;
 

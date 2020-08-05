@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DOCUMENT Type="Advanced Installer" CreateVersion="17.3" version="17.3" Modules="professional" RootPath="." Language="en" Id="{6231D1B4-23AF-4C6E-998C-070D74534FAD}">
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
+    <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
+    <ROW Property="AI_FINDEXE_TITLE" Value="Select the installation package for [|ProductName]" ValueLocId="AI.Property.FindExeTitle"/>
+    <ROW Property="AI_PREDEF_LCONDS_PROPS" Value="AI_DETECTED_INTERNET_CONNECTION"/>
+    <ROW Property="ALLUSERS" Value="1"/>
+    <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
+    <ROW Property="ARPNOMODIFY" MultiBuildValue="DefaultBuild:1"/>
+    <ROW Property="ARPNOREPAIR" MultiBuildValue="DefaultBuild:1"/>
+    <ROW Property="Manufacturer" Value="Lithnet"/>
+    <ROW Property="ProductCode" Value="1033:{39DC881C-4C33-46D9-8DB7-B1CF60DA0949} " Type="16"/>
+    <ROW Property="ProductLanguage" Value="1033"/>
+    <ROW Property="ProductName" Value="Lithnet Access Manager Agent"/>
+    <ROW Property="ProductVersion" Value="1.0.7522.59676" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
+    <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
+    <ROW Property="UpgradeCode" Value="{EEDECF4C-BABB-4AE0-9CB9-DC051FF1AE75}"/>
+    <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
+    <ROW Property="WindowsType9XDisplay" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT40" MultiBuildValue="DefaultBuild:Windows NT 4.0" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT40Display" MultiBuildValue="DefaultBuild:Windows NT 4.0" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT50" MultiBuildValue="DefaultBuild:Windows 2000" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT50Display" MultiBuildValue="DefaultBuild:Windows 2000" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT5X" MultiBuildValue="DefaultBuild:Windows XP/2003" ValueLocId="-"/>
+    <ROW Property="WindowsTypeNT5XDisplay" MultiBuildValue="DefaultBuild:Windows XP/2003" ValueLocId="-"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiDirsComponent">
+    <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
+    <ROW Directory="PolicyDefinitions_Dir" Directory_Parent="WindowsFolder" DefaultDir="POLICY~1|PolicyDefinitions"/>
+    <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
+    <ROW Directory="WindowsFolder" Directory_Parent="TARGETDIR" DefaultDir="WINDOW~1|WindowsFolder" IsPseudoRoot="1"/>
+    <ROW Directory="enUS_Dir" Directory_Parent="PolicyDefinitions_Dir" DefaultDir="en-US"/>
+    <ROW Directory="lib_Dir" Directory_Parent="win_Dir" DefaultDir="lib"/>
+    <ROW Directory="netcoreapp2.0_Dir" Directory_Parent="lib_Dir" DefaultDir="NETCOR~1.0|netcoreapp2.0"/>
+    <ROW Directory="netcoreapp3.0_Dir" Directory_Parent="lib_Dir" DefaultDir="NETCOR~2.0|netcoreapp3.0"/>
+    <ROW Directory="netstandard2.0_Dir" Directory_Parent="lib_Dir" DefaultDir="NETSTA~1.0|netstandard2.0"/>
+    <ROW Directory="runtimes_Dir" Directory_Parent="APPDIR" DefaultDir="runtimes"/>
+    <ROW Directory="win_Dir" Directory_Parent="runtimes_Dir" DefaultDir="win"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
+    <ROW Component="AI_ExePath" ComponentId="{57F899EC-DD6A-414C-9C02-1DE09A1D32F7}" Directory_="APPDIR" Attributes="260" KeyPath="AI_ExePath"/>
+    <ROW Component="APPDIR" ComponentId="{EAB761F8-6670-4FCD-BA74-C8A0A6728E79}" Directory_="APPDIR" Attributes="0"/>
+    <ROW Component="Lithnet.AccessManager.Agent.dll" ComponentId="{1DBCAD9A-3A7D-41E7-B1B4-7947CAD79C45}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Agent.dll"/>
+    <ROW Component="Lithnet.AccessManager.Agent.exe" ComponentId="{FC28B581-C649-40ED-8567-583F066D6BED}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Agent.exe"/>
+    <ROW Component="Lithnet.AccessManager.Agent.pdb" ComponentId="{2A9E8973-9483-4D09-8B1B-1A5ED0C989C0}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Agent.pdb" Type="4"/>
+    <ROW Component="Lithnet.AccessManager.dll" ComponentId="{33C8BD82-39F7-46C6-8B2E-D96B651B1DE8}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.dll"/>
+    <ROW Component="Lithnet.AccessManager.pdb" ComponentId="{914BA1B7-B2F4-4C1D-A6D4-6A7CB09D02BF}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.pdb" Type="4"/>
+    <ROW Component="Lithnet.Security.Authorization.dll" ComponentId="{84B34663-65B7-4163-B36D-C47EAAC9A036}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.Security.Authorization.dll"/>
+    <ROW Component="Microsoft.Extensions.Configuration.Abstractions.dll" ComponentId="{AC7ADEF0-67FD-4680-9249-99FB69FB87CA}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.Abstractions.dll"/>
+    <ROW Component="Microsoft.Extensions.Configuration.Binder.dll" ComponentId="{1E0D588E-126E-4B64-A1F5-CDC1BA3E79C9}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.Binder.dll"/>
+    <ROW Component="Microsoft.Extensions.Configuration.CommandLine.dll" ComponentId="{BDD6BF40-2137-4F81-A6E2-206CD9A12628}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.CommandLine.dll"/>
+    <ROW Component="Microsoft.Extensions.Configuration.EnvironmentVariables.dll" ComponentId="{09EE2CC6-DAC0-455A-B6B5-C58A97EB670E}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.EnvironmentVariables.dll"/>
+    <ROW Component="Microsoft.Extensions.Configuration.FileExtensions.dll" ComponentId="{29481F53-5F2C-4CE7-8936-4525B4E391E2}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.FileExtensions.dll"/>
+    <ROW Component="Microsoft.Extensions.Configuration.Json.dll" ComponentId="{AC1DD223-D24B-4C14-A8C1-3ED1B3B3C49A}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.Json.dll"/>
+    <ROW Component="Microsoft.Extensions.Configuration.UserSecrets.dll" ComponentId="{A90CEA78-1E47-4059-80C3-CD58CC9502CC}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.UserSecrets.dll"/>
+    <ROW Component="Microsoft.Extensions.Configuration.dll" ComponentId="{AC8A0368-B12D-4C76-9062-A707FB8B5DC9}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.dll"/>
+    <ROW Component="Microsoft.Extensions.DependencyInjection.Abstractions.dll" ComponentId="{A42F6405-C505-4CF8-8FD9-6992C4BB7F86}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.DependencyInjection.Abstractions.dll"/>
+    <ROW Component="Microsoft.Extensions.DependencyInjection.dll" ComponentId="{142DD3B3-706F-458C-B677-6991AAF77E76}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.DependencyInjection.dll"/>
+    <ROW Component="Microsoft.Extensions.FileProviders.Abstractions.dll" ComponentId="{B5E83717-B6FF-4854-8CF9-4DAE3B3FB733}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.FileProviders.Abstractions.dll"/>
+    <ROW Component="Microsoft.Extensions.FileProviders.Physical.dll" ComponentId="{65C51F72-FAC1-4DE9-B936-A387B1AA31C1}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.FileProviders.Physical.dll"/>
+    <ROW Component="Microsoft.Extensions.FileSystemGlobbing.dll" ComponentId="{5940EEAE-9F81-4B7F-8161-7E41AE4F651C}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.FileSystemGlobbing.dll"/>
+    <ROW Component="Microsoft.Extensions.Hosting.Abstractions.dll" ComponentId="{D4A41925-BD84-49F0-B4C8-45D17E04932F}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Hosting.Abstractions.dll"/>
+    <ROW Component="Microsoft.Extensions.Hosting.WindowsServices.dll" ComponentId="{7A1337A6-08C3-49A7-8256-8A2BA51D2CFC}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Hosting.WindowsServices.dll"/>
+    <ROW Component="Microsoft.Extensions.Hosting.dll" ComponentId="{2824A4EC-F1BC-45D8-BDC1-AC18E5DAAAAC}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Hosting.dll"/>
+    <ROW Component="Microsoft.Extensions.Logging.Abstractions.dll" ComponentId="{CEB8B270-D1D5-4DF7-97F6-3E0DBF9D7258}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.Abstractions.dll"/>
+    <ROW Component="Microsoft.Extensions.Logging.Configuration.dll" ComponentId="{3E573CFE-B8D2-42DD-9CBB-895C68BB992D}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.Configuration.dll"/>
+    <ROW Component="Microsoft.Extensions.Logging.Console.dll" ComponentId="{F9550232-867B-4A44-9E9C-5067CF684F18}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.Console.dll"/>
+    <ROW Component="Microsoft.Extensions.Logging.Debug.dll" ComponentId="{75088E93-9837-421F-8731-C1A3EE6790AD}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.Debug.dll"/>
+    <ROW Component="Microsoft.Extensions.Logging.EventLog.dll" ComponentId="{C3743128-B22F-4D0C-BB4B-5E175BAC82E1}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.EventLog.dll"/>
+    <ROW Component="Microsoft.Extensions.Logging.EventSource.dll" ComponentId="{BC648938-5456-49B2-A70D-F5D8A93F8438}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.EventSource.dll"/>
+    <ROW Component="Microsoft.Extensions.Logging.dll" ComponentId="{63CC9BAA-F22D-45C6-9D78-3E07A8B1A508}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.dll"/>
+    <ROW Component="Microsoft.Extensions.Options.ConfigurationExtensions.dll" ComponentId="{B6705F12-E6B0-4CBB-850C-8E3429EC7909}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Options.ConfigurationExtensions.dll"/>
+    <ROW Component="Microsoft.Extensions.Options.dll" ComponentId="{D3477817-AAEF-404A-A6FA-AE14FAC043C3}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Options.dll"/>
+    <ROW Component="Microsoft.Extensions.Primitives.dll" ComponentId="{60AF0B01-58C2-4431-817C-FD88C769F8BD}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Primitives.dll"/>
+    <ROW Component="Microsoft.Win32.SystemEvents.dll" ComponentId="{379F97A4-7224-42B7-8C0F-4FB61E7747E6}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Win32.SystemEvents.dll"/>
+    <ROW Component="Microsoft.Win32.SystemEvents.dll_1" ComponentId="{F0631F7B-1DA7-430E-A319-7C590E4CD5E6}" Directory_="netcoreapp3.0_Dir" Attributes="0" KeyPath="Microsoft.Win32.SystemEvents.dll_1"/>
+    <ROW Component="NLog.Extensions.Logging.dll" ComponentId="{00DA4274-2386-465C-A9EC-FB6555881485}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.Extensions.Logging.dll"/>
+    <ROW Component="NLog.dll" ComponentId="{48A426CB-2B0A-4486-B6E7-9F6B1B6F33DA}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.dll"/>
+    <ROW Component="Newtonsoft.Json.dll" ComponentId="{0B968678-5DF2-47FA-B6BC-738ACBE3E2AE}" Directory_="APPDIR" Attributes="0" KeyPath="Newtonsoft.Json.dll"/>
+    <ROW Component="ProductInformation" ComponentId="{851A7A97-4DEA-4B4C-956B-FE073CF208B1}" Directory_="APPDIR" Attributes="4" KeyPath="Version"/>
+    <ROW Component="System.Configuration.ConfigurationManager.dll" ComponentId="{3552386F-7BBF-4C50-92B1-37A893127D30}" Directory_="APPDIR" Attributes="0" KeyPath="System.Configuration.ConfigurationManager.dll"/>
+    <ROW Component="System.Diagnostics.EventLog.dll" ComponentId="{93D1C34C-8EE4-4C33-BEAD-E7B89DA4A890}" Directory_="APPDIR" Attributes="0" KeyPath="System.Diagnostics.EventLog.dll"/>
+    <ROW Component="System.Diagnostics.EventLog.dll_1" ComponentId="{B00F5D4F-D961-48F4-8BA4-CBEA0460D8FE}" Directory_="netcoreapp2.0_Dir" Attributes="0" KeyPath="System.Diagnostics.EventLog.dll_1"/>
+    <ROW Component="System.DirectoryServices.AccountManagement.dll" ComponentId="{E6A5FE2D-3905-4B6A-BAB0-1E80795CEA79}" Directory_="APPDIR" Attributes="0" KeyPath="System.DirectoryServices.AccountManagement.dll"/>
+    <ROW Component="System.DirectoryServices.AccountManagement.dll_1" ComponentId="{58F9A19E-ACFC-44F6-B6DF-6E007646ECAB}" Directory_="netcoreapp2.0_Dir" Attributes="0" KeyPath="System.DirectoryServices.AccountManagement.dll_1"/>
+    <ROW Component="System.DirectoryServices.Protocols.dll" ComponentId="{C34FD9DC-D37D-4293-BE69-71AE207DC029}" Directory_="APPDIR" Attributes="0" KeyPath="System.DirectoryServices.Protocols.dll"/>
+    <ROW Component="System.DirectoryServices.Protocols.dll_1" ComponentId="{5ED7D380-7731-45E5-8BE6-1ABA4D6A8445}" Directory_="netcoreapp2.0_Dir" Attributes="0" KeyPath="System.DirectoryServices.Protocols.dll_1"/>
+    <ROW Component="System.DirectoryServices.dll" ComponentId="{61A483B0-CAF0-493A-8835-B5367D199ACC}" Directory_="APPDIR" Attributes="0" KeyPath="System.DirectoryServices.dll"/>
+    <ROW Component="System.DirectoryServices.dll_1" ComponentId="{5A5E88A1-257C-4F8F-94EE-5EE70B71F2CE}" Directory_="netcoreapp2.0_Dir" Attributes="0" KeyPath="System.DirectoryServices.dll_1"/>
+    <ROW Component="System.Drawing.Common.dll" ComponentId="{256E73BC-9A19-4F28-A453-E69F2F795B36}" Directory_="APPDIR" Attributes="0" KeyPath="System.Drawing.Common.dll"/>
+    <ROW Component="System.Drawing.Common.dll_1" ComponentId="{9260E2D6-6976-4D31-97EB-3735C3231F16}" Directory_="netcoreapp3.0_Dir" Attributes="0" KeyPath="System.Drawing.Common.dll_1"/>
+    <ROW Component="System.Security.Cryptography.ProtectedData.dll" ComponentId="{911D9E7D-1EBD-49FF-9E88-E5AAB92CB530}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Cryptography.ProtectedData.dll"/>
+    <ROW Component="System.Security.Cryptography.ProtectedData.dll_1" ComponentId="{BE949CBF-D50B-4F0A-A34C-F96D51203394}" Directory_="netstandard2.0_Dir" Attributes="0" KeyPath="System.Security.Cryptography.ProtectedData.dll_1"/>
+    <ROW Component="System.Security.Permissions.dll" ComponentId="{E2A3AFB4-35C1-4DE0-9DFF-6E173CAAFC99}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Permissions.dll"/>
+    <ROW Component="System.ServiceProcess.ServiceController.dll" ComponentId="{1931658B-85CA-4C8B-938B-D4D32F04A4D6}" Directory_="APPDIR" Attributes="0" KeyPath="System.ServiceProcess.ServiceController.dll"/>
+    <ROW Component="System.ServiceProcess.ServiceController.dll_1" ComponentId="{985F35FE-B438-47D5-A41F-B58427241169}" Directory_="netstandard2.0_Dir" Attributes="0" KeyPath="System.ServiceProcess.ServiceController.dll_1"/>
+    <ROW Component="System.Windows.Extensions.dll" ComponentId="{DD58870F-A8B7-4FE7-9766-A1E154B3C8CC}" Directory_="APPDIR" Attributes="0" KeyPath="System.Windows.Extensions.dll"/>
+    <ROW Component="System.Windows.Extensions.dll_1" ComponentId="{5B5C1893-233B-41B7-955E-7FF0115E2291}" Directory_="netcoreapp3.0_Dir" Attributes="0" KeyPath="System.Windows.Extensions.dll_1"/>
+    <ROW Component="Vanara.Core.dll" ComponentId="{5072B473-308F-4CBE-9C9B-DEE285EC4F3E}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.Core.dll"/>
+    <ROW Component="Vanara.PInvoke.Cryptography.dll" ComponentId="{887E6EA8-A5AF-49BD-86E0-533F2E4079E1}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Cryptography.dll"/>
+    <ROW Component="Vanara.PInvoke.Kernel32.dll" ComponentId="{753703CF-BEBF-460D-A714-8CE8CF20AC48}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Kernel32.dll"/>
+    <ROW Component="Vanara.PInvoke.Security.dll" ComponentId="{21345AB3-7C50-47B6-BDD2-B574CDBD7C31}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Security.dll"/>
+    <ROW Component="Vanara.PInvoke.Shared.dll" ComponentId="{B593AED6-0F7B-4BCB-A2A2-EF3E1D46A42E}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Shared.dll"/>
+    <ROW Component="appsettings.Development.json" ComponentId="{2DD80C99-2760-4367-9399-5221A7DEDAF6}" Directory_="APPDIR" Attributes="0" KeyPath="appsettings.json" Type="0"/>
+    <ROW Component="lithnet.accessmanager.agent.adml" ComponentId="{26248AAD-5537-4D99-A826-1379B0A4FCBA}" Directory_="enUS_Dir" Attributes="0" KeyPath="lithnet.accessmanager.agent.adml" Type="0"/>
+    <ROW Component="lithnet.accessmanager.agent.admx" ComponentId="{4A2EA2A4-4ACD-4051-A1FA-9594018B22D7}" Directory_="PolicyDefinitions_Dir" Attributes="0" KeyPath="lithnet.accessmanager.agent.admx" Type="0"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
+    <ROW Feature="AI32BitFiles" Title="32-bit" Description="32-bit Executables and Libraries" Display="3" Level="1" Directory_="APPDIR" Attributes="0"/>
+    <ROW Feature="AIOtherFiles" Title="Common" Description="Shared Resource and Regular Files" Display="5" Level="1" Directory_="APPDIR" Attributes="0"/>
+    <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0"/>
+    <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
+    <ROW File="appsettings.json" Component_="appsettings.Development.json" FileName="APPSET~2.JSO|appsettings.json" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\appsettings.json" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Agent.deps.json" Component_="appsettings.Development.json" FileName="LITHNE~1.JSO|Lithnet.AccessManager.Agent.deps.json" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Lithnet.AccessManager.Agent.deps.json" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Agent.dll" Component_="Lithnet.AccessManager.Agent.dll" FileName="LITHNE~1.DLL|Lithnet.AccessManager.Agent.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Lithnet.AccessManager.Agent.dll" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Agent.exe" Component_="Lithnet.AccessManager.Agent.exe" FileName="LITHNE~1.EXE|Lithnet.AccessManager.Agent.exe" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Lithnet.AccessManager.Agent.exe" SelfReg="false" DigSign="true"/>
+    <ROW File="Lithnet.AccessManager.Agent.pdb" Component_="Lithnet.AccessManager.Agent.pdb" FileName="LITHNE~1.PDB|Lithnet.AccessManager.Agent.pdb" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Lithnet.AccessManager.Agent.pdb" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Agent.runtimeconfig.json" Component_="appsettings.Development.json" FileName="LITHNE~2.JSO|Lithnet.AccessManager.Agent.runtimeconfig.json" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Lithnet.AccessManager.Agent.runtimeconfig.json" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.dll" Component_="Lithnet.AccessManager.dll" FileName="LITHNE~2.DLL|Lithnet.AccessManager.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Lithnet.AccessManager.dll" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.pdb" Component_="Lithnet.AccessManager.pdb" FileName="LITHNE~2.PDB|Lithnet.AccessManager.pdb" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Lithnet.AccessManager.pdb" SelfReg="false"/>
+    <ROW File="Lithnet.Security.Authorization.dll" Component_="Lithnet.Security.Authorization.dll" FileName="LITHNE~3.DLL|Lithnet.Security.Authorization.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Lithnet.Security.Authorization.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Configuration.Abstractions.dll" Component_="Microsoft.Extensions.Configuration.Abstractions.dll" FileName="MICROS~1.DLL|Microsoft.Extensions.Configuration.Abstractions.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Configuration.Abstractions.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Configuration.Binder.dll" Component_="Microsoft.Extensions.Configuration.Binder.dll" FileName="MICROS~2.DLL|Microsoft.Extensions.Configuration.Binder.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Configuration.Binder.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Configuration.CommandLine.dll" Component_="Microsoft.Extensions.Configuration.CommandLine.dll" FileName="MICROS~3.DLL|Microsoft.Extensions.Configuration.CommandLine.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Configuration.CommandLine.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Configuration.dll" Component_="Microsoft.Extensions.Configuration.dll" FileName="MICROS~4.DLL|Microsoft.Extensions.Configuration.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Configuration.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Configuration.EnvironmentVariables.dll" Component_="Microsoft.Extensions.Configuration.EnvironmentVariables.dll" FileName="MICROS~5.DLL|Microsoft.Extensions.Configuration.EnvironmentVariables.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Configuration.EnvironmentVariables.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Configuration.FileExtensions.dll" Component_="Microsoft.Extensions.Configuration.FileExtensions.dll" FileName="MICROS~6.DLL|Microsoft.Extensions.Configuration.FileExtensions.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Configuration.FileExtensions.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Configuration.Json.dll" Component_="Microsoft.Extensions.Configuration.Json.dll" FileName="MICROS~7.DLL|Microsoft.Extensions.Configuration.Json.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Configuration.Json.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Configuration.UserSecrets.dll" Component_="Microsoft.Extensions.Configuration.UserSecrets.dll" FileName="MICROS~8.DLL|Microsoft.Extensions.Configuration.UserSecrets.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Configuration.UserSecrets.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.DependencyInjection.Abstractions.dll" Component_="Microsoft.Extensions.DependencyInjection.Abstractions.dll" FileName="MICROS~9.DLL|Microsoft.Extensions.DependencyInjection.Abstractions.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.DependencyInjection.Abstractions.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.DependencyInjection.dll" Component_="Microsoft.Extensions.DependencyInjection.dll" FileName="MICRO~10.DLL|Microsoft.Extensions.DependencyInjection.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.DependencyInjection.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.FileProviders.Abstractions.dll" Component_="Microsoft.Extensions.FileProviders.Abstractions.dll" FileName="MICRO~11.DLL|Microsoft.Extensions.FileProviders.Abstractions.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.FileProviders.Abstractions.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.FileProviders.Physical.dll" Component_="Microsoft.Extensions.FileProviders.Physical.dll" FileName="MICRO~12.DLL|Microsoft.Extensions.FileProviders.Physical.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.FileProviders.Physical.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.FileSystemGlobbing.dll" Component_="Microsoft.Extensions.FileSystemGlobbing.dll" FileName="MICRO~13.DLL|Microsoft.Extensions.FileSystemGlobbing.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.FileSystemGlobbing.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Hosting.Abstractions.dll" Component_="Microsoft.Extensions.Hosting.Abstractions.dll" FileName="MICRO~14.DLL|Microsoft.Extensions.Hosting.Abstractions.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Hosting.Abstractions.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Hosting.dll" Component_="Microsoft.Extensions.Hosting.dll" FileName="MICRO~15.DLL|Microsoft.Extensions.Hosting.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Hosting.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Hosting.WindowsServices.dll" Component_="Microsoft.Extensions.Hosting.WindowsServices.dll" FileName="MICRO~16.DLL|Microsoft.Extensions.Hosting.WindowsServices.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Hosting.WindowsServices.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Logging.Abstractions.dll" Component_="Microsoft.Extensions.Logging.Abstractions.dll" FileName="MICRO~17.DLL|Microsoft.Extensions.Logging.Abstractions.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Logging.Abstractions.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Logging.Configuration.dll" Component_="Microsoft.Extensions.Logging.Configuration.dll" FileName="MICRO~18.DLL|Microsoft.Extensions.Logging.Configuration.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Logging.Configuration.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Logging.Console.dll" Component_="Microsoft.Extensions.Logging.Console.dll" FileName="MICRO~19.DLL|Microsoft.Extensions.Logging.Console.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Logging.Console.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Logging.Debug.dll" Component_="Microsoft.Extensions.Logging.Debug.dll" FileName="MICRO~20.DLL|Microsoft.Extensions.Logging.Debug.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Logging.Debug.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Logging.dll" Component_="Microsoft.Extensions.Logging.dll" FileName="MICRO~21.DLL|Microsoft.Extensions.Logging.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Logging.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Logging.EventLog.dll" Component_="Microsoft.Extensions.Logging.EventLog.dll" FileName="MICRO~22.DLL|Microsoft.Extensions.Logging.EventLog.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Logging.EventLog.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Logging.EventSource.dll" Component_="Microsoft.Extensions.Logging.EventSource.dll" FileName="MICRO~23.DLL|Microsoft.Extensions.Logging.EventSource.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Logging.EventSource.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Options.ConfigurationExtensions.dll" Component_="Microsoft.Extensions.Options.ConfigurationExtensions.dll" FileName="MICRO~24.DLL|Microsoft.Extensions.Options.ConfigurationExtensions.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Options.ConfigurationExtensions.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Options.dll" Component_="Microsoft.Extensions.Options.dll" FileName="MICRO~25.DLL|Microsoft.Extensions.Options.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Options.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Primitives.dll" Component_="Microsoft.Extensions.Primitives.dll" FileName="MICRO~26.DLL|Microsoft.Extensions.Primitives.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Extensions.Primitives.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Win32.SystemEvents.dll" Component_="Microsoft.Win32.SystemEvents.dll" FileName="MICRO~27.DLL|Microsoft.Win32.SystemEvents.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Microsoft.Win32.SystemEvents.dll" SelfReg="false"/>
+    <ROW File="Newtonsoft.Json.dll" Component_="Newtonsoft.Json.dll" FileName="NEWTON~1.DLL|Newtonsoft.Json.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Newtonsoft.Json.dll" SelfReg="false"/>
+    <ROW File="NLog.config" Component_="appsettings.Development.json" FileName="NLOG~1.CON|NLog.config" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\NLog.config" SelfReg="false"/>
+    <ROW File="NLog.dll" Component_="NLog.dll" FileName="NLog.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\NLog.dll" SelfReg="false"/>
+    <ROW File="NLog.Extensions.Logging.dll" Component_="NLog.Extensions.Logging.dll" FileName="NLOGEX~1.DLL|NLog.Extensions.Logging.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\NLog.Extensions.Logging.dll" SelfReg="false"/>
+    <ROW File="System.Configuration.ConfigurationManager.dll" Component_="System.Configuration.ConfigurationManager.dll" FileName="SYSTEM~1.DLL|System.Configuration.ConfigurationManager.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\System.Configuration.ConfigurationManager.dll" SelfReg="false"/>
+    <ROW File="System.Diagnostics.EventLog.dll" Component_="System.Diagnostics.EventLog.dll" FileName="SYSTEM~2.DLL|System.Diagnostics.EventLog.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\System.Diagnostics.EventLog.dll" SelfReg="false"/>
+    <ROW File="System.DirectoryServices.AccountManagement.dll" Component_="System.DirectoryServices.AccountManagement.dll" FileName="SYSTEM~3.DLL|System.DirectoryServices.AccountManagement.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\System.DirectoryServices.AccountManagement.dll" SelfReg="false"/>
+    <ROW File="System.DirectoryServices.dll" Component_="System.DirectoryServices.dll" FileName="SYSTEM~4.DLL|System.DirectoryServices.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\System.DirectoryServices.dll" SelfReg="false"/>
+    <ROW File="System.DirectoryServices.Protocols.dll" Component_="System.DirectoryServices.Protocols.dll" FileName="SYSTEM~5.DLL|System.DirectoryServices.Protocols.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\System.DirectoryServices.Protocols.dll" SelfReg="false"/>
+    <ROW File="System.Drawing.Common.dll" Component_="System.Drawing.Common.dll" FileName="SYSTEM~6.DLL|System.Drawing.Common.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\System.Drawing.Common.dll" SelfReg="false"/>
+    <ROW File="System.Security.Cryptography.ProtectedData.dll" Component_="System.Security.Cryptography.ProtectedData.dll" FileName="SYSTEM~7.DLL|System.Security.Cryptography.ProtectedData.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\System.Security.Cryptography.ProtectedData.dll" SelfReg="false"/>
+    <ROW File="System.Security.Permissions.dll" Component_="System.Security.Permissions.dll" FileName="SYSTEM~8.DLL|System.Security.Permissions.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\System.Security.Permissions.dll" SelfReg="false"/>
+    <ROW File="System.ServiceProcess.ServiceController.dll" Component_="System.ServiceProcess.ServiceController.dll" FileName="SYSTEM~9.DLL|System.ServiceProcess.ServiceController.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\System.ServiceProcess.ServiceController.dll" SelfReg="false"/>
+    <ROW File="System.Windows.Extensions.dll" Component_="System.Windows.Extensions.dll" FileName="SYSTE~10.DLL|System.Windows.Extensions.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\System.Windows.Extensions.dll" SelfReg="false"/>
+    <ROW File="Vanara.Core.dll" Component_="Vanara.Core.dll" FileName="VANARA~1.DLL|Vanara.Core.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Vanara.Core.dll" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.Cryptography.dll" Component_="Vanara.PInvoke.Cryptography.dll" FileName="VANARA~2.DLL|Vanara.PInvoke.Cryptography.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Vanara.PInvoke.Cryptography.dll" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.Shared.dll" Component_="Vanara.PInvoke.Shared.dll" FileName="VANARA~3.DLL|Vanara.PInvoke.Shared.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Vanara.PInvoke.Shared.dll" SelfReg="false"/>
+    <ROW File="lithnet.accessmanager.agent.adml" Component_="lithnet.accessmanager.agent.adml" FileName="LITHNE~1.ADM|lithnet.accessmanager.agent.adml" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\PolicyDefinitions\en-US\lithnet.accessmanager.agent.adml" SelfReg="false"/>
+    <ROW File="lithnet.accessmanager.agent.jit.adml" Component_="lithnet.accessmanager.agent.adml" FileName="LITHNE~2.ADM|lithnet.accessmanager.agent.jit.adml" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\PolicyDefinitions\en-US\lithnet.accessmanager.agent.jit.adml" SelfReg="false"/>
+    <ROW File="lithnet.accessmanager.agent.password.adml" Component_="lithnet.accessmanager.agent.adml" FileName="LITHNE~3.ADM|lithnet.accessmanager.agent.password.adml" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\PolicyDefinitions\en-US\lithnet.accessmanager.agent.password.adml" SelfReg="false"/>
+    <ROW File="lithnet.adml" Component_="lithnet.accessmanager.agent.adml" FileName="LITHNE~4.ADM|lithnet.adml" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\PolicyDefinitions\en-US\lithnet.adml" SelfReg="false"/>
+    <ROW File="lithnet.accessmanager.agent.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~1.ADM|lithnet.accessmanager.agent.admx" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\PolicyDefinitions\lithnet.accessmanager.agent.admx" SelfReg="false"/>
+    <ROW File="lithnet.accessmanager.agent.jit.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~2.ADM|lithnet.accessmanager.agent.jit.admx" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\PolicyDefinitions\lithnet.accessmanager.agent.jit.admx" SelfReg="false"/>
+    <ROW File="lithnet.accessmanager.agent.password.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~3.ADM|lithnet.accessmanager.agent.password.admx" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\PolicyDefinitions\lithnet.accessmanager.agent.password.admx" SelfReg="false"/>
+    <ROW File="lithnet.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~4.ADM|lithnet.admx" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\PolicyDefinitions\lithnet.admx" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.Kernel32.dll" Component_="Vanara.PInvoke.Kernel32.dll" FileName="VANARA~4.DLL|Vanara.PInvoke.Kernel32.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Vanara.PInvoke.Kernel32.dll" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.Security.dll" Component_="Vanara.PInvoke.Security.dll" FileName="VANARA~5.DLL|Vanara.PInvoke.Security.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\Vanara.PInvoke.Security.dll" SelfReg="false"/>
+    <ROW File="System.Diagnostics.EventLog.dll_1" Component_="System.Diagnostics.EventLog.dll_1" FileName="SYSTEM~1.DLL|System.Diagnostics.EventLog.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\runtimes\win\lib\netcoreapp2.0\System.Diagnostics.EventLog.dll" SelfReg="false"/>
+    <ROW File="System.DirectoryServices.AccountManagement.dll_1" Component_="System.DirectoryServices.AccountManagement.dll_1" FileName="SYSTEM~2.DLL|System.DirectoryServices.AccountManagement.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\runtimes\win\lib\netcoreapp2.0\System.DirectoryServices.AccountManagement.dll" SelfReg="false"/>
+    <ROW File="System.DirectoryServices.dll_1" Component_="System.DirectoryServices.dll_1" FileName="SYSTEM~3.DLL|System.DirectoryServices.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\runtimes\win\lib\netcoreapp2.0\System.DirectoryServices.dll" SelfReg="false"/>
+    <ROW File="System.DirectoryServices.Protocols.dll_1" Component_="System.DirectoryServices.Protocols.dll_1" FileName="SYSTEM~4.DLL|System.DirectoryServices.Protocols.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\runtimes\win\lib\netcoreapp2.0\System.DirectoryServices.Protocols.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Win32.SystemEvents.dll_1" Component_="Microsoft.Win32.SystemEvents.dll_1" FileName="MICROS~1.DLL|Microsoft.Win32.SystemEvents.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll" SelfReg="false"/>
+    <ROW File="System.Drawing.Common.dll_1" Component_="System.Drawing.Common.dll_1" FileName="SYSTEM~1.DLL|System.Drawing.Common.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll" SelfReg="false"/>
+    <ROW File="System.Windows.Extensions.dll_1" Component_="System.Windows.Extensions.dll_1" FileName="SYSTEM~2.DLL|System.Windows.Extensions.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll" SelfReg="false"/>
+    <ROW File="System.Security.Cryptography.ProtectedData.dll_1" Component_="System.Security.Cryptography.ProtectedData.dll_1" FileName="SYSTEM~1.DLL|System.Security.Cryptography.ProtectedData.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll" SelfReg="false"/>
+    <ROW File="System.ServiceProcess.ServiceController.dll_1" Component_="System.ServiceProcess.ServiceController.dll_1" FileName="SYSTEM~2.DLL|System.ServiceProcess.ServiceController.dll" Attributes="0" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish\runtimes\win\lib\netstandard2.0\System.ServiceProcess.ServiceController.dll" SelfReg="false"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
+    <ROW BootstrOptKey="GlobalOptions" GeneralOptions="o" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.BootstrapperUISequenceComponent">
+    <ROW Action="AI_DetectSoftware" Sequence="151"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
+    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="1" PackageFileName="Lithnet Access Manager Agent Setup" Languages="en" InstallationType="4" CabsLocation="1" PackageType="1" FilesInsideExe="true" ExtractionFolder="[AppDataFolder][|Manufacturer]\[|ProductName] [|ProductVersion]\install" UseLargeSchema="true" ExeName="Lithnet Access Manager Agent Setup" MsiPackageType="AI_ALL"/>
+    <ATTRIBUTE name="CompConditionPolicy" value="0"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
+    <ROW Path="&lt;AI_DICTS&gt;ui.ail"/>
+    <ROW Path="&lt;AI_DICTS&gt;ui_en.ail"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.DigCertStoreComponent">
+    <ROW TimeStampUrl="http://timestamp.digicert.com" SignerDescription="[|ProductName]" SignOptions="7" SignTool="0" UseSha256="1" Thumbprint="578375f6d4d431d4049ce754ed0affdffe3a51a9 Subject: Lithnet&#10;Issuer: DigiCert SHA2 Assured ID Code Signing CA&#10;Valid from 09/12/2019 to 12/23/2020&#10;User\MY" Subject="CN=Lithnet, O=Lithnet, L=Chadstone, S=Victoria, C=AU"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.FragmentComponent">
+    <ROW Fragment="CommonUI.aip" Path="&lt;AI_FRAGS&gt;CommonUI.aip"/>
+    <ROW Fragment="FolderDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\FolderDlg.aip"/>
+    <ROW Fragment="MaintenanceTypeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\MaintenanceTypeDlg.aip"/>
+    <ROW Fragment="MaintenanceWelcomeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\MaintenanceWelcomeDlg.aip"/>
+    <ROW Fragment="PreparePrereqDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\PreparePrereqDlg.aip"/>
+    <ROW Fragment="PrerequisitesDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\PrerequisitesDlg.aip"/>
+    <ROW Fragment="ProgressPrereqDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\ProgressPrereqDlg.aip"/>
+    <ROW Fragment="SequenceDialogs.aip" Path="&lt;AI_THEMES&gt;classic\fragments\SequenceDialogs.aip"/>
+    <ROW Fragment="Sequences.aip" Path="&lt;AI_FRAGS&gt;Sequences.aip"/>
+    <ROW Fragment="StaticUIStrings.aip" Path="&lt;AI_FRAGS&gt;StaticUIStrings.aip"/>
+    <ROW Fragment="UI.aip" Path="&lt;AI_THEMES&gt;classic\fragments\UI.aip"/>
+    <ROW Fragment="Validation.aip" Path="&lt;AI_FRAGS&gt;Validation.aip"/>
+    <ROW Fragment="VerifyRemoveDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\VerifyRemoveDlg.aip"/>
+    <ROW Fragment="VerifyRepairDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\VerifyRepairDlg.aip"/>
+    <ROW Fragment="WelcomeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\WelcomeDlg.aip"/>
+    <ROW Fragment="WelcomePrereqDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\WelcomePrereqDlg.aip"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiActionTextComponent">
+    <ROW Action="AI_DeleteLzma" Description="Deleting files extracted from archive" DescriptionLocId="ActionText.Description.AI_DeleteLzma" TemplateLocId="-"/>
+    <ROW Action="AI_DeleteRLzma" Description="Deleting files extracted from archive" DescriptionLocId="ActionText.Description.AI_DeleteLzma" TemplateLocId="-"/>
+    <ROW Action="AI_ExtractFiles" Description="Extracting files from archive" DescriptionLocId="ActionText.Description.AI_ExtractLzma" TemplateLocId="-"/>
+    <ROW Action="AI_ExtractLzma" Description="Extracting files from archive" DescriptionLocId="ActionText.Description.AI_ExtractLzma" TemplateLocId="-"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiAppSearchComponent">
+    <ROW Property="AI_SETUPEXEPATH" Signature_="AI_EXE_PATH_LM" Builds="DefaultBuild"/>
+    <ROW Property="AI_SETUPEXEPATH" Signature_="AI_EXE_PATH_CU" Builds="DefaultBuild"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiBinaryComponent">
+    <ROW Name="Prereq.dll" SourcePath="&lt;AI_CUSTACTS&gt;Prereq.dll"/>
+    <ROW Name="SoftwareDetector.dll" SourcePath="&lt;AI_CUSTACTS&gt;SoftwareDetector.dll"/>
+    <ROW Name="aicustact.dll" SourcePath="&lt;AI_CUSTACTS&gt;aicustact.dll"/>
+    <ROW Name="lzmaextractor.dll" SourcePath="&lt;AI_CUSTACTS&gt;lzmaextractor.dll"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiControlEventComponent">
+    <ROW Dialog_="WelcomeDlg" Control_="Next" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="FolderDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_INSTALL" Ordering="201"/>
+    <ROW Dialog_="FolderDlg" Control_="Back" Event="NewDialog" Argument="WelcomeDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="MaintenanceWelcomeDlg" Control_="Next" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="99"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_MAINT" Ordering="198"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="CustomizeDlg" Condition="AI_MAINT" Ordering="202"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_INSTALL" Ordering="197"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="201"/>
+    <ROW Dialog_="CustomizeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_MAINT" Ordering="101"/>
+    <ROW Dialog_="CustomizeDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="ChangeButton" Event="NewDialog" Argument="CustomizeDlg" Condition="AI_MAINT" Ordering="501"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceWelcomeDlg" Condition="AI_MAINT" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="RemoveButton" Event="NewDialog" Argument="VerifyRemoveDlg" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="601"/>
+    <ROW Dialog_="VerifyRemoveDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="1"/>
+    <ROW Dialog_="MaintenanceTypeDlg" Control_="RepairButton" Event="NewDialog" Argument="VerifyRepairDlg" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="601"/>
+    <ROW Dialog_="VerifyRepairDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="1"/>
+    <ROW Dialog_="VerifyRepairDlg" Control_="Repair" Event="EndDialog" Argument="Return" Condition="AI_MAINT AND InstallMode=&quot;Repair&quot;" Ordering="399" Options="1"/>
+    <ROW Dialog_="VerifyRemoveDlg" Control_="Remove" Event="EndDialog" Argument="Return" Condition="AI_MAINT AND InstallMode=&quot;Remove&quot;" Ordering="299" Options="1"/>
+    <ROW Dialog_="PatchWelcomeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_PATCH" Ordering="201"/>
+    <ROW Dialog_="ResumeDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_RESUME" Ordering="299"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_PATCH" Ordering="199"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="PatchWelcomeDlg" Condition="AI_PATCH" Ordering="203"/>
+    <ROW Dialog_="WelcomePrereqDlg" Control_="Next" Event="NewDialog" Argument="PrerequisitesDlg" Condition="AI_BOOTSTRAPPER" Ordering="1"/>
+    <ROW Dialog_="PrerequisitesDlg" Control_="Next" Event="EndDialog" Argument="Return" Condition="AI_BOOTSTRAPPER" Ordering="1"/>
+    <ROW Dialog_="PrerequisitesDlg" Control_="Back" Event="NewDialog" Argument="WelcomePrereqDlg" Condition="AI_BOOTSTRAPPER" Ordering="1"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
+    <ROW Directory_="APPDIR" Component_="APPDIR" ManualDelete="true"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
+    <ROW Action="AI_AppSearchEx" Type="1" Source="Prereq.dll" Target="DoAppSearchEx"/>
+    <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Type="51" Source="AI_SETUPEXEPATH_ORIGINAL" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_DATA_SETTER" Type="51" Source="AI_ExtractFiles" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
+    <ROW Action="AI_DeleteCadLzma" Type="51" Source="AI_DeleteLzma" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_DeleteLzma" Type="1025" Source="lzmaextractor.dll" Target="DeleteLZMAFiles"/>
+    <ROW Action="AI_DeleteRCadLzma" Type="51" Source="AI_DeleteRLzma" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_DeleteRLzma" Type="1281" Source="lzmaextractor.dll" Target="DeleteLZMAFiles"/>
+    <ROW Action="AI_DetectSoftware" Type="257" Source="SoftwareDetector.dll" Target="OnDetectSoftware"/>
+    <ROW Action="AI_DpiContentScale" Type="1" Source="aicustact.dll" Target="DpiContentScale"/>
+    <ROW Action="AI_EnableDebugLog" Type="321" Source="aicustact.dll" Target="EnableDebugLog"/>
+    <ROW Action="AI_EstimateExtractFiles" Type="1" Source="Prereq.dll" Target="EstimateExtractFiles"/>
+    <ROW Action="AI_ExtractCadLzma" Type="51" Source="AI_ExtractLzma" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_ExtractFiles" Type="1025" Source="Prereq.dll" Target="ExtractSourceFiles" AdditionalSeq="AI_DATA_SETTER"/>
+    <ROW Action="AI_ExtractLzma" Type="1025" Source="lzmaextractor.dll" Target="ExtractLZMAFiles"/>
+    <ROW Action="AI_FindExeLzma" Type="1" Source="lzmaextractor.dll" Target="FindEXE"/>
+    <ROW Action="AI_InstallModeCheck" Type="1" Source="aicustact.dll" Target="UpdateInstallMode" WithoutSeq="true"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Type="65" Source="aicustact.dll" Target="PrepareUpgrade"/>
+    <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Type="51" Source="AI_SETUPEXEPATH" Target="[AI_SETUPEXEPATH_ORIGINAL]"/>
+    <ROW Action="AI_ResolveKnownFolders" Type="1" Source="aicustact.dll" Target="AI_ResolveKnownFolders"/>
+    <ROW Action="AI_SETPROGRAMFILES" Type="51" Source="AI_ProgramFiles" Target="[ProgramFilesFolder]"/>
+    <ROW Action="AI_SETPROGRAMFILES64" Type="51" Source="AI_ProgramFiles" Target="[ProgramFiles64Folder]"/>
+    <ROW Action="AI_SHOW_LOG" Type="65" Source="aicustact.dll" Target="LaunchLogFile" WithoutSeq="true"/>
+    <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
+    <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="DefaultBuild:[ProgramFiles64Folder][Manufacturer]\[ProductName]"/>
+    <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]"/>
+    <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatCompsComponent">
+    <ROW Feature_="MainFeature" Component_="APPDIR"/>
+    <ROW Feature_="MainFeature" Component_="ProductInformation"/>
+    <ROW Feature_="MainFeature" Component_="AI_ExePath"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Logging.EventLog.dll"/>
+    <ROW Feature_="AIOtherFiles" Component_="appsettings.Development.json"/>
+    <ROW Feature_="AIOtherFiles" Component_="lithnet.accessmanager.agent.admx"/>
+    <ROW Feature_="AIOtherFiles" Component_="lithnet.accessmanager.agent.adml"/>
+    <ROW Feature_="AIOtherFiles" Component_="Lithnet.AccessManager.pdb"/>
+    <ROW Feature_="AIOtherFiles" Component_="Lithnet.AccessManager.Agent.pdb"/>
+    <ROW Feature_="AI32BitFiles" Component_="Lithnet.AccessManager.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="System.DirectoryServices.AccountManagement.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Lithnet.AccessManager.Agent.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.FileProviders.Physical.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Configuration.EnvironmentVariables.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Lithnet.AccessManager.Agent.exe"/>
+    <ROW Feature_="AI32BitFiles" Component_="System.Diagnostics.EventLog.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Lithnet.Security.Authorization.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Configuration.Abstractions.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Configuration.Binder.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Configuration.FileExtensions.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Configuration.CommandLine.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Configuration.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Logging.Console.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Primitives.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Configuration.Json.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Configuration.UserSecrets.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Logging.Abstractions.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.DependencyInjection.Abstractions.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.DependencyInjection.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Options.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.FileProviders.Abstractions.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Logging.Debug.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.FileSystemGlobbing.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Hosting.Abstractions.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Hosting.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Hosting.WindowsServices.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Logging.Configuration.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Logging.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Logging.EventSource.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Extensions.Options.ConfigurationExtensions.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Microsoft.Win32.SystemEvents.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Newtonsoft.Json.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="NLog.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Vanara.Core.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="NLog.Extensions.Logging.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="System.Security.Cryptography.ProtectedData.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="System.Configuration.ConfigurationManager.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="System.DirectoryServices.Protocols.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="System.DirectoryServices.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="System.Drawing.Common.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="System.Security.Permissions.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="System.ServiceProcess.ServiceController.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="System.Windows.Extensions.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Vanara.PInvoke.Cryptography.dll"/>
+    <ROW Feature_="AI32BitFiles" Component_="Vanara.PInvoke.Shared.dll"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Kernel32.dll"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Security.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Diagnostics.EventLog.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.DirectoryServices.AccountManagement.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.DirectoryServices.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.DirectoryServices.Protocols.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Win32.SystemEvents.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Drawing.Common.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Windows.Extensions.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Security.Cryptography.ProtectedData.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.ServiceProcess.ServiceController.dll_1"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
+    <ROW Action="AI_STORE_LOCATION" Condition="(Not Installed) OR REINSTALL" Sequence="1501"/>
+    <ROW Action="AI_PREPARE_UPGRADE" Condition="AI_UPGRADE=&quot;No&quot; AND (Not Installed)" Sequence="1399"/>
+    <ROW Action="AI_ResolveKnownFolders" Sequence="52"/>
+    <ROW Action="AI_EnableDebugLog" Sequence="51"/>
+    <ROW Action="AI_AppSearchEx" Sequence="103"/>
+    <ROW Action="AI_DetectSoftware" Sequence="102"/>
+    <ROW Action="AI_SETPROGRAMFILES64" Condition="VersionNT64" Sequence="747"/>
+    <ROW Action="AI_SETPROGRAMFILES" Condition="NOT VersionNT64" Sequence="748"/>
+    <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="201"/>
+    <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="99" Builds="DefaultBuild"/>
+    <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="101" Builds="DefaultBuild"/>
+    <ROW Action="AI_DeleteCadLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="199" Builds="DefaultBuild"/>
+    <ROW Action="AI_DeleteRCadLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="198" Builds="DefaultBuild"/>
+    <ROW Action="AI_ExtractCadLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="197" Builds="DefaultBuild"/>
+    <ROW Action="AI_FindExeLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="196" Builds="DefaultBuild"/>
+    <ROW Action="AI_ExtractLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="1549" Builds="DefaultBuild"/>
+    <ROW Action="AI_DeleteRLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="1548" Builds="DefaultBuild"/>
+    <ROW Action="AI_DeleteLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="6599" Builds="DefaultBuild"/>
+    <ROW Action="AI_ExtractFiles" Sequence="3998" Builds="DefaultBuild"/>
+    <ROW Action="AI_DATA_SETTER" Sequence="3997"/>
+    <ROW Action="AI_EstimateExtractFiles" Sequence="3999" Builds="DefaultBuild"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiInstallUISequenceComponent">
+    <ROW Action="AI_ResolveKnownFolders" Sequence="53"/>
+    <ROW Action="AI_DpiContentScale" Sequence="52"/>
+    <ROW Action="AI_EnableDebugLog" Sequence="51"/>
+    <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="99"/>
+    <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="103"/>
+    <ROW Action="AI_AppSearchEx" Sequence="102"/>
+    <ROW Action="AI_DetectSoftware" Sequence="101"/>
+    <ROW Action="AI_SETPROGRAMFILES64" Condition="VersionNT64" Sequence="747"/>
+    <ROW Action="AI_SETPROGRAMFILES" Condition="NOT VersionNT64" Sequence="748"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiLaunchConditionsComponent">
+    <ROW Condition="((VersionNT &lt;&gt; 501) AND (VersionNT &lt;&gt; 502))" Description="[ProductName] cannot be installed on [WindowsTypeNT5XDisplay]." DescriptionLocId="AI.LaunchCondition.NoNT5X" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="(VersionNT &lt;&gt; 400)" Description="[ProductName] cannot be installed on [WindowsTypeNT40Display]." DescriptionLocId="AI.LaunchCondition.NoNT40" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="(VersionNT &lt;&gt; 500)" Description="[ProductName] cannot be installed on [WindowsTypeNT50Display]." DescriptionLocId="AI.LaunchCondition.NoNT50" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="AI_DETECTED_INTERNET_CONNECTION" Description="[ProductName] requires an active Internet connection for installation. Please check your network configuration and proxy settings." DescriptionLocId="AI.LaunchCondition.Internet" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="SETUPEXEDIR OR (REMOVE=&quot;ALL&quot;)" Description="This package can only be run from a bootstrapper." DescriptionLocId="AI.LaunchCondition.RequireBootstrapper" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]." DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiRegLocatorComponent">
+    <ROW Signature_="AI_EXE_PATH_CU" Root="1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="2"/>
+    <ROW Signature_="AI_EXE_PATH_LM" Root="2" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="2"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
+    <ROW Registry="AI_ExePath" Root="-1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Value="[AI_SETUPEXEPATH]" Component_="AI_ExePath"/>
+    <ROW Registry="Path" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Path" Value="[APPDIR]" Component_="ProductInformation"/>
+    <ROW Registry="Version" Root="-1" Key="Software\[Manufacturer]\[ProductName]" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiServCtrlComponent">
+    <ROW ServiceControl="Lithnet.AccessManager.Agent.exe" Name="lithnetama" Event="161" Wait="1" Component_="Lithnet.AccessManager.Agent.exe"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiServInstComponent">
+    <ROW ServiceInstall="Lithnet.AccessManager.Agent.exe" Name="lithnetama" DisplayName="Lithnet Access Manager Agent" ServiceType="16" StartType="2" ErrorControl="32769" Component_="Lithnet.AccessManager.Agent.exe" Description="Manages local admin passwords and the availability of just-in-time access for this machine"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
+    <ATTRIBUTE name="UsedTheme" value="classic"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiUpgradeComponent">
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="0.0.1" VersionMax="[|ProductVersion]" Attributes="257" ActionProperty="OLDPRODUCTS"/>
+    <ROW UpgradeCode="[|UpgradeCode]" VersionMin="[|ProductVersion]" Attributes="2" ActionProperty="AI_NEWERPRODUCTFOUND"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.PreReqComponent">
+    <ROW PrereqKey="A6FDB874285E4A6284929AED1E62A148" DisplayName=".NET Core Desktop Runtime 3.1.4 x86" VersionMin="3.1" SetupFileUrl="https://download.visualstudio.microsoft.com/download/pr/2d4b7600-5f32-4a1f-abd5-47cdb2d1362b/7b8b7635e3bb63f6b2cc9a1c624b5325/windowsdesktop-runtime-3.1.4-win-x86.exe" Location="1" ExactSize="48703936" WinNTVersions="Windows Vista x86, Windows Server 2008 x86, Windows 7 RTM x86, Windows 8 x86, Windows 10 version 1507 x86, Windows 10 version 1511 x86" WinNT64Versions="Windows XP/Vista/Windows 7/Windows 8 x64/Windows 8.1 x64/Windows 10 x64" Operator="1" NoUiComLine="/q /norestart" Options="ym" MD5="1ea3ddc532c9d70bc44d5951ecf1468e" TargetName=".NET Core 3.1"/>
+    <ROW PrereqKey="D0156DFD814047AB868D49D0D15F8245" DisplayName=".NET Core Desktop Runtime 3.1.4 x64" VersionMin="3.1" SetupFileUrl="https://download.visualstudio.microsoft.com/download/pr/d8cf1fe3-21c2-4baf-988f-f0152996135e/0c00b94713ee93e7ad5b4f82e2b86607/windowsdesktop-runtime-3.1.4-win-x64.exe" Location="1" ExactSize="54480864" WinNTVersions="Windows 9x/ME/NT/2000/XP/Vista/Windows 7/Windows 8 x86/Windows 8.1 x86/Windows 10 x86" WinNT64Versions="Windows Vista x64, Windows Server 2008 x64, Windows 7 RTM x64, Windows Server 2008 R2 x64, Windows 8 x64, Windows Server 2012 x64, Windows 10 version 1507 x64, Windows 10 version 1511 x64" Operator="1" NoUiComLine="/q /norestart" Options="xym" MD5="7f402d44cf352d91fd29ac45e174b546" TargetName=".NET Core 3.1"/>
+    <ATTRIBUTE name="PrereqsOrder" value="D0156DFD814047AB868D49D0D15F8245 A6FDB874285E4A6284929AED1E62A148"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.PreReqSearchComponent">
+    <ROW SearchKey="A6FDB874285E4A6284929AED1E62A148Mic" Prereq="A6FDB874285E4A6284929AED1E62A148" SearchType="0" SearchString="[ProgramFilesFolder]dotnet\shared\Microsoft.WindowsDesktop.App\3.1.4\Microsoft.WindowsDesktop.App.runtimeconfig.json" Order="1" Property="PreReqSearch_A6FDB874285E4A6284929A"/>
+    <ROW SearchKey="D0156DFD814047AB868D49D0D15F8245Mic" Prereq="D0156DFD814047AB868D49D0D15F8245" SearchType="0" SearchString="[ProgramFiles64Folder]dotnet\shared\Microsoft.WindowsDesktop.App\3.1.4\Microsoft.WindowsDesktop.App.runtimeconfig.json" Order="1" Property="PreReqSearch_D0156DFD814047AB868D49"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.SynchronizedFolderComponent">
+    <ROW Directory_="APPDIR" SourcePath="..\Lithnet.AccessManager.Agent\bin\publish" Feature="MainFeature" ExcludePattern="*~|#*#|%*%|._|CVS|.cvsignore|SCCS|vssver.scc|mssccprj.scc|vssver2.scc|.svn|.DS_Store|\PolicyDefinitions|\unix" ExcludeFlags="6" FileAddOptions="4"/>
+  </COMPONENT>
+</DOCUMENT>

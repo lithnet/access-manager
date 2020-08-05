@@ -24,7 +24,7 @@ namespace Lithnet.AccessManager
 
         public SecurityIdentifier GetWellKnownSid(WellKnownSidType sidType, SecurityIdentifier domainSid)
         {
-            return NativeMethods.CreateWellKnownSid(sidType, domainSid.AccountDomainSid);
+            return new SecurityIdentifier(sidType, domainSid.AccountDomainSid);
         }
 
         public string GetMachineNetbiosDomainName()

@@ -5,7 +5,7 @@ namespace Lithnet.AccessManager.Agent.Test
 {
     public class JitRegistryTests
     {
-        private const string policyKeyName = "SOFTWARE\\Lithnet\\UnitTest\\AccessManager\\Agent\\Jit";
+        private const string policyKeyName = "SOFTWARE\\Lithnet\\UnitTest\\Access Manager Agent\\Jit";
 
         private RegistryKey policyKey;
 
