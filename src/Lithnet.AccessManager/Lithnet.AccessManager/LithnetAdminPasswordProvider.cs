@@ -24,6 +24,11 @@ namespace Lithnet.AccessManager
 
             var data = this.GetCurrentPassword(de);
 
+            if (data == null)
+            {
+                throw new NoPasswordException();
+            }
+
             if (newExpiry != null)
             {
                 de.Properties["lithnetAdminPasswordExpiry"].Value = newExpiry.Value.ToFileTimeUtc().ToString();

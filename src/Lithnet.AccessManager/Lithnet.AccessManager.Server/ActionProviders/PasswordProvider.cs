@@ -68,7 +68,7 @@ namespace Lithnet.AccessManager
             PasswordEntry current = new PasswordEntry()
             {
                 Created = item.Created,
-                Password = this.encryptionProvider.Decrypt(item.EncryptedData, this.certificateProvider.FindDecryptionCertificate),
+                Password = this.encryptionProvider.Decrypt(item.EncryptedData, (thumbprint) => this.certificateProvider.FindDecryptionCertificate(thumbprint, Constants.ServiceName)),
                 ExpiryDate = newExpiry ?? this.lithnetProvider.GetExpiry(computer)
             };
 
@@ -84,7 +84,7 @@ namespace Lithnet.AccessManager
                 PasswordEntry p = new PasswordEntry()
                 {
                     Created = item.Created,
-                    Password = this.encryptionProvider.Decrypt(item.EncryptedData, this.certificateProvider.FindDecryptionCertificate),
+                    Password = this.encryptionProvider.Decrypt(item.EncryptedData, (thumbprint) => this.certificateProvider.FindDecryptionCertificate(thumbprint, Constants.ServiceName)),
                     ExpiryDate = item.Retired
                 };
 

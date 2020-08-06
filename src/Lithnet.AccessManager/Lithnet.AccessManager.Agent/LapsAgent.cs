@@ -117,7 +117,7 @@ namespace Lithnet.AccessManager.Agent
                     DateTime? expiry = lithnetAdminPasswordProvider.GetExpiry(computer);
                     if (expiry == null)
                     {
-                        return false;
+                        return true;
                     }
 
                     return DateTime.UtcNow > expiry;
@@ -128,7 +128,7 @@ namespace Lithnet.AccessManager.Agent
 
                     if (expiry == null)
                     {
-                        return false;
+                        return true;
                     }
 
                     return DateTime.UtcNow > expiry;

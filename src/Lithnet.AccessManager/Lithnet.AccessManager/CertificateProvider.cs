@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.DirectoryServices;
+using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -128,7 +129,7 @@ namespace Lithnet.AccessManager
 
             if (cert == null)
             {
-                this.TryGetCertificateFromDirectory(out cert, WindowsIdentity.GetCurrent().User);
+                this.TryGetCertificateFromDirectory(out cert, Domain.GetComputerDomain().Name);
             }
 
             if (cert == null)
@@ -169,12 +170,6 @@ namespace Lithnet.AccessManager
             }
         }
 
-        public X509Certificate2 GetCertificateFromDirectory(SecurityIdentifier domainSid)
-        {
-            string dnsDomain = NativeMethods.GetDnsDomainNameFromSid(domainSid.AccountDomainSid);
-            return GetCertificateFromDirectory(dnsDomain);
-        }
-
         public X509Certificate2 GetCertificateFromDirectory(string dnsDomain)
         {
             var cnc = this.directory.GetConfigurationNamingContext(dnsDomain);
@@ -199,23 +194,6 @@ namespace Lithnet.AccessManager
             try
             {
                 cert = this.GetCertificateFromDirectory(dnsDomain);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                logger.LogTrace(ex, "TryGetCertificateFromDirectory failed");
-            }
-
-            return false;
-        }
-
-        public bool TryGetCertificateFromDirectory(out X509Certificate2 cert, SecurityIdentifier domain)
-        {
-            cert = null;
-
-            try
-            {
-                cert = this.GetCertificateFromDirectory(domain);
                 return true;
             }
             catch (Exception ex)

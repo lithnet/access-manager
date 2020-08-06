@@ -37,27 +37,33 @@ namespace Lithnet.AccessManager.Agent
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                logger.LogTrace("Worker running at: {time}", DateTimeOffset.Now);
-
-                if (this.sam.IsDomainController())
+                try
                 {
-                    this.logger.LogWarning(EventIDs.RunningOnDC, "This application should not be run on a domain controller. Shutting down");
-                    this.appLifetime.StopApplication();
-                    return;
+                    logger.LogTrace("Worker running at: {time}", DateTimeOffset.Now);
+
+                    if (this.sam.IsDomainController())
+                    {
+                        this.logger.LogWarning(EventIDs.RunningOnDC, "This application should not be run on a domain controller. Shutting down");
+                        this.appLifetime.StopApplication();
+                        return;
+                    }
+
+                    this.RunCheck();
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(EventIDs.AgentUnexpectedException, ex, "An unexpected error occurred");
                 }
 
-                this.RunCheck();
-
-                await Task.Delay(TimeSpan.FromMinutes(Math.Max(this.settings.Interval, 1)), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(Math.Max(this.settings.Interval, 5)), stoppingToken);
             }
+
         }
 
         private void RunCheck()
         {
             try
             {
-                Thread.Sleep(15000);
-
                 if (!this.settings.Enabled)
                 {
                     logger.LogTrace(EventIDs.AgentDisabled, "Lithnet Access Manager agent is not enabled");

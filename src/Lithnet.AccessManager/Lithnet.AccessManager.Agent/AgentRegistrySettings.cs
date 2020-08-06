@@ -27,6 +27,6 @@ namespace Lithnet.AccessManager.Agent
     
         public bool Enabled => this.policyKey.GetValue<int>("Enabled", 0) == 1;
 
-        public int Interval => this.policyKey.GetValue<int>("Interval", 1);
+        public int Interval => this.policyKey.GetValue<int>("Interval", 60);
     }
 }
