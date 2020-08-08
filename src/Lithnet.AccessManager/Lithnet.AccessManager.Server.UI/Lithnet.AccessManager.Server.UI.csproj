@@ -17,6 +17,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <ApplicationIcon>access-manager.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

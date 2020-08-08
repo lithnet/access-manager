@@ -26,7 +26,7 @@ namespace Lithnet.AccessManager
 
             if (data == null)
             {
-                throw new NoPasswordException();
+                return null;
             }
 
             if (newExpiry != null)

@@ -13,6 +13,7 @@ using System.Security.Principal;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media.Animation;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using MahApps.Metro.Controls.Dialogs;
@@ -40,21 +41,25 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IServiceSettingsProvider serviceSettings;
 
-        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifiableEventPublisher eventPublisher)
+        private readonly ICertificateProvider certProvider;
+
+        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifiableEventPublisher eventPublisher, ICertificateProvider certProvider)
         {
             this.logger = logger;
             this.pathProvider = pathProvider;
             this.OriginalModel = model;
-            this.WorkingModel = this.CloneModel(model);
+            this.certProvider = certProvider;
             this.dialogCoordinator = dialogCoordinator;
             this.serviceSettings = serviceSettings;
+            this.Validator = validator;
+
+            this.WorkingModel = this.CloneModel(model);
             this.Certificate = this.GetCertificate();
             this.OriginalCertificate = this.Certificate;
             this.ServiceAccount = this.serviceSettings.GetServiceAccount();
             this.OriginalServiceAccount = this.ServiceAccount;
             this.ServiceStatus = this.serviceSettings.ServiceController.Status.ToString();
             this.DisplayName = "Web hosting";
-            this.Validator = validator;
 
             eventPublisher.Register(this);
         }
@@ -183,6 +188,8 @@ namespace Lithnet.AccessManager.Server.UI
 
             bool updateConfigFile = updateHttpReservations;
 
+            bool updateFirewallRules = updateHttpReservations;
+
             bool updateCertificateBinding =
                 this.WorkingModel.HttpSys.HttpsPort != this.OriginalModel.HttpSys.HttpsPort ||
                 this.Certificate?.Thumbprint != this.OriginalCertificate?.Thumbprint ||
@@ -190,17 +197,38 @@ namespace Lithnet.AccessManager.Server.UI
 
             bool updateServiceAccount = this.workingServiceAccountUserName != null;
 
+            HostingSettingsRollbackContext rollbackContext = new HostingSettingsRollbackContext();
+            rollbackContext.StartingUnconfigured = currentlyUnconfigured;
+
             try
             {
                 if (updatePrivateKeyPermissions)
                 {
-                    this.Certificate.AddPrivateKeyReadPermission(this.ServiceAccount);
+                    this.UpdateCertificatePermissions(rollbackContext);
                 }
             }
             catch (Exception ex)
             {
-                this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Could not add private key permissions");
+                this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Could not add private key permissions for SSL certificate");
                 var result = await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred while trying to add permissions for the service account {this.ServiceAccountDisplayName} to read the private key of the specified certificate. Try adding permissions for this manually using the Windows computer certificates MMC console. Do you want to continue with the operation?\r\n{ex.Message}", MessageDialogStyle.AffirmativeAndNegative);
+
+                if (result == MessageDialogResult.Canceled)
+                {
+                    return false;
+                }
+            }
+
+            try
+            {
+                if (updatePrivateKeyPermissions)
+                {
+                    this.UpdateEncryptionCertificateAcls(rollbackContext);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Could not add private key permissions for encryption certificate");
+                var result = await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred while trying to add permissions for the service account {this.ServiceAccountDisplayName} to read the private key of one of the existing password encryption certificates. Try adding permissions for this manually using the Windows service certificates MMC console. Do you want to continue with the operation?\r\n{ex.Message}", MessageDialogStyle.AffirmativeAndNegative);
 
                 if (result == MessageDialogResult.Canceled)
                 {
@@ -237,29 +265,28 @@ namespace Lithnet.AccessManager.Server.UI
                         }
                     }
 
-                    this.CreateNewHttpReservations();
+                    this.CreateNewHttpReservations(rollbackContext);
                 }
             }
             catch (Exception ex)
             {
                 this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Error creating HTTP reservations");
-                this.TryRollbackHttpReservations(currentlyUnconfigured);
+                rollbackContext.Rollback(this.logger);
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not create the HTTP reservations\r\n{ex.Message}");
                 return false;
             }
 
             try
             {
-                if (updateHttpReservations)
+                if (updateFirewallRules)
                 {
-                    this.ReplaceFirewallRules(this.HttpPort, this.HttpsPort);
+                    this.ReplaceFirewallRules(rollbackContext);
                 }
             }
             catch (Exception ex)
             {
-                this.TryRollbackFirewallRules(currentlyUnconfigured);
-
                 this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Error updating the firewall rules");
+                rollbackContext.Rollback(this.logger);
 
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not update the firewall rules. Please manually update them to ensure your users can access the application\r\n{ex.Message}");
                 return false;
@@ -269,13 +296,13 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 if (updateConfigFile)
                 {
-                    this.WorkingModel.Save(pathProvider.HostingConfigFile);
+                    this.SaveHostingConfigFile(rollbackContext);
                 }
             }
             catch (Exception ex)
             {
-                this.logger.LogError(EventIDs.UIConfigurationSaveError,ex, "Could not save updated config file");
-                this.TryRollbackConfig();
+                this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Could not save updated config file");
+                rollbackContext.Rollback(this.logger);
                 return false;
             }
 
@@ -283,26 +310,13 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 if (updateCertificateBinding)
                 {
-                    this.UpdateCertificateBinding();
+                    this.UpdateCertificateBinding(rollbackContext);
                 }
             }
             catch (Exception ex)
             {
-                this.logger.LogError(EventIDs.UIConfigurationSaveError,ex, "Error creating certificate binding");
-
-                this.TryRollbackCertificateBinding(currentlyUnconfigured);
-
-                if (updateHttpReservations)
-                {
-                    this.TryRollbackHttpReservations(currentlyUnconfigured);
-                    this.TryRollbackFirewallRules(currentlyUnconfigured);
-                }
-
-                if (updateConfigFile)
-                {
-                    this.TryRollbackConfig();
-                }
-
+                this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Error creating certificate binding");
+                rollbackContext.Rollback(this.logger);
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not bind the certificate to the specified port\r\n{ex.Message}");
 
                 return false;
@@ -312,7 +326,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 if (updateServiceAccount)
                 {
-                    this.serviceSettings.SetServiceAccount(this.workingServiceAccountUserName, this.workingServiceAccountPassword);
+                    this.UpdateServiceAccount();
                 }
             }
             catch (Exception ex)
@@ -320,31 +334,14 @@ namespace Lithnet.AccessManager.Server.UI
                 this.logger.LogError(EventIDs.UIConfigurationSaveError, ex,
                     "Could not change the service account to the specified account {serviceAccountName}",
                     workingServiceAccountUserName);
-
+                rollbackContext.Rollback(this.logger);
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The service account could not be changed\r\n{ex.Message}");
-
-                if (updateCertificateBinding)
-                {
-                    this.TryRollbackCertificateBinding(currentlyUnconfigured);
-                }
-
-                if (updateHttpReservations)
-                {
-                    this.TryRollbackHttpReservations(currentlyUnconfigured);
-                    this.TryRollbackFirewallRules(currentlyUnconfigured);
-                }
-
-                if (updateConfigFile)
-                {
-                    this.TryRollbackConfig();
-                }
-
                 return false;
             }
 
             if (updateCertificateBinding || updateHttpReservations || updatePrivateKeyPermissions ||
                 // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                updateServiceAccount || updateConfigFile)
+                updateServiceAccount || updateConfigFile || updateFirewallRules)
             {
                 this.OriginalModel = this.CloneModel(this.WorkingModel);
                 this.OriginalCertificate = this.Certificate;
@@ -354,6 +351,33 @@ namespace Lithnet.AccessManager.Server.UI
             }
 
             return true;
+        }
+
+        private void UpdateServiceAccount()
+        {
+            this.serviceSettings.SetServiceAccount(this.workingServiceAccountUserName, this.workingServiceAccountPassword);
+        }
+
+        private void SaveHostingConfigFile(HostingSettingsRollbackContext rollback)
+        {
+            var originalSettings = this.OriginalModel;
+
+            this.WorkingModel.Save(pathProvider.HostingConfigFile);
+            rollback.RollbackActions.Add(() => originalSettings.Save(pathProvider.HostingConfigFile));
+        }
+
+        private void UpdateCertificatePermissions(HostingSettingsRollbackContext rollback)
+        {
+            if (this.Certificate == null)
+            {
+                return;
+            }
+
+            var originalCertificateSecurity = this.Certificate.GetPrivateKeySecurity();
+            var certificate = this.Certificate;
+
+            certificate.AddPrivateKeyReadPermission(this.ServiceAccount);
+            rollback.RollbackActions.Add(() => certificate.SetPrivateKeySecurity(originalCertificateSecurity));
         }
 
         public async Task DownloadUpdate()
@@ -601,13 +625,6 @@ namespace Lithnet.AccessManager.Server.UI
             return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(model));
         }
 
-        private void CreateCertificateBinding(X509Certificate2 cert, int port)
-        {
-            var config = new CertificateBindingConfiguration();
-            CertificateBinding binding = new CertificateBinding(cert.Thumbprint, "My", new IPEndPoint(IPAddress.Parse("0.0.0.0"), port), HttpSysHostingOptions.AppId, new BindingOptions());
-            config.Bind(binding);
-        }
-
         private bool IsReservationInUse(bool currentlyUnconfigured, string oldurl, string newurl, out string user)
         {
             user = null;
@@ -656,7 +673,7 @@ namespace Lithnet.AccessManager.Server.UI
         }
 
 
-        private void CreateNewHttpReservations()
+        private void CreateNewHttpReservations(HostingSettingsRollbackContext rollback)
         {
             if (this.ServiceAccount == null)
             {
@@ -668,13 +685,39 @@ namespace Lithnet.AccessManager.Server.UI
             string httpNew = this.WorkingModel.HttpSys.BuildHttpUrlPrefix();
             string httpsNew = this.WorkingModel.HttpSys.BuildHttpsUrlPrefix();
 
-            this.DeleteUrlReservation(httpOld);
-            this.DeleteUrlReservation(httpsOld);
-            this.DeleteUrlReservation(httpNew);
-            this.DeleteUrlReservation(httpsNew);
+            var existingHttpOld = this.GetUrlReservation(httpOld);
+            if (existingHttpOld != null)
+            {
+                UrlAcl.Delete(existingHttpOld.Prefix);
+                rollback.RollbackActions.Add(() => UrlAcl.Create(existingHttpOld.Prefix, existingHttpOld.Sddl));
+            }
+
+            var existingHttpsOld = this.GetUrlReservation(httpsOld);
+            if (existingHttpsOld != null)
+            {
+                UrlAcl.Delete(existingHttpsOld.Prefix);
+                rollback.RollbackActions.Add(() => UrlAcl.Create(existingHttpsOld.Prefix, existingHttpsOld.Sddl));
+            }
+
+            var existingHttpNew = this.GetUrlReservation(httpNew);
+            if (existingHttpNew != null)
+            {
+                UrlAcl.Delete(existingHttpNew.Prefix);
+                rollback.RollbackActions.Add(() => UrlAcl.Create(existingHttpNew.Prefix, existingHttpNew.Sddl));
+            }
+
+            var existingHttpsNew = this.GetUrlReservation(httpsNew);
+            if (existingHttpsNew != null)
+            {
+                UrlAcl.Delete(existingHttpsNew.Prefix);
+                rollback.RollbackActions.Add(() => UrlAcl.Create(existingHttpsNew.Prefix, existingHttpsNew.Sddl));
+            }
 
             this.CreateUrlReservation(httpNew, this.ServiceAccount);
+            rollback.RollbackActions.Add(() => UrlAcl.Delete(httpNew));
+
             this.CreateUrlReservation(httpsNew, this.ServiceAccount);
+            rollback.RollbackActions.Add(() => UrlAcl.Delete(httpsNew));
         }
 
         private void CreateUrlReservation(string url, SecurityIdentifier sid)
@@ -704,6 +747,17 @@ namespace Lithnet.AccessManager.Server.UI
             }
 
             return null;
+        }
+
+        private void UpdateEncryptionCertificateAcls(HostingSettingsRollbackContext rollback)
+        {
+            foreach (var cert in this.certProvider.GetEligibleCertificates(true))
+            {
+                var originalCertificateSecurity = cert.GetPrivateKeySecurity();
+
+                cert.AddPrivateKeyReadPermission(this.ServiceAccount);
+                rollback.RollbackActions.Add(() => cert.SetPrivateKeySecurity(originalCertificateSecurity));
+            }
         }
 
         private X509Certificate2Collection GetAvailableCertificateCollection()
@@ -758,11 +812,20 @@ namespace Lithnet.AccessManager.Server.UI
             return store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false).OfType<X509Certificate2>().FirstOrDefault();
         }
 
-        private void ReplaceFirewallRules(int httpPort, int httpsPort)
+        private void ReplaceFirewallRules(HostingSettingsRollbackContext rollback)
         {
-            this.DeleteFirewallRules();
+            this.DeleteFirewallRules(rollback);
 
             INetFwPolicy2 firewallPolicy = GetFirewallPolicyObject();
+            INetFwRule firewallRule = CreateNetFwRule($"{this.HttpPort},{this.HttpsPort}");
+
+            firewallPolicy.Rules.Add(firewallRule);
+
+            rollback.RollbackActions.Add(() => firewallPolicy.Rules.Remove(firewallRule.Name));
+        }
+
+        private INetFwRule CreateNetFwRule(string ports)
+        {
             INetFwRule firewallRule = CreateFirewallRuleInstance();
 
             firewallRule.ApplicationName = this.pathProvider.GetFullPath(Constants.ServiceExeName, this.pathProvider.AppPath);
@@ -771,10 +834,10 @@ namespace Lithnet.AccessManager.Server.UI
             firewallRule.Enabled = true;
             firewallRule.Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN;
             firewallRule.Protocol = 6; //TCP
-            firewallRule.LocalPorts = $"{httpPort},{httpsPort}";
+            firewallRule.LocalPorts = ports;
             firewallRule.InterfaceTypes = "All";
             firewallRule.Name = Constants.FirewallRuleName;
-            firewallPolicy.Rules.Add(firewallRule);
+            return firewallRule;
         }
 
         private static INetFwRule CreateFirewallRuleInstance()
@@ -815,36 +878,19 @@ namespace Lithnet.AccessManager.Server.UI
             return firewallPolicy;
         }
 
-        private void DeleteFirewallRules()
+        private void DeleteFirewallRules(HostingSettingsRollbackContext rollback)
         {
             INetFwPolicy2 firewallPolicy = GetFirewallPolicyObject();
 
             try
             {
+                var existingFirewallRule = firewallPolicy.Rules.Item(Constants.FirewallRuleName);
                 firewallPolicy.Rules.Remove(Constants.FirewallRuleName);
+                rollback.RollbackActions.Add(() => firewallPolicy.Rules.Add(this.CreateNetFwRule(existingFirewallRule.LocalPorts)));
             }
             catch
             {
                 // ignore
-            }
-        }
-
-        private void TryRollbackFirewallRules(bool currentlyUnconfigured)
-        {
-            try
-            {
-                if (currentlyUnconfigured)
-                {
-                    this.DeleteFirewallRules();
-                }
-                else
-                {
-                    this.ReplaceFirewallRules(this.OriginalModel.HttpSys.HttpPort, this.OriginalModel.HttpSys.HttpsPort);
-                }
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(EventIDs.UIConfigurationRollbackError, ex, "Unable to rollback firewall rules");
             }
         }
 
@@ -902,81 +948,34 @@ namespace Lithnet.AccessManager.Server.UI
             Debug.WriteLine("Poll stopped");
         }
 
-        private void ReplaceCertificateBinding(X509Certificate2 cert, int port)
+
+        private void UpdateCertificateBinding(HostingSettingsRollbackContext rollback)
         {
-            this.DeleteCertificateBinding();
-            this.CreateCertificateBinding(cert, port);
+            var bindingConfiguration = new CertificateBindingConfiguration();
+            var originalBinding = this.GetCertificateBinding(bindingConfiguration);
+
+            if (originalBinding != null)
+            {
+                bindingConfiguration.Delete(originalBinding.IpPort);
+                rollback.RollbackActions.Add(() => bindingConfiguration.Bind(originalBinding));
+            }
+
+            CertificateBinding binding = new CertificateBinding(this.Certificate.Thumbprint, "My", new IPEndPoint(IPAddress.Parse("0.0.0.0"), this.WorkingModel.HttpSys.HttpsPort), HttpSysHostingOptions.AppId, new BindingOptions());
+            bindingConfiguration.Bind(binding);
+            rollback.RollbackActions.Add(() => bindingConfiguration.Delete(binding.IpPort));
         }
 
-        private void DeleteCertificateBinding()
+        private CertificateBinding GetCertificateBinding(CertificateBindingConfiguration config)
         {
-            var config = new CertificateBindingConfiguration();
-
-            foreach (var b in config.Query())
+            foreach (var binding in config.Query())
             {
-                if (b.AppId == HttpSysHostingOptions.AppId)
+                if (binding.AppId == HttpSysHostingOptions.AppId)
                 {
-                    config.Delete(b.IpPort);
+                    return binding;
                 }
             }
-        }
 
-        private void TryRollbackCertificateBinding(bool currentlyUnconfigured)
-        {
-            try
-            {
-                if (currentlyUnconfigured)
-                {
-                    this.DeleteCertificateBinding();
-                }
-                else
-                {
-                    this.ReplaceCertificateBinding(this.OriginalCertificate, this.OriginalModel.HttpSys.HttpsPort);
-                }
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(EventIDs.UIConfigurationRollbackError, ex, "Unable to rollback certificate binding");
-            }
-        }
-
-        private void TryRollbackConfig()
-        {
-            try
-            {
-                this.OriginalModel.Save(pathProvider.HostingConfigFile);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(EventIDs.UIConfigurationRollbackError, ex, "Could not rollback the config file");
-            }
-        }
-
-        private void TryRollbackHttpReservations(bool currentlyUnconfigured)
-        {
-            try
-            {
-                this.DeleteUrlReservation(this.WorkingModel.HttpSys.BuildHttpUrlPrefix());
-                this.DeleteUrlReservation(this.WorkingModel.HttpSys.BuildHttpsUrlPrefix());
-
-                if (!currentlyUnconfigured)
-                {
-                    string httpOld = this.OriginalModel.HttpSys.BuildHttpUrlPrefix();
-                    string httpsOld = this.OriginalModel.HttpSys.BuildHttpsUrlPrefix();
-
-                    this.CreateUrlReservation(httpOld, this.ServiceAccount);
-                    this.CreateUrlReservation(httpsOld, this.ServiceAccount);
-                }
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(EventIDs.UIConfigurationRollbackError, ex, "Unable to rollback HTTP reservations");
-            }
-        }
-
-        private void UpdateCertificateBinding()
-        {
-            this.ReplaceCertificateBinding(this.Certificate, this.WorkingModel.HttpSys.HttpsPort);
+            return null;
         }
     }
 }

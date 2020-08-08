@@ -19,6 +19,32 @@ namespace Lithnet.AccessManager.Server.UI
 {
     internal static class Extensions
     {
+        public static FileSecurity GetPrivateKeySecurity(this X509Certificate2 cert)
+        {
+            string location = NativeMethods.GetKeyLocation(cert);
+
+            if (location == null)
+            {
+                throw new CertificateNotFoundException("The certificate private key was not found");
+            }
+
+            FileInfo info = new FileInfo(location);
+            return info.GetAccessControl();
+        }
+
+        public static void SetPrivateKeySecurity(this X509Certificate2 cert, FileSecurity security)
+        {
+            string location = NativeMethods.GetKeyLocation(cert);
+
+            if (location == null)
+            {
+                throw new CertificateNotFoundException("The certificate private key was not found");
+            }
+
+            FileInfo info = new FileInfo(location);
+            info.SetAccessControl(security);
+        }
+
         public static void AddPrivateKeyReadPermission(this X509Certificate2 cert, IdentityReference account)
         {
             string location = NativeMethods.GetKeyLocation(cert);

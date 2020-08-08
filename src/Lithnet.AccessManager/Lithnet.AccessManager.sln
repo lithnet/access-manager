@@ -10,8 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Lithnet.AccessManager.Web.Setup", "Lithnet.AccessManager.Web.Setup\Lithnet.AccessManager.Web.Setup.wixproj", "{39625153-BB10-4A05-8BBD-76A44918CAFF}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager.Test", "Lithnet.AccessManager.Web.Test\Lithnet.AccessManager.Test.csproj", "{A0AD7464-968B-416F-A2F2-0C42778A5A32}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager.Agent", "Lithnet.AccessManager.Agent\Lithnet.AccessManager.Agent.csproj", "{95B23EE9-2C33-4F83-993A-317E3EE92B6A}"
@@ -70,26 +68,6 @@ Global
 		{A7BADC85-D43B-498C-B55B-C0231644AC88}.Release|x64.Build.0 = Release|Any CPU
 		{A7BADC85-D43B-498C-B55B-C0231644AC88}.Release|x86.ActiveCfg = Release|Any CPU
 		{A7BADC85-D43B-498C-B55B-C0231644AC88}.Release|x86.Build.0 = Release|Any CPU
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.All|Any CPU.ActiveCfg = Release|x86
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.All|Any CPU.Build.0 = Release|x86
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.All|x64.ActiveCfg = Release|x64
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.All|x64.Build.0 = Release|x64
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.All|x86.ActiveCfg = Release|x86
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.All|x86.Build.0 = Release|x86
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.Debug|x64.ActiveCfg = Debug|x64
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.Debug|x64.Build.0 = Debug|x64
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.Debug|x86.ActiveCfg = Debug|x64
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.Dev|Any CPU.ActiveCfg = Release|x64
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.Dev|Any CPU.Build.0 = Release|x64
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.Dev|x64.ActiveCfg = Debug|x64
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.Dev|x64.Build.0 = Debug|x64
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.Dev|x86.ActiveCfg = Release|x64
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.Dev|x86.Build.0 = Release|x64
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.Release|Any CPU.ActiveCfg = Release|x64
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.Release|x64.ActiveCfg = Release|x64
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.Release|x64.Build.0 = Release|x64
-		{39625153-BB10-4A05-8BBD-76A44918CAFF}.Release|x86.ActiveCfg = Release|x64
 		{A0AD7464-968B-416F-A2F2-0C42778A5A32}.All|Any CPU.ActiveCfg = Release|Any CPU
 		{A0AD7464-968B-416F-A2F2-0C42778A5A32}.All|Any CPU.Build.0 = Release|Any CPU
 		{A0AD7464-968B-416F-A2F2-0C42778A5A32}.All|x64.ActiveCfg = Release|Any CPU

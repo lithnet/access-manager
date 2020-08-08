@@ -171,6 +171,23 @@
                                                    VerticalAlignment="Center"/>
                         </StackPanel>
                     </DataTemplate>
+                    <DataTemplate x:Key="HasPermissionIconTemplate">
+                        <StackPanel Orientation="Horizontal">
+                            <iconPacks:PackIconFontAwesome Kind="CheckSolid"
+                                                           Foreground="DarkGreen" 
+                                                           Visibility="{Binding HasPermission, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                           VerticalAlignment="Center"/>
+                            <iconPacks:PackIconFontAwesome Kind="TimesCircleRegular" 
+                                                           Foreground="DarkRed" 
+                                                           Visibility="{Binding HasNoPermission, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                           VerticalAlignment="Center"/>
+                            <iconPacks:PackIconTypicons Kind="WarningOutline" 
+                                                           Foreground="DarkOrange" 
+                                                           Visibility="{Binding HasPermissionError, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                           VerticalAlignment="Center"/>
+                            <Label Content="{Binding PermissionError}"/>
+                        </StackPanel>
+                    </DataTemplate>
                 </ListView.Resources>
                 <ListView.View>
                     <GridView>
@@ -189,6 +206,9 @@
                         <GridViewColumn Header="Has Private Key"
                                     CellTemplate="{StaticResource PrivateKeyIconTemplate}"
                                     Width="Auto"/>
+                        <GridViewColumn Header="Private key permission"
+                                        CellTemplate="{StaticResource HasPermissionIconTemplate}"
+                                        Width="Auto"/>
                     </GridView>
                 </ListView.View>
             </ListView>
@@ -213,6 +233,11 @@
                 <Button Command="{s:Action GenerateEncryptionCertificate}"
                             Content="Generate new..."
                             Margin="5"/>
+
+
+                <Button Command="{s:Action Repermission}"
+                        Content="Reset permission..."
+                        Margin="5"/>
             </StackPanel>
 
         </Grid>

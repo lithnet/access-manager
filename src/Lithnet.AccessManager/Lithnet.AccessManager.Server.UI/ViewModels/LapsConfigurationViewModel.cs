@@ -153,9 +153,10 @@ namespace Lithnet.AccessManager.Server.UI
                 X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert(this.SelectedForest.Name);
 
                 using X509Store store =
-                    this.certificateProvider.OpenServiceStore(Lithnet.AccessManager.Constants.ServiceName,
+                    this.certificateProvider.OpenServiceStore(AccessManager.Constants.ServiceName,
                         OpenFlags.ReadWrite);
                 store.Add(cert);
+                cert.AddPrivateKeyReadPermission(this.serviceSettings.GetServiceAccount());
 
                 var vm = this.certificate2ViewModelFactory.CreateViewModel(cert);
 
@@ -167,6 +168,20 @@ namespace Lithnet.AccessManager.Server.UI
                 logger.LogError(EventIDs.UIGenericError, ex, "Could not generate encryption certificate");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not generate the certificate\r\n{ex.Message}");
             }
+        }
+
+        public bool CanRepermission => this.SelectedCertificate?.CanRepermission == true;
+
+        public async Task Repermission()
+        {
+            var cert = this.SelectedCertificate;
+
+            if (cert == null)
+            {
+                return;
+            }
+
+            await cert.Repermission();
         }
 
         public bool CanShowCertificateDialog => this.SelectedCertificate != null;

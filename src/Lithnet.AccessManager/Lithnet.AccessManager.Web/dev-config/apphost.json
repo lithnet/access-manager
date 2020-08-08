@@ -2,8 +2,8 @@
   "Hosting": {
     "Environment": "HttpSys",
     "HttpSys": {
-      "HttpPort": 5000,
-      "HttpsPort": 5001,
+      "HttpPort": 80,
+      "HttpsPort": 443,
       "Hostname": "",
       "Path": null,
       "MaxAccepts": 100,
