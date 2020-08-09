@@ -15,24 +15,43 @@
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
 </head>
-<body>
-    <div class="content">
-        <div class="app-header">
-            <img class="app-logo" alt="@uiSettings.Value.Title" src="~/images/logo.png" />
-            <div class="app-title">@uiSettings.Value.Title</div>
-        </div>
-        @RenderBody()
-    </div>
-    @if (authSettings.CanLogout && User.Identity.IsAuthenticated)
-    {
-        <div class="center-content">
-            <a class="logout-link" href="@Url.Action("Logout", "Home")">@UIMessages.Logout</a>
-        </div>
-    }
 
+
+<body>
+    <div id="page-container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <span class="navbar-brand">Admin Access Service</span>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">New Request</a>
+                    </li>
+                    @if (authSettings.CanLogout && User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Logout", "Home")">Logout</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </nav>
+
+        <h1 class="app-header">
+            <img class="app-logo" alt="Lithnet Access Manager" src="/images/logo.png">
+        </h1>
+
+        <div class="content">
+            @RenderBody()
+        </div>
+    </div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js"></script>
-    @RenderSection("Scripts", required: false)
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

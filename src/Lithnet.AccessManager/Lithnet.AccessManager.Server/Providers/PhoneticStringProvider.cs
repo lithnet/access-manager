@@ -3,7 +3,7 @@ using System.Text;
 using Lithnet.AccessManager.Server.Configuration;
 using Microsoft.Extensions.Options;
 
-namespace Lithnet.AccessManager.Web.Internal
+namespace Lithnet.AccessManager.Server
 {
     public class PhoneticStringProvider : IPhoneticPasswordTextProvider
     {
@@ -83,18 +83,35 @@ namespace Lithnet.AccessManager.Web.Internal
 
         private readonly PhoneticSettings settings;
 
-        public PhoneticStringProvider(IOptionsSnapshot<UserInterfaceOptions> options)
+        public PhoneticStringProvider(IOptionsSnapshot<UserInterfaceOptions> options) : this(options.Value.PhoneticSettings)
         {
-            this.settings = options.Value.PhoneticSettings ?? new PhoneticSettings()
+
+        }
+
+        public PhoneticStringProvider(PhoneticSettings settings)
+        {
+            this.settings = settings ?? new PhoneticSettings()
             {
                 GroupSize = 4,
                 LowerPrefix = null,
                 UpperPrefix = "capital"
             };
 
+            if (this.settings.GroupSize < 3)
+            {
+                this.settings.GroupSize = 3;
+            }
+            this.dictionary = new Dictionary<char, string>();
+
+            this.BuildCharacterMap();
+        }
+
+        private void BuildCharacterMap()
+        {
+            this.dictionary.Clear();
+
             if (this.settings.CharacterMappings != null && this.settings.CharacterMappings.Count > 0)
             {
-                this.dictionary = new Dictionary<char, string>();
                 foreach (var kvp in this.settings.CharacterMappings)
                 {
                     char key = kvp.Key[0];
@@ -116,7 +133,7 @@ namespace Lithnet.AccessManager.Web.Internal
             }
         }
 
-        public IEnumerable<string> GetPhoneticText(string password)
+        public IEnumerable<string> GetPhoneticTextSections(string password)
         {
             int count = 0;
 
@@ -160,6 +177,11 @@ namespace Lithnet.AccessManager.Web.Internal
             {
                 yield return group.ToString();
             }
+        }
+
+        public string GetPhoneticText(string password)
+        {
+            return string.Join(". ", this.GetPhoneticTextSections(password));
         }
 
         private string GetPhoneticName(char c)

@@ -9,7 +9,6 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
-using Lithnet.AccessManager.Interop;
 using Lithnet.Security.Authorization;
 using Microsoft.Extensions.Logging;
 using Vanara.PInvoke;

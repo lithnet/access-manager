@@ -5,15 +5,16 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
              xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" >
+             d:DesignWidth="800" >
     <StackPanel Margin="5">
         <Label Style="{DynamicResource DescriptionHeaderStyle}" 
                Content="User interface customization"/>
 
         <Grid Margin="5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
@@ -66,8 +67,8 @@
 
         <Grid Margin="5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="250"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition />
@@ -76,15 +77,88 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="3" Grid.Column="0" 
-                            Orientation="Horizontal"
-                            ToolTip="Specify if a reason for requesting admin access is required, optional, or not shown at all"
-                            Margin="5">
-                <Label Content="User supplied request reason" />
-                <ComboBox SelectedItem="{Binding UserSuppliedReason}" 
-                              ItemsSource="{Binding UserSuppliedReasonValues}"
-                              Margin="5 0 0 0"/>
-            </StackPanel>
+            <Label Grid.Row="3" Grid.Column="0" 
+                   ToolTip="Specify if a reason for requesting admin access is required, optional, or not shown at all"
+                   Content="User supplied request reason" 
+                   Margin="5"/>
+            <ComboBox Grid.Row="3" Grid.Column="1" SelectedItem="{Binding UserSuppliedReason}" 
+                      ItemsSource="{Binding UserSuppliedReasonValues}"
+                      Margin="5"/>
+        </Grid>
+
+        <Label Style="{DynamicResource DescriptionHeaderStyle}" 
+               Content="Password phonetics"/>
+
+        <Grid Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" 
+               Content="Disable text to speech function" Margin="5"/>
+            <CheckBox Grid.Row="0" Grid.Column="1"
+                  IsChecked="{Binding DisableTextToSpeech}"
+                  Margin="5"/>
+
+            <Label Grid.Row="1" Grid.Column="0" 
+               Content="Hide phonetic breakdown" Margin="5"/>
+            <CheckBox Grid.Row="1" Grid.Column="1"
+                  IsChecked="{Binding HidePhoneticBreakdown}"
+                  Margin="5"/>
+
+            <Label Grid.Row="2" Grid.Column="0" 
+                   Content="Prefix upper-case letters with"
+                   Margin="5"/>
+            <TextBox Grid.Row="2" Grid.Column="1" 
+                     Text="{Binding UpperPrefix, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="5"/>
+
+            <Label Grid.Row="3" Grid.Column="0" 
+                   Content="Prefix lower-case letters with"
+                   Margin="5"/>
+            <TextBox Grid.Row="3" Grid.Column="1" 
+                     Text="{Binding LowerPrefix, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="5"/>
+
+            <Label Grid.Row="4" Grid.Column="0" 
+                   Content="Group size"
+                   Margin="5"/>
+            <mah:NumericUpDown Grid.Row="4" Grid.Column="1" 
+                               Value="{Binding GroupSize, UpdateSourceTrigger=PropertyChanged}" 
+                               Minimum="3" Maximum="20" Interval="1" 
+                               HideUpDownButtons="false"
+                               Width="100" 
+                               TextAlignment="Left"
+                               HorizontalAlignment="Left"
+                               Margin="5"/>
+
+            <Label Grid.Row="5" Grid.Column="0" 
+                   Content="Preview Password"
+                   Margin="5"/>
+            <TextBox Grid.Row="5" Grid.Column="1" 
+                     Text="{Binding PreviewPassword, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="5"/>
+
+            <Label Grid.Row="6" Grid.Column="0" 
+                   Content="Preview"
+                   Margin="5"/>
+            <TextBox Grid.Row="6" Grid.Column="1"  Grid.ColumnSpan="2"
+                     Text="{Binding Preview, Mode=OneWay}"
+                     IsReadOnly="True"
+                     MinLines="5"
+                     Margin="5"/>
+
         </Grid>
     </StackPanel>
 </UserControl>

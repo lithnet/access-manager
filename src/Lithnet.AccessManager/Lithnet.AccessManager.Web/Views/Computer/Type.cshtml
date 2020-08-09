@@ -13,39 +13,12 @@
     @using (Html.BeginForm("AccessResponse", "Computer", FormMethod.Post))
     {
         <header>
-            @UIMessages.HeadingRequestAccess
+            @UIMessages.HeadingRequestAccess to @Model.ComputerName
         </header>
         <fieldset>
-            <section>
-                <label class="title">@UIMessages.ComputerName*</label>
-                <label class="input">
-                    <i class="icon-append fa fa-desktop"></i>
-                    @Html.TextBoxFor(m => m.ComputerName, new { @class = "dataEntry", @readonly = "readonly" })
-                </label>
-            </section>
-
-            @if (Model.ShowReason)
-            {
-                <section>
-                    <label class="title">@($"{UIMessages.UserReasonPrompt}{(Model.ReasonRequired ? "*" : string.Empty)}")</label>
-                    <label class="input">
-
-                        @if (Model.ReasonRequired)
-                        {
-                            @Html.TextAreaFor(m => m.UserRequestReason, new { @class = "dataEntryLarge", @required = "required" })
-                        }
-                        else
-                        {
-                            @Html.TextAreaFor(m => m.UserRequestReason, new { @class = "dataEntryLarge" })
-                        }
-
-                        @Html.ValidationMessageFor(m => m.UserRequestReason)
-                    </label>
-                </section>
-            }
 
             <section>
-                <label class="title">Access type</label>
+                <label class="title">Please select the type of access you require</label>
                 <div class="form-check">
                     @if (Model.AllowedRequestTypes.HasFlag(AccessMask.Laps))
                     {
@@ -70,6 +43,8 @@
                 </div>
             </section>
 
+            @Html.HiddenFor(m => m.ComputerName)
+            @Html.HiddenFor(m => m.ReasonRequired)
         </fieldset>
 
         <footer>

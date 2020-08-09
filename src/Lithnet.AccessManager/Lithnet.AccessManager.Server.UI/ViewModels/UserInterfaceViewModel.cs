@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
@@ -13,7 +14,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class UserInterfaceViewModel : PropertyChangedBase, IHaveDisplayName, IViewAware
+    public class UserInterfaceViewModel : Screen
     {
         private readonly UserInterfaceOptions model;
 
@@ -29,8 +30,16 @@ namespace Lithnet.AccessManager.Server.UI
             this.dialogCoordinator = dialogCoordinator;
             this.logger = logger;
             this.model = model;
-            this.LoadImage();
+            this.DisplayName = "User interface";
+            model.PhoneticSettings ??= new PhoneticSettings();
+
             eventPublisher.Register(this);
+        }
+
+        protected override void OnInitialActivate()
+        {
+            this.LoadImage();
+            this.BuildPreview();
         }
 
         [NotifiableProperty]
@@ -44,6 +53,51 @@ namespace Lithnet.AccessManager.Server.UI
         public BitmapImage Image { get; set; }
 
         public string ImageError { get; set; }
+
+        [NotifiableProperty]
+        public bool DisableTextToSpeech { get => this.model.PhoneticSettings.DisableTextToSpeech; set => this.model.PhoneticSettings.DisableTextToSpeech = value; }
+
+        [NotifiableProperty]
+        public bool HidePhoneticBreakdown { get => this.model.PhoneticSettings.HidePhoneticBreakdown; set => this.model.PhoneticSettings.HidePhoneticBreakdown = value; }
+
+        [PropertyChanged.OnChangedMethod(nameof(BuildPreview))]
+        [NotifiableProperty]
+        public string UpperPrefix { get => this.model.PhoneticSettings.UpperPrefix; set => this.model.PhoneticSettings.UpperPrefix = value; }
+
+        [PropertyChanged.OnChangedMethod(nameof(BuildPreview))]
+        [NotifiableProperty]
+        public string LowerPrefix { get => this.model.PhoneticSettings.LowerPrefix; set => this.model.PhoneticSettings.LowerPrefix = value; }
+
+        [PropertyChanged.OnChangedMethod(nameof(BuildPreview))]
+        [NotifiableProperty]
+        public int GroupSize { get => this.model.PhoneticSettings.GroupSize; set => this.model.PhoneticSettings.GroupSize = value; }
+
+        [PropertyChanged.OnChangedMethod(nameof(BuildPreview))]
+        public string PreviewPassword { get; set; } = "Password123!";
+
+        public string Preview { get; private set; }
+
+        public void BuildPreview()
+        {
+            string previewPassword = this.PreviewPassword;
+
+            if (string.IsNullOrWhiteSpace(previewPassword))
+            {
+                this.Preview = null;
+                return;
+            }
+
+            PhoneticStringProvider p = new PhoneticStringProvider(this.model.PhoneticSettings);
+
+            StringBuilder builder = new StringBuilder();
+
+            foreach (var segment in p.GetPhoneticTextSections(previewPassword))
+            {
+                builder.AppendLine(segment);
+            }
+
+            this.Preview = builder.ToString();
+        }
 
         private void LoadImage()
         {
@@ -110,15 +164,8 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public void AttachView(UIElement view)
-        {
-            this.View = view;
-        }
-
-        public string DisplayName { get; set; } = "User interface";
 
         public PackIconMaterialKind Icon => PackIconMaterialKind.Application;
 
-        public UIElement View { get; private set; }
     }
 }

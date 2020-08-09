@@ -3,26 +3,67 @@
     src: url('/fonts/Inconsolata-Regular.ttf');
 }
 
+.bg-primary, .btn-primary {
+    background-color: rgb(29,168,224);
+}
+
+.btn-primary {
+    border-color: rgb(29,168,224);
+}
+
+    .btn-primary:hover {
+        background-color: rgb(27, 152, 202);
+        border-color: rgb(29,168,224);
+    }
+
+html {
+    font-size: 10pt;
+}
+
 body {
     color: #666;
     /*font-family: "Open Sans",Arial,Helvetica,sans-serif;*/
-    font-size: 13px;
+}
+
+#page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
 }
 
 .app-header {
-    display: block;
+    background: rgb(255,255,255);
+    background: linear-gradient(180deg, rgba(255,255,255,1) 0%, #f8f9fa 100%);
+    display: flex;
+    flex-direction: row;
     font-size: 18px;
     font-weight: 300;
     color: #242424;
-    padding: 15px 13px;
-    border-bottom-width: 0px;
-    border-bottom-style: solid;
-    border-bottom-color: rgba(0, 0, 0, .1);
-    background: white;
+    padding: 2rem 0.5rem;
+    margin: 0;
     position: relative;
-    border: 1px solid #dcdcdc;
-    align-items: center;
-    text-align: center;
+    border-bottom: 1px solid silver;
+    order: 0;
+}
+
+.navbar {
+    order: 1;
+    border-bottom: 1px solid silver;
+}
+
+.app-title {
+    font-weight: 200;
+    font-size: 3rem;
+    flex-grow: 1;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.app-logo {
+    max-height: 100px;
+    padding: 0 1.5rem 0 1.5rem;
 }
 
 .center-content {
@@ -30,30 +71,34 @@ body {
     text-align: center;
 }
 
-.app-logo {
-    max-width: 200px;
-}
-
-.app-title {
-    font-weight: 400;
-}
-
 .content {
-    width: 500px;
+    max-width: 800px;
     margin-left: auto;
     margin-right: auto;
-    padding: 10px;
+    padding: 1rem;
+    order: 2;
+}
+
+.form-content-icon {
+    padding: 1rem 2rem 1rem 1rem;
+}
+
+.form-content {
+    flex: 1;
+    padding-right: 1rem;
 }
 
 .form-container {
-    background-color: #fefbfb;
-    border: 1px solid #dcdcdc;
     position: relative;
+    border: 1px solid silver;
+    border-radius: 1rem;
+    padding: 1rem 1rem;
+    display: flex;
 }
 
     .form-container header {
         display: block;
-        font-size: 18px;
+        font-size: 1.5rem;
         font-weight: 300;
         color: #242424;
         padding: 15px 13px;
@@ -83,7 +128,7 @@ body {
         margin-bottom: 3px;
         line-height: 19px;
         font-weight: 600;
-        font-size: 13px;
+        font-size: 1rem;
         color: #333;
     }
 
@@ -92,7 +137,7 @@ body {
         display: block;
         font-weight: 400;
         max-width: 100%;
-        font-size: 13px;
+        font-size: 1rem;
     }
 
     .form-container i.icon-append {
@@ -106,7 +151,7 @@ body {
         top: 5px;
         width: 22px;
         height: 22px;
-        font-size: 14px;
+        font-size: 1rem;
         line-height: 22px;
         text-align: center;
     }
@@ -148,7 +193,7 @@ body {
         z-index: 99999;
         left: -9999px;
         padding: 2px 8px 3px;
-        font-size: 11px;
+        font-size: 0.8rem;
         line-height: 16px;
         font-weight: 400;
         background: rgba(0,0,0,.9);
@@ -169,12 +214,19 @@ body {
         }
 
     .form-container footer {
-        display: block;
-        padding: 7px 14px 15px;
-        border-top: 1px solid rgba(0,0,0,.1);
-        background: rgba(248,248,248,.9);
+        display: flex;
+        flex-direction: column;
         margin: 0;
+        padding-top: 1rem;
     }
+
+        .form-container footer .btn-primary {
+            align-self: flex-end;
+        }
+
+        .form-container footer .btn-secondary, .form-container footer .btn-outline-secondary {
+            align-self: flex-start;
+        }
 
     .form-container .error {
         color: #8f2626;
@@ -239,14 +291,38 @@ body {
     display: inline-block;
 }
 
-@media only screen and (max-width: 600px) {
+@media (min-width: 993px) {
+    .navbar-nav {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 992px) {
+    .navbar {
+        order: 0;
+    }
+}
+
+@media (max-width: 600px) {
+
+    html {
+        font-size: 12pt;
+    }
+
+    .app-header {
+        order: 1;
+    }
+
+    .app-title {
+        font-size: 2rem;
+    }
+
     .form-container {
         width: auto;
         margin-right: 0;
         margin-left: 0;
-        border: 0;
         margin-top: 0;
-        box-shadow: none;
     }
 
     /*.auth-container .auth-content {
@@ -255,7 +331,20 @@ body {
     }*/
 }
 
-@media only screen and (max-device-width: 480px) {
+@media (max-device-width: 480px) {
+
+    html {
+        font-size: 10pt;
+    }
+
+    .app-logo {
+        max-height: 50px;
+    }
+
+    .app-title {
+        font-size: 1.75rem;
+    }
+
     .content {
         margin-top: 0;
         width: 100%;

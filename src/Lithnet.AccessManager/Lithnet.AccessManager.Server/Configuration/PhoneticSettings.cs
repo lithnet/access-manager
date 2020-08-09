@@ -8,10 +8,14 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public string PhoneticNameColon { get; set; }
 
-        public string UpperPrefix { get; set; }
+        public string UpperPrefix { get; set; } = "capital";
 
         public string LowerPrefix { get; set; }
 
-        public int GroupSize { get; set; }
+        public int GroupSize { get; set; } = 4;
+
+        public bool HidePhoneticBreakdown { get; set; }
+
+        public bool DisableTextToSpeech { get; set; }
     }
 }
