@@ -124,6 +124,26 @@ namespace Lithnet.AccessManager.Server.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to # Create-GroupManagedServiceAccount
+        ///# 
+        ///# This script enables the KDS service in the domain if it is not already enabled, and creates a new group-managed service account to use with the Access Manager service
+        ///#
+        ///# This script requires membership in the Domain Admins group
+        ///#
+        ///# Version 1.0
+        ///
+        ///#-------------------------------------------------------------------------
+        ///# Set the following values as appropriate for your environment
+        ///#-------------------------------------------------------------------------
+        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string CreateGmsa {
+            get {
+                return ResourceManager.GetString("CreateGmsa", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to # Enable-PamFeature
         ///# 
         ///# This script enabled the &apos;Privileged Access Management&apos; optional feature in a forest
@@ -259,6 +279,30 @@ namespace Lithnet.AccessManager.Server.UI {
         internal static string GrantServiceAccountPermission {
             get {
                 return ResourceManager.GetString("GrantServiceAccountPermission", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to # Prevent-Delegation
+        ///# 
+        ///# This script modifies the userAccountControl attribute to set the flag that prevents delegation of the specified account
+        ///#
+        ///# This script requires membership in the domain admins group, or delegated permission to manage user objects in the container where the account resides
+        ///# 
+        ///#
+        ///# Version 1.0
+        ///
+        ///$ErrorActionPreference = &quot;Stop&quot;
+        ///$InformationPreference = &quot;Continue&quot;
+        ///
+        ///Import-Module ActiveDirectory
+        ///    
+        ///$sid = &quot;{sid}&quot;            
+        ///Set-ADAccountControl -Identity $sid -AccountNo [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string PreventDelegation {
+            get {
+                return ResourceManager.GetString("PreventDelegation", resourceCulture);
             }
         }
         

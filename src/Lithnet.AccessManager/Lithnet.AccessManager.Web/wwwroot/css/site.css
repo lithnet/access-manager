@@ -15,7 +15,7 @@
         background-color: rgb(27, 152, 202);
         border-color: rgb(29,168,224);
     }
-
+    
 html {
     font-size: 10pt;
 }
@@ -23,6 +23,14 @@ html {
 body {
     color: #666;
     /*font-family: "Open Sans",Arial,Helvetica,sans-serif;*/
+}
+
+.clipboard-copy-button {
+
+}
+
+.speech-button {
+
 }
 
 #page-container {

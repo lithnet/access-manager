@@ -1,1 +1,1 @@
-﻿new ClipboardJS('#copy-button');
+﻿new ClipboardJS('.clipboard-copy-button');

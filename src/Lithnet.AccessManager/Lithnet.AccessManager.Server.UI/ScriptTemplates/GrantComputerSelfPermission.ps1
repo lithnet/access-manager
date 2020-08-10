@@ -16,6 +16,7 @@ $OU = "OU=Laps Testing,DC=IDMDEV1,DC=LOCAL"
 
 #-------------------------------------------------------------------------
 # Do not modify below here
+#-------------------------------------------------------------------------
 
 Import-Module ActiveDirectory
 

@@ -11,11 +11,21 @@ namespace Lithnet.AccessManager
     {
         private const int PasswordHistoryItemLimit = 500;
 
-        private readonly ILogger<LithnetAdminPasswordProvider> logger;
+        private const string AttrMsMcsAdmPwd = "ms-Mcs-AdmPwd";
+        private const string AttrMsMcsAdmPwdExpirationTime = "ms-Mcs-AdmPwdExpirationTime";
+        private const string AttrLithnetAdminPasswordHistory = "lithnetAdminPasswordHistory";
+        private const string AttrLithnetAdminPasswordExpiry = "lithnetAdminPasswordExpiry";
+        private const string AttrLithnetAdminPassword = "lithnetAdminPassword";
 
-        public LithnetAdminPasswordProvider(ILogger<LithnetAdminPasswordProvider> logger)
+        private readonly ILogger<LithnetAdminPasswordProvider> logger;
+        private readonly IEncryptionProvider encryptionProvider;
+        private readonly ICertificateProvider certificateProvider;
+
+        public LithnetAdminPasswordProvider(ILogger<LithnetAdminPasswordProvider> logger, IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider)
         {
             this.logger = logger;
+            this.encryptionProvider = encryptionProvider;
+            this.certificateProvider = certificateProvider;
         }
 
         public ProtectedPasswordHistoryItem GetCurrentPassword(IComputer computer, DateTime? newExpiry)
@@ -31,7 +41,7 @@ namespace Lithnet.AccessManager
 
             if (newExpiry != null)
             {
-                de.Properties["lithnetAdminPasswordExpiry"].Value = newExpiry.Value.ToFileTimeUtc().ToString();
+                de.Properties[AttrLithnetAdminPasswordExpiry].Value = newExpiry.Value.ToFileTimeUtc().ToString();
                 de.CommitChanges();
             }
 
@@ -47,7 +57,7 @@ namespace Lithnet.AccessManager
 
         private List<ProtectedPasswordHistoryItem> GetPasswordHistory(DirectoryEntry de)
         {
-            List<string> items = de.GetPropertyStrings("lithnetAdminPasswordHistory").ToList();
+            List<string> items = de.GetPropertyStrings(AttrLithnetAdminPasswordHistory).ToList();
 
             List<ProtectedPasswordHistoryItem> list = new List<ProtectedPasswordHistoryItem>();
 
@@ -64,17 +74,26 @@ namespace Lithnet.AccessManager
             DirectoryEntry de = computer.DirectoryEntry;
             de.RefreshCache();
 
-            return de.GetPropertyDateTimeFromAdsLargeInteger("lithnetAdminPasswordExpiry");
+            return de.GetPropertyDateTimeFromAdsLargeInteger(AttrLithnetAdminPasswordExpiry);
         }
+
+        private DateTime? GetMsMcsAdmPwdExpiry(IComputer computer)
+        {
+            DirectoryEntry de = computer.DirectoryEntry;
+            de.RefreshCache();
+
+            return de.GetPropertyDateTimeFromAdsLargeInteger(AttrMsMcsAdmPwdExpirationTime);
+        }
+
 
         public void UpdatePasswordExpiry(IComputer computer, DateTime expiry)
         {
             DirectoryEntry de = computer.DirectoryEntry;
-            de.Properties["lithnetAdminPasswordExpiry"].Value = expiry.ToFileTimeUtc().ToString();
+            de.Properties[AttrLithnetAdminPasswordExpiry].Value = expiry.ToFileTimeUtc().ToString();
             de.CommitChanges();
         }
 
-        public void UpdateCurrentPassword(IComputer computer, string encryptedPassword, DateTime rotationInstant, DateTime expiryDate, int maximumPasswordHistory)
+        public void UpdateCurrentPassword(IComputer computer, string password, DateTime rotationInstant, DateTime expiryDate, int maximumPasswordHistory, MsMcsAdmPwdBehaviour msLapsBehaviour)
         {
             DirectoryEntry de = computer.DirectoryEntry;
 
@@ -95,24 +114,65 @@ namespace Lithnet.AccessManager
             ProtectedPasswordHistoryItem newPassword = new ProtectedPasswordHistoryItem()
             {
                 Created = rotationInstant,
-                EncryptedData = encryptedPassword,
+                EncryptedData = this.encryptionProvider.Encrypt(this.certificateProvider.FindEncryptionCertificate(), password)
             };
 
-            de.Properties["lithnetAdminPasswordHistory"].Clear();
+            de.Properties[AttrLithnetAdminPasswordHistory].Clear();
             if (items.Count > 0)
             {
-                de.Properties["lithnetAdminPasswordHistory"]
+                de.Properties[AttrLithnetAdminPasswordHistory]
                     .AddRange(items.Select(JsonConvert.SerializeObject).ToArray<object>());
             }
 
-            de.Properties["lithnetAdminPasswordExpiry"].Value = expiryDate.ToFileTimeUtc().ToString();
-            de.Properties["lithnetAdminPassword"].Value = JsonConvert.SerializeObject(newPassword);
+            de.Properties[AttrLithnetAdminPasswordExpiry].Value = expiryDate.ToFileTimeUtc().ToString();
+            de.Properties[AttrLithnetAdminPassword].Value = JsonConvert.SerializeObject(newPassword);
+
+            if (msLapsBehaviour == MsMcsAdmPwdBehaviour.Populate)
+            {
+                de.Properties[AttrMsMcsAdmPwd].Value = password;
+                de.Properties[AttrMsMcsAdmPwdExpirationTime].Value = expiryDate.ToFileTimeUtc().ToString();
+            }
+            else if (msLapsBehaviour == MsMcsAdmPwdBehaviour.Clear)
+            {
+                de.Properties[AttrMsMcsAdmPwd].Clear();
+                de.Properties[AttrMsMcsAdmPwdExpirationTime].Clear();
+            }
+
             de.CommitChanges();
+        }
+
+        public bool HasPasswordExpired(IComputer computer, bool considerMsMcsAdmPwdExpiry)
+        {
+            DateTime? lithnetExpiry = this.GetExpiry(computer);
+
+            if (lithnetExpiry == null)
+            {
+                return true;
+            }
+
+            if (DateTime.UtcNow > lithnetExpiry)
+            {
+                return true;
+            }
+
+            if (considerMsMcsAdmPwdExpiry)
+            {
+                var lapsExpiry = this.GetMsMcsAdmPwdExpiry(computer);
+
+                if (lapsExpiry == null)
+                {
+                    return true;
+                }
+
+                return DateTime.UtcNow > lapsExpiry;
+            }
+
+            return false;
         }
 
         private ProtectedPasswordHistoryItem GetCurrentPassword(DirectoryEntry de)
         {
-            string rawExistingPassword = de.GetPropertyString("lithnetAdminPassword");
+            string rawExistingPassword = de.GetPropertyString(AttrLithnetAdminPassword);
 
             if (!string.IsNullOrWhiteSpace(rawExistingPassword))
             {
@@ -126,7 +186,7 @@ namespace Lithnet.AccessManager
         {
             DirectoryEntry de = computer.DirectoryEntry;
 
-            de.Properties["lithnetAdminPasswordHistory"].Clear();
+            de.Properties[AttrLithnetAdminPasswordHistory].Clear();
             de.CommitChanges();
         }
 
@@ -134,8 +194,8 @@ namespace Lithnet.AccessManager
         {
             DirectoryEntry de = computer.DirectoryEntry;
 
-            de.Properties["lithnetAdminPassword"].Clear();
-            de.Properties["lithnetAdminPasswordExpiry"].Clear();
+            de.Properties[AttrLithnetAdminPassword].Clear();
+            de.Properties[AttrLithnetAdminPasswordExpiry].Clear();
             de.CommitChanges();
         }
 

@@ -19,9 +19,10 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="15*" MinWidth="110"/>
                 <ColumnDefinition Width="85*"/>
-                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -49,18 +50,85 @@
                          Text="{Binding ServiceAccountDisplayName, Mode=OneWay}" 
                          IsReadOnly="True"
                          Margin="5"/>
-            <Button Grid.Row="1" Grid.Column="1"
+
+            <Grid Grid.Row="1" Grid.Column="1"
+                  VerticalAlignment="Center"
+                  Visibility="{Binding CanBeDelegated, Converter={StaticResource BooleanToVisibilityConverter}}"
+                  Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <iconPacks:PackIconFontAwesome Grid.Column="0" 
+                                               Kind="ExclamationTriangleSolid"
+                                               Margin="0 0 5 0"
+                                               Foreground="Red"/>
+                <TextBlock Grid.Column="1" 
+                           Text="Warning: This account is not protected from impersonation. Other services in the domain that are authorized for delegation could impersonate this account and inherit it's permissions. Protect the account by setting the 'account is sensitive and cannot be delegated' user account control flag" TextWrapping="Wrap"/>
+                <Button Grid.Column="2"
+                        Command="{s:Action PreventDelegation}"
+                        Margin="5" 
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        VerticalContentAlignment="Center">
+                    <StackPanel Orientation="Horizontal" 
+                                VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="ScriptOutline" Margin="0 0 2 0"/>
+                        <TextBlock Text="PREVENT DELEGATION..." VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+
+            <Grid Grid.Row="2" Grid.Column="1"
+                  VerticalAlignment="Center"
+                  Visibility="{Binding IsNotGmsa, Converter={StaticResource BooleanToVisibilityConverter}}"
+                  Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <iconPacks:PackIconFontAwesome Grid.Column="0" 
+                                               Kind="ExclamationCircleSolid"
+                                               Margin="0 0 5 0"
+                                               Foreground="DeepSkyBlue"/>
+                <TextBlock Grid.Column="1" 
+                           TextWrapping="Wrap"
+                           >Use a <Hyperlink Click="{s:Action OpenGmsaInfo}">group-managed service account</Hyperlink> if possible. GMSA passwords are very strong and are set and changed automatically by the system on a regular basis</TextBlock>
+                <Button Grid.Column="2"
+                        Command="{s:Action CreateGmsa}"
+                        Margin="5" 
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Center"
+                        VerticalContentAlignment="Center">
+                    <StackPanel Orientation="Horizontal" 
+                                VerticalAlignment="Center">
+                        <iconPacks:PackIconMaterial Kind="ScriptOutline" Margin="0 0 2 0"/>
+                        <TextBlock Text="CREATE GMSA..." VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+
+
+            <Button Grid.Row="3" Grid.Column="1"
                         Height="Auto"
                         HorizontalAlignment="Left"
                         Command="{s:Action SelectServiceAccountUser}"
                         Content="Change account..."
                         Margin="5"/>
 
-            <Label Grid.Row="2" Grid.Column="0"
+            <Label Grid.Row="4" Grid.Column="0"
                        Content="Service Status"
                        Margin="5"/>
 
-            <StackPanel Grid.Row="2" Grid.Column="1" 
+            <StackPanel Grid.Row="4" Grid.Column="1" 
                         Orientation="Horizontal">
                 <Label Content="{Binding ServiceStatus}"
                            Margin="5"/>
@@ -68,7 +136,7 @@
                                       Visibility="{Binding ServicePending, Converter={StaticResource BooleanToVisibilityConverter}}"/>
             </StackPanel>
 
-            <StackPanel  Grid.Row="3" Grid.Column="1" 
+            <StackPanel  Grid.Row="5" Grid.Column="1" 
                          Orientation="Horizontal">
                 <Button Command="{s:Action StartService}"
                         Content="Start Service"
@@ -80,11 +148,11 @@
                          Margin="5"/>
             </StackPanel>
 
-            <Label Grid.Row="5" Grid.Column="0"
+            <Label Grid.Row="7" Grid.Column="0"
                    Content="Version"
                    Margin="5"/>
 
-            <StackPanel Grid.Row="5" Grid.Column="1" 
+            <StackPanel Grid.Row="7" Grid.Column="1" 
                             Orientation="Horizontal"
                             VerticalAlignment="Center"
                             Margin="5">
@@ -110,23 +178,23 @@
             </StackPanel>
 
 
-            <Label Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+            <Label Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2"
             Style="{DynamicResource DescriptionHeaderStyle}" Content="TLS/SSL Certificate"/>
 
-            <Label Grid.Row="7" Grid.Column="0"
+            <Label Grid.Row="9" Grid.Column="0"
                        Content="Certificate"
                        Margin="5"/>
 
-            <TextBox  Grid.Row="7" Grid.Column="1"
+            <TextBox  Grid.Row="9" Grid.Column="1"
                       Text="{Binding CertificateDisplayName, Mode=OneWay}" 
                       IsReadOnly="True"
                       Margin="5"/>
 
-            <Label Grid.Row="9" Grid.Column="0"
+            <Label Grid.Row="11" Grid.Column="0"
                    Content="Certificate Expiry"
                    Margin="5"/>
 
-            <StackPanel Grid.Row="9" Grid.Column="1"
+            <StackPanel Grid.Row="11" Grid.Column="1"
                         Orientation="Horizontal"
                         VerticalAlignment="Center"
                         Margin="5">
@@ -146,7 +214,7 @@
             </StackPanel>
 
 
-            <StackPanel Grid.Row="8" Grid.Column="1"
+            <StackPanel Grid.Row="10" Grid.Column="1"
                         Orientation="Horizontal">
                 <Button HorizontalAlignment="Left"
                         Command="{s:Action ShowCertificateDialog}"
@@ -165,46 +233,46 @@
 
 
 
-            <Label Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="2"
+            <Label Grid.Row="13" Grid.Column="0" Grid.ColumnSpan="2"
                Style="{DynamicResource DescriptionHeaderStyle}" Content="Web host"/>
 
-            <Label Grid.Row="12" Grid.Column="0" 
+            <Label Grid.Row="14" Grid.Column="0" 
                    Content="HTTP Port"
                    Margin="5"/>
-            <mah:NumericUpDown Grid.Row="12" Grid.Column="1" 
+            <mah:NumericUpDown Grid.Row="14" Grid.Column="1" 
                                Value="{Binding HttpPort, UpdateSourceTrigger=PropertyChanged}" 
                                Minimum="1" Maximum="65535" Interval="1"
                                HideUpDownButtons="True"
                                Width="50" 
                                TextAlignment="Left" HorizontalAlignment="Left"
                                Margin="5 5 5 0"/>
-            <TextBlock Grid.Row="13" Grid.Column="1"
+            <TextBlock Grid.Row="15" Grid.Column="1"
                            TextWrapping="Wrap"
                            Text="Enter the HTTP port to listen on (Default 80). Note that all connections on this port are redirected to HTTPS"
                            Margin="5 0 5 0"/>
 
-            <Label Grid.Row="14" Grid.Column="0" 
+            <Label Grid.Row="16" Grid.Column="0" 
                    Content="HTTPS Port"
                    Margin="5"/>
-            <mah:NumericUpDown Grid.Row="14" Grid.Column="1" 
+            <mah:NumericUpDown Grid.Row="16" Grid.Column="1" 
                                Value="{Binding HttpsPort, UpdateSourceTrigger=PropertyChanged}" 
                                Minimum="1" Maximum="65535" Interval="1" 
                                HideUpDownButtons="True"
                                Width="50" 
                                TextAlignment="Left" HorizontalAlignment="Left"
                                Margin="5 5 5 0"/>
-            <TextBlock Grid.Row="15" Grid.Column="1" 
+            <TextBlock Grid.Row="17" Grid.Column="1" 
                    Text="Enter the HTTPS port to listen on (Default 443)"
                     TextWrapping="Wrap"
                    Margin="5 0 5 0"/>
 
-            <Label Grid.Row="16" Grid.Column="0" 
+            <Label Grid.Row="18" Grid.Column="0" 
                    Content="Hostname"
                    Margin="5"/>
-            <TextBox Grid.Row="16" Grid.Column="1"
+            <TextBox Grid.Row="18" Grid.Column="1"
                      Text="{Binding Hostname, UpdateSourceTrigger=PropertyChanged}"
                      Margin="5 5 5 0"/>
-            <TextBlock Grid.Row="17" Grid.Column="1" 
+            <TextBlock Grid.Row="19" Grid.Column="1" 
                    Text="Optionally, enter a specific hostname to listen on. Leave this field blank to listen on all hostnames"
                     TextWrapping="Wrap"
                    Margin="5 0 5 0"/>

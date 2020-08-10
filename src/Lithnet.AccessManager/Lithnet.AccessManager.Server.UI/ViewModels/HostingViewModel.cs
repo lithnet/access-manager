@@ -13,7 +13,6 @@ using System.Security.Principal;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Media.Animation;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using MahApps.Metro.Controls.Dialogs;
@@ -67,6 +66,8 @@ namespace Lithnet.AccessManager.Server.UI
         protected override void OnInitialActivate()
         {
             _ = this.TryGetVersion();
+            this.PopulateCanDelegate();
+            this.PopulateIsNotGmsa();
         }
 
         protected override void OnActivate()
@@ -143,6 +144,119 @@ namespace Lithnet.AccessManager.Server.UI
         public bool ServicePending { get; set; }
 
         public string ServiceStatus { get; set; }
+
+        public bool CanBeDelegated { get; set; }
+
+        public bool IsNotGmsa { get; set; }
+
+        private void PopulateCanDelegate()
+        {
+            try
+            {
+                this.CanBeDelegated = false;
+
+                using PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
+                using var u = UserPrincipal.FindByIdentity(ctx, IdentityType.Sid, this.ServiceAccount.ToString());
+
+                if (u != null)
+                {
+                    this.CanBeDelegated = u.DelegationPermitted;
+                    return;
+                }
+
+                using var cmp = ComputerPrincipal.FindByIdentity(ctx, IdentityType.Sid, this.ServiceAccount.ToString());
+
+                if (cmp != null)
+                {
+                    this.CanBeDelegated = cmp.DelegationPermitted;
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not determine delegation status of account");
+            }
+        }
+
+        private void PopulateIsNotGmsa()
+        {
+            try
+            {
+                this.IsNotGmsa = false;
+
+                using PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
+                using var cmp = ComputerPrincipal.FindByIdentity(ctx, IdentityType.Sid, this.ServiceAccount.ToString());
+
+                if (cmp != null)
+                {
+                    this.IsNotGmsa = !string.Equals(cmp.StructuralObjectClass, "msDS-GroupManagedServiceAccount", StringComparison.OrdinalIgnoreCase);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not determine gmsa status of account");
+            }
+        }
+
+
+
+        public async Task OpenGmsaInfo()
+        {
+            try
+            {
+                var psi = new ProcessStartInfo
+                {
+                    FileName = Constants.LinkGmsaInfo,
+                    UseShellExecute = true
+                };
+
+                Process.Start(psi);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not open link");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not open the default link handler\r\n{ex.Message}");
+            }
+        }
+
+        public void PreventDelegation()
+        {
+            var vm = new ScriptContentViewModel(this.dialogCoordinator)
+            {
+                HelpText = "Run the following script as an account that is a member of the 'Domain admins' group",
+                ScriptText = ScriptTemplates.PreventDelegation
+                    .Replace("{sid}", this.ServiceAccount.ToString(), StringComparison.OrdinalIgnoreCase)
+            };
+
+            ExternalDialogWindow w = new ExternalDialogWindow
+            {
+                DataContext = vm,
+                SaveButtonVisible = false,
+                CancelButtonName = "Close"
+            };
+
+            w.ShowDialog();
+
+            this.PopulateCanDelegate();
+        }
+
+        public void CreateGmsa()
+        {
+            var vm = new ScriptContentViewModel(this.dialogCoordinator)
+            {
+                HelpText = "Run the following script as an account that is a member of the 'Domain admins' group",
+                ScriptText = ScriptTemplates.CreateGmsa
+                    .Replace("{serverName}", Environment.MachineName, StringComparison.OrdinalIgnoreCase)
+            };
+
+            ExternalDialogWindow w = new ExternalDialogWindow
+            {
+                DataContext = vm,
+                SaveButtonVisible = false,
+                CancelButtonName = "Close"
+            };
+
+            w.ShowDialog();
+        }
 
         public bool ShowCertificateExpiryWarning => this.Certificate != null && this.Certificate.NotAfter.AddDays(-30) >= DateTime.Now;
 
@@ -483,6 +597,8 @@ namespace Lithnet.AccessManager.Server.UI
 
                 this.workingServiceAccountUserName = r.Username;
                 this.workingServiceAccountPassword = r.Password;
+
+                this.PopulateIsNotGmsa();
             }
             catch (Exception ex)
             {

@@ -10,6 +10,10 @@
 #
 # Version 1.0
 
+#-------------------------------------------------------------------------
+# Do not modify below here
+#-------------------------------------------------------------------------
+
 Import-Module ActiveDirectory
 
 $ErrorActionPreference = "Stop"

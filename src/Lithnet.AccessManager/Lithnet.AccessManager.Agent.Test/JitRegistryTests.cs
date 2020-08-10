@@ -27,11 +27,11 @@ namespace Lithnet.AccessManager.Agent.Test
             Assert.AreEqual(false, this.registrySettings.JitEnabled);
 
             // Test enabled
-            policyKey.SetValue("JitEnabled", 1);
+            policyKey.SetValue("Enabled", 1);
             Assert.AreEqual(true, this.registrySettings.JitEnabled);
 
             // Test disabled
-            policyKey.SetValue("JitEnabled", 0);
+            policyKey.SetValue("Enabled", 0);
             Assert.AreEqual(false, this.registrySettings.JitEnabled);
         }
 

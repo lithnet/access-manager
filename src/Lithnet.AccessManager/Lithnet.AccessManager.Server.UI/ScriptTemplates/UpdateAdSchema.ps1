@@ -7,6 +7,11 @@
 # 
 #
 # Version 1.0
+
+#-------------------------------------------------------------------------
+# Do not modify below here
+#-------------------------------------------------------------------------
+
 $ErrorActionPreference = "Stop"
 $InformationPreference = "Continue"
 

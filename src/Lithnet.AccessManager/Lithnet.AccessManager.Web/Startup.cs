@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Threading.Channels;
+using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
@@ -11,7 +12,6 @@ using Lithnet.AccessManager.Server.Workers;
 using Lithnet.AccessManager.Web.AppSettings;
 using Lithnet.AccessManager.Web.Extensions;
 using Lithnet.AccessManager.Web.Internal;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -35,7 +35,7 @@ namespace Lithnet.AccessManager.Web
         {
             services.AddControllersWithViews();
             services.AddHttpContextAccessor();
-
+            services.AddResponseCaching();
             services.TryAddScoped<IIwaAuthenticationProvider, IwaAuthenticationProvider>();
             services.TryAddScoped<IOidcAuthenticationProvider, OidcAuthenticationProvider>();
             services.TryAddScoped<IWsFedAuthenticationProvider, WsFedAuthenticationProvider>();
@@ -114,6 +114,8 @@ namespace Lithnet.AccessManager.Web
 
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseResponseCaching();
+
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseFeaturePolicy();

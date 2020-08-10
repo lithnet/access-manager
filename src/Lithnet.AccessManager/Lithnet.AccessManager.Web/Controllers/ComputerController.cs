@@ -112,6 +112,7 @@ namespace Lithnet.AccessManager.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult AccessResponse(AccessRequestModel model)
         {
             model.ShowReason = this.userInterfaceSettings.UserSuppliedReason != AuditReasonFieldState.Hidden;

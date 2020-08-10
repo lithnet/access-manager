@@ -2,8 +2,6 @@
 {
     public interface ILapsSettings
     {
-        string CertThumbprint { get; }
-
         bool Enabled { get; }
 
         int PasswordLength { get; }
@@ -26,10 +24,8 @@
 
         int PasswordHistoryDaysToKeep { get; }
 
-        bool WriteToMsMcsAdmPasswordAttributes { get; }
+        MsMcsAdmPwdBehaviour MsMcsAdmPwdBehaviour { get; }
 
         int MaximumPasswordAge { get; }
-
-        bool WriteToLithnetAttributes { get; }
     }
 }

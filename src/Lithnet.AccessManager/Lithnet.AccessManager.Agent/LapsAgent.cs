@@ -15,29 +15,20 @@ namespace Lithnet.AccessManager.Agent
 
         private readonly IPasswordGenerator passwordGenerator;
 
-        private readonly IEncryptionProvider encryptionProvider;
-
-        private readonly ICertificateProvider certificateProvider;
-
         private readonly ILocalSam sam;
 
         private readonly ILithnetAdminPasswordProvider lithnetAdminPasswordProvider;
 
-        private readonly IMsMcsAdmPwdProvider msMcsAdmPwdProvider;
-
         private bool mslapsInstaled;
 
-        public LapsAgent(ILogger<LapsAgent> logger, IDirectory directory, ILapsSettings settings, IPasswordGenerator passwordGenerator, IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider, ILocalSam sam, ILithnetAdminPasswordProvider lithnetAdminPasswordProvider, IMsMcsAdmPwdProvider msMcsAdmPwdProvider)
+        public LapsAgent(ILogger<LapsAgent> logger, IDirectory directory, ILapsSettings settings, IPasswordGenerator passwordGenerator, ILocalSam sam, ILithnetAdminPasswordProvider lithnetAdminPasswordProvider)
         {
             this.logger = logger;
             this.directory = directory;
             this.settings = settings;
             this.passwordGenerator = passwordGenerator;
-            this.encryptionProvider = encryptionProvider;
-            this.certificateProvider = certificateProvider;
             this.sam = sam;
             this.lithnetAdminPasswordProvider = lithnetAdminPasswordProvider;
-            this.msMcsAdmPwdProvider = msMcsAdmPwdProvider;
         }
 
         public void DoCheck()
@@ -47,12 +38,6 @@ namespace Lithnet.AccessManager.Agent
                 if (!this.settings.Enabled)
                 {
                     this.logger.LogTrace(EventIDs.LapsAgentDisabled, "The LAPS agent is disabled");
-                    return;
-                }
-
-                if (!this.settings.WriteToLithnetAttributes && !this.settings.WriteToMsMcsAdmPasswordAttributes)
-                {
-                    this.logger.LogTrace(EventIDs.LapsAgentNotConfigured, "The LAPS agent is not configured to write passwords to any attribute stores");
                     return;
                 }
 
@@ -112,29 +97,7 @@ namespace Lithnet.AccessManager.Agent
         {
             try
             {
-                if (this.settings.WriteToLithnetAttributes)
-                {
-                    DateTime? expiry = lithnetAdminPasswordProvider.GetExpiry(computer);
-                    if (expiry == null)
-                    {
-                        return true;
-                    }
-
-                    return DateTime.UtcNow > expiry;
-                }
-                else if (this.settings.WriteToMsMcsAdmPasswordAttributes)
-                {
-                    var expiry = this.msMcsAdmPwdProvider.GetExpiry(computer);
-
-                    if (expiry == null)
-                    {
-                        return true;
-                    }
-
-                    return DateTime.UtcNow > expiry;
-                }
-
-                return false;
+                return this.lithnetAdminPasswordProvider.HasPasswordExpired(computer, this.settings.MsMcsAdmPwdBehaviour == MsMcsAdmPwdBehaviour.Populate);
             }
             catch (Exception ex)
             {
@@ -156,28 +119,15 @@ namespace Lithnet.AccessManager.Agent
                 DateTime rotationInstant = DateTime.UtcNow;
                 DateTime expiryDate = DateTime.UtcNow.AddDays(this.settings.MaximumPasswordAge);
 
-                if (this.settings.WriteToLithnetAttributes)
-                {
-                    lithnetAdminPasswordProvider.UpdateCurrentPassword(computer,
-                        this.encryptionProvider.Encrypt(
-                            this.certificateProvider.FindEncryptionCertificate(this.settings.CertThumbprint),
-                            newPassword),
-                        rotationInstant,
-                        expiryDate,
-                        this.settings.PasswordHistoryDaysToKeep);
-                    this.logger.LogTrace(EventIDs.SetPasswordOnAmAttribute, "Set password on Lithnet Access Manager attribute");
-                }
+                lithnetAdminPasswordProvider.UpdateCurrentPassword(computer, newPassword, rotationInstant, expiryDate, this.settings.PasswordHistoryDaysToKeep, this.settings.MsMcsAdmPwdBehaviour);
 
-                if (this.settings.WriteToMsMcsAdmPasswordAttributes)
+                this.logger.LogTrace(EventIDs.SetPasswordOnAmAttribute, "Set password on Lithnet Access Manager attribute");
+                
+                if (this.settings.MsMcsAdmPwdBehaviour == MsMcsAdmPwdBehaviour.Populate)
                 {
-                    this.msMcsAdmPwdProvider.SetPassword(computer, newPassword, expiryDate);
                     this.logger.LogTrace(EventIDs.SetPasswordOnLapsAttribute, "Set password on Microsoft LAPS attribute");
                 }
-                else
-                {
-                    this.msMcsAdmPwdProvider.ClearPassword(computer);
-                }
-
+               
                 this.sam.SetLocalAccountPassword(sid, newPassword);
                 this.logger.LogInformation(EventIDs.SetPassword, "The local administrator password has been changed and will expire on {expiryDate}", expiryDate);
             }

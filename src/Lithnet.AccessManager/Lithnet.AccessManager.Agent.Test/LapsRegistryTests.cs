@@ -90,15 +90,6 @@ namespace Lithnet.AccessManager.Agent.Test
         }
 
         [Test]
-        public void CertThumbprint()
-        {
-            Assert.AreEqual(null, this.registrySettings.CertThumbprint);
-
-            policyKey.SetValue("CertThumbprint", "ABCDEFG");
-            Assert.AreEqual("ABCDEFG", this.registrySettings.CertThumbprint);
-        }
-
-        [Test]
         public void UseLower()
         {
             Assert.AreEqual(false, this.registrySettings.UseLower);
@@ -123,14 +114,14 @@ namespace Lithnet.AccessManager.Agent.Test
         }
 
         [Test]
-        public void UseReadibilitySeparator()
+        public void UseReadabilitySeparator()
         {
             Assert.AreEqual(false, this.registrySettings.UseReadabilitySeparator);
 
-            policyKey.SetValue("UseReadibilitySeparator", 1);
+            policyKey.SetValue("UseReadabilitySeparator", 1);
             Assert.AreEqual(true, this.registrySettings.UseReadabilitySeparator);
 
-            policyKey.SetValue("UseReadibilitySeparator", 0);
+            policyKey.SetValue("UseReadabilitySeparator", 0);
             Assert.AreEqual(false, this.registrySettings.UseReadabilitySeparator);
         }
 
@@ -161,13 +152,16 @@ namespace Lithnet.AccessManager.Agent.Test
         [Test]
         public void WriteToMsMcsAdmPasswordAttributes()
         {
-            Assert.AreEqual(PasswordStorageLocation.Auto, this.registrySettings.StorageMode);
+            Assert.AreEqual(MsMcsAdmPwdBehaviour.Ignore, this.registrySettings.MsMcsAdmPwdBehaviour);
 
-            policyKey.SetValue("StorageMode", (int)PasswordStorageLocation.LithnetAttribute);
-            Assert.AreEqual(PasswordStorageLocation.LithnetAttribute, this.registrySettings.StorageMode);
+            policyKey.SetValue("MsMcsAdmPwdBehaviour", (int)MsMcsAdmPwdBehaviour.Populate);
+            Assert.AreEqual(MsMcsAdmPwdBehaviour.Populate, this.registrySettings.MsMcsAdmPwdBehaviour);
 
-            policyKey.SetValue("StorageMode", 0);
-            Assert.AreEqual(PasswordStorageLocation.Auto, this.registrySettings.StorageMode);
+            policyKey.SetValue("MsMcsAdmPwdBehaviour", (int)MsMcsAdmPwdBehaviour.Clear);
+            Assert.AreEqual(MsMcsAdmPwdBehaviour.Clear, this.registrySettings.MsMcsAdmPwdBehaviour);
+
+            policyKey.SetValue("MsMcsAdmPwdBehaviour", 0);
+            Assert.AreEqual(MsMcsAdmPwdBehaviour.Ignore, this.registrySettings.MsMcsAdmPwdBehaviour);
         }
     }
 }
