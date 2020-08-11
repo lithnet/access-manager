@@ -12,7 +12,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class ApplicationConfigViewModel : Conductor<PropertyChangedBase>.Collection.OneActive
+    public class ApplicationConfigViewModel : Conductor<PropertyChangedBase>.Collection.OneActive, IHelpLink
     {
         private readonly IApplicationConfig model;
 
@@ -72,6 +72,8 @@ namespace Lithnet.AccessManager.Server.UI
 
         private HostingViewModel hosting { get; }
 
+        public string HelpLink => (this.ActiveItem as IHelpLink)?.HelpLink;
+        
         public async Task<bool> Save()
         {
             try

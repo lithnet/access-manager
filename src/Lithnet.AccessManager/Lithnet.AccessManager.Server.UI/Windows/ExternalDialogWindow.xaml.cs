@@ -17,6 +17,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             InitializeComponent();
             this.SaveButton.Focus();
+            this.Owner ??= Application.Current.MainWindow;
         }
 
         public bool CancelButtonVisible { get; set; } = true;

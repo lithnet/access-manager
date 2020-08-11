@@ -8,8 +8,7 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
              Dialog:DialogParticipation.Register="{Binding}"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             mc:Ignorable="d">
     <AdornerDecorator>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -18,8 +17,6 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -34,10 +31,13 @@
             <TextBox Grid.Row="0" Grid.Column="1" 
                          Text="{Binding ComputerOU, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
                          IsReadOnly="True"
+                         ToolTip="Select the container that contains the computer objects you want to create groups for"
                          Margin="5"/>
+            
             <Button Grid.Row="0" Grid.Column="2"
                     Command="{s:Action SelectComputerOU}"
                     Content="..."
+                    ToolTip="Browse for a container in the directory"
                     Margin="5"/>
 
             <StackPanel Grid.Row="1" Grid.Column="1">
@@ -56,24 +56,32 @@
             <TextBox Grid.Row="2" Grid.Column="1" 
                      Text="{Binding GroupOU, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
                      IsReadOnly="True"
+                     ToolTip="Specifies the OU where group objects will be created"
                      Margin="5"/>
             <Button Grid.Row="2" Grid.Column="2"
                     Command="{s:Action SelectGroupOU}"
+                    ToolTip="Browse for a container in the directory"
                     Content="..."
                     Margin="5"/>
 
-            <CheckBox Grid.Row="3" Grid.Column="1"
-                      Margin="5"
+            <StackPanel Grid.Row="3" Grid.Column="1">
+            <CheckBox Margin="5"
                       Content="Delete groups in this OU that do not have matching computers"
                       IsChecked="{Binding EnableJitGroupDeletion}"/>
+                <TextBlock Margin="5 0 5 5"
+                           TextWrapping="Wrap">Don't select this option if this OU contains groups that are not managed by Access Manager. They will be deleted.</TextBlock>
+            </StackPanel>
 
             <Label Grid.Row="4" Grid.Column="0"
                    Content="Group name template"
                    Margin="5"/>
-            <TextBox Grid.Row="4" Grid.Column="1" 
-                     Text="{Binding GroupNameTemplate, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
-                     Margin="5"/>
-
+            <StackPanel Grid.Row="4" Grid.Column="1">
+                <TextBox Text="{Binding GroupNameTemplate, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="5"/>
+                <TextBlock Margin="5 0 5 5"
+                           TextWrapping="Wrap">Specify the name of the group, and include the {computerName} placeholder. For example, "JIT-{computername}"</TextBlock>
+            </StackPanel>
+           
             <Label Grid.Row="5" Grid.Column="0"
                    Content="Group type"
                    Margin="5"/>

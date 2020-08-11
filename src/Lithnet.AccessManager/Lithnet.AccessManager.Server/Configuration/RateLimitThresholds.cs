@@ -2,7 +2,7 @@
 {
     public class RateLimitThresholds 
     {
-        public bool Enabled { get; set; }
+        public bool Enabled { get; set; } = true;
 
         public int RequestsPerMinute { get; set; } = 10;
 

@@ -59,7 +59,7 @@
         </Grid>
 
         <Label Style="{DynamicResource DescriptionHeaderStyle}" 
-               Content="Lithnet Access Manager Agent"/>
+               Content="Lithnet Access Manager agent"/>
         <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
                Content="Permissions"/>
         <Grid Margin="5">

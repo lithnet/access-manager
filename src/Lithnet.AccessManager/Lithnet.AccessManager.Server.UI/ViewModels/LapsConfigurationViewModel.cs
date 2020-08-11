@@ -13,7 +13,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class LapsConfigurationViewModel : Screen
+    public class LapsConfigurationViewModel : Screen, IHelpLink
     {
         private readonly ICertificateProvider certificateProvider;
 
@@ -39,6 +39,9 @@ namespace Lithnet.AccessManager.Server.UI
             this.AvailableCertificates = new BindableCollection<X509Certificate2ViewModel>();
             this.DisplayName = "Local admin passwords";
         }
+
+
+        public string HelpLink => Constants.HelpLinkPageLocalAdminPasswords;
 
         protected override void OnInitialActivate()
         {
@@ -107,6 +110,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             ExternalDialogWindow w = new ExternalDialogWindow
             {
+                Title = "Script",
                 DataContext = vm,
                 SaveButtonVisible = false,
                 CancelButtonName = "Close"
@@ -201,6 +205,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             ExternalDialogWindow w = new ExternalDialogWindow
             {
+                Title = "Script",
                 DataContext = vm,
                 SaveButtonVisible = false,
                 CancelButtonName = "Close"
@@ -257,6 +262,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             ExternalDialogWindow w = new ExternalDialogWindow
             {
+                Title = "Script",
                 DataContext = vm,
                 SaveButtonVisible = false,
                 CancelButtonName = "Close"

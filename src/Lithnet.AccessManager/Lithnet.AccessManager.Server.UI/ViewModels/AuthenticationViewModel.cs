@@ -19,7 +19,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class AuthenticationViewModel : Screen
+    public class AuthenticationViewModel : Screen, IHelpLink
     {
         private readonly AuthenticationOptions model;
         private readonly IDialogCoordinator dialogCoordinator;
@@ -53,6 +53,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.RequiredEkus = new BindableCollection<string>(model.ClientCert.RequiredEkus);
             this.AllowedPrincipals = new BindableCollection<SecurityIdentifierViewModel>();
         }
+
+        public string HelpLink => Constants.HelpLinkPageAuthentication;
 
         protected override void OnInitialActivate()
         {

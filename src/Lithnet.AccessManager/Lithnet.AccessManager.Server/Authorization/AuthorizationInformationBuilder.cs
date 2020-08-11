@@ -176,7 +176,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             Lazy<List<SecurityIdentifier>> computerTokenSids = new Lazy<List<SecurityIdentifier>>(() => this.directory.GetTokenGroups(computer, computer.Sid.AccountDomainSid).ToList());
             Lazy<List<Guid>> computerParents = new Lazy<List<Guid>>(() => computer.GetParentGuids().ToList());
 
-            foreach (var target in this.options.Targets.OrderBy(t => (int)t.Type).ThenByDescending(this.targetDataProvider.GetSortOrder))
+            foreach (var target in this.options.ComputerTargets.OrderBy(t => (int)t.Type).ThenByDescending(this.targetDataProvider.GetSortOrder))
             {
                 TargetData targetData = this.targetDataProvider.GetTargetData(target);
 

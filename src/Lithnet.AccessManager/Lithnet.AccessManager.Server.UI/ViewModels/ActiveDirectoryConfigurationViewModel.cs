@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Threading.Tasks;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Markdig.Extensions.TaskLists;
+using Microsoft.Extensions.Logging;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class ActiveDirectoryConfigurationViewModel : Screen, IHaveDisplayName
+    public class ActiveDirectoryConfigurationViewModel : Screen, IHelpLink
     {
         private readonly IDialogCoordinator dialogCoordinator;
 
@@ -20,20 +22,25 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IServiceSettingsProvider serviceSettings;
 
+        private readonly ILogger<ActiveDirectoryConfigurationView> logger;
+
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.SitemapSolid;
 
-        public ActiveDirectoryConfigurationViewModel(IActiveDirectoryForestSchemaViewModelFactory forestFactory, IActiveDirectoryDomainPermissionViewModelFactory domainFactory, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings)
+        public ActiveDirectoryConfigurationViewModel(IActiveDirectoryForestSchemaViewModelFactory forestFactory, IActiveDirectoryDomainPermissionViewModelFactory domainFactory, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<ActiveDirectoryConfigurationView> logger)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.domainFactory = domainFactory;
             this.forestFactory = forestFactory;
             this.serviceSettings = serviceSettings;
+            this.logger = logger;
             this.DisplayName = "Active Directory";
 
             this.Forests = new BindableCollection<ActiveDirectoryForestSchemaViewModel>();
             this.Domains = new BindableCollection<ActiveDirectoryDomainPermissionViewModel>();
         }
 
+        public string HelpLink => Constants.HelpLinkPageActiveDirectory;
+        
         protected override void OnInitialActivate()
         {
             Task.Run(this.PopulateForestsAndDomains);
@@ -102,6 +109,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             ExternalDialogWindow w = new ExternalDialogWindow
             {
+                Title = "Script",
                 DataContext = vm,
                 SaveButtonVisible = false,
                 CancelButtonName = "Close"
@@ -149,6 +157,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             ExternalDialogWindow w = new ExternalDialogWindow
             {
+                Title = "Script",
                 DataContext = vm,
                 SaveButtonVisible = false,
                 CancelButtonName = "Close"

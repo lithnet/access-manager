@@ -4,13 +4,15 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class RateLimitsViewModel : PropertyChangedBase, IHaveDisplayName
+    public class RateLimitsViewModel : Screen, IHelpLink
     {
         private readonly RateLimitOptions model;
 
         public RateLimitsViewModel(RateLimitOptions model, INotifiableEventPublisher eventPublisher)
         {
             this.model = model;
+            this.DisplayName = "Rate limits";
+
             if (this.model.PerUser == null)
             {
                 this.model.PerUser = new RateLimitThresholds();
@@ -48,9 +50,9 @@ namespace Lithnet.AccessManager.Server.UI
 
         [NotifiableProperty]
         public int PerUserRequestsPerDay { get => this.model.PerUser.RequestsPerDay; set => this.model.PerUser.RequestsPerDay = value; }
-        
-        public string DisplayName { get; set; } = "Rate limits";
 
+        public string HelpLink => Constants.HelpLinkPageRateLimits;
+        
         public PackIconMaterialKind Icon => PackIconMaterialKind.Speedometer;
     }
 }

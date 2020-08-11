@@ -5,7 +5,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class AuthorizationViewModel : Screen
+    public class AuthorizationViewModel : Screen, IHelpLink
     {
         private readonly AuthorizationOptions model;
 
@@ -22,12 +22,14 @@ namespace Lithnet.AccessManager.Server.UI
         {
             Task.Run(() =>
             {
-                this.Targets = this.factory.CreateViewModel(model.Targets);
+                this.Targets = this.factory.CreateViewModel(model.ComputerTargets);
             });
         }
 
         public SecurityDescriptorTargetsViewModel Targets { get; set; }
 
         public PackIconModernKind Icon => PackIconModernKind.Lock;
+
+        public string HelpLink => Constants.HelpLinkPageAuthorization;
     }
 }

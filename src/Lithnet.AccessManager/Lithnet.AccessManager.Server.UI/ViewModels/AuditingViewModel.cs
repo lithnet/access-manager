@@ -5,7 +5,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public sealed class AuditingViewModel : Conductor<PropertyChangedBase>.Collection.OneActive
+    public sealed class AuditingViewModel : Conductor<PropertyChangedBase>.Collection.OneActive, IHelpLink
     {
         private readonly AuditOptions model;
         private readonly INotificationChannelDefinitionsViewModelFactory<PowershellNotificationChannelDefinition, PowershellNotificationChannelDefinitionViewModel> psFactory;
@@ -53,5 +53,7 @@ namespace Lithnet.AccessManager.Server.UI
         private NotificationChannelDefinitionsViewModel<WebhookNotificationChannelDefinition, WebhookNotificationChannelDefinitionViewModel> Webhook { get; set; }
 
         private NotificationChannelDefinitionsViewModel<SmtpNotificationChannelDefinition, SmtpNotificationChannelDefinitionViewModel> Smtp { get; set; }
+        
+        public string HelpLink => Constants.HelpLinkPageAuditing;
     }
 }

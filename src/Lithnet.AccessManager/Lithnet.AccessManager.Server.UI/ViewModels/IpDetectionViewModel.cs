@@ -11,7 +11,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class IpDetectionViewModel : Screen
+    public class IpDetectionViewModel : Screen, IHelpLink
     {
         private readonly ForwardedHeadersAppOptions model;
 
@@ -28,6 +28,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.KnownNetworks = new BindableCollection<string>(model.KnownNetworks);
             eventPublisher.Register(this);
         }
+
+        public string HelpLink => Constants.HelpLinkPageIPAddressDetection;
 
         [NotifiableProperty]
         public bool Enabled

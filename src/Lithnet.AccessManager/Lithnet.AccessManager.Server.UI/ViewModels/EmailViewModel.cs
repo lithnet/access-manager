@@ -8,7 +8,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class EmailViewModel : PropertyChangedBase, IHaveDisplayName
+    public class EmailViewModel : Screen, IHelpLink
     {
         private readonly EmailOptions model;
 
@@ -18,8 +18,11 @@ namespace Lithnet.AccessManager.Server.UI
         {
             this.model = model;
             this.rng = rng;
+            this.DisplayName = "Email";
             eventPublisher.Register(this);
         }
+
+        public string HelpLink => Constants.HelpLinkPageEmail;
 
         [NotifiableProperty]
         public string FromAddress { get => this.model.FromAddress; set => this.model.FromAddress = value; }
@@ -67,8 +70,6 @@ namespace Lithnet.AccessManager.Server.UI
         {
             this.Password = null;
         }
-
-        public string DisplayName { get; set; } = "Email";
 
         public PackIconUniconsKind Icon => PackIconUniconsKind.At;
     }

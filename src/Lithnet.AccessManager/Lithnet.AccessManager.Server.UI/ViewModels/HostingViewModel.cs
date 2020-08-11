@@ -26,7 +26,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public sealed class HostingViewModel : Screen
+    public sealed class HostingViewModel : Screen, IHelpLink
     {
         private const string SddlTemplate = "D:(A;;GX;;;{0})";
 
@@ -62,6 +62,8 @@ namespace Lithnet.AccessManager.Server.UI
 
             eventPublisher.Register(this);
         }
+
+        public string HelpLink => Constants.HelpLinkPageWebHosting;
 
         protected override void OnInitialActivate()
         {
@@ -229,6 +231,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             ExternalDialogWindow w = new ExternalDialogWindow
             {
+                Title = "Script",
                 DataContext = vm,
                 SaveButtonVisible = false,
                 CancelButtonName = "Close"
@@ -250,6 +253,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             ExternalDialogWindow w = new ExternalDialogWindow
             {
+                Title = "Script",
                 DataContext = vm,
                 SaveButtonVisible = false,
                 CancelButtonName = "Close"

@@ -9,7 +9,8 @@
              xmlns:dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
              dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
-             d:DesignHeight="100" d:DesignWidth="600">
+             Width="600"
+             d:DesignWidth="600">
     <AdornerDecorator>
         <Grid>
             <Grid.ColumnDefinitions>
@@ -21,24 +22,32 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0"
-                   Content="{Binding HelpText, Mode=OneWay}"
+            <TextBlock Grid.Row="0"
+                       TextWrapping="Wrap"
+                   Text="{Binding HelpText, Mode=OneWay}"
                          Margin="0 0 0 0"/>
 
             <TextBox Grid.Row="1"
                      Margin="5"
                      Text="{Binding ScriptText, Mode=OneWay}"
-                     MaxHeight="600"
+                     Height="300"
+                     HorizontalScrollBarVisibility="Auto"
+                     VerticalScrollBarVisibility="Auto"
                      FontFamily="Consolas,Courier New"
                      IsReadOnly="True"/>
 
-            <Button Grid.Row="2"
-                    HorizontalAlignment="Right"
-                    Command="{s:Action Save}"
-                    Content="Save script as..."
-                    Margin="5"
-                    VerticalAlignment="Top"
-                    />
+            <StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                <Button Command="{s:Action Save}"
+                        Content="Save script as..."
+                        Margin="5"
+                        VerticalAlignment="Top"/>
+                <Button Command="{s:Action Copy}"
+                        Content="Copy to clipboard"
+                        Margin="5"
+                        VerticalAlignment="Top"/>
+            </StackPanel>
         </Grid>
     </AdornerDecorator>
 </UserControl>

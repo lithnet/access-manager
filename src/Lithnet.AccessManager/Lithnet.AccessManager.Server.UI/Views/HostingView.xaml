@@ -68,7 +68,7 @@
                                                Margin="0 0 5 0"
                                                Foreground="Red"/>
                 <TextBlock Grid.Column="1" 
-                           Text="Warning: This account is not protected from impersonation. Other services in the domain that are authorized for delegation could impersonate this account and inherit it's permissions. Protect the account by setting the 'account is sensitive and cannot be delegated' user account control flag" TextWrapping="Wrap"/>
+                           Text="Warning: This account is not protected from impersonation. Other services in the domain that are authorized for delegation could impersonate this account and inherit its permissions. Protect the account by setting the 'account is sensitive and cannot be delegated' user account control flag" TextWrapping="Wrap"/>
                 <Button Grid.Column="2"
                         Command="{s:Action PreventDelegation}"
                         Margin="5" 

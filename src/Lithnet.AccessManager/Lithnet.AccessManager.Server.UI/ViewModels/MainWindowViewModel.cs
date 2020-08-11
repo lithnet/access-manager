@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Security.AccessControl;
 using System.Threading.Tasks;
 using MahApps.Metro.Controls.Dialogs;
@@ -46,9 +47,29 @@ namespace Lithnet.AccessManager.Server.UI
             this.RequestClose();
         }
 
-        public void Help()
-        {
 
+        public async Task Help()
+        {
+            if (Config.HelpLink == null)
+            {
+                return;
+            }
+
+            try
+            {
+                var psi = new ProcessStartInfo
+                {
+                    FileName = Config.HelpLink,
+                    UseShellExecute = true
+                };
+
+                Process.Start(psi);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not open link");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not open the default link handler\r\n{ex.Message}");
+            }
         }
 
         public void About()

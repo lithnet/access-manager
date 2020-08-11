@@ -15,7 +15,7 @@
               d:DesignWidth="800">
     <StackPanel Margin="5">
         <Label Style="{DynamicResource DescriptionHeaderStyle}" 
-               Content="JIT Access Group Creation"/>
+               Content="Automatic JIT access group creation"/>
 
         <TextBlock Margin="10 5 5 5"
                    TextWrapping="Wrap">Lithnet Access Manager can automatically create a JIT group for each computer in a specified OU based on a templated name.
@@ -77,7 +77,7 @@
         </StackPanel>
 
         <Label Style="{DynamicResource DescriptionHeaderStyle}" 
-               Content="JIT Mode"/>
+               Content="JIT mode"/>
 
         <Expander Style="{x:Null}"
                   Margin="5">

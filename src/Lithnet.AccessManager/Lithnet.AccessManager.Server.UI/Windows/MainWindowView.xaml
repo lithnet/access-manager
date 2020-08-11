@@ -20,6 +20,8 @@
         <KeyBinding Modifiers="Control"
                     Key="X"
                     Command="{s:Action Close}" />
+        <KeyBinding Key="F1"
+                    Command="{s:Action Help}" />
     </Window.InputBindings>
     <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top"

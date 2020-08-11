@@ -274,6 +274,7 @@
     <ROW Directory="dist_Dir" Directory_Parent="bootstrap_Dir" DefaultDir="dist"/>
     <ROW Directory="fontawesome_Dir" Directory_Parent="lib_2_Dir" DefaultDir="FONT-A~1|font-awesome"/>
     <ROW Directory="fonts_Dir" Directory_Parent="wwwroot_Dir" DefaultDir="fonts"/>
+    <ROW Directory="freebsd_Dir" Directory_Parent="runtimes_Dir" DefaultDir="freebsd"/>
     <ROW Directory="images_Dir" Directory_Parent="wwwroot_Dir" DefaultDir="images"/>
     <ROW Directory="jquery_Dir" Directory_Parent="lib_2_Dir" DefaultDir="jquery"/>
     <ROW Directory="jqueryvalidation_Dir" Directory_Parent="lib_2_Dir" DefaultDir="JQUERY~1|jquery-validation"/>
@@ -281,17 +282,87 @@
     <ROW Directory="js_1_Dir" Directory_Parent="dist_Dir" DefaultDir="js"/>
     <ROW Directory="js_2_Dir" Directory_Parent="fontawesome_Dir" DefaultDir="js"/>
     <ROW Directory="js_Dir" Directory_Parent="wwwroot_Dir" DefaultDir="js"/>
+    <ROW Directory="lib_10_Dir" Directory_Parent="win7x64_Dir" DefaultDir="lib"/>
+    <ROW Directory="lib_11_Dir" Directory_Parent="win7x86_Dir" DefaultDir="lib"/>
+    <ROW Directory="lib_12_Dir" Directory_Parent="win8x64_Dir" DefaultDir="lib"/>
+    <ROW Directory="lib_13_Dir" Directory_Parent="win8x86_Dir" DefaultDir="lib"/>
+    <ROW Directory="lib_14_Dir" Directory_Parent="win81x64_Dir" DefaultDir="lib"/>
+    <ROW Directory="lib_15_Dir" Directory_Parent="win81x86_Dir" DefaultDir="lib"/>
     <ROW Directory="lib_1_Dir" Directory_Parent="win_Dir" DefaultDir="lib"/>
     <ROW Directory="lib_2_Dir" Directory_Parent="wwwroot_Dir" DefaultDir="lib"/>
+    <ROW Directory="lib_3_Dir" Directory_Parent="freebsd_Dir" DefaultDir="lib"/>
+    <ROW Directory="lib_4_Dir" Directory_Parent="linux_Dir" DefaultDir="lib"/>
+    <ROW Directory="lib_5_Dir" Directory_Parent="osx_Dir" DefaultDir="lib"/>
+    <ROW Directory="lib_6_Dir" Directory_Parent="winarm_Dir" DefaultDir="lib"/>
+    <ROW Directory="lib_7_Dir" Directory_Parent="winarm64_Dir" DefaultDir="lib"/>
+    <ROW Directory="lib_8_Dir" Directory_Parent="win10x64_Dir" DefaultDir="lib"/>
+    <ROW Directory="lib_9_Dir" Directory_Parent="win10x86_Dir" DefaultDir="lib"/>
     <ROW Directory="lib_Dir" Directory_Parent="unix_Dir" DefaultDir="lib"/>
+    <ROW Directory="linux_Dir" Directory_Parent="runtimes_Dir" DefaultDir="linux"/>
+    <ROW Directory="linuxarm64_Dir" Directory_Parent="runtimes_Dir" DefaultDir="LINUX-~2|linux-arm64"/>
+    <ROW Directory="linuxarm_Dir" Directory_Parent="runtimes_Dir" DefaultDir="LINUX-~1|linux-arm"/>
+    <ROW Directory="linuxmuslx64_Dir" Directory_Parent="runtimes_Dir" DefaultDir="LINUX-~3|linux-musl-x64"/>
+    <ROW Directory="linuxx64_Dir" Directory_Parent="runtimes_Dir" DefaultDir="LINUX-~4|linux-x64"/>
+    <ROW Directory="native_10_Dir" Directory_Parent="win10x64_Dir" DefaultDir="native"/>
+    <ROW Directory="native_11_Dir" Directory_Parent="win10x86_Dir" DefaultDir="native"/>
+    <ROW Directory="native_12_Dir" Directory_Parent="win7x64_Dir" DefaultDir="native"/>
+    <ROW Directory="native_13_Dir" Directory_Parent="win7x86_Dir" DefaultDir="native"/>
+    <ROW Directory="native_14_Dir" Directory_Parent="win8x64_Dir" DefaultDir="native"/>
+    <ROW Directory="native_15_Dir" Directory_Parent="win8x86_Dir" DefaultDir="native"/>
+    <ROW Directory="native_16_Dir" Directory_Parent="win81x64_Dir" DefaultDir="native"/>
+    <ROW Directory="native_17_Dir" Directory_Parent="win81x86_Dir" DefaultDir="native"/>
+    <ROW Directory="native_1_Dir" Directory_Parent="linuxarm64_Dir" DefaultDir="native"/>
+    <ROW Directory="native_2_Dir" Directory_Parent="linuxmuslx64_Dir" DefaultDir="native"/>
+    <ROW Directory="native_3_Dir" Directory_Parent="linuxx64_Dir" DefaultDir="native"/>
+    <ROW Directory="native_4_Dir" Directory_Parent="osx_Dir" DefaultDir="native"/>
+    <ROW Directory="native_5_Dir" Directory_Parent="osxx64_Dir" DefaultDir="native"/>
+    <ROW Directory="native_6_Dir" Directory_Parent="winarm_Dir" DefaultDir="native"/>
+    <ROW Directory="native_7_Dir" Directory_Parent="winarm64_Dir" DefaultDir="native"/>
+    <ROW Directory="native_8_Dir" Directory_Parent="winx64_Dir" DefaultDir="native"/>
+    <ROW Directory="native_9_Dir" Directory_Parent="winx86_Dir" DefaultDir="native"/>
+    <ROW Directory="native_Dir" Directory_Parent="linuxarm_Dir" DefaultDir="native"/>
+    <ROW Directory="netcoreapp2.0_1_Dir" Directory_Parent="lib_4_Dir" DefaultDir="NETCOR~1.0|netcoreapp2.0"/>
+    <ROW Directory="netcoreapp2.0_2_Dir" Directory_Parent="lib_5_Dir" DefaultDir="NETCOR~1.0|netcoreapp2.0"/>
+    <ROW Directory="netcoreapp2.0_3_Dir" Directory_Parent="lib_1_Dir" DefaultDir="NETCOR~1.0|netcoreapp2.0"/>
+    <ROW Directory="netcoreapp2.0_Dir" Directory_Parent="lib_3_Dir" DefaultDir="NETCOR~1.0|netcoreapp2.0"/>
+    <ROW Directory="netcoreapp2.1_1_Dir" Directory_Parent="lib_1_Dir" DefaultDir="NETCOR~2.1|netcoreapp2.1"/>
+    <ROW Directory="netcoreapp2.1_Dir" Directory_Parent="lib_Dir" DefaultDir="NETCOR~2.1|netcoreapp2.1"/>
     <ROW Directory="netcoreapp3.1_1_Dir" Directory_Parent="lib_1_Dir" DefaultDir="NETCOR~1.1|netcoreapp3.1"/>
     <ROW Directory="netcoreapp3.1_Dir" Directory_Parent="lib_Dir" DefaultDir="NETCOR~1.1|netcoreapp3.1"/>
+    <ROW Directory="netstandard1.6_10_Dir" Directory_Parent="lib_15_Dir" DefaultDir="NETSTA~1.6|netstandard1.6"/>
+    <ROW Directory="netstandard1.6_1_Dir" Directory_Parent="lib_6_Dir" DefaultDir="NETSTA~1.6|netstandard1.6"/>
+    <ROW Directory="netstandard1.6_2_Dir" Directory_Parent="lib_7_Dir" DefaultDir="NETSTA~1.6|netstandard1.6"/>
+    <ROW Directory="netstandard1.6_3_Dir" Directory_Parent="lib_8_Dir" DefaultDir="NETSTA~1.6|netstandard1.6"/>
+    <ROW Directory="netstandard1.6_4_Dir" Directory_Parent="lib_9_Dir" DefaultDir="NETSTA~1.6|netstandard1.6"/>
+    <ROW Directory="netstandard1.6_5_Dir" Directory_Parent="lib_10_Dir" DefaultDir="NETSTA~1.6|netstandard1.6"/>
+    <ROW Directory="netstandard1.6_6_Dir" Directory_Parent="lib_11_Dir" DefaultDir="NETSTA~1.6|netstandard1.6"/>
+    <ROW Directory="netstandard1.6_7_Dir" Directory_Parent="lib_12_Dir" DefaultDir="NETSTA~1.6|netstandard1.6"/>
+    <ROW Directory="netstandard1.6_8_Dir" Directory_Parent="lib_13_Dir" DefaultDir="NETSTA~1.6|netstandard1.6"/>
+    <ROW Directory="netstandard1.6_9_Dir" Directory_Parent="lib_14_Dir" DefaultDir="NETSTA~1.6|netstandard1.6"/>
+    <ROW Directory="netstandard1.6_Dir" Directory_Parent="lib_Dir" DefaultDir="NETSTA~1.6|netstandard1.6"/>
+    <ROW Directory="netstandard2.0_1_Dir" Directory_Parent="lib_5_Dir" DefaultDir="NETSTA~1.0|netstandard2.0"/>
+    <ROW Directory="netstandard2.0_2_Dir" Directory_Parent="lib_1_Dir" DefaultDir="NETSTA~1.0|netstandard2.0"/>
+    <ROW Directory="netstandard2.0_Dir" Directory_Parent="lib_4_Dir" DefaultDir="NETSTA~1.0|netstandard2.0"/>
+    <ROW Directory="osx_Dir" Directory_Parent="runtimes_Dir" DefaultDir="osx"/>
+    <ROW Directory="osxx64_Dir" Directory_Parent="runtimes_Dir" DefaultDir="osx-x64"/>
     <ROW Directory="ref_Dir" Directory_Parent="APPDIR" DefaultDir="ref"/>
     <ROW Directory="runtimes_Dir" Directory_Parent="APPDIR" DefaultDir="runtimes"/>
     <ROW Directory="sprites_Dir" Directory_Parent="fontawesome_Dir" DefaultDir="sprites"/>
     <ROW Directory="unix_Dir" Directory_Parent="runtimes_Dir" DefaultDir="unix"/>
     <ROW Directory="webfonts_Dir" Directory_Parent="fontawesome_Dir" DefaultDir="webfonts"/>
+    <ROW Directory="win10x64_Dir" Directory_Parent="runtimes_Dir" DefaultDir="WIN10-~1|win10-x64"/>
+    <ROW Directory="win10x86_Dir" Directory_Parent="runtimes_Dir" DefaultDir="WIN10-~2|win10-x86"/>
+    <ROW Directory="win7x64_Dir" Directory_Parent="runtimes_Dir" DefaultDir="win7-x64"/>
+    <ROW Directory="win7x86_Dir" Directory_Parent="runtimes_Dir" DefaultDir="win7-x86"/>
+    <ROW Directory="win81x64_Dir" Directory_Parent="runtimes_Dir" DefaultDir="WIN81-~1|win81-x64"/>
+    <ROW Directory="win81x86_Dir" Directory_Parent="runtimes_Dir" DefaultDir="WIN81-~2|win81-x86"/>
+    <ROW Directory="win8x64_Dir" Directory_Parent="runtimes_Dir" DefaultDir="win8-x64"/>
+    <ROW Directory="win8x86_Dir" Directory_Parent="runtimes_Dir" DefaultDir="win8-x86"/>
     <ROW Directory="win_Dir" Directory_Parent="runtimes_Dir" DefaultDir="win"/>
+    <ROW Directory="winarm64_Dir" Directory_Parent="runtimes_Dir" DefaultDir="WIN-AR~1|win-arm64"/>
+    <ROW Directory="winarm_Dir" Directory_Parent="runtimes_Dir" DefaultDir="win-arm"/>
+    <ROW Directory="winx64_Dir" Directory_Parent="runtimes_Dir" DefaultDir="win-x64"/>
+    <ROW Directory="winx86_Dir" Directory_Parent="runtimes_Dir" DefaultDir="win-x86"/>
     <ROW Directory="wwwroot_Dir" Directory_Parent="APPDIR" DefaultDir="wwwroot"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
@@ -398,21 +469,65 @@
     <ROW Component="Microsoft.IdentityModel.Tokens.dll" ComponentId="{3AAA7C3B-7CE1-4697-8093-4C5739DEA507}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.Tokens.dll"/>
     <ROW Component="Microsoft.IdentityModel.Xml.dll" ComponentId="{E3E3D367-7D4D-434D-BA3A-DE57493A93B8}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.Xml.dll"/>
     <ROW Component="Microsoft.Management.Infrastructure.CimCmdlets.dll" ComponentId="{2ADC08EE-E6A9-4F20-8AA9-CECFF48FC174}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.CimCmdlets.dll"/>
+    <ROW Component="Microsoft.Management.Infrastructure.CimCmdlets.dll_1" ComponentId="{827531BB-CB96-4642-9C86-B57C90E60419}" Directory_="netcoreapp3.1_1_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.CimCmdlets.dll_1"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.Unmanaged.dll" ComponentId="{17ACA601-F969-487C-900F-887F7992B9BF}" Directory_="native_6_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.Native.Unmanaged.dll"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_1" ComponentId="{27122B28-46BD-45DD-A52B-A70F524E0138}" Directory_="native_7_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_1"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_2" ComponentId="{F77D365F-0DFD-47E0-8992-D0827B45472A}" Directory_="native_10_Dir" Attributes="256" KeyPath="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_2"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_3" ComponentId="{5B1DA9A3-77A0-48A7-A6F3-6DF5446CF3FD}" Directory_="native_11_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_3"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_4" ComponentId="{6FC1AA05-4DA8-4E6D-B27E-694457EE5F43}" Directory_="native_12_Dir" Attributes="256" KeyPath="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_4"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_5" ComponentId="{1A1BC6BC-7339-4871-B21D-EFBF58A59DA4}" Directory_="native_13_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_5"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_6" ComponentId="{1013F3D4-4F3C-42F0-A966-0DE31F0D05DD}" Directory_="native_16_Dir" Attributes="256" KeyPath="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_6"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_7" ComponentId="{F7886EB1-2CAE-4772-BFDB-B7887090D0BA}" Directory_="native_17_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_7"/>
     <ROW Component="Microsoft.Management.Infrastructure.Native.dll" ComponentId="{76C1C983-75AB-430C-8BDC-44CF9A130A3C}" Directory_="APPDIR" Attributes="256" KeyPath="Microsoft.Management.Infrastructure.Native.dll"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.dll_1" ComponentId="{26813924-078D-4156-936A-187AEC2CCB4D}" Directory_="netstandard1.6_1_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.Native.dll_2"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.dll_10" ComponentId="{C8FA6F61-C43A-45E3-8000-B395C66B3FA1}" Directory_="netstandard1.6_10_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.Native.dll_11"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.dll_2" ComponentId="{056EEB36-9DD6-4999-A49E-734552A0B133}" Directory_="netstandard1.6_2_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.Native.dll_3"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.dll_3" ComponentId="{E8E59E53-C203-4E6E-80CF-439D06C30C46}" Directory_="netstandard1.6_3_Dir" Attributes="256" KeyPath="Microsoft.Management.Infrastructure.Native.dll_4"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.dll_4" ComponentId="{80559BA6-AAA1-4DCA-A740-011D2143C85C}" Directory_="netstandard1.6_4_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.Native.dll_5"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.dll_5" ComponentId="{13135C17-F6B8-456D-81D0-07FEE515FF38}" Directory_="netstandard1.6_5_Dir" Attributes="256" KeyPath="Microsoft.Management.Infrastructure.Native.dll_6"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.dll_6" ComponentId="{DB442BF0-06AE-4C51-B34F-01DFC6B511F7}" Directory_="netstandard1.6_6_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.Native.dll_7"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.dll_7" ComponentId="{982B350F-E24E-4996-B5E9-39C8E8DF1F34}" Directory_="netstandard1.6_7_Dir" Attributes="256" KeyPath="Microsoft.Management.Infrastructure.Native.dll_8"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.dll_8" ComponentId="{42A33A43-829B-4DDA-BEFB-86C14BDCBE86}" Directory_="netstandard1.6_8_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.Native.dll_9"/>
+    <ROW Component="Microsoft.Management.Infrastructure.Native.dll_9" ComponentId="{4E81F454-503C-4DB1-AF56-3EE9ECF38D8A}" Directory_="netstandard1.6_9_Dir" Attributes="256" KeyPath="Microsoft.Management.Infrastructure.Native.dll_10"/>
     <ROW Component="Microsoft.Management.Infrastructure.dll" ComponentId="{1CFBC9E1-0092-4A99-B207-A7BB196D223B}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.dll"/>
+    <ROW Component="Microsoft.Management.Infrastructure.dll_1" ComponentId="{91C27E00-2878-4A5E-88E7-634F52B8C267}" Directory_="netstandard1.6_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.dll_2"/>
+    <ROW Component="Microsoft.Management.Infrastructure.dll_10" ComponentId="{C242A38C-D977-40B3-8B4C-1ACBBEFD277D}" Directory_="netstandard1.6_9_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.dll_11"/>
+    <ROW Component="Microsoft.Management.Infrastructure.dll_11" ComponentId="{E16CA8B5-4227-4E44-87DB-6EA4EB3F19BA}" Directory_="netstandard1.6_10_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.dll_12"/>
+    <ROW Component="Microsoft.Management.Infrastructure.dll_2" ComponentId="{4A059AB7-6A3B-4808-8E04-F6F480EADCEC}" Directory_="netstandard1.6_1_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.dll_3"/>
+    <ROW Component="Microsoft.Management.Infrastructure.dll_3" ComponentId="{641BAD0B-C34C-41DD-90B4-29EB820D5324}" Directory_="netstandard1.6_2_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.dll_4"/>
+    <ROW Component="Microsoft.Management.Infrastructure.dll_4" ComponentId="{8A6BE52F-D8A1-4F7B-AEB3-EC891E5091B3}" Directory_="netstandard1.6_3_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.dll_5"/>
+    <ROW Component="Microsoft.Management.Infrastructure.dll_5" ComponentId="{DB12F14D-202C-47CB-9909-20BCC984937B}" Directory_="netstandard1.6_4_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.dll_6"/>
+    <ROW Component="Microsoft.Management.Infrastructure.dll_6" ComponentId="{790A9664-3844-4613-95CD-FB4EFAE51A93}" Directory_="netstandard1.6_5_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.dll_7"/>
+    <ROW Component="Microsoft.Management.Infrastructure.dll_7" ComponentId="{09FDB354-C3BF-46EA-AEFA-BD21B933B0CC}" Directory_="netstandard1.6_6_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.dll_8"/>
+    <ROW Component="Microsoft.Management.Infrastructure.dll_8" ComponentId="{5E405E5C-FDA6-4857-9993-CE635D9E1015}" Directory_="netstandard1.6_7_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.dll_9"/>
+    <ROW Component="Microsoft.Management.Infrastructure.dll_9" ComponentId="{B804554F-C969-4F11-B4AE-586FD73BEF3E}" Directory_="netstandard1.6_8_Dir" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.dll_10"/>
     <ROW Component="Microsoft.Net.Http.Headers.dll" ComponentId="{CA751C73-8CAA-4028-A775-2EC880F157C1}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Net.Http.Headers.dll"/>
     <ROW Component="Microsoft.PowerShell.Commands.Diagnostics.dll" ComponentId="{A8D841B7-D28B-44BC-B46D-D333A59691D2}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.Commands.Diagnostics.dll"/>
+    <ROW Component="Microsoft.PowerShell.Commands.Diagnostics.dll_1" ComponentId="{D8EAA184-3230-43CA-915D-22FD06AB2D62}" Directory_="netcoreapp3.1_1_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.Commands.Diagnostics.dll_1"/>
     <ROW Component="Microsoft.PowerShell.Commands.Management.dll" ComponentId="{01587919-4799-4534-BFFF-FD51B6EC81A9}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.Commands.Management.dll"/>
+    <ROW Component="Microsoft.PowerShell.Commands.Management.dll_1" ComponentId="{AF8786E7-559A-42F0-8320-0A41590566DD}" Directory_="netcoreapp3.1_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.Commands.Management.dll_1"/>
+    <ROW Component="Microsoft.PowerShell.Commands.Management.dll_2" ComponentId="{FCA4AA1F-020F-49A4-BDA6-B7AFBF3AE022}" Directory_="netcoreapp3.1_1_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.Commands.Management.dll_2"/>
     <ROW Component="Microsoft.PowerShell.Commands.Utility.dll" ComponentId="{1CE8F3EF-E712-4294-9E2A-4BD5357D8D22}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.Commands.Utility.dll"/>
+    <ROW Component="Microsoft.PowerShell.Commands.Utility.dll_1" ComponentId="{9DB02035-EC0A-4E5F-A76E-EDD793EFE0E9}" Directory_="netcoreapp3.1_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.Commands.Utility.dll_2"/>
+    <ROW Component="Microsoft.PowerShell.Commands.Utility.dll_2" ComponentId="{047233C4-27C5-43E8-A63B-0457087CD167}" Directory_="netcoreapp3.1_1_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.Commands.Utility.dll_3"/>
     <ROW Component="Microsoft.PowerShell.ConsoleHost.dll" ComponentId="{3F23A5DB-D4F1-4459-B8E4-D647A3C3D1D2}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.ConsoleHost.dll"/>
+    <ROW Component="Microsoft.PowerShell.ConsoleHost.dll_1" ComponentId="{C47CDE1D-783E-483B-8F43-5438B757A07A}" Directory_="netcoreapp3.1_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.ConsoleHost.dll_2"/>
+    <ROW Component="Microsoft.PowerShell.ConsoleHost.dll_2" ComponentId="{DBA7C516-B35C-4137-94E6-DDA7B86528BF}" Directory_="netcoreapp3.1_1_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.ConsoleHost.dll_3"/>
     <ROW Component="Microsoft.PowerShell.CoreCLR.Eventing.dll" ComponentId="{6CBDAA51-754C-46AC-A6E0-FB487D3DAA59}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.CoreCLR.Eventing.dll"/>
+    <ROW Component="Microsoft.PowerShell.CoreCLR.Eventing.dll_1" ComponentId="{E30DA571-9215-41F5-892A-3E69EF34B2EA}" Directory_="netcoreapp3.1_1_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.CoreCLR.Eventing.dll_1"/>
     <ROW Component="Microsoft.PowerShell.Host.psd1" ComponentId="{53027B3B-F4A9-4676-81D9-E50DD666AC11}" Directory_="Microsoft.PowerShell.Host_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.Host.psd1" Type="0"/>
     <ROW Component="Microsoft.PowerShell.Host.psd1_1" ComponentId="{3D8DB2CC-CB60-4594-9654-7E7CB8A9077A}" Directory_="Microsoft.PowerShell.Host_1_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.Host.psd1_1" Type="0"/>
     <ROW Component="Microsoft.PowerShell.Management.psd1" ComponentId="{CE7A5E39-A2EB-40AF-B83B-66C81B79D0F5}" Directory_="Microsoft.PowerShell.Management_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.Management.psd1" Type="0"/>
     <ROW Component="Microsoft.PowerShell.Management.psd1_1" ComponentId="{94083D97-FD0B-4583-9317-130D87644E1E}" Directory_="Microsoft.PowerShell.Manageme_1_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.Management.psd1_1" Type="0"/>
     <ROW Component="Microsoft.PowerShell.MarkdownRender.dll" ComponentId="{7567D7FE-840F-4919-84D2-956EEE32578A}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.MarkdownRender.dll"/>
+    <ROW Component="Microsoft.PowerShell.MarkdownRender.dll_1" ComponentId="{B1688FE1-232B-44D9-8140-6071EE42623B}" Directory_="netcoreapp3.1_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.MarkdownRender.dll_1"/>
+    <ROW Component="Microsoft.PowerShell.MarkdownRender.dll_2" ComponentId="{18D0960E-576C-4255-BBAC-C9CB827BB03F}" Directory_="netcoreapp3.1_1_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.MarkdownRender.dll_2"/>
     <ROW Component="Microsoft.PowerShell.SDK.dll" ComponentId="{D862A13E-F6D1-4B68-A503-1A1A4AA72941}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.SDK.dll"/>
+    <ROW Component="Microsoft.PowerShell.SDK.dll_1" ComponentId="{CD941819-131E-4661-B882-52E6679F8676}" Directory_="netcoreapp3.1_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.SDK.dll_1"/>
+    <ROW Component="Microsoft.PowerShell.SDK.dll_2" ComponentId="{B976E534-277E-488B-873B-3245B3987661}" Directory_="netcoreapp3.1_1_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.SDK.dll_2"/>
     <ROW Component="Microsoft.PowerShell.Security.dll" ComponentId="{76FFAB6B-57B2-4C35-AD73-24A478BDF2A6}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.Security.dll"/>
+    <ROW Component="Microsoft.PowerShell.Security.dll_1" ComponentId="{2DAE92A8-D360-47C5-A5AF-2DD32CAD670C}" Directory_="netcoreapp3.1_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.Security.dll_1"/>
+    <ROW Component="Microsoft.PowerShell.Security.dll_2" ComponentId="{BF862C84-6110-4250-B7AD-F7353CACD591}" Directory_="netcoreapp3.1_1_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.Security.dll_2"/>
     <ROW Component="Microsoft.PowerShell.Security.psd1" ComponentId="{6F4E7404-3EB9-4BC3-9833-96DBEDCC487F}" Directory_="Microsoft.PowerShell.Security_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.Security.psd1" Type="0"/>
     <ROW Component="Microsoft.PowerShell.Security.psd1_1" ComponentId="{97C39343-E2A9-4630-9A7B-4E3966C56E97}" Directory_="Microsoft.PowerShell.Security_1_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.Security.psd1_1" Type="0"/>
     <ROW Component="Microsoft.PowerShell.Utility.psd1" ComponentId="{2BA134F1-27FD-410E-ACD4-E24DCB220969}" Directory_="Microsoft.PowerShell.Utility_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.Utility.psd1" Type="0"/>
@@ -420,8 +535,10 @@
     <ROW Component="Microsoft.VisualBasic.Core.dll" ComponentId="{ADE20571-090F-4A7D-96A9-C1B2E4A5D14F}" Directory_="ref_Dir" Attributes="0" KeyPath="Microsoft.VisualBasic.Core.dll"/>
     <ROW Component="Microsoft.VisualBasic.dll" ComponentId="{93B2BEE8-F376-4E0A-98F9-17CD8435429E}" Directory_="ref_Dir" Attributes="0" KeyPath="Microsoft.VisualBasic.dll"/>
     <ROW Component="Microsoft.WSMan.Management.dll" ComponentId="{3BCBC2B0-5197-4026-AFBB-11E73A032C2B}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.WSMan.Management.dll"/>
+    <ROW Component="Microsoft.WSMan.Management.dll_1" ComponentId="{DB5E35AA-EE84-4461-8227-5F27247E87E6}" Directory_="netcoreapp3.1_1_Dir" Attributes="0" KeyPath="Microsoft.WSMan.Management.dll_1"/>
     <ROW Component="Microsoft.WSMan.Management.psd1" ComponentId="{084F505D-71E2-4B53-B1D5-F9D39507461A}" Directory_="Microsoft.WSMan.Management_Dir" Attributes="0" KeyPath="Microsoft.WSMan.Management.psd1" Type="0"/>
     <ROW Component="Microsoft.WSMan.Runtime.dll" ComponentId="{DBA3F5F6-BAF0-4E3C-A835-5F7511B53B5D}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.WSMan.Runtime.dll"/>
+    <ROW Component="Microsoft.WSMan.Runtime.dll_1" ComponentId="{9D94B2E4-BCF6-41C3-A127-E6A43399B8C5}" Directory_="netcoreapp3.1_1_Dir" Attributes="0" KeyPath="Microsoft.WSMan.Runtime.dll_1"/>
     <ROW Component="Microsoft.Win32.Primitives.dll" ComponentId="{1D59DF23-C691-4C38-84B8-288329CD2F91}" Directory_="ref_Dir" Attributes="0" KeyPath="Microsoft.Win32.Primitives.dll"/>
     <ROW Component="Microsoft.Win32.Registry.AccessControl.dll" ComponentId="{B70ACDC1-07C1-4D5D-B539-FF42790E9E65}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Win32.Registry.AccessControl.dll"/>
     <ROW Component="Microsoft.Xaml.Behaviors.dll" ComponentId="{B5C573E1-631A-44FE-B3B6-1380EFC37A18}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Xaml.Behaviors.dll"/>
@@ -435,6 +552,10 @@
     <ROW Component="NotificationTemplates" ComponentId="{6D76343F-254F-450E-AEAB-F845EBFE11CD}" Directory_="NotificationTemplates_Dir" Attributes="0"/>
     <ROW Component="PSDiagnostics.psd1" ComponentId="{21CD8837-1EB6-4D6E-A9FD-C0AF347CF1AC}" Directory_="PSDiagnostics_Dir" Attributes="0" KeyPath="PSDiagnostics.psd1" Type="0"/>
     <ROW Component="PowerShell.Core.Instrumentation.dll" ComponentId="{FB4DC40C-5BBA-4557-9B38-7808F15470C2}" Directory_="APPDIR" Attributes="256" KeyPath="PowerShell.Core.Instrumentation.dll"/>
+    <ROW Component="PowerShell.Core.Instrumentation.dll_1" ComponentId="{D0EE5A77-F2D2-4CB3-9DCA-8EE1EAB65069}" Directory_="native_6_Dir" Attributes="0" KeyPath="PowerShell.Core.Instrumentation.dll_1"/>
+    <ROW Component="PowerShell.Core.Instrumentation.dll_2" ComponentId="{821ACF16-4B20-4A9C-BAF5-8B3EBD9D4E0D}" Directory_="native_7_Dir" Attributes="0" KeyPath="PowerShell.Core.Instrumentation.dll_2"/>
+    <ROW Component="PowerShell.Core.Instrumentation.dll_3" ComponentId="{1836BDF4-6C38-4B69-952D-0A3F3B83CFAB}" Directory_="native_8_Dir" Attributes="256" KeyPath="PowerShell.Core.Instrumentation.dll_3"/>
+    <ROW Component="PowerShell.Core.Instrumentation.dll_4" ComponentId="{E631A2E7-5ECA-4E7E-9F42-6B6A639D44DC}" Directory_="native_9_Dir" Attributes="0" KeyPath="PowerShell.Core.Instrumentation.dll_4"/>
     <ROW Component="ProductInformation" ComponentId="{EF48E22B-B87F-4609-BCA9-10F3D3A555BF}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
     <ROW Component="PropertyChanged.dll" ComponentId="{FE72D1FB-4C00-4B6B-80B3-D268D476D4D1}" Directory_="APPDIR" Attributes="0" KeyPath="PropertyChanged.dll"/>
     <ROW Component="SslCertBinding.Net.dll" ComponentId="{C26DCF18-8647-4F4B-863D-0CC2F7DFE40E}" Directory_="APPDIR" Attributes="0" KeyPath="SslCertBinding.Net.dll"/>
@@ -462,8 +583,15 @@
     <ROW Component="System.Data.Common.dll" ComponentId="{C74B0D16-1C17-45F2-BD46-7292FEE66CC1}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Data.Common.dll"/>
     <ROW Component="System.Data.DataSetExtensions.dll" ComponentId="{610C0239-BE23-4E8D-8D26-4F7111C8ED21}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Data.DataSetExtensions.dll"/>
     <ROW Component="System.Data.Odbc.dll" ComponentId="{3C360C2C-965F-40A7-AA1E-DECE8AFDCECF}" Directory_="APPDIR" Attributes="0" KeyPath="System.Data.Odbc.dll"/>
+    <ROW Component="System.Data.Odbc.dll_1" ComponentId="{F5E9524D-5FB5-427F-9353-5F30787315AD}" Directory_="netcoreapp2.0_Dir" Attributes="0" KeyPath="System.Data.Odbc.dll_2"/>
+    <ROW Component="System.Data.Odbc.dll_2" ComponentId="{945C6D27-15FC-4D25-AC9B-72D369726253}" Directory_="netcoreapp2.0_1_Dir" Attributes="0" KeyPath="System.Data.Odbc.dll_3"/>
+    <ROW Component="System.Data.Odbc.dll_3" ComponentId="{7DC06873-E0E6-4CEC-9CBD-7955CF1ADD61}" Directory_="netcoreapp2.0_2_Dir" Attributes="0" KeyPath="System.Data.Odbc.dll_4"/>
+    <ROW Component="System.Data.Odbc.dll_4" ComponentId="{A044B83E-8222-40E5-B6AF-5DE4787870D0}" Directory_="netcoreapp2.0_3_Dir" Attributes="0" KeyPath="System.Data.Odbc.dll_5"/>
     <ROW Component="System.Data.OleDb.dll" ComponentId="{18DF1560-1C91-4A26-BC23-BB6D9C1D126F}" Directory_="APPDIR" Attributes="0" KeyPath="System.Data.OleDb.dll"/>
+    <ROW Component="System.Data.OleDb.dll_1" ComponentId="{F5153465-9EA4-469C-89F9-83AA76F49809}" Directory_="netstandard2.0_2_Dir" Attributes="0" KeyPath="System.Data.OleDb.dll_2"/>
     <ROW Component="System.Data.SqlClient.dll" ComponentId="{EAE2BD96-BF12-402A-BF56-1D71941BD071}" Directory_="APPDIR" Attributes="0" KeyPath="System.Data.SqlClient.dll"/>
+    <ROW Component="System.Data.SqlClient.dll_1" ComponentId="{CCEB3544-0DB9-40FA-ACD8-A729D2CF1156}" Directory_="netcoreapp2.1_Dir" Attributes="0" KeyPath="System.Data.SqlClient.dll_2"/>
+    <ROW Component="System.Data.SqlClient.dll_2" ComponentId="{04E4DABA-4B90-49F1-BE82-872776EC2BDF}" Directory_="netcoreapp2.1_1_Dir" Attributes="0" KeyPath="System.Data.SqlClient.dll_3"/>
     <ROW Component="System.Data.dll" ComponentId="{2DEE0BE6-6424-4BBB-BA54-10A9032A8C4C}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Data.dll"/>
     <ROW Component="System.Diagnostics.Contracts.dll" ComponentId="{DB051661-90FB-43A3-A300-85886804A26D}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Diagnostics.Contracts.dll"/>
     <ROW Component="System.Diagnostics.Debug.dll" ComponentId="{1D8F03E3-B94E-4333-A34F-BB871555CAD2}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Diagnostics.Debug.dll"/>
@@ -477,7 +605,9 @@
     <ROW Component="System.Diagnostics.TraceSource.dll" ComponentId="{6869C1C9-4107-4777-A98A-BF4182CF0CF3}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Diagnostics.TraceSource.dll"/>
     <ROW Component="System.Diagnostics.Tracing.dll" ComponentId="{97436C48-D634-4393-B33D-219C8DA90D60}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Diagnostics.Tracing.dll"/>
     <ROW Component="System.DirectoryServices.AccountManagement.dll" ComponentId="{E4972FAE-A017-4DC1-BDFC-B314C0066859}" Directory_="APPDIR" Attributes="0" KeyPath="System.DirectoryServices.AccountManagement.dll"/>
+    <ROW Component="System.DirectoryServices.AccountManagement.dll_1" ComponentId="{39046162-C1F4-4C06-93B6-8FD31B80F9E3}" Directory_="netcoreapp2.0_3_Dir" Attributes="0" KeyPath="System.DirectoryServices.AccountManagement.dll_2"/>
     <ROW Component="System.DirectoryServices.Protocols.dll" ComponentId="{CB7098CF-AF8B-473B-B522-FB6948EEAE3B}" Directory_="APPDIR" Attributes="0" KeyPath="System.DirectoryServices.Protocols.dll"/>
+    <ROW Component="System.DirectoryServices.Protocols.dll_1" ComponentId="{B610F507-64BA-4ACE-9657-22A857B06534}" Directory_="netcoreapp2.0_3_Dir" Attributes="0" KeyPath="System.DirectoryServices.Protocols.dll_2"/>
     <ROW Component="System.DirectoryServices.dll" ComponentId="{F386B49C-569B-49B3-A6DC-3CAB839C12C9}" Directory_="APPDIR" Attributes="0" KeyPath="System.DirectoryServices.dll"/>
     <ROW Component="System.Drawing.Primitives.dll" ComponentId="{B4DDAEC5-CD61-4524-875B-45F69F595107}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Drawing.Primitives.dll"/>
     <ROW Component="System.Drawing.dll" ComponentId="{24E90280-5790-4025-A3F3-994699988EDA}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Drawing.dll"/>
@@ -497,7 +627,11 @@
     <ROW Component="System.IO.MemoryMappedFiles.dll" ComponentId="{7145557C-CD1F-40A8-A15A-63F4683A6723}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.MemoryMappedFiles.dll"/>
     <ROW Component="System.IO.Packaging.dll" ComponentId="{ABD36009-DEA4-458F-814B-FACD48C82181}" Directory_="APPDIR" Attributes="0" KeyPath="System.IO.Packaging.dll"/>
     <ROW Component="System.IO.Pipes.dll" ComponentId="{A70CF400-0192-470B-B478-7D30DD957E6B}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.Pipes.dll"/>
+    <ROW Component="System.IO.Ports.Native.dylib" ComponentId="{4D0516DE-F722-4735-850F-DD358526168A}" Directory_="native_5_Dir" Attributes="0" KeyPath="System.IO.Ports.Native.dylib" Type="0"/>
     <ROW Component="System.IO.Ports.dll" ComponentId="{5411A77E-6C8F-4623-9858-BE137759B928}" Directory_="APPDIR" Attributes="0" KeyPath="System.IO.Ports.dll"/>
+    <ROW Component="System.IO.Ports.dll_1" ComponentId="{C4A9FFD5-DAAF-4326-B7B9-BA09E923A0B8}" Directory_="netstandard2.0_Dir" Attributes="0" KeyPath="System.IO.Ports.dll_2"/>
+    <ROW Component="System.IO.Ports.dll_2" ComponentId="{6C2A59BE-2803-4DA5-879A-B1CBA62ADE15}" Directory_="netstandard2.0_1_Dir" Attributes="0" KeyPath="System.IO.Ports.dll_3"/>
+    <ROW Component="System.IO.Ports.dll_3" ComponentId="{19583C85-DA4F-45BB-A768-077B255A65F0}" Directory_="netstandard2.0_2_Dir" Attributes="0" KeyPath="System.IO.Ports.dll_4"/>
     <ROW Component="System.IO.UnmanagedMemoryStream.dll" ComponentId="{E0DF0C16-6E5B-4B15-86D5-6B205DAC9AD9}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.UnmanagedMemoryStream.dll"/>
     <ROW Component="System.IO.dll" ComponentId="{E9FEEBFB-86AE-4CD8-BA77-C56B0B819206}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.dll"/>
     <ROW Component="System.IdentityModel.Tokens.Jwt.dll" ComponentId="{C49752A2-617D-4806-B6C6-C2D4C809160C}" Directory_="APPDIR" Attributes="0" KeyPath="System.IdentityModel.Tokens.Jwt.dll"/>
@@ -506,9 +640,13 @@
     <ROW Component="System.Linq.Queryable.dll" ComponentId="{E9C7A3B9-6F61-47E4-A682-BD70AE1128E3}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Linq.Queryable.dll"/>
     <ROW Component="System.Linq.dll" ComponentId="{38EC987F-EA6B-4AC0-8D30-086495C2419B}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Linq.dll"/>
     <ROW Component="System.Management.Automation.dll" ComponentId="{5A55BDBA-5AB4-4C05-ACD5-41DB3A24F2FA}" Directory_="APPDIR" Attributes="0" KeyPath="System.Management.Automation.dll"/>
+    <ROW Component="System.Management.Automation.dll_1" ComponentId="{30504A2B-5725-4F02-8C42-277DDAD30122}" Directory_="netcoreapp3.1_Dir" Attributes="0" KeyPath="System.Management.Automation.dll_2"/>
+    <ROW Component="System.Management.Automation.dll_2" ComponentId="{DAD1C52C-072F-4F59-A19C-2CA3C9AE6B8A}" Directory_="netcoreapp3.1_1_Dir" Attributes="0" KeyPath="System.Management.Automation.dll_3"/>
     <ROW Component="System.Management.dll" ComponentId="{E3FA88D6-63D9-4D8C-BD4B-CF18B3738348}" Directory_="APPDIR" Attributes="0" KeyPath="System.Management.dll"/>
+    <ROW Component="System.Management.dll_1" ComponentId="{3A8AD421-2E07-46D3-9F66-3AE59E8C5244}" Directory_="netcoreapp2.0_3_Dir" Attributes="0" KeyPath="System.Management.dll_2"/>
     <ROW Component="System.Memory.dll" ComponentId="{2C8DB8A5-9BBB-4FD2-A87D-B4216BC72CE2}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Memory.dll"/>
     <ROW Component="System.Net.Http.WinHttpHandler.dll" ComponentId="{CE9D2175-9B0B-4A1B-8E1F-AACF08245BC9}" Directory_="APPDIR" Attributes="0" KeyPath="System.Net.Http.WinHttpHandler.dll"/>
+    <ROW Component="System.Net.Http.WinHttpHandler.dll_1" ComponentId="{190BDAA7-A1E4-46E6-BF94-7D1D7419B62A}" Directory_="netstandard2.0_2_Dir" Attributes="0" KeyPath="System.Net.Http.WinHttpHandler.dll_2"/>
     <ROW Component="System.Net.Http.dll" ComponentId="{7224A4A3-0A73-4429-9170-8F5870AEB8DD}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Net.Http.dll"/>
     <ROW Component="System.Net.HttpListener.dll" ComponentId="{E2BA3EB6-07F1-43FB-9B40-D790CEE15286}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Net.HttpListener.dll"/>
     <ROW Component="System.Net.Mail.dll" ComponentId="{C7982B39-B6C0-4B02-B0C4-884C6249A8B9}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Net.Mail.dll"/>
@@ -544,6 +682,7 @@
     <ROW Component="System.Resources.ResourceManager.dll" ComponentId="{E1844614-60CB-4FAC-B8E6-9944F09FA5FD}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Resources.ResourceManager.dll"/>
     <ROW Component="System.Resources.Writer.dll" ComponentId="{D99D1D06-ECF7-45C0-B699-9C3D15BEB35F}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Resources.Writer.dll"/>
     <ROW Component="System.Runtime.Caching.dll" ComponentId="{A9ADA137-DC3B-4728-921A-F05EB596358D}" Directory_="APPDIR" Attributes="0" KeyPath="System.Runtime.Caching.dll"/>
+    <ROW Component="System.Runtime.Caching.dll_1" ComponentId="{BD3888D1-1490-4610-821D-72C87CEA5B1E}" Directory_="netstandard2.0_2_Dir" Attributes="0" KeyPath="System.Runtime.Caching.dll_2"/>
     <ROW Component="System.Runtime.CompilerServices.Unsafe.dll" ComponentId="{9D2DD101-A2BB-472E-AB03-EADDCEBA8FA7}" Directory_="APPDIR" Attributes="0" KeyPath="System.Runtime.CompilerServices.Unsafe.dll"/>
     <ROW Component="System.Runtime.CompilerServices.VisualC.dll" ComponentId="{A8129919-1B1B-41BE-BF30-F69994AE6D5F}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Runtime.CompilerServices.VisualC.dll"/>
     <ROW Component="System.Runtime.Extensions.dll" ComponentId="{3304AB00-B2F4-4328-ACDE-B18F4DEC4337}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Runtime.Extensions.dll"/>
@@ -579,8 +718,10 @@
     <ROW Component="System.ServiceModel.Web.dll" ComponentId="{CA4ABF99-4B49-47AE-AA60-82798C95980D}" Directory_="ref_Dir" Attributes="0" KeyPath="System.ServiceModel.Web.dll"/>
     <ROW Component="System.ServiceModel.dll" ComponentId="{C8F9D9D1-B48F-43AA-870D-5C251BB98994}" Directory_="APPDIR" Attributes="0" KeyPath="System.ServiceModel.dll"/>
     <ROW Component="System.ServiceProcess.ServiceController.dll" ComponentId="{4A46E2E5-D3D3-4F8F-8D35-83F88D7E1D4B}" Directory_="APPDIR" Attributes="0" KeyPath="System.ServiceProcess.ServiceController.dll"/>
+    <ROW Component="System.ServiceProcess.ServiceController.dll_1" ComponentId="{2C8A3A90-AE95-4AFF-9E39-AAA670BAABC8}" Directory_="netstandard2.0_2_Dir" Attributes="0" KeyPath="System.ServiceProcess.ServiceController.dll_2"/>
     <ROW Component="System.ServiceProcess.dll" ComponentId="{D97360EB-7C59-422F-8F90-10E2BEFB460A}" Directory_="ref_Dir" Attributes="0" KeyPath="System.ServiceProcess.dll"/>
     <ROW Component="System.Text.Encoding.CodePages.dll" ComponentId="{63222F8F-9873-45F4-99FB-24797AED8521}" Directory_="APPDIR" Attributes="0" KeyPath="System.Text.Encoding.CodePages.dll"/>
+    <ROW Component="System.Text.Encoding.CodePages.dll_1" ComponentId="{EE34DF9B-20EF-4B04-AFB4-F0BEA8C91A8A}" Directory_="netcoreapp2.0_3_Dir" Attributes="0" KeyPath="System.Text.Encoding.CodePages.dll_2"/>
     <ROW Component="System.Text.Encoding.Extensions.dll" ComponentId="{714DC72C-B5CD-41B6-807F-DC44082CCE42}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Text.Encoding.Extensions.dll"/>
     <ROW Component="System.Text.Encoding.dll" ComponentId="{DC690EFC-BC23-41E5-9B17-2553766A43F5}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Text.Encoding.dll"/>
     <ROW Component="System.Text.Encodings.Web.dll" ComponentId="{04BBD469-845C-4AAB-8D93-A297408E1253}" Directory_="APPDIR" Attributes="0" KeyPath="System.Text.Encodings.Web.dll"/>
@@ -654,14 +795,46 @@
     <ROW Component="favicon.ico" ComponentId="{E36A5F3B-C867-47CA-BFB8-9E721C7E646A}" Directory_="wwwroot_Dir" Attributes="0" KeyPath="favicon.ico" Type="0"/>
     <ROW Component="jquery.js" ComponentId="{659FCE26-8E4D-4990-82EC-C60EDAFB39D3}" Directory_="dist_1_Dir" Attributes="0" KeyPath="jquery.js" Type="0"/>
     <ROW Component="jquery.validate.unobtrusive.js" ComponentId="{CB636563-22FF-4B13-B09C-1BF953D8503C}" Directory_="jqueryvalidationunobtrusive_Dir" Attributes="0" KeyPath="jquery.validate.unobtrusive.js" Type="0"/>
+    <ROW Component="libmi.dylib" ComponentId="{68D5388D-6532-45B9-989D-B09C01563898}" Directory_="native_4_Dir" Attributes="0" KeyPath="libmi.dylib" Type="0"/>
+    <ROW Component="libmi.so" ComponentId="{D97BAC97-047D-48CA-8DC3-D6460192A93F}" Directory_="native_3_Dir" Attributes="0" KeyPath="libmi.so" Type="0"/>
+    <ROW Component="libpslnative.so" ComponentId="{A7A7E201-D745-4A22-A5FB-E5BAD239A169}" Directory_="native_Dir" Attributes="0" KeyPath="libpslnative.so" Type="0"/>
+    <ROW Component="libpslnative.so_1" ComponentId="{9EDA0EC0-4E8E-45C1-834E-FB6023E7A6D6}" Directory_="native_1_Dir" Attributes="0" KeyPath="libpslnative.so_1" Type="0"/>
+    <ROW Component="libpslnative.so_2" ComponentId="{06FFE1C2-9B37-42BE-B83D-8260253DE962}" Directory_="native_2_Dir" Attributes="0" KeyPath="libpslnative.so_2" Type="0"/>
     <ROW Component="logo.png" ComponentId="{E2143340-E93D-4D8E-A017-9E31BA0B4C91}" Directory_="images_Dir" Attributes="0" KeyPath="logo.png" Type="0"/>
     <ROW Component="mi.dll" ComponentId="{0F7F132D-B90E-41E1-9444-78C120DB7D04}" Directory_="APPDIR" Attributes="256" KeyPath="mi.dll"/>
+    <ROW Component="mi.dll_1" ComponentId="{660728E0-4870-4E4F-AEA6-75CE08C6BCC8}" Directory_="native_6_Dir" Attributes="0" KeyPath="mi.dll_1"/>
+    <ROW Component="mi.dll_10" ComponentId="{EB1D7576-DE15-4E5A-AB65-848F202BAF9A}" Directory_="native_17_Dir" Attributes="0" KeyPath="mi.dll_10"/>
+    <ROW Component="mi.dll_2" ComponentId="{DA735FEC-7A56-4C45-ACD1-E9753FA1A204}" Directory_="native_7_Dir" Attributes="0" KeyPath="mi.dll_2"/>
+    <ROW Component="mi.dll_3" ComponentId="{E0DC3616-A9D9-415E-931B-D942424FC313}" Directory_="native_10_Dir" Attributes="256" KeyPath="mi.dll_3"/>
+    <ROW Component="mi.dll_4" ComponentId="{DCD9B057-7422-40BB-A675-CA73FF289B66}" Directory_="native_11_Dir" Attributes="0" KeyPath="mi.dll_4"/>
+    <ROW Component="mi.dll_5" ComponentId="{50FC1C2C-DD03-427F-858F-0FB02A000EC4}" Directory_="native_12_Dir" Attributes="256" KeyPath="mi.dll_5"/>
+    <ROW Component="mi.dll_6" ComponentId="{69EDD845-BF46-4E4D-A30D-E8BFCCC244B6}" Directory_="native_13_Dir" Attributes="0" KeyPath="mi.dll_6"/>
+    <ROW Component="mi.dll_7" ComponentId="{7273C074-9811-44D3-81C0-0AFF0D891AAE}" Directory_="native_14_Dir" Attributes="256" KeyPath="mi.dll_7"/>
+    <ROW Component="mi.dll_8" ComponentId="{B20890D3-059D-4B6D-8E27-1B03990C576F}" Directory_="native_15_Dir" Attributes="0" KeyPath="mi.dll_8"/>
+    <ROW Component="mi.dll_9" ComponentId="{89CCBFE2-AB6F-4BE2-9E98-84442DDC94D4}" Directory_="native_16_Dir" Attributes="256" KeyPath="mi.dll_9"/>
     <ROW Component="miutils.dll" ComponentId="{9BF434E0-0240-4383-A456-604EF73EC59B}" Directory_="APPDIR" Attributes="256" KeyPath="miutils.dll"/>
+    <ROW Component="miutils.dll_1" ComponentId="{550E7743-4197-43F8-8509-B702539718C7}" Directory_="native_6_Dir" Attributes="0" KeyPath="miutils.dll_1"/>
+    <ROW Component="miutils.dll_10" ComponentId="{7D23016B-D3EB-478D-AED1-9172CB41DA7A}" Directory_="native_17_Dir" Attributes="0" KeyPath="miutils.dll_10"/>
+    <ROW Component="miutils.dll_2" ComponentId="{3D91955A-C327-427D-8EC6-7B48BEA322DF}" Directory_="native_7_Dir" Attributes="0" KeyPath="miutils.dll_2"/>
+    <ROW Component="miutils.dll_3" ComponentId="{56669920-B9F9-437B-A378-42606D14DAB5}" Directory_="native_10_Dir" Attributes="256" KeyPath="miutils.dll_3"/>
+    <ROW Component="miutils.dll_4" ComponentId="{8A3A1117-C4DB-4477-8E41-FA685AEB08DB}" Directory_="native_11_Dir" Attributes="0" KeyPath="miutils.dll_4"/>
+    <ROW Component="miutils.dll_5" ComponentId="{4075EB78-2168-4E3D-927D-FC27EF865E00}" Directory_="native_12_Dir" Attributes="256" KeyPath="miutils.dll_5"/>
+    <ROW Component="miutils.dll_6" ComponentId="{071AD0A7-FDEE-4AD4-A0D0-A157A4146F93}" Directory_="native_13_Dir" Attributes="0" KeyPath="miutils.dll_6"/>
+    <ROW Component="miutils.dll_7" ComponentId="{95288393-B932-42EF-9EEB-C59BC13610D0}" Directory_="native_14_Dir" Attributes="256" KeyPath="miutils.dll_7"/>
+    <ROW Component="miutils.dll_8" ComponentId="{3DACAAF3-2506-499D-8170-B164EEBD686F}" Directory_="native_15_Dir" Attributes="0" KeyPath="miutils.dll_8"/>
+    <ROW Component="miutils.dll_9" ComponentId="{C0393F4F-75D1-4460-A2E4-EF08108A2413}" Directory_="native_16_Dir" Attributes="256" KeyPath="miutils.dll_9"/>
     <ROW Component="mscorlib.dll" ComponentId="{D3817E98-E520-483B-BC85-F4470AF98110}" Directory_="ref_Dir" Attributes="0" KeyPath="mscorlib.dll"/>
     <ROW Component="netstandard.dll" ComponentId="{7C27F2AD-D4E3-475C-9859-2E7CCE2C6421}" Directory_="ref_Dir" Attributes="0" KeyPath="netstandard.dll"/>
     <ROW Component="pwrshplugin.dll" ComponentId="{894C3B8A-03F7-4C1E-A0DD-44331C04690A}" Directory_="APPDIR" Attributes="256" KeyPath="pwrshplugin.dll"/>
+    <ROW Component="pwrshplugin.dll_1" ComponentId="{32DD89CE-31BF-4B78-9B69-1C1B9A3834D9}" Directory_="native_6_Dir" Attributes="0" KeyPath="pwrshplugin.dll_1"/>
+    <ROW Component="pwrshplugin.dll_2" ComponentId="{C8F5F8C2-C5DC-4B77-8E09-83E8F86EC369}" Directory_="native_7_Dir" Attributes="0" KeyPath="pwrshplugin.dll_2"/>
+    <ROW Component="pwrshplugin.dll_3" ComponentId="{10ACEC66-7B9D-4A22-B4D2-16BCA7C7C9B4}" Directory_="native_8_Dir" Attributes="256" KeyPath="pwrshplugin.dll_3"/>
+    <ROW Component="pwrshplugin.dll_4" ComponentId="{651C568C-7DB6-49DC-8D4C-BECCA893F7AB}" Directory_="native_9_Dir" Attributes="0" KeyPath="pwrshplugin.dll_4"/>
     <ROW Component="site.css" ComponentId="{7FA9BE2A-A0E0-4CCD-BA0E-270D5A332221}" Directory_="css_Dir" Attributes="0" KeyPath="site.css" Type="0"/>
     <ROW Component="sni.dll" ComponentId="{351F6213-E0E7-433D-9DFC-AA13AA9B756E}" Directory_="APPDIR" Attributes="256" KeyPath="sni.dll"/>
+    <ROW Component="sni.dll_1" ComponentId="{72E27884-6093-4693-9338-A5EA8593288B}" Directory_="native_7_Dir" Attributes="0" KeyPath="sni.dll_1"/>
+    <ROW Component="sni.dll_2" ComponentId="{842365FB-5AF7-4B78-BE1A-375D4782E9E6}" Directory_="native_8_Dir" Attributes="256" KeyPath="sni.dll_2"/>
+    <ROW Component="sni.dll_3" ComponentId="{B6CC58BF-67F2-4DBE-B731-4FFC8152EB35}" Directory_="native_9_Dir" Attributes="0" KeyPath="sni.dll_3"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
     <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0"/>
@@ -1224,6 +1397,118 @@
     <ROW File="SslCertBinding.Net.dll" Component_="SslCertBinding.Net.dll" FileName="SSLCER~1.DLL|SslCertBinding.Net.dll" Attributes="0" SourcePath="output\SslCertBinding.Net.dll" SelfReg="false"/>
     <ROW File="Stylet.dll" Component_="Stylet.dll" FileName="Stylet.dll" Attributes="0" SourcePath="output\Stylet.dll" SelfReg="false"/>
     <ROW File="System.Text.Json.dll_1" Component_="System.Text.Json.dll_1" FileName="SYSTE~34.DLL|System.Text.Json.dll" Attributes="0" SourcePath="output\System.Text.Json.dll" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.deps.json" Component_="apphost.json" FileName="LITHNE~5.JSO|Lithnet.AccessManager.deps.json" Attributes="0" SourcePath="output\Lithnet.AccessManager.deps.json" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Server.deps.json" Component_="apphost.json" FileName="LITHNE~6.JSO|Lithnet.AccessManager.Server.deps.json" Attributes="0" SourcePath="output\Lithnet.AccessManager.Server.deps.json" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Server.UI.runtimeconfig.dev.json" Component_="apphost.json" FileName="LITHNE~7.JSO|Lithnet.AccessManager.Server.UI.runtimeconfig.dev.json" Attributes="0" SourcePath="output\Lithnet.AccessManager.Server.UI.runtimeconfig.dev.json" SelfReg="false"/>
+    <ROW File="System.Data.Odbc.dll_2" Component_="System.Data.Odbc.dll_1" FileName="SYSTEM~1.DLL|System.Data.Odbc.dll" Attributes="0" SourcePath="output\runtimes\freebsd\lib\netcoreapp2.0\System.Data.Odbc.dll" SelfReg="false"/>
+    <ROW File="System.Data.Odbc.dll_3" Component_="System.Data.Odbc.dll_2" FileName="SYSTEM~1.DLL|System.Data.Odbc.dll" Attributes="0" SourcePath="output\runtimes\linux\lib\netcoreapp2.0\System.Data.Odbc.dll" SelfReg="false"/>
+    <ROW File="System.IO.Ports.dll_2" Component_="System.IO.Ports.dll_1" FileName="SYSTEM~1.DLL|System.IO.Ports.dll" Attributes="0" SourcePath="output\runtimes\linux\lib\netstandard2.0\System.IO.Ports.dll" SelfReg="false"/>
+    <ROW File="libpslnative.so" Component_="libpslnative.so" FileName="LIBPSL~1.SO|libpsl-native.so" Attributes="0" SourcePath="output\runtimes\linux-arm\native\libpsl-native.so" SelfReg="false"/>
+    <ROW File="System.IO.Ports.Native.so" Component_="libpslnative.so" FileName="SYSTEM~1.SO|System.IO.Ports.Native.so" Attributes="0" SourcePath="output\runtimes\linux-arm\native\System.IO.Ports.Native.so" SelfReg="false"/>
+    <ROW File="libpslnative.so_1" Component_="libpslnative.so_1" FileName="LIBPSL~1.SO|libpsl-native.so" Attributes="0" SourcePath="output\runtimes\linux-arm64\native\libpsl-native.so" SelfReg="false"/>
+    <ROW File="System.IO.Ports.Native.so_1" Component_="libpslnative.so_1" FileName="SYSTEM~1.SO|System.IO.Ports.Native.so" Attributes="0" SourcePath="output\runtimes\linux-arm64\native\System.IO.Ports.Native.so" SelfReg="false"/>
+    <ROW File="libpslnative.so_2" Component_="libpslnative.so_2" FileName="LIBPSL~1.SO|libpsl-native.so" Attributes="0" SourcePath="output\runtimes\linux-musl-x64\native\libpsl-native.so" SelfReg="false"/>
+    <ROW File="libmi.so" Component_="libmi.so" FileName="libmi.so" Attributes="0" SourcePath="output\runtimes\linux-x64\native\libmi.so" SelfReg="false"/>
+    <ROW File="libpslnative.so_3" Component_="libmi.so" FileName="LIBPSL~1.SO|libpsl-native.so" Attributes="0" SourcePath="output\runtimes\linux-x64\native\libpsl-native.so" SelfReg="false"/>
+    <ROW File="libpsrpclient.so" Component_="libmi.so" FileName="LIBPSR~1.SO|libpsrpclient.so" Attributes="0" SourcePath="output\runtimes\linux-x64\native\libpsrpclient.so" SelfReg="false"/>
+    <ROW File="System.IO.Ports.Native.so_2" Component_="libmi.so" FileName="SYSTEM~1.SO|System.IO.Ports.Native.so" Attributes="0" SourcePath="output\runtimes\linux-x64\native\System.IO.Ports.Native.so" SelfReg="false"/>
+    <ROW File="System.Data.Odbc.dll_4" Component_="System.Data.Odbc.dll_3" FileName="SYSTEM~1.DLL|System.Data.Odbc.dll" Attributes="0" SourcePath="output\runtimes\osx\lib\netcoreapp2.0\System.Data.Odbc.dll" SelfReg="false"/>
+    <ROW File="System.IO.Ports.dll_3" Component_="System.IO.Ports.dll_2" FileName="SYSTEM~1.DLL|System.IO.Ports.dll" Attributes="0" SourcePath="output\runtimes\osx\lib\netstandard2.0\System.IO.Ports.dll" SelfReg="false"/>
+    <ROW File="libmi.dylib" Component_="libmi.dylib" FileName="LIBMI~1.DYL|libmi.dylib" Attributes="0" SourcePath="output\runtimes\osx\native\libmi.dylib" SelfReg="false"/>
+    <ROW File="libpslnative.dylib" Component_="libmi.dylib" FileName="LIBPSL~1.DYL|libpsl-native.dylib" Attributes="0" SourcePath="output\runtimes\osx\native\libpsl-native.dylib" SelfReg="false"/>
+    <ROW File="libpsrpclient.dylib" Component_="libmi.dylib" FileName="LIBPSR~1.DYL|libpsrpclient.dylib" Attributes="0" SourcePath="output\runtimes\osx\native\libpsrpclient.dylib" SelfReg="false"/>
+    <ROW File="System.IO.Ports.Native.dylib" Component_="System.IO.Ports.Native.dylib" FileName="SYSTEM~1.DYL|System.IO.Ports.Native.dylib" Attributes="0" SourcePath="output\runtimes\osx-x64\native\System.IO.Ports.Native.dylib" SelfReg="false"/>
+    <ROW File="System.Data.SqlClient.dll_2" Component_="System.Data.SqlClient.dll_1" FileName="SYSTEM~1.DLL|System.Data.SqlClient.dll" Attributes="0" SourcePath="output\runtimes\unix\lib\netcoreapp2.1\System.Data.SqlClient.dll" SelfReg="false"/>
+    <ROW File="Microsoft.PowerShell.Commands.Management.dll_1" Component_="Microsoft.PowerShell.Commands.Management.dll_1" FileName="MICROS~1.DLL|Microsoft.PowerShell.Commands.Management.dll" Attributes="0" SourcePath="output\runtimes\unix\lib\netcoreapp3.1\Microsoft.PowerShell.Commands.Management.dll" SelfReg="false"/>
+    <ROW File="Microsoft.PowerShell.Commands.Utility.dll_2" Component_="Microsoft.PowerShell.Commands.Utility.dll_1" FileName="MICROS~2.DLL|Microsoft.PowerShell.Commands.Utility.dll" Attributes="0" SourcePath="output\runtimes\unix\lib\netcoreapp3.1\Microsoft.PowerShell.Commands.Utility.dll" SelfReg="false"/>
+    <ROW File="Microsoft.PowerShell.ConsoleHost.dll_2" Component_="Microsoft.PowerShell.ConsoleHost.dll_1" FileName="MICROS~3.DLL|Microsoft.PowerShell.ConsoleHost.dll" Attributes="0" SourcePath="output\runtimes\unix\lib\netcoreapp3.1\Microsoft.PowerShell.ConsoleHost.dll" SelfReg="false"/>
+    <ROW File="Microsoft.PowerShell.MarkdownRender.dll_1" Component_="Microsoft.PowerShell.MarkdownRender.dll_1" FileName="MICROS~4.DLL|Microsoft.PowerShell.MarkdownRender.dll" Attributes="0" SourcePath="output\runtimes\unix\lib\netcoreapp3.1\Microsoft.PowerShell.MarkdownRender.dll" SelfReg="false"/>
+    <ROW File="Microsoft.PowerShell.SDK.dll_1" Component_="Microsoft.PowerShell.SDK.dll_1" FileName="MICROS~5.DLL|Microsoft.PowerShell.SDK.dll" Attributes="0" SourcePath="output\runtimes\unix\lib\netcoreapp3.1\Microsoft.PowerShell.SDK.dll" SelfReg="false"/>
+    <ROW File="Microsoft.PowerShell.Security.dll_1" Component_="Microsoft.PowerShell.Security.dll_1" FileName="MICROS~6.DLL|Microsoft.PowerShell.Security.dll" Attributes="0" SourcePath="output\runtimes\unix\lib\netcoreapp3.1\Microsoft.PowerShell.Security.dll" SelfReg="false"/>
+    <ROW File="System.Management.Automation.dll_2" Component_="System.Management.Automation.dll_1" FileName="SYSTEM~1.DLL|System.Management.Automation.dll" Attributes="0" SourcePath="output\runtimes\unix\lib\netcoreapp3.1\System.Management.Automation.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.dll_2" Component_="Microsoft.Management.Infrastructure.dll_1" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.dll" Attributes="0" SourcePath="output\runtimes\unix\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" SelfReg="false"/>
+    <ROW File="System.Data.Odbc.dll_5" Component_="System.Data.Odbc.dll_4" FileName="SYSTEM~1.DLL|System.Data.Odbc.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp2.0\System.Data.Odbc.dll" SelfReg="false"/>
+    <ROW File="System.DirectoryServices.AccountManagement.dll_2" Component_="System.DirectoryServices.AccountManagement.dll_1" FileName="SYSTEM~2.DLL|System.DirectoryServices.AccountManagement.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp2.0\System.DirectoryServices.AccountManagement.dll" SelfReg="false"/>
+    <ROW File="System.DirectoryServices.Protocols.dll_2" Component_="System.DirectoryServices.Protocols.dll_1" FileName="SYSTEM~3.DLL|System.DirectoryServices.Protocols.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp2.0\System.DirectoryServices.Protocols.dll" SelfReg="false"/>
+    <ROW File="System.Management.dll_2" Component_="System.Management.dll_1" FileName="SYSTEM~4.DLL|System.Management.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp2.0\System.Management.dll" SelfReg="false"/>
+    <ROW File="System.Text.Encoding.CodePages.dll_2" Component_="System.Text.Encoding.CodePages.dll_1" FileName="SYSTEM~5.DLL|System.Text.Encoding.CodePages.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp2.0\System.Text.Encoding.CodePages.dll" SelfReg="false"/>
+    <ROW File="System.Data.SqlClient.dll_3" Component_="System.Data.SqlClient.dll_2" FileName="SYSTEM~1.DLL|System.Data.SqlClient.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.CimCmdlets.dll_1" Component_="Microsoft.Management.Infrastructure.CimCmdlets.dll_1" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.CimCmdlets.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp3.1\Microsoft.Management.Infrastructure.CimCmdlets.dll" SelfReg="false"/>
+    <ROW File="Microsoft.PowerShell.Commands.Diagnostics.dll_1" Component_="Microsoft.PowerShell.Commands.Diagnostics.dll_1" FileName="MICROS~2.DLL|Microsoft.PowerShell.Commands.Diagnostics.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp3.1\Microsoft.PowerShell.Commands.Diagnostics.dll" SelfReg="false"/>
+    <ROW File="Microsoft.PowerShell.Commands.Management.dll_2" Component_="Microsoft.PowerShell.Commands.Management.dll_2" FileName="MICROS~3.DLL|Microsoft.PowerShell.Commands.Management.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp3.1\Microsoft.PowerShell.Commands.Management.dll" SelfReg="false"/>
+    <ROW File="Microsoft.PowerShell.Commands.Utility.dll_3" Component_="Microsoft.PowerShell.Commands.Utility.dll_2" FileName="MICROS~4.DLL|Microsoft.PowerShell.Commands.Utility.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp3.1\Microsoft.PowerShell.Commands.Utility.dll" SelfReg="false"/>
+    <ROW File="Microsoft.PowerShell.ConsoleHost.dll_3" Component_="Microsoft.PowerShell.ConsoleHost.dll_2" FileName="MICROS~5.DLL|Microsoft.PowerShell.ConsoleHost.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp3.1\Microsoft.PowerShell.ConsoleHost.dll" SelfReg="false"/>
+    <ROW File="Microsoft.PowerShell.CoreCLR.Eventing.dll_1" Component_="Microsoft.PowerShell.CoreCLR.Eventing.dll_1" FileName="MICROS~6.DLL|Microsoft.PowerShell.CoreCLR.Eventing.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp3.1\Microsoft.PowerShell.CoreCLR.Eventing.dll" SelfReg="false"/>
+    <ROW File="Microsoft.PowerShell.MarkdownRender.dll_2" Component_="Microsoft.PowerShell.MarkdownRender.dll_2" FileName="MICROS~7.DLL|Microsoft.PowerShell.MarkdownRender.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp3.1\Microsoft.PowerShell.MarkdownRender.dll" SelfReg="false"/>
+    <ROW File="Microsoft.PowerShell.SDK.dll_2" Component_="Microsoft.PowerShell.SDK.dll_2" FileName="MICROS~8.DLL|Microsoft.PowerShell.SDK.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp3.1\Microsoft.PowerShell.SDK.dll" SelfReg="false"/>
+    <ROW File="Microsoft.PowerShell.Security.dll_2" Component_="Microsoft.PowerShell.Security.dll_2" FileName="MICROS~9.DLL|Microsoft.PowerShell.Security.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp3.1\Microsoft.PowerShell.Security.dll" SelfReg="false"/>
+    <ROW File="Microsoft.WSMan.Management.dll_1" Component_="Microsoft.WSMan.Management.dll_1" FileName="MICRO~10.DLL|Microsoft.WSMan.Management.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp3.1\Microsoft.WSMan.Management.dll" SelfReg="false"/>
+    <ROW File="Microsoft.WSMan.Runtime.dll_1" Component_="Microsoft.WSMan.Runtime.dll_1" FileName="MICRO~11.DLL|Microsoft.WSMan.Runtime.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp3.1\Microsoft.WSMan.Runtime.dll" SelfReg="false"/>
+    <ROW File="System.Management.Automation.dll_3" Component_="System.Management.Automation.dll_2" FileName="SYSTEM~1.DLL|System.Management.Automation.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp3.1\System.Management.Automation.dll" SelfReg="false"/>
+    <ROW File="System.Data.OleDb.dll_2" Component_="System.Data.OleDb.dll_1" FileName="SYSTEM~1.DLL|System.Data.OleDb.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netstandard2.0\System.Data.OleDb.dll" SelfReg="false"/>
+    <ROW File="System.IO.Ports.dll_4" Component_="System.IO.Ports.dll_3" FileName="SYSTEM~2.DLL|System.IO.Ports.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netstandard2.0\System.IO.Ports.dll" SelfReg="false"/>
+    <ROW File="System.Net.Http.WinHttpHandler.dll_2" Component_="System.Net.Http.WinHttpHandler.dll_1" FileName="SYSTEM~3.DLL|System.Net.Http.WinHttpHandler.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netstandard2.0\System.Net.Http.WinHttpHandler.dll" SelfReg="false"/>
+    <ROW File="System.Runtime.Caching.dll_2" Component_="System.Runtime.Caching.dll_1" FileName="SYSTEM~4.DLL|System.Runtime.Caching.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll" SelfReg="false"/>
+    <ROW File="System.ServiceProcess.ServiceController.dll_2" Component_="System.ServiceProcess.ServiceController.dll_1" FileName="SYSTEM~5.DLL|System.ServiceProcess.ServiceController.dll" Attributes="0" SourcePath="output\runtimes\win\lib\netstandard2.0\System.ServiceProcess.ServiceController.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.dll_3" Component_="Microsoft.Management.Infrastructure.dll_2" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.dll" Attributes="0" SourcePath="output\runtimes\win-arm\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.dll_2" Component_="Microsoft.Management.Infrastructure.Native.dll_1" FileName="MICROS~2.DLL|Microsoft.Management.Infrastructure.Native.dll" Attributes="0" SourcePath="output\runtimes\win-arm\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" SelfReg="false"/>
+    <ROW File="mi.dll_1" Component_="mi.dll_1" FileName="mi.dll" Attributes="0" SourcePath="output\runtimes\win-arm\native\mi.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.Unmanaged.dll" Component_="Microsoft.Management.Infrastructure.Native.Unmanaged.dll" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.Native.Unmanaged.dll" Attributes="0" SourcePath="output\runtimes\win-arm\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll" SelfReg="false"/>
+    <ROW File="miutils.dll_1" Component_="miutils.dll_1" FileName="miutils.dll" Attributes="0" SourcePath="output\runtimes\win-arm\native\miutils.dll" SelfReg="false"/>
+    <ROW File="PowerShell.Core.Instrumentation.dll_1" Component_="PowerShell.Core.Instrumentation.dll_1" FileName="POWERS~1.DLL|PowerShell.Core.Instrumentation.dll" Attributes="0" SourcePath="output\runtimes\win-arm\native\PowerShell.Core.Instrumentation.dll" SelfReg="false"/>
+    <ROW File="pwrshplugin.dll_1" Component_="pwrshplugin.dll_1" FileName="PWRSHP~1.DLL|pwrshplugin.dll" Attributes="0" SourcePath="output\runtimes\win-arm\native\pwrshplugin.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.dll_4" Component_="Microsoft.Management.Infrastructure.dll_3" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.dll" Attributes="0" SourcePath="output\runtimes\win-arm64\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.dll_3" Component_="Microsoft.Management.Infrastructure.Native.dll_2" FileName="MICROS~2.DLL|Microsoft.Management.Infrastructure.Native.dll" Attributes="0" SourcePath="output\runtimes\win-arm64\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" SelfReg="false"/>
+    <ROW File="mi.dll_2" Component_="mi.dll_2" FileName="mi.dll" Attributes="0" SourcePath="output\runtimes\win-arm64\native\mi.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_1" Component_="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_1" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.Native.Unmanaged.dll" Attributes="0" SourcePath="output\runtimes\win-arm64\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll" SelfReg="false"/>
+    <ROW File="miutils.dll_2" Component_="miutils.dll_2" FileName="miutils.dll" Attributes="0" SourcePath="output\runtimes\win-arm64\native\miutils.dll" SelfReg="false"/>
+    <ROW File="PowerShell.Core.Instrumentation.dll_2" Component_="PowerShell.Core.Instrumentation.dll_2" FileName="POWERS~1.DLL|PowerShell.Core.Instrumentation.dll" Attributes="0" SourcePath="output\runtimes\win-arm64\native\PowerShell.Core.Instrumentation.dll" SelfReg="false"/>
+    <ROW File="pwrshplugin.dll_2" Component_="pwrshplugin.dll_2" FileName="PWRSHP~1.DLL|pwrshplugin.dll" Attributes="0" SourcePath="output\runtimes\win-arm64\native\pwrshplugin.dll" SelfReg="false"/>
+    <ROW File="sni.dll_1" Component_="sni.dll_1" FileName="sni.dll" Attributes="0" SourcePath="output\runtimes\win-arm64\native\sni.dll" SelfReg="false"/>
+    <ROW File="PowerShell.Core.Instrumentation.dll_3" Component_="PowerShell.Core.Instrumentation.dll_3" FileName="POWERS~1.DLL|PowerShell.Core.Instrumentation.dll" Attributes="0" SourcePath="output\runtimes\win-x64\native\PowerShell.Core.Instrumentation.dll" SelfReg="false"/>
+    <ROW File="pwrshplugin.dll_3" Component_="pwrshplugin.dll_3" FileName="PWRSHP~1.DLL|pwrshplugin.dll" Attributes="0" SourcePath="output\runtimes\win-x64\native\pwrshplugin.dll" SelfReg="false"/>
+    <ROW File="sni.dll_2" Component_="sni.dll_2" FileName="sni.dll" Attributes="0" SourcePath="output\runtimes\win-x64\native\sni.dll" SelfReg="false"/>
+    <ROW File="PowerShell.Core.Instrumentation.dll_4" Component_="PowerShell.Core.Instrumentation.dll_4" FileName="POWERS~1.DLL|PowerShell.Core.Instrumentation.dll" Attributes="0" SourcePath="output\runtimes\win-x86\native\PowerShell.Core.Instrumentation.dll" SelfReg="false"/>
+    <ROW File="pwrshplugin.dll_4" Component_="pwrshplugin.dll_4" FileName="PWRSHP~1.DLL|pwrshplugin.dll" Attributes="0" SourcePath="output\runtimes\win-x86\native\pwrshplugin.dll" SelfReg="false"/>
+    <ROW File="sni.dll_3" Component_="sni.dll_3" FileName="sni.dll" Attributes="0" SourcePath="output\runtimes\win-x86\native\sni.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.dll_5" Component_="Microsoft.Management.Infrastructure.dll_4" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.dll" Attributes="0" SourcePath="output\runtimes\win10-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.dll_4" Component_="Microsoft.Management.Infrastructure.Native.dll_3" FileName="MICROS~2.DLL|Microsoft.Management.Infrastructure.Native.dll" Attributes="0" SourcePath="output\runtimes\win10-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" SelfReg="false"/>
+    <ROW File="mi.dll_3" Component_="mi.dll_3" FileName="mi.dll" Attributes="0" SourcePath="output\runtimes\win10-x64\native\mi.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_2" Component_="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_2" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.Native.Unmanaged.dll" Attributes="0" SourcePath="output\runtimes\win10-x64\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll" SelfReg="false"/>
+    <ROW File="miutils.dll_3" Component_="miutils.dll_3" FileName="miutils.dll" Attributes="0" SourcePath="output\runtimes\win10-x64\native\miutils.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.dll_6" Component_="Microsoft.Management.Infrastructure.dll_5" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.dll" Attributes="0" SourcePath="output\runtimes\win10-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.dll_5" Component_="Microsoft.Management.Infrastructure.Native.dll_4" FileName="MICROS~2.DLL|Microsoft.Management.Infrastructure.Native.dll" Attributes="0" SourcePath="output\runtimes\win10-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" SelfReg="false"/>
+    <ROW File="mi.dll_4" Component_="mi.dll_4" FileName="mi.dll" Attributes="0" SourcePath="output\runtimes\win10-x86\native\mi.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_3" Component_="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_3" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.Native.Unmanaged.dll" Attributes="0" SourcePath="output\runtimes\win10-x86\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll" SelfReg="false"/>
+    <ROW File="miutils.dll_4" Component_="miutils.dll_4" FileName="miutils.dll" Attributes="0" SourcePath="output\runtimes\win10-x86\native\miutils.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.dll_7" Component_="Microsoft.Management.Infrastructure.dll_6" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.dll" Attributes="0" SourcePath="output\runtimes\win7-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.dll_6" Component_="Microsoft.Management.Infrastructure.Native.dll_5" FileName="MICROS~2.DLL|Microsoft.Management.Infrastructure.Native.dll" Attributes="0" SourcePath="output\runtimes\win7-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" SelfReg="false"/>
+    <ROW File="mi.dll_5" Component_="mi.dll_5" FileName="mi.dll" Attributes="0" SourcePath="output\runtimes\win7-x64\native\mi.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_4" Component_="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_4" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.Native.Unmanaged.dll" Attributes="0" SourcePath="output\runtimes\win7-x64\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll" SelfReg="false"/>
+    <ROW File="miutils.dll_5" Component_="miutils.dll_5" FileName="miutils.dll" Attributes="0" SourcePath="output\runtimes\win7-x64\native\miutils.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.dll_8" Component_="Microsoft.Management.Infrastructure.dll_7" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.dll" Attributes="0" SourcePath="output\runtimes\win7-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.dll_7" Component_="Microsoft.Management.Infrastructure.Native.dll_6" FileName="MICROS~2.DLL|Microsoft.Management.Infrastructure.Native.dll" Attributes="0" SourcePath="output\runtimes\win7-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" SelfReg="false"/>
+    <ROW File="mi.dll_6" Component_="mi.dll_6" FileName="mi.dll" Attributes="0" SourcePath="output\runtimes\win7-x86\native\mi.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_5" Component_="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_5" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.Native.Unmanaged.dll" Attributes="0" SourcePath="output\runtimes\win7-x86\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll" SelfReg="false"/>
+    <ROW File="miutils.dll_6" Component_="miutils.dll_6" FileName="miutils.dll" Attributes="0" SourcePath="output\runtimes\win7-x86\native\miutils.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.dll_9" Component_="Microsoft.Management.Infrastructure.dll_8" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.dll" Attributes="0" SourcePath="output\runtimes\win8-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.dll_8" Component_="Microsoft.Management.Infrastructure.Native.dll_7" FileName="MICROS~2.DLL|Microsoft.Management.Infrastructure.Native.dll" Attributes="0" SourcePath="output\runtimes\win8-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" SelfReg="false"/>
+    <ROW File="mi.dll_7" Component_="mi.dll_7" FileName="mi.dll" Attributes="0" SourcePath="output\runtimes\win8-x64\native\mi.dll" SelfReg="false"/>
+    <ROW File="miutils.dll_7" Component_="miutils.dll_7" FileName="miutils.dll" Attributes="0" SourcePath="output\runtimes\win8-x64\native\miutils.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.dll_10" Component_="Microsoft.Management.Infrastructure.dll_9" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.dll" Attributes="0" SourcePath="output\runtimes\win8-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.dll_9" Component_="Microsoft.Management.Infrastructure.Native.dll_8" FileName="MICROS~2.DLL|Microsoft.Management.Infrastructure.Native.dll" Attributes="0" SourcePath="output\runtimes\win8-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" SelfReg="false"/>
+    <ROW File="mi.dll_8" Component_="mi.dll_8" FileName="mi.dll" Attributes="0" SourcePath="output\runtimes\win8-x86\native\mi.dll" SelfReg="false"/>
+    <ROW File="miutils.dll_8" Component_="miutils.dll_8" FileName="miutils.dll" Attributes="0" SourcePath="output\runtimes\win8-x86\native\miutils.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.dll_11" Component_="Microsoft.Management.Infrastructure.dll_10" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.dll" Attributes="0" SourcePath="output\runtimes\win81-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.dll_10" Component_="Microsoft.Management.Infrastructure.Native.dll_9" FileName="MICROS~2.DLL|Microsoft.Management.Infrastructure.Native.dll" Attributes="0" SourcePath="output\runtimes\win81-x64\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" SelfReg="false"/>
+    <ROW File="mi.dll_9" Component_="mi.dll_9" FileName="mi.dll" Attributes="0" SourcePath="output\runtimes\win81-x64\native\mi.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_6" Component_="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_6" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.Native.Unmanaged.dll" Attributes="0" SourcePath="output\runtimes\win81-x64\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll" SelfReg="false"/>
+    <ROW File="miutils.dll_9" Component_="miutils.dll_9" FileName="miutils.dll" Attributes="0" SourcePath="output\runtimes\win81-x64\native\miutils.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.dll_12" Component_="Microsoft.Management.Infrastructure.dll_11" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.dll" Attributes="0" SourcePath="output\runtimes\win81-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.dll_11" Component_="Microsoft.Management.Infrastructure.Native.dll_10" FileName="MICROS~2.DLL|Microsoft.Management.Infrastructure.Native.dll" Attributes="0" SourcePath="output\runtimes\win81-x86\lib\netstandard1.6\Microsoft.Management.Infrastructure.Native.dll" SelfReg="false"/>
+    <ROW File="mi.dll_10" Component_="mi.dll_10" FileName="mi.dll" Attributes="0" SourcePath="output\runtimes\win81-x86\native\mi.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_7" Component_="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_7" FileName="MICROS~1.DLL|Microsoft.Management.Infrastructure.Native.Unmanaged.dll" Attributes="0" SourcePath="output\runtimes\win81-x86\native\Microsoft.Management.Infrastructure.Native.Unmanaged.dll" SelfReg="false"/>
+    <ROW File="miutils.dll_10" Component_="miutils.dll_10" FileName="miutils.dll" Attributes="0" SourcePath="output\runtimes\win81-x86\native\miutils.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.AiPersistentDataComponent">
     <ROW PersistentRow="apphost.json" Type="0" Condition="1"/>
@@ -1435,12 +1720,12 @@
     <ROW Dialog_="ServiceAccountDialog" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Advanced Installer" Order="800"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Attributes="196611" Text="Service Configuration" TextStyle="[DlgTitleFont]" Order="900"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Text_4" Type="Text" X="25" Y="128" Width="243" Height="14" Attributes="65539" Property="TEXT_4_PROP" Text="1. Use a group-managed service account" Order="1000"/>
-    <ROW Dialog_="ServiceAccountDialog" Control="Text_5" Type="Text" X="25" Y="142" Width="243" Height="13" Attributes="65539" Property="TEXT_5_PROP" Text="2. Add the service account to the &apos;Protected Users&apos; group in your AD" Order="1100"/>
-    <ROW Dialog_="ServiceAccountDialog" Control="Hyperlink_2" Type="Hyperlink" X="15" Y="168" Width="310" Height="17" Attributes="65539" Property="HYPERLINK_2_PROP" Text="&lt;a href=&quot;https://github.com/lithnet/&quot;&gt;More details...&lt;/a&gt;" Order="1200"/>
+    <ROW Dialog_="ServiceAccountDialog" Control="Text_5" Type="Text" X="25" Y="142" Width="300" Height="26" Attributes="65539" Property="TEXT_5_PROP" Text="2. Make sure the account has the &apos;account is sensitive and cannot be delegated&apos; flag set" Order="1100"/>
+    <ROW Dialog_="ServiceAccountDialog" Control="Hyperlink_2" Type="Hyperlink" X="15" Y="177" Width="310" Height="17" Attributes="65539" Property="HYPERLINK_2_PROP" Text="&lt;a href=&quot;https://github.com/lithnet/access-manager&quot;&gt;Creation script and more details...&lt;/a&gt;" Order="1200"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Text_6" Type="Text" X="15" Y="62" Width="337" Height="30" Attributes="65539" Property="TEXT_6_PROP" Text="Lithnet Access Manager should never be run as a privileged account (eg Domain Admins), the configuration utility will guide you through the process of delegating the minimum necessary permissions." Order="1300"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Text_7" Type="Text" X="15" Y="109" Width="316" Height="15" Attributes="65539" Property="TEXT_7_PROP" Text="To keep your service account as safe as possible, we recommend doing the following" Order="1400"/>
     <ROW Dialog_="ShowGsmaScript" Control="OK" Type="PushButton" X="256" Y="158" Width="56" Height="17" Attributes="3" Text="[ButtonText_OK]" Order="100"/>
-    <ROW Dialog_="ShowGsmaScript" Control="Edit_1" Type="Edit" X="14" Y="22" Width="298" Height="119" Attributes="65539" Property="EDIT_1_PROP" Text="[#apphost.json]" Order="200" ExtAttributes="521"/>
+    <ROW Dialog_="ShowGsmaScript" Control="Edit_1" Type="Edit" X="14" Y="22" Width="298" Height="119" Attributes="65539" Property="EDIT_1_PROP" Order="200" ExtAttributes="521"/>
     <ATTRIBUTE name="DeletedRows" value="LogonInformationDlg#DomainEdit@LogonInformationDlg#DomainLabel"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiControlEventComponent">
@@ -1923,6 +2208,108 @@
     <ROW Feature_="MainFeature" Component_="SslCertBinding.Net.dll"/>
     <ROW Feature_="MainFeature" Component_="Stylet.dll"/>
     <ROW Feature_="MainFeature" Component_="System.Text.Json.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Data.Odbc.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Data.Odbc.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="System.IO.Ports.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="libpslnative.so"/>
+    <ROW Feature_="MainFeature" Component_="libpslnative.so_1"/>
+    <ROW Feature_="MainFeature" Component_="libpslnative.so_2"/>
+    <ROW Feature_="MainFeature" Component_="libmi.so"/>
+    <ROW Feature_="MainFeature" Component_="System.Data.Odbc.dll_3"/>
+    <ROW Feature_="MainFeature" Component_="System.IO.Ports.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="libmi.dylib"/>
+    <ROW Feature_="MainFeature" Component_="System.IO.Ports.Native.dylib"/>
+    <ROW Feature_="MainFeature" Component_="System.Data.SqlClient.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.Commands.Management.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.Commands.Utility.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.ConsoleHost.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.MarkdownRender.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.SDK.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.Security.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Management.Automation.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Data.Odbc.dll_4"/>
+    <ROW Feature_="MainFeature" Component_="System.DirectoryServices.AccountManagement.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.DirectoryServices.Protocols.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Management.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Text.Encoding.CodePages.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Data.SqlClient.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.CimCmdlets.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.Commands.Diagnostics.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.Commands.Management.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.Commands.Utility.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.ConsoleHost.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.CoreCLR.Eventing.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.MarkdownRender.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.SDK.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.Security.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.WSMan.Management.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.WSMan.Runtime.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Management.Automation.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="System.Data.OleDb.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.IO.Ports.dll_3"/>
+    <ROW Feature_="MainFeature" Component_="System.Net.Http.WinHttpHandler.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Runtime.Caching.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.ServiceProcess.ServiceController.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="mi.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.Unmanaged.dll"/>
+    <ROW Feature_="MainFeature" Component_="miutils.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="PowerShell.Core.Instrumentation.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="pwrshplugin.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.dll_3"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="mi.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="miutils.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="PowerShell.Core.Instrumentation.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="pwrshplugin.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="sni.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="PowerShell.Core.Instrumentation.dll_3"/>
+    <ROW Feature_="MainFeature" Component_="pwrshplugin.dll_3"/>
+    <ROW Feature_="MainFeature" Component_="sni.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="PowerShell.Core.Instrumentation.dll_4"/>
+    <ROW Feature_="MainFeature" Component_="pwrshplugin.dll_4"/>
+    <ROW Feature_="MainFeature" Component_="sni.dll_3"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.dll_4"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.dll_3"/>
+    <ROW Feature_="MainFeature" Component_="mi.dll_3"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_2"/>
+    <ROW Feature_="MainFeature" Component_="miutils.dll_3"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.dll_5"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.dll_4"/>
+    <ROW Feature_="MainFeature" Component_="mi.dll_4"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_3"/>
+    <ROW Feature_="MainFeature" Component_="miutils.dll_4"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.dll_6"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.dll_5"/>
+    <ROW Feature_="MainFeature" Component_="mi.dll_5"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_4"/>
+    <ROW Feature_="MainFeature" Component_="miutils.dll_5"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.dll_7"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.dll_6"/>
+    <ROW Feature_="MainFeature" Component_="mi.dll_6"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_5"/>
+    <ROW Feature_="MainFeature" Component_="miutils.dll_6"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.dll_8"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.dll_7"/>
+    <ROW Feature_="MainFeature" Component_="mi.dll_7"/>
+    <ROW Feature_="MainFeature" Component_="miutils.dll_7"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.dll_9"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.dll_8"/>
+    <ROW Feature_="MainFeature" Component_="mi.dll_8"/>
+    <ROW Feature_="MainFeature" Component_="miutils.dll_8"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.dll_10"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.dll_9"/>
+    <ROW Feature_="MainFeature" Component_="mi.dll_9"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_6"/>
+    <ROW Feature_="MainFeature" Component_="miutils.dll_9"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.dll_11"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.dll_10"/>
+    <ROW Feature_="MainFeature" Component_="mi.dll_10"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.Unmanaged.dll_7"/>
+    <ROW Feature_="MainFeature" Component_="miutils.dll_10"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>

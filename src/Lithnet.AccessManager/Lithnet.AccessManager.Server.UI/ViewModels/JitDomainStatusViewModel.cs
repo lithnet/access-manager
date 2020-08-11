@@ -40,6 +40,11 @@ namespace Lithnet.AccessManager.Server.UI
         {
             get
             {
+                if (Mapping?.OverrideMode == 2)
+                {
+                    return "Windows Server 2012 R2";
+                }
+
                 return this.forest.ForestModeLevel switch
                 {
                     0 => "Windows 2000 Server",
@@ -59,6 +64,11 @@ namespace Lithnet.AccessManager.Server.UI
         {
             get
             {
+                if (Mapping?.OverrideMode == 2)
+                {
+                    return "Windows Server 2012 R2";
+                }
+
                 return this.Domain.DomainModeLevel switch
                 {
                     0 => "Windows 2000 Server",
@@ -108,7 +118,7 @@ namespace Lithnet.AccessManager.Server.UI
                     }
                     else if (Mapping?.OverrideMode == 3)
                     {
-                        this.PamStatus = "Available, but not enabled";
+                        this.PamStatus = "Supported, but not enabled";
                         this.JitType = "Dynamic group";
                         this.IsPamSupported = true;
                         return;
@@ -124,7 +134,7 @@ namespace Lithnet.AccessManager.Server.UI
                     }
                     else if (Domain.DomainModeLevel >= 7)
                     {
-                        this.PamStatus = "Available, but not enabled";
+                        this.PamStatus = "Supported, but not enabled";
                         this.JitType = "Dynamic group";
                         this.IsPamSupported = true;
                     }

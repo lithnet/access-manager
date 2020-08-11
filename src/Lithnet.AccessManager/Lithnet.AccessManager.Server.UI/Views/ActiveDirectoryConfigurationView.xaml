@@ -113,7 +113,7 @@
         </StackPanel>
 
         <Label Style="{DynamicResource DescriptionHeaderStyle}" 
-               Content="Domain Permissions"/>
+               Content="Domain permissions"/>
 
         <TextBlock Margin="5"
                    TextWrapping="Wrap">The built-in group "Windows Authorization Access Group" grants permissions that are required for the service account to calculate group membership of users within a domain. This is required for all installations.</TextBlock>

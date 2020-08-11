@@ -457,7 +457,7 @@ namespace Lithnet.AccessManager.Server.Test
         private IOptionsSnapshot<AuthorizationOptions> SetupOptions(params SecurityDescriptorTarget[] targets)
         {
             AuthorizationOptions options = new AuthorizationOptions();
-            options.Targets = new List<SecurityDescriptorTarget>(targets);
+            options.ComputerTargets = new List<SecurityDescriptorTarget>(targets);
 
             Mock<IOptionsSnapshot<AuthorizationOptions>> optionsSnapshot = new Mock<IOptionsSnapshot<AuthorizationOptions>>();
             optionsSnapshot.SetupGet(t => t.Value).Returns((AuthorizationOptions)options);

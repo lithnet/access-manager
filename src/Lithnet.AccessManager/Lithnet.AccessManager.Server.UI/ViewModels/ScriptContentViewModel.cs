@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Windows;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Win32;
 using Stylet;
@@ -18,6 +19,11 @@ namespace Lithnet.AccessManager.Server.UI
         public string ScriptText { get; set; }
 
         public string HelpText { get; set; }
+
+        public void Copy()
+        {
+            Clipboard.SetText(this.ScriptText);
+        }
 
         public async Task Save()
         {

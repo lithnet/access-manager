@@ -13,7 +13,7 @@ using NativeMethods = Lithnet.AccessManager.Server.UI.Interop.NativeMethods;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class JitConfigurationViewModel : Screen
+    public class JitConfigurationViewModel : Screen, IHelpLink
     {
         private readonly JitConfigurationOptions jitOptions;
         private readonly IDirectory directory;
@@ -225,6 +225,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             ExternalDialogWindow w = new ExternalDialogWindow
             {
+                Title = "Script",
                 DataContext = vm,
                 SaveButtonVisible = false,
                 CancelButtonName = "Close"
@@ -251,6 +252,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             ExternalDialogWindow w = new ExternalDialogWindow
             {
+                Title = "Script",
                 DataContext = vm,
                 SaveButtonVisible = false,
                 CancelButtonName = "Close"
@@ -274,6 +276,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             ExternalDialogWindow w = new ExternalDialogWindow
             {
+                Title = "Script",
                 DataContext = vm,
                 SaveButtonVisible = false,
                 CancelButtonName = "Close"
@@ -290,5 +293,7 @@ namespace Lithnet.AccessManager.Server.UI
                 await vm.RefreshStatus();
             }
         }
+
+        public string HelpLink => Constants.HelpLinkPageJitAccess;
     }
 }

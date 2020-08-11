@@ -14,7 +14,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class UserInterfaceViewModel : Screen
+    public class UserInterfaceViewModel : Screen, IHelpLink
     {
         private readonly UserInterfaceOptions model;
 
@@ -35,6 +35,8 @@ namespace Lithnet.AccessManager.Server.UI
 
             eventPublisher.Register(this);
         }
+
+        public string HelpLink => Constants.HelpLinkPageUserInterface;
 
         protected override void OnInitialActivate()
         {
