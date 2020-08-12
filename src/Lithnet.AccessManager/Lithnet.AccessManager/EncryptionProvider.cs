@@ -8,10 +8,14 @@ namespace Lithnet.AccessManager
 {
     public class EncryptionProvider : IEncryptionProvider
     {
-      
+
         public string Encrypt(X509Certificate2 cert, string data)
         {
+#if NETCOREAPP
             return this.Encrypt(cert, data, 2);
+#else
+            return this.Encrypt(cert, data, 1);
+#endif
         }
 
         internal string Encrypt(X509Certificate2 cert, string data, int version)
@@ -22,10 +26,12 @@ namespace Lithnet.AccessManager
             {
                 return Convert.ToBase64String(this.Encryptv1(cert, dataToEncrypt));
             }
+#if NETCOREAPP
             else if (version == 2)
             {
                 return Convert.ToBase64String(this.Encryptv2(cert, dataToEncrypt));
             }
+#endif
             else
             {
                 throw new CryptographicException($"The requested encryption version is not supported: {version}");
@@ -40,12 +46,14 @@ namespace Lithnet.AccessManager
 
         private byte[] Encryptv1(X509Certificate2 cert, byte[] dataToEncrypt)
         {
-            using (AesManaged aes = new AesManaged())
+            using (Aes aes = Aes.Create())
             {
                 aes.KeySize = 256;
                 aes.BlockSize = 128;
                 aes.Mode = CipherMode.CBC;
                 aes.Padding = PaddingMode.PKCS7;
+                aes.GenerateIV();
+                aes.GenerateKey();
 
                 using (ICryptoTransform transform = aes.CreateEncryptor())
                 {
@@ -71,6 +79,7 @@ namespace Lithnet.AccessManager
             }
         }
 
+#if NETCOREAPP
         private byte[] Encryptv2(X509Certificate2 cert, byte[] dataToEncrypt)
         {
             int version = 2;
@@ -110,6 +119,7 @@ namespace Lithnet.AccessManager
                 }
             }
         }
+#endif
 
         private string Decrypt(byte[] rawData, Func<string, X509Certificate2> certResolver)
         {
@@ -122,10 +132,12 @@ namespace Lithnet.AccessManager
                     {
                         return Decryptv1(certResolver, inputStream, reader);
                     }
+#if NETCOREAPP
                     else if (version == 2)
                     {
                         return Decryptv2(certResolver, inputStream, reader);
                     }
+#endif
                     else
                     {
                         throw new CryptographicException($"The encrypted blob was of an unsupported version: {version}");
@@ -146,17 +158,17 @@ namespace Lithnet.AccessManager
             byte[] encryptedKey = reader.ReadBytes(encryptedKeyLength);
             byte[] iv = reader.ReadBytes(ivLength);
 
-            using (AesManaged aesManaged = new AesManaged())
+            using (Aes aes = Aes.Create())
             {
-                aesManaged.KeySize = 256;
-                aesManaged.BlockSize = 128;
-                aesManaged.Mode = CipherMode.CBC;
-                aesManaged.Padding = PaddingMode.PKCS7;
+                aes.KeySize = 256;
+                aes.BlockSize = 128;
+                aes.Mode = CipherMode.CBC;
+                aes.Padding = PaddingMode.PKCS7;
 
                 RSA privateKey = cert.GetRSAPrivateKey();
                 byte[] decryptedKey = privateKey.Decrypt(encryptedKey, RSAEncryptionPadding.OaepSHA512);
 
-                using (ICryptoTransform transform = aesManaged.CreateDecryptor(decryptedKey, iv))
+                using (ICryptoTransform transform = aes.CreateDecryptor(decryptedKey, iv))
                 {
                     int remainingBytes = (int)(inputStream.Length - inputStream.Position);
 
@@ -166,6 +178,7 @@ namespace Lithnet.AccessManager
             }
         }
 
+#if NETCOREAPP
         private static string Decryptv2(Func<string, X509Certificate2> certResolver, MemoryStream inputStream, BinaryReader reader)
         {
             int version = 2;
@@ -197,6 +210,8 @@ namespace Lithnet.AccessManager
 
             return Encoding.UTF8.GetString(decryptedData);
         }
+
+#endif
 
         private static byte[] HexStringToBytes(string h)
         {

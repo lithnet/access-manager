@@ -17,7 +17,7 @@ namespace Lithnet.AccessManager.Test
         public void TestInitialize()
         {
             directory = new ActiveDirectory();
-            provider = new LithnetAdminPasswordProvider(Mock.Of<ILogger<LithnetAdminPasswordProvider>>());
+            provider = new LithnetAdminPasswordProvider(Mock.Of<ILogger<LithnetAdminPasswordProvider>>(), new EncryptionProvider(), new CertificateProvider(Mock.Of<ILogger<CertificateProvider>>(), directory, Mock.Of<IAppPathProvider>()));
         }
 
         [TestCase("EXTDEV1\\PC1")]
@@ -36,7 +36,7 @@ namespace Lithnet.AccessManager.Test
 
             string password = "this is my data";
 
-            this.provider.UpdateCurrentPassword(computer, password, created, expired, 0);
+            this.provider.UpdateCurrentPassword(computer, password, created, expired, 0, MsMcsAdmPwdBehaviour.Ignore);
 
             ProtectedPasswordHistoryItem current = this.provider.GetCurrentPassword(computer, null);
             IReadOnlyList<ProtectedPasswordHistoryItem> history = this.provider.GetPasswordHistory(computer);
@@ -59,7 +59,7 @@ namespace Lithnet.AccessManager.Test
             DateTime firstExpiry = DateTime.UtcNow.AddDays(-3).Trim(TimeSpan.TicksPerSecond);
             string firstPassword = "first password";
 
-            provider.UpdateCurrentPassword(computer, firstPassword, firstCreated, firstExpiry, 0);
+            provider.UpdateCurrentPassword(computer, firstPassword, firstCreated, firstExpiry, 0, MsMcsAdmPwdBehaviour.Ignore);
             IReadOnlyList<ProtectedPasswordHistoryItem> history =  provider.GetPasswordHistory(computer);
             ProtectedPasswordHistoryItem currentPassword = provider.GetCurrentPassword(computer, null);
             DateTime? currentExpiry = provider.GetExpiry(computer);
@@ -76,7 +76,7 @@ namespace Lithnet.AccessManager.Test
             DateTime secondExpiry = DateTime.UtcNow.AddDays(-5).Trim(TimeSpan.TicksPerSecond);
             string secondPassword = "second password";
 
-            provider.UpdateCurrentPassword(computer, secondPassword, secondCreated, secondExpiry, 30);
+            provider.UpdateCurrentPassword(computer, secondPassword, secondCreated, secondExpiry, 30, MsMcsAdmPwdBehaviour.Ignore);
 
 
             history = provider.GetPasswordHistory(computer);
@@ -109,7 +109,7 @@ namespace Lithnet.AccessManager.Test
             DateTime firstExpiry = DateTime.UtcNow.AddDays(-5).Trim(TimeSpan.TicksPerSecond);
             string firstPassword = "first password";
 
-            provider.UpdateCurrentPassword(computer, firstPassword, firstCreated, firstExpiry, 0);
+            provider.UpdateCurrentPassword(computer, firstPassword, firstCreated, firstExpiry, 0, MsMcsAdmPwdBehaviour.Ignore);
             IReadOnlyList<ProtectedPasswordHistoryItem> history = provider.GetPasswordHistory(computer);
             ProtectedPasswordHistoryItem currentPassword = provider.GetCurrentPassword(computer, null);
             DateTime? currentExpiry = provider.GetExpiry(computer);
@@ -126,7 +126,7 @@ namespace Lithnet.AccessManager.Test
             DateTime secondExpiry = DateTime.UtcNow.AddDays(-5).Trim(TimeSpan.TicksPerSecond);
             string secondPassword = "second password";
 
-            provider.UpdateCurrentPassword(computer, secondPassword, secondCreated, secondExpiry, 30);
+            provider.UpdateCurrentPassword(computer, secondPassword, secondCreated, secondExpiry, 30, MsMcsAdmPwdBehaviour.Ignore);
             history = provider.GetPasswordHistory(computer);
             currentPassword = provider.GetCurrentPassword(computer, null);
             currentExpiry = provider.GetExpiry(computer);
@@ -147,7 +147,7 @@ namespace Lithnet.AccessManager.Test
             DateTime thirdExpiry = DateTime.UtcNow.AddDays(-5).Trim(TimeSpan.TicksPerSecond);
             string thirdPassword = "third password";
 
-            provider.UpdateCurrentPassword(computer, thirdPassword, thirdCreated, thirdExpiry, 2);
+            provider.UpdateCurrentPassword(computer, thirdPassword, thirdCreated, thirdExpiry, 2, MsMcsAdmPwdBehaviour.Ignore);
             history = provider.GetPasswordHistory(computer);
             
             Assert.AreEqual(1, history.Count);

@@ -407,19 +407,21 @@ namespace Lithnet.AccessManager
 
             d.PropertiesToLoad.Add("distinguishedName");
 
-            using SearchResultCollection result = d.FindAll();
-
-            if (result.Count > 1)
+            using (SearchResultCollection result = d.FindAll())
             {
-                throw new AmbiguousNameException($"There was more than one value in the directory that matched the name {samAccountName}");
-            }
 
-            if (result.Count == 0)
-            {
-                return null;
-            }
+                if (result.Count > 1)
+                {
+                    throw new AmbiguousNameException($"There was more than one value in the directory that matched the name {samAccountName}");
+                }
 
-            return result[0].Properties["distinguishedName"][0].ToString();
+                if (result.Count == 0)
+                {
+                    return null;
+                }
+
+                return result[0].Properties["distinguishedName"][0].ToString();
+            }
         }
 
         private static string EscapeSearchFilterParameter(string p)

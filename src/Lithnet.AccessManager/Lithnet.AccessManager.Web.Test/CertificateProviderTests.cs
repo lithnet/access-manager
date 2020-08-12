@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -141,7 +142,7 @@ namespace Lithnet.AccessManager.Test
         [Test]
         public void GetCertificateFromDirectory()
         {
-            Assert.IsTrue(provider.TryGetCertificateFromDirectory(out X509Certificate2 cert, WindowsIdentity.GetCurrent().User));
+            Assert.IsTrue(provider.TryGetCertificateFromDirectory(out X509Certificate2 cert, Domain.GetComputerDomain().Name));
             Assert.IsNotNull(cert);
         }
     }

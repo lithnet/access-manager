@@ -2,6 +2,7 @@
 using System.DirectoryServices;
 using System.Security.Cryptography;
 using System.Security.Principal;
+using System.Text.RegularExpressions;
 
 namespace Lithnet.AccessManager
 {
@@ -76,12 +77,19 @@ namespace Lithnet.AccessManager
                 return null;
             }
 
+#if NETCOREAPP
             groupNameTemplate = groupNameTemplate
                 .Replace("{computerName}", computerName, StringComparison.OrdinalIgnoreCase)
                 .Replace("{domain}", computerDomain, StringComparison.OrdinalIgnoreCase)
                 .Replace("{computerDomain}", computerDomain, StringComparison.OrdinalIgnoreCase);
-
-            if (!groupNameTemplate.Contains('\\'))
+#else
+            groupNameTemplate = groupNameTemplate.ToLowerInvariant()
+                .Replace("{computername}", computerName)
+                .Replace("{domain}", computerDomain)
+                .Replace("{computerdomain}", computerDomain);
+#endif
+            
+            if (!groupNameTemplate.Contains("\\"))
             {
                 groupNameTemplate = $"{computerDomain}\\{groupNameTemplate}";
             }

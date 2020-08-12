@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net48</TargetFrameworks>
     <Company>Lithnet</Company>
     <Product>Access Manager</Product>
     <Authors>Lithnet</Authors>
@@ -27,6 +27,10 @@
     <PackageReference Include="System.DirectoryServices.Protocols" Version="4.7.0" />
     <PackageReference Include="system.security.Cryptography.Cng" Version="4.7.0" />
     <PackageReference Include="Vanara.PInvoke.Cryptography" Version="3.2.13" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <Reference Include="System.Net.Http" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

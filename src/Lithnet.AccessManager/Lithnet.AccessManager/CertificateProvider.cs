@@ -292,31 +292,25 @@ namespace Lithnet.AccessManager
 
         private X509Certificate2 GetCertificateFromStore(string thumbprint, StoreLocation storeLocation)
         {
-            X509Store store = new X509Store(StoreName.My, storeLocation);
-            store.Open(OpenFlags.ReadOnly);
-
-            try
+            using (X509Store store = new X509Store(StoreName.My, storeLocation))
             {
+                store.Open(OpenFlags.ReadOnly);
+
                 foreach (var item in store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false))
                 {
                     return item;
                 }
-            }
-            finally
-            {
-                if (store.IsOpen)
-                {
-                    store.Close();
-                }
-            }
 
-            return null;
+                return null;
+            }
         }
 
         private static bool GetServiceStatus()
         {
-            using AuthorizationContext c = new AuthorizationContext(WindowsIdentity.GetCurrent().AccessToken);
-            return c.ContainsSid(new SecurityIdentifier("S-1-5-6"));
+            using (AuthorizationContext c = new AuthorizationContext(WindowsIdentity.GetCurrent().AccessToken))
+            {
+                return c.ContainsSid(new SecurityIdentifier("S-1-5-6"));
+            }
         }
 
         private X509Certificate2 GetCertificateFromServiceStore(string thumbprint, string serviceName)
@@ -338,18 +332,11 @@ namespace Lithnet.AccessManager
                     store = this.OpenServiceStore(serviceName, OpenFlags.ReadOnly);
                 }
 
-                try
+                using (store)
                 {
                     foreach (var item in store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false))
                     {
                         return item;
-                    }
-                }
-                finally
-                {
-                    if (store.IsOpen)
-                    {
-                        store.Close();
                     }
                 }
             }

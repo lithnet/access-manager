@@ -406,8 +406,10 @@ namespace Lithnet.AccessManager.Interop
                 server = NativeMethods.GetDomainControllerForDnsDomain(dnsDomain);
             }
 
-            using AuthorizationContext context = new AuthorizationContext(principalSid, server);
-            return context.ContainsSid(sidToCheck);
+            using (AuthorizationContext context = new AuthorizationContext(principalSid, server))
+            {
+                return context.ContainsSid(sidToCheck);
+            }
         }
 
         public static IEnumerable<SecurityIdentifier> GetTokenGroups(SecurityIdentifier principalSid, SecurityIdentifier requestContext = null)
@@ -429,8 +431,10 @@ namespace Lithnet.AccessManager.Interop
                 server = NativeMethods.GetDomainControllerForDnsDomain(dnsDomain);
             }
 
-            using AuthorizationContext context = new AuthorizationContext(principalSid, server);
-            return context.GetTokenGroups().ToList(); // Force the enumeration now before the context goes out of scope
+            using (AuthorizationContext context = new AuthorizationContext(principalSid, server))
+            {
+                return context.GetTokenGroups().ToList(); // Force the enumeration now before the context goes out of scope
+            }
         }
 
         public static string GetDomainControllerForDnsDomain(string dnsDomain, bool forceRediscovery = false)
