@@ -25,7 +25,6 @@ namespace Lithnet.AccessManager.Web.Internal
                 config.AddJsonFile(Path.Combine(basePath, "appsettings.json"), optional: false, reloadOnChange: true);
                 config.AddJsonFile(Path.Combine(basePath, "appsecrets.json"), optional: true, reloadOnChange: true);
                 config.AddJsonFile(Path.Combine(basePath, "apphost.json"), optional: true, reloadOnChange: true);
-                config.AddJsonFile(Path.Combine(basePath, "appsettings.json"), optional: true, reloadOnChange: true);
             }
             else
             {

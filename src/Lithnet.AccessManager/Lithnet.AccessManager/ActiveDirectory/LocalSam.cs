@@ -12,6 +12,12 @@ namespace Lithnet.AccessManager
     {
         private readonly ILogger<LocalSam> logger;
 
+        private string machineNtAccountName;
+
+        private string machineNetbiosName;
+        
+        private bool? isDC;
+
         public LocalSam(ILogger<LocalSam> logger)
         {
             this.logger = logger;
@@ -29,14 +35,24 @@ namespace Lithnet.AccessManager
 
         public string GetMachineNetbiosDomainName()
         {
-            var result = NativeMethods.GetWorkstationInfo(null);
-            return result.LanGroup;
+            if (this.machineNetbiosName == null)
+            {
+                var result = NativeMethods.GetWorkstationInfo(null);
+                this.machineNetbiosName = result.LanGroup;
+            }
+
+            return this.machineNetbiosName;
         }
 
         public string GetMachineNTAccountName()
         {
-            var result = NativeMethods.GetWorkstationInfo(null);
-            return $"{result.LanGroup}\\{result.ComputerName}";
+            if (this.machineNtAccountName == null)
+            {
+                var result = NativeMethods.GetWorkstationInfo(null);
+                this.machineNtAccountName = $"{result.LanGroup}\\{result.ComputerName}";
+            }
+
+            return this.machineNtAccountName;
         }
 
         public IList<SecurityIdentifier> GetLocalGroupMembers(string name)
@@ -60,8 +76,10 @@ namespace Lithnet.AccessManager
             NativeMethods.RemoveLocalGroupMember(groupName, member);
         }
 
-        public void UpdateLocalGroupMembership(string groupName, IEnumerable<SecurityIdentifier> membersToAdd, IEnumerable<SecurityIdentifier> membersToRemove, bool ignoreErrors)
+        public bool UpdateLocalGroupMembership(string groupName, IEnumerable<SecurityIdentifier> membersToAdd, IEnumerable<SecurityIdentifier> membersToRemove, bool ignoreErrors)
         {
+            bool modifiedMembership = false;
+
             if (membersToAdd != null)
             {
                 foreach (var member in membersToAdd)
@@ -69,6 +87,7 @@ namespace Lithnet.AccessManager
                     try
                     {
                         this.AddLocalGroupMember(groupName, member);
+                        modifiedMembership = true;
                         this.logger.LogInformation(EventIDs.LocalSamGroupMemberAdded, "Added member {member} to group {groupName}", member, groupName);
                     }
                     catch (Exception ex)
@@ -89,6 +108,7 @@ namespace Lithnet.AccessManager
                     try
                     {
                         this.RemoveLocalGroupMember(groupName, member);
+                        modifiedMembership = true;
                         this.logger.LogInformation(EventIDs.LocalSamGroupMemberRemoved, "Removed member {member} from group {groupName}", member, groupName);
                     }
                     catch (Exception ex)
@@ -101,22 +121,28 @@ namespace Lithnet.AccessManager
                     }
                 }
             }
+
+            return modifiedMembership;
         }
 
-        public void UpdateLocalGroupMembership(string groupName, IEnumerable<SecurityIdentifier> expectedMembers, bool allowOthers, bool ignoreErrors)
+        public bool UpdateLocalGroupMembership(string groupName, IEnumerable<SecurityIdentifier> expectedMembers, bool allowOthers, bool ignoreErrors)
         {
             IList<SecurityIdentifier> currentMembers = this.GetLocalGroupMembers(groupName);
             IEnumerable<SecurityIdentifier> membersToAdd = expectedMembers.Except(currentMembers);
             IEnumerable<SecurityIdentifier> membersToRemove = allowOthers ? null : currentMembers.Except(expectedMembers);
 
-            this.UpdateLocalGroupMembership(groupName, membersToAdd, membersToRemove, ignoreErrors);
+            return this.UpdateLocalGroupMembership(groupName, membersToAdd, membersToRemove, ignoreErrors);
         }
 
         public bool IsDomainController()
         {
-            var info = NativeMethods.GetServerInfo(null);
+            if (this.isDC == null)
+            {
+                var info = NativeMethods.GetServerInfo(null);
+                this.isDC = (info.Type & ServerTypes.DomainCtrl) == ServerTypes.DomainCtrl || (info.Type & ServerTypes.BackupDomainCtrl) == ServerTypes.BackupDomainCtrl;
+            }
 
-            return (info.Type & ServerTypes.DomainCtrl) == ServerTypes.DomainCtrl || (info.Type & ServerTypes.BackupDomainCtrl) == ServerTypes.BackupDomainCtrl;
+            return this.isDC.Value;
         }
 
         public void SetLocalAccountPassword(SecurityIdentifier sid, string password)
@@ -125,6 +151,11 @@ namespace Lithnet.AccessManager
             {
                 using (var user = UserPrincipal.FindByIdentity(context, IdentityType.Sid, sid.ToString()))
                 {
+                    if (user == null)
+                    {
+                        throw new ObjectNotFoundException("The local administrator account could not be found");
+                    }
+
                     user.SetPassword(password);
                 }
             }

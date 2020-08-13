@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.Cryptography;
@@ -420,6 +421,41 @@ namespace Lithnet.AccessManager.Server.UI
             this.RequiredEkus.Remove(removing);
             this.model.ClientCert.RequiredEkus.Remove(removing);
         }
+
+        public async Task OktaHelp()
+        {
+            await this.OpenLink(Constants.HelpLinkAuthNSetupOkta);
+        }
+
+        public async Task AadHelp()
+        {
+            await this.OpenLink(Constants.HelpLinkAuthNSetupAzureAD);
+        }
+
+        public async Task AdfsHelp()
+        {
+            await this.OpenLink(Constants.HelpLinkAuthNSetupAdfs);
+        }
+
+        private async Task OpenLink(string link)
+        {
+            try
+            {
+                var psi = new ProcessStartInfo
+                {
+                    FileName = link,
+                    UseShellExecute = true
+                };
+
+                Process.Start(psi);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not open link");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not open the default link handler\r\n{ex.Message}");
+            }
+        }
+
 
         public bool CanRemoveEku => this.SelectedEku != null;
 

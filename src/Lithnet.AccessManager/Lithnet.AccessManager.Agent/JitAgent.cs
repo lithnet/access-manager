@@ -17,6 +17,8 @@ namespace Lithnet.AccessManager.Agent
 
         private readonly IJitAccessGroupResolver jitGroupResolver;
 
+        private bool isDisabledLogged;
+
         public JitAgent(ILogger<JitAgent> logger, IDirectory directory, IJitSettings settings, ILocalSam sam, IJitAccessGroupResolver jitGroupResolver)
         {
             this.logger = logger;
@@ -32,14 +34,22 @@ namespace Lithnet.AccessManager.Agent
             {
                 if (!this.settings.JitEnabled)
                 {
-                    this.logger.LogTrace(EventIDs.JitAgentDisabled, "The JIT agent is disabled");
+                    if (!this.isDisabledLogged)
+                    {
+                        this.logger.LogTrace(EventIDs.JitAgentDisabled, "The JIT agent is disabled");
+                        this.isDisabledLogged = true;
+                    }
+
                     return;
                 }
 
-                IGroup group = this.jitGroupResolver.GetJitGroup(this.settings.JitGroup, Environment.MachineName,
-                    this.sam.GetMachineNetbiosDomainName());
+                if (this.isDisabledLogged)
+                {
+                    this.logger.LogTrace(EventIDs.JitAgentEnabled, "The JIT agent has been enabled");
+                    this.isDisabledLogged = false;
+                }
 
-                this.logger.LogTrace(EventIDs.JitGroupFound, "The JIT group was found in the directory as {principalName}", group.MsDsPrincipalName);
+                IGroup group = this.jitGroupResolver.GetJitGroup(this.settings.JitGroup, Environment.MachineName, this.sam.GetMachineNetbiosDomainName());
 
                 this.sam.UpdateLocalGroupMembership(
                     this.sam.GetBuiltInAdministratorsGroupName(),

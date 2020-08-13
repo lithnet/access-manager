@@ -9,7 +9,7 @@ namespace Lithnet.AccessManager.Agent.Test
 
         private RegistryKey policyKey;
 
-        private AgentRegistrySettings registrySettings;
+        private RegistrySettingsAgent registrySettings;
 
         [SetUp()]
         public void TestInitialize()
@@ -17,7 +17,7 @@ namespace Lithnet.AccessManager.Agent.Test
             Registry.CurrentUser.DeleteSubKeyTree(policyKeyName, false);
 
             this.policyKey = Registry.CurrentUser.CreateSubKey(policyKeyName, true);
-            this.registrySettings = new AgentRegistrySettings(policyKey, policyKey);
+            this.registrySettings = new RegistrySettingsAgent(policyKey, policyKey);
         }
 
         [Test]

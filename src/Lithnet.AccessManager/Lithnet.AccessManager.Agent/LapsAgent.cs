@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Principal;
+using System.ServiceModel.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 
@@ -21,6 +22,8 @@ namespace Lithnet.AccessManager.Agent
 
         private bool mslapsInstaled;
 
+        private bool isDisabledLogged;
+
         public LapsAgent(ILogger<LapsAgent> logger, IDirectory directory, ILapsSettings settings, IPasswordGenerator passwordGenerator, ILocalSam sam, ILithnetAdminPasswordProvider lithnetAdminPasswordProvider)
         {
             this.logger = logger;
@@ -37,8 +40,19 @@ namespace Lithnet.AccessManager.Agent
             {
                 if (!this.settings.Enabled)
                 {
-                    this.logger.LogTrace(EventIDs.LapsAgentDisabled, "The LAPS agent is disabled");
+                    if (!this.isDisabledLogged)
+                    {
+                        this.logger.LogTrace(EventIDs.LapsAgentDisabled, "The local admin password agent is disabled");
+                        this.isDisabledLogged = true;
+                    }
+
                     return;
+                }
+
+                if (this.isDisabledLogged)
+                {
+                    this.logger.LogTrace(EventIDs.LapsAgentEnabled, "The local admin password agent is enabled");
+                    this.isDisabledLogged = false;
                 }
 
                 if (this.IsMsLapsInstalled())
@@ -67,10 +81,10 @@ namespace Lithnet.AccessManager.Agent
                     logger.LogTrace(EventIDs.PasswordExpired, "Password has expired and needs to be changed");
                     this.ChangePassword(computer);
                 }
-                else
-                {
-                    logger.LogTrace(EventIDs.PasswordChangeNotRequired, "Password does not need to be changed");
-                }
+                //else
+                //{
+                //    logger.LogTrace(EventIDs.PasswordChangeNotRequired, "Password does not need to be changed");
+                //}
             }
             catch (Exception ex)
             {
@@ -129,7 +143,7 @@ namespace Lithnet.AccessManager.Agent
                 }
                
                 this.sam.SetLocalAccountPassword(sid, newPassword);
-                this.logger.LogInformation(EventIDs.SetPassword, "The local administrator password has been changed and will expire on {expiryDate}", expiryDate);
+                this.logger.LogInformation(EventIDs.SetPassword, "The local administrator password has been changed and will expire on {expiryDate}", expiryDate.ToLocalTime());
             }
             catch (Exception ex)
             {

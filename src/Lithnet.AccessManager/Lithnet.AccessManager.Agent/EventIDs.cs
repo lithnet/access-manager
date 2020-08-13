@@ -6,6 +6,8 @@
         public const int AgentDisabled = 1001;
         public const int LapsAgentDisabled = 1002;
         public const int JitAgentDisabled = 1003;
+        public const int JitAgentEnabled = 1019;
+        public const int LapsAgentEnabled = 1020;
 
         public const int RunningOnDC = 1004;
         public const int JitUnexpectedException = 1005;

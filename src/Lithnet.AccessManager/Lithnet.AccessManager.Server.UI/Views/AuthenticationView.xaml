@@ -99,6 +99,9 @@
                                  local:PasswordBoxBindingHelper.BoundPassword="{Binding Path=OidcSecret, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  Margin="5"/>
 
+            <TextBlock Grid.Row="3" Grid.Column="1"
+                       Margin="5">View the setup guides for <Hyperlink Click="{s:Action AadHelp}">Azure AD</Hyperlink> and <Hyperlink Click="{s:Action OktaHelp}">Okta</Hyperlink></TextBlock>
+
         </Grid>
 
         <Grid Visibility="{Binding Path=WsFedVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -126,6 +129,9 @@
             <TextBox Grid.Row="1" Grid.Column="1" 
                              Text="{Binding WsFedRealm, UpdateSourceTrigger=PropertyChanged}" 
                              Margin="5"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="1"
+                       Margin="5">View the setup guide for <Hyperlink Click="{s:Action AdfsHelp}">ADFS</Hyperlink></TextBlock>
         </Grid>
 
         <Grid Visibility="{Binding Path=CertificateVisible, Converter={StaticResource BooleanToVisibilityConverter}}">

@@ -24,6 +24,10 @@ namespace Lithnet.AccessManager.Server.UI
         public const string HelpLinkPageUserInterface = "https://github.com/lithnet/access-manager/wiki/User-Interface-Page";
         public const string HelpLinkPageWebHosting = "https://github.com/lithnet/access-manager/wiki/Web-Hosting-Page";
 
+        public const string HelpLinkAuthNSetupOkta = "https://github.com/lithnet/access-manager/wiki/Setting-up-authentication-with-Okta";
+        public const string HelpLinkAuthNSetupAzureAD = "https://github.com/lithnet/access-manager/wiki/Setting-up-authentication-with-Azure-AD";
+        public const string HelpLinkAuthNSetupAdfs = "https://github.com/lithnet/access-manager/wiki/Setting-up-authentication-with-ADFS";
+
         public const string EventSourceName = "Lithnet Access Manager Configuration Tool";
         public const string EventLogName = "Lithnet Access Manager";
         public const string FirewallRuleName = "Lithnet Access Manager Web Service (HTTP/HTTPS-In)"; // This value also needs to be updated in the installer

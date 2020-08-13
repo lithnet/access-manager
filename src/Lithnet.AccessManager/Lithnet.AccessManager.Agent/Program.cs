@@ -23,11 +23,11 @@ namespace Lithnet.AccessManager.Agent
                 {
                     services.AddHostedService<Worker>();
                     services.AddTransient<IDirectory, ActiveDirectory>();
-                    services.AddTransient<IAgentSettings, AgentRegistrySettings>();
-                    services.AddTransient<IJitSettings, JitRegistrySettings>();
+                    services.AddTransient<IAgentSettings, RegistrySettingsAgent>();
+                    services.AddTransient<IJitSettings, RegistrySettingsJit>();
                     services.AddTransient<IJitAgent, JitAgent>();
                     services.AddTransient<IJitAccessGroupResolver, JitAccessGroupResolver>();
-                    services.AddTransient<ILapsSettings, LapsRegistrySettings>();
+                    services.AddTransient<ILapsSettings, RegistrySettingsLaps>();
                     services.AddTransient<ILapsAgent, LapsAgent>();
                     services.AddTransient<ILocalSam, LocalSam>();
                     services.AddTransient<IAppPathProvider, AgentAppPathProvider>();
