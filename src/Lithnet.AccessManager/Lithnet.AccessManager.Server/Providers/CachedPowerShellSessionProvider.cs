@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Management.Automation;
@@ -84,10 +85,55 @@ namespace Lithnet.AccessManager.Server.Authorization
                 }
             }
 
+            powershell.Streams.Warning.DataAdded += Warning_DataAdded;
+            powershell.Streams.Error.DataAdded += Error_DataAdded;
+            powershell.Streams.Information.DataAdded += Information_DataAdded;
+            powershell.Streams.Debug.DataAdded += Debug_DataAdded;
+            powershell.Streams.Verbose.DataAdded += Verbose_DataAdded;
+
             this.logger.LogTrace($"The PowerShell script was successfully initialized");
 
             return powershell;
         }
 
+        private void Verbose_DataAdded(object sender, DataAddedEventArgs e)
+        {
+            if (((IList)sender)[e.Index] is VerboseRecord newRecord)
+            {
+                this.logger.LogTrace(newRecord.ToString());
+            }
+        }
+
+        private void Debug_DataAdded(object sender, DataAddedEventArgs e)
+        {
+            if (((IList)sender)[e.Index] is DebugRecord newRecord)
+            {
+                this.logger.LogDebug(newRecord.ToString());
+            }
+        }
+
+        private void Information_DataAdded(object sender, DataAddedEventArgs e)
+        {
+            if (((IList)sender)[e.Index] is InformationRecord newRecord)
+            {
+                this.logger.LogInformation(newRecord.ToString());
+            }
+        }
+
+        private void Error_DataAdded(object sender, DataAddedEventArgs e)
+        {
+            if (((IList)sender)[e.Index] is ErrorRecord newRecord)
+            {
+                this.logger.LogError(newRecord.ToString());
+            }
+        }
+
+        private void Warning_DataAdded(object sender, DataAddedEventArgs e)
+        {
+            if (((IList)sender)[e.Index] is WarningRecord newRecord)
+            {
+                this.logger.LogWarning(newRecord.ToString());
+            }
+        }
     }
 }

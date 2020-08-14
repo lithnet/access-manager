@@ -84,15 +84,13 @@ namespace Lithnet.AccessManager.Server.UI {
         ///   Looks up a localized string similar to function Write-AuditLog{
         ///	param(
         ///	[hashtable]$tokens,
-        ///	[bool]$isSuccess,
-        ///	[Microsoft.Extensions.Logging.ILogger]$logger
+        ///	[bool]$isSuccess
         ///)
         ///
-        ///	$logger.LogTrace(&quot;We&apos;re in PowerShell for auditing!&quot;);
+        ///	Write-Information &quot;We&apos;re in PowerShell for auditing!&quot;
         ///
         ///	$tokens.Keys | % {
-        ///		Write-Host &quot;$($_):$($tokens.Item($_))&quot;;
-        ///		$logger.Log(LogLevel.Trace, &quot;$($_):$($tokens.Item($_))&quot;);
+        ///		Write-Information &quot;$($_):$($tokens.Item($_))&quot;;
         ///		};
         ///}.
         /// </summary>
@@ -105,17 +103,17 @@ namespace Lithnet.AccessManager.Server.UI {
         /// <summary>
         ///   Looks up a localized string similar to function Get-AuthorizationResponse{
         ///	param(
-        ///	[Lithnet.AccessManager.IUser]$user,
-        ///	[Lithnet.AccessManager.IComputer]$computer,
-        ///	[Nlog.ILogger]$logger
+        ///	$user,
+        ///	$computer
         ///)
         ///
-        ///	$logger.Trace(&quot;We&apos;re in PowerShell!&quot;);
-        ///	$logger.Trace(&quot;Checking if $($user.MsDsPrincipalName) is allowed administrative access to $($computer.MsDsPrincipalName)&quot;);
+        ///	# See https://github.com/lithnet/access-manager/wiki/Authorization-Scripts for help
         ///
-        ///	$response = New-Object -TypeName &quot;Lithnet.AccessManager.Server.Authorization.PowerShellAuthorizationResponse&quot;
+        ///	Write-Information  &quot;We&apos;re in PowerShell!&quot;
+        ///	Write-Information &quot;Checking if $($user.MsDsPrincipalName) is allowed administrative access to $($computer.MsDsPrincipalName)&quot;
         ///
-        ///	# Set IsAllowed to true to allow access, or set IsDenied to explicitl [rest of string was truncated]&quot;;.
+        ///	# Create an object to hold our authorization decisions
+        ///	# Set IsAllowed to true to allow access, or set IsDenied to explicitly deny access, or leave both as false if no decisio [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AuthorizationScriptTemplate {
             get {

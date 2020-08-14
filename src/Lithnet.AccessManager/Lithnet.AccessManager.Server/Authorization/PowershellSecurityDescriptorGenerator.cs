@@ -15,8 +15,6 @@ namespace Lithnet.AccessManager.Server.Authorization
     {
         private readonly ILogger logger;
 
-        private readonly NLog.ILogger nlogger = NLog.LogManager.GetCurrentClassLogger();
-
         private readonly IPowerShellSessionProvider sessionProvider;
 
         public PowerShellSecurityDescriptorGenerator(ILogger<PowerShellSecurityDescriptorGenerator> logger, IPowerShellSessionProvider sessionProvider)
@@ -83,12 +81,12 @@ namespace Lithnet.AccessManager.Server.Authorization
 
             if (allowedAccess > 0)
             {
-                dacl.AddAccess(AccessControlType.Allow, sid, (int) allowedAccess, InheritanceFlags.None, PropagationFlags.None);
+                dacl.AddAccess(AccessControlType.Allow, sid, (int)allowedAccess, InheritanceFlags.None, PropagationFlags.None);
             }
 
             if (deniedAccess > 0)
             {
-                dacl.AddAccess(AccessControlType.Deny, sid, (int) deniedAccess, InheritanceFlags.None, PropagationFlags.None);
+                dacl.AddAccess(AccessControlType.Deny, sid, (int)deniedAccess, InheritanceFlags.None, PropagationFlags.None);
             }
 
             return new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, dacl);
@@ -98,9 +96,8 @@ namespace Lithnet.AccessManager.Server.Authorization
         {
             PowerShell powershell = this.sessionProvider.GetSession(script, "Get-AuthorizationResponse");
             powershell.AddCommand("Get-AuthorizationResponse")
-                .AddParameter("user", user)
-                .AddParameter("computer", computer)
-                .AddParameter("logger", nlogger);
+                .AddParameter("user", this.ToPSObject(user))
+                .AddParameter("computer", this.ToPSObject(computer));
 
             Task<PowerShellAuthorizationResponse> task = new Task<PowerShellAuthorizationResponse>(() =>
             {
@@ -113,6 +110,25 @@ namespace Lithnet.AccessManager.Server.Authorization
                     {
                         return res;
                     }
+
+                    if (result.Properties[nameof(res.IsLocalAdminPasswordAllowed)] == null &&
+                        result.Properties[nameof(res.IsLocalAdminPasswordDenied)] == null &&
+                        result.Properties[nameof(res.IsLocalAdminPasswordHistoryAllowed)] == null &&
+                        result.Properties[nameof(res.IsLocalAdminPasswordHistoryDenied)] == null &&
+                        result.Properties[nameof(res.IsJitAllowed)] == null &&
+                        result.Properties[nameof(res.IsJitDenied)] == null)
+                    {
+                        continue;
+                    }
+
+                    res = new PowerShellAuthorizationResponse();
+                    res.IsLocalAdminPasswordAllowed = Convert.ToBoolean(result.Properties[nameof(res.IsLocalAdminPasswordAllowed)]?.Value ?? false);
+                    res.IsLocalAdminPasswordDenied = Convert.ToBoolean(result.Properties[nameof(res.IsLocalAdminPasswordDenied)]?.Value ?? false);
+                    res.IsLocalAdminPasswordHistoryAllowed = Convert.ToBoolean(result.Properties[nameof(res.IsLocalAdminPasswordHistoryAllowed)]?.Value ?? false);
+                    res.IsLocalAdminPasswordHistoryDenied = Convert.ToBoolean(result.Properties[nameof(res.IsLocalAdminPasswordHistoryDenied)]?.Value ?? false);
+                    res.IsJitAllowed = Convert.ToBoolean(result.Properties[nameof(res.IsJitAllowed)]?.Value ?? false);
+                    res.IsJitDenied = Convert.ToBoolean(result.Properties[nameof(res.IsJitDenied)]?.Value ?? false);
+                    return res;
                 }
 
                 return null;
@@ -139,6 +155,38 @@ namespace Lithnet.AccessManager.Server.Authorization
             this.logger.LogWarning(EventIDs.PowerShellSDGeneratorInvalidResponse, $"The PowerShell script did not return an AuthorizationResponse");
 
             return new PowerShellAuthorizationResponse();
+        }
+
+        private PSObject ToPSObject(IUser user)
+        {
+            PSObject u = new PSObject();
+            u.Properties.Add(new PSNoteProperty("Description", user.Description));
+            u.Properties.Add(new PSNoteProperty("DisplayName", user.DisplayName));
+            u.Properties.Add(new PSNoteProperty("DistinguishedName", user.DistinguishedName));
+            u.Properties.Add(new PSNoteProperty("EmailAddress", user.EmailAddress));
+            u.Properties.Add(new PSNoteProperty("GivenName", user.GivenName));
+            u.Properties.Add(new PSNoteProperty("Guid", user.Guid));
+            u.Properties.Add(new PSNoteProperty("MsDsPrincipalName", user.MsDsPrincipalName));
+            u.Properties.Add(new PSNoteProperty("SamAccountName", user.SamAccountName));
+            u.Properties.Add(new PSNoteProperty("Sid", user.Sid.ToString()));
+            u.Properties.Add(new PSNoteProperty("Surname", user.Surname));
+            u.Properties.Add(new PSNoteProperty("UserPrincipalName", user.UserPrincipalName));
+
+            return u;
+        }
+
+        private PSObject ToPSObject(IComputer user)
+        {
+            PSObject u = new PSObject();
+            u.Properties.Add(new PSNoteProperty("Description", user.Description));
+            u.Properties.Add(new PSNoteProperty("DisplayName", user.DisplayName));
+            u.Properties.Add(new PSNoteProperty("DistinguishedName", user.DistinguishedName));
+            u.Properties.Add(new PSNoteProperty("Guid", user.Guid));
+            u.Properties.Add(new PSNoteProperty("MsDsPrincipalName", user.MsDsPrincipalName));
+            u.Properties.Add(new PSNoteProperty("SamAccountName", user.SamAccountName));
+            u.Properties.Add(new PSNoteProperty("Sid", user.Sid.ToString()));
+
+            return u;
         }
     }
 }

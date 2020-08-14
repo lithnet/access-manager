@@ -15,8 +15,6 @@ namespace Lithnet.AccessManager.Server.Auditing
 {
     public class PowershellNotificationChannel : NotificationChannel<PowershellNotificationChannelDefinition>
     {
-        private readonly NLog.ILogger nlogger = NLog.LogManager.GetCurrentClassLogger();
-
         public override string Name => "powershell";
 
         protected override IList<PowershellNotificationChannelDefinition> NotificationChannelDefinitions { get; }
@@ -36,8 +34,7 @@ namespace Lithnet.AccessManager.Server.Auditing
 
             powershell.AddCommand("Write-AuditLog")
                 .AddParameter("tokens", tokens)
-                .AddParameter("isSuccess", action.IsSuccess)
-                .AddParameter("logger", nlogger);
+                .AddParameter("isSuccess", action.IsSuccess);
 
             Task task = new Task(() =>
             {

@@ -138,8 +138,8 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 var rights = new List<SiAccess>
                 {
-                    new SiAccess(0x00000200, "Laps access", InheritFlags.SiAccessGeneral),
-                    new SiAccess(0x00000400, "Laps history", InheritFlags.SiAccessGeneral),
+                    new SiAccess(0x00000200, "Local admin password", InheritFlags.SiAccessGeneral),
+                    new SiAccess(0x00000400, "Local admin password history", InheritFlags.SiAccessGeneral),
                     new SiAccess(0x00000800, "Just-in-time access", InheritFlags.SiAccessGeneral),
                     new SiAccess(0, "None", 0)
                 };
