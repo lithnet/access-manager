@@ -117,7 +117,7 @@ namespace Lithnet.AccessManager.Web.Controllers
         {
             model.ShowReason = this.userInterfaceSettings.UserSuppliedReason != AuditReasonFieldState.Hidden;
             model.ReasonRequired = this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required;
-            model.RequestType = model.RequestType == 0 ? AccessMask.Laps : model.RequestType;
+            model.RequestType = model.RequestType == 0 ? AccessMask.LocalAdminPassword : model.RequestType;
 
             if (!this.ModelState.IsValid)
             {
@@ -205,11 +205,11 @@ namespace Lithnet.AccessManager.Web.Controllers
                 }
 
                 // Do actual work only if authorized.
-                if (authResponse.EvaluatedAccess == AccessMask.Laps)
+                if (authResponse.EvaluatedAccess == AccessMask.LocalAdminPassword)
                 {
                     return this.GetLapsPassword(model, user, computer, (LapsAuthorizationResponse)authResponse);
                 }
-                else if (authResponse.EvaluatedAccess == AccessMask.LapsHistory)
+                else if (authResponse.EvaluatedAccess == AccessMask.LocalAdminPasswordHistory)
                 {
                     return this.GetLapsPasswordHistory(model, user, computer, (LapsHistoryAuthorizationResponse)authResponse);
                 }
@@ -374,13 +374,13 @@ namespace Lithnet.AccessManager.Web.Controllers
 
                 model.AllowedRequestTypes = authResponse.EvaluatedAccess;
 
-                if (model.AllowedRequestTypes.HasFlag(AccessMask.Laps))
+                if (model.AllowedRequestTypes.HasFlag(AccessMask.LocalAdminPassword))
                 {
-                    model.RequestType = AccessMask.Laps;
+                    model.RequestType = AccessMask.LocalAdminPassword;
                 }
-                else if (model.AllowedRequestTypes.HasFlag(AccessMask.LapsHistory))
+                else if (model.AllowedRequestTypes.HasFlag(AccessMask.LocalAdminPasswordHistory))
                 {
-                    model.RequestType = AccessMask.LapsHistory;
+                    model.RequestType = AccessMask.LocalAdminPasswordHistory;
                 }
                 else
                 {

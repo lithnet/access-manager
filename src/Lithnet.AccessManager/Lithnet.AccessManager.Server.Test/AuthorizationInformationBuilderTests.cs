@@ -39,19 +39,19 @@ namespace Lithnet.AccessManager.Server.Test
             authorizationContextProvider = new AuthorizationContextProvider(Mock.Of<IOptions<AuthorizationOptions>>(), directory, Global.LogFactory.CreateLogger<AuthorizationContextProvider>());
         }
 
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.Laps, AccessMask.None, AccessMask.Laps)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.Laps, AccessMask.Laps, AccessMask.None)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.None, AccessMask.Laps, AccessMask.None)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.LapsHistory, AccessMask.None, AccessMask.LapsHistory)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.LapsHistory, AccessMask.LapsHistory, AccessMask.None)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.None, AccessMask.LapsHistory, AccessMask.None)]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.LocalAdminPassword, AccessMask.None, AccessMask.LocalAdminPassword)]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.LocalAdminPassword, AccessMask.LocalAdminPassword, AccessMask.None)]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.None, AccessMask.LocalAdminPassword, AccessMask.None)]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.LocalAdminPasswordHistory, AccessMask.None, AccessMask.LocalAdminPasswordHistory)]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.LocalAdminPasswordHistory, AccessMask.LocalAdminPasswordHistory, AccessMask.None)]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.None, AccessMask.LocalAdminPasswordHistory, AccessMask.None)]
         [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.Jit, AccessMask.None, AccessMask.Jit)]
         [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.Jit, AccessMask.Jit, AccessMask.None)]
         [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.None, AccessMask.Jit, AccessMask.None)]
         [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.None, AccessMask.None, AccessMask.None)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.Laps | AccessMask.LapsHistory | AccessMask.Jit, AccessMask.Jit, AccessMask.Laps | AccessMask.LapsHistory)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.Laps | AccessMask.LapsHistory | AccessMask.Jit, AccessMask.Laps, AccessMask.Jit | AccessMask.LapsHistory)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.Laps | AccessMask.LapsHistory | AccessMask.Jit, AccessMask.LapsHistory, AccessMask.Laps | AccessMask.Jit)]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory | AccessMask.Jit, AccessMask.Jit, AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory)]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory | AccessMask.Jit, AccessMask.LocalAdminPassword, AccessMask.Jit | AccessMask.LocalAdminPasswordHistory)]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory | AccessMask.Jit, AccessMask.LocalAdminPasswordHistory, AccessMask.LocalAdminPassword | AccessMask.Jit)]
         public void TestAclAuthorizationOnComputerTarget(string username, string computerName, AccessMask allowed, AccessMask denied, AccessMask expected)
         {
             IUser user = directory.GetUser(username);
@@ -65,9 +65,9 @@ namespace Lithnet.AccessManager.Server.Test
             Assert.AreEqual(expected, result.EffectiveAccess);
         }
 
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", "OU=Computers,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", AccessMask.Laps, AccessMask.None, AccessMask.Laps)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", "OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", AccessMask.Laps, AccessMask.None, AccessMask.Laps)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", "DC=IDMDEV1,DC=LOCAL", AccessMask.Laps, AccessMask.None, AccessMask.Laps)]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", "OU=Computers,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", AccessMask.LocalAdminPassword, AccessMask.None, AccessMask.LocalAdminPassword)]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", "OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", AccessMask.LocalAdminPassword, AccessMask.None, AccessMask.LocalAdminPassword)]
+        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", "DC=IDMDEV1,DC=LOCAL", AccessMask.LocalAdminPassword, AccessMask.None, AccessMask.LocalAdminPassword)]
         public void TestAclAuthorizationOnOUTarget(string username, string computerName, string targetOU, AccessMask allowed, AccessMask denied, AccessMask expected)
         {
             IUser user = directory.GetUser(username);
@@ -96,14 +96,14 @@ namespace Lithnet.AccessManager.Server.Test
 
             var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
 
-            var t1 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
-            var t2 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
-            var t3 = CreateTarget(AccessMask.Laps, AccessMask.None, $"{namingContext}", trustee);
-            var t4 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
-            var t5 = CreateTarget(AccessMask.Laps, AccessMask.None, computer1, trustee);
-            var t6 = CreateTarget(AccessMask.Laps, AccessMask.None, computer2, trustee);
-            var t7 = CreateTarget(AccessMask.Laps, AccessMask.None, group1, trustee);
-            var t8 = CreateTarget(AccessMask.Laps, AccessMask.None, group2, trustee);
+            var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t3 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t5 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer1, trustee);
+            var t6 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer2, trustee);
+            var t7 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, group1, trustee);
+            var t8 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, group2, trustee);
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
@@ -118,10 +118,10 @@ namespace Lithnet.AccessManager.Server.Test
             ISecurityPrincipal trustee = directory.GetPrincipal("IDMDEV1\\user1");
             IComputer computer1 = directory.GetComputer("IDMDEV1\\PC1");
 
-            var t1 = CreateTarget(AccessMask.Laps, AccessMask.None, "OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", trustee);
-            var t2 = CreateTarget(AccessMask.Laps, AccessMask.None, "DC=IDMDEV1,DC=LOCAL", trustee);
-            var t3 = CreateTarget(AccessMask.Laps, AccessMask.None, "OU=Computers,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", trustee);
-            var t4 = CreateTarget(AccessMask.Laps, AccessMask.None, "OU=JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", trustee);
+            var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, "OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", trustee);
+            var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, "DC=IDMDEV1,DC=LOCAL", trustee);
+            var t3 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, "OU=Computers,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", trustee);
+            var t4 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, "OU=JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", trustee);
 
             var options = SetupOptions(t1, t2, t3, t4);
 
@@ -154,7 +154,7 @@ namespace Lithnet.AccessManager.Server.Test
             var t2 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
             var t3 = CreateTarget(AccessMask.None, AccessMask.None, $"{namingContext}", trustee);
             var t4 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
-            var t5 = CreateTarget(AccessMask.Laps, AccessMask.None, computer1, trustee);
+            var t5 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer1, trustee);
             var t6 = CreateTarget(AccessMask.None, AccessMask.None, computer2, trustee);
             var t7 = CreateTarget(AccessMask.None, AccessMask.None, group1, trustee);
             var t8 = CreateTarget(AccessMask.None, AccessMask.None, group2, trustee);
@@ -164,7 +164,7 @@ namespace Lithnet.AccessManager.Server.Test
             builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
             var result = builder.GetAuthorizationInformation(requestor, computer1);
 
-            Assert.AreEqual(AccessMask.Laps, result.EffectiveAccess);
+            Assert.AreEqual(AccessMask.LocalAdminPassword, result.EffectiveAccess);
 
             CollectionAssert.AreEquivalent(new[] { t5 }, result.SuccessfulLapsTargets);
         }
@@ -195,7 +195,7 @@ namespace Lithnet.AccessManager.Server.Test
             var t4 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
             var t5 = CreateTarget(AccessMask.None, AccessMask.None, computer1, trustee);
             var t6 = CreateTarget(AccessMask.None, AccessMask.None, computer2, trustee);
-            var t7 = CreateTarget(AccessMask.Laps, AccessMask.None, group1, trustee);
+            var t7 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, group1, trustee);
             var t8 = CreateTarget(AccessMask.None, AccessMask.None, group2, trustee);
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
@@ -203,7 +203,7 @@ namespace Lithnet.AccessManager.Server.Test
             builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
             var result = builder.GetAuthorizationInformation(requestor, computer1);
 
-            Assert.AreEqual(AccessMask.Laps, result.EffectiveAccess);
+            Assert.AreEqual(AccessMask.LocalAdminPassword, result.EffectiveAccess);
 
             CollectionAssert.AreEquivalent(new[] { t7 }, result.SuccessfulLapsTargets);
         }
@@ -230,7 +230,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var t1 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
             var t2 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
-            var t3 = CreateTarget(AccessMask.Laps, AccessMask.None, $"{namingContext}", trustee);
+            var t3 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"{namingContext}", trustee);
             var t4 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
             var t5 = CreateTarget(AccessMask.None, AccessMask.None, computer1, trustee);
             var t6 = CreateTarget(AccessMask.None, AccessMask.None, computer2, trustee);
@@ -242,7 +242,7 @@ namespace Lithnet.AccessManager.Server.Test
             builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
             var result = builder.GetAuthorizationInformation(requestor, computer1);
 
-            Assert.AreEqual(AccessMask.Laps, result.EffectiveAccess);
+            Assert.AreEqual(AccessMask.LocalAdminPassword, result.EffectiveAccess);
 
             CollectionAssert.AreEquivalent(new[] { t3 }, result.SuccessfulLapsTargets);
         }
@@ -267,14 +267,14 @@ namespace Lithnet.AccessManager.Server.Test
 
             var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
 
-            var t1 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
-            var t2 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
-            var t3 = CreateTarget(AccessMask.Laps, AccessMask.None, $"{namingContext}", trustee);
-            var t4 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
-            var t5 = CreateTarget(AccessMask.None, AccessMask.Laps, computer1, trustee);
-            var t6 = CreateTarget(AccessMask.Laps, AccessMask.None, computer2, trustee);
-            var t7 = CreateTarget(AccessMask.Laps, AccessMask.None, group1, trustee);
-            var t8 = CreateTarget(AccessMask.Laps, AccessMask.None, group2, trustee);
+            var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t3 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t5 = CreateTarget(AccessMask.None, AccessMask.LocalAdminPassword, computer1, trustee);
+            var t6 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer2, trustee);
+            var t7 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, group1, trustee);
+            var t8 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, group2, trustee);
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
@@ -304,14 +304,14 @@ namespace Lithnet.AccessManager.Server.Test
 
             var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
 
-            var t1 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
-            var t2 = CreateTarget(AccessMask.Laps, AccessMask.Laps, $"OU=LAPS Testing,{namingContext}", trustee);
-            var t3 = CreateTarget(AccessMask.Laps, AccessMask.None, $"{namingContext}", trustee);
-            var t4 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
-            var t5 = CreateTarget(AccessMask.Laps, AccessMask.None, computer1, trustee);
-            var t6 = CreateTarget(AccessMask.Laps, AccessMask.None, computer2, trustee);
-            var t7 = CreateTarget(AccessMask.Laps, AccessMask.None, group1, trustee);
-            var t8 = CreateTarget(AccessMask.Laps, AccessMask.None, group2, trustee);
+            var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.LocalAdminPassword, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t3 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t5 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer1, trustee);
+            var t6 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer2, trustee);
+            var t7 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, group1, trustee);
+            var t8 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, group2, trustee);
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
@@ -341,14 +341,14 @@ namespace Lithnet.AccessManager.Server.Test
 
             var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
 
-            var t1 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
-            var t2 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
-            var t3 = CreateTarget(AccessMask.Laps, AccessMask.None, $"{namingContext}", trustee);
-            var t4 = CreateTarget(AccessMask.Laps, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
-            var t5 = CreateTarget(AccessMask.Laps, AccessMask.None, computer1, trustee);
-            var t6 = CreateTarget(AccessMask.Laps, AccessMask.None, computer2, trustee);
-            var t7 = CreateTarget(AccessMask.None, AccessMask.Laps, group1, trustee);
-            var t8 = CreateTarget(AccessMask.Laps, AccessMask.None, group2, trustee);
+            var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t3 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t5 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer1, trustee);
+            var t6 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer2, trustee);
+            var t7 = CreateTarget(AccessMask.None, AccessMask.LocalAdminPassword, group1, trustee);
+            var t8 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, group2, trustee);
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
@@ -372,14 +372,14 @@ namespace Lithnet.AccessManager.Server.Test
             ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
             IComputer computer = directory.GetComputer(computerName);
 
-            var t1 = CreateTarget(AccessMask.Laps, AccessMask.None, computer, trustee);
+            var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer, trustee);
 
             var options = SetupOptions(t1);
 
             builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
             var result = builder.GetAuthorizationInformation(requestor, computer);
             CollectionAssert.AreEquivalent(new[] { t1 }, result.SuccessfulLapsTargets);
-            Assert.AreEqual(AccessMask.Laps, result.EffectiveAccess);
+            Assert.AreEqual(AccessMask.LocalAdminPassword, result.EffectiveAccess);
         }
 
         // IDMDEV1\\user1 can access PCs in all domains via global groups in their home domain
@@ -432,7 +432,7 @@ namespace Lithnet.AccessManager.Server.Test
             ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
             IComputer computer = directory.GetComputer(computerName);
 
-            var t1 = CreateTarget(AccessMask.Laps, AccessMask.None, computer, trustee);
+            var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer, trustee);
 
             var options = SetupOptions(t1);
 
@@ -440,7 +440,7 @@ namespace Lithnet.AccessManager.Server.Test
             var result = builder.GetAuthorizationInformation(requestor, computer);
 
             CollectionAssert.AreEquivalent(new[] { t1 }, result.SuccessfulLapsTargets);
-            Assert.AreEqual(AccessMask.Laps, result.EffectiveAccess);
+            Assert.AreEqual(AccessMask.LocalAdminPassword, result.EffectiveAccess);
         }
 
 

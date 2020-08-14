@@ -122,7 +122,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string DisplayName => this.Type == TargetType.Container ? this.Target : $"{this.TryGetNameFromSid(this.Target)} ({this.Type})";
 
-        public bool ShowLapsOptions => this.IsModeScript || SdHasMask(this.SecurityDescriptor, AccessMask.Laps);
+        public bool ShowLapsOptions => this.IsModeScript || SdHasMask(this.SecurityDescriptor, AccessMask.LocalAdminPassword);
 
         public bool ShowJitOptions => this.IsModeScript || SdHasMask(this.SecurityDescriptor, AccessMask.Jit);
 

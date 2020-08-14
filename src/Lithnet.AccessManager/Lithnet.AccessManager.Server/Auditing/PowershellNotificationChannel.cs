@@ -33,7 +33,7 @@ namespace Lithnet.AccessManager.Server.Auditing
             PowerShell powershell = this.sessionProvider.GetSession(settings.Script, "Write-AuditLog");
 
             powershell.AddCommand("Write-AuditLog")
-                .AddParameter("tokens", tokens)
+                .AddParameter("tokens", new System.Collections.Hashtable(tokens, StringComparer.OrdinalIgnoreCase))
                 .AddParameter("isSuccess", action.IsSuccess);
 
             Task task = new Task(() =>

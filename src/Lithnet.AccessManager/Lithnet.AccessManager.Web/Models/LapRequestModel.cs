@@ -14,7 +14,7 @@ namespace Lithnet.AccessManager.Web.Models
         [MaxLength(4096, ErrorMessageResourceType = typeof(UIMessages), ErrorMessageResourceName = "ReasonTooLong")]
         public string UserRequestReason { get; set; }
 
-        public AccessMask RequestType { get; set; } = AccessMask.Laps;
+        public AccessMask RequestType { get; set; } = AccessMask.LocalAdminPassword;
 
         public bool RequestLapsHistory { get; set; }
 

@@ -50,8 +50,8 @@ namespace Lithnet.AccessManager.Server.Extensions
             }
 
             if (requestedAccess == AccessMask.Jit ||
-                requestedAccess == AccessMask.Laps ||
-                requestedAccess == AccessMask.LapsHistory)
+                requestedAccess == AccessMask.LocalAdminPassword ||
+                requestedAccess == AccessMask.LocalAdminPasswordHistory)
             {
                 return;
             }

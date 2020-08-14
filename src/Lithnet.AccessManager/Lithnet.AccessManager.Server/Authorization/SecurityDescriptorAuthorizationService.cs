@@ -41,11 +41,11 @@ namespace Lithnet.AccessManager.Server.Authorization
 
                 IList<SecurityDescriptorTarget> successTargets;
 
-                if (requestedAccess.HasFlag(AccessMask.Laps))
+                if (requestedAccess.HasFlag(AccessMask.LocalAdminPassword))
                 {
                     successTargets = info.SuccessfulLapsTargets;
                 }
-                else if (requestedAccess.HasFlag(AccessMask.LapsHistory))
+                else if (requestedAccess.HasFlag(AccessMask.LocalAdminPasswordHistory))
                 {
                     successTargets = info.SuccessfulLapsHistoryTargets;
                 }
@@ -123,7 +123,7 @@ namespace Lithnet.AccessManager.Server.Authorization
         {
             AuthorizationResponse response;
 
-            if (requestedAccess == AccessMask.Laps)
+            if (requestedAccess == AccessMask.LocalAdminPassword)
             {
                 response = new LapsAuthorizationResponse()
                 {
@@ -131,7 +131,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                     RetrievalLocation = matchedTarget.Laps.RetrievalLocation
                 };
             }
-            else if (requestedAccess == AccessMask.LapsHistory)
+            else if (requestedAccess == AccessMask.LocalAdminPasswordHistory)
             {
                 response = new LapsHistoryAuthorizationResponse();
             }

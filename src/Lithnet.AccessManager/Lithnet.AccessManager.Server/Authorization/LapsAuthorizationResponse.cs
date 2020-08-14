@@ -12,6 +12,6 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         public PasswordStorageLocation RetrievalLocation { get; set; }
 
-        public override AccessMask EvaluatedAccess => AccessMask.Laps;
+        public override AccessMask EvaluatedAccess => AccessMask.LocalAdminPassword;
     }
 }

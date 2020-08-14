@@ -58,7 +58,7 @@ namespace Lithnet.AccessManager.Server.Authorization
         {
             mask.ValidateAccessMask();
 
-            if (mask == AccessMask.Laps)
+            if (mask == AccessMask.LocalAdminPassword)
             {
                 return new LapsAuthorizationResponse();
             }
@@ -68,7 +68,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                 return new JitAuthorizationResponse();
             }
 
-            if (mask == AccessMask.LapsHistory)
+            if (mask == AccessMask.LocalAdminPasswordHistory)
             {
                 return new LapsHistoryAuthorizationResponse();
             }

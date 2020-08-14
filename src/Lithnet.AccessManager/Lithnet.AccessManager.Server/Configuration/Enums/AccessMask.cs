@@ -11,11 +11,11 @@ namespace Lithnet.AccessManager.Server.Configuration
     {
         None = 0,
 
-        [Description("Active local admin password")]
-        Laps = 0x200,
+        [Description("Local admin password")]
+        LocalAdminPassword = 0x200,
 
-        [Description("Previous local admin passwords")]
-        LapsHistory = 0x400,
+        [Description("Local admin password history")]
+        LocalAdminPasswordHistory = 0x400,
 
         [Description("Just-in-time access")]
         Jit = 0x800,

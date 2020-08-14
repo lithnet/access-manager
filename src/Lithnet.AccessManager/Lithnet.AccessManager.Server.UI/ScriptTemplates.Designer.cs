@@ -82,17 +82,23 @@ namespace Lithnet.AccessManager.Server.UI {
         
         /// <summary>
         ///   Looks up a localized string similar to function Write-AuditLog{
-        ///	param(
-        ///	[hashtable]$tokens,
-        ///	[bool]$isSuccess
+        ///    param(
+        ///    [hashtable]$tokens,
+        ///    [bool]$isSuccess
         ///)
+        ///    Write-Information &quot;We&apos;re in PowerShell for auditing!&quot;;
         ///
-        ///	Write-Information &quot;We&apos;re in PowerShell for auditing!&quot;
+        ///    $user = $tokens[&quot;{user.MsDsPrincipalName}&quot;]
+        ///    $computer = $tokens[&quot;{computer.msdsprincipalname}&quot;]
+        ///    $result = $tokens[&quot;{AuthzResult.ResponseCode}&quot;]
+        ///    $accessType = $tokens[&quot;{AuthzResult.AccessType}&quot;]
         ///
-        ///	$tokens.Keys | % {
-        ///		Write-Information &quot;$($_):$($tokens.Item($_))&quot;;
-        ///		};
-        ///}.
+        ///    if ($isSuccess)
+        ///    {
+        ///        Write-Information &quot;User $user successfully requested $accessType access to $computer&quot;;
+        ///    }
+        ///    else
+        ///    { [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AuditScriptTemplate {
             get {
@@ -110,10 +116,10 @@ namespace Lithnet.AccessManager.Server.UI {
         ///	# See https://github.com/lithnet/access-manager/wiki/Authorization-Scripts for help
         ///
         ///	Write-Information  &quot;We&apos;re in PowerShell!&quot;
-        ///	Write-Information &quot;Checking if $($user.MsDsPrincipalName) is allowed administrative access to $($computer.MsDsPrincipalName)&quot;
+        ///	Write-Information &quot;Checking if $($user.MsDsPrincipalName) is allowed access to $($computer.MsDsPrincipalName)&quot;
         ///
         ///	# Create an object to hold our authorization decisions
-        ///	# Set IsAllowed to true to allow access, or set IsDenied to explicitly deny access, or leave both as false if no decisio [rest of string was truncated]&quot;;.
+        ///	# Set IsAllowed to true to allow access, or set IsDenied to explicitly deny access, or leave both as false if no decision was made. Thi [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AuthorizationScriptTemplate {
             get {

@@ -40,8 +40,8 @@ namespace Lithnet.AccessManager.Server.Test
 
             using AuthorizationContext context = new AuthorizationContext(user.Sid);
             Assert.IsTrue(context.AccessCheck(sd, (int)AccessMask.Jit));
-            Assert.IsTrue(context.AccessCheck(sd, (int)AccessMask.Laps));
-            Assert.IsFalse(context.AccessCheck(sd, (int)AccessMask.LapsHistory));
+            Assert.IsTrue(context.AccessCheck(sd, (int)AccessMask.LocalAdminPassword));
+            Assert.IsFalse(context.AccessCheck(sd, (int)AccessMask.LocalAdminPasswordHistory));
         }
 
         [Test]
@@ -53,16 +53,16 @@ namespace Lithnet.AccessManager.Server.Test
 
             using AuthorizationContext context = new AuthorizationContext(user.Sid);
             Assert.IsFalse(context.AccessCheck(sd, (int)AccessMask.Jit));
-            Assert.IsFalse(context.AccessCheck(sd, (int)AccessMask.Laps));
-            Assert.IsTrue(context.AccessCheck(sd, (int)AccessMask.LapsHistory));
+            Assert.IsFalse(context.AccessCheck(sd, (int)AccessMask.LocalAdminPassword));
+            Assert.IsTrue(context.AccessCheck(sd, (int)AccessMask.LocalAdminPasswordHistory));
         }
 
-        [TestCase(AccessMask.Laps | AccessMask.LapsHistory | AccessMask.Jit, AccessMask.None)]
-        [TestCase(AccessMask.Laps | AccessMask.LapsHistory | AccessMask.Jit, AccessMask.Laps)]
-        [TestCase(AccessMask.None, AccessMask.Laps)]
-        [TestCase(AccessMask.Laps | AccessMask.LapsHistory | AccessMask.Jit, AccessMask.LapsHistory)]
-        [TestCase(AccessMask.None, AccessMask.LapsHistory)]
-        [TestCase(AccessMask.Laps | AccessMask.LapsHistory | AccessMask.Jit, AccessMask.Jit)]
+        [TestCase(AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory | AccessMask.Jit, AccessMask.None)]
+        [TestCase(AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory | AccessMask.Jit, AccessMask.LocalAdminPassword)]
+        [TestCase(AccessMask.None, AccessMask.LocalAdminPassword)]
+        [TestCase(AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory | AccessMask.Jit, AccessMask.LocalAdminPasswordHistory)]
+        [TestCase(AccessMask.None, AccessMask.LocalAdminPasswordHistory)]
+        [TestCase(AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory | AccessMask.Jit, AccessMask.Jit)]
         [TestCase(AccessMask.None, AccessMask.Jit)]
         [TestCase(AccessMask.None, AccessMask.None)]
         public void TestSd(AccessMask allowedAccess, AccessMask deniedAccess)
@@ -75,17 +75,17 @@ namespace Lithnet.AccessManager.Server.Test
             using AuthorizationContext context = new AuthorizationContext(user);
 
             Assert.AreEqual(response.IsJitAllowed && !response.IsJitDenied, context.AccessCheck(sd, (int)AccessMask.Jit));
-            Assert.AreEqual(response.IsLocalAdminPasswordAllowed && !response.IsLocalAdminPasswordDenied, context.AccessCheck(sd, (int)AccessMask.Laps));
-            Assert.AreEqual(response.IsLocalAdminPasswordHistoryAllowed && !response.IsLocalAdminPasswordHistoryDenied, context.AccessCheck(sd, (int)AccessMask.LapsHistory));
+            Assert.AreEqual(response.IsLocalAdminPasswordAllowed && !response.IsLocalAdminPasswordDenied, context.AccessCheck(sd, (int)AccessMask.LocalAdminPassword));
+            Assert.AreEqual(response.IsLocalAdminPasswordHistoryAllowed && !response.IsLocalAdminPasswordHistoryDenied, context.AccessCheck(sd, (int)AccessMask.LocalAdminPasswordHistory));
         }
 
-        [TestCase(AccessMask.Laps, AccessMask.None, true)]
+        [TestCase(AccessMask.LocalAdminPassword, AccessMask.None, true)]
         [TestCase(AccessMask.Jit, AccessMask.None, false)]
-        [TestCase(AccessMask.LapsHistory, AccessMask.None, false)]
-        [TestCase(AccessMask.Laps, AccessMask.Laps, false)]
-        [TestCase(AccessMask.Laps, AccessMask.LapsHistory, true)]
-        [TestCase(AccessMask.Laps, AccessMask.Jit, true)]
-        [TestCase(AccessMask.None, AccessMask.Laps, false)]
+        [TestCase(AccessMask.LocalAdminPasswordHistory, AccessMask.None, false)]
+        [TestCase(AccessMask.LocalAdminPassword, AccessMask.LocalAdminPassword, false)]
+        [TestCase(AccessMask.LocalAdminPassword, AccessMask.LocalAdminPasswordHistory, true)]
+        [TestCase(AccessMask.LocalAdminPassword, AccessMask.Jit, true)]
+        [TestCase(AccessMask.None, AccessMask.LocalAdminPassword, false)]
         [TestCase(AccessMask.None, AccessMask.None, false)]
         public void TestLapsSecurityDescriptor(AccessMask allowedAccess, AccessMask deniedAccess, bool expectedResult)
         {
@@ -96,16 +96,16 @@ namespace Lithnet.AccessManager.Server.Test
 
             using AuthorizationContext context = new AuthorizationContext(user);
 
-            Assert.AreEqual(expectedResult, context.AccessCheck(sd, (int)AccessMask.Laps));
+            Assert.AreEqual(expectedResult, context.AccessCheck(sd, (int)AccessMask.LocalAdminPassword));
         }
 
-        [TestCase(AccessMask.LapsHistory, AccessMask.None, true)]
+        [TestCase(AccessMask.LocalAdminPasswordHistory, AccessMask.None, true)]
         [TestCase(AccessMask.Jit, AccessMask.None, false)]
-        [TestCase(AccessMask.Laps, AccessMask.None, false)]
-        [TestCase(AccessMask.LapsHistory, AccessMask.LapsHistory, false)]
-        [TestCase(AccessMask.LapsHistory, AccessMask.Laps, true)]
-        [TestCase(AccessMask.LapsHistory, AccessMask.Jit, true)]
-        [TestCase(AccessMask.None, AccessMask.LapsHistory, false)]
+        [TestCase(AccessMask.LocalAdminPassword, AccessMask.None, false)]
+        [TestCase(AccessMask.LocalAdminPasswordHistory, AccessMask.LocalAdminPasswordHistory, false)]
+        [TestCase(AccessMask.LocalAdminPasswordHistory, AccessMask.LocalAdminPassword, true)]
+        [TestCase(AccessMask.LocalAdminPasswordHistory, AccessMask.Jit, true)]
+        [TestCase(AccessMask.None, AccessMask.LocalAdminPasswordHistory, false)]
         [TestCase(AccessMask.None, AccessMask.None, false)]
         public void TestLapsHistorySecurityDescriptor(AccessMask allowedAccess, AccessMask deniedAccess, bool expectedResult)
         {
@@ -116,15 +116,15 @@ namespace Lithnet.AccessManager.Server.Test
 
             using AuthorizationContext context = new AuthorizationContext(user);
 
-            Assert.AreEqual(expectedResult, context.AccessCheck(sd, (int)AccessMask.LapsHistory));
+            Assert.AreEqual(expectedResult, context.AccessCheck(sd, (int)AccessMask.LocalAdminPasswordHistory));
         }
 
         [TestCase(AccessMask.Jit, AccessMask.None, true)]
-        [TestCase(AccessMask.LapsHistory, AccessMask.None, false)]
-        [TestCase(AccessMask.Laps, AccessMask.None, false)]
+        [TestCase(AccessMask.LocalAdminPasswordHistory, AccessMask.None, false)]
+        [TestCase(AccessMask.LocalAdminPassword, AccessMask.None, false)]
         [TestCase(AccessMask.Jit, AccessMask.Jit, false)]
-        [TestCase(AccessMask.Jit, AccessMask.Laps, true)]
-        [TestCase(AccessMask.Jit, AccessMask.LapsHistory, true)]
+        [TestCase(AccessMask.Jit, AccessMask.LocalAdminPassword, true)]
+        [TestCase(AccessMask.Jit, AccessMask.LocalAdminPasswordHistory, true)]
         [TestCase(AccessMask.None, AccessMask.Jit, false)]
         [TestCase(AccessMask.None, AccessMask.None, false)]
         public void TestJitSecurityDescriptor(AccessMask allowedAccess, AccessMask deniedAccess, bool expectedResult)
@@ -144,11 +144,11 @@ namespace Lithnet.AccessManager.Server.Test
         {
             PowerShellAuthorizationResponse response = new PowerShellAuthorizationResponse
             {
-                IsLocalAdminPasswordAllowed = allowedAccessMask.HasFlag(AccessMask.Laps),
-                IsLocalAdminPasswordHistoryAllowed = allowedAccessMask.HasFlag(AccessMask.LapsHistory),
+                IsLocalAdminPasswordAllowed = allowedAccessMask.HasFlag(AccessMask.LocalAdminPassword),
+                IsLocalAdminPasswordHistoryAllowed = allowedAccessMask.HasFlag(AccessMask.LocalAdminPasswordHistory),
                 IsJitAllowed = allowedAccessMask.HasFlag(AccessMask.Jit),
-                IsLocalAdminPasswordDenied = deniedAccessMask.HasFlag(AccessMask.Laps),
-                IsLocalAdminPasswordHistoryDenied = deniedAccessMask.HasFlag(AccessMask.LapsHistory),
+                IsLocalAdminPasswordDenied = deniedAccessMask.HasFlag(AccessMask.LocalAdminPassword),
+                IsLocalAdminPasswordHistoryDenied = deniedAccessMask.HasFlag(AccessMask.LocalAdminPasswordHistory),
                 IsJitDenied = deniedAccessMask.HasFlag(AccessMask.Jit)
             };
 

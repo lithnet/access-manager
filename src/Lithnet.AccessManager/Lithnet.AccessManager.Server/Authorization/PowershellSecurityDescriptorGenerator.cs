@@ -36,12 +36,12 @@ namespace Lithnet.AccessManager.Server.Authorization
 
             if (result.IsLocalAdminPasswordAllowed)
             {
-                allowedAccess |= AccessMask.Laps;
+                allowedAccess |= AccessMask.LocalAdminPassword;
             }
 
             if (result.IsLocalAdminPasswordHistoryAllowed)
             {
-                allowedAccess |= AccessMask.LapsHistory;
+                allowedAccess |= AccessMask.LocalAdminPasswordHistory;
             }
 
             if (result.IsJitAllowed)
@@ -51,12 +51,12 @@ namespace Lithnet.AccessManager.Server.Authorization
 
             if (result.IsLocalAdminPasswordDenied)
             {
-                deniedAccess |= AccessMask.Laps;
+                deniedAccess |= AccessMask.LocalAdminPassword;
             }
 
             if (result.IsLocalAdminPasswordHistoryDenied)
             {
-                deniedAccess |= AccessMask.LapsHistory;
+                deniedAccess |= AccessMask.LocalAdminPasswordHistory;
             }
 
             if (result.IsJitDenied)

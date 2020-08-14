@@ -20,7 +20,7 @@
             <section>
                 <label class="title">Please select the type of access you require</label>
                 <div class="form-check">
-                    @if (Model.AllowedRequestTypes.HasFlag(AccessMask.Laps))
+                    @if (Model.AllowedRequestTypes.HasFlag(AccessMask.LocalAdminPassword))
                     {
                         @Html.RadioButtonFor(m => m.RequestType, "Laps", new { @class = "form-check-input", @id = "lapscheck" })
                         <label class="form-check-label" for="lapscheck">Current local admin password</label>
@@ -28,7 +28,7 @@
                     }
                 </div>
                 <div class="form-check">
-                    @if (Model.AllowedRequestTypes.HasFlag(AccessMask.LapsHistory))
+                    @if (Model.AllowedRequestTypes.HasFlag(AccessMask.LocalAdminPasswordHistory))
                     {
                         @Html.RadioButtonFor(m => m.RequestType, "LapsHistory", new { @class = "form-check-input", @id = "lapshistorycheck" })
                         <label class="form-check-label" for="lapshistorycheck">Previous local admin passwords</label>

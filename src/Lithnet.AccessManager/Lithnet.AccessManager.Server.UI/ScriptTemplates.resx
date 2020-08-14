@@ -143,16 +143,25 @@ $de.CommitChanges()</value>
   </data>
   <data name="AuditScriptTemplate" xml:space="preserve">
     <value>function Write-AuditLog{
-	param(
-	[hashtable]$tokens,
-	[bool]$isSuccess
+    param(
+    [hashtable]$tokens,
+    [bool]$isSuccess
 )
+    Write-Information "We're in PowerShell for auditing!";
 
-	Write-Information "We're in PowerShell for auditing!"
+    $user = $tokens["{user.MsDsPrincipalName}"]
+    $computer = $tokens["{computer.msdsprincipalname}"]
+    $result = $tokens["{AuthzResult.ResponseCode}"]
+    $accessType = $tokens["{AuthzResult.AccessType}"]
 
-	$tokens.Keys | % {
-		Write-Information "$($_):$($tokens.Item($_))";
-		};
+    if ($isSuccess)
+    {
+        Write-Information "User $user successfully requested $accessType access to $computer";
+    }
+    else
+    {
+        Write-Information "User $user was denied $accessType access to $computer with response code $result";
+    }
 }</value>
   </data>
   <data name="AuthorizationScriptTemplate" xml:space="preserve">
@@ -165,7 +174,7 @@ $de.CommitChanges()</value>
 	# See https://github.com/lithnet/access-manager/wiki/Authorization-Scripts for help
 
 	Write-Information  "We're in PowerShell!"
-	Write-Information "Checking if $($user.MsDsPrincipalName) is allowed administrative access to $($computer.MsDsPrincipalName)"
+	Write-Information "Checking if $($user.MsDsPrincipalName) is allowed access to $($computer.MsDsPrincipalName)"
 
 	# Create an object to hold our authorization decisions
 	# Set IsAllowed to true to allow access, or set IsDenied to explicitly deny access, or leave both as false if no decision was made. This will allow other rules to be evaluated.

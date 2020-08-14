@@ -128,13 +128,13 @@ namespace Lithnet.AccessManager.Server.Authorization
 
                 int i = matchedTargetCount;
 
-                if (c.AccessCheck(sd, (int)AccessMask.Laps))
+                if (c.AccessCheck(sd, (int)AccessMask.LocalAdminPassword))
                 {
                     info.SuccessfulLapsTargets.Add(target);
                     matchedTargetCount++;
                 }
 
-                if (c.AccessCheck(sd, (int)AccessMask.LapsHistory))
+                if (c.AccessCheck(sd, (int)AccessMask.LocalAdminPasswordHistory))
                 {
                     info.SuccessfulLapsHistoryTargets.Add(target);
                     matchedTargetCount++;
@@ -159,9 +159,9 @@ namespace Lithnet.AccessManager.Server.Authorization
 
                 this.logger.LogTrace($"Resultant security descriptor for computer {computer.MsDsPrincipalName}: {info.SecurityDescriptor.GetSddlForm(AccessControlSections.All)}");
 
-                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.Laps) ? AccessMask.Laps : 0;
+                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.LocalAdminPassword) ? AccessMask.LocalAdminPassword : 0;
                 info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.Jit) ? AccessMask.Jit : 0;
-                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.LapsHistory) ? AccessMask.LapsHistory : 0;
+                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.LocalAdminPasswordHistory) ? AccessMask.LocalAdminPasswordHistory : 0;
             }
 
             this.logger.LogTrace($"User {user.MsDsPrincipalName} has effective access of {info.EffectiveAccess} on computer {computer.MsDsPrincipalName}");
