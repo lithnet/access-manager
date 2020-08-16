@@ -15,10 +15,10 @@
     height: 1.2rem;
 }
 
-clipboard-copy-button {
+.clipboard-copy-button {
 }
 
-speech-button {
+.speech-button {
 }
 
 @font-face {
@@ -120,11 +120,11 @@ body {
 }
 
 .form-content-header {
-    padding: 1rem 2rem 1rem 1rem;
+/*    padding: 1rem 2rem 1rem 1rem;*/
     font-size: 2rem;
     font-weight: 200;
     color: #555;
-    background-color: rgba(248,248,248,.9);
+   /* background-color: rgba(248,248,248,.9);*/
     position: relative;
     margin-bottom: 1rem;
     border-top-right-radius: 0.75rem;
@@ -168,7 +168,7 @@ body {
         font-size: 1.5rem;
         font-weight: 300;
         color: #242424;
-        padding: 15px 13px;
+/*        padding: 15px 13px;*/
         margin: 0;
         border-bottom-width: 1px;
         border-bottom-style: solid;
