@@ -2,7 +2,7 @@
 SETLOCAL
 SET solutiondir=D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager
 SET outputdir=%solutiondir%\Lithnet.AccessManager.Service.Setup\output
-SET serviceProject=%solutiondir%\Lithnet.AccessManager.Web\Lithnet.AccessManager.Web.csproj
+SET serviceProject=%solutiondir%\Lithnet.AccessManager.Service\Lithnet.AccessManager.Service.csproj
 SET uiProject=%solutiondir%\Lithnet.AccessManager.Server.UI\Lithnet.AccessManager.Server.UI.csproj
 SET setupProject=%solutiondir%\Lithnet.AccessManager.Service.Setup\Lithnet.AccessManager.Service.Setup.aip
 

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager.Web", "Lithnet.AccessManager.Web\Lithnet.AccessManager.Web.csproj", "{A7BADC85-D43B-498C-B55B-C0231644AC88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager.Service", "Lithnet.AccessManager.Service\Lithnet.AccessManager.Service.csproj", "{A7BADC85-D43B-498C-B55B-C0231644AC88}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5436F418-3FBB-4453-84C6-1CF0B98B8AA5}"
 	ProjectSection(SolutionItems) = preProject
@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build-service.bat = build-service.bat
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager.Test", "Lithnet.AccessManager.Web.Test\Lithnet.AccessManager.Test.csproj", "{A0AD7464-968B-416F-A2F2-0C42778A5A32}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager.Test", "Lithnet.AccessManager.Test\Lithnet.AccessManager.Test.csproj", "{A0AD7464-968B-416F-A2F2-0C42778A5A32}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager.Agent", "Lithnet.AccessManager.Agent\Lithnet.AccessManager.Agent.csproj", "{95B23EE9-2C33-4F83-993A-317E3EE92B6A}"
 EndProject
