@@ -9,10 +9,10 @@
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="ARPPRODUCTICON" Value="accessmanager.exe" Type="8"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
-    <ROW Property="ProductCode" Value="1033:{B7C5D5BB-8290-43ED-81FA-E1B0B76527A3} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{73349E06-875C-4F14-88D8-6CEF64B27DAC} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Agent"/>
-    <ROW Property="ProductVersion" Value="1.0.7530.11752" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7533.61387" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
     <ROW Property="SETUPEXEDIR" Value="1"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{EEDECF4C-BABB-4AE0-9CB9-DC051FF1AE75}"/>
@@ -172,12 +172,12 @@
     <ROW Action="AI_DetectSoftware" Sequence="151"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildKey="MSIOnlyBuild_1_2" BuildName="Net472Msi" BuildOrder="1" BuildType="1" PackageFolder="output" PackageFileName="Lithnet Access Manager Agent Setup-x64" Languages="en" InstallationType="4" UseLargeSchema="true" MsiPackageType="x64"/>
+    <ROW BuildKey="MSIOnlyBuild_1_2" BuildName="Net472Msi" BuildOrder="1" BuildType="1" PackageFolder="packages" PackageFileName="Lithnet Access Manager Agent Setup-x64" Languages="en" InstallationType="4" UseLargeSchema="true" MsiPackageType="x64"/>
     <ATTRIBUTE name="CompConditionPolicy" value="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildEventsComponent">
-    <ROW EventId="1" EventRun="cmd.exe" EventCmdLine="/c rd /s /q &quot;D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager\Lithnet.AccessManager.Agent\bin\publish&quot;" EventDescription="Cleaing publish folder" OutputRedirect="D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager\Lithnet.AccessManager.Agent.Setup\output\clean.log" EventOrder="1" EventType="1" EventInterupt="true" EventEnabled="true" EventPrecompression="false" RollbackEvent="false" EventBuild="MSIOnlyBuild_1_2"/>
-    <ROW EventId="3" EventRun="dotnet" EventCmdLine="publish --runtime win-x64 --output &quot;D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager\Lithnet.AccessManager.Agent\bin\publish&quot;" EventWkDir="D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager\Lithnet.AccessManager.Agent" OutputRedirect="D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager\Lithnet.AccessManager.Agent.Setup\output\build.log" EventOrder="2" EventType="1" EventInterupt="true" EventEnabled="true" EventPrecompression="false" RollbackEvent="false" EventBuild="MSIOnlyBuild_1_2"/>
+    <ROW EventId="1" EventRun="cmd.exe" EventCmdLine="/c rd /s /q &quot;D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager\Lithnet.AccessManager.Agent\bin\publish&quot;" EventDescription="Cleaing publish folder" OutputRedirect="D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager\Lithnet.AccessManager.Agent.Setup\output\clean.log" EventOrder="1" EventType="1" EventInterupt="true" EventEnabled="false" EventPrecompression="false" RollbackEvent="false" EventBuild="MSIOnlyBuild_1_2"/>
+    <ROW EventId="3" EventRun="dotnet" EventCmdLine="publish --runtime win-x64 --output &quot;D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager\Lithnet.AccessManager.Agent\bin\publish&quot;" EventWkDir="D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager\Lithnet.AccessManager.Agent" OutputRedirect="D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager\Lithnet.AccessManager.Agent.Setup\output\build.log" EventOrder="2" EventType="1" EventInterupt="true" EventEnabled="false" EventPrecompression="false" RollbackEvent="false" EventBuild="MSIOnlyBuild_1_2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
     <ROW Path="&lt;AI_DICTS&gt;ui.ail"/>
