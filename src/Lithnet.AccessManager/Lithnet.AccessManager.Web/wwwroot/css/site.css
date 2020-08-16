@@ -1,21 +1,57 @@
-﻿@font-face {
+﻿.loading {
+    opacity: .5;
+}
+
+    .loading span {
+        display: none;
+    }
+
+.wait-content {
+    display: none;
+}
+
+.app-spinner {
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+clipboard-copy-button {
+}
+
+speech-button {
+}
+
+@font-face {
     font-family: Inconsolata;
     src: url('/fonts/Inconsolata-Regular.ttf');
 }
 
-.bg-primary, .btn-primary {
+.bg-primary {
     background-color: rgb(29,168,224);
 }
 
-.btn-primary {
+.btn-primary, .btn-primary:disabled {
+    background-color: rgb(29,168,224);
     border-color: rgb(29,168,224);
 }
+
+    .btn-primary:disabled:hover {
+        background-color: rgb(29,168,224);
+        border-color: rgb(29,168,224);
+    }
 
     .btn-primary:hover {
         background-color: rgb(27, 152, 202);
         border-color: rgb(29,168,224);
     }
-    
+
+.btn-image {
+    margin: 5px;
+    padding: 2px;
+    height: 35px;
+    width: 35px;
+}
+
 html {
     font-size: 10pt;
 }
@@ -23,14 +59,6 @@ html {
 body {
     color: #666;
     /*font-family: "Open Sans",Arial,Helvetica,sans-serif;*/
-}
-
-.clipboard-copy-button {
-
-}
-
-.speech-button {
-
 }
 
 #page-container {
@@ -42,8 +70,6 @@ body {
 .app-header {
     background: rgb(255,255,255);
     background: linear-gradient(180deg, rgba(255,255,255,1) 0%, #f8f9fa 100%);
-    display: flex;
-    flex-direction: row;
     font-size: 18px;
     font-weight: 300;
     color: #242424;
@@ -52,6 +78,7 @@ body {
     position: relative;
     border-bottom: 1px solid silver;
     order: 0;
+    text-align: center;
 }
 
 .navbar {
@@ -70,7 +97,7 @@ body {
 }
 
 .app-logo {
-    max-height: 100px;
+    max-height: 75px;
     padding: 0 1.5rem 0 1.5rem;
 }
 
@@ -80,6 +107,7 @@ body {
 }
 
 .content {
+    min-width: 50%;
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
@@ -91,18 +119,49 @@ body {
     padding: 1rem 2rem 1rem 1rem;
 }
 
+.form-content-header {
+    padding: 1rem 2rem 1rem 1rem;
+    font-size: 2rem;
+    font-weight: 200;
+    color: #555;
+    background-color: rgba(248,248,248,.9);
+    position: relative;
+    margin-bottom: 1rem;
+    border-top-right-radius: 0.75rem;
+    border-top-left-radius: 0.75rem;
+}
+
+.form-content-subheader {
+    font-size: 1.3rem;
+    font-weight: 300;
+    color: #555;
+    background-color: rgba(248,248,248,.5);
+    border-bottom: 1px solid silver;
+    position: relative;
+    padding: 1rem 0;
+    margin-bottom: 1rem;
+}
+
+.computer-name {
+    font-weight: bold;
+}
+
 .form-content {
     flex: 1;
-    padding-right: 1rem;
 }
 
 .form-container {
     position: relative;
     border: 1px solid silver;
-    border-radius: 1rem;
-    padding: 1rem 1rem;
     display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    border-radius: 1rem;
 }
+
+    .form-container form {
+        width: 100%;
+    }
 
     .form-container header {
         display: block;
@@ -116,6 +175,10 @@ body {
         border-bottom-color: rgba(0,0,0,.1);
         background: rgba(248,248,248,.9);
         position: relative;
+    }
+
+    .form-container .subtitle {
+        font-weight: bold;
     }
 
     .form-container fieldset {
@@ -222,18 +285,20 @@ body {
         }
 
     .form-container footer {
-        display: flex;
-        flex-direction: column;
         margin: 0;
         padding-top: 1rem;
     }
 
         .form-container footer .btn-primary {
-            align-self: flex-end;
+            float: right;
+            margin-left: 1.5rem;
+            max-width: 50%;
         }
 
         .form-container footer .btn-secondary, .form-container footer .btn-outline-secondary {
-            align-self: flex-start;
+            float: left;
+            margin-right: 1.5rem;
+            max-width: 50%;
         }
 
     .form-container .error {
@@ -241,6 +306,52 @@ body {
         text-align: center;
         display: block;
     }
+
+.card-footer button {
+    margin: 3px;
+}
+
+#history-panel .card-header {
+    display: flex;
+    flex-direction: row;
+    font-size: 1rem;
+    vertical-align: middle;
+}
+
+.password-history-summary {
+    padding: 0.5rem;
+}
+
+.password-history-counter {
+    margin-right: 1rem;
+}
+
+.password-history-emph {
+    font-weight: bold;
+}
+
+.password-details-title {
+    font-size: 1.1rem;
+}
+
+.password-content {
+    margin-bottom: 1rem;
+    font-size: 2rem;
+    font-family: Inconsolata, Consolas, Courier New, Courier, monospace;
+    font-weight: bold;
+}
+
+.password-details-footer {
+    text-align: right;
+    background-color: #fcfcfc;
+}
+
+.phonetic-items {
+    font-family: Inconsolata, Consolas, Courier New, Courier, monospace;
+}
+
+.phonetic-item {
+}
 
 .resultsText {
     border-color: #f0f0f0;
@@ -259,14 +370,16 @@ body {
 
 .input-group {
     width: 100%;
-    display: table;
+    display: flex;
+    flex-direction: row;
 }
 
 .input-group-append {
     width: 1%;
     vertical-align: middle;
-    display: table-cell;
+    display: flex;
     height: 32px;
+    flex-direction: row;
 }
 
     .input-group-append button {
@@ -315,7 +428,7 @@ body {
 @media (max-width: 600px) {
 
     html {
-        font-size: 12pt;
+        font-size: 9pt;
     }
 
     .app-header {
@@ -342,7 +455,7 @@ body {
 @media (max-device-width: 480px) {
 
     html {
-        font-size: 10pt;
+        font-size: 8pt;
     }
 
     .app-logo {
@@ -369,10 +482,6 @@ body {
     .content {
         margin-top: 0;
     }
-}
-
-.logout-link {
-    color: #777;
 }
 
 .hidden {

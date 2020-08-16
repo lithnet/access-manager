@@ -9,7 +9,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>@uiSettings.Value.Title</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
@@ -19,27 +19,6 @@
 
 <body>
     <div id="page-container">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <span class="navbar-brand">Admin Access Service</span>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="#">New Request</a>
-                    </li>
-                    @if (authSettings.CanLogout && User.Identity.IsAuthenticated)
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" href="@Url.Action("Logout", "Home")">Logout</a>
-                        </li>
-                    }
-                </ul>
-            </div>
-        </nav>
-
         <h1 class="app-header">
             <img class="app-logo" alt="Lithnet Access Manager" src="/images/logo.png">
         </h1>
@@ -50,6 +29,7 @@
     </div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/clipboard.js"></script>
     <script src="~/js/site.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

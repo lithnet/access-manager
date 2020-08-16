@@ -10,58 +10,54 @@
 @model Lithnet.AccessManager.Web.Models.AccessRequestModel
 
 <div class="form-container">
+    <div class="form-content-header">
+        @UIMessages.HeadingRequestAccess
+    </div>
     @using (Html.BeginForm("AccessRequestType", "Computer", FormMethod.Post))
     {
-        <header>
-            @UIMessages.HeadingRequestAccess
-        </header>
-        <fieldset>
+        <section>
+            <label class="title">@UIMessages.ComputerName*</label>
+            <label class="input">
+                <i class="icon-append fa fa-desktop"></i>
+                @Html.TextBoxFor(m => m.ComputerName, new { @class = "dataEntry" })
+                @Html.ValidationMessageFor(m => m.ComputerName)
+            </label>
+        </section>
 
+        @if (Model.ShowReason)
+        {
             <section>
-                <label class="title">@UIMessages.ComputerName*</label>
+                <label class="title">@($"{UIMessages.UserReasonPrompt}{(Model.ReasonRequired ? "*" : string.Empty)}")</label>
                 <label class="input">
-                    <i class="icon-append fa fa-desktop"></i>
-                    @Html.TextBoxFor(m => m.ComputerName, new { @class = "dataEntry" })
-                    @Html.ValidationMessageFor(m => m.ComputerName)
+                    @if (Model.ReasonRequired)
+                    {
+                        @Html.TextAreaFor(m => m.UserRequestReason, new { @class = "dataEntryLarge", @required = "required" })
+                    }
+                    else
+                    {
+                        @Html.TextAreaFor(m => m.UserRequestReason, new { @class = "dataEntryLarge" })
+                    }
+
+                    @Html.ValidationMessageFor(m => m.UserRequestReason)
                 </label>
             </section>
+        }
 
-            @if (Model.ShowReason)
-            {
-                <section>
-                    <label class="title">@($"{UIMessages.UserReasonPrompt}{(Model.ReasonRequired ? "*" : string.Empty)}")</label>
-                    <label class="input">
-
-                        @if (Model.ReasonRequired)
-                        {
-                            @Html.TextAreaFor(m => m.UserRequestReason, new { @class = "dataEntryLarge", @required = "required" })
-                        }
-                        else
-                        {
-                            @Html.TextAreaFor(m => m.UserRequestReason, new { @class = "dataEntryLarge" })
-                        }
-
-                        @Html.ValidationMessageFor(m => m.UserRequestReason)
-                    </label>
-                </section>
-            }
-
-            @if (Model?.FailureReason != null)
-            {
-                <section>
-                    <b class="error">
-                        <i class="fas fa-exclamation-circle"></i> @Html.DisplayTextFor(m => m.FailureReason)
-                    </b>
-                </section>
-            }
-
-        </fieldset>
+        @if (Model?.FailureReason != null)
+        {
+            <section>
+                <div class="alert alert-danger">
+                    @Html.DisplayTextFor(m => m.FailureReason)
+                </div>
+            </section>
+        }
 
         <footer>
-            <div class="center-content">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-primary">@UIMessages.ButtonRequestAccess</button>
-            </div>
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-primary">
+                <span class="wait-content hidden"><span class="spinner-border app-spinner" role="status" aria-hidden="true"></span>Please wait...</span>
+                <span class="default-button-text">Next</span>
+            </button>
         </footer>
     }
 </div>

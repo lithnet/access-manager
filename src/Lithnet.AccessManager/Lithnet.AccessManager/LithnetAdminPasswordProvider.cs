@@ -72,7 +72,7 @@ namespace Lithnet.AccessManager
         public DateTime? GetExpiry(IComputer computer)
         {
             DirectoryEntry de = computer.DirectoryEntry;
-            de.RefreshCache();
+            de.RefreshCache(ActiveDirectoryComputer.PropertiesToGet);
 
             return de.GetPropertyDateTimeFromAdsLargeInteger(AttrLithnetAdminPasswordExpiry);
         }
@@ -80,7 +80,7 @@ namespace Lithnet.AccessManager
         private DateTime? GetMsMcsAdmPwdExpiry(IComputer computer)
         {
             DirectoryEntry de = computer.DirectoryEntry;
-            de.RefreshCache();
+            de.RefreshCache(ActiveDirectoryComputer.PropertiesToGet);
 
             return de.GetPropertyDateTimeFromAdsLargeInteger(AttrMsMcsAdmPwdExpirationTime);
         }

@@ -76,7 +76,7 @@
     <PackageReference Include="microsoft.aspnetcore.authentication.WsFederation" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.6" />
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.0.3" />
-    <PackageReference Include="nlog" Version="4.7.2" />
+    <PackageReference Include="nlog" Version="4.7.3" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.9.2" />
     <PackageReference Include="nlog.WindowsEventLog" Version="4.7.2" />
     <PackageReference Include="system.directoryservices" Version="4.7.0" />
@@ -120,6 +120,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="appsettings.*.json" CopyToPublishDirectory="Never" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\StatusCode\" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

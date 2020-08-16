@@ -32,15 +32,17 @@ function clickSpeakButton(event) {
         return;
     }
 
-    var utterance = new SpeechSynthesisUtterance(text);
-    utterance.addEventListener('start', () => {
+    this.utterance = new SpeechSynthesisUtterance(text);
+    this.utterance.rate = 0.9;
+
+    this.utterance.addEventListener('start', () => {
         $(clickedButton).addClass("active");
         speakingButton = clickedButton;
     });
 
-    utterance.addEventListener('end', () => {
+    this.utterance.addEventListener('end', () => {
         $(clickedButton).removeClass("active");
     });
 
-    speechSynthesis.speak(utterance);
+    speechSynthesis.speak(this.utterance);
 }

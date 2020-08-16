@@ -169,7 +169,7 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your access has been approved.
+        ///   Looks up a localized string similar to Your access has been granted.
         /// </summary>
         public static string HeadingAccessApproved {
             get {
@@ -412,7 +412,7 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please provide the reason for this request.
+        ///   Looks up a localized string similar to Please provide a reason for this request.
         /// </summary>
         public static string UserReasonPrompt {
             get {

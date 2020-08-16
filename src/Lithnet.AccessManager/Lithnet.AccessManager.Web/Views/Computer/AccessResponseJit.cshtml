@@ -1,0 +1,43 @@
+﻿@{
+    ViewBag.Title = "JIT Details";
+}
+
+@model Lithnet.AccessManager.Web.Models.JitDetailsModel
+
+<div class="form-container">
+
+    <div class="form-content-header">
+        @UIMessages.HeadingJitRequest
+    </div>
+    <div class="form-content">
+
+        <div class="alert alert-success">
+            @UIMessages.HeadingAccessApproved
+        </div>
+
+        <section>
+            <label class="title">Computer</label>
+            <p class="lead">@Model.ComputerName</p>
+        </section>
+
+        <section>
+            <label class="title">User</label>
+            <p class="lead">@Model.Username</p>
+        </section>
+
+
+        <section>
+            <label class="title">Access expires</label>
+            <p class="lead">@Model.ValidUntil</p>
+        </section>
+
+        @*<p>User <strong>@Model.Username</strong> now has just-in-time access to <strong>@Model.ComputerName</strong></p>
+        <p>
+            This remains valid until <strong>@Model.ValidUntil</strong>.
+        </p>*@
+
+        <footer>
+            @Html.ActionLink(UIMessages.ButtonNewRequest, "AccessRequest", "Computer", null, new { @class = "btn btn-outline-secondary" })
+        </footer>
+    </div>
+</div>

@@ -169,7 +169,7 @@
     <value>The size of the reason field is limited to 4096 characters</value>
   </data>
   <data name="UserReasonPrompt" xml:space="preserve">
-    <value>Please provide the reason for this request</value>
+    <value>Please provide a reason for this request</value>
   </data>
   <data name="Logout" xml:space="preserve">
     <value>Logout</value>
@@ -187,7 +187,7 @@
     <value>Request access</value>
   </data>
   <data name="HeadingAccessApproved" xml:space="preserve">
-    <value>Your access has been approved</value>
+    <value>Your access has been granted</value>
   </data>
   <data name="HeadingRequestAccess" xml:space="preserve">
     <value>Request access</value>

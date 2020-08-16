@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Lithnet.AccessManager.Server.Configuration;
 using Microsoft.Extensions.Options;
@@ -142,12 +143,14 @@ namespace Lithnet.AccessManager.Server
             for (int i = 0; i < password.Length; i++)
             {
                 char c = password[i];
+                bool cleared = i == 0;
 
                 if (count >= this.settings.GroupSize)
                 {
                     count = 0;
                     yield return group.ToString();
                     group.Clear();
+                    cleared = true;
                 }
                 else
                 {
@@ -170,6 +173,12 @@ namespace Lithnet.AccessManager.Server
                 }
 
                 group.Append(this.GetPhoneticName(c));
+
+                if (cleared)
+                {
+                    group[0] = group[0].ToString().ToUpper()[0];
+                }
+
                 count++;
             }
 

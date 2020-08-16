@@ -6,12 +6,16 @@
 
 <div class="form-container">
     <div class="form-content-header">
-        Request failed
+       Request failed
     </div>
     <div class="form-content">
         <div class="alert alert-danger">
             <h4>@Model.Heading</h4>
             @Model.Message
         </div>
+
+        <footer>
+            @Html.ActionLink(UIMessages.ButtonNewRequest, "AccessRequest", "Computer", null, new { @class="btn btn-outline-secondary" })
+        </footer>
     </div>
 </div>
