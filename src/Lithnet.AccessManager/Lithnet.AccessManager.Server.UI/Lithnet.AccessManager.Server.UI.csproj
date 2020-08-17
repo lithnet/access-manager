@@ -10,8 +10,6 @@
     <Description>Lithnet Access Manager</Description>
     <Copyright>(c) 2020 Lithnet</Copyright>
     <PackageProjectUrl>https://github.com/lithnet/access-manager</PackageProjectUrl>
-    <FileVersion>1.0.$([System.DateTime]::UtcNow.Date.Subtract($([System.DateTime]::Parse("2000-01-01"))).TotalDays).$([System.Math]::Floor($([MSBuild]::Divide($([System.DateTime]::UtcNow.TimeOfDay.TotalSeconds), 1.32))))</FileVersion>
-    <Version>1.0.$([System.DateTime]::UtcNow.Date.Subtract($([System.DateTime]::Parse("2000-01-01"))).TotalDays)</Version>
     <Deterministic>false</Deterministic>
     <Platforms>AnyCPU</Platforms>
     <ApplicationManifest>app.manifest</ApplicationManifest>

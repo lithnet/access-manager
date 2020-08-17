@@ -267,3 +267,6 @@ output/
 *-cache/
 *-SetupFiles/
 *.back*.aip
+
+output-x64
+output-x86
