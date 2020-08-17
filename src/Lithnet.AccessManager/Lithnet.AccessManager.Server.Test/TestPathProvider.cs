@@ -2,7 +2,7 @@
 using System.IO;
 using Microsoft.Extensions.Hosting;
 
-namespace Lithnet.AccessManager.Web.Internal
+namespace Lithnet.AccessManager.Service.Internal
 {
     public class TestPathProvider : IAppPathProvider
     {

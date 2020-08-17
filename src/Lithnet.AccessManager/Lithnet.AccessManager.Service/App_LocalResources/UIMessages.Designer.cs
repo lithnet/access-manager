@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Lithnet.AccessManager.Web.App_LocalResources {
+namespace Lithnet.AccessManager.Service.App_LocalResources {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Lithnet.AccessManager.Web.App_LocalResources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Lithnet.AccessManager.Web.App_LocalResources.UIMessages", typeof(UIMessages).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Lithnet.AccessManager.Service.App_LocalResources.UIMessages", typeof(UIMessages).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

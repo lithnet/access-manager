@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
-using Lithnet.AccessManager.Web.App_LocalResources;
+using Lithnet.AccessManager.Service.App_LocalResources;
 
-namespace Lithnet.AccessManager.Web.Models
+namespace Lithnet.AccessManager.Service.Models
 {
     [Localizable(true)]
     public class ErrorModel

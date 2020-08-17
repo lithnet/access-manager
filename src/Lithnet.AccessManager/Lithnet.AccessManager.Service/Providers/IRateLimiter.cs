@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Lithnet.AccessManager.Web.Internal
+namespace Lithnet.AccessManager.Service
 {
     public interface IRateLimiter
     {

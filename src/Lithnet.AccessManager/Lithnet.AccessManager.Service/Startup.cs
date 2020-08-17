@@ -9,9 +9,9 @@ using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Workers;
-using Lithnet.AccessManager.Web.AppSettings;
-using Lithnet.AccessManager.Web.Extensions;
-using Lithnet.AccessManager.Web.Internal;
+using Lithnet.AccessManager.Service.AppSettings;
+using Lithnet.AccessManager.Service.Internal;
+using Lithnet.AccessManager.Service.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -20,7 +20,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-namespace Lithnet.AccessManager.Web
+namespace Lithnet.AccessManager.Service
 {
     public class Startup
     {

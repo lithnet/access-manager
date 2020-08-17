@@ -5,7 +5,7 @@ using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Lithnet.AccessManager.Web
+namespace Lithnet.AccessManager.Service
 {
     public class UnconfiguredHost : IHostedService
     {

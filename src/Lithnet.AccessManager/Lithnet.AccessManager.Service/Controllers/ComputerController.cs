@@ -8,17 +8,17 @@ using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Exceptions;
 using Lithnet.AccessManager.Server.Extensions;
-using Lithnet.AccessManager.Web.App_LocalResources;
-using Lithnet.AccessManager.Web.AppSettings;
-using Lithnet.AccessManager.Web.Internal;
-using Lithnet.AccessManager.Web.Models;
+using Lithnet.AccessManager.Service.App_LocalResources;
+using Lithnet.AccessManager.Service.AppSettings;
+using Lithnet.AccessManager.Service.Internal;
+using Lithnet.AccessManager.Service.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using IAuthorizationService = Lithnet.AccessManager.Server.Authorization.IAuthorizationService;
 
-namespace Lithnet.AccessManager.Web.Controllers
+namespace Lithnet.AccessManager.Service.Controllers
 {
     [Authorize(Policy = "RequireAuthorizedUser")]
     [Localizable(true)]

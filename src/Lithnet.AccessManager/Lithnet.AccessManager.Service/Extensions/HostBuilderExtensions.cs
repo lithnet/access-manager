@@ -4,14 +4,13 @@ using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
 using Microsoft.Win32;
 using HttpSys = Microsoft.AspNetCore.Server.HttpSys;
 
-namespace Lithnet.AccessManager.Web.Internal
+namespace Lithnet.AccessManager.Service.Internal
 {
     internal static class HostBuilderExtensions
     {
@@ -19,18 +18,25 @@ namespace Lithnet.AccessManager.Web.Internal
         {
             RegistryKey key = Registry.LocalMachine.OpenSubKey(Constants.BaseKey, false);
             string basePath = key?.GetValue("BasePath") as string;
+            string configPath = key?.GetValue("ConfigPath") as string;
 
-            if (!string.IsNullOrWhiteSpace(basePath))
+            if (!string.IsNullOrWhiteSpace(configPath))
             {
-                config.AddJsonFile(Path.Combine(basePath, "appsettings.json"), optional: false, reloadOnChange: true);
-                config.AddJsonFile(Path.Combine(basePath, "appsecrets.json"), optional: true, reloadOnChange: true);
-                config.AddJsonFile(Path.Combine(basePath, "apphost.json"), optional: true, reloadOnChange: true);
+                config.AddJsonFile(Path.Combine(configPath, "appsettings.json"), optional: false, reloadOnChange: true);
+                config.AddJsonFile(Path.Combine(configPath, "appsecrets.json"), optional: true, reloadOnChange: true);
+                config.AddJsonFile(Path.Combine(configPath, "apphost.json"), optional: true, reloadOnChange: true);
+            }
+            else if (!string.IsNullOrEmpty(basePath))
+            {
+                config.AddJsonFile(Path.Combine(basePath, "config\\appsettings.json"), optional: false, reloadOnChange: true);
+                config.AddJsonFile(Path.Combine(basePath, "config\\appsecrets.json"), optional: true, reloadOnChange: true);
+                config.AddJsonFile(Path.Combine(basePath, "config\\apphost.json"), optional: true, reloadOnChange: true);
             }
             else
             {
-                config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-                config.AddJsonFile("appsecrets.json", optional: true, reloadOnChange: true);
-                config.AddJsonFile("apphost.json", optional: false, reloadOnChange: true);
+                config.AddJsonFile("config\\appsettings.json", optional: false, reloadOnChange: true);
+                config.AddJsonFile("config\\appsecrets.json", optional: true, reloadOnChange: true);
+                config.AddJsonFile("config\\apphost.json", optional: false, reloadOnChange: true);
             }
 
             config.AddEnvironmentVariables("AccessManagerService");

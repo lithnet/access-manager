@@ -85,7 +85,7 @@ namespace Lithnet.AccessManager.Agent
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogError(EventIDs.LapsUnexpectedException, ex, "The LAPS worker encountered an exception");
+                    this.logger.LogError(EventIDs.LapsUnexpectedException, ex, "The local admin password worker encountered an exception");
                 }
             }
             catch (Exception ex)

@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 using Lithnet.AccessManager.Server.Authorization;
 using Microsoft.Extensions.Logging;
 
-namespace Lithnet.AccessManager.Web.Internal
+namespace Lithnet.AccessManager.Service.Internal
 {
     public sealed class AuditEventProcessor : IAuditEventProcessor
     {
@@ -78,11 +78,11 @@ namespace Lithnet.AccessManager.Web.Internal
 
             if (action.IsSuccess)
             {
-                message = this.templates.GetTemplate("LogAuditSuccess.txt") ?? LogMessages.DefaultAuditSuccessText;
+                message = this.templates.GetTemplate("eventlog-success.txt") ?? LogMessages.DefaultAuditSuccessText;
             }
             else
             {
-                message = this.templates.GetTemplate("LogAuditFailure.txt") ?? LogMessages.DefaultAuditFailureText;
+                message = this.templates.GetTemplate("eventlog-failure.txt") ?? LogMessages.DefaultAuditFailureText;
             }
 
             message = this.ReplaceTokens(tokens, message, false);

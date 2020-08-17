@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 
-namespace Lithnet.AccessManager.Web.AppSettings
+namespace Lithnet.AccessManager.Service.AppSettings
 {
     public interface IIdpAuthenticationProvider : IHttpContextAuthenticationProvider
     {

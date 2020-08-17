@@ -1,9 +1,9 @@
-﻿using Lithnet.AccessManager.Web.App_LocalResources;
-using Lithnet.AccessManager.Web.Models;
+﻿using Lithnet.AccessManager.Service.App_LocalResources;
+using Lithnet.AccessManager.Service.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace Lithnet.AccessManager.Web.Controllers
+namespace Lithnet.AccessManager.Service.Controllers
 {
     public class StatusCode : Controller
     {

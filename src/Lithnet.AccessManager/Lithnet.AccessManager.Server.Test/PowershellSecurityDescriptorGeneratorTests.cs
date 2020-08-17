@@ -1,7 +1,7 @@
 ﻿using System.Security.Principal;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Web.Internal;
+using Lithnet.AccessManager.Service.Internal;
 using Lithnet.Security.Authorization;
 using Microsoft.Extensions.Logging;
 using Moq;

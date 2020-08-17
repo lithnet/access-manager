@@ -1,4 +1,4 @@
-﻿namespace Lithnet.AccessManager.Web.Internal
+﻿namespace Lithnet.AccessManager.Service.Internal
 {
     public enum AuthNFailureMessageID
     {

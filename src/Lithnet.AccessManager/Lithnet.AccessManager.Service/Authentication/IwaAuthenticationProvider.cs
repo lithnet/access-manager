@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Server.HttpSys;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Lithnet.AccessManager.Web.AppSettings
+namespace Lithnet.AccessManager.Service.AppSettings
 {
     public class IwaAuthenticationProvider : HttpContextAuthenticationProvider, IIwaAuthenticationProvider
     {

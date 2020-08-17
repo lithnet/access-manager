@@ -10,14 +10,16 @@ namespace Lithnet.AccessManager.Server.UI
         {
             RegistryKey key = Registry.LocalMachine.OpenSubKey(AccessManager.Constants.BaseKey, false);
             string appPath = key?.GetValue("BasePath", null) as string ?? key?.GetValue("Path", null) as string ?? Environment.CurrentDirectory;
+            string configPath = key?.GetValue("ConfigPath", null) as string ?? Path.Combine(appPath, "config");
+            string wwwRootPath = key?.GetValue("WwwRootPath", null) as string ?? Path.Combine(appPath, "wwwroot");
 
             this.AppPath = appPath.TrimEnd('\\');
-            this.TemplatesPath = $"{AppPath}\\NotificationTemplates";
-            this.ConfigFile = $"{AppPath}\\appsettings.json";
-            this.HostingConfigFile = $"{AppPath}\\apphost.json";
-            this.ImagesPath = $"{AppPath}\\wwwroot\\images";
-            this.ScriptsPath = $"{AppPath}\\Scripts";
-            this.WwwRootPath = $"{AppPath}\\wwwroot";
+            this.TemplatesPath = $"{configPath}\\audit-templates";
+            this.ConfigFile = $"{configPath}\\appsettings.json";
+            this.HostingConfigFile = $"{configPath}\\apphost.json";
+            this.ScriptsPath = $"{configPath}\\scripts";
+            this.WwwRootPath = wwwRootPath;
+            this.ImagesPath = $"{wwwRootPath}\\images";
         }
 
         public string AppPath { get; }

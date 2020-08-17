@@ -1,4 +1,4 @@
-﻿namespace Lithnet.AccessManager.Web.AppSettings
+﻿namespace Lithnet.AccessManager.Service.AppSettings
 {
     public interface IIwaAuthenticationProvider : IHttpContextAuthenticationProvider
     {

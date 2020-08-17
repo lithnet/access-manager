@@ -9,8 +9,8 @@ using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Extensions;
-using Lithnet.AccessManager.Web.App_LocalResources;
-using Lithnet.AccessManager.Web.Internal;
+using Lithnet.AccessManager.Service.App_LocalResources;
+using Lithnet.AccessManager.Service.Internal;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -19,7 +19,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Vanara.PInvoke;
 
-namespace Lithnet.AccessManager.Web.AppSettings
+namespace Lithnet.AccessManager.Service.AppSettings
 {
     public class CertificateAuthenticationProvider : HttpContextAuthenticationProvider, ICertificateAuthenticationProvider
     {

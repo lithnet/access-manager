@@ -31,6 +31,6 @@ namespace Lithnet.AccessManager.Server.UI
         public const string EventSourceName = "Lithnet Access Manager Configuration Tool";
         public const string EventLogName = "Lithnet Access Manager";
         public const string FirewallRuleName = "Lithnet Access Manager Web Service (HTTP/HTTPS-In)"; // This value also needs to be updated in the installer
-        public const string ServiceExeName = "Lithnet.AccessManager.Web.exe";
+        public const string ServiceExeName = "Lithnet.AccessManager.Service.exe";
     }
 }

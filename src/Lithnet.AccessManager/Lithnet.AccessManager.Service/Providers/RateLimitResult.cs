@@ -1,4 +1,4 @@
-﻿namespace Lithnet.AccessManager.Web.Internal
+﻿namespace Lithnet.AccessManager.Service
 {
     public class RateLimitResult
     {

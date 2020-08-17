@@ -1,6 +1,6 @@
 using System.IO;
 using System.Runtime.CompilerServices;
-using Lithnet.AccessManager.Web.Internal;
+using Lithnet.AccessManager.Service.Internal;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +9,7 @@ using Microsoft.Win32;
 using NLog.Web;
 
 [assembly: InternalsVisibleTo("Lithnet.AccessManager.Test")]
-namespace Lithnet.AccessManager.Web
+namespace Lithnet.AccessManager.Service
 {
     public class Program
     {
@@ -35,8 +35,6 @@ namespace Lithnet.AccessManager.Web
             var host = new HostBuilder();
 
             host.UseContentRoot(Directory.GetCurrentDirectory());
-
-            string basePath = key?.GetValue("BasePath") as string;
 
             host.ConfigureHostConfiguration(config =>
             {

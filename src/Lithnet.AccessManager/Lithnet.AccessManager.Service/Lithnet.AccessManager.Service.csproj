@@ -12,48 +12,50 @@
     <FileVersion>1.0.$([System.DateTime]::UtcNow.Date.Subtract($([System.DateTime]::Parse("2000-01-01"))).TotalDays).$([System.Math]::Floor($([MSBuild]::Divide($([System.DateTime]::UtcNow.TimeOfDay.TotalSeconds), 1.32))))</FileVersion>
     <Version>1.0.$([System.DateTime]::UtcNow.Date.Subtract($([System.DateTime]::Parse("2000-01-01"))).TotalDays)</Version>
     <Deterministic>false</Deterministic>
-    <Platforms>AnyCPU;x86</Platforms>
+    <Platforms>AnyCPU</Platforms>
     <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
     <ApplicationIcon>access-manager.ico</ApplicationIcon>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Remove="dev-config\apphost.json" />
     <Content Remove="dev-config\appsecrets.json" />
     <Content Remove="dev-config\appsettings.json" />
-    <Content Remove="dev-config\NotificationTemplates\SlackTemplateFailure.json" />
-    <Content Remove="dev-config\NotificationTemplates\SlackTemplateSuccess.json" />
-    <Content Remove="dev-config\NotificationTemplates\TeamsTemplateFailure.json" />
-    <Content Remove="dev-config\NotificationTemplates\TeamsTemplateSuccess.json" />
+    <Content Remove="dev-config\audit-templates\webhook-slack-failure.json" />
+    <Content Remove="dev-config\audit-templates\webhook-slack-success.json" />
+    <Content Remove="dev-config\audit-templates\webhook-teams-failure.json" />
+    <Content Remove="dev-config\audit-templates\webhook-teams-success.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="NotificationTemplates\EmailAuditFailure.html" />
-    <None Remove="NotificationTemplates\EmailAuditSuccess.html" />
-    <None Remove="NotificationTemplates\LogAuditFailure.txt" />
-    <None Remove="NotificationTemplates\LogAuditSuccess.txt" />
-    <None Remove="Scripts\AuditingSample.ps1" />
-    <None Remove="Scripts\AuthZSample.ps1" />
+    <None Remove="config\audit-templates\email-failure.html" />
+    <None Remove="config\audit-templates\email-success.html" />
+    <None Remove="config\audit-templates\eventlog-failure.txt" />
+    <None Remove="config\audit-templates\eventlog-success.txt" />
+    <None Remove="config\scripts\example-audit.ps1" />
+    <None Remove="config\scripts\example-authorization.ps1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="NotificationTemplates\EmailAuditFailure.html">
+    <Content Include="config\audit-templates\email-failure.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NotificationTemplates\EmailAuditSuccess.html">
+    <Content Include="config\audit-templates\email-success.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NotificationTemplates\LogAuditFailure.txt">
+    <Content Include="config\audit-templates\eventlog-failure.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="NotificationTemplates\LogAuditSuccess.txt">
+    <Content Include="config\audit-templates\eventlog-success.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\AuditingSample.ps1">
+    <Content Include="config\scripts\example-audit.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Scripts\AuthZSample.ps1">
+    <Content Include="config\scripts\example-authorization.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+
     </Content>
   </ItemGroup>
 
@@ -62,10 +64,11 @@
     <None Include="dev-config\apphost.json" />
     <None Include="dev-config\appsecrets.json" />
     <None Include="dev-config\appsettings.json" />
-    <None Include="dev-config\NotificationTemplates\SlackTemplateFailure.json" />
-    <None Include="dev-config\NotificationTemplates\SlackTemplateSuccess.json" />
-    <None Include="dev-config\NotificationTemplates\TeamsTemplateFailure.json" />
-    <None Include="dev-config\NotificationTemplates\TeamsTemplateSuccess.json" />
+    <None Include="dev-config\audit-templates\webhook-slack-failure.json" />
+    <None Include="dev-config\audit-templates\webhook-slack-success.json" />
+    <None Include="dev-config\audit-templates\webhook-teams-failure.json" />
+    <None Include="dev-config\audit-templates\webhook-teams-success.json" />
+    
   </ItemGroup>
 
   <ItemGroup>
@@ -114,7 +117,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="libman.json" CopyToPublishDirectory="Never" CopyToOutputDirectory="Never">
+   <Content Update="libman.json" CopyToPublishDirectory="Never" CopyToOutputDirectory="Never">
     </Content>
     <Content Update="wwwroot\images\custom.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -124,6 +127,24 @@
 
   <ItemGroup>
     <Folder Include="Views\StatusCode\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="dev-config\audit-templates\email-success.html">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="dev-config\audit-templates\eventlog-failure.txt">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="dev-config\audit-templates\eventlog-success.txt">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="dev-config\scripts\example-audit.ps1">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="dev-config\scripts\example-authorization.ps1">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

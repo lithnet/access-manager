@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lithnet.AccessManager.Web.Models
+namespace Lithnet.AccessManager.Service.Models
 {
     public class JitDetailsModel
     {

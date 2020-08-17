@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 
-namespace Lithnet.AccessManager.Web.Extensions
+namespace Lithnet.AccessManager.Service.Extensions
 {
     public static class ApplicationBuilderExtensions
     {

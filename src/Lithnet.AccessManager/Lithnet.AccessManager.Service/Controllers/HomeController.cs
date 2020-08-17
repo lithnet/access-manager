@@ -1,14 +1,14 @@
 ﻿using System.Threading.Tasks;
-using Lithnet.AccessManager.Web.App_LocalResources;
-using Lithnet.AccessManager.Web.AppSettings;
-using Lithnet.AccessManager.Web.Internal;
-using Lithnet.AccessManager.Web.Models;
+using Lithnet.AccessManager.Service.App_LocalResources;
+using Lithnet.AccessManager.Service.AppSettings;
+using Lithnet.AccessManager.Service.Internal;
+using Lithnet.AccessManager.Service.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace Lithnet.AccessManager.Web.Controllers
+namespace Lithnet.AccessManager.Service.Controllers
 {
     public class HomeController : Controller
     {

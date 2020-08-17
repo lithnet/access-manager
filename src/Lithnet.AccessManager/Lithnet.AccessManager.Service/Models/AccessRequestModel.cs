@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Web.App_LocalResources;
+using Lithnet.AccessManager.Service.App_LocalResources;
 
-namespace Lithnet.AccessManager.Web.Models
+namespace Lithnet.AccessManager.Service.Models
 {
     [Localizable(true)]
     public class AccessRequestModel

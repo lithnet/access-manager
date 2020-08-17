@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Lithnet.AccessManager.Web.AppSettings
+namespace Lithnet.AccessManager.Service.AppSettings
 {
     public class OidcAuthenticationProvider : IdpAuthenticationProvider, IOidcAuthenticationProvider
     {

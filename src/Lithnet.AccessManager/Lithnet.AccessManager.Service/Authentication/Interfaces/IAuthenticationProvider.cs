@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Lithnet.AccessManager.Web.AppSettings
+namespace Lithnet.AccessManager.Service.AppSettings
 {
     public interface IAuthenticationProvider
     {

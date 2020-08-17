@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Lithnet.AccessManager.Web.Models
+namespace Lithnet.AccessManager.Service.Models
 {
     public class PasswordHistoryModel
     {
