@@ -12,7 +12,7 @@
     <Platforms>AnyCPU</Platforms>
     <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <RuntimeIdentifier>win8-x64</RuntimeIdentifier>
   </PropertyGroup>
  
   <ItemGroup>
@@ -23,8 +23,9 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="6.7.1" />
-    <PackageReference Include="microsoft.powershell.sdk" Version="7.0.3" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.0.3" />
     <PackageReference Include="newtonsoft.json" Version="12.0.3" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -53,6 +53,10 @@ namespace Lithnet.AccessManager.Server.Authorization
                 {
                     successTargets = info.SuccessfulJitTargets;
                 }
+                else if (requestedAccess.HasFlag(AccessMask.BitLocker))
+                {
+                    successTargets = info.SuccessfulBitLockerTargets;
+                }
                 else
                 {
                     throw new AccessManagerException($"An invalid access mask combination was requested: {requestedAccess}");
@@ -142,6 +146,10 @@ namespace Lithnet.AccessManager.Server.Authorization
                     ExpireAfter = matchedTarget.Jit.ExpireAfter,
                     AuthorizingGroup = this.jitResolver.GetJitGroup(computer, matchedTarget.Jit.AuthorizingGroup).MsDsPrincipalName,
                 };
+            }
+            else if (requestedAccess == AccessMask.BitLocker)
+            {
+                response = new BitLockerAuthorizationResponse();
             }
             else
             {

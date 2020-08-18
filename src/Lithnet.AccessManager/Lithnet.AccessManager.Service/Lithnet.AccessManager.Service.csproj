@@ -13,7 +13,9 @@
     <Platforms>AnyCPU</Platforms>
     <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
     <ApplicationIcon>access-manager.ico</ApplicationIcon>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+
+    <!--PowerShell fails without a version-specific identifier https://stackoverflow.com/a/56756599/3274702 -->
+    <RuntimeIdentifier>win8-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
@@ -76,10 +78,8 @@
     <PackageReference Include="microsoft.aspnetcore.authentication.openidconnect" Version="3.1.6" />
     <PackageReference Include="microsoft.aspnetcore.authentication.WsFederation" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.6" />
-    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.0.3" />
     <PackageReference Include="nlog" Version="4.7.3" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.9.2" />
-    <PackageReference Include="nlog.WindowsEventLog" Version="4.7.2" />
     <PackageReference Include="system.directoryservices" Version="4.7.0" />
     <PackageReference Include="system.security.Cryptography.Cng" Version="4.7.0" />
   </ItemGroup>

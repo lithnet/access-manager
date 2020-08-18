@@ -24,6 +24,8 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         public IList<SecurityDescriptorTarget> SuccessfulJitTargets { get; set; } = new List<SecurityDescriptorTarget>();
 
+        public IList<SecurityDescriptorTarget> SuccessfulBitLockerTargets { get; set; } = new List<SecurityDescriptorTarget>();
+
         public GenericSecurityDescriptor SecurityDescriptor { get; set; }
     }
 }

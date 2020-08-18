@@ -228,4 +228,10 @@
   <data name="LapsPasswordHistoryError" xml:space="preserve">
     <value>An error occurred when trying to get the password history for computer {0} as requested by user {1}</value>
   </data>
+  <data name="BitLockerKeysNotPresent" xml:space="preserve">
+    <value>The computer does not have any BitLocker recovery passwords in the directory</value>
+  </data>
+  <data name="BitLockerKeyAccessError" xml:space="preserve">
+    <value>An error occurred when trying to get the BitLocker recovery passwords for computer {0} as requested by user {1}</value>
+  </data>
 </root>

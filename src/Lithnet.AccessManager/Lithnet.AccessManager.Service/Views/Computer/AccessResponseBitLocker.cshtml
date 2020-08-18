@@ -1,0 +1,96 @@
+﻿@{
+    ViewBag.Title = UIMessages.HeadingPasswordDetails;
+}
+
+@using Lithnet.AccessManager
+@model Lithnet.AccessManager.Service.Models.BitLockerRecoveryPasswordsModel
+@inject Lithnet.AccessManager.Server.IPhoneticPasswordTextProvider textProvider;
+@inject Lithnet.AccessManager.Service.IHtmlPasswordProvider htmlProvider;
+@inject Microsoft.Extensions.Options.IOptionsSnapshot<Lithnet.AccessManager.Server.Configuration.UserInterfaceOptions> uiOptions;
+
+<div class="form-container">
+
+
+    <div class="form-content-header">
+        @UIMessages.HeadingBitLockerKeys
+    </div>
+    <div class="form-content">
+
+        <section>
+            <label class="title">Computer</label>
+            <p class="lead">@Model.ComputerName</p>
+        </section>
+
+        <div class="accordion" id="history-panel">
+            @{
+                int index = 0;
+            }
+            @foreach (BitLockerRecoveryPassword e in Model.Passwords)
+            {
+                <div class="card">
+                    <div class="card-header" id="password-summary-@index" data-toggle="collapse" data-target="#password-details-@index" aria-expanded="false" aria-controls="password-details-@index">
+                        <button class="btn btn-link">
+                            <i class="fas fa-caret-down"></i>
+                        </button>
+                        <div class="password-history-summary">Password ID @e.PasswordID <span class="password-history-emph">created on</span> @e.Created</div>
+                    </div>
+                    <div id="password-details-@index" class="collapse" aria-labelledby="password-summary-@index" data-parent="#history-panel">
+                        <div class="card-body">
+                            <div class="password-content" id="password-content-@index">
+                                @Html.Raw(htmlProvider.GetHtmlPassword(e.RecoveryPassword))
+                            </div>
+
+                            @if (!uiOptions.Value.PhoneticSettings.HidePhoneticBreakdown)
+                            {
+                                <div id="password-phonetic-@index" class="collapse phonetic-items">
+                                    <div class="input-group">
+                                        @foreach (string w in textProvider.GetPhoneticTextSections(e.RecoveryPassword))
+                                        {
+                                            @w<br />
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="card-footer password-details-footer">
+                            <button id="copy-button" type="button"
+                                    class="btn btn-outline-secondary clipboard-copy-button"
+                                    data-clipboard-text="@e.RecoveryPassword">
+                                Copy password
+                            </button>
+                            @if (!uiOptions.Value.PhoneticSettings.HidePhoneticBreakdown)
+                            {
+                                <button id="buttonShowPhonetic" type="button" data-toggle="collapse"
+                                        class="btn btn-outline-secondary" data-target="#password-phonetic-@index"
+                                        aria-expanded="true">
+                                    Show phonetic
+                                </button>
+                            }
+                            @if (!uiOptions.Value.PhoneticSettings.DisableTextToSpeech)
+                            {
+                                <button id="buttonSpeak" type="button" data-toggle="button" speech-data="@textProvider.GetPhoneticText(e.RecoveryPassword)"
+                                        class="btn btn-outline-secondary speech-button">
+                                    Read aloud
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                index++;
+            }
+
+        </div>
+        <footer>
+            @Html.ActionLink(UIMessages.ButtonNewRequest, "AccessRequest", "Computer", null, new { @class = "btn btn-outline-secondary" })
+        </footer>
+    </div>
+</div>
+
+
+@section Scripts {
+    @if (!uiOptions.Value.PhoneticSettings.DisableTextToSpeech)
+    {
+        <script src="@Url.Content("~/js/speech.js")"></script>
+    }
+}

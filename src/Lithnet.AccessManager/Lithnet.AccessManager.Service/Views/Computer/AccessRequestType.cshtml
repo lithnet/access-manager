@@ -44,6 +44,13 @@
                         <label  for="jitcheck">Just-in-time access</label>
                     }
                 </div>
+                <div>
+                    @if (Model.AllowedRequestTypes.HasFlag(AccessMask.BitLocker))
+                    {
+                        @Html.RadioButtonFor(m => m.RequestType, "BitLocker", new {  @id = "bitlockercheck" })
+                        <label  for="bitlockercheck">BitLocker recovery passwords</label>
+                    }
+                </div>
             </section>
 
             @Html.HiddenFor(m => m.ComputerName)

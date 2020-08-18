@@ -19,5 +19,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         [Description("Just-in-time access")]
         Jit = 0x800,
+
+        [Description("BitLocker recovery passwords")]
+        BitLocker = 0x1000,
     }
 }

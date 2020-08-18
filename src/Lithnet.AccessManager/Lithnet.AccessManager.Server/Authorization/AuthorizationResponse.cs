@@ -73,6 +73,11 @@ namespace Lithnet.AccessManager.Server.Authorization
                 return new LapsHistoryAuthorizationResponse();
             }
 
+            if (mask == AccessMask.BitLocker)
+            {
+                return new BitLockerAuthorizationResponse();
+            }
+
             throw new ArgumentException($"Invalid value for mask: {mask}");
         }
     }

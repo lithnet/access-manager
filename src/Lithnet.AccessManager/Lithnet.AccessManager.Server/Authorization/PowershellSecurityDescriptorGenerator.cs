@@ -49,6 +49,11 @@ namespace Lithnet.AccessManager.Server.Authorization
                 allowedAccess |= AccessMask.Jit;
             }
 
+            if (result.IsBitLockerAllowed)
+            {
+                allowedAccess |= AccessMask.BitLocker;
+            }
+
             if (result.IsLocalAdminPasswordDenied)
             {
                 deniedAccess |= AccessMask.LocalAdminPassword;
@@ -62,6 +67,11 @@ namespace Lithnet.AccessManager.Server.Authorization
             if (result.IsJitDenied)
             {
                 deniedAccess |= AccessMask.Jit;
+            }
+
+            if (result.IsBitLockerDenied)
+            {
+                deniedAccess |= AccessMask.BitLocker;
             }
 
             DiscretionaryAcl dacl;
@@ -116,7 +126,10 @@ namespace Lithnet.AccessManager.Server.Authorization
                         result.Properties[nameof(res.IsLocalAdminPasswordHistoryAllowed)] == null &&
                         result.Properties[nameof(res.IsLocalAdminPasswordHistoryDenied)] == null &&
                         result.Properties[nameof(res.IsJitAllowed)] == null &&
-                        result.Properties[nameof(res.IsJitDenied)] == null)
+                        result.Properties[nameof(res.IsJitDenied)] == null &&
+                        result.Properties[nameof(res.IsBitLockerAllowed)] == null &&
+                        result.Properties[nameof(res.IsBitLockerDenied)] == null 
+                        )
                     {
                         continue;
                     }
@@ -128,6 +141,8 @@ namespace Lithnet.AccessManager.Server.Authorization
                     res.IsLocalAdminPasswordHistoryDenied = Convert.ToBoolean(result.Properties[nameof(res.IsLocalAdminPasswordHistoryDenied)]?.Value ?? false);
                     res.IsJitAllowed = Convert.ToBoolean(result.Properties[nameof(res.IsJitAllowed)]?.Value ?? false);
                     res.IsJitDenied = Convert.ToBoolean(result.Properties[nameof(res.IsJitDenied)]?.Value ?? false);
+                    res.IsBitLockerAllowed = Convert.ToBoolean(result.Properties[nameof(res.IsBitLockerAllowed)]?.Value ?? false);
+                    res.IsBitLockerDenied = Convert.ToBoolean(result.Properties[nameof(res.IsBitLockerDenied)]?.Value ?? false);
                     return res;
                 }
 

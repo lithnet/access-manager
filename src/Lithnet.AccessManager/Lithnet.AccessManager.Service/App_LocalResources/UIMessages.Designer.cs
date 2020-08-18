@@ -97,6 +97,24 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error occurred while trying to access the BitLocker recovery passwords.
+        /// </summary>
+        public static string BitLockerKeyAccessError {
+            get {
+                return ResourceManager.GetString("BitLockerKeyAccessError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The requested computer does not have any BitLocker recovery passwords.
+        /// </summary>
+        public static string BitLockerKeysNotPresent {
+            get {
+                return ResourceManager.GetString("BitLockerKeysNotPresent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to New request.
         /// </summary>
         public static string ButtonNewRequest {
@@ -174,6 +192,15 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         public static string HeadingAccessApproved {
             get {
                 return ResourceManager.GetString("HeadingAccessApproved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BitLocker recovery passwords.
+        /// </summary>
+        public static string HeadingBitLockerKeys {
+            get {
+                return ResourceManager.GetString("HeadingBitLockerKeys", resourceCulture);
             }
         }
         

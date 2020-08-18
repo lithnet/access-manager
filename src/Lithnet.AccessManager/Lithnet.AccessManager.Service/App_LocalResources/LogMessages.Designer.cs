@@ -152,6 +152,24 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error occurred when trying to get the BitLocker recovery passwords for computer {0} as requested by user {1}.
+        /// </summary>
+        internal static string BitLockerKeyAccessError {
+            get {
+                return ResourceManager.GetString("BitLockerKeyAccessError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The computer does not have any BitLocker recovery passwords in the directory.
+        /// </summary>
+        internal static string BitLockerKeysNotPresent {
+            get {
+                return ResourceManager.GetString("BitLockerKeysNotPresent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The certificate could not be validated due to an unexpected error
         ///
         ///{0}.

@@ -192,6 +192,28 @@ namespace Lithnet.AccessManager.Server.UI {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to # Grant-BitLockerRecoveryPasswordPermissions
+        ///# 
+        ///# This script grants permissions that allow the Lithnet Admin Access Manager service account to read BitLocker recovery passwords from Active Directory
+        ///#
+        ///# This script requires membership in the Domain Admins group 
+        ///#
+        ///# Version 1.0
+        ///
+        ///
+        ///#-------------------------------------------------------------------------
+        ///# Set the following values as appropriate for your environment
+        ///#-------------------------------------------------------------------------
+        ///
+        ///# L [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string GrantBitLockerRecoveryPasswordPermissions {
+            get {
+                return ResourceManager.GetString("GrantBitLockerRecoveryPasswordPermissions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to # Grant-ComputerSelfPermission
         ///# 
         ///# This script grants permissions for computer objects to set their own password attributes

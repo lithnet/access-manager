@@ -33,9 +33,10 @@ namespace Lithnet.AccessManager.Service.Controllers
         private readonly IRateLimiter rateLimiter;
         private readonly IAuditEventProcessor reporting;
         private readonly UserInterfaceOptions userInterfaceSettings;
+        private readonly IBitLockerRecoveryPasswordProvider bitLockerProvider;
 
         public ComputerController(IAuthorizationService authorizationService, ILogger<ComputerController> logger, IDirectory directory,
-            IAuditEventProcessor reporting, IRateLimiter rateLimiter, IOptionsSnapshot<UserInterfaceOptions> userInterfaceSettings, IAuthenticationProvider authenticationProvider, IPasswordProvider passwordProvider, IJitAccessProvider jitAccessProvider)
+            IAuditEventProcessor reporting, IRateLimiter rateLimiter, IOptionsSnapshot<UserInterfaceOptions> userInterfaceSettings, IAuthenticationProvider authenticationProvider, IPasswordProvider passwordProvider, IJitAccessProvider jitAccessProvider, IBitLockerRecoveryPasswordProvider bitLockerProvider)
         {
             this.authorizationService = authorizationService;
             this.logger = logger;
@@ -46,6 +47,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             this.authenticationProvider = authenticationProvider;
             this.passwordProvider = passwordProvider;
             this.jitAccessProvider = jitAccessProvider;
+            this.bitLockerProvider = bitLockerProvider;
         }
 
         public IActionResult AccessRequest()
@@ -220,6 +222,10 @@ namespace Lithnet.AccessManager.Service.Controllers
                 {
                     return this.GrantJitAccess(model, user, computer, (JitAuthorizationResponse)authResponse);
                 }
+                else if (authResponse.EvaluatedAccess == AccessMask.BitLocker)
+                {
+                    return this.GetBitLockerRecoveryPasswords(model, user, computer, (BitLockerAuthorizationResponse) authResponse);
+                }
                 else
                 {
                     throw new AccessManagerException(@"The evaluated access response mask was not supported");
@@ -243,6 +249,58 @@ namespace Lithnet.AccessManager.Service.Controllers
                 {
                     Heading = UIMessages.UnableToProcessRequest,
                     Message = UIMessages.AuthZError
+                });
+            }
+        }
+        private IActionResult GetBitLockerRecoveryPasswords(AccessRequestModel model, IUser user, IComputer computer, BitLockerAuthorizationResponse authResponse)
+        {
+            try
+            {
+                IList<BitLockerRecoveryPassword> entries = this.bitLockerProvider.GetBitLockerRecoveryPasswords(computer);
+
+                if (entries == null || entries.Count == 0)
+                {
+                    throw new NoPasswordException();
+                }
+
+                this.reporting.GenerateAuditEvent(new AuditableAction
+                {
+                    AuthzResponse = authResponse,
+                    RequestedComputerName = model.ComputerName,
+                    RequestReason = model.UserRequestReason,
+                    IsSuccess = true,
+                    User = user,
+                    Computer = computer,
+                    EventID = EventIDs.ComputerBitLockerAccessGranted,
+                });
+
+                return this.View("AccessResponseBitLocker", new BitLockerRecoveryPasswordsModel()
+                {
+                    ComputerName = computer.MsDsPrincipalName,
+                    Passwords = entries
+                });
+            }
+            catch (NoPasswordException)
+            {
+                this.logger.LogEventError(EventIDs.BitLockerKeysNotPresent, string.Format(LogMessages.BitLockerKeysNotPresent, computer.MsDsPrincipalName, user.MsDsPrincipalName));
+
+                model.FailureReason = UIMessages.BitLockerKeysNotPresent;
+
+                return this.View("AccessResponseNoBitLocker", new NoPasswordModel
+                {
+                    Heading = UIMessages.HeadingBitLockerKeys,
+                    Message = UIMessages.BitLockerKeysNotPresent,
+                    ComputerName = computer.MsDsPrincipalName
+                });
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogEventError(EventIDs.BitLockerKeyAccessError, string.Format(LogMessages.BitLockerKeyAccessError, computer.MsDsPrincipalName, user.MsDsPrincipalName), ex);
+
+                return this.View("AccessRequestError", new ErrorModel
+                {
+                    Heading = UIMessages.UnableToProcessRequest,
+                    Message = UIMessages.BitLockerKeyAccessError
                 });
             }
         }

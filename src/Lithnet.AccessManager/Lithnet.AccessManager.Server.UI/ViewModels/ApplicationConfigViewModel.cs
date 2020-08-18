@@ -23,7 +23,7 @@ namespace Lithnet.AccessManager.Server.UI
         public ApplicationConfigViewModel(IApplicationConfig model, IDialogCoordinator dialogCoordinator, AuthenticationViewModel authentication,
             AuthorizationViewModel authorization, UserInterfaceViewModel ui, RateLimitsViewModel rate, IpDetectionViewModel ip,
             AuditingViewModel audit, EmailViewModel mail, HostingViewModel hosting, ActiveDirectoryConfigurationViewModel ad,
-            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help)
+            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker)
         {
             this.model = model;
             this.dialogCoordinator = dialogCoordinator;
@@ -41,8 +41,9 @@ namespace Lithnet.AccessManager.Server.UI
                 this.suspendedModels.Add(ad);
                 this.suspendedModels.Add(audit);
                 this.suspendedModels.Add(authorization);
-                this.suspendedModels.Add(jit);
                 this.suspendedModels.Add(laps);
+                this.suspendedModels.Add(jit);
+                this.suspendedModels.Add(bitLocker);
                 this.suspendedModels.Add(ui);
                 this.suspendedModels.Add(mail);
                 this.suspendedModels.Add(rate);
@@ -54,8 +55,9 @@ namespace Lithnet.AccessManager.Server.UI
                 this.Items.Add(ad);
                 this.Items.Add(audit);
                 this.Items.Add(authorization);
-                this.Items.Add(jit);
                 this.Items.Add(laps);
+                this.Items.Add(jit);
+                this.Items.Add(bitLocker);
                 this.Items.Add(ui);
                 this.Items.Add(mail);
                 this.Items.Add(rate);

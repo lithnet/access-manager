@@ -240,4 +240,13 @@
   <data name="Http403Message" xml:space="preserve">
     <value>You are not authorized to access this application</value>
   </data>
+  <data name="BitLockerKeysNotPresent" xml:space="preserve">
+    <value>The requested computer does not have any BitLocker recovery passwords</value>
+  </data>
+  <data name="BitLockerKeyAccessError" xml:space="preserve">
+    <value>An error occurred while trying to access the BitLocker recovery passwords</value>
+  </data>
+  <data name="HeadingBitLockerKeys" xml:space="preserve">
+    <value>BitLocker recovery passwords</value>
+  </data>
 </root>

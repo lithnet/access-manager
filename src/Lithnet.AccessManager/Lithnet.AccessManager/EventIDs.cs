@@ -18,6 +18,7 @@
         public const int ComputerPasswordActiveAccessGranted = 3001;
         public const int ComputerPasswordHistoryAccessGranted = 3002;
         public const int ComputerJitAccessGranted = 3003;
+        public const int ComputerBitLockerAccessGranted = 3004;
 
         // 4000 range - User errors
         public const int SsoIdentityNotFound = 4000;
@@ -37,6 +38,7 @@
         public const int AuthZFailedAuditError = 4016;
         public const int RateLimitExceededIP = 4017;
         public const int RateLimitExceededUser = 4018;
+        public const int BitLockerKeysNotPresent = 4019;
 
         // 5000 range - Server errors
         public const int LocalSamGroupMemberAddFailed = 5001;
@@ -73,6 +75,7 @@
         public const int ExternalAuthNAccessDenied = 5032;
         public const int CertificateAuthNAccessDenied = 5033;
         public const int CertificateAuthNError = 5034;
+        public const int BitLockerKeyAccessError = 5035;
 
         // 8000 range - UI errors
         public const int UIGroupMembershipLookupError = 8000;

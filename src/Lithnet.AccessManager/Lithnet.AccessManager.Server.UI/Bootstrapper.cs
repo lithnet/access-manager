@@ -93,6 +93,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<HelpViewModel>().ToSelf();
                 builder.Bind<LapsConfigurationViewModel>().ToSelf();
                 builder.Bind<JitConfigurationViewModel>().ToSelf();
+                builder.Bind<BitLockerViewModel>().ToSelf();
 
                 // ViewModel factories
                 builder.Bind<INotificationChannelSelectionViewModelFactory>().To<NotificationChannelSelectionViewModelFactory>();

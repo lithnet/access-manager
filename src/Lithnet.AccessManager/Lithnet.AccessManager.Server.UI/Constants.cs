@@ -21,6 +21,7 @@ namespace Lithnet.AccessManager.Server.UI
         public const string HelpLinkPageJitAccess = "https://github.com/lithnet/access-manager/wiki/Jit-Access-Page";
         public const string HelpLinkPageLocalAdminPasswords = "https://github.com/lithnet/access-manager/wiki/Local-Admin-Passwords-Page";
         public const string HelpLinkPageRateLimits = "https://github.com/lithnet/access-manager/wiki/Rate-Limits-Page";
+        public const string HelpLinkPageBitLocker = "https://github.com/lithnet/access-manager/wiki/BitLocker-Page";
         public const string HelpLinkPageUserInterface = "https://github.com/lithnet/access-manager/wiki/User-Interface-Page";
         public const string HelpLinkPageWebHosting = "https://github.com/lithnet/access-manager/wiki/Web-Hosting-Page";
 

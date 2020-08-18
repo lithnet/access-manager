@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
-using System.Management.Automation;
 using System.Security.AccessControl;
-using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
-using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Extensions;
 using Lithnet.Security.Authorization;
@@ -146,6 +142,12 @@ namespace Lithnet.AccessManager.Server.Authorization
                     matchedTargetCount++;
                 }
 
+                if (c.AccessCheck(sd, (int)AccessMask.BitLocker))
+                {
+                    info.SuccessfulBitLockerTargets.Add(target);
+                    matchedTargetCount++;
+                }
+
                 // If the ACE did not grant any permissions to the user, consider it a failure response
                 if (i == matchedTargetCount)
                 {
@@ -162,6 +164,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                 info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.LocalAdminPassword) ? AccessMask.LocalAdminPassword : 0;
                 info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.Jit) ? AccessMask.Jit : 0;
                 info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.LocalAdminPasswordHistory) ? AccessMask.LocalAdminPasswordHistory : 0;
+                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.BitLocker) ? AccessMask.BitLocker : 0;
             }
 
             this.logger.LogTrace($"User {user.MsDsPrincipalName} has effective access of {info.EffectiveAccess} on computer {computer.MsDsPrincipalName}");

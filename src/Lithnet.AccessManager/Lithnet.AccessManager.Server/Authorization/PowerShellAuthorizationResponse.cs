@@ -13,5 +13,9 @@
         public bool IsJitAllowed { get; set; }
 
         public bool IsJitDenied { get; set; }
+
+        public bool IsBitLockerAllowed { get; set; }
+
+        public bool IsBitLockerDenied { get; set; }
     }
 }

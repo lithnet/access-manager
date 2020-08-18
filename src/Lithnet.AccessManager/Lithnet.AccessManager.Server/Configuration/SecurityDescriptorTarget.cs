@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.DirectoryServices;
-using System.Security.Cryptography.Pkcs;
-using System.Security.Principal;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
