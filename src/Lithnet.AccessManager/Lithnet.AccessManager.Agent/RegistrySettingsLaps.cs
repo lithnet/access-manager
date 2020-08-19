@@ -6,34 +6,38 @@ namespace Lithnet.AccessManager.Agent
     {
         private const string keyName = "Lithnet\\Access Manager Agent\\Password";
 
-        public RegistrySettingsLaps() : base(keyName)
+        public RegistrySettingsLaps() : base(keyName, true)
         {
         }
 
-        public bool Enabled => this.GetKey().GetValue<int>("Enabled", 0) == 1;
+        internal RegistrySettingsLaps(string key) : base(key, false)
+        {
+        }
 
-        public int PasswordLength => this.GetKey().GetValue<int>("PasswordLength", 16);
+        public bool Enabled => this.GetValue<int>("Enabled", 0) == 1;
 
-        public string PasswordCharacters => this.GetKey().GetValue<string>("PasswordCharacters", null);
+        public int PasswordLength => this.GetValue<int>("PasswordLength", 16);
 
-        public bool UseUpper => this.GetKey().GetValue<int>("UseUpper", 0) == 1;
+        public string PasswordCharacters => this.GetValue<string>("PasswordCharacters", null);
 
-        public bool UseLower => this.GetKey().GetValue<int>("UseLower", 0) == 1;
+        public bool UseUpper => this.GetValue<int>("UseUpper", 0) == 1;
 
-        public bool UseSymbol => this.GetKey().GetValue<int>("UseSymbol", 0) == 1;
+        public bool UseLower => this.GetValue<int>("UseLower", 0) == 1;
 
-        public bool UseNumeric => this.GetKey().GetValue<int>("UseNumeric", 0) == 1;
+        public bool UseSymbol => this.GetValue<int>("UseSymbol", 0) == 1;
 
-        public bool UseReadabilitySeparator => this.GetKey().GetValue<int>("UseReadabilitySeparator", 0) == 1;
+        public bool UseNumeric => this.GetValue<int>("UseNumeric", 0) == 1;
 
-        public string ReadabilitySeparator => this.GetKey().GetValue<string>("ReadabilitySeparator", "-");
+        public bool UseReadabilitySeparator => this.GetValue<int>("UseReadabilitySeparator", 0) == 1;
 
-        public int ReadabilitySeparatorInterval => this.GetKey().GetValue<int>("ReadabilitySeparatorInterval", 4);
+        public string ReadabilitySeparator => this.GetValue<string>("ReadabilitySeparator", "-");
 
-        public int PasswordHistoryDaysToKeep => this.GetKey().GetValue<int>("PasswordHistoryDaysToKeep", 0);
+        public int ReadabilitySeparatorInterval => this.GetValue<int>("ReadabilitySeparatorInterval", 4);
+
+        public int PasswordHistoryDaysToKeep => this.GetValue<int>("PasswordHistoryDaysToKeep", 0);
         
-        public int MaximumPasswordAge => this.GetKey().GetValue<int>("MaximumPasswordAge", 14);
+        public int MaximumPasswordAge => this.GetValue<int>("MaximumPasswordAge", 14);
 
-        public MsMcsAdmPwdBehaviour MsMcsAdmPwdBehaviour => (MsMcsAdmPwdBehaviour)(this.GetKey().GetValue<int>("MsMcsAdmPwdBehaviour", 0));
+        public MsMcsAdmPwdBehaviour MsMcsAdmPwdBehaviour => (MsMcsAdmPwdBehaviour)(this.GetValue<int>("MsMcsAdmPwdBehaviour", 0));
     }
 }

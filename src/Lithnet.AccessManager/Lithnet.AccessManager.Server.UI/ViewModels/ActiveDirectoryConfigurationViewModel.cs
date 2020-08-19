@@ -40,7 +40,7 @@ namespace Lithnet.AccessManager.Server.UI
         }
 
         public string HelpLink => Constants.HelpLinkPageActiveDirectory;
-        
+
         protected override void OnInitialActivate()
         {
             Task.Run(this.PopulateForestsAndDomains);
@@ -109,6 +109,8 @@ namespace Lithnet.AccessManager.Server.UI
 
             ExternalDialogWindow w = new ExternalDialogWindow
             {
+                Width = 650,
+                Height = 400,
                 Title = "Script",
                 DataContext = vm,
                 SaveButtonVisible = false,

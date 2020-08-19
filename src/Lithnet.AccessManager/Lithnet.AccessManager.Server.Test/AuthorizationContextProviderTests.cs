@@ -33,7 +33,7 @@ namespace Lithnet.AccessManager.Server.Test
             string dnsDomain = this.directory.GetDomainNameDnsFromSid(user.Sid);
             string dc = this.directory.GetDomainControllerForDomain(dnsDomain);
 
-            var options = new BuiltInProviderOptions
+            var options = new AuthorizationOptions
             {
                 AuthorizationServerMapping = new List<AuthorizationServerMapping>
                 {
@@ -59,9 +59,9 @@ namespace Lithnet.AccessManager.Server.Test
             };
 
             var authorizationContextProvider = new AuthorizationContextProvider(this.SetupOptions(options), directory, logger);
-            var c = authorizationContextProvider.GetAuthorizationContext(user, computer);
+            var c = authorizationContextProvider.GetAuthorizationContext(user, computer.Sid);
 
-            c = authorizationContextProvider.GetAuthorizationContext(user, computer);
+            c = authorizationContextProvider.GetAuthorizationContext(user, computer.Sid);
 
             Assert.AreEqual(c.Server, dc);
         }
@@ -73,7 +73,7 @@ namespace Lithnet.AccessManager.Server.Test
             IComputer computer = directory.GetComputer(computerName);
             string dnsDomain = this.directory.GetDomainNameDnsFromSid(user.Sid);
 
-            var options = new BuiltInProviderOptions
+            var options = new AuthorizationOptions
             {
                 AuthorizationServerMapping = new List<AuthorizationServerMapping>
                 {
@@ -104,7 +104,7 @@ namespace Lithnet.AccessManager.Server.Test
             };
 
             var authorizationContextProvider = new AuthorizationContextProvider(this.SetupOptions(options), directory, logger);
-            Assert.Throws<AuthorizationContextException>(() => authorizationContextProvider.GetAuthorizationContext(user, computer));
+            Assert.Throws<AuthorizationContextException>(() => authorizationContextProvider.GetAuthorizationContext(user, computer.Sid));
         }
 
         [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1")]
@@ -114,7 +114,7 @@ namespace Lithnet.AccessManager.Server.Test
             IComputer computer = directory.GetComputer(computerName);
             string dnsDomain = this.directory.GetDomainNameDnsFromSid(user.Sid);
 
-            var options = new BuiltInProviderOptions
+            var options = new AuthorizationOptions
             {
                 AuthorizationServerMapping = new List<AuthorizationServerMapping>
                 {
@@ -135,15 +135,15 @@ namespace Lithnet.AccessManager.Server.Test
             };
 
             var authorizationContextProvider = new AuthorizationContextProvider(this.SetupOptions(options), directory, logger);
-            var c = authorizationContextProvider.GetAuthorizationContext(user, computer);
+            var c = authorizationContextProvider.GetAuthorizationContext(user, computer.Sid);
 
             Assert.AreEqual(c.Server, null);
         }
 
-        private IOptionsSnapshot<BuiltInProviderOptions> SetupOptions(BuiltInProviderOptions options)
+        private IOptionsSnapshot<AuthorizationOptions> SetupOptions(AuthorizationOptions options)
         {
-            Mock<IOptionsSnapshot<BuiltInProviderOptions>> optionsSnapshot = new Mock<IOptionsSnapshot<BuiltInProviderOptions>>();
-            optionsSnapshot.SetupGet(t => t.Value).Returns((BuiltInProviderOptions)options);
+            Mock<IOptionsSnapshot<AuthorizationOptions>> optionsSnapshot = new Mock<IOptionsSnapshot<AuthorizationOptions>>();
+            optionsSnapshot.SetupGet(t => t.Value).Returns((AuthorizationOptions)options);
             return optionsSnapshot.Object;
         }
     }

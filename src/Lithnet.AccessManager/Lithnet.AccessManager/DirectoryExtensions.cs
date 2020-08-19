@@ -16,6 +16,14 @@ namespace Lithnet.AccessManager
 {
     public static class DirectoryExtensions
     {
+        internal static void ThrowIfNotObjectClass(this DirectoryEntry de, string objectClass)
+        {
+            if (!string.Equals(de.SchemaClassName, objectClass, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new UnsupportedPrincipalTypeException($"An object of type {de.SchemaClassName} was provided, but an object of type '{objectClass}' was expected");
+            }
+        }
+
         internal static byte[] ToBytes(this SecurityIdentifier s)
         {
             byte[] b = new byte[s.BinaryLength];

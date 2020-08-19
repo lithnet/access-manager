@@ -17,7 +17,7 @@ namespace Lithnet.AccessManager.Agent.Test
             Registry.CurrentUser.DeleteSubKey(policyKeyName, false);
 
             this.policyKey = Registry.CurrentUser.CreateSubKey(policyKeyName, true);
-            this.registrySettings = new RegistrySettingsLaps(policyKey, policyKey);
+            this.registrySettings = new RegistrySettingsLaps($"HKEY_CURRENT_USER\\{policyKeyName}");
         }
 
         [Test]

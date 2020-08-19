@@ -8,6 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using Lithnet.AccessManager.Server.UI.ViewModels;
@@ -112,6 +113,7 @@ namespace Lithnet.AccessManager.Server.UI
                 var vm = new SelectForestViewModel();
                 w.DataContext = vm;
                 w.SaveButtonName = "Next...";
+                w.SizeToContent = SizeToContent.WidthAndHeight;
                 w.SaveButtonIsDefault = true;
                 vm.AvailableForests = new List<string>();
                 var domain = Domain.GetCurrentDomain();

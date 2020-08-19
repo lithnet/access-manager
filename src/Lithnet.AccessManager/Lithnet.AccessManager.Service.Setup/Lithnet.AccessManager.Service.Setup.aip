@@ -7,7 +7,6 @@
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
     <ROW Property="AI_FINDEXE_TITLE" Value="Select the installation package for [|ProductName]" ValueLocId="AI.Property.FindExeTitle"/>
     <ROW Property="AI_LOGON_AS_SERVICE_ACCOUNTS" Value="[USER_NAME]"/>
-    <ROW Property="AI_PREDEF_LCONDS_PROPS" Value="AI_DETECTED_INTERNET_CONNECTION"/>
     <ROW Property="AI_RUN_AS_ADMIN" Value="1"/>
     <ROW Property="AI_ThemeStyle" Value="aero" MsiKey="AI_ThemeStyle"/>
     <ROW Property="AI_USER_IGNORE_FULLNAME" Value="1"/>
@@ -18,10 +17,10 @@
     <ROW Property="CTRLS" Value="2"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{C8CC5B00-8C84-4DA6-92EA-1A76CF8BE9C8} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{3B7DD7D7-6C84-48FC-8CF0-1A5F6770DAD4} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7559.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7566.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="RUNAPPLICATION" Value="1" Type="4"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
@@ -98,7 +97,6 @@
     <ROW Component="FluentValidation.dll" ComponentId="{8BFEC7C5-222F-4A6B-8D54-FCB9CFEA515D}" Directory_="APPDIR" Attributes="0" KeyPath="FluentValidation.dll"/>
     <ROW Component="HtmlAgilityPack.dll" ComponentId="{8505AA5C-23A4-4869-9C25-E396707B78B8}" Directory_="APPDIR" Attributes="0" KeyPath="HtmlAgilityPack.dll"/>
     <ROW Component="InconsolataRegular.ttf" ComponentId="{599B69B5-3EBB-4383-A188-CF1595F67276}" Directory_="fonts_Dir" Attributes="0" Type="0"/>
-    <ROW Component="Interop.NetFwTypeLib.dll" ComponentId="{7382ED5C-584A-4658-BD11-23BE7AF94B91}" Directory_="APPDIR" Attributes="256" KeyPath="Interop.NetFwTypeLib.dll"/>
     <ROW Component="Lithnet" ComponentId="{87EF8BF8-4942-4907-826F-8DC42D990F22}" Directory_="Lithnet_Dir" Attributes="0"/>
     <ROW Component="Lithnet.AccessManager.Server.UI.dll" ComponentId="{3F7461B5-EFB6-48F1-8CBA-9CB1F97BC88A}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.Server.UI.dll"/>
     <ROW Component="Lithnet.AccessManager.Server.UI.exe" ComponentId="{12E3D520-C42D-4704-B2A5-EAC20746AEF3}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.Server.UI.exe"/>
@@ -218,6 +216,7 @@
     <ROW Component="PSDiagnostics.psd1" ComponentId="{21CD8837-1EB6-4D6E-A9FD-C0AF347CF1AC}" Directory_="PSDiagnostics_Dir" Attributes="0" KeyPath="PSDiagnostics.psd1" Type="0"/>
     <ROW Component="PowerShell.Core.Instrumentation.dll" ComponentId="{C93C7DED-B22F-4C2A-99CB-E766FFF33310}" Directory_="APPDIR" Attributes="256" KeyPath="PowerShell.Core.Instrumentation.dll"/>
     <ROW Component="ProductInformation" ComponentId="{EF48E22B-B87F-4609-BCA9-10F3D3A555BF}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
+    <ROW Component="PropertyChanged.dll" ComponentId="{B53211A2-769C-4989-955F-BE5FF81F4B34}" Directory_="APPDIR" Attributes="0" KeyPath="PropertyChanged.dll"/>
     <ROW Component="SslCertBinding.Net.dll" ComponentId="{4ED96CB7-EECE-4BAC-9DB2-6BF79C5652B8}" Directory_="APPDIR" Attributes="0" KeyPath="SslCertBinding.Net.dll"/>
     <ROW Component="Stylet.dll" ComponentId="{2D1874CF-81D8-453A-8F20-EEA3E6FA65CB}" Directory_="APPDIR" Attributes="0" KeyPath="Stylet.dll"/>
     <ROW Component="System.AppContext.dll" ComponentId="{1B762BFF-41E7-42C3-9A1B-202A716CF768}" Directory_="ref_Dir" Attributes="0" KeyPath="System.AppContext.dll"/>
@@ -399,6 +398,7 @@
     <ROW Component="Vanara.PInvoke.Cryptography.dll" ComponentId="{E364F82B-6AE3-4C9E-8782-ACF33BF83A7A}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Cryptography.dll"/>
     <ROW Component="Vanara.PInvoke.Shared.dll" ComponentId="{E7A3EFE6-B53C-4E22-981D-BB99B883514C}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Shared.dll"/>
     <ROW Component="WindowsBase.dll" ComponentId="{5FEB7CF7-9184-4567-B6EE-BA06B26334CC}" Directory_="ref_Dir" Attributes="0" KeyPath="WindowsBase.dll"/>
+    <ROW Component="WindowsFirewallHelper.dll" ComponentId="{D7719CCD-5293-4ABF-AD98-0F9FBC2D803B}" Directory_="APPDIR" Attributes="0" KeyPath="WindowsFirewallHelper.dll"/>
     <ROW Component="all.css" ComponentId="{B40E0286-ED2B-4ADC-921D-7D72ACCB4816}" Directory_="css_2_Dir" Attributes="0" KeyPath="all.css" Type="0"/>
     <ROW Component="all.js" ComponentId="{2CFA21C0-433E-414B-A7D8-2D68B32E35E7}" Directory_="js_2_Dir" Attributes="0" KeyPath="all.js" Type="0"/>
     <ROW Component="apimswincorefilel121.dll" ComponentId="{7D9364E0-D30F-4848-A8A9-58EAFB2DA475}" Directory_="APPDIR" Attributes="256" KeyPath="apimswincorefilel121.dll"/>
@@ -791,7 +791,6 @@
     <ROW File="jquery.min.map" Component_="jquery.min.js" FileName="JQUERY~1.MAP|jquery.min.map" Attributes="0" SourcePath="output\wwwroot\lib\jquery\jquery.min.map" SelfReg="false"/>
     <ROW File="ControlzEx.dll" Component_="ControlzEx.dll" FileName="CONTRO~1.DLL|ControlzEx.dll" Attributes="0" SourcePath="output\ControlzEx.dll" SelfReg="false"/>
     <ROW File="FluentValidation.dll" Component_="FluentValidation.dll" FileName="FLUENT~1.DLL|FluentValidation.dll" Attributes="0" SourcePath="output\FluentValidation.dll" SelfReg="false"/>
-    <ROW File="Interop.NetFwTypeLib.dll" Component_="Interop.NetFwTypeLib.dll" FileName="INTERO~1.DLL|Interop.NetFwTypeLib.dll" Attributes="0" SourcePath="output\Interop.NetFwTypeLib.dll" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Server.UI.deps.json" Component_="apphost.json" FileName="LITHNE~3.JSO|Lithnet.AccessManager.Server.UI.deps.json" Attributes="0" SourcePath="output\Lithnet.AccessManager.Server.UI.deps.json" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Server.UI.dll" Component_="Lithnet.AccessManager.Server.UI.dll" FileName="LITHNE~6.DLL|Lithnet.AccessManager.Server.UI.dll" Attributes="0" SourcePath="output\Lithnet.AccessManager.Server.UI.dll" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Server.UI.pdb" Component_="Lithnet.AccessManager.Server.UI.exe" FileName="LITHNE~5.PDB|Lithnet.AccessManager.Server.UI.pdb" Attributes="0" SourcePath="output\Lithnet.AccessManager.Server.UI.pdb" SelfReg="false"/>
@@ -829,9 +828,6 @@
     <ROW File="SslCertBinding.Net.dll" Component_="SslCertBinding.Net.dll" FileName="SSLCER~1.DLL|SslCertBinding.Net.dll" Attributes="0" SourcePath="output\SslCertBinding.Net.dll" SelfReg="false"/>
     <ROW File="Stylet.dll" Component_="Stylet.dll" FileName="Stylet.dll" Attributes="0" SourcePath="output\Stylet.dll" SelfReg="false"/>
     <ROW File="System.Text.Json.dll_1" Component_="System.Text.Json.dll_1" FileName="SYSTE~34.DLL|System.Text.Json.dll" Attributes="0" SourcePath="output\System.Text.Json.dll" SelfReg="false"/>
-    <ROW File="Lithnet.AccessManager.deps.json" Component_="apphost.json" FileName="LITHNE~5.JSO|Lithnet.AccessManager.deps.json" Attributes="0" SourcePath="output\Lithnet.AccessManager.deps.json" SelfReg="false"/>
-    <ROW File="Lithnet.AccessManager.Server.deps.json" Component_="apphost.json" FileName="LITHNE~6.JSO|Lithnet.AccessManager.Server.deps.json" Attributes="0" SourcePath="output\Lithnet.AccessManager.Server.deps.json" SelfReg="false"/>
-    <ROW File="Lithnet.AccessManager.Server.UI.runtimeconfig.dev.json" Component_="apphost.json" FileName="LITHNE~7.JSO|Lithnet.AccessManager.Server.UI.runtimeconfig.dev.json" Attributes="0" SourcePath="output\Lithnet.AccessManager.Server.UI.runtimeconfig.dev.json" SelfReg="false"/>
     <ROW File="apphost.json_1" Component_="apphost.json_1" FileName="APPHOS~1.JSO|apphost.json" Attributes="0" SourcePath="output\config\apphost.json" SelfReg="false"/>
     <ROW File="appsettings.json_1" Component_="apphost.json_1" FileName="APPSET~1.JSO|appsettings.json" Attributes="0" SourcePath="output\config\appsettings.json" SelfReg="false"/>
     <ROW File="emailfailure.html" Component_="emailfailure.html" FileName="EMAIL-~1.HTM|email-failure.html" Attributes="0" SourcePath="output\config\audit-templates\email-failure.html" SelfReg="false"/>
@@ -876,6 +872,8 @@
     <ROW File="Microsoft.Management.Infrastructure.dll" Component_="Microsoft.Management.Infrastructure.dll" FileName="MICRO~61.DLL|Microsoft.Management.Infrastructure.dll" Attributes="0" SourcePath="output\Microsoft.Management.Infrastructure.dll" SelfReg="false"/>
     <ROW File="Microsoft.Management.Infrastructure.Native.dll" Component_="Microsoft.Management.Infrastructure.Native.dll" FileName="MICRO~62.DLL|Microsoft.Management.Infrastructure.Native.dll" Attributes="0" SourcePath="output\Microsoft.Management.Infrastructure.Native.dll" SelfReg="false"/>
     <ROW File="miutils.dll" Component_="miutils.dll" FileName="miutils.dll" Attributes="0" SourcePath="output\miutils.dll" SelfReg="false"/>
+    <ROW File="WindowsFirewallHelper.dll" Component_="WindowsFirewallHelper.dll" FileName="WINDOW~1.DLL|WindowsFirewallHelper.dll" Attributes="0" SourcePath="output\WindowsFirewallHelper.dll" SelfReg="false"/>
+    <ROW File="PropertyChanged.dll" Component_="PropertyChanged.dll" FileName="PROPER~1.DLL|PropertyChanged.dll" Attributes="0" SourcePath="output\PropertyChanged.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.AiPersistentDataComponent">
     <ROW PersistentRow="config_Dir" Type="1" Condition="1"/>
@@ -886,9 +884,6 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
-  </COMPONENT>
-  <COMPONENT cid="caphyon.advinst.msicomp.BootstrapperUISequenceComponent">
-    <ROW Action="AI_DetectSoftware" Sequence="151"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
     <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="1" PackageFolder="packages" Languages="en" InstallationType="4" CabsLocation="1" PackageType="1" FilesInsideExe="true" ExtractionFolder="[AppDataFolder][|Manufacturer]\[|ProductName] [|ProductVersion]\install" ExtUI="true" UseLargeSchema="true" MsiPackageType="x64" UACExecutionLevel="2"/>
@@ -950,7 +945,6 @@
     <ROW Name="PowerShellScriptLauncher.dll" SourcePath="&lt;AI_CUSTACTS&gt;PowerShellScriptLauncher.dll"/>
     <ROW Name="Prereq.dll" SourcePath="&lt;AI_CUSTACTS&gt;Prereq.dll"/>
     <ROW Name="ResourceCleaner.dll" SourcePath="&lt;AI_CUSTACTS&gt;ResourceCleaner.dll"/>
-    <ROW Name="SoftwareDetector.dll" SourcePath="&lt;AI_CUSTACTS&gt;SoftwareDetector.dll"/>
     <ROW Name="aicustact.dll" SourcePath="&lt;AI_CUSTACTS&gt;aicustact.dll"/>
     <ROW Name="lzmaextractor.dll" SourcePath="&lt;AI_CUSTACTS&gt;lzmaextractor.dll"/>
     <ROW Name="userAccounts.dll" SourcePath="&lt;AI_CUSTACTS&gt;userAccounts.dll"/>
@@ -973,7 +967,7 @@
     <ROW Dialog_="LogonInformationDlg" Control="NameEdit" Type="Edit" X="50" Y="100" Width="269" Height="18" Attributes="3" Property="USER_NAME" Text="{80}" Order="1300" TextLocId="Control.Text.LogonInformationDlg#NameEdit" MsiKey="LogonInformationDlg#NameEdit"/>
     <ROW Dialog_="LogonInformationDlg" Control="PassworEdit" Type="Edit" X="50" Y="139" Width="269" Height="18" Attributes="2097155" Property="USER_PASSWORD" Text="{80}" Order="1400" TextLocId="Control.Text.LogonInformationDlg#PasswordEdit" MsiKey="LogonInformationDlg#PassworEdit"/>
     <ROW Dialog_="LogonInformationDlg" Control="Edit_1" Type="Edit" X="50" Y="178" Width="269" Height="18" Attributes="2097155" Property="USER_PASSWORD_CONFIRM" Text="{80}" Order="1500" TextLocId="Control.Text.LogonInformationDlg#PasswordEdit"/>
-    <ROW Dialog_="LogonInformationDlg" Control="Text_3" Type="Text" X="15" Y="56" Width="337" Height="23" Attributes="65539" Property="TEXT_3_PROP_1" Text="Enter the credentials for the service account. For a group-managed service account, ensure the username ends with a &apos;$&apos;, and leave the password field blank. " Order="1600"/>
+    <ROW Dialog_="LogonInformationDlg" Control="Text_3" Type="Text" X="15" Y="54" Width="337" Height="32" Attributes="65539" Property="TEXT_3_PROP_1" Text="Enter the credentials for the service account in the format of DOMAIN\username. For a group-managed service account, ensure the username ends with a &apos;$&apos;, and leave the password field blank. " Order="1600"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Next]" Order="100" Options="1"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Cancel]" Order="200" Options="1"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Back]" Order="300" Options="1"/>
@@ -1070,7 +1064,6 @@
     <ROW Action="AI_DeleteLzma" Type="1025" Source="lzmaextractor.dll" Target="DeleteLZMAFiles"/>
     <ROW Action="AI_DeleteRCadLzma" Type="51" Source="AI_DeleteRLzma" Target="[AI_SETUPEXEPATH]"/>
     <ROW Action="AI_DeleteRLzma" Type="1281" Source="lzmaextractor.dll" Target="DeleteLZMAFiles"/>
-    <ROW Action="AI_DetectSoftware" Type="257" Source="SoftwareDetector.dll" Target="OnDetectSoftware"/>
     <ROW Action="AI_DpiContentScale" Type="1" Source="aicustact.dll" Target="DpiContentScale"/>
     <ROW Action="AI_EnableDebugLog" Type="321" Source="aicustact.dll" Target="EnableDebugLog"/>
     <ROW Action="AI_EstimateExtractFiles" Type="1" Source="Prereq.dll" Target="EstimateExtractFiles"/>
@@ -1358,7 +1351,6 @@
     <ROW Feature_="MainFeature" Component_="jquery.min.js"/>
     <ROW Feature_="MainFeature" Component_="ControlzEx.dll"/>
     <ROW Feature_="MainFeature" Component_="FluentValidation.dll"/>
-    <ROW Feature_="MainFeature" Component_="Interop.NetFwTypeLib.dll"/>
     <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Server.UI.dll"/>
     <ROW Feature_="MainFeature" Component_="MahApps.Metro.dll"/>
     <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.BoxIcons.dll"/>
@@ -1464,6 +1456,8 @@
     <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.dll"/>
     <ROW Feature_="MainFeature" Component_="miutils.dll"/>
+    <ROW Feature_="MainFeature" Component_="WindowsFirewallHelper.dll"/>
+    <ROW Feature_="MainFeature" Component_="PropertyChanged.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>
@@ -1481,8 +1475,7 @@
     <ROW Action="AI_PREPARE_UPGRADE" Condition="AI_UPGRADE=&quot;No&quot; AND (Not Installed)" Sequence="1399"/>
     <ROW Action="AI_ResolveKnownFolders" Sequence="52"/>
     <ROW Action="AI_EnableDebugLog" Sequence="51"/>
-    <ROW Action="AI_AppSearchEx" Sequence="103"/>
-    <ROW Action="AI_DetectSoftware" Sequence="102"/>
+    <ROW Action="AI_AppSearchEx" Sequence="102"/>
     <ROW Action="RemoveExistingProducts" Condition="AI_UPGRADE&lt;&gt;&quot;No&quot;" Sequence="6501" SeqType="0" MsiKey="RemoveExistingProducts"/>
     <ROW Action="AI_SetLogOnAsService" Condition="NOT Installed" Sequence="4002"/>
     <ROW Action="AI_DATA_SETTER_1" Condition="NOT Installed" Sequence="4001"/>
@@ -1520,9 +1513,8 @@
     <ROW Action="AI_DpiContentScale" Sequence="52"/>
     <ROW Action="AI_EnableDebugLog" Sequence="51"/>
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="99"/>
-    <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="103"/>
-    <ROW Action="AI_AppSearchEx" Sequence="102"/>
-    <ROW Action="AI_DetectSoftware" Sequence="101"/>
+    <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="102"/>
+    <ROW Action="AI_AppSearchEx" Sequence="101"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiLaunchConditionsComponent">
     <ROW Condition="( Version9X OR ( NOT VersionNT64 ) OR ( VersionNT64 AND ((VersionNT64 &lt;&gt; 600) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 600) OR (MsiNTProductType = 1)) AND ((VersionNT64 &lt;&gt; 601) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 601) OR (MsiNTProductType = 1)) AND ((VersionNT64 &lt;&gt; 602) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 602) OR (MsiNTProductType = 1)) AND ((VersionNT64 &lt;&gt; 603) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 1000) OR (MsiNTProductType &lt;&gt; 1)) ) )" Description="[ProductName] cannot be installed on the following Windows versions: [WindowsTypeNT64Display]." DescriptionLocId="AI.LaunchCondition.NoSpecificNT64" IsPredefined="true" Builds="DefaultBuild"/>
@@ -1530,7 +1522,6 @@
     <ROW Condition="((VersionNT &lt;&gt; 501) AND (VersionNT &lt;&gt; 502))" Description="[ProductName] cannot be installed on [WindowsTypeNT5XDisplay]." DescriptionLocId="AI.LaunchCondition.NoNT5X" IsPredefined="true" Builds="DefaultBuild"/>
     <ROW Condition="(VersionNT &lt;&gt; 400)" Description="[ProductName] cannot be installed on [WindowsTypeNT40Display]." DescriptionLocId="AI.LaunchCondition.NoNT40" IsPredefined="true" Builds="DefaultBuild"/>
     <ROW Condition="(VersionNT &lt;&gt; 500)" Description="[ProductName] cannot be installed on [WindowsTypeNT50Display]." DescriptionLocId="AI.LaunchCondition.NoNT50" IsPredefined="true" Builds="DefaultBuild"/>
-    <ROW Condition="AI_DETECTED_INTERNET_CONNECTION" Description="[ProductName] requires an active Internet connection for installation. Please check your network configuration and proxy settings." DescriptionLocId="AI.LaunchCondition.Internet" IsPredefined="true" Builds="DefaultBuild"/>
     <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]." DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiLockPermComponent">

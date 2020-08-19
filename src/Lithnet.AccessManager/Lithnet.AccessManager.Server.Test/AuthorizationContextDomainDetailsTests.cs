@@ -40,13 +40,12 @@ namespace Lithnet.AccessManager.Server.Test
                     }
                 }
             };
-
             
-            Assert.AreEqual("madeup.local", d.GetServer(false)); // Get the first entry
-            Assert.AreEqual("madeup.local", d.GetServer(false)); // Call GetServer again and we should get the same entry
-            Assert.AreEqual("madeup2.local", d.GetServer(true)); // Ask for the next entry
-            Assert.AreEqual("madeup2.local", d.GetServer(false)); // Make sure we still get the same entry
-            Assert.AreEqual("madeup.local", d.GetServer(true)); // Make sure we return to the start
+            Assert.AreEqual("madeup.local", d.GetServer(false).Name); // Get the first entry
+            Assert.AreEqual("madeup.local", d.GetServer(false).Name); // Call GetServer again and we should get the same entry
+            Assert.AreEqual("madeup2.local", d.GetServer(true).Name); // Ask for the next entry
+            Assert.AreEqual("madeup2.local", d.GetServer(false).Name); // Make sure we still get the same entry
+            Assert.AreEqual("madeup.local", d.GetServer(true).Name); // Make sure we return to the start
         }
 
         [Test]
@@ -95,7 +94,7 @@ namespace Lithnet.AccessManager.Server.Test
                 Domain = dnsDomain,
             };
 
-            Assert.AreEqual(dc, d.GetServer(false)); // Get the first entry
+            Assert.AreEqual(dc, d.GetServer(false).Name); // Get the first entry
         }
     }
 }

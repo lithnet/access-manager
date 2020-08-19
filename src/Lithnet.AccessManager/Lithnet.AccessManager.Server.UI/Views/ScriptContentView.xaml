@@ -9,7 +9,6 @@
              xmlns:dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
              dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
-             Width="600"
              d:DesignWidth="600">
     <AdornerDecorator>
         <Grid>
@@ -30,7 +29,7 @@
             <TextBox Grid.Row="1"
                      Margin="5"
                      Text="{Binding ScriptText, Mode=OneWay}"
-                     Height="300"
+                     MinHeight="300"
                      HorizontalScrollBarVisibility="Auto"
                      VerticalScrollBarVisibility="Auto"
                      FontFamily="Consolas,Courier New"

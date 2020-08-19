@@ -14,6 +14,7 @@ namespace Lithnet.AccessManager.Server.Test
         public static ILoggerFactory LogFactory;
 
         [OneTimeSetUp]
+        [Obsolete]
         public void RunBeforeAnyTests()
         {
             var config = new NLog.Config.LoggingConfiguration();

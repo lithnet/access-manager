@@ -24,22 +24,22 @@ namespace Lithnet.AccessManager
 
         public IUser GetUser(string name)
         {
-            return new ActiveDirectoryUser(this.DoGcLookup(name, "user", ActiveDirectoryUser.PropertiesToGet));
+            return new ActiveDirectoryUser(this.FindUserInGc(name));
         }
 
         public IUser GetUser(SecurityIdentifier sid)
         {
-            return new ActiveDirectoryUser(this.DoGcLookup(sid.ToString(), "user", ActiveDirectoryUser.PropertiesToGet));
+            return new ActiveDirectoryUser(this.FindUserInGc(sid.ToString()));
         }
 
         public IComputer GetComputer(string name)
         {
-            return new ActiveDirectoryComputer(this.DoGcLookup(name, "computer", ActiveDirectoryComputer.PropertiesToGet));
+            return new ActiveDirectoryComputer(this.FindComputerInGc(name));
         }
 
         public IComputer GetComputer(SecurityIdentifier sid)
         {
-            return new ActiveDirectoryComputer(this.DoGcLookup(sid.ToString(), "computer", ActiveDirectoryComputer.PropertiesToGet));
+            return new ActiveDirectoryComputer(this.FindComputerInGc(sid.ToString()));
         }
 
         public bool TryGetComputer(string name, out IComputer computer)
@@ -71,7 +71,7 @@ namespace Lithnet.AccessManager
 
         public ISecurityPrincipal GetPrincipal(string name)
         {
-            var result = this.DoGcLookup(name, "*", ActiveDirectoryComputer.PropertiesToGet);
+            var result = this.FindInGc(name, "*");
 
             if (result.HasPropertyValue("objectClass", "computer"))
             {
@@ -130,7 +130,7 @@ namespace Lithnet.AccessManager
 
         public IGroup GetGroup(string groupName)
         {
-            return new ActiveDirectoryGroup(this.DoGcLookup(groupName, "group", ActiveDirectoryGroup.PropertiesToGet));
+            return new ActiveDirectoryGroup(this.FindGroupInGc(groupName));
         }
 
         public bool TryGetGroup(string name, out IGroup group)
@@ -140,7 +140,7 @@ namespace Lithnet.AccessManager
 
         public IGroup GetGroup(SecurityIdentifier sid)
         {
-            return new ActiveDirectoryGroup(this.DoGcLookup(sid.ToString(), "group", ActiveDirectoryGroup.PropertiesToGet));
+            return new ActiveDirectoryGroup(this.FindGroupInGc(sid.ToString()));
         }
 
         public bool TryGetGroup(SecurityIdentifier sid, out IGroup group)
@@ -166,7 +166,7 @@ namespace Lithnet.AccessManager
 
         public void DeleteGroup(string name)
         {
-            var result = this.DoGcLookup(name, "group", null);
+            var result = this.FindGroupInGc(name);
             result.DeleteTree();
         }
 
@@ -356,14 +356,160 @@ namespace Lithnet.AccessManager
             return true;
         }
 
-        private DirectoryEntry DoGcLookup(string objectName, string objectClass, IEnumerable<string> propertiesToGet)
+        private DirectoryEntry FindComputerInGc(string objectName)
+        {
+            DirectoryEntry de;
+
+            if (objectName.TryParseAsSid(out SecurityIdentifier sid))
+            {
+                de = NativeMethods.GetDirectoryEntry(sid);
+            }
+            else if (objectName.Contains("."))
+            {
+                string dn = GcGetDnFromAttributeSearch("dnsHostName", objectName, "computer");
+
+                if (dn == null)
+                {
+                    throw new ObjectNotFoundException(
+                        $"An object {objectName} of type computer was not found in the global catalog");
+                }
+
+                de = new DirectoryEntry($"LDAP://{dn}");
+            }
+            else if (this.IsDistinguishedName(objectName))
+            {
+                de = NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.DistinguishedName);
+            }
+            else
+            {
+                if (!objectName.EndsWith("$"))
+                {
+                    objectName += "$";
+                }
+
+                if (objectName.Contains("\\"))
+                {
+                    return NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.Nt4Name);
+                }
+                else
+                {
+                    string dn = ActiveDirectory.GcGetDnFromAttributeSearch("samAccountName", objectName, "computer");
+
+                    if (dn == null)
+                    {
+                        throw new ObjectNotFoundException(
+                            $"An object {objectName} of type computer was not found in the global catalog");
+                    }
+
+                    de = new DirectoryEntry($"LDAP://{dn}");
+                }
+            }
+
+            if (de == null)
+            {
+                throw new ObjectNotFoundException(
+                    $"An object {objectName} of type computer was not found in the global catalog");
+            }
+
+            de.ThrowIfNotObjectClass("computer");
+
+            return de;
+        }
+
+        private DirectoryEntry FindUserInGc(string objectName)
+        {
+            DirectoryEntry de;
+
+            if (objectName.TryParseAsSid(out SecurityIdentifier sid))
+            {
+                de = NativeMethods.GetDirectoryEntry(sid);
+            }
+
+            else if (objectName.Contains("\\"))
+            {
+                de = NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.Nt4Name);
+            }
+            else if (objectName.Contains("@"))
+            {
+                de = NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.UserPrincipalName);
+            }
+            else if (this.IsDistinguishedName(objectName))
+            {
+                de = NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.DistinguishedName);
+            }
+            else
+            {
+                string dn = ActiveDirectory.GcGetDnFromAttributeSearch("samAccountName", objectName, "user");
+
+                if (dn == null)
+                {
+                    throw new ObjectNotFoundException(
+                        $"An object {objectName} of type user was not found in the global catalog");
+                }
+
+                de = new DirectoryEntry($"LDAP://{dn}");
+            }
+
+            if (de == null)
+            {
+                throw new ObjectNotFoundException(
+                    $"An object {objectName} of type user was not found in the global catalog");
+            }
+
+            de.ThrowIfNotObjectClass("user");
+
+            return de;
+        }
+
+        private DirectoryEntry FindGroupInGc(string objectName)
+        {
+            DirectoryEntry de;
+
+            if (objectName.TryParseAsSid(out SecurityIdentifier sid))
+            {
+                de = NativeMethods.GetDirectoryEntry(sid);
+            }
+
+            else if (objectName.Contains("\\"))
+            {
+                de = NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.Nt4Name);
+            }
+            else if (this.IsDistinguishedName(objectName))
+            {
+                de = NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.DistinguishedName);
+            }
+            else
+            {
+                string dn = ActiveDirectory.GcGetDnFromAttributeSearch("samAccountName", objectName, "group");
+
+                if (dn == null)
+                {
+                    throw new ObjectNotFoundException(
+                        $"An object {objectName} of type group was not found in the global catalog");
+                }
+
+                de = new DirectoryEntry($"LDAP://{dn}");
+            }
+
+            if (de == null)
+            {
+                throw new ObjectNotFoundException(
+                    $"An object {objectName} of type group was not found in the global catalog");
+            }
+
+            de.ThrowIfNotObjectClass("group");
+
+            return de;
+        }
+
+        private DirectoryEntry FindInGc(string objectName, string objectClass)
         {
             if (objectName.TryParseAsSid(out SecurityIdentifier sid))
             {
                 return NativeMethods.GetDirectoryEntry(sid);
             }
 
-            if (objectClass.Equals("computer", StringComparison.OrdinalIgnoreCase) && !objectName.EndsWith("$"))
+            if (objectClass.Equals("computer", StringComparison.OrdinalIgnoreCase) && !objectName.Contains(".") && !objectName.EndsWith("$"))
             {
                 objectName += "$";
             }
@@ -382,7 +528,7 @@ namespace Lithnet.AccessManager
             }
             else
             {
-                string dn = ActiveDirectory.GcGetDnFromSimpleName(objectName, objectClass);
+                string dn = ActiveDirectory.GcGetDnFromAttributeSearch("samAccountName", objectName, objectClass);
 
                 if (dn == null)
                 {
@@ -396,13 +542,13 @@ namespace Lithnet.AccessManager
             }
         }
 
-        private static string GcGetDnFromSimpleName(string samAccountName, string objectClass)
+        private static string GcGetDnFromAttributeSearch(string attributeName, string attributeValue, string objectClass)
         {
             DirectorySearcher d = new DirectorySearcher
             {
                 SearchRoot = new DirectoryEntry($"GC://{Forest.GetCurrentForest().Name}"),
                 SearchScope = SearchScope.Subtree,
-                Filter = $"(&(objectClass={objectClass})(samAccountName={ActiveDirectory.EscapeSearchFilterParameter(samAccountName)}))"
+                Filter = $"(&(objectClass={objectClass})({attributeName}={ActiveDirectory.EscapeSearchFilterParameter(attributeValue)}))"
             };
 
             d.PropertiesToLoad.Add("distinguishedName");
@@ -412,7 +558,7 @@ namespace Lithnet.AccessManager
 
                 if (result.Count > 1)
                 {
-                    throw new AmbiguousNameException($"There was more than one value in the directory that matched the name {samAccountName}");
+                    throw new AmbiguousNameException($"There was more than one value in the directory that matched the criteria of ({attributeName}={attributeValue})");
                 }
 
                 if (result.Count == 0)
@@ -470,7 +616,7 @@ namespace Lithnet.AccessManager
 
             try
             {
-                X500DistinguishedName d2 = new X500DistinguishedName(name);
+                _ = new X500DistinguishedName(name);
                 return true;
             }
             catch

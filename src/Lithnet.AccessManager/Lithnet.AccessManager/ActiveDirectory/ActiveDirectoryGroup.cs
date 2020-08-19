@@ -23,8 +23,8 @@ namespace Lithnet.AccessManager
 
         public ActiveDirectoryGroup(DirectoryEntry directoryEntry)
         {
+            directoryEntry.ThrowIfNotObjectClass("group");
             this.de = directoryEntry;
-
             this.de.RefreshCache(PropertiesToGet);
         }
 

@@ -7,6 +7,7 @@ using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.SimpleChildWindow;
 using Newtonsoft.Json;
+using PropertyChanged;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -119,6 +120,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.View = view;
         }
 
+        [SuppressPropertyChangedWarnings]
         public abstract string DisplayName { get; set; }
 
         public UIElement View { get; set; }

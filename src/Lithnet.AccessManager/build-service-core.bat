@@ -12,7 +12,8 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 dotnet publish "%serviceProject%" --runtime win8-x64 --output "%outputdir%" --framework netcoreapp3.1 --self-contained false
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\msbuild" "%uiproject%" /p:OutputPath="%outputdir%" /p:Runtimeidentifier=win8-x64 /p:TargetFramework=netcoreapp3.1 /p:SelfContained=false
+dotnet publish "%uiproject%" --runtime win8-x64 --output "%outputdir%" --framework netcoreapp3.1 --self-contained false
+REM "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\msbuild" "%uiproject%" /t:Publish /p:OutputPath="%outputdir%\\" /p:Runtimeidentifier=win8-x64 /p:TargetFramework=netcoreapp3.1 /p:SelfContained=false
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 "C:\Program Files (x86)\Caphyon\Advanced Installer 17.3\bin\x86\AdvancedInstaller.com" /build "%setupProject%"

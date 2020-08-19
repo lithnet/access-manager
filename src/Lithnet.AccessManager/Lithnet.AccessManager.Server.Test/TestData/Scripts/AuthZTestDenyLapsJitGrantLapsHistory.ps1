@@ -1,24 +1,25 @@
 function Get-AuthorizationResponse{
 	param(
-	[Lithnet.AccessManager.IUser]$user,
-	[Lithnet.AccessManager.IComputer]$computer,
-	[Nlog.ILogger]$logger
+	$user,
+	$computer
 )
 
-	$logger.Trace("We're in PowerShell!");
-	$logger.Trace("Checking if $($user.MsDsPrincipalName) is allowed administrative access to $($computer.MsDsPrincipalName)");
+	# See https://github.com/lithnet/access-manager/wiki/Authorization-Scripts for help
 
-	$response = New-Object -TypeName "Lithnet.AccessManager.Server.Authorization.PowerShellAuthorizationResponse"
+	Write-Information  "We're in PowerShell!"
+	Write-Information "Checking if $($user.MsDsPrincipalName) is allowed access to $($computer.MsDsPrincipalName)"
 
+	# Create an object to hold our authorization decisions
 	# Set IsAllowed to true to allow access, or set IsDenied to explicitly deny access, or leave both as false if no decision was made. This will allow other rules to be evaluated.
-	$response.IsLocalAdminPasswordAllowed = $true;
-	$response.IsLocalAdminPasswordDenied = $true;
-	
-	$response.IsLocalAdminPasswordHistoryAllowed = $true;
-	$response.IsLocalAdminPasswordHistoryDenied = $false;
-	
-	$response.IsJitAllowed = $true;
-	$response.IsJitDenied = $true;
+	$response = [pscustomobject]@{
+		IsLocalAdminPasswordAllowed = $true
+		IsLocalAdminPasswordDenied = $true
+		IsLocalAdminPasswordHistoryAllowed = $true
+		IsLocalAdminPasswordHistoryDenied = $false
+		IsJitAllowed = $true
+		IsJitDenied = $true
+	}
 
+	# Return the authorization response to Access Manager to process
 	Write-Output $response;
 }

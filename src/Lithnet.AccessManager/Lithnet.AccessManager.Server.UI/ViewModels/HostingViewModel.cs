@@ -19,10 +19,10 @@ using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
-using NetFwTypeLib;
 using Newtonsoft.Json;
 using SslCertBinding.Net;
 using Stylet;
+using WindowsFirewallHelper;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -936,77 +936,38 @@ namespace Lithnet.AccessManager.Server.UI
         {
             this.DeleteFirewallRules(rollback);
 
-            INetFwPolicy2 firewallPolicy = GetFirewallPolicyObject();
-            INetFwRule firewallRule = CreateNetFwRule($"{this.HttpPort},{this.HttpsPort}");
+            var firewallRule = CreateNetFwRule((ushort)this.HttpPort,(ushort)this.HttpsPort);
 
-            firewallPolicy.Rules.Add(firewallRule);
+            FirewallManager.Instance.Rules.Add(firewallRule);
 
-            rollback.RollbackActions.Add(() => firewallPolicy.Rules.Remove(firewallRule.Name));
+            rollback.RollbackActions.Add(() => FirewallManager.Instance.Rules.Remove(firewallRule));
         }
 
-        private INetFwRule CreateNetFwRule(string ports)
+        private IRule CreateNetFwRule(params ushort[] ports)
         {
-            INetFwRule firewallRule = CreateFirewallRuleInstance();
+            var firewallRule = FirewallManager.Instance.CreateApplicationRule( FirewallProfiles.Domain | FirewallProfiles.Private | FirewallProfiles.Public,
+                Constants.FirewallRuleName,
+                FirewallAction.Allow,
+                this.pathProvider.GetFullPath(Constants.ServiceExeName, this.pathProvider.AppPath), 
+                FirewallProtocol.TCP
+            );
 
-            firewallRule.ApplicationName = this.pathProvider.GetFullPath(Constants.ServiceExeName, this.pathProvider.AppPath);
-            firewallRule.Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW;
-            firewallRule.Description = "Permits access to the Lithnet Access Manager Web Service";
-            firewallRule.Enabled = true;
-            firewallRule.Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN;
-            firewallRule.Protocol = 6; //TCP
+            firewallRule.IsEnable = true;
+            firewallRule.Direction = FirewallDirection.Inbound;
             firewallRule.LocalPorts = ports;
-            firewallRule.InterfaceTypes = "All";
-            firewallRule.Name = Constants.FirewallRuleName;
             return firewallRule;
-        }
-
-        private static INetFwRule CreateFirewallRuleInstance()
-        {
-            var firewallRuleType = Type.GetTypeFromProgID("HNetCfg.FWRule");
-
-            if (firewallRuleType == null)
-            {
-                throw new InvalidOperationException("Unable to find type 'HNetCfg.FWRule'");
-            }
-
-            INetFwRule firewallRule = (INetFwRule)Activator.CreateInstance(firewallRuleType);
-
-            if (firewallRule == null)
-            {
-                throw new InvalidOperationException("Unable to create type 'HNetCfg.FWRule'");
-            }
-
-            return firewallRule;
-        }
-
-        private static INetFwPolicy2 GetFirewallPolicyObject()
-        {
-            var firewallPolicyType = Type.GetTypeFromProgID("HNetCfg.FwPolicy2");
-
-            if (firewallPolicyType == null)
-            {
-                throw new InvalidOperationException("Unable to find type 'HNetCfg.FwPolicy2'");
-            }
-
-            INetFwPolicy2 firewallPolicy = (INetFwPolicy2)Activator.CreateInstance(firewallPolicyType);
-
-            if (firewallPolicyType == null)
-            {
-                throw new InvalidOperationException("Unable to find type 'HNetCfg.FwPolicy2'");
-            }
-
-            return firewallPolicy;
         }
 
         private void DeleteFirewallRules(HostingSettingsRollbackContext rollback)
         {
-            INetFwPolicy2 firewallPolicy = GetFirewallPolicyObject();
-
             try
             {
-                var existingFirewallRule = firewallPolicy.Rules.Item(Constants.FirewallRuleName);
-                firewallPolicy.Rules.Remove(Constants.FirewallRuleName);
-                rollback.RollbackActions.Add(() => firewallPolicy.Rules.Add(this.CreateNetFwRule(existingFirewallRule.LocalPorts)));
+                var existingFirewallRule = FirewallManager.Instance.Rules.SingleOrDefault(t => string.Equals(t.Name, Constants.FirewallRuleName, StringComparison.OrdinalIgnoreCase));
+                if (existingFirewallRule != null)
+                {
+                    FirewallManager.Instance.Rules.Remove(existingFirewallRule);
+                    rollback.RollbackActions.Add(() => FirewallManager.Instance.Rules.Add(existingFirewallRule));
+                }
             }
             catch
             {

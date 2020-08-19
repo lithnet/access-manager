@@ -35,8 +35,8 @@ namespace Lithnet.AccessManager.Server.Test
         public void TestScriptGrantLapsJit()
         {
             IUser user = directory.GetUser(WindowsIdentity.GetCurrent().User);
-
-            var sd = generator.GenerateSecurityDescriptor(user, null, "AuthZTestGrantLapsJit.ps1", 30);
+            IComputer computer = directory.GetComputer("IDMDEV1\\PC1"); 
+            var sd = generator.GenerateSecurityDescriptor(user, computer, "AuthZTestGrantLapsJit.ps1", 30);
 
             using AuthorizationContext context = new AuthorizationContext(user.Sid);
             Assert.IsTrue(context.AccessCheck(sd, (int)AccessMask.Jit));
@@ -48,8 +48,8 @@ namespace Lithnet.AccessManager.Server.Test
         public void TestScriptDenyLapsJitGrantLapsHistory()
         {
             IUser user = directory.GetUser(WindowsIdentity.GetCurrent().User);
-
-            var sd = generator.GenerateSecurityDescriptor(user, null, "AuthZTestDenyLapsJitGrantLapsHistory.ps1", 30);
+            IComputer computer = directory.GetComputer("IDMDEV1\\PC1");
+            var sd = generator.GenerateSecurityDescriptor(user, computer, "AuthZTestDenyLapsJitGrantLapsHistory.ps1", 30);
 
             using AuthorizationContext context = new AuthorizationContext(user.Sid);
             Assert.IsFalse(context.AccessCheck(sd, (int)AccessMask.Jit));

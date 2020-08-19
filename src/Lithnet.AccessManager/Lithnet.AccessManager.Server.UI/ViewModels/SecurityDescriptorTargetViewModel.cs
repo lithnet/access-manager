@@ -199,6 +199,7 @@ namespace Lithnet.AccessManager.Server.UI
                 w.Title = "Select forest";
                 var vm = new SelectForestViewModel();
                 w.DataContext = vm;
+                w.SizeToContent = SizeToContent.WidthAndHeight;
                 w.SaveButtonName = "Next...";
                 w.SaveButtonIsDefault = true;
                 vm.AvailableForests = new List<string>();

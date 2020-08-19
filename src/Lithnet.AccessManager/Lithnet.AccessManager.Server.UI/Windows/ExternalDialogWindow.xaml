@@ -11,7 +11,6 @@
                       BorderBrush="{DynamicResource MahApps.Brushes.AccentBase}"
                       BorderThickness="1"
                       Padding="30"
-                      SizeToContent="WidthAndHeight"
                       WindowStartupLocation="CenterScreen"
                       ShowInTaskbar="False"
                       ShowCloseButton="True"

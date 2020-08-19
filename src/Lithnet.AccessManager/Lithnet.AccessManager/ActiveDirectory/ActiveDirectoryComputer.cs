@@ -13,6 +13,7 @@ namespace Lithnet.AccessManager
 
         public ActiveDirectoryComputer(DirectoryEntry directoryEntry)
         {
+            directoryEntry.ThrowIfNotObjectClass("computer");
             this.de = directoryEntry;
             this.de.RefreshCache(PropertiesToGet);
         }

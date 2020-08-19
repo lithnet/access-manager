@@ -12,6 +12,7 @@ namespace Lithnet.AccessManager
 
         public ActiveDirectoryUser(DirectoryEntry directoryEntry)
         {
+            directoryEntry.ThrowIfNotObjectClass("user");
             this.de = directoryEntry;
             this.de.RefreshCache(PropertiesToGet);
         }

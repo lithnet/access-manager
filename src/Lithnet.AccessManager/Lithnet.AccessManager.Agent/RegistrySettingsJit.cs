@@ -7,16 +7,20 @@ namespace Lithnet.AccessManager.Agent
     {
         private const string keyName = "Lithnet\\Access Manager Agent\\Jit";
 
-        public RegistrySettingsJit() : base(keyName)
+        public RegistrySettingsJit() : base(keyName, true)
         {
         }
 
-        public bool RestrictAdmins => this.GetKey().GetValue<int>("RestrictAdmins", 0) == 1;
+        internal RegistrySettingsJit(string key) : base(key, false)
+        {
+        }
 
-        public bool JitEnabled => this.GetKey().GetValue<int>("Enabled", 0) == 1;
+        public bool RestrictAdmins => this.GetValue<int>("RestrictAdmins", 0) == 1;
 
-        public string JitGroup => this.GetKey().GetValue<string>("JitGroup");
+        public bool JitEnabled => this.GetValue<int>("Enabled", 0) == 1;
 
-        public IEnumerable<string> AllowedAdmins => this.GetKey().GetValues("AllowedAdmins");
+        public string JitGroup => this.GetValue<string>("JitGroup");
+
+        public IEnumerable<string> AllowedAdmins => this.GetValues("AllowedAdmins");
     }
 }

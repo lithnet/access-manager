@@ -6,12 +6,16 @@ namespace Lithnet.AccessManager.Agent
     {
         private const string keyName = "Lithnet\\Access Manager Agent";
 
-        public RegistrySettingsAgent() : base(keyName)
+        public RegistrySettingsAgent() : base(keyName, true)
         {
         }
 
-        public bool Enabled => this.GetKey().GetValue<int>("Enabled", 0) == 1;
+        internal RegistrySettingsAgent(string key) : base(key, false)
+        {
+        }
 
-        public int Interval => this.GetKey().GetValue<int>("Interval", 60);
+        public bool Enabled => this.GetValue<int>("Enabled", 0) == 1;
+
+        public int Interval => this.GetValue<int>("Interval", 60);
     }
 }
