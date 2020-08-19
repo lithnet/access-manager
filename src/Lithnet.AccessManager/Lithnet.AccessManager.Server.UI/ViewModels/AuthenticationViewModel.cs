@@ -144,9 +144,9 @@ namespace Lithnet.AccessManager.Server.UI
 
                 scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS | DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
 
-                string target = vm.SelectedForest == domain.Forest.Name ? null : vm.SelectedForest;
+                var targetServer = this.directory.GetDomainControllerForDomain(vm.SelectedForest ?? Forest.GetCurrentForest().Name);
 
-                var result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), target, scope, "objectClass", "objectSid").FirstOrDefault();
+                var result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), targetServer, scope, "objectClass", "objectSid").FirstOrDefault();
 
                 if (result != null)
                 {
@@ -193,7 +193,7 @@ namespace Lithnet.AccessManager.Server.UI
                 }
                 catch
                 {
-                    return sid.ToString(); ;
+                    return sid.ToString();
                 }
             }
         }

@@ -6,7 +6,7 @@ namespace Lithnet.AccessManager.Server.Configuration
 {
     public class SecurityDescriptorTargetLapsDetails
     {
-        public TimeSpan ExpireAfter { get; set; }
+        public TimeSpan ExpireAfter { get; set; } = TimeSpan.FromMinutes(60);
 
         [JsonConverter(typeof(StringEnumConverter))]
         public PasswordStorageLocation RetrievalLocation { get; set; }

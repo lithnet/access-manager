@@ -109,8 +109,6 @@ namespace Lithnet.AccessManager.Server.UI
 
             ExternalDialogWindow w = new ExternalDialogWindow
             {
-                Width = 650,
-                Height = 400,
                 Title = "Script",
                 DataContext = vm,
                 SaveButtonVisible = false,

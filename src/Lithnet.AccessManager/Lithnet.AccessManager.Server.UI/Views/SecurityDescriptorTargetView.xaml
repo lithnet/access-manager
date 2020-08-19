@@ -38,7 +38,7 @@
                                Content="Target"
                                Margin="5 2 5 2"/>
                 <TextBox Grid.Row="0" Grid.Column="1" 
-                                 Text="{Binding DisplayName, Mode=OneWay}"
+                                 Text="{Binding DisplayName, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                                  IsReadOnly="True"
                                  Margin="2"/>
                 <Button Grid.Row="0" Grid.Column="2" 
@@ -194,7 +194,7 @@
                                    Margin="5"/>
 
                 <TextBox Grid.Row="0" Grid.Column="1" 
-                                     Text="{Binding JitGroupDisplayName}"
+                                     Text="{Binding JitGroupDisplayName,  ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=LostFocus}"
                                      VerticalAlignment="Center"
                                      Margin="0"/>
                 <Button Grid.Row="0" Grid.Column="2" 
@@ -221,7 +221,7 @@
                            VerticalAlignment="Center"
                            Margin="0 0 5 0"/>
                     <mah:NumericUpDown Value="{Binding JitExpireMinutes}" 
-                                       Minimum="0" Interval="15" 
+                                       Minimum="15" Interval="15" 
                                        HideUpDownButtons="False"
                                        Width="100" 
                                        VerticalAlignment="Center"

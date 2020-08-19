@@ -15,7 +15,7 @@ namespace Lithnet.AccessManager.Server.Configuration
         public string Description { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public TargetType Type { get; set; }
+        public TargetType Type { get; set; } = TargetType.Container;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public AuthorizationMode AuthorizationMode { get; set; } = AuthorizationMode.SecurityDescriptor;

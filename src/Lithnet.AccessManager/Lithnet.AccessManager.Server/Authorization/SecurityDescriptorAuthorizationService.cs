@@ -141,6 +141,11 @@ namespace Lithnet.AccessManager.Server.Authorization
             }
             else if (requestedAccess == AccessMask.Jit)
             {
+                if (string.IsNullOrWhiteSpace(matchedTarget.Jit.AuthorizingGroup))
+                {
+                    throw new ConfigurationException($"The target {matchedTarget.Id} has an empty JIT group");
+                }
+
                 response = new JitAuthorizationResponse()
                 {
                     ExpireAfter = matchedTarget.Jit.ExpireAfter,

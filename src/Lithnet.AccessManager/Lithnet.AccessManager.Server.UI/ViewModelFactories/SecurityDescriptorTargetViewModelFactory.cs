@@ -1,6 +1,7 @@
 ﻿using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
+using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -11,19 +12,21 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory;
         private readonly IFileSelectionViewModelFactory fileSelectionViewModelFactory;
         private readonly ILogger<SecurityDescriptorTargetViewModel> logger;
+        private readonly IModelValidator<SecurityDescriptorTargetViewModel> validator;
 
-        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger)
+        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IModelValidator<SecurityDescriptorTargetViewModel> validator)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.appPathProvider = appPathProvider;
             this.channelSelectionViewModelFactory = channelSelectionViewModelFactory;
             this.fileSelectionViewModelFactory = fileSelectionViewModelFactory;
             this.logger = logger;
+            this.validator = validator;
         }
 
         public SecurityDescriptorTargetViewModel CreateViewModel(SecurityDescriptorTarget model)
         {
-            return new SecurityDescriptorTargetViewModel(model, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator);
+            return new SecurityDescriptorTargetViewModel(model, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, validator);
         }
     }
 }

@@ -19,6 +19,16 @@ namespace Lithnet.AccessManager
 
         string GetDomainControllerForDomain(string domainDns, bool forceRediscovery);
 
+        string GetDomainControllerForOUOrDefault(string ou);
+
+        string GetDomainControllerForOU(string ou);
+
+        string GetFullyQualifiedAdsPath(string ou);
+
+        string GetFullyQualifiedDomainControllerAdsPath(string ou);
+
+        string GetForestDnsNameForOU(string ou);
+
         IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl);
 
         IComputer GetComputer(string name);

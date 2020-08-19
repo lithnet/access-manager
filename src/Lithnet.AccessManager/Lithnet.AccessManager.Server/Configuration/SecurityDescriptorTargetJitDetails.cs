@@ -6,6 +6,6 @@ namespace Lithnet.AccessManager.Server.Configuration
     {
         public string AuthorizingGroup { get; set; }
 
-        public TimeSpan ExpireAfter { get; set; }
+        public TimeSpan ExpireAfter { get; set; } = TimeSpan.FromMinutes(60);
     }
 }

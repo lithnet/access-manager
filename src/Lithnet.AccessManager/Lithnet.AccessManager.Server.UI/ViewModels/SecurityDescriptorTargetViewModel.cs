@@ -15,7 +15,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class SecurityDescriptorTargetViewModel : PropertyChangedBase, IViewAware
+    public sealed class SecurityDescriptorTargetViewModel : ValidatingModelBase, IViewAware
     {
         private readonly IDirectory directory;
 
@@ -23,9 +23,13 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IDialogCoordinator dialogCoordinator;
 
+        private static readonly Domain currentDomain = Domain.GetCurrentDomain();
+
+        private static readonly Forest currentForest = Forest.GetCurrentForest();
+
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator)
         {
             this.directory = new ActiveDirectory();
             this.Model = model;
@@ -37,7 +41,17 @@ namespace Lithnet.AccessManager.Server.UI
             this.Script.Filter = "PowerShell script|*.ps1";
             this.Script.NewFileContent = ScriptTemplates.AuthorizationScriptTemplate;
             this.Script.ShouldValidate = false;
+            this.Script.PropertyChanged += Script_PropertyChanged;
+
             this.Notifications = notificationChannelFactory.CreateViewModel(model.Notifications);
+
+            this.Validator = validator;
+            this.Validate();
+        }
+
+        private void Script_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            this.Validate();
         }
 
         public NotificationChannelSelectionViewModel Notifications { get; }
@@ -67,8 +81,6 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string JitAuthorizingGroup { get => this.Model.Jit.AuthorizingGroup; set => this.Model.Jit.AuthorizingGroup = value; }
 
-        public string EvaluationDomain { get; set; }
-
         public string JitGroupDisplayName
         {
             get => this.TryGetNameIfSid(this.JitAuthorizingGroup);
@@ -96,11 +108,12 @@ namespace Lithnet.AccessManager.Server.UI
 
         public TimeSpan LapsExpireAfter { get => this.Model.Laps.ExpireAfter; set => this.Model.Laps.ExpireAfter = value; }
 
-        public int LapsExpireMinutes { get => (int)this.LapsExpireAfter.TotalMinutes; set => this.LapsExpireAfter = new TimeSpan(0, value, 0); }
+        public int LapsExpireMinutes { get => (int)this.LapsExpireAfter.TotalMinutes; set => this.LapsExpireAfter = new TimeSpan(0, Math.Max(value, 15), 0); }
 
         public bool ExpireLapsPassword
         {
-            get => this.LapsExpireAfter.TotalSeconds > 0; set
+            get => this.LapsExpireAfter.TotalSeconds > 0;
+            set
             {
                 if (value)
                 {
@@ -116,11 +129,11 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public int JitExpireMinutes { get => (int)this.JitExpireAfter.TotalMinutes; set => this.JitExpireAfter = new TimeSpan(0, value, 0); }
+        public int JitExpireMinutes { get => (int)this.JitExpireAfter.TotalMinutes; set => this.JitExpireAfter = new TimeSpan(0, Math.Max(value, 15), 0); }
 
         public PasswordStorageLocation RetrievalLocation { get => this.Model.Laps.RetrievalLocation; set => this.Model.Laps.RetrievalLocation = value; }
 
-        public string DisplayName => this.Type == TargetType.Container ? this.Target : $"{this.TryGetNameFromSid(this.Target)} ({this.Type})";
+        public string DisplayName => this.Target == null ? null : this.Type == TargetType.Container ? this.Target : $"{this.TryGetNameFromSid(this.Target)} ({this.Type})";
 
         public bool ShowLapsOptions => this.IsModeScript || SdHasMask(this.SecurityDescriptor, AccessMask.LocalAdminPassword);
 
@@ -138,33 +151,24 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 var rights = new List<SiAccess>
                 {
-                    new SiAccess((uint)(AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory | AccessMask.Jit | AccessMask.BitLocker), "Full access", InheritFlags.SiAccessGeneral),
                     new SiAccess((uint)AccessMask.LocalAdminPassword, "Local admin password", InheritFlags.SiAccessGeneral),
                     new SiAccess((uint)AccessMask.LocalAdminPasswordHistory, "Local admin password history", InheritFlags.SiAccessGeneral),
                     new SiAccess((uint)AccessMask.Jit, "Just-in-time access", InheritFlags.SiAccessGeneral),
                     new SiAccess((uint)AccessMask.BitLocker, "BitLocker recovery passwords", InheritFlags.SiAccessGeneral),
-                    new SiAccess(0, "None", 0)
                 };
 
                 this.SecurityDescriptor ??= "O:SYD:";
 
                 RawSecurityDescriptor sd = new RawSecurityDescriptor(this.SecurityDescriptor);
 
-                string targetServer = null;
-
-                if (this.Type == TargetType.Container)
-                {
-                    targetServer = this.directory.GetDomainNameDnsFromDn(this.Target);
-                }
-                else if (this.Target.TryParseAsSid(out SecurityIdentifier sid))
-                {
-                    targetServer = this.directory.GetDomainNameDnsFromSid(sid);
-                }
+                string targetServer = this.GetDcForTargetOrDefault();
 
                 SiObjectInfoFlags flags = SiObjectInfoFlags.EditPermissions;
 
-                GenericMapping mapping = new GenericMapping();
-                mapping.GenericAll = 0x200 | 0x400 | 0x800;
+                GenericMapping mapping = new GenericMapping
+                {
+                    GenericAll = (uint)(AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory | AccessMask.Jit | AccessMask.BitLocker)
+                };
 
                 BasicSecurityInformation info = new BasicSecurityInformation(
                     flags,
@@ -181,6 +185,8 @@ namespace Lithnet.AccessManager.Server.UI
                     info.SecurityDescriptor.Group = null;
                     this.SecurityDescriptor = info.SecurityDescriptor.GetSddlForm(AccessControlSections.All);
                 }
+
+                await this.ValidateAsync();
             }
             catch (Exception ex)
             {
@@ -191,59 +197,98 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool CanSelectJitGroup => this.CanEdit;
 
+        private string GetDcForTargetOrDefault()
+        {
+            if (this.Target == null)
+            {
+                return currentDomain.Name;
+            }
+
+            string domain = null;
+
+            try
+            {
+                if (this.Type == TargetType.Container)
+                {
+                    domain = this.directory.GetDomainNameDnsFromDn(this.Target);
+                }
+                else if (this.Target.TryParseAsSid(out SecurityIdentifier sid))
+                {
+                    domain = this.directory.GetDomainNameDnsFromSid(sid);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning(EventIDs.UIGenericWarning, ex, "Error dc for target");
+            }
+
+            return this.directory.GetDomainControllerForDomain(domain ?? currentDomain.Name);
+        }
+
+        private string GetForestDcForTargetOrDefault()
+        {
+            return this.directory.GetDomainControllerForDomain(GetForestForTargetOrDefault() ?? currentForest.Name);
+        }
+
+        private string GetForestForTargetOrDefault()
+        {
+            if (string.IsNullOrWhiteSpace(this.Target))
+            {
+                return currentForest.Name;
+            }
+            
+            string forest = null;
+            try
+            {
+                if (this.Type == TargetType.Container)
+                {
+                    forest = directory.GetForestDnsNameForOU(this.Target);
+                }
+                else if (this.Target.TryParseAsSid(out SecurityIdentifier sid))
+                {
+                    forest = Domain.GetDomain(new DirectoryContext(DirectoryContextType.Domain, this.directory.GetDomainNameDnsFromSid(sid))).Forest.Name;
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning(EventIDs.UIGenericWarning, ex, "Error resolving forest name");
+            }
+
+            forest ??= currentForest.Name;
+
+            return forest;
+        }
+
+
         public async Task SelectJitGroup()
         {
             try
             {
-                ExternalDialogWindow w = new ExternalDialogWindow();
-                w.Title = "Select forest";
-                var vm = new SelectForestViewModel();
-                w.DataContext = vm;
-                w.SizeToContent = SizeToContent.WidthAndHeight;
-                w.SaveButtonName = "Next...";
-                w.SaveButtonIsDefault = true;
-                vm.AvailableForests = new List<string>();
-                var domain = Domain.GetCurrentDomain();
-                vm.AvailableForests.Add(domain.Forest.Name);
-                vm.SelectedForest = domain.Forest.Name;
+                //var vm = new SelectForestViewModel
+                //{
+                //    AvailableForests = BuildAvailableForests(),
+                //    SelectedForest = this.GetForestForTargetOrDefault()
+                //};
 
-                foreach (var trust in domain.Forest.GetAllTrustRelationships().OfType<TrustRelationshipInformation>())
+                //ExternalDialogWindow w = new ExternalDialogWindow
+                //{
+                //    Title = "Select forest",
+                //    DataContext = vm,
+                //    SizeToContent = SizeToContent.WidthAndHeight,
+                //    SaveButtonName = "Next...",
+                //    SaveButtonIsDefault = true,
+                //    Owner = this.GetWindow()
+                //};
+
+                //if (!w.ShowDialog() ?? false)
+                //{
+                //    return;
+                //}
+
+                var sid = ShowObjectPickerGroups(this.GetDcForTargetOrDefault());
+                if (sid != null)
                 {
-                    if (trust.TrustDirection == TrustDirection.Inbound || trust.TrustDirection == TrustDirection.Bidirectional)
-                    {
-                        vm.AvailableForests.Add(trust.TargetName);
-                    }
-                }
-
-                w.Owner = this.GetWindow();
-
-                if (!w.ShowDialog() ?? false)
-                {
-                    return;
-                }
-
-                DsopScopeInitInfo scope = new DsopScopeInitInfo();
-                scope.Filter = new DsFilterFlags();
-
-                scope.Filter.UpLevel.BothModeFilter = DsopObjectFilterFlags.DSOP_FILTER_DOMAIN_LOCAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_GLOBAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_UNIVERSAL_GROUPS_SE;
-
-                scope.ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_ENTERPRISE_DOMAIN | DsopScopeTypeFlags.DSOP_SCOPE_TYPE_USER_ENTERED_UPLEVEL_SCOPE | DsopScopeTypeFlags.DSOP_SCOPE_TYPE_EXTERNAL_UPLEVEL_DOMAIN;
-
-                scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS | DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
-
-                string target = vm.SelectedForest == domain.Forest.Name ? null : vm.SelectedForest;
-
-                var result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), target, scope, "objectClass", "objectSid").FirstOrDefault();
-
-                if (result != null)
-                {
-                    byte[] sid = result.Attributes["objectSid"] as byte[];
-                    if (sid == null)
-                    {
-                        return;
-                    }
-
-                    this.JitAuthorizingGroup = new SecurityIdentifier(sid, 0).ToString();
+                    this.JitAuthorizingGroup = sid.ToString();
                 }
             }
             catch (Exception ex)
@@ -253,43 +298,57 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
+        private SecurityIdentifier ShowObjectPickerGroups(string targetServer)
+        {
+            DsopScopeInitInfo scope = new DsopScopeInitInfo();
+            scope.Filter = new DsFilterFlags();
+            scope.Filter.UpLevel.BothModeFilter =
+                DsopObjectFilterFlags.DSOP_FILTER_DOMAIN_LOCAL_GROUPS_SE |
+                DsopObjectFilterFlags.DSOP_FILTER_GLOBAL_GROUPS_SE |
+                DsopObjectFilterFlags.DSOP_FILTER_UNIVERSAL_GROUPS_SE;
+
+            scope.ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_ENTERPRISE_DOMAIN |
+                              DsopScopeTypeFlags.DSOP_SCOPE_TYPE_USER_ENTERED_UPLEVEL_SCOPE |
+                              DsopScopeTypeFlags.DSOP_SCOPE_TYPE_EXTERNAL_UPLEVEL_DOMAIN;
+
+            scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS |
+                             DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
+
+            var result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), targetServer, scope, "objectClass", "objectSid").FirstOrDefault();
+
+            if (result != null)
+            {
+                byte[] sid = result.Attributes["objectSid"] as byte[];
+                if (sid == null)
+                {
+                    return null;
+                }
+
+                return new SecurityIdentifier(sid, 0);
+            }
+
+            return null;
+        }
+
         public async Task SelectTarget()
         {
             try
             {
-                DialogWindow w = new DialogWindow();
-                w.Title = "Select target type";
-                var vm = new SelectTargetTypeViewModel();
-                w.DataContext = vm;
-                w.SaveButtonName = "Next...";
-                w.SaveButtonIsDefault = true;
-                vm.TargetType = this.Type;
-                vm.AvailableForests = new List<string>();
-                var domain = Domain.GetCurrentDomain();
-                vm.AvailableForests.Add(domain.Forest.Name);
-
-                if (this.Type == TargetType.Container && !string.IsNullOrWhiteSpace(this.Target))
+                var vm = new SelectTargetTypeViewModel
                 {
-                    try
-                    {
-                        vm.SelectedForest = directory.GetDomainNameDnsFromDn(this.Target);
-                    }
-                    catch
-                    {
-                        // ignore
-                    }
-                }
+                    TargetType = this.Type,
+                    AvailableForests = BuildAvailableForests()
+                };
 
-                vm.SelectedForest ??= domain.Forest.Name;
-
-                foreach (var trust in domain.Forest.GetAllTrustRelationships().OfType<TrustRelationshipInformation>())
+                DialogWindow w = new DialogWindow
                 {
-                    if (trust.TrustDirection == TrustDirection.Inbound ||
-                        trust.TrustDirection == TrustDirection.Bidirectional)
-                    {
-                        vm.AvailableForests.Add(trust.TargetName);
-                    }
-                }
+                    Title = "Select target type",
+                    DataContext = vm,
+                    SaveButtonName = "Next...",
+                    SaveButtonIsDefault = true
+                };
+
+                vm.SelectedForest = this.GetForestForTargetOrDefault();
 
                 await this.GetWindow().ShowChildWindowAsync(w);
 
@@ -302,52 +361,15 @@ namespace Lithnet.AccessManager.Server.UI
 
                 if (vm.TargetType == TargetType.Container)
                 {
-                    var container =
-                        NativeMethods.ShowContainerDialog(this.GetHandle(), "Select container", "Select container", $"LDAP://{vm.SelectedForest}", $"LDAP://{vm.SelectedForest}/{this.Target}");
-
-                    if (container != null)
-                    {
-                        this.Target = container;
-                    }
+                    ShowContainerDialog();
                 }
                 else
                 {
-                    DsopScopeInitInfo scope = new DsopScopeInitInfo();
-                    scope.Filter = new DsFilterFlags();
-                    if (vm.TargetType == TargetType.Computer)
+                    var sid = ShowObjectPickerDialogComputersAndGroups(vm.TargetType, vm.SelectedForest);
+
+                    if (sid != null)
                     {
-                        scope.Filter.UpLevel.BothModeFilter = DsopObjectFilterFlags.DSOP_FILTER_COMPUTERS;
-                    }
-                    else
-                    {
-                        scope.Filter.UpLevel.BothModeFilter =
-                            DsopObjectFilterFlags.DSOP_FILTER_DOMAIN_LOCAL_GROUPS_SE |
-                            DsopObjectFilterFlags.DSOP_FILTER_GLOBAL_GROUPS_SE |
-                            DsopObjectFilterFlags.DSOP_FILTER_UNIVERSAL_GROUPS_SE;
-                    }
-
-                    scope.ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_ENTERPRISE_DOMAIN |
-                                      DsopScopeTypeFlags.DSOP_SCOPE_TYPE_USER_ENTERED_UPLEVEL_SCOPE |
-                                      DsopScopeTypeFlags.DSOP_SCOPE_TYPE_EXTERNAL_UPLEVEL_DOMAIN;
-
-                    scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_COMPUTERS |
-                                     DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS |
-                                     DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
-
-                    string targetServer = vm.SelectedForest == domain.Forest.Name ? null : vm.SelectedForest;
-                    var result = NativeMethods
-                        .ShowObjectPickerDialog(this.GetHandle(), targetServer, scope, "objectClass", "objectSid")
-                        .FirstOrDefault();
-
-                    if (result != null)
-                    {
-                        byte[] sid = result.Attributes["objectSid"] as byte[];
-                        if (sid == null)
-                        {
-                            return;
-                        }
-
-                        this.Target = new SecurityIdentifier(sid, 0).ToString();
+                        this.Target = sid.ToString();
                     }
                 }
             }
@@ -356,6 +378,83 @@ namespace Lithnet.AccessManager.Server.UI
                 this.logger.LogError(EventIDs.UIGenericError, ex, "Select target error");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred when processing the request\r\n{ex.Message}");
             }
+        }
+
+        private SecurityIdentifier ShowObjectPickerDialogComputersAndGroups(TargetType targetType, string forest)
+        {
+            DsopScopeInitInfo scope = new DsopScopeInitInfo
+            {
+                Filter = new DsFilterFlags()
+            };
+
+            if (targetType == TargetType.Computer)
+            {
+                scope.Filter.UpLevel.BothModeFilter = DsopObjectFilterFlags.DSOP_FILTER_COMPUTERS;
+            }
+            else
+            {
+                scope.Filter.UpLevel.BothModeFilter =
+                    DsopObjectFilterFlags.DSOP_FILTER_DOMAIN_LOCAL_GROUPS_SE |
+                    DsopObjectFilterFlags.DSOP_FILTER_GLOBAL_GROUPS_SE |
+                    DsopObjectFilterFlags.DSOP_FILTER_UNIVERSAL_GROUPS_SE;
+            }
+
+            scope.ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_ENTERPRISE_DOMAIN |
+                              DsopScopeTypeFlags.DSOP_SCOPE_TYPE_USER_ENTERED_UPLEVEL_SCOPE |
+                              DsopScopeTypeFlags.DSOP_SCOPE_TYPE_EXTERNAL_UPLEVEL_DOMAIN;
+
+            scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_COMPUTERS |
+                             DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS |
+                             DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
+
+            string targetServer = this.directory.GetDomainControllerForDomain(forest ?? currentForest.Name);
+
+            var result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), targetServer, scope, "objectClass", "objectSid").FirstOrDefault();
+
+            if (result != null)
+            {
+                byte[] sid = result.Attributes["objectSid"] as byte[];
+                if (sid == null)
+                {
+                    return null;
+                }
+
+                return new SecurityIdentifier(sid, 0);
+            }
+
+            return null;
+        }
+
+        private void ShowContainerDialog()
+        {
+            string path = this.Target ?? currentDomain.GetDirectoryEntry().GetPropertyString("distinguishedName");
+
+            string basePath = this.directory.GetFullyQualifiedDomainControllerAdsPath(path);
+            string initialPath = this.directory.GetFullyQualifiedAdsPath(path);
+
+            var container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select container", "Select container", basePath, initialPath);
+
+            if (container != null)
+            {
+                this.Target = container;
+            }
+        }
+
+        private static List<string> BuildAvailableForests()
+        {
+            List<string> availableForests = new List<string>();
+            availableForests.Add(currentForest.Name);
+
+            foreach (var trust in currentForest.GetAllTrustRelationships().OfType<TrustRelationshipInformation>())
+            {
+                if (trust.TrustDirection == TrustDirection.Inbound ||
+                    trust.TrustDirection == TrustDirection.Bidirectional)
+                {
+                    availableForests.Add(trust.TargetName);
+                }
+            }
+
+            return availableForests;
         }
 
         public UIElement View { get; set; }

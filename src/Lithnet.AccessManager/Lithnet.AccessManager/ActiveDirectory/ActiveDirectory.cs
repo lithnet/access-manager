@@ -301,6 +301,53 @@ namespace Lithnet.AccessManager
             return NativeMethods.GetDomainControllerForDnsDomain(domainDns, forceRediscovery);
         }
 
+        public string GetDomainControllerForOUOrDefault(string ou)
+        {
+            if (ou != null)
+            {
+                try
+                {
+                    string domain = this.GetDomainNameDnsFromDn(ou);
+                    return this.GetDomainControllerForDomain(domain);
+                }
+                catch
+                {
+                }
+            }
+
+            return Domain.GetComputerDomain().FindDomainController().Name;
+        }
+
+        public string GetForestDnsNameForOU(string ou)
+        {
+            var domain = this.GetDomainNameDnsFromDn(ou);
+            
+            if (domain != null)
+            {
+                var domainObject = Domain.GetDomain(new DirectoryContext(DirectoryContextType.Domain, domain));
+                return domainObject.Forest.Name;
+            }
+
+            return null;
+        }
+
+        public string GetDomainControllerForOU(string ou)
+        {
+            string domain = this.GetDomainNameDnsFromDn(ou);
+            return this.GetDomainControllerForDomain(domain);
+        }
+
+        public string GetFullyQualifiedAdsPath(string ou)
+        {
+            string server = this.GetDomainControllerForOUOrDefault(ou);
+            return $"LDAP://{server}/{ou}";
+        }
+
+        public string GetFullyQualifiedDomainControllerAdsPath(string ou)
+        {
+            string server = this.GetDomainControllerForOUOrDefault(ou);
+            return $"LDAP://{server}";
+        }
 
         public DirectoryEntry GetConfigurationNamingContext(SecurityIdentifier domain)
         {

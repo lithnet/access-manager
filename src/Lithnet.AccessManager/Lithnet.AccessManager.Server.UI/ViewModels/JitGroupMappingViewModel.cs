@@ -1,21 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
+using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.Logging;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
     public sealed class JitGroupMappingViewModel : ValidatingModelBase, IViewAware
     {
+        private readonly IDirectory directory;
+
+        private readonly ILogger<JitGroupMappingViewModel> logger;
+
+        private readonly IDialogCoordinator dialogCoordinator;
+
         public JitGroupMapping Model { get; }
 
         public UIElement View { get; set; }
 
-        public JitGroupMappingViewModel(JitGroupMapping model, IModelValidator<JitGroupMappingViewModel> validator)
+        public JitGroupMappingViewModel(JitGroupMapping model, IDirectory directory, ILogger<JitGroupMappingViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<JitGroupMappingViewModel> validator)
         {
+            this.directory = directory;
+            this.logger = logger;
+            this.dialogCoordinator = dialogCoordinator;
             this.Model = model;
             this.Validator = validator;
         }
@@ -64,21 +77,43 @@ namespace Lithnet.AccessManager.Server.UI
 
         public IEnumerable<GroupType> GroupTypeValues => Enum.GetValues(typeof(GroupType)).Cast<GroupType>();
 
-        public void SelectComputerOU()
+        public async Task SelectComputerOU()
         {
-            var container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select OU", "Select computer OU");
-            if (container != null)
+            try
             {
-                this.ComputerOU = container;
+                string basePath = this.directory.GetFullyQualifiedDomainControllerAdsPath(this.ComputerOU);
+                string initialPath = this.directory.GetFullyQualifiedAdsPath(this.ComputerOU);
+
+                var container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select OU", "Select computer OU", basePath, initialPath);
+                if (container != null)
+                {
+                    this.ComputerOU = container;
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Select OU error");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred when processing the request\r\n{ex.Message}");
             }
         }
 
-        public void SelectGroupOU()
+        public async Task SelectGroupOU()
         {
-            var container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select OU", "Select group OU");
-            if (container != null)
+            try
             {
-                this.GroupOU = container;
+                string basePath = this.directory.GetFullyQualifiedDomainControllerAdsPath(this.ComputerOU);
+                string initialPath = this.directory.GetFullyQualifiedAdsPath(this.ComputerOU);
+
+                var container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select OU", "Select group OU", basePath, initialPath);
+                if (container != null)
+                {
+                    this.GroupOU = container;
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Select OU error");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred when processing the request\r\n{ex.Message}");
             }
         }
 

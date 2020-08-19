@@ -18,6 +18,8 @@ namespace Lithnet.AccessManager.Server.UI
 
         public TargetType TargetType { get; set; }
 
-        public IEnumerable<TargetType> TargetTypeValues => Enum.GetValues(typeof(TargetType)).Cast<TargetType>();
+        public bool ShowForest => this.TargetType != TargetType.Container;
+
+        public IEnumerable<TargetType> TargetTypeValues => Enum.GetValues(typeof(TargetType)).Cast<int>().OrderByDescending(t => t).Cast<TargetType>();
     }
 }

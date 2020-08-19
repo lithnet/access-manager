@@ -183,8 +183,10 @@ namespace Lithnet.AccessManager.Server.UI
             JitDomainStatusViewModel current = this.SelectedDomain;
             string oldOU = current.DynamicGroupOU;
 
-            var container =
-                NativeMethods.ShowContainerDialog(this.GetHandle(), "Select container", "Select container", $"LDAP://{current.Domain.Name}", $"LDAP://{current.Domain.Name}/{current.DynamicGroupOU}");
+            string basePath = this.directory.GetFullyQualifiedDomainControllerAdsPath(current.DynamicGroupOU);
+            string initialPath = this.directory.GetFullyQualifiedAdsPath(current.DynamicGroupOU);
+
+            var container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select container", "Select container", basePath, initialPath);
 
             if (container != null)
             {

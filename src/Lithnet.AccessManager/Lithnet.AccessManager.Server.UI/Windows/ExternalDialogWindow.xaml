@@ -17,6 +17,8 @@
                       ShowMaxRestoreButton="False"
                       ShowMinButton="False"
                       WindowStyle="SingleBorderWindow"
+                      Width="800"
+                      Height="500"
                       xmlns:s="https://github.com/canton7/Stylet"
                       controls:DialogParticipation.Register="{Binding}"
                       mc:Ignorable="d">

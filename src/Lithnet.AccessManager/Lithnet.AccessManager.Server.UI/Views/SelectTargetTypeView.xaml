@@ -34,10 +34,12 @@
         </ComboBox>
         <Label Grid.Row="1" Grid.Column="0"
                Content="Forest"
-               Margin="5"/>
+               Margin="5"
+               Visibility="{Binding ShowForest, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         <ComboBox Grid.Row="1" Grid.Column="1" 
                               ItemsSource="{Binding AvailableForests, Mode=OneWay}"
                               SelectedItem="{Binding SelectedForest}"
+                              Visibility="{Binding ShowForest, Converter={StaticResource BooleanToVisibilityConverter}}"
                               Width="200"
                               Margin="5"/>
 
