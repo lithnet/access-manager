@@ -69,6 +69,7 @@ namespace Lithnet.AccessManager.Server.UI
                 this.IsNotLithnetSchemaPresent = false;
                 
                 var schema = ActiveDirectorySchema.GetSchema(new DirectoryContext(DirectoryContextType.Forest, this.Forest.Name));
+                schema.RefreshSchema();
                 schema.FindProperty("lithnetAdminPassword");
                 this.IsLithnetSchemaPresent = true;
                 this.LithnetAccessManagerSchemaPresentText = "Present";
@@ -100,6 +101,7 @@ namespace Lithnet.AccessManager.Server.UI
                 this.IsNotMsLapsSchemaPresent = false;
 
                 var schema = ActiveDirectorySchema.GetSchema(new DirectoryContext(DirectoryContextType.Forest, this.Forest.Name));
+                schema.RefreshSchema();
                 schema.FindProperty("ms-Mcs-AdmPwd");
                 this.IsMsLapsSchemaPresent = true;
                 this.MsLapsSchemaPresentText = "Present";
