@@ -1,6 +1,6 @@
 ﻿# Enable-PamFeature
 # 
-# This script enabled the 'Privileged Access Management' optional feature in a forest
+# This script enables the 'Privileged Access Management' optional feature in a forest
 #
 # This script requires membership in the Domain Admins group of the forest root domain or Enterprise Admins
 #

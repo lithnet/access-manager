@@ -7,6 +7,7 @@ using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using MahApps.Metro.SimpleChildWindow;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Stylet;
 using NativeMethods = Lithnet.AccessManager.Server.UI.Interop.NativeMethods;
@@ -22,11 +23,13 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IJitDomainStatusViewModelFactory jitDomainStatusFactory;
         private readonly IServiceSettingsProvider serviceSettings;
         private readonly INotifiableEventPublisher eventPublisher;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.UserClockSolid;
 
-        public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IDirectory directory, IJitGroupMappingViewModelFactory groupMappingFactory, INotifiableEventPublisher eventPublisher, IJitDomainStatusViewModelFactory jitDomainStatusFactory, IServiceSettingsProvider serviceSettings)
+        public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IDirectory directory, IJitGroupMappingViewModelFactory groupMappingFactory, INotifiableEventPublisher eventPublisher, IJitDomainStatusViewModelFactory jitDomainStatusFactory, IServiceSettingsProvider serviceSettings, IShellExecuteProvider shellExecuteProvider)
         {
+            this.shellExecuteProvider = shellExecuteProvider;
             this.dialogCoordinator = dialogCoordinator;
             this.directory = directory;
             this.jitOptions = jitOptions;
@@ -297,5 +300,10 @@ namespace Lithnet.AccessManager.Server.UI
         }
 
         public string HelpLink => Constants.HelpLinkPageJitAccess;
+
+        public async Task Help()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
+        }
     }
 }

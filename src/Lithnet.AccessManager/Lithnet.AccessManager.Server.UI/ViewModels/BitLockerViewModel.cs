@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
+using Microsoft.Extensions.Logging;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -10,9 +12,11 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IServiceSettingsProvider serviceSettings;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public BitLockerViewModel(IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings)
+        public BitLockerViewModel(IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, IShellExecuteProvider shellExecuteProvider)
         {
+            this.shellExecuteProvider = shellExecuteProvider;
             this.dialogCoordinator = dialogCoordinator;
             this.serviceSettings = serviceSettings;
             this.DisplayName = "BitLocker";
@@ -39,6 +43,10 @@ namespace Lithnet.AccessManager.Server.UI
             };
 
             w.ShowDialog();
+        }
+        public async Task Help()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
         }
     }
 }

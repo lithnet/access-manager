@@ -8,7 +8,7 @@ namespace Lithnet.AccessManager.Server.Configuration
         None = 0,
         Basic = 1,
         NTLM = 4,
-        Negotiate = 8,
-        Kerberos = 16
+        Negotiate = 8
+        // Kerberos = 16
     }
 }

@@ -7,6 +7,7 @@ using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Logging;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -14,11 +15,12 @@ namespace Lithnet.AccessManager.Server.UI
     public class IpDetectionViewModel : Screen, IHelpLink
     {
         private readonly ForwardedHeadersAppOptions model;
-
         private readonly IDialogCoordinator dialogCoordinator;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public IpDetectionViewModel(ForwardedHeadersAppOptions model, IDialogCoordinator dialogCoordinator, INotifiableEventPublisher eventPublisher)
+        public IpDetectionViewModel(ForwardedHeadersAppOptions model, IDialogCoordinator dialogCoordinator, INotifiableEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider)
         {
+            this.shellExecuteProvider = shellExecuteProvider;
             this.DisplayName = "IP address detection";
             this.model = model;
             this.dialogCoordinator = dialogCoordinator;
@@ -189,5 +191,10 @@ namespace Lithnet.AccessManager.Server.UI
 
 
         public PackIconPicolIconsKind Icon => PackIconPicolIconsKind.NetworkSansSecurity;
+
+        public async Task Help()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
+        }
     }
 }

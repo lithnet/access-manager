@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Markdig.Extensions.TaskLists;
@@ -15,24 +16,20 @@ namespace Lithnet.AccessManager.Server.UI
     public class ActiveDirectoryConfigurationViewModel : Screen, IHelpLink
     {
         private readonly IDialogCoordinator dialogCoordinator;
-
         private readonly IActiveDirectoryDomainPermissionViewModelFactory domainFactory;
-
         private readonly IActiveDirectoryForestSchemaViewModelFactory forestFactory;
-
         private readonly IServiceSettingsProvider serviceSettings;
-
-        private readonly ILogger<ActiveDirectoryConfigurationView> logger;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.SitemapSolid;
 
-        public ActiveDirectoryConfigurationViewModel(IActiveDirectoryForestSchemaViewModelFactory forestFactory, IActiveDirectoryDomainPermissionViewModelFactory domainFactory, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<ActiveDirectoryConfigurationView> logger)
+        public ActiveDirectoryConfigurationViewModel(IActiveDirectoryForestSchemaViewModelFactory forestFactory, IActiveDirectoryDomainPermissionViewModelFactory domainFactory, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<ActiveDirectoryConfigurationView> logger, IShellExecuteProvider shellExecuteProvider)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.domainFactory = domainFactory;
             this.forestFactory = forestFactory;
             this.serviceSettings = serviceSettings;
-            this.logger = logger;
+            this.shellExecuteProvider = shellExecuteProvider;
             this.DisplayName = "Active Directory";
 
             this.Forests = new BindableCollection<ActiveDirectoryForestSchemaViewModel>();
@@ -166,6 +163,11 @@ namespace Lithnet.AccessManager.Server.UI
             w.ShowDialog();
 
             current.RefreshGroupMembership();
+        }
+
+        public async Task Help()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
         }
     }
 }

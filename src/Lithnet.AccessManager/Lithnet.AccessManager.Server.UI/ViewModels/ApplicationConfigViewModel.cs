@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Documents;
-using System.Windows.Media.Animation;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
-using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using Stylet;
 
@@ -34,7 +31,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.suspendedModels = new List<PropertyChangedBase>();
 
             RegistryKey key = Registry.LocalMachine.OpenSubKey(AccessManager.Constants.BaseKey);
-            bool currentlyUnconfigured = !(key?.GetValue("Configured", 0) is int value) || value == 0; 
+            bool currentlyUnconfigured = !(key?.GetValue("Configured", 0) is int value) || value == 0;
             if (currentlyUnconfigured)
             {
                 this.suspendedModels.Add(authentication);
@@ -75,7 +72,7 @@ namespace Lithnet.AccessManager.Server.UI
         private HostingViewModel hosting { get; }
 
         public string HelpLink => (this.ActiveItem as IHelpLink)?.HelpLink;
-        
+
         public async Task<bool> Save()
         {
             try

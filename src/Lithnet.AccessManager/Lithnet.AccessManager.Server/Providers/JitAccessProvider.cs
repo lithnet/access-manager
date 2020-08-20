@@ -24,7 +24,7 @@ namespace Lithnet.AccessManager
 
         public TimeSpan GrantJitAccess(IGroup group, IUser user, bool canExtend, TimeSpan requestedExpiry, out Action undo)
         {
-            if (this.directory.IsPamFeatureEnabled(group.Sid))
+            if (this.directory.IsPamFeatureEnabled(group.Sid, false))
             {
                 return this.GrantJitAccessPam(group, user, canExtend, requestedExpiry, out undo);
             }

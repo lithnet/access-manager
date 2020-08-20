@@ -77,9 +77,9 @@ namespace Lithnet.AccessManager
 
         bool DoesSchemaAttributeExist(string dnsDomain, string attributeName);
 
-        bool IsPamFeatureEnabled(SecurityIdentifier domainSid);
+        bool IsPamFeatureEnabled(SecurityIdentifier domainSid, bool forceRefresh);
 
-        bool IsPamFeatureEnabled(string dnsDomain);
+        bool IsPamFeatureEnabled(string dnsDomain, bool forceRefresh);
 
         bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, ISecurityPrincipal principal);
 

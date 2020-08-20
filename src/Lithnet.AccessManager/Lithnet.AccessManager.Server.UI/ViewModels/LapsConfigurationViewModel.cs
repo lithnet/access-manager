@@ -27,8 +27,12 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly ILogger<LapsConfigurationViewModel> logger;
 
-        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IDirectory directory, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IServiceSettingsProvider serviceSettings, ILogger<LapsConfigurationViewModel> logger)
+        private readonly IShellExecuteProvider shellExecuteProvider;
+
+
+        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IDirectory directory, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IServiceSettingsProvider serviceSettings, ILogger<LapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider)
         {
+            this.shellExecuteProvider = shellExecuteProvider;
             this.directory = directory;
             this.certificateProvider = certificateProvider;
             this.certificate2ViewModelFactory = certificate2ViewModelFactory;
@@ -326,5 +330,10 @@ namespace Lithnet.AccessManager.Server.UI
         }
 
         public PackIconUniconsKind Icon => PackIconUniconsKind.Asterisk;
+
+        public async Task Help()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
+        }
     }
 }

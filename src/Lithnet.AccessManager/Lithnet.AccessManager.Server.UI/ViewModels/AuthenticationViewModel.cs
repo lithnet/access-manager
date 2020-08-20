@@ -30,9 +30,11 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDirectory directory;
         private readonly RandomNumberGenerator rng;
         private readonly INotifiableEventPublisher eventPublisher;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifiableEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, RandomNumberGenerator rng, IDirectory directory)
+        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifiableEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, RandomNumberGenerator rng, IDirectory directory, IShellExecuteProvider shellExecuteProvider)
         {
+            this.shellExecuteProvider = shellExecuteProvider;
             this.model = model;
             this.dialogCoordinator = dialogCoordinator;
             this.x509ViewModelFactory = x509ViewModelFactory;
@@ -462,5 +464,10 @@ namespace Lithnet.AccessManager.Server.UI
         public bool CanRemoveEku => this.SelectedEku != null;
 
         public PackIconUniconsKind Icon => PackIconUniconsKind.User;
+
+        public async Task Help()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
+        }
     }
 }

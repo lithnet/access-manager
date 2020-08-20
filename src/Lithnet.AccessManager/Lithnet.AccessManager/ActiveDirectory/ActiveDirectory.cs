@@ -233,18 +233,25 @@ namespace Lithnet.AccessManager
             return new ActiveDirectoryGroup(group);
         }
 
-        public bool IsPamFeatureEnabled(SecurityIdentifier domainSid)
+        public bool IsPamFeatureEnabled(SecurityIdentifier domainSid, bool forceRefresh)
         {
             SecurityIdentifier sid = domainSid.AccountDomainSid;
 
-            return this.IsPamFeatureEnabled(NativeMethods.GetDnsDomainNameFromSid(sid));
+            return this.IsPamFeatureEnabled(NativeMethods.GetDnsDomainNameFromSid(sid), forceRefresh);
         }
 
-        public bool IsPamFeatureEnabled(string dnsDomain)
+        public bool IsPamFeatureEnabled(string dnsDomain, bool forceRefresh)
         {
             if (pamEnabledDomainCache.TryGetValue(dnsDomain, out bool value))
             {
-                return value;
+                if (!forceRefresh)
+                {
+                    return value;
+                }
+                else
+                {
+                    pamEnabledDomainCache.Remove(dnsDomain);
+                }
             }
 
             DirectorySearcher d = new DirectorySearcher
@@ -254,7 +261,15 @@ namespace Lithnet.AccessManager
                 Filter = $"(&(objectClass=msDS-OptionalFeature)(msDS-OptionalFeatureGUID={PamFeatureGuid.ToOctetString()}))",
             };
 
-            bool result = d.FindOne() != null;
+            d.PropertiesToLoad.Add("msDS-EnabledFeatureBL");
+
+            var item = d.FindOne();
+            bool result = false;
+
+            if (item != null)
+            {
+                result = item.GetPropertyStrings("msDS-EnabledFeatureBL")?.Any() ?? false;
+            }
 
             pamEnabledDomainCache.Add(dnsDomain, result);
 

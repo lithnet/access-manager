@@ -100,6 +100,9 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 try
                 {
+                    this.IsPamNotSupported = false;
+                    this.IsPamEnabled = false;
+                    this.IsPamEnabled = false;
 #if DEBUG
                     if (Mapping?.OverrideMode == 1)
                     {
@@ -125,7 +128,7 @@ namespace Lithnet.AccessManager.Server.UI
                     }
 #endif
 
-                    if (directory.IsPamFeatureEnabled(Domain.Name))
+                    if (directory.IsPamFeatureEnabled(Domain.Name, true))
                     {
                         this.PamStatus = "Enabled";
                         this.JitType = "Time-based membership";

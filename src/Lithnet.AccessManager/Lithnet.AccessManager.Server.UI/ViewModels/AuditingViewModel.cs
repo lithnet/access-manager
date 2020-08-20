@@ -1,6 +1,10 @@
-﻿using ControlzEx.Standard;
+﻿using System.Threading.Tasks;
+using ControlzEx.Standard;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.AccessManager.Server.UI.Providers;
+using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
+using Microsoft.Extensions.Logging;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -12,8 +16,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly INotificationChannelDefinitionsViewModelFactory<SmtpNotificationChannelDefinition, SmtpNotificationChannelDefinitionViewModel> smtpFactory;
         private readonly INotificationChannelDefinitionsViewModelFactory<WebhookNotificationChannelDefinition, WebhookNotificationChannelDefinitionViewModel> whFactory;
         private readonly INotificationChannelSelectionViewModelFactory notificationChannelSelectionViewModelFactory;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public AuditingViewModel(AuditOptions model,
+        public AuditingViewModel(AuditOptions model, IShellExecuteProvider shellExecuteProvider,
             INotificationChannelDefinitionsViewModelFactory<PowershellNotificationChannelDefinition, PowershellNotificationChannelDefinitionViewModel> psFactory,
             INotificationChannelDefinitionsViewModelFactory<SmtpNotificationChannelDefinition, SmtpNotificationChannelDefinitionViewModel> smtpFactory,
             INotificationChannelDefinitionsViewModelFactory<WebhookNotificationChannelDefinition, WebhookNotificationChannelDefinitionViewModel> whFactory,
@@ -24,6 +29,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.psFactory = psFactory;
             this.smtpFactory = smtpFactory;
             this.whFactory = whFactory;
+            this.shellExecuteProvider = shellExecuteProvider;
             this.notificationChannelSelectionViewModelFactory = notificationChannelSelectionViewModelFactory;
             this.DisplayName = "Auditing";
 
@@ -55,5 +61,10 @@ namespace Lithnet.AccessManager.Server.UI
         private NotificationChannelDefinitionsViewModel<SmtpNotificationChannelDefinition, SmtpNotificationChannelDefinitionViewModel> Smtp { get; set; }
         
         public string HelpLink => Constants.HelpLinkPageAuditing;
+
+        public async Task Help()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
+        }
     }
 }

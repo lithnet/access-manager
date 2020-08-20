@@ -2,8 +2,11 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Unicode;
+using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Configuration;
+using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
+using Microsoft.Extensions.Logging;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -11,11 +14,13 @@ namespace Lithnet.AccessManager.Server.UI
     public class EmailViewModel : Screen, IHelpLink
     {
         private readonly EmailOptions model;
-
         private readonly RandomNumberGenerator rng;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public EmailViewModel(EmailOptions model, RandomNumberGenerator rng, INotifiableEventPublisher eventPublisher)
+
+        public EmailViewModel(EmailOptions model, RandomNumberGenerator rng, INotifiableEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider)
         {
+            this.shellExecuteProvider = shellExecuteProvider;
             this.model = model;
             this.rng = rng;
             this.DisplayName = "Email";
@@ -72,5 +77,10 @@ namespace Lithnet.AccessManager.Server.UI
         }
 
         public PackIconUniconsKind Icon => PackIconUniconsKind.At;
+
+        public async Task Help()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
+        }
     }
 }

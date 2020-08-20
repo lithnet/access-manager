@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Windows.Threading;
 using FluentValidation;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
@@ -118,6 +119,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<ICertificateProvider>().To<CertificateProvider>();
                 builder.Bind<IAppPathProvider>().To<AppPathProvider>();
                 builder.Bind<INotifiableEventPublisher>().To<NotifiableEventPublisher>();
+                builder.Bind<IShellExecuteProvider>().To<ShellExecuteProvider>();
                 builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentModelValidator<>));
                 builder.Bind(typeof(IValidator<>)).ToAllImplementations();
                 builder.Bind<ILoggerFactory>().ToInstance(this.loggerFactory);

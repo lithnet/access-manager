@@ -1,4 +1,6 @@
-﻿using Lithnet.AccessManager.Server.Configuration;
+﻿using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.Configuration;
+using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Stylet;
 
@@ -7,9 +9,11 @@ namespace Lithnet.AccessManager.Server.UI
     public class RateLimitsViewModel : Screen, IHelpLink
     {
         private readonly RateLimitOptions model;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public RateLimitsViewModel(RateLimitOptions model, INotifiableEventPublisher eventPublisher)
+        public RateLimitsViewModel(RateLimitOptions model, INotifiableEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider)
         {
+            this.shellExecuteProvider = shellExecuteProvider;
             this.model = model;
             this.DisplayName = "Rate limits";
 
@@ -54,5 +58,9 @@ namespace Lithnet.AccessManager.Server.UI
         public string HelpLink => Constants.HelpLinkPageRateLimits;
         
         public PackIconMaterialKind Icon => PackIconMaterialKind.Speedometer;
+        public async Task Help()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
+        }
     }
 }

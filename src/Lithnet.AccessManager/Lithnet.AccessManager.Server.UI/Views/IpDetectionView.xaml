@@ -7,14 +7,20 @@
              xmlns:s="https://github.com/canton7/Stylet"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel Margin="5">
+             d:DesignHeight="450" d:DesignWidth="800"
+             Margin="5">
+    <StackPanel>
 
-        <Label Style="{DynamicResource DescriptionHeaderStyle}" 
-               Content="Proxy settings"/>
-
+        <DockPanel>
+            <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
+                <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
+            </Button>
+            <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Proxy settings" />
+        </DockPanel>
+      
         <Grid Margin="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>

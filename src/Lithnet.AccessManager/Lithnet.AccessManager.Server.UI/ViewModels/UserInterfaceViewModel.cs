@@ -17,15 +17,14 @@ namespace Lithnet.AccessManager.Server.UI
     public class UserInterfaceViewModel : Screen, IHelpLink
     {
         private readonly UserInterfaceOptions model;
-
         private readonly IDialogCoordinator dialogCoordinator;
-
         private readonly IAppPathProvider appPathProvider;
-
         private readonly ILogger<UserInterfaceViewModel> logger;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public UserInterfaceViewModel(UserInterfaceOptions model, IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotifiableEventPublisher eventPublisher, ILogger<UserInterfaceViewModel> logger)
+        public UserInterfaceViewModel(UserInterfaceOptions model, IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotifiableEventPublisher eventPublisher, ILogger<UserInterfaceViewModel> logger, IShellExecuteProvider shellExecuteProvider)
         {
+            this.shellExecuteProvider = shellExecuteProvider;
             this.appPathProvider = appPathProvider;
             this.dialogCoordinator = dialogCoordinator;
             this.logger = logger;
@@ -166,8 +165,12 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-
         public PackIconMaterialKind Icon => PackIconMaterialKind.Application;
+        
+        public async Task Help()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
+        }
 
     }
 }

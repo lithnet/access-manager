@@ -6,11 +6,17 @@
              xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
              xmlns:s="https://github.com/canton7/Stylet"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
-             d:DesignWidth="800" >
-    <StackPanel Margin="5">
-        <Label Style="{DynamicResource DescriptionHeaderStyle}" 
-               Content="User interface customization"/>
+             d:DesignWidth="800"
+             Margin="5">
+    <StackPanel >
+        <DockPanel>
+            <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
+                <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
+            </Button>
+            <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="User interface customization" />
+        </DockPanel>
 
         <Grid Margin="5">
             <Grid.ColumnDefinitions>

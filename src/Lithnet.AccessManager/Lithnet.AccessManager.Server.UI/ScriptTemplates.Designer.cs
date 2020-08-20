@@ -150,7 +150,7 @@ namespace Lithnet.AccessManager.Server.UI {
         /// <summary>
         ///   Looks up a localized string similar to # Enable-PamFeature
         ///# 
-        ///# This script enabled the &apos;Privileged Access Management&apos; optional feature in a forest
+        ///# This script enables the &apos;Privileged Access Management&apos; optional feature in a forest
         ///#
         ///# This script requires membership in the Domain Admins group of the forest root domain or Enterprise Admins
         ///#

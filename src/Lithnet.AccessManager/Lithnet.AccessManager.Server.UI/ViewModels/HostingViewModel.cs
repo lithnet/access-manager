@@ -33,16 +33,13 @@ namespace Lithnet.AccessManager.Server.UI
         private CancellationTokenSource cancellationTokenSource;
 
         private readonly IDialogCoordinator dialogCoordinator;
-
         private readonly ILogger<HostingViewModel> logger;
-
         private readonly IAppPathProvider pathProvider;
-
         private readonly IServiceSettingsProvider serviceSettings;
-
         private readonly ICertificateProvider certProvider;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifiableEventPublisher eventPublisher, ICertificateProvider certProvider)
+        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifiableEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider)
         {
             this.logger = logger;
             this.pathProvider = pathProvider;
@@ -50,6 +47,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.certProvider = certProvider;
             this.dialogCoordinator = dialogCoordinator;
             this.serviceSettings = serviceSettings;
+            this.shellExecuteProvider = shellExecuteProvider;
             this.Validator = validator;
 
             this.WorkingModel = this.CloneModel(model);
@@ -1057,6 +1055,11 @@ namespace Lithnet.AccessManager.Server.UI
             }
 
             return null;
+        }
+
+        public async Task Help()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
         }
     }
 }

@@ -16,10 +16,13 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly ILogger<MainWindowViewModel> logger;
 
+        private readonly IShellExecuteProvider shellExecuteProvider;
+        
         public ApplicationConfigViewModel Config { get; set; }
 
-        public MainWindowViewModel(ApplicationConfigViewModel c, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger)
+        public MainWindowViewModel(ApplicationConfigViewModel c, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider)
         {
+            this.shellExecuteProvider = shellExecuteProvider;
             this.ActiveItem = c;
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
@@ -55,21 +58,7 @@ namespace Lithnet.AccessManager.Server.UI
                 return;
             }
 
-            try
-            {
-                var psi = new ProcessStartInfo
-                {
-                    FileName = Config.HelpLink,
-                    UseShellExecute = true
-                };
-
-                Process.Start(psi);
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not open link");
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not open the default link handler\r\n{ex.Message}");
-            }
+            await this.shellExecuteProvider.OpenWithShellExecute(Config.HelpLink);
         }
 
         public void About()
