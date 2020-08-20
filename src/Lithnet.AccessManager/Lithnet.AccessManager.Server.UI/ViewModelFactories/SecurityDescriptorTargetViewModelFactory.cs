@@ -13,8 +13,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IFileSelectionViewModelFactory fileSelectionViewModelFactory;
         private readonly ILogger<SecurityDescriptorTargetViewModel> logger;
         private readonly IModelValidator<SecurityDescriptorTargetViewModel> validator;
+        private readonly IDirectory directory;
 
-        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IModelValidator<SecurityDescriptorTargetViewModel> validator)
+        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.appPathProvider = appPathProvider;
@@ -22,11 +23,12 @@ namespace Lithnet.AccessManager.Server.UI
             this.fileSelectionViewModelFactory = fileSelectionViewModelFactory;
             this.logger = logger;
             this.validator = validator;
+            this.directory = directory;
         }
 
         public SecurityDescriptorTargetViewModel CreateViewModel(SecurityDescriptorTarget model)
         {
-            return new SecurityDescriptorTargetViewModel(model, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, validator);
+            return new SecurityDescriptorTargetViewModel(model, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, validator, directory);
         }
     }
 }

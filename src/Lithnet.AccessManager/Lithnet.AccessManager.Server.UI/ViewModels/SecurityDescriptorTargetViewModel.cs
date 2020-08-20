@@ -17,24 +17,24 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public sealed class SecurityDescriptorTargetViewModel : ValidatingModelBase, IViewAware
     {
-        private readonly IDirectory directory;
-
-        private readonly ILogger<SecurityDescriptorTargetViewModel> logger;
-
-        private readonly IDialogCoordinator dialogCoordinator;
-
         private static readonly Domain currentDomain = Domain.GetCurrentDomain();
-
         private static readonly Forest currentForest = Forest.GetCurrentForest();
-
+        
+        private readonly IDirectory directory;
+        private readonly ILogger<SecurityDescriptorTargetViewModel> logger;
+        private readonly IDialogCoordinator dialogCoordinator;
+        private readonly INotificationChannelSelectionViewModelFactory notificationChannelFactory;
+        
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory)
         {
-            this.directory = new ActiveDirectory();
+            this.directory = directory;
             this.Model = model;
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
+            this.notificationChannelFactory = notificationChannelFactory;
+            this.Validator = validator;
 
             this.Script = fileSelectionViewModelFactory.CreateViewModel(model, () => model.Script, appPathProvider.ScriptsPath);
             this.Script.DefaultFileExtension = "ps1";
@@ -42,11 +42,12 @@ namespace Lithnet.AccessManager.Server.UI
             this.Script.NewFileContent = ScriptTemplates.AuthorizationScriptTemplate;
             this.Script.ShouldValidate = false;
             this.Script.PropertyChanged += Script_PropertyChanged;
+        }
 
-            this.Notifications = notificationChannelFactory.CreateViewModel(model.Notifications);
-
-            this.Validator = validator;
-            this.Validate();
+        public async Task Initialize()
+        {
+            this.Notifications = notificationChannelFactory.CreateViewModel(this.Model.Notifications);
+            await this.ValidateAsync();
         }
 
         private void Script_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -54,7 +55,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.Validate();
         }
 
-        public NotificationChannelSelectionViewModel Notifications { get; }
+        public NotificationChannelSelectionViewModel Notifications { get; private set; }
 
         public AuthorizationMode AuthorizationMode
         {
@@ -236,7 +237,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 return currentForest.Name;
             }
-            
+
             string forest = null;
             try
             {

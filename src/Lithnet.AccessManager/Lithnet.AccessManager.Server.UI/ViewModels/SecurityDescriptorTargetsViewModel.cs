@@ -46,6 +46,7 @@ namespace Lithnet.AccessManager.Server.UI
             var vm = this.factory.CreateViewModel(m);
             w.DataContext = vm;
             w.SaveButtonIsDefault = true;
+            await vm.Initialize();
 
             await this.GetWindow().ShowChildWindowAsync(w);
 
@@ -63,6 +64,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             var m = JsonConvert.DeserializeObject<SecurityDescriptorTarget>(JsonConvert.SerializeObject(this.SelectedItem.Model));
             var vm = this.factory.CreateViewModel(m);
+            await vm.Initialize();
 
             w.DataContext = vm;
 
@@ -85,7 +87,9 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task Delete()
         {
-            if (this.SelectedItem == null)
+            var deleting = this.SelectedItem;
+
+            if (deleting == null)
             {
                 return;
             }
@@ -98,7 +102,6 @@ namespace Lithnet.AccessManager.Server.UI
 
             if (await this.DialogCoordinator.ShowMessageAsync(this, "Confirm", "Are you sure you want to delete this target?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
             {
-                var deleting = this.SelectedItem;
                 this.Model.Remove(deleting.Model);
                 this.ViewModels.Remove(deleting);
                 this.SelectedItem = this.ViewModels.FirstOrDefault();
