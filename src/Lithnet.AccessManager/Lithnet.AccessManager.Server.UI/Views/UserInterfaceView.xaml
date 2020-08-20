@@ -75,6 +75,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition />
@@ -83,13 +84,34 @@
                 <RowDefinition />
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="3" Grid.Column="0" 
+            <Label Grid.Row="0" Grid.Column="0" 
                    ToolTip="Specify if a reason for requesting admin access is required, optional, or not shown at all"
                    Content="User supplied request reason" 
                    Margin="5"/>
-            <ComboBox Grid.Row="3" Grid.Column="1" SelectedItem="{Binding UserSuppliedReason}" 
+            <ComboBox Grid.Row="0" Grid.Column="1" SelectedItem="{Binding UserSuppliedReason}" 
                       ItemsSource="{Binding UserSuppliedReasonValues}"
                       Margin="5"/>
+
+            <Label Grid.Row="1" Grid.Column="0" 
+                   Content="Policy message header (optional)" 
+                   Margin="5"/>
+
+            <TextBox Grid.Row="1" Grid.Column="1" 
+                     Text="{Binding RequestScreenCustomHeading, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="5"/>
+
+            <Label Grid.Row="2" Grid.Column="0" 
+                   Content="Policy message content (optional)" 
+                   Margin="5"/>
+
+            <TextBox Grid.Row="2" Grid.Column="1" 
+                     Text="{Binding RequestScreenCustomMessage, UpdateSourceTrigger=PropertyChanged}"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     VerticalScrollBarVisibility="Auto"
+                     Height="75"
+                     Margin="5"/>
+
         </Grid>
 
         <Label Style="{DynamicResource DescriptionHeaderStyle}" 
@@ -162,7 +184,9 @@
             <TextBox Grid.Row="6" Grid.Column="1"  Grid.ColumnSpan="2"
                      Text="{Binding Preview, Mode=OneWay}"
                      IsReadOnly="True"
-                     MinLines="5"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     Height="100"
                      Margin="5"/>
 
         </Grid>

@@ -47,6 +47,12 @@ namespace Lithnet.AccessManager.Server.UI
         public string Title { get => this.model.Title; set => this.model.Title = value; }
 
         [NotifiableProperty]
+        public string RequestScreenCustomHeading { get => this.model.RequestScreenCustomHeading; set => this.model.RequestScreenCustomHeading = value; }
+
+        [NotifiableProperty]
+        public string RequestScreenCustomMessage { get => this.model.RequestScreenCustomMessage; set => this.model.RequestScreenCustomMessage = value; }
+
+        [NotifiableProperty]
         public AuditReasonFieldState UserSuppliedReason { get => this.model.UserSuppliedReason; set => this.model.UserSuppliedReason = value; }
 
         public IEnumerable<AuditReasonFieldState> UserSuppliedReasonValues => Enum.GetValues(typeof(AuditReasonFieldState)).Cast<AuditReasonFieldState>();

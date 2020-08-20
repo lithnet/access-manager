@@ -15,6 +15,22 @@
     </div>
     @using (Html.BeginForm("AccessRequestType", "Computer", FormMethod.Post))
     {
+        @if (!string.IsNullOrWhiteSpace(uiSettings.Value.RequestScreenCustomHeading) || !string.IsNullOrWhiteSpace(uiSettings.Value.RequestScreenCustomMessage))
+        {
+            <section>
+                <div class="alert alert-primary">
+                    @if (!string.IsNullOrWhiteSpace(uiSettings.Value.RequestScreenCustomHeading))
+                    {
+                        <h4 class="alert-heading">@uiSettings.Value.RequestScreenCustomHeading</h4>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(uiSettings.Value.RequestScreenCustomMessage))
+                    {
+                        <p>@uiSettings.Value.RequestScreenCustomMessage</p>
+                    }
+                </div>
+            </section>
+        }
+
         <section>
             <label class="title">@UIMessages.ComputerName*</label>
             <label class="input">
