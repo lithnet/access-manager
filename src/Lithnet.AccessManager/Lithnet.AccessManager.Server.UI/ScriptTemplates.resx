@@ -282,6 +282,7 @@ $OU = ""
 
 #-------------------------------------------------------------------------
 # Do not modify below here
+#-------------------------------------------------------------------------
 
 Import-Module ActiveDirectory
 
@@ -297,9 +298,9 @@ if ([string]::IsNullOrEmpty($ou))
 
 $schemaNC = $rootDSE.schemaNamingContext
 $computerObjectGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=computer)(objectclass=classSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$lithnetAdminPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPassword)(objectclass=attributeSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$lithnetAdminPasswordExpiryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordExpiry)(objectclass=attributeSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$lithnetAdminPasswordHistoryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordHistory)(objectclass=attributeSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$lithnetAdminPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPassword)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$lithnetAdminPasswordExpiryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordExpiry)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$lithnetAdminPasswordHistoryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordHistory)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
 
 $selfSid = new-object System.Security.Principal.SecurityIdentifier "S-1-5-10"
 $serviceAccountSid = new-object System.Security.Principal.SecurityIdentifier "{serviceAccount}"
@@ -375,7 +376,7 @@ if ([string]::IsNullOrEmpty($ou))
 
 $schemaNC = $rootDSE.schemaNamingContext
 $fveRecoveryObjectGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=msFVE-RecoveryInformation)(objectclass=classSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$fveRecoveryPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=msFVE-RecoveryPassword)(objectclass=attributeSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$fveRecoveryPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=msFVE-RecoveryPassword)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
 
 $serviceAccountSid = new-object System.Security.Principal.SecurityIdentifier "{serviceAccount}"
 
@@ -390,63 +391,6 @@ $acl.AddAccessRule($propertyAccessRule2)
 $acl.AddAccessRule($propertyAccessRule3)
 $acl.AddAccessRule($propertyAccessRule4)
 
-set-acl -AclObject $acl -Path $path</value>
-  </data>
-  <data name="GrantComputerSelfPermission" xml:space="preserve">
-    <value># Grant-ComputerSelfPermission
-# 
-# This script grants permissions for computer objects to set their own password attributes
-#
-# This script requires membership in the Domain Admins group 
-# 
-#
-# Version 1.0
-
-
-#-------------------------------------------------------------------------
-# Set the following values as appropriate for your environment
-#-------------------------------------------------------------------------
-
-$OU = "OU=Laps Testing,DC=IDMDEV1,DC=LOCAL"
-
-#-------------------------------------------------------------------------
-# Do not modify below here
-
-Import-Module ActiveDirectory
-
-$ErrorActionPreference = "Stop"
-$InformationPreference = "Continue"
-
-$rootDSE = Get-ADRootDSE
-$schemaNC = $rootDSE.schemaNamingContext
-$computerObjectGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=computer)(objectclass=classSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$lithnetAdminPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPassword)(objectclass=attributeSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$lithnetAdminPasswordExpiryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordExpiry)(objectclass=attributeSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$lithnetAdminPasswordHistoryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordHistory)(objectclass=attributeSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-
-$selfSid = new-object System.Security.Principal.SecurityIdentifier "S-1-5-10"
-
-$propertyAccessRule1 = new-object "System.DirectoryServices.PropertyAccessRule" $selfSid, "Allow", "Read", $lithnetAdminPasswordGuid, "Descendents", $computerObjectGuid
-$propertyAccessRule2 = new-object "System.DirectoryServices.PropertyAccessRule" $selfSid, "Allow", "Read", $lithnetAdminPasswordExpiryGuid, "Descendents", $computerObjectGuid
-$propertyAccessRule3 = new-object "System.DirectoryServices.PropertyAccessRule" $selfSid, "Allow", "Read", $lithnetAdminPasswordHistoryGuid, "Descendents", $computerObjectGuid
-$propertyAccessRule4 = new-object "System.DirectoryServices.PropertyAccessRule" $selfSid, "Allow", "Write", $lithnetAdminPasswordGuid, "Descendents", $computerObjectGuid
-$propertyAccessRule5 = new-object "System.DirectoryServices.PropertyAccessRule" $selfSid, "Allow", "Write", $lithnetAdminPasswordExpiryGuid, "Descendents", $computerObjectGuid
-$propertyAccessRule6 = new-object "System.DirectoryServices.PropertyAccessRule" $selfSid, "Allow", "Write", $lithnetAdminPasswordHistoryGuid, "Descendents", $computerObjectGuid
-$propertyAccessRule7 = new-object "System.DirectoryServices.ActiveDirectoryAccessRule" $sid, "ExtendedRight", "Allow", $lithnetAdminPasswordGuid, "Descendents", $computerObjectGuid
-$propertyAccessRule8 = new-object "System.DirectoryServices.ActiveDirectoryAccessRule" $sid, "ExtendedRight", "Allow", $lithnetAdminPasswordHistoryGuid, "Descendents", $computerObjectGuid
-
-
-$path = "AD:\$OU"
-
-$acl = get-acl -Path $path
-$acl.AddAccessRule($propertyAccessRule1)
-$acl.AddAccessRule($propertyAccessRule2)
-$acl.AddAccessRule($propertyAccessRule3)
-$acl.AddAccessRule($propertyAccessRule4)
-$acl.AddAccessRule($propertyAccessRule5)
-$acl.AddAccessRule($propertyAccessRule6)
-$acl.AddAccessRule($propertyAccessRule7)
-$acl.AddAccessRule($propertyAccessRule8)
 set-acl -AclObject $acl -Path $path</value>
   </data>
   <data name="GrantGroupPermissions" xml:space="preserve">
@@ -515,6 +459,7 @@ $OU = ""
 
 #-------------------------------------------------------------------------
 # Do not modify below here
+#-------------------------------------------------------------------------
 
 Import-Module ActiveDirectory
 
@@ -530,8 +475,8 @@ if ([string]::IsNullOrEmpty($ou))
 
 $schemaNC = $rootDSE.schemaNamingContext
 $computerObjectGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=computer)(objectclass=classSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$msLapsPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=ms-Mcs-AdmPwd)(objectclass=attributeSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$msLapsPasswordExpiryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=ms-Mcs-AdmPwdExpirationTime)(objectclass=attributeSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$msLapsPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=ms-Mcs-AdmPwd)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$msLapsPasswordExpiryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=ms-Mcs-AdmPwdExpirationTime)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
 
 $serviceAccountSid = new-object System.Security.Principal.SecurityIdentifier "{serviceAccount}"
 
@@ -540,58 +485,12 @@ $propertyAccessRule2 = new-object "System.DirectoryServices.PropertyAccessRule" 
 $propertyAccessRule3 = new-object "System.DirectoryServices.PropertyAccessRule" $serviceAccountSid, "Allow", "Write", $msLapsPasswordExpiryGuid, "Descendents", $computerObjectGuid
 $propertyAccessRule4 = new-object "System.DirectoryServices.ActiveDirectoryAccessRule" $serviceAccountSid, "ExtendedRight", "Allow", $msLapsPasswordGuid, "Descendents", $computerObjectGuid
 
-$path = "AD:\$OU"
+$selfSid = new-object System.Security.Principal.SecurityIdentifier "S-1-5-10"
 
-$acl = get-acl -Path $path
-$acl.AddAccessRule($propertyAccessRule1)
-$acl.AddAccessRule($propertyAccessRule2)
-$acl.AddAccessRule($propertyAccessRule3)
-$acl.AddAccessRule($propertyAccessRule4)
+$propertyAccessRule5 = new-object "System.DirectoryServices.PropertyAccessRule" $selfSid, "Allow", "Write", $msLapsPasswordGuid, "Descendents", $computerObjectGuid
+$propertyAccessRule6 = new-object "System.DirectoryServices.PropertyAccessRule" $selfSid, "Allow", "Write", $msLapsPasswordExpiryGuid, "Descendents", $computerObjectGuid
+$propertyAccessRule7 = new-object "System.DirectoryServices.PropertyAccessRule" $selfSid, "Allow", "Read", $msLapsPasswordExpiryGuid, "Descendents", $computerObjectGuid
 
-set-acl -AclObject $acl -Path $path</value>
-  </data>
-  <data name="GrantServiceAccountPermission" xml:space="preserve">
-    <value># Grant-ServiceAccountPermission
-# 
-# This script grants permissions for a user or group to read the admin password values, as well as trigger a password reset by cleaning the password expiry field
-#
-# This script requires membership in the Domain Admins group 
-# 
-#
-# Version 1.0
-
-
-#-------------------------------------------------------------------------
-# Set the following values as appropriate for your environment
-#-------------------------------------------------------------------------
-
-$OU = "OU=Laps Testing,DC=IDMDEV1,DC=LOCAL"
-$userOrGroup = "IDMDEV1\Domain Admins"
-
-#-------------------------------------------------------------------------
-# Do not modify below here
-
-Import-Module ActiveDirectory
-
-$ErrorActionPreference = "Stop"
-$InformationPreference = "Continue"
-
-$rootDSE = Get-ADRootDSE
-$schemaNC = $rootDSE.schemaNamingContext
-$computerObjectGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=computer)(objectclass=classSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$lithnetAdminPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPassword)(objectclass=attributeSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$lithnetAdminPasswordExpiryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordExpiry)(objectclass=attributeSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$lithnetAdminPasswordHistoryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordHistory)(objectclass=attributeSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-
-$objUser = New-Object System.Security.Principal.NTAccount($userOrGroup)
-$sid = $objUser.Translate([System.Security.Principal.SecurityIdentifier])
-
-$propertyAccessRule1 = new-object "System.DirectoryServices.PropertyAccessRule" $sid, "Allow", "Read", $lithnetAdminPasswordGuid, "Descendents", $computerObjectGuid
-$propertyAccessRule2 = new-object "System.DirectoryServices.PropertyAccessRule" $sid, "Allow", "Read", $lithnetAdminPasswordExpiryGuid, "Descendents", $computerObjectGuid
-$propertyAccessRule3 = new-object "System.DirectoryServices.PropertyAccessRule" $sid, "Allow", "Read", $lithnetAdminPasswordHistoryGuid, "Descendents", $computerObjectGuid
-$propertyAccessRule4 = new-object "System.DirectoryServices.PropertyAccessRule" $sid, "Allow", "Write", $lithnetAdminPasswordExpiryGuid, "Descendents", $computerObjectGuid
-$propertyAccessRule5 = new-object "System.DirectoryServices.ActiveDirectoryAccessRule" $sid, "ExtendedRight", "Allow", $lithnetAdminPasswordGuid, "Descendents", $computerObjectGuid
-$propertyAccessRule6 = new-object "System.DirectoryServices.ActiveDirectoryAccessRule" $sid, "ExtendedRight", "Allow", $lithnetAdminPasswordHistoryGuid, "Descendents", $computerObjectGuid
 
 $path = "AD:\$OU"
 
@@ -602,6 +501,8 @@ $acl.AddAccessRule($propertyAccessRule3)
 $acl.AddAccessRule($propertyAccessRule4)
 $acl.AddAccessRule($propertyAccessRule5)
 $acl.AddAccessRule($propertyAccessRule6)
+$acl.AddAccessRule($propertyAccessRule7)
+
 set-acl -AclObject $acl -Path $path</value>
   </data>
   <data name="PreventDelegation" xml:space="preserve">
@@ -694,6 +595,11 @@ catch [Microsoft.ActiveDirectory.Management.ADIdentityNotFoundException]
 # 
 #
 # Version 1.0
+
+#-------------------------------------------------------------------------
+# Do not modify below here
+#-------------------------------------------------------------------------
+
 $ErrorActionPreference = "Stop"
 $InformationPreference = "Continue"
 
@@ -706,7 +612,7 @@ $schemaNC = $rootDSE.schemaNamingContext
 $schemaMaster = Get-ADObject $schemaNC -Properties fSMORoleOwner -server $server | Get-ADDomainController -Identity { $_.fSMORoleOwner } -Server $server
 $schemaMasterRootDse = [ADSI]::new("LDAP://$($schemaMaster.HostName)/RootDSE")
 
-if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPassword)(objectclass=attributeSchema))"))
+if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPassword)(objectclass=attributeSchema)(!(isDefunct=true)))"))
 {
     New-ADObject -Name "Lithnet-Admin-Password" -Type "attributeSchema" -Path $schemaNC -Server $schemaMaster.HostName -OtherAttributes @{
         schemaIDGUID                  = [Guid]::new("f440de15-5e53-4522-a221-0000b9d757dd").ToByteArray()
@@ -729,7 +635,7 @@ else
     Write-Host "The attribute lithnetAdminPassword already exists"
 }
 
-if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordHistory)(objectclass=attributeSchema))"))
+if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordHistory)(objectclass=attributeSchema)(!(isDefunct=true)))"))
 {
     New-ADObject -Name "Lithnet-Admin-Password-History" -Type "attributeSchema" -Path $schemaNC -Server $schemaMaster.HostName -OtherAttributes @{
         schemaIDGUID                  = [Guid]::new("5e7f84e2-9561-4ac3-b3b4-0000121aa663").ToByteArray()
@@ -752,7 +658,7 @@ else
     Write-Host "The attribute lithnetAdminPasswordHistory already exists"
 }
 
-if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordExpiry)(objectclass=attributeSchema))"))
+if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordExpiry)(objectclass=attributeSchema)(!(isDefunct=true)))"))
 {
     New-ADObject -Name "Lithnet-Admin-Password-Expiry" -Type "attributeSchema" -Path $schemaNC -Server $schemaMaster.HostName -OtherAttributes @{
         schemaIDGUID                  = [Guid]::new("0f65f007-22e9-4a4f-9fba-000025aa156d").ToByteArray()

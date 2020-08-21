@@ -286,7 +286,7 @@ namespace Lithnet.AccessManager.Test
         [Test]
         public void TestPamIsEnabled()
         {
-            Assert.IsTrue(this.directory.IsPamFeatureEnabled(this.directory.GetUser("idmdev1\\user1").Sid));
+            Assert.IsTrue(this.directory.IsPamFeatureEnabled(this.directory.GetUser("idmdev1\\user1").Sid, true));
         }
 
         [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]

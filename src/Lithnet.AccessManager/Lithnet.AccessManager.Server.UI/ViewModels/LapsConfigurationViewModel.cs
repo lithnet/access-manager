@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using System.Windows;
+using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Microsoft.Extensions.Logging;
@@ -16,21 +17,15 @@ namespace Lithnet.AccessManager.Server.UI
     public class LapsConfigurationViewModel : Screen, IHelpLink
     {
         private readonly ICertificateProvider certificateProvider;
-
         private readonly IDirectory directory;
-
         private readonly IX509Certificate2ViewModelFactory certificate2ViewModelFactory;
-
         private readonly IDialogCoordinator dialogCoordinator;
-
         private readonly IServiceSettingsProvider serviceSettings;
-
         private readonly ILogger<LapsConfigurationViewModel> logger;
-
         private readonly IShellExecuteProvider shellExecuteProvider;
+        private readonly IDomainTrustProvider domainTrustProvider;
 
-
-        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IDirectory directory, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IServiceSettingsProvider serviceSettings, ILogger<LapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider)
+        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IDirectory directory, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IServiceSettingsProvider serviceSettings, ILogger<LapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.directory = directory;
@@ -39,12 +34,13 @@ namespace Lithnet.AccessManager.Server.UI
             this.dialogCoordinator = dialogCoordinator;
             this.serviceSettings = serviceSettings;
             this.logger = logger;
+            this.domainTrustProvider = domainTrustProvider;
+
             this.Forests = new List<Forest>();
             this.AvailableCertificates = new BindableCollection<X509Certificate2ViewModel>();
             this.DisplayName = "Local admin passwords";
         }
-
-
+        
         public string HelpLink => Constants.HelpLinkPageLocalAdminPasswords;
 
         protected override void OnInitialActivate()
@@ -61,18 +57,9 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                var domain = Domain.GetCurrentDomain();
-                this.Forests.Add(domain.Forest);
-
-                foreach (var trust in domain.Forest.GetAllTrustRelationships().OfType<TrustRelationshipInformation>())
+                foreach (var forest in this.domainTrustProvider.GetForests())
                 {
-                    if (trust.TrustDirection == TrustDirection.Inbound ||
-                        trust.TrustDirection == TrustDirection.Bidirectional)
-                    {
-                        var forest =
-                            Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, trust.TargetName));
-                        this.Forests.Add(forest);
-                    }
+                    this.Forests.Add(forest);
                 }
             }
             catch (Exception ex)
@@ -334,6 +321,11 @@ namespace Lithnet.AccessManager.Server.UI
         public async Task Help()
         {
             await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
+        }
+
+        public async Task LapsHelp()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkPageChooseLapsStrategy);
         }
     }
 }

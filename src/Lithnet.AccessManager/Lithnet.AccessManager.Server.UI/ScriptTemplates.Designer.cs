@@ -214,31 +214,6 @@ namespace Lithnet.AccessManager.Server.UI {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to # Grant-ComputerSelfPermission
-        ///# 
-        ///# This script grants permissions for computer objects to set their own password attributes
-        ///#
-        ///# This script requires membership in the Domain Admins group 
-        ///# 
-        ///#
-        ///# Version 1.0
-        ///
-        ///
-        ///#-------------------------------------------------------------------------
-        ///# Set the following values as appropriate for your environment
-        ///#-------------------------------------------------------------------------
-        ///
-        ///$OU = &quot;OU=Laps Testing,DC=IDMDEV1,DC=LOCAL&quot;
-        ///
-        ///#-------------------------- [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string GrantComputerSelfPermission {
-            get {
-                return ResourceManager.GetString("GrantComputerSelfPermission", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to # Grant-GroupPermissions
         ///# 
         ///# This script grants permissions for the AMS service account to create, delete, and manage groups in the specified OU
@@ -282,29 +257,6 @@ namespace Lithnet.AccessManager.Server.UI {
         internal static string GrantMsLapsPermissions {
             get {
                 return ResourceManager.GetString("GrantMsLapsPermissions", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to # Grant-ServiceAccountPermission
-        ///# 
-        ///# This script grants permissions for a user or group to read the admin password values, as well as trigger a password reset by cleaning the password expiry field
-        ///#
-        ///# This script requires membership in the Domain Admins group 
-        ///# 
-        ///#
-        ///# Version 1.0
-        ///
-        ///
-        ///#-------------------------------------------------------------------------
-        ///# Set the following values as appropriate for your environment
-        ///#-------------------------------------------------------------------------
-        ///
-        ///$ [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string GrantServiceAccountPermission {
-            get {
-                return ResourceManager.GetString("GrantServiceAccountPermission", resourceCulture);
             }
         }
         
@@ -359,13 +311,13 @@ namespace Lithnet.AccessManager.Server.UI {
         ///# 
         ///#
         ///# Version 1.0
+        ///
+        ///#-------------------------------------------------------------------------
+        ///# Do not modify below here
+        ///#-------------------------------------------------------------------------
+        ///
         ///$ErrorActionPreference = &quot;Stop&quot;
-        ///$InformationPreference = &quot;Continue&quot;
-        ///
-        ///Import-Module ActiveDirectory
-        ///
-        ///$forest = &quot;{forest}&quot;
-        ///$server = (Get-ADDomainController -DomainName $forest -Discover -ForceDiscover -Writable).Ho [rest of string was truncated]&quot;;.
+        ///$I [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string UpdateAdSchemaTemplate {
             get {

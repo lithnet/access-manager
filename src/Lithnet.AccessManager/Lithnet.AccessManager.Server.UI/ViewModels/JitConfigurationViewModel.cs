@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using MahApps.Metro.SimpleChildWindow;
@@ -24,10 +25,11 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IServiceSettingsProvider serviceSettings;
         private readonly INotifiableEventPublisher eventPublisher;
         private readonly IShellExecuteProvider shellExecuteProvider;
+        private readonly IDomainTrustProvider domainTrustProvider;
 
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.UserClockSolid;
 
-        public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IDirectory directory, IJitGroupMappingViewModelFactory groupMappingFactory, INotifiableEventPublisher eventPublisher, IJitDomainStatusViewModelFactory jitDomainStatusFactory, IServiceSettingsProvider serviceSettings, IShellExecuteProvider shellExecuteProvider)
+        public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IDirectory directory, IJitGroupMappingViewModelFactory groupMappingFactory, INotifiableEventPublisher eventPublisher, IJitDomainStatusViewModelFactory jitDomainStatusFactory, IServiceSettingsProvider serviceSettings, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.dialogCoordinator = dialogCoordinator;
@@ -37,6 +39,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.jitDomainStatusFactory = jitDomainStatusFactory;
             this.serviceSettings = serviceSettings;
             this.eventPublisher = eventPublisher;
+            this.domainTrustProvider = domainTrustProvider;
+
             this.DisplayName = "Just-in-time access";
             this.GroupMappings = new BindableCollection<JitGroupMappingViewModel>();
             this.Domains = new BindableCollection<JitDomainStatusViewModel>();
@@ -60,26 +64,10 @@ namespace Lithnet.AccessManager.Server.UI
 
         private void BuildDomainList()
         {
-            JitDomainStatusViewModel vm;
-
-            foreach (var d in Forest.GetCurrentForest().Domains.OfType<Domain>())
+            foreach (Domain d in this.domainTrustProvider.GetDomains())
             {
-                vm = jitDomainStatusFactory.CreateViewModel(d, this.GetDynamicGroupMapping(d));
+                JitDomainStatusViewModel vm = jitDomainStatusFactory.CreateViewModel(d, this.GetDynamicGroupMapping(d));
                 this.Domains.Add(vm);
-            }
-
-            foreach (var trust in Domain.GetCurrentDomain().Forest.GetAllTrustRelationships().OfType<TrustRelationshipInformation>())
-            {
-                if (trust.TrustDirection == TrustDirection.Inbound || trust.TrustDirection == TrustDirection.Bidirectional)
-                {
-                    var forest = Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, trust.TargetName));
-
-                    foreach (var d in forest.Domains.OfType<Domain>())
-                    {
-                        vm = jitDomainStatusFactory.CreateViewModel(d, this.GetDynamicGroupMapping(d));
-                        this.Domains.Add(vm);
-                    }
-                }
             }
         }
 
@@ -208,6 +196,9 @@ namespace Lithnet.AccessManager.Server.UI
                     this.HasBeenChanged++;
                 }
             }
+
+            this.NotifyOfPropertyChange(nameof(CanDelegateJitGroupPermission));
+            this.NotifyOfPropertyChange(nameof(CanDelegateDynamicGroupPermission));
         }
 
         [NotifiableProperty]

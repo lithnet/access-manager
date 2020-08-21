@@ -120,6 +120,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IAppPathProvider>().To<AppPathProvider>();
                 builder.Bind<INotifiableEventPublisher>().To<NotifiableEventPublisher>();
                 builder.Bind<IShellExecuteProvider>().To<ShellExecuteProvider>();
+                builder.Bind<IDomainTrustProvider>().To<DomainTrustProvider>();
                 builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentModelValidator<>));
                 builder.Bind(typeof(IValidator<>)).ToAllImplementations();
                 builder.Bind<ILoggerFactory>().ToInstance(this.loggerFactory);

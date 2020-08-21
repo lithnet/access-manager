@@ -20,16 +20,18 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IActiveDirectoryForestSchemaViewModelFactory forestFactory;
         private readonly IServiceSettingsProvider serviceSettings;
         private readonly IShellExecuteProvider shellExecuteProvider;
+        private readonly IDomainTrustProvider domainTrustProvider;
 
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.SitemapSolid;
 
-        public ActiveDirectoryConfigurationViewModel(IActiveDirectoryForestSchemaViewModelFactory forestFactory, IActiveDirectoryDomainPermissionViewModelFactory domainFactory, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<ActiveDirectoryConfigurationView> logger, IShellExecuteProvider shellExecuteProvider)
+        public ActiveDirectoryConfigurationViewModel(IActiveDirectoryForestSchemaViewModelFactory forestFactory, IActiveDirectoryDomainPermissionViewModelFactory domainFactory, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<ActiveDirectoryConfigurationView> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.domainFactory = domainFactory;
             this.forestFactory = forestFactory;
             this.serviceSettings = serviceSettings;
             this.shellExecuteProvider = shellExecuteProvider;
+            this.domainTrustProvider = domainTrustProvider;
             this.DisplayName = "Active Directory";
 
             this.Forests = new BindableCollection<ActiveDirectoryForestSchemaViewModel>();
@@ -45,25 +47,13 @@ namespace Lithnet.AccessManager.Server.UI
 
         private void PopulateForestsAndDomains()
         {
-            var currentDomain = Domain.GetCurrentDomain();
-            this.Forests.Add(forestFactory.CreateViewModel(currentDomain.Forest));
-
-            foreach (var domain in currentDomain.Forest.Domains.OfType<Domain>())
+            foreach (Forest forest in this.domainTrustProvider.GetForests())
             {
-                this.Domains.Add(domainFactory.CreateViewModel(domain));
-            }
+                this.Forests.Add(forestFactory.CreateViewModel(forest));
 
-            foreach (var trust in currentDomain.Forest.GetAllTrustRelationships().OfType<TrustRelationshipInformation>())
-            {
-                if (trust.TrustDirection == TrustDirection.Inbound || trust.TrustDirection == TrustDirection.Bidirectional)
+                foreach (Domain domain in this.domainTrustProvider.GetDomains(forest))
                 {
-                    var forest = Forest.GetForest(new DirectoryContext(DirectoryContextType.Forest, trust.TargetName));
-                    this.Forests.Add(forestFactory.CreateViewModel(forest));
-
-                    foreach (var domain in forest.Domains.OfType<Domain>())
-                    {
-                        this.Domains.Add(domainFactory.CreateViewModel(domain));
-                    }
+                    this.Domains.Add(domainFactory.CreateViewModel(domain));
                 }
             }
 

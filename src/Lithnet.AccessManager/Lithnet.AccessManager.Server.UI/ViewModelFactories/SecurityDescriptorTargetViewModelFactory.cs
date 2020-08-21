@@ -1,4 +1,5 @@
 ﻿using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Stylet;
@@ -14,8 +15,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILogger<SecurityDescriptorTargetViewModel> logger;
         private readonly IModelValidator<SecurityDescriptorTargetViewModel> validator;
         private readonly IDirectory directory;
+        private readonly IDomainTrustProvider domainTrustProvider;
 
-        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory)
+        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.appPathProvider = appPathProvider;
@@ -24,11 +26,12 @@ namespace Lithnet.AccessManager.Server.UI
             this.logger = logger;
             this.validator = validator;
             this.directory = directory;
+            this.domainTrustProvider = domainTrustProvider;
         }
 
         public SecurityDescriptorTargetViewModel CreateViewModel(SecurityDescriptorTarget model)
         {
-            return new SecurityDescriptorTargetViewModel(model, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, validator, directory);
+            return new SecurityDescriptorTargetViewModel(model, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, validator, directory, domainTrustProvider);
         }
     }
 }

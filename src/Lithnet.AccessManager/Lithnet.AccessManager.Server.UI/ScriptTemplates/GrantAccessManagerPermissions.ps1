@@ -33,9 +33,9 @@ if ([string]::IsNullOrEmpty($ou))
 
 $schemaNC = $rootDSE.schemaNamingContext
 $computerObjectGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&(ldapDisplayName=computer)(objectclass=classSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$lithnetAdminPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&(ldapDisplayName=lithnetAdminPassword)(objectclass=attributeSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$lithnetAdminPasswordExpiryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&(ldapDisplayName=lithnetAdminPasswordExpiry)(objectclass=attributeSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$lithnetAdminPasswordHistoryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&(ldapDisplayName=lithnetAdminPasswordHistory)(objectclass=attributeSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$lithnetAdminPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&(ldapDisplayName=lithnetAdminPassword)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$lithnetAdminPasswordExpiryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&(ldapDisplayName=lithnetAdminPasswordExpiry)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$lithnetAdminPasswordHistoryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&(ldapDisplayName=lithnetAdminPasswordHistory)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
 
 $selfSid = new-object System.Security.Principal.SecurityIdentifier "S-1-5-10"
 $serviceAccountSid = new-object System.Security.Principal.SecurityIdentifier "{serviceAccount}"

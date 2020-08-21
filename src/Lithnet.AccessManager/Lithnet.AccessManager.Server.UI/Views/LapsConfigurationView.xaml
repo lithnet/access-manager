@@ -17,9 +17,13 @@
             <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
                 <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
             </Button>
-            <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Microsoft LAPS agent" />
+            <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Local admin passwords" />
         </DockPanel>
-        
+
+        <TextBlock TextWrapping="Wrap" Margin="5">AMS can read passwords set by the Microsoft LAPS agent, or the Lithnet Access Manager agent. Read our guide on <Hyperlink>choosing between the Microsoft LAPS agent and the Lithnet Access Manager Agent</Hyperlink> to learn more.</TextBlock>
+
+        <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Microsoft LAPS agent" />
+
         <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
                Content="Permissions"/>
 
@@ -65,8 +69,10 @@
 
         <Label Style="{DynamicResource DescriptionHeaderStyle}" 
                Content="Lithnet Access Manager agent"/>
+
         <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
                Content="Permissions"/>
+
         <Grid Margin="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="150"/>

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
+using Lithnet.AccessManager.Server.UI.Providers;
 using Lithnet.AccessManager.Server.UI.ViewModels;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
@@ -31,8 +32,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly RandomNumberGenerator rng;
         private readonly INotifiableEventPublisher eventPublisher;
         private readonly IShellExecuteProvider shellExecuteProvider;
+        private readonly IDomainTrustProvider domainTrustProvider;
 
-        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifiableEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, RandomNumberGenerator rng, IDirectory directory, IShellExecuteProvider shellExecuteProvider)
+        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifiableEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, RandomNumberGenerator rng, IDirectory directory, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.model = model;
@@ -42,7 +44,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.rng = rng;
             this.directory = directory;
             this.eventPublisher = eventPublisher;
-
+            this.domainTrustProvider = domainTrustProvider;
+            
             this.DisplayName = "Authentication";
 
             model.Iwa ??= new IwaAuthenticationProviderOptions();
@@ -118,17 +121,13 @@ namespace Lithnet.AccessManager.Server.UI
                 w.SizeToContent = SizeToContent.WidthAndHeight;
                 w.SaveButtonIsDefault = true;
                 vm.AvailableForests = new List<string>();
-                var domain = Domain.GetCurrentDomain();
-                vm.AvailableForests.Add(domain.Forest.Name);
-                vm.SelectedForest = domain.Forest.Name;
 
-                foreach (var trust in domain.Forest.GetAllTrustRelationships().OfType<TrustRelationshipInformation>())
+                foreach (var forest in this.domainTrustProvider.GetForests())
                 {
-                    if (trust.TrustDirection == TrustDirection.Inbound || trust.TrustDirection == TrustDirection.Bidirectional)
-                    {
-                        vm.AvailableForests.Add(trust.TargetName);
-                    }
+                    vm.AvailableForests.Add(forest.Name);
                 }
+
+                vm.SelectedForest = vm.AvailableForests.FirstOrDefault();
 
                 w.Owner = this.GetWindow();
 

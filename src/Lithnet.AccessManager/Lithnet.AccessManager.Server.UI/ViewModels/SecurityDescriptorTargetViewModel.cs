@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
+using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.SimpleChildWindow;
 using Microsoft.Extensions.Logging;
@@ -24,10 +25,11 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILogger<SecurityDescriptorTargetViewModel> logger;
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly INotificationChannelSelectionViewModelFactory notificationChannelFactory;
-        
+        private readonly IDomainTrustProvider domainTrustProvider;
+
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider)
         {
             this.directory = directory;
             this.Model = model;
@@ -35,6 +37,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.dialogCoordinator = dialogCoordinator;
             this.notificationChannelFactory = notificationChannelFactory;
             this.Validator = validator;
+            this.domainTrustProvider = domainTrustProvider;
 
             this.Script = fileSelectionViewModelFactory.CreateViewModel(model, () => model.Script, appPathProvider.ScriptsPath);
             this.Script.DefaultFileExtension = "ps1";
@@ -338,7 +341,7 @@ namespace Lithnet.AccessManager.Server.UI
                 var vm = new SelectTargetTypeViewModel
                 {
                     TargetType = this.Type,
-                    AvailableForests = BuildAvailableForests()
+                    AvailableForests = this.domainTrustProvider.GetForests().Select(t => t.Name).ToList()
                 };
 
                 DialogWindow w = new DialogWindow
@@ -439,23 +442,6 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 this.Target = container;
             }
-        }
-
-        private static List<string> BuildAvailableForests()
-        {
-            List<string> availableForests = new List<string>();
-            availableForests.Add(currentForest.Name);
-
-            foreach (var trust in currentForest.GetAllTrustRelationships().OfType<TrustRelationshipInformation>())
-            {
-                if (trust.TrustDirection == TrustDirection.Inbound ||
-                    trust.TrustDirection == TrustDirection.Bidirectional)
-                {
-                    availableForests.Add(trust.TargetName);
-                }
-            }
-
-            return availableForests;
         }
 
         public UIElement View { get; set; }
