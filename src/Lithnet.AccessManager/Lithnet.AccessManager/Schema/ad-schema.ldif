@@ -28,7 +28,8 @@ dn: cn=Lithnet-Admin-Password-History,cn=Schema,cn=Configuration,dc=X
 changetype: ntdsschemaadd
 objectClass: attributeSchema
 # schemaIDGUID: 5e7f84e2-9561-4ac3-b3b4-0000121aa663
-schemaIDGUID:: 4oR/XmGVw0qztAAAEhqmYw==attributeId: 1.3.6.1.4.1.55989.1.1.2
+schemaIDGUID:: 4oR/XmGVw0qztAAAEhqmYw==
+attributeId: 1.3.6.1.4.1.55989.1.1.2
 ldapDisplayName: lithnetAdminPasswordHistory
 adminDisplayName: lithnetAdminPasswordHistory
 attributeSyntax: 2.5.5.12
