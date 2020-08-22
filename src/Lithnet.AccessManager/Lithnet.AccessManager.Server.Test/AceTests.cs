@@ -154,7 +154,7 @@ namespace Lithnet.AccessManager.Server.Test
             Assert.Throws<ObjectNotFoundException>(() => this.IsMatch(trustee, requestor, null, AccessControlType.Deny));
         }
 
-        private bool IsMatch(string trustee, string requestor, string serverName, AccessControlType aceType = AccessControlType.Allow)
+        private bool IsMatch(string trustee, string requestor, string domainName, AccessControlType aceType = AccessControlType.Allow)
         {
             ActiveDirectory d = new ActiveDirectory();
             var user = d.GetUser(requestor);
@@ -164,9 +164,15 @@ namespace Lithnet.AccessManager.Server.Test
             dacl.AddAccess(aceType, p.Sid, (int)AccessMask.Jit, InheritanceFlags.None, PropagationFlags.None);
             CommonSecurityDescriptor sd = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, dacl);
 
-            if (serverName == null)
+            string serverName;
+
+            if (domainName == null)
             {
-                serverName = d.GetDomainNameDnsFromSid(p.Sid);
+                serverName = d.GetDomainControllerForDomain(d.GetDomainNameDnsFromSid(p.Sid));
+            }
+            else
+            {
+                serverName = d.GetDomainControllerForDomain(domainName);
             }
 
             using AuthorizationContext c = new AuthorizationContext(user.Sid, serverName);
