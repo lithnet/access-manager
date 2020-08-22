@@ -35,30 +35,30 @@ namespace Lithnet.AccessManager.Server.UI
             if (currentlyUnconfigured)
             {
                 this.suspendedModels.Add(authentication);
-                this.suspendedModels.Add(ad);
-                this.suspendedModels.Add(audit);
-                this.suspendedModels.Add(authorization);
-                this.suspendedModels.Add(laps);
-                this.suspendedModels.Add(jit);
-                this.suspendedModels.Add(bitLocker);
                 this.suspendedModels.Add(ui);
                 this.suspendedModels.Add(mail);
                 this.suspendedModels.Add(rate);
                 this.suspendedModels.Add(ip);
+                this.suspendedModels.Add(ad);
+                this.suspendedModels.Add(audit);
+                this.suspendedModels.Add(laps);
+                this.suspendedModels.Add(jit);
+                this.suspendedModels.Add(bitLocker);
+                this.suspendedModels.Add(authorization);
             }
             else
             {
                 this.Items.Add(authentication);
-                this.Items.Add(ad);
-                this.Items.Add(audit);
-                this.Items.Add(authorization);
-                this.Items.Add(laps);
-                this.Items.Add(jit);
-                this.Items.Add(bitLocker);
                 this.Items.Add(ui);
                 this.Items.Add(mail);
                 this.Items.Add(rate);
                 this.Items.Add(ip);
+                this.Items.Add(ad);
+                this.Items.Add(audit);
+                this.Items.Add(laps);
+                this.Items.Add(jit);
+                this.Items.Add(bitLocker);
+                this.Items.Add(authorization);
             }
 
             this.OptionItems = new BindableCollection<PropertyChangedBase>();

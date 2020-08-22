@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
@@ -148,7 +149,7 @@ namespace Lithnet.AccessManager
             return DirectoryExtensions.TryGet(() => this.GetGroup(sid), out group);
         }
 
-        public void CreateGroup(string name, string description, GroupType groupType, string ou)
+        public void CreateGroup(string name, string description, GroupType groupType, string ou, bool removeAccountOperators)
         {
             DirectoryEntry oude = new DirectoryEntry($"LDAP://{ou}");
             string samAccountName = name;
@@ -161,7 +162,14 @@ namespace Lithnet.AccessManager
             de.Properties["samAccountName"].Add(samAccountName);
             de.Properties["description"].Add(description);
             de.Properties["groupType"].Add(unchecked((int)groupType));
+
             de.CommitChanges();
+            
+            if (removeAccountOperators)
+            {
+                de.ObjectSecurity.RemoveAccess(new SecurityIdentifier(WellKnownSidType.BuiltinAccountOperatorsSid, null), AccessControlType.Allow);
+                de.CommitChanges();
+            }
         }
 
         public void DeleteGroup(string name)
@@ -215,7 +223,7 @@ namespace Lithnet.AccessManager
             return NativeMethods.CrackNames(nameFormat, requiredFormat, name, dnsDomainName).Name;
         }
 
-        public IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl)
+        public IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl, bool removeAccountOperators)
         {
             DirectoryEntry container = new DirectoryEntry($"LDAP://{ou}");
             dynamic[] objectClasses = new dynamic[] { "dynamicObject", "group" };
@@ -229,6 +237,12 @@ namespace Lithnet.AccessManager
             group.Properties["groupType"].Add(-2147483644);
             group.Properties["entryTTL"].Add((int)ttl.TotalSeconds);
             group.CommitChanges();
+
+            if (removeAccountOperators)
+            {
+                group.ObjectSecurity.RemoveAccess(new SecurityIdentifier(WellKnownSidType.BuiltinAccountOperatorsSid, null), AccessControlType.Allow);
+                group.CommitChanges();
+            }
 
             return new ActiveDirectoryGroup(group);
         }

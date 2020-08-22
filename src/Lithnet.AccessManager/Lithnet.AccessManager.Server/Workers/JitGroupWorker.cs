@@ -230,8 +230,9 @@ namespace Lithnet.AccessManager.Server.Workers
                 try
                 {
                     this.logger.LogTrace($"Creating JIT group {group} in OU {groupOU}");
+
                     this.directory.CreateGroup(group, groupDescription ?? "JIT access group created by Lithnet Access Manager",
-                        groupType, groupOU);
+                        groupType, groupOU, true);
                     this.logger.LogInformation(EventIDs.JitWorkerGroupCreated, $"Created JIT group {group} in OU {groupOU}");
                 }
                 catch (Exception ex)

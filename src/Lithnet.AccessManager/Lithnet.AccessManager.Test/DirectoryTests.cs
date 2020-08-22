@@ -280,7 +280,7 @@ namespace Lithnet.AccessManager.Test
         [Test]
         public void CreateTtlTestGroup()
         {
-            this.directory.CreateTtlGroup("G-DL-Test-TTL", "G-DL-Test-TTL", "TTL test group", "OU=Computers,OU=Laps Testing,DC=idmdev1,DC=local", TimeSpan.FromMinutes(1));
+            this.directory.CreateTtlGroup("G-DL-Test-TTL", "G-DL-Test-TTL", "TTL test group", "OU=Computers,OU=Laps Testing,DC=idmdev1,DC=local", TimeSpan.FromMinutes(1), true);
         }
 
         [Test]
@@ -350,7 +350,7 @@ namespace Lithnet.AccessManager.Test
         {
             string groupName =  TestContext.CurrentContext.Random.GetString(10, "abcdefghijklmnop");
 
-            this.directory.CreateTtlGroup(groupName, groupName, "TTL test group 2", "OU=Laps Testing,DC=idmdev1,DC=local", TimeSpan.FromMinutes(1));
+            this.directory.CreateTtlGroup(groupName, groupName, "TTL test group 2", "OU=Laps Testing,DC=idmdev1,DC=local", TimeSpan.FromMinutes(1), true);
 
             Thread.Sleep(20000);
             IGroup group = this.directory.GetGroup($"IDMDEV1\\{groupName}");
