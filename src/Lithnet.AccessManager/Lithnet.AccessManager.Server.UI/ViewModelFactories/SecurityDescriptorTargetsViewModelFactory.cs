@@ -8,9 +8,9 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly SecurityDescriptorTargetViewModelFactory factory;
-        private readonly INotifiableEventPublisher eventPublisher;
+        private readonly INotifyModelChangedEventPublisher eventPublisher;
 
-        public SecurityDescriptorTargetsViewModelFactory(IDialogCoordinator dialogCoordinator, SecurityDescriptorTargetViewModelFactory factory, INotifiableEventPublisher eventPublisher)
+        public SecurityDescriptorTargetsViewModelFactory(IDialogCoordinator dialogCoordinator, SecurityDescriptorTargetViewModelFactory factory, INotifyModelChangedEventPublisher eventPublisher)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.factory = factory;

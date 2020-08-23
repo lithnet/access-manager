@@ -75,7 +75,6 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<JitConfigurationOptions>().ToInstance(appconfig.JitConfiguration);
 
                 // ViewModels
-                builder.Bind<ApplicationConfigViewModel>().ToSelf();
                 builder.Bind<AuthenticationViewModel>().ToSelf();
                 builder.Bind<EmailViewModel>().ToSelf();
                 builder.Bind<HostingViewModel>().ToSelf();
@@ -118,7 +117,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IEncryptionProvider>().To<EncryptionProvider>();
                 builder.Bind<ICertificateProvider>().To<CertificateProvider>();
                 builder.Bind<IAppPathProvider>().To<AppPathProvider>();
-                builder.Bind<INotifiableEventPublisher>().To<NotifiableEventPublisher>();
+                builder.Bind<INotifyModelChangedEventPublisher>().To<NotifyModelChangedEventPublisher>();
                 builder.Bind<IShellExecuteProvider>().To<ShellExecuteProvider>();
                 builder.Bind<IDomainTrustProvider>().To<DomainTrustProvider>();
                 builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentModelValidator<>));

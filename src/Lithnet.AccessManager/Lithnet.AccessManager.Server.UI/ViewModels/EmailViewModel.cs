@@ -18,7 +18,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IShellExecuteProvider shellExecuteProvider;
 
 
-        public EmailViewModel(EmailOptions model, RandomNumberGenerator rng, INotifiableEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider)
+        public EmailViewModel(EmailOptions model, RandomNumberGenerator rng, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.model = model;
@@ -29,25 +29,25 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string HelpLink => Constants.HelpLinkPageEmail;
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public string FromAddress { get => this.model.FromAddress; set => this.model.FromAddress = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public int Port { get => this.model.Port; set => this.model.Port = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public string Host { get => this.model.Host; set => this.model.Host = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public bool UseSsl { get => this.model.UseSsl; set => this.model.UseSsl = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public bool UseSpecifiedCredentials { get => !this.model.UseDefaultCredentials; set => this.model.UseDefaultCredentials = !value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public string Username { get => this.model.Username; set => this.model.Username = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public string Password
         {
             get => this.model.Password?.Data == null ? null : "-placeholder-";

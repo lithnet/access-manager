@@ -7,7 +7,7 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class WebhookNotificationChannelDefinitionsViewModel : NotificationChannelDefinitionsViewModel<WebhookNotificationChannelDefinition, WebhookNotificationChannelDefinitionViewModel>
     {
-        public WebhookNotificationChannelDefinitionsViewModel(IList<WebhookNotificationChannelDefinition> model, WebhookNotificationChannelDefinitionViewModelFactory factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator, INotifiableEventPublisher eventPublisher) :
+        public WebhookNotificationChannelDefinitionsViewModel(IList<WebhookNotificationChannelDefinition> model, WebhookNotificationChannelDefinitionViewModelFactory factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator, INotifyModelChangedEventPublisher eventPublisher) :
             base(model, factory, dialogCoordinator, eventAggregator, eventPublisher)
         {
         }

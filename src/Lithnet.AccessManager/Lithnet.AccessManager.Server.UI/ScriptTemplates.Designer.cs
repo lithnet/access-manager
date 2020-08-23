@@ -113,13 +113,13 @@ namespace Lithnet.AccessManager.Server.UI {
         ///	$computer
         ///)
         ///
-        ///	# See https://github.com/lithnet/access-manager/wiki/Authorization-Scripts for help
+        ///	# See https://l.lithnet.io/fwlink/oyotjigz for help
         ///
         ///	Write-Information  &quot;We&apos;re in PowerShell!&quot;
         ///	Write-Information &quot;Checking if $($user.MsDsPrincipalName) is allowed access to $($computer.MsDsPrincipalName)&quot;
         ///
         ///	# Create an object to hold our authorization decisions
-        ///	# Set IsAllowed to true to allow access, or set IsDenied to explicitly deny access, or leave both as false if no decision was made. Thi [rest of string was truncated]&quot;;.
+        ///	# Set IsAllowed to true to allow access, or set IsDenied to explicitly deny access, or leave both as false if no decision was made. This will allow other rules to be e [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AuthorizationScriptTemplate {
             get {

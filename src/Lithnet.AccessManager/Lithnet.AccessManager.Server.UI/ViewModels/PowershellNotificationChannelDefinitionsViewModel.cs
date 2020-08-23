@@ -7,7 +7,7 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class PowershellNotificationChannelDefinitionsViewModel : NotificationChannelDefinitionsViewModel<PowershellNotificationChannelDefinition, PowershellNotificationChannelDefinitionViewModel>
     {
-        public PowershellNotificationChannelDefinitionsViewModel(IList<PowershellNotificationChannelDefinition> model, PowershellNotificationChannelDefinitionViewModelFactory factory, IDialogCoordinator dialogCoordinator,  IEventAggregator eventAggregator, INotifiableEventPublisher eventPublisher) :
+        public PowershellNotificationChannelDefinitionsViewModel(IList<PowershellNotificationChannelDefinition> model, PowershellNotificationChannelDefinitionViewModelFactory factory, IDialogCoordinator dialogCoordinator,  IEventAggregator eventAggregator, INotifyModelChangedEventPublisher eventPublisher) :
             base (model, factory, dialogCoordinator, eventAggregator, eventPublisher)
         {
         }

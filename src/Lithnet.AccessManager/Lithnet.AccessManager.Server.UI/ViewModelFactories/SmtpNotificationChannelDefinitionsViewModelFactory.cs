@@ -11,9 +11,9 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IEventAggregator eventAggregator;
-        private readonly INotifiableEventPublisher eventPublisher;
+        private readonly INotifyModelChangedEventPublisher eventPublisher;
 
-        public SmtpNotificationChannelDefinitionsViewModelFactory(SmtpNotificationChannelDefinitionViewModelFactory factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator, INotifiableEventPublisher eventPublisher) : base(factory)
+        public SmtpNotificationChannelDefinitionsViewModelFactory(SmtpNotificationChannelDefinitionViewModelFactory factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator, INotifyModelChangedEventPublisher eventPublisher) : base(factory)
         {
             this.factory = factory;
             this.dialogCoordinator = dialogCoordinator;

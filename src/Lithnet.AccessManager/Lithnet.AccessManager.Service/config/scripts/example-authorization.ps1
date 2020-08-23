@@ -4,7 +4,7 @@ function Get-AuthorizationResponse{
 	$computer
 )
 
-	# See https://github.com/lithnet/access-manager/wiki/Authorization-Scripts for help
+	# See https://l.lithnet.io/fwlink/oyotjigz for help
 
 	Write-Information  "We're in PowerShell!"
 	Write-Information "Checking if $($user.MsDsPrincipalName) is allowed access to $($computer.MsDsPrincipalName)"

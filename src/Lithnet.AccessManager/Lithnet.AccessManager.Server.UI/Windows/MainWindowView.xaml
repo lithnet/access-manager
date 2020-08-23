@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-        mc:Ignorable="d" d:DesignHeight="250" d:DesignWidth="400"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
         xmlns:s="https://github.com/canton7/Stylet"
+        xmlns:converter="http://metro.mahapps.com/winfx/xaml/iconpacks"
         Title="{Binding WindowTitle}"
         BorderThickness="1"
         Height="Auto"
@@ -24,6 +25,39 @@
                     Command="{s:Action Help}" />
     </Window.InputBindings>
     <DockPanel LastChildFill="True">
+
+        <DockPanel.Resources>
+            <DataTemplate x:Key="MenuItemTemplate" DataType="{x:Type controls:HamburgerMenuGlyphItem}">
+                <Grid x:Name="RootGrid"
+                      Height="48"
+                      IsEnabled="False"
+                      Background="Transparent">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:HamburgerMenu}}, Path=CompactPaneLength}" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Focusable="False"
+                           Width="24"
+                           Height="24"
+                           Source="{Binding Icon, Mode=OneWay, Converter={converter:PackIconKindToImageConverter Brush=White}}"/>
+                    <TextBlock Grid.Column="1"
+                               VerticalAlignment="Center"
+                               FontSize="16"
+                               Text="{Binding DisplayName}" />
+                </Grid>
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:HamburgerMenu}}, Path=IsPaneOpen}" Value="False">
+                        <Setter TargetName="RootGrid" Property="ToolTip" Value="{Binding ToolTip, Mode=OneWay}" />
+                    </DataTrigger>
+
+                </DataTemplate.Triggers>
+            </DataTemplate>
+            <local:SelectedItemToContentConverter x:Key="SelectedItemToContentConverter" />
+        </DockPanel.Resources>
+
         <Menu DockPanel.Dock="Top"
               BorderBrush="{DynamicResource MahApps.Brushes.Control.Border}"
               BorderThickness="0,0,0,1">
@@ -56,9 +90,66 @@
             </MenuItem>
         </Menu>
 
-        <ContentControl DockPanel.Dock="Bottom" 
-                            s:View.Model="{Binding Config}"/>
+        <!--<ContentControl DockPanel.Dock="Bottom" 
+                            s:View.Model="{Binding Config}"/>-->
 
+
+
+
+        <controls:HamburgerMenu DockPanel.Dock="Bottom" 
+                                ItemsSource="{Binding Items}" 
+                                OptionsItemsSource="{Binding OptionItems}"
+                                IsPaneOpen="True" 
+                                SelectedItem="{Binding ActiveItem}"
+                                DisplayMode="CompactInline"
+                                HamburgerVisibility="Collapsed"
+                                ItemTemplate="{StaticResource MenuItemTemplate}"
+                                OptionsItemTemplate="{StaticResource MenuItemTemplate}">
+            <controls:HamburgerMenu.ContentTemplate>
+                <DataTemplate>
+                    <DockPanel LastChildFill="True">
+                        <StackPanel DockPanel.Dock="Top">
+                            <Grid  Background="LightYellow"
+                              Margin="5" 
+                              Visibility="{Binding Path=DataContext.IsUnconfigured, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindowView}}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <converter:PackIconFontAwesome Kind="ExclamationTriangleSolid" Margin="5" Foreground="Orange" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1"  TextWrapping="Wrap" Margin="5">The web service is currently not configured. Validate the information on the web hosting page, save the configuration, and restart the service to activate the Access Manager Service</TextBlock>
+                            </Grid>
+                            <Grid Background="LightYellow"
+                              Margin="5" 
+                              Visibility="{Binding Path=DataContext.IsPendingServiceRestart, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindowView}}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <converter:PackIconFontAwesome Kind="ExclamationTriangleSolid" Margin="5" Foreground="Orange" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" TextWrapping="Wrap" Margin="5">Changes have been made that will not take effect until the service is restarted</TextBlock>
+                            </Grid>
+                        </StackPanel>
+                        <ScrollViewer DockPanel.Dock="Bottom">
+                            <ContentControl s:View.Model="{Binding}" 
+                                        Margin="10 0 10 0"
+                                        IsTabStop="False"/>
+                        </ScrollViewer>
+                    </DockPanel>
+                </DataTemplate>
+            </controls:HamburgerMenu.ContentTemplate>
+
+            <MultiBinding Converter="{StaticResource SelectedItemToContentConverter}">
+                <Binding FallbackValue="{x:Null}"
+                             Mode="OneWay"
+                             Path="SelectedItem"
+                             RelativeSource="{RelativeSource Self}" />
+                <Binding FallbackValue="{x:Null}"
+                             Mode="OneWay"
+                             Path="SelectedOptionsItem"
+                             RelativeSource="{RelativeSource Self}" />
+            </MultiBinding>
+
+        </controls:HamburgerMenu>
     </DockPanel>
-
 </controls:MetroWindow>

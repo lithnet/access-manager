@@ -22,7 +22,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILogger<UserInterfaceViewModel> logger;
         private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public UserInterfaceViewModel(UserInterfaceOptions model, IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotifiableEventPublisher eventPublisher, ILogger<UserInterfaceViewModel> logger, IShellExecuteProvider shellExecuteProvider)
+        public UserInterfaceViewModel(UserInterfaceOptions model, IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotifyModelChangedEventPublisher eventPublisher, ILogger<UserInterfaceViewModel> logger, IShellExecuteProvider shellExecuteProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.appPathProvider = appPathProvider;
@@ -43,16 +43,16 @@ namespace Lithnet.AccessManager.Server.UI
             this.BuildPreview();
         }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public string Title { get => this.model.Title; set => this.model.Title = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public string RequestScreenCustomHeading { get => this.model.RequestScreenCustomHeading; set => this.model.RequestScreenCustomHeading = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public string RequestScreenCustomMessage { get => this.model.RequestScreenCustomMessage; set => this.model.RequestScreenCustomMessage = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public AuditReasonFieldState UserSuppliedReason { get => this.model.UserSuppliedReason; set => this.model.UserSuppliedReason = value; }
 
         public IEnumerable<AuditReasonFieldState> UserSuppliedReasonValues => Enum.GetValues(typeof(AuditReasonFieldState)).Cast<AuditReasonFieldState>();
@@ -61,22 +61,22 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string ImageError { get; set; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public bool DisableTextToSpeech { get => this.model.PhoneticSettings.DisableTextToSpeech; set => this.model.PhoneticSettings.DisableTextToSpeech = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public bool HidePhoneticBreakdown { get => this.model.PhoneticSettings.HidePhoneticBreakdown; set => this.model.PhoneticSettings.HidePhoneticBreakdown = value; }
 
         [PropertyChanged.OnChangedMethod(nameof(BuildPreview))]
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public string UpperPrefix { get => this.model.PhoneticSettings.UpperPrefix; set => this.model.PhoneticSettings.UpperPrefix = value; }
 
         [PropertyChanged.OnChangedMethod(nameof(BuildPreview))]
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public string LowerPrefix { get => this.model.PhoneticSettings.LowerPrefix; set => this.model.PhoneticSettings.LowerPrefix = value; }
 
         [PropertyChanged.OnChangedMethod(nameof(BuildPreview))]
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public int GroupSize { get => this.model.PhoneticSettings.GroupSize; set => this.model.PhoneticSettings.GroupSize = value; }
 
         [PropertyChanged.OnChangedMethod(nameof(BuildPreview))]

@@ -9,7 +9,7 @@ namespace Lithnet.AccessManager.Server.UI
     {
         public AuditNotificationChannels Model { get; }
 
-        public NotificationChannelSelectionViewModel(AuditNotificationChannels model, INotificationSubscriptionProvider subscriptionProvider, IEventAggregator eventAggregator, INotifiableEventPublisher eventPublisher)
+        public NotificationChannelSelectionViewModel(AuditNotificationChannels model, INotificationSubscriptionProvider subscriptionProvider, IEventAggregator eventAggregator, INotifyModelChangedEventPublisher eventPublisher)
         {
             this.Model = model;
 
@@ -23,10 +23,10 @@ namespace Lithnet.AccessManager.Server.UI
             eventPublisher.Register(this);
         }
         
-        [NotifiableCollection]
+        [NotifyModelChangedCollection]
         public BindableCollection<SubscriptionViewModel> SuccessSubscriptions { get; set; }
 
-        [NotifiableCollection] 
+        [NotifyModelChangedCollection] 
         public BindableCollection<SubscriptionViewModel> FailureSubscriptions { get; set; }
 
         public BindableCollection<SubscriptionViewModel> AvailableSuccessSubscriptions { get; }

@@ -1,4 +1,5 @@
-﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.ApplicationConfigView"
+﻿<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"/>
+                                    <!--<UserControl x:Class="Lithnet.AccessManager.Server.UI.ApplicationConfigView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -37,7 +38,7 @@
                 <DataTrigger Binding="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type mah:HamburgerMenu}}, Path=IsPaneOpen}" Value="False">
                     <Setter TargetName="RootGrid" Property="ToolTip" Value="{Binding ToolTip, Mode=OneWay}" />
                 </DataTrigger>
-                
+
             </DataTemplate.Triggers>
         </DataTemplate>
         <local:SelectedItemToContentConverter x:Key="SelectedItemToContentConverter" />
@@ -53,11 +54,23 @@
                        OptionsItemTemplate="{StaticResource MenuItemTemplate}">
         <mah:HamburgerMenu.ContentTemplate>
             <DataTemplate>
-                <ScrollViewer>
-                    <ContentControl s:View.Model="{Binding}" 
-                                Margin="10 0 10 0"
-                                IsTabStop="False"/>
-                </ScrollViewer>
+                <DockPanel>
+                    <Grid DockPanel.Dock="Top" Background="LightYellow"
+                          Margin="5" 
+                          Visibility="{Binding Path=IsPendingServiceRestart, Converter={StaticResource BooleanToVisibilityConverter}, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type local:MainWindowViewModel}}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <converter:PackIconFontAwesome Kind="ExclamationTriangleSolid" Margin="5" Foreground="Orange" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1"  TextWrapping="Wrap" Margin="5">Changes have been made that will not take effect until the service is restarted</TextBlock>
+                    </Grid>
+                    <ScrollViewer DockPanel.Dock="Bottom">
+                        <ContentControl s:View.Model="{Binding}" 
+                                        Margin="10 0 10 0"
+                                        IsTabStop="False"/>
+                    </ScrollViewer>
+                </DockPanel>
             </DataTemplate>
         </mah:HamburgerMenu.ContentTemplate>
 
@@ -73,4 +86,6 @@
         </MultiBinding>
 
     </mah:HamburgerMenu>
-</UserControl>
+
+
+</UserControl>-->

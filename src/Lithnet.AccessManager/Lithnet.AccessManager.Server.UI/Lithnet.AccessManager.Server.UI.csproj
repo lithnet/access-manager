@@ -19,6 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="access-manager.png" />
     <None Remove="NLog.config" />
   </ItemGroup>
 
@@ -51,6 +52,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Lithnet.AccessManager.Server\Lithnet.AccessManager.Server.csproj" />
     <ProjectReference Include="..\Lithnet.AccessManager\Lithnet.AccessManager.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="access-manager.png" />
   </ItemGroup>
 
   <ItemGroup>

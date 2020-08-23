@@ -2,7 +2,7 @@
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public interface INotifiableEventPublisher
+    public interface INotifyModelChangedEventPublisher
     {
         void Register(INotifyPropertyChanged item);
     }

@@ -22,10 +22,10 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly NotificationChannelDefinitionViewModelFactory<TModel, TViewModel> factory;
 
-        [NotifiableCollection]
+        [NotifyModelChangedCollection]
         public BindableCollection<TViewModel> ViewModels { get; }
         
-        protected NotificationChannelDefinitionsViewModel(IList<TModel> model, NotificationChannelDefinitionViewModelFactory<TModel, TViewModel> factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator, INotifiableEventPublisher eventPublisher)
+        protected NotificationChannelDefinitionsViewModel(IList<TModel> model, NotificationChannelDefinitionViewModelFactory<TModel, TViewModel> factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator, INotifyModelChangedEventPublisher eventPublisher)
         {
             this.factory = factory;
             this.Model = model;

@@ -11,9 +11,9 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IEventAggregator eventAggregator;
-        private readonly INotifiableEventPublisher eventPublisher;
+        private readonly INotifyModelChangedEventPublisher eventPublisher;
 
-        public PowershellNotificationChannelDefinitionsViewModelFactory(PowershellNotificationChannelDefinitionViewModelFactory factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator, INotifiableEventPublisher eventPublisher) : base(factory)
+        public PowershellNotificationChannelDefinitionsViewModelFactory(PowershellNotificationChannelDefinitionViewModelFactory factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator, INotifyModelChangedEventPublisher eventPublisher) : base(factory)
         {
             this.factory = factory;
             this.dialogCoordinator = dialogCoordinator;

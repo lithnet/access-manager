@@ -18,7 +18,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public IpDetectionViewModel(ForwardedHeadersAppOptions model, IDialogCoordinator dialogCoordinator, INotifiableEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider)
+        public IpDetectionViewModel(ForwardedHeadersAppOptions model, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.DisplayName = "IP address detection";
@@ -33,7 +33,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string HelpLink => Constants.HelpLinkPageIPAddressDetection;
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public bool Enabled
         {
             get => this.model.ForwardedHeaders.HasFlag(ForwardedHeaders.XForwardedFor);
@@ -50,24 +50,24 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public string ForwardedForHeaderName
         {
             get => this.model.ForwardedForHeaderName;
             set => this.model.ForwardedForHeaderName = value;
         }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public int? ForwardLimit
         {
             get => this.model.ForwardLimit;
             set => this.model.ForwardLimit = value;
         }
 
-        [NotifiableCollection]
+        [NotifyModelChangedCollection]
         public BindableCollection<string> KnownProxies { get; }
 
-        [NotifiableCollection]
+        [NotifyModelChangedCollection]
         public BindableCollection<string> KnownNetworks { get; }
 
         public string SelectedNetwork { get; set; }

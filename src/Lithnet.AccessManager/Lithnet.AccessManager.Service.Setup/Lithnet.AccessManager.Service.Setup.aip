@@ -17,10 +17,10 @@
     <ROW Property="CTRLS" Value="2"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{63A86692-66C7-4633-B5E9-66EA28FC35F2} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{9C1CFB67-0337-4896-A7B8-08F9842A5B9E} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7578.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7582.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="RUNAPPLICATION" Value="1" Type="4"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
@@ -90,6 +90,7 @@
     <ROW Component="APIMSWinCoreKernel32PrivateL112.dll" ComponentId="{98E4F6EC-166F-4C8A-B273-5B4BCD67168A}" Directory_="APPDIR" Attributes="256" KeyPath="APIMSWinCoreKernel32PrivateL112.dll"/>
     <ROW Component="APIMSWindevicesconfigL111.dll" ComponentId="{E6C4C465-B004-4774-8CB7-D0EC0896CCC5}" Directory_="APPDIR" Attributes="256" KeyPath="APIMSWindevicesconfigL111.dll"/>
     <ROW Component="APPDIR" ComponentId="{F9AEC186-4F5E-404F-991C-59F9414E9848}" Directory_="APPDIR" Attributes="0"/>
+    <ROW Component="AccessManagerService" ComponentId="{7A348F02-D471-4E9B-AE59-21D38089B507}" Directory_="APPDIR" Attributes="260" KeyPath="AccessManagerService"/>
     <ROW Component="CimCmdlets.psd1" ComponentId="{19FC76BC-BDB2-4D1B-A139-14DCF06BCB86}" Directory_="CimCmdlets_Dir" Attributes="0" KeyPath="CimCmdlets.psd1" Type="0"/>
     <ROW Component="ControlzEx.dll" ComponentId="{5AA8ACA1-3B5E-4E83-B240-2B29E1469B74}" Directory_="APPDIR" Attributes="0" KeyPath="ControlzEx.dll"/>
     <ROW Component="Diagnostics.format.ps1xml" ComponentId="{BB25EE07-1937-49B5-A660-D7C1A6FA7152}" Directory_="Microsoft.PowerShell.Diagnostic_Dir" Attributes="0" KeyPath="Diagnostics.format.ps1xml" Type="0"/>
@@ -881,6 +882,9 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.AiRemoveRegComponent">
     <ROW RemoveReg="Configured" InstallMode="2" Condition="(REMOVE=&quot;ALL&quot; AND (NOT UPGRADINGPRODUCTCODE))"/>
+    <ROW RemoveReg="HttpAcl" InstallMode="2" Condition="(REMOVE=&quot;ALL&quot; AND (NOT UPGRADINGPRODUCTCODE))"/>
+    <ROW RemoveReg="CertBinding" InstallMode="2" Condition="(REMOVE=&quot;ALL&quot; AND (NOT UPGRADINGPRODUCTCODE))"/>
+    <ROW RemoveReg="HttpsAcl" InstallMode="2" Condition="(REMOVE=&quot;ALL&quot; AND (NOT UPGRADINGPRODUCTCODE))"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
@@ -940,6 +944,9 @@
     <ROW Property="USER_NAME" Signature_="AppSearchSign"/>
     <ROW Property="AI_SETUPEXEPATH" Signature_="AI_EXE_PATH_LM" Builds="DefaultBuild"/>
     <ROW Property="AI_SETUPEXEPATH" Signature_="AI_EXE_PATH_CU" Builds="DefaultBuild"/>
+    <ROW Property="HTTP_ACL" Signature_="AppSearchSign_1"/>
+    <ROW Property="HTTPS_ACL" Signature_="AppSearchSign_2"/>
+    <ROW Property="CERT_BINDING" Signature_="AppSearchSign_3"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiBinaryComponent">
     <ROW Name="PowerShellScriptLauncher.dll" SourcePath="&lt;AI_CUSTACTS&gt;PowerShellScriptLauncher.dll"/>
@@ -948,6 +955,7 @@
     <ROW Name="aicustact.dll" SourcePath="&lt;AI_CUSTACTS&gt;aicustact.dll"/>
     <ROW Name="lzmaextractor.dll" SourcePath="&lt;AI_CUSTACTS&gt;lzmaextractor.dll"/>
     <ROW Name="userAccounts.dll" SourcePath="&lt;AI_CUSTACTS&gt;userAccounts.dll"/>
+    <ROW Name="viewer.exe" SourcePath="&lt;AI_CUSTACTS&gt;viewer.exe"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiControlComponent">
     <ROW Dialog_="ExitDialog" Control="LaunchProdText" Type="Text" X="148" Y="170" Width="220" Height="20" Attributes="196611" Text="Launch [ProductName] Configuration Utility" Order="800" MsiKey="ExitDialog#LaunchProdText"/>
@@ -979,7 +987,7 @@
     <ROW Dialog_="ServiceAccountDialog" Control="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Attributes="196611" Text="Service Configuration" TextStyle="[DlgTitleFont]" Order="900"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Text_4" Type="Text" X="25" Y="128" Width="243" Height="14" Attributes="65539" Property="TEXT_4_PROP" Text="1. Use a group-managed service account" Order="1000"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Text_5" Type="Text" X="25" Y="142" Width="300" Height="26" Attributes="65539" Property="TEXT_5_PROP" Text="2. Make sure the account has the &apos;account is sensitive and cannot be delegated&apos; flag set" Order="1100"/>
-    <ROW Dialog_="ServiceAccountDialog" Control="Hyperlink_2" Type="Hyperlink" X="15" Y="177" Width="310" Height="17" Attributes="65539" Property="HYPERLINK_2_PROP" Text="&lt;a href=&quot;https://github.com/lithnet/access-manager/wiki/Creating-a-service-account-for-the-Access-Manager-Service&quot;&gt;Creation script and more details...&lt;/a&gt;" Order="1200"/>
+    <ROW Dialog_="ServiceAccountDialog" Control="Hyperlink_2" Type="Hyperlink" X="15" Y="177" Width="310" Height="17" Attributes="65539" Property="HYPERLINK_2_PROP" Text="&lt;a href=&quot;https://l.lithnet.io/fwlink/enhjqpaz&quot;&gt;Creation script and more details...&lt;/a&gt;" Order="1200"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Text_6" Type="Text" X="15" Y="62" Width="337" Height="30" Attributes="65539" Property="TEXT_6_PROP" Text="Lithnet Access Manager should never be run as a privileged account (eg Domain Admins), the configuration utility will guide you through the process of delegating the minimum necessary permissions." Order="1300"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Text_7" Type="Text" X="15" Y="109" Width="316" Height="15" Attributes="65539" Property="TEXT_7_PROP" Text="To keep your service account as safe as possible, we recommend doing the following" Order="1400"/>
     <ROW Dialog_="ShowGsmaScript" Control="OK" Type="PushButton" X="256" Y="158" Width="56" Height="17" Attributes="3" Text="[ButtonText_OK]" Order="100"/>
@@ -1087,8 +1095,11 @@
     <ROW Action="AI_SetPermissions" Type="11265" Source="userAccounts.dll" Target="OnSetPermissions" WithoutSeq="true"/>
     <ROW Action="CreateEventSource" Type="1" Source="PowerShellScriptLauncher.dll" Target="RunPowerShellScript" Options="1" AdditionalSeq="AI_DATA_SETTER_6"/>
     <ROW Action="PasswordsDontMatchMessage" Type="65" Source="aicustact.dll" Target="MsgBox" WithoutSeq="true" Options="1" AdditionalSeq="AI_DATA_SETTER_5"/>
+    <ROW Action="RemoveCertBinding" Type="1090" Source="viewer.exe" Target="/EnforcedRunAsAdmin /RunAsAdmin /HideWindow netsh http delete sslcert [CERT_BINDING]" Options="1"/>
     <ROW Action="RemoveEventSource" Type="65" Source="PowerShellScriptLauncher.dll" Target="RunPowerShellScript" Options="1" AdditionalSeq="AI_DATA_SETTER_7"/>
     <ROW Action="RemoveFirewallRules" Type="3137" Source="PowerShellScriptLauncher.dll" Target="RunPowerShellScript" Options="1" AdditionalSeq="AI_DATA_SETTER_8"/>
+    <ROW Action="RemoveHttpUrlAcl" Type="1090" Source="viewer.exe" Target="/EnforcedRunAsAdmin /RunAsAdmin /HideWindow netsh http delete urlacl [HTTP_ACL]" Options="1"/>
+    <ROW Action="RemoveHttpsUrlAcl" Type="1090" Source="viewer.exe" Target="/EnforcedRunAsAdmin /RunAsAdmin /HideWindow netsh http delete urlacl [HTTPS_ACL]" Options="1"/>
     <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="DefaultBuild:[ProgramFiles64Folder][Manufacturer]\Access Manager Service"/>
     <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]"/>
     <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
@@ -1460,6 +1471,7 @@
     <ROW Feature_="MainFeature" Component_="WindowsFirewallHelper.dll"/>
     <ROW Feature_="MainFeature" Component_="PropertyChanged.dll"/>
     <ROW Feature_="MainFeature" Component_="AI_ExePath"/>
+    <ROW Feature_="MainFeature" Component_="AccessManagerService"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>
@@ -1467,7 +1479,7 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIniFileComponent">
     <ROW IniFile="IconFile" FileName="ACCESS~1.URL|Access Manager online help.url" DirProperty="Lithnet_Dir" Section="InternetShortcut" Key="IconFile" Value="[#Lithnet.AccessManager.Server.UI.exe]" Action="0" Component_="Lithnet.AccessManager.Server.UI.exe"/>
     <ROW IniFile="IconIndex" FileName="ACCESS~1.URL|Access Manager online help.url" DirProperty="Lithnet_Dir" Section="InternetShortcut" Key="IconIndex" Value="0" Action="0" Component_="Lithnet.AccessManager.Server.UI.exe"/>
-    <ROW IniFile="URL" FileName="ACCESS~1.URL|Access Manager online help.url" DirProperty="Lithnet_Dir" Section="InternetShortcut" Key="URL" Value="https://github.com/lithnet/access-manager/wiki" Action="0" Component_="Lithnet.AccessManager.Server.UI.exe"/>
+    <ROW IniFile="URL" FileName="ACCESS~1.URL|Access Manager online help.url" DirProperty="Lithnet_Dir" Section="InternetShortcut" Key="URL" Value="https://l.lithnet.io/fwlink/ujoohidm" Action="0" Component_="Lithnet.AccessManager.Server.UI.exe"/>
     <ROW IniFile="WorkingDirectory" FileName="ACCESS~1.URL|Access Manager online help.url" DirProperty="Lithnet_Dir" Section="InternetShortcut" Key="WorkingDirectory" Value="[Lithnet_Dir]" Action="0" Component_="Lithnet.AccessManager.Server.UI.exe"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
@@ -1485,12 +1497,12 @@
     <ROW Action="AI_ConfigPermissions" Condition="REMOVE &lt;&gt; &quot;ALL&quot;" Sequence="5852"/>
     <ROW Action="AI_DATA_SETTER_2" Condition="REMOVE &lt;&gt; &quot;ALL&quot;" Sequence="5851"/>
     <ROW Action="AI_PrepareRevokePermissions" Condition="REMOVE = &quot;ALL&quot;" Sequence="1699"/>
-    <ROW Action="CreateEventSource" Condition="( NOT Installed AND NOT OLDPRODUCTS ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6406"/>
-    <ROW Action="AI_DATA_SETTER_6" Condition="( NOT Installed AND NOT OLDPRODUCTS ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6405"/>
-    <ROW Action="RemoveEventSource" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) AND NOT UPGRADINGPRODUCTCODE ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6404"/>
-    <ROW Action="AI_DATA_SETTER_7" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) AND NOT UPGRADINGPRODUCTCODE ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6403"/>
-    <ROW Action="RemoveFirewallRules" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) AND NOT UPGRADINGPRODUCTCODE ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6402"/>
-    <ROW Action="AI_DATA_SETTER_8" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) AND NOT UPGRADINGPRODUCTCODE ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6401"/>
+    <ROW Action="CreateEventSource" Condition="( NOT Installed AND NOT OLDPRODUCTS ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6409"/>
+    <ROW Action="AI_DATA_SETTER_6" Condition="( NOT Installed AND NOT OLDPRODUCTS ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6408"/>
+    <ROW Action="RemoveEventSource" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) AND NOT UPGRADINGPRODUCTCODE ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6407"/>
+    <ROW Action="AI_DATA_SETTER_7" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) AND NOT UPGRADINGPRODUCTCODE ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6406"/>
+    <ROW Action="RemoveFirewallRules" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) AND NOT UPGRADINGPRODUCTCODE ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6405"/>
+    <ROW Action="AI_DATA_SETTER_8" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) AND NOT UPGRADINGPRODUCTCODE ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6404"/>
     <ROW Action="AI_AiRemoveRegsImmediate" Sequence="2599"/>
     <ROW Action="AI_AiBackupImmediate" Sequence="1401"/>
     <ROW Action="AI_AiBackupRollback" Sequence="1501"/>
@@ -1508,6 +1520,9 @@
     <ROW Action="AI_ExtractFiles" Sequence="3998" Builds="DefaultBuild"/>
     <ROW Action="AI_DATA_SETTER" Sequence="3997"/>
     <ROW Action="AI_EstimateExtractFiles" Sequence="3999" Builds="DefaultBuild"/>
+    <ROW Action="RemoveHttpUrlAcl" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) AND NOT UPGRADINGPRODUCTCODE ) AND ( HTTP_ACL )" Sequence="6401"/>
+    <ROW Action="RemoveHttpsUrlAcl" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) AND NOT UPGRADINGPRODUCTCODE ) AND ( HTTPS_ACL )" Sequence="6402"/>
+    <ROW Action="RemoveCertBinding" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) AND NOT UPGRADINGPRODUCTCODE ) AND ( CERT_BINDING )" Sequence="6403"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstallUISequenceComponent">
     <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="749"/>
@@ -1528,19 +1543,27 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiLockPermComponent">
     <ROW LockObject="Logs_Dir" Table="CreateFolder" User="[USER_NAME]" Permission="1610809791" Flags="2"/>
+    <ROW LockObject="AccessManagerService" Table="Registry" User="[USER_NAME]" Permission="1880096767" Flags="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRegLocatorComponent">
     <ROW Signature_="AI_EXE_PATH_CU" Root="1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="18"/>
     <ROW Signature_="AI_EXE_PATH_LM" Root="2" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="18"/>
     <ROW Signature_="AppSearchSign" Root="2" Key="SYSTEM\CurrentControlSet\Services\lithnetams" Name="ObjectName" Type="18"/>
+    <ROW Signature_="AppSearchSign_1" Root="2" Key="Software\Lithnet\Access Manager Service" Name="HttpAcl" Type="18"/>
+    <ROW Signature_="AppSearchSign_2" Root="2" Key="Software\Lithnet\Access Manager Service" Name="HttpsAcl" Type="18"/>
+    <ROW Signature_="AppSearchSign_3" Root="2" Key="Software\Lithnet\Access Manager Service" Name="CertBinding" Type="18"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
     <ROW Registry="AI_ExePath" Root="-1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Value="[AI_SETUPEXEPATH]" Component_="AI_ExePath"/>
+    <ROW Registry="AccessManagerService" Root="-1" Key="Software\Lithnet\Access Manager Service" Name="+" Component_="AccessManagerService"/>
     <ROW Registry="Path" Root="-1" Key="Software\Lithnet\Access Manager Service" Name="Path" Value="[APPDIR]" Component_="ProductInformation"/>
     <ROW Registry="Version" Root="-1" Key="Software\Lithnet\Access Manager Service" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRemoveRegComponent">
+    <ROW RemoveRegistry="CertBinding" Root="-1" Key="Software\Lithnet\Access Manager Service" Name="CertBinding" Component_="Lithnet.AccessManager.Server.UI.exe"/>
     <ROW RemoveRegistry="Configured" Root="-1" Key="Software\Lithnet\Access Manager Service" Name="Configured" Component_="Lithnet.AccessManager.Service.exe"/>
+    <ROW RemoveRegistry="HttpAcl" Root="-1" Key="Software\Lithnet\Access Manager Service" Name="HttpAcl" Component_="Lithnet.AccessManager.Server.UI.exe"/>
+    <ROW RemoveRegistry="HttpsAcl" Root="-1" Key="Software\Lithnet\Access Manager Service" Name="HttpsAcl" Component_="Lithnet.AccessManager.Server.UI.exe"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiServCtrlComponent">
     <ROW ServiceControl="Lithnet.AccessManager.Service.exe" Name="lithnetams" Event="161" Wait="1" Component_="Lithnet.AccessManager.Service.exe"/>

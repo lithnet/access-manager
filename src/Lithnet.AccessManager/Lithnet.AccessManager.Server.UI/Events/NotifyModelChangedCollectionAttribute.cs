@@ -4,7 +4,9 @@ using System.Text;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class NotifiablePropertyAttribute : Attribute
+    public class NotifyModelChangedCollectionAttribute : Attribute
     {
+        public bool RequiresServiceRestart { get; set; }
+
     }
 }

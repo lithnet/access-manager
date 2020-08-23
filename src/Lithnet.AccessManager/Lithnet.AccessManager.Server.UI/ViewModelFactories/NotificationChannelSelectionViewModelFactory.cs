@@ -7,9 +7,9 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly INotificationSubscriptionProvider subscriptionProvider;
         private readonly IEventAggregator eventAggregator;
-        private readonly INotifiableEventPublisher eventPublisher;
+        private readonly INotifyModelChangedEventPublisher eventPublisher;
 
-        public NotificationChannelSelectionViewModelFactory(INotificationSubscriptionProvider subscriptionProvider, IEventAggregator eventAggregator, INotifiableEventPublisher eventPublisher)
+        public NotificationChannelSelectionViewModelFactory(INotificationSubscriptionProvider subscriptionProvider, IEventAggregator eventAggregator, INotifyModelChangedEventPublisher eventPublisher)
         {
             this.subscriptionProvider = subscriptionProvider;
             this.eventAggregator = eventAggregator;

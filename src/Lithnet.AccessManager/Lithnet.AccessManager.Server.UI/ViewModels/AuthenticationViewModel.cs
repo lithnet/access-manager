@@ -30,11 +30,11 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILogger logger;
         private readonly IDirectory directory;
         private readonly RandomNumberGenerator rng;
-        private readonly INotifiableEventPublisher eventPublisher;
+        private readonly INotifyModelChangedEventPublisher eventPublisher;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IDomainTrustProvider domainTrustProvider;
 
-        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifiableEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, RandomNumberGenerator rng, IDirectory directory, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider)
+        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, RandomNumberGenerator rng, IDirectory directory, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.model = model;
@@ -45,7 +45,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.directory = directory;
             this.eventPublisher = eventPublisher;
             this.domainTrustProvider = domainTrustProvider;
-            
+
             this.DisplayName = "Authentication";
 
             model.Iwa ??= new IwaAuthenticationProviderOptions();
@@ -199,7 +199,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        [NotifiableCollection]
+        [NotifyModelChangedCollection(RequiresServiceRestart = true)]
         public BindableCollection<SecurityIdentifierViewModel> AllowedPrincipals { get; }
 
         private void BuildTrustedIssuers()
@@ -225,7 +225,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
         public AuthenticationMode AuthenticationMode { get => this.model.Mode; set => this.model.Mode = value; }
 
         public IEnumerable<AuthenticationMode> AuthenticationModeValues
@@ -236,7 +236,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
         public AuthenticationSchemes IwaAuthenticationSchemes { get => this.model.Iwa.AuthenticationSchemes; set => this.model.Iwa.AuthenticationSchemes = value; }
 
         public IEnumerable<AuthenticationSchemes> IwaAuthenticationSchemesValues
@@ -255,13 +255,13 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool CertificateVisible => this.AuthenticationMode == AuthenticationMode.Certificate;
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
         public string OidcAuthority { get => this.model.Oidc.Authority; set => this.model.Oidc.Authority = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
         public string OidcClientID { get => this.model.Oidc.ClientID; set => this.model.Oidc.ClientID = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
         public string OidcSecret
         {
             get => this.model.Oidc.Secret?.Data == null ? null : "-placeholder-";
@@ -290,20 +290,20 @@ namespace Lithnet.AccessManager.Server.UI
             this.OidcSecret = null;
         }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
         public string WsFedRealm { get => this.model.WsFed.Realm; set => this.model.WsFed.Realm = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
         public string WsFedMetadata { get => this.model.WsFed.Metadata; set => this.model.WsFed.Metadata = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
         public bool RequireSmartCardEku
         {
             get => this.model.ClientCert.RequireSmartCardLogonEku;
             set => this.model.ClientCert.RequireSmartCardLogonEku = value;
         }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
         [DependsOn(nameof(ValidateAnyTrustedIssuer), nameof(ValidateSpecificIssuer))]
         public bool ValidateToNTAuth
         {
@@ -317,7 +317,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
         [DependsOn(nameof(ValidateToNTAuth), nameof(ValidateSpecificIssuer))]
         public bool ValidateAnyTrustedIssuer
         {
@@ -331,7 +331,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
         [DependsOn(nameof(ValidateToNTAuth), nameof(ValidateAnyTrustedIssuer))]
         public bool ValidateSpecificIssuer
         {
@@ -345,10 +345,10 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        [NotifiableCollection]
+        [NotifyModelChangedCollection(RequiresServiceRestart = true)]
         public BindableCollection<X509Certificate2ViewModel> TrustedIssuers { get; }
 
-        [NotifiableCollection]
+        [NotifyModelChangedCollection(RequiresServiceRestart = true)]
         public BindableCollection<string> RequiredEkus { get; }
 
         public X509Certificate2ViewModel SelectedIssuer { get; set; }

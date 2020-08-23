@@ -23,13 +23,13 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IJitGroupMappingViewModelFactory groupMappingFactory;
         private readonly IJitDomainStatusViewModelFactory jitDomainStatusFactory;
         private readonly IServiceSettingsProvider serviceSettings;
-        private readonly INotifiableEventPublisher eventPublisher;
+        private readonly INotifyModelChangedEventPublisher eventPublisher;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IDomainTrustProvider domainTrustProvider;
 
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.UserClockSolid;
 
-        public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IDirectory directory, IJitGroupMappingViewModelFactory groupMappingFactory, INotifiableEventPublisher eventPublisher, IJitDomainStatusViewModelFactory jitDomainStatusFactory, IServiceSettingsProvider serviceSettings, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider)
+        public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IDirectory directory, IJitGroupMappingViewModelFactory groupMappingFactory, INotifyModelChangedEventPublisher eventPublisher, IJitDomainStatusViewModelFactory jitDomainStatusFactory, IServiceSettingsProvider serviceSettings, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.dialogCoordinator = dialogCoordinator;
@@ -86,7 +86,7 @@ namespace Lithnet.AccessManager.Server.UI
             return null;
         }
 
-        [NotifiableCollection]
+        [NotifyModelChangedCollection]
         public BindableCollection<JitGroupMappingViewModel> GroupMappings { get; }
 
         public BindableCollection<JitDomainStatusViewModel> Domains { get; }
@@ -95,7 +95,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public JitGroupMappingViewModel SelectedGroupMapping { get; set; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public bool EnableJitGroupCreation
         {
             get => this.jitOptions.EnableJitGroupCreation;
@@ -201,7 +201,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.NotifyOfPropertyChange(nameof(CanDelegateDynamicGroupPermission));
         }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public int HasBeenChanged { get; set; }
 
         public bool CanDelegateJitGroupPermission => !string.IsNullOrWhiteSpace(this.SelectedGroupMapping?.GroupOU);

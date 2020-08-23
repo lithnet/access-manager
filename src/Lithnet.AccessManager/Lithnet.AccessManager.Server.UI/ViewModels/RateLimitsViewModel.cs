@@ -11,7 +11,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly RateLimitOptions model;
         private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public RateLimitsViewModel(RateLimitOptions model, INotifiableEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider)
+        public RateLimitsViewModel(RateLimitOptions model, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.model = model;
@@ -30,29 +30,29 @@ namespace Lithnet.AccessManager.Server.UI
             eventPublisher.Register(this);
         }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public bool PerIPEnabled { get => this.model.PerIP.Enabled; set => this.model.PerIP.Enabled = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public int PerIPRequestsPerMinute { get => this.model.PerIP.RequestsPerMinute; set => this.model.PerIP.RequestsPerMinute = value; }
         
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public int PerIPRequestsPerHour { get => this.model.PerIP.RequestsPerHour; set => this.model.PerIP.RequestsPerHour = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public int PerIPRequestsPerDay { get => this.model.PerIP.RequestsPerDay; set => this.model.PerIP.RequestsPerDay = value; }
 
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public bool PerUserEnabled { get => this.model.PerUser.Enabled; set => this.model.PerUser.Enabled = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public int PerUserRequestsPerMinute { get => this.model.PerUser.RequestsPerMinute; set => this.model.PerUser.RequestsPerMinute = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public int PerUserRequestsPerHour { get => this.model.PerUser.RequestsPerHour; set => this.model.PerUser.RequestsPerHour = value; }
 
-        [NotifiableProperty]
+        [NotifyModelChangedProperty]
         public int PerUserRequestsPerDay { get => this.model.PerUser.RequestsPerDay; set => this.model.PerUser.RequestsPerDay = value; }
 
         public string HelpLink => Constants.HelpLinkPageRateLimits;
