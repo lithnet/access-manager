@@ -24,6 +24,8 @@ namespace Lithnet.AccessManager
 
         public TimeSpan GrantJitAccess(IGroup group, IUser user, bool canExtend, TimeSpan requestedExpiry, out Action undo)
         {
+            this.logger.LogTrace("Adding user {user} to JIT group {group}", user.MsDsPrincipalName, group.MsDsPrincipalName);
+
             if (this.directory.IsPamFeatureEnabled(group.Sid, false))
             {
                 return this.GrantJitAccessPam(group, user, canExtend, requestedExpiry, out undo);

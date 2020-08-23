@@ -17,10 +17,10 @@
     <ROW Property="CTRLS" Value="2"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{9C1CFB67-0337-4896-A7B8-08F9842A5B9E} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{FF293E24-F7EA-4071-B12F-4276941A1A51} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7582.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7585.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="RUNAPPLICATION" Value="1" Type="4"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
@@ -1543,7 +1543,7 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiLockPermComponent">
     <ROW LockObject="Logs_Dir" Table="CreateFolder" User="[USER_NAME]" Permission="1610809791" Flags="2"/>
-    <ROW LockObject="AccessManagerService" Table="Registry" User="[USER_NAME]" Permission="1880096767" Flags="0"/>
+    <ROW LockObject="AccessManagerService" Table="Registry" User="[USER_NAME]" Permission="1880096767" Flags="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRegLocatorComponent">
     <ROW Signature_="AI_EXE_PATH_CU" Root="1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="18"/>
