@@ -171,7 +171,7 @@ $de.CommitChanges()</value>
 	$computer
 )
 
-	# See https://l.lithnet.io/fwlink/oyotjigz for help
+	# See https://go.lithnet.io/fwlink/oyotjigz for help
 
 	Write-Information  "We're in PowerShell!"
 	Write-Information "Checking if $($user.MsDsPrincipalName) is allowed access to $($computer.MsDsPrincipalName)"

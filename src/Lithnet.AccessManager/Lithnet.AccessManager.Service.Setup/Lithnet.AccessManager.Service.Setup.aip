@@ -17,10 +17,10 @@
     <ROW Property="CTRLS" Value="2"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{FF293E24-F7EA-4071-B12F-4276941A1A51} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{598A2B02-857B-450B-902A-41C4BF2D403F} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7585.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7586.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="RUNAPPLICATION" Value="1" Type="4"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
@@ -987,7 +987,7 @@
     <ROW Dialog_="ServiceAccountDialog" Control="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Attributes="196611" Text="Service Configuration" TextStyle="[DlgTitleFont]" Order="900"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Text_4" Type="Text" X="25" Y="128" Width="243" Height="14" Attributes="65539" Property="TEXT_4_PROP" Text="1. Use a group-managed service account" Order="1000"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Text_5" Type="Text" X="25" Y="142" Width="300" Height="26" Attributes="65539" Property="TEXT_5_PROP" Text="2. Make sure the account has the &apos;account is sensitive and cannot be delegated&apos; flag set" Order="1100"/>
-    <ROW Dialog_="ServiceAccountDialog" Control="Hyperlink_2" Type="Hyperlink" X="15" Y="177" Width="310" Height="17" Attributes="65539" Property="HYPERLINK_2_PROP" Text="&lt;a href=&quot;https://l.lithnet.io/fwlink/enhjqpaz&quot;&gt;Creation script and more details...&lt;/a&gt;" Order="1200"/>
+    <ROW Dialog_="ServiceAccountDialog" Control="Hyperlink_2" Type="Hyperlink" X="15" Y="177" Width="310" Height="17" Attributes="65539" Property="HYPERLINK_2_PROP" Text="&lt;a href=&quot;https://go.lithnet.io/fwlink/enhjqpaz&quot;&gt;Creation script and more details...&lt;/a&gt;" Order="1200"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Text_6" Type="Text" X="15" Y="62" Width="337" Height="30" Attributes="65539" Property="TEXT_6_PROP" Text="Lithnet Access Manager should never be run as a privileged account (eg Domain Admins), the configuration utility will guide you through the process of delegating the minimum necessary permissions." Order="1300"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Text_7" Type="Text" X="15" Y="109" Width="316" Height="15" Attributes="65539" Property="TEXT_7_PROP" Text="To keep your service account as safe as possible, we recommend doing the following" Order="1400"/>
     <ROW Dialog_="ShowGsmaScript" Control="OK" Type="PushButton" X="256" Y="158" Width="56" Height="17" Attributes="3" Text="[ButtonText_OK]" Order="100"/>
@@ -1477,10 +1477,10 @@
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIniFileComponent">
-    <ROW IniFile="IconFile" FileName="ACCESS~1.URL|Access Manager online help.url" DirProperty="Lithnet_Dir" Section="InternetShortcut" Key="IconFile" Value="[#Lithnet.AccessManager.Server.UI.exe]" Action="0" Component_="Lithnet.AccessManager.Server.UI.exe"/>
-    <ROW IniFile="IconIndex" FileName="ACCESS~1.URL|Access Manager online help.url" DirProperty="Lithnet_Dir" Section="InternetShortcut" Key="IconIndex" Value="0" Action="0" Component_="Lithnet.AccessManager.Server.UI.exe"/>
-    <ROW IniFile="URL" FileName="ACCESS~1.URL|Access Manager online help.url" DirProperty="Lithnet_Dir" Section="InternetShortcut" Key="URL" Value="https://l.lithnet.io/fwlink/ujoohidm" Action="0" Component_="Lithnet.AccessManager.Server.UI.exe"/>
-    <ROW IniFile="WorkingDirectory" FileName="ACCESS~1.URL|Access Manager online help.url" DirProperty="Lithnet_Dir" Section="InternetShortcut" Key="WorkingDirectory" Value="[Lithnet_Dir]" Action="0" Component_="Lithnet.AccessManager.Server.UI.exe"/>
+    <ROW IniFile="IconFile" FileName="LITHNE~1.URL|Lithnet Access Manager online help.url" DirProperty="Lithnet_Dir" Section="InternetShortcut" Key="IconFile" Value="[#Lithnet.AccessManager.Server.UI.exe]" Action="0" Component_="Lithnet.AccessManager.Server.UI.exe"/>
+    <ROW IniFile="IconIndex" FileName="LITHNE~1.URL|Lithnet Access Manager online help.url" DirProperty="Lithnet_Dir" Section="InternetShortcut" Key="IconIndex" Value="0" Action="0" Component_="Lithnet.AccessManager.Server.UI.exe"/>
+    <ROW IniFile="URL" FileName="LITHNE~1.URL|Lithnet Access Manager online help.url" DirProperty="Lithnet_Dir" Section="InternetShortcut" Key="URL" Value="https://go.lithnet.io/fwlink/ujoohidm" Action="0" Component_="Lithnet.AccessManager.Server.UI.exe"/>
+    <ROW IniFile="WorkingDirectory" FileName="LITHNE~1.URL|Lithnet Access Manager online help.url" DirProperty="Lithnet_Dir" Section="InternetShortcut" Key="WorkingDirectory" Value="[Lithnet_Dir]" Action="0" Component_="Lithnet.AccessManager.Server.UI.exe"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
     <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="210"/>
@@ -1543,7 +1543,6 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiLockPermComponent">
     <ROW LockObject="Logs_Dir" Table="CreateFolder" User="[USER_NAME]" Permission="1610809791" Flags="2"/>
-    <ROW LockObject="AccessManagerService" Table="Registry" User="[USER_NAME]" Permission="1880096767" Flags="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRegLocatorComponent">
     <ROW Signature_="AI_EXE_PATH_CU" Root="1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="18"/>
@@ -1572,7 +1571,7 @@
     <ROW ServiceInstall="Lithnet.AccessManager.Service.exe" Name="lithnetams" DisplayName="Lithnet Access Manager Service" ServiceType="16" StartType="2" ErrorControl="32769" Dependencies="http" StartName="[USER_NAME]" Password="63998AA4F793C703378093538F428611E8FB587A92802300A596BE070168" Component_="Lithnet.AccessManager.Service.exe" Description="Hosts the Lithnet Access Manager web service"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiShortsComponent">
-    <ROW Shortcut="LithnetAccessManagerServiceConfigur" Directory_="Lithnet_Dir" Name="ACCESS~1|Access Manager Service configuration tool" Component_="Lithnet.AccessManager.Server.UI.exe" Target="[#Lithnet.AccessManager.Server.UI.exe]" Description="Acces Manager Service configuration tool" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
+    <ROW Shortcut="LithnetAccessManagerServiceConfigur" Directory_="Lithnet_Dir" Name="LITHNE~1|Lithnet Access Manager Service configuration tool" Component_="Lithnet.AccessManager.Server.UI.exe" Target="[#Lithnet.AccessManager.Server.UI.exe]" Description="Lithnet Access Manager Service configuration tool" Hotkey="0" IconIndex="0" ShowCmd="1" WkDir="APPDIR"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiThemeComponent">
     <ATTRIBUTE name="UsedTheme" value="classic"/>

@@ -113,7 +113,7 @@ namespace Lithnet.AccessManager.Server.UI {
         ///	$computer
         ///)
         ///
-        ///	# See https://l.lithnet.io/fwlink/oyotjigz for help
+        ///	# See https://go.lithnet.io/fwlink/oyotjigz for help
         ///
         ///	Write-Information  &quot;We&apos;re in PowerShell!&quot;
         ///	Write-Information &quot;Checking if $($user.MsDsPrincipalName) is allowed access to $($computer.MsDsPrincipalName)&quot;
