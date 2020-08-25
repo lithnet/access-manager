@@ -69,11 +69,11 @@ namespace Lithnet.AccessManager.Server.UI
             set => this.Model.Subtree = !value;
         }
 
-        public GroupType GroupType
-        {
-            get => this.Model.GroupType;
-            set => this.Model.GroupType = value;
-        }
+        //public GroupType GroupType
+        //{
+        //    get => this.Model.GroupType;
+        //    set => this.Model.GroupType = value;
+        //}
 
         public IEnumerable<GroupType> GroupTypeValues => Enum.GetValues(typeof(GroupType)).Cast<GroupType>();
 
@@ -102,9 +102,16 @@ namespace Lithnet.AccessManager.Server.UI
             try
             {
                 string basePath = this.directory.GetFullyQualifiedDomainControllerAdsPath(this.ComputerOU);
-                string initialPath = this.directory.GetFullyQualifiedAdsPath(this.ComputerOU);
+                string initialPath = this.directory.GetFullyQualifiedAdsPath(this.GroupOU);
 
                 var container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select OU", "Select group OU", basePath, initialPath);
+
+                if (!string.Equals(this.directory.GetDomainNameDnsFromDn(this.ComputerOU), this.directory.GetDomainNameDnsFromDn(container), StringComparison.OrdinalIgnoreCase))
+                {
+                    await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The group container must belong to the same domain as the computers");
+                    return;
+                }
+
                 if (container != null)
                 {
                     this.GroupOU = container;

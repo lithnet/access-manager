@@ -9,10 +9,10 @@
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="ARPPRODUCTICON" Value="accessmanager.exe" Type="8"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
-    <ROW Property="ProductCode" Value="1033:{E4CD0455-F3A5-491B-80BF-5AE141AB516A} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{19DF2473-F573-49B3-99FF-A52C8FE3D859} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Agent"/>
-    <ROW Property="ProductVersion" Value="1.0.7585.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7587.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
     <ROW Property="SETUPEXEDIR" Value="1"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{EEDECF4C-BABB-4AE0-9CB9-DC051FF1AE75}"/>

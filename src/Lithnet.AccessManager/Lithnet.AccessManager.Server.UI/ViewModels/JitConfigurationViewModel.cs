@@ -169,7 +169,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool CanSelectDynamicGroupOU => this.SelectedDomain != null && !this.SelectedDomain.IsPamEnabled;
 
-        public void SelectDynamicGroupOU()
+        public async Task SelectDynamicGroupOU()
         {
             JitDomainStatusViewModel current = this.SelectedDomain;
             string oldOU = current.DynamicGroupOU;
@@ -181,6 +181,12 @@ namespace Lithnet.AccessManager.Server.UI
 
             if (container != null)
             {
+                if (!string.Equals(current.Domain.Name, this.directory.GetDomainNameDnsFromDn(container)))
+                {
+                    await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The dynamic group OU must be in the {current.Domain.Name} domain");
+                    return;
+                }
+                
                 if (current.Mapping == null)
                 {
                     current.Mapping = new JitDynamicGroupMapping();

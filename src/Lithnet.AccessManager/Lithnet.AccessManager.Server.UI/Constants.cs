@@ -23,6 +23,7 @@ namespace Lithnet.AccessManager.Server.UI
         public const string HelpLinkPageJitAccess = "https://go.lithnet.io/fwlink/ctekraup";
         public const string HelpLinkPageLocalAdminPasswords = "https://go.lithnet.io/fwlink/vcbvhmkj";
         public const string HelpLinkPageChooseLapsStrategy = "https://go.lithnet.io/fwlink/vcbvhmkj";
+        public const string HelpLinkPageHelp = "https://go.lithnet.io/fwlink/ytejxvsk";
 
         public const string HelpLinkPageRateLimits = "https://go.lithnet.io/fwlink/zbllbamw";
         public const string HelpLinkPageBitLocker = "https://go.lithnet.io/fwlink/lixfecyh";

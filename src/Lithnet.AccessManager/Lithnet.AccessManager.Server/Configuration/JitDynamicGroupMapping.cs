@@ -7,7 +7,9 @@
         public string GroupNameTemplate { get; set; }
 
         public string Description { get; set; }
-        
+
+        public GroupType GroupType { get; set; } = GroupType.DomainLocal;
+
         public string Domain { get; set; }
 
         public int? OverrideMode { get; set; }

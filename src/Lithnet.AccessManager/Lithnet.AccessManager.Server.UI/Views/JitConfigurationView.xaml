@@ -115,7 +115,7 @@
             </b:Interaction.Behaviors>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Forest" 
+                    <GridViewColumn Header="Forest"
                                     DisplayMemberBinding="{Binding ForestName}" 
                                     Width="Auto"/>
                     <GridViewColumn Header="Domain"
@@ -128,7 +128,7 @@
                                     DisplayMemberBinding="{Binding DomainFunctionalLevel}" 
                                     Width="Auto"/>
                     <GridViewColumn Header="PAM status"
-                                    Width="Auto">
+                                    Width="125">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -152,7 +152,7 @@
                     </GridViewColumn>
                     <GridViewColumn Header="JIT type"
                                     DisplayMemberBinding="{Binding JitType}" 
-                                    Width="Auto"/>
+                                    Width="100"/>
                     <GridViewColumn Header="Dynamic group container"
                                     DisplayMemberBinding="{Binding DynamicGroupOU}" 
                                     Width="Auto"/>

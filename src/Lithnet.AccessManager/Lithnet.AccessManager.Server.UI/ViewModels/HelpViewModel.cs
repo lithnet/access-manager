@@ -12,7 +12,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class HelpViewModel : Screen
+    public class HelpViewModel : Screen, IHelpLink
     {
         private readonly IShellExecuteProvider shellExecuteProvider;
 
@@ -43,5 +43,7 @@ namespace Lithnet.AccessManager.Server.UI
         public void Faqs() => this.shellExecuteProvider.OpenWithShellExecute(Constants.LinkFaqs);
       
         public void SupportInformation() => this.shellExecuteProvider.OpenWithShellExecute(Constants.LinkSupportInformation);
+
+        public string HelpLink => Constants.HelpLinkPageHelp;
     }
 }

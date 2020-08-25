@@ -323,7 +323,7 @@ namespace Lithnet.AccessManager.Server.UI
             await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
         }
 
-        public async Task LapsHelp()
+        public async Task OpenLapsStrategyLink()
         {
             await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkPageChooseLapsStrategy);
         }

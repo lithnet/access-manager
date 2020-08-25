@@ -11,7 +11,7 @@
         Title="{Binding WindowTitle}"
         BorderThickness="1"
         Height="Auto"
-        Width="Auto" 
+        Width="1200" 
         controls:DialogParticipation.Register="{Binding}" 
         SizeToContent="Manual">
     <Window.InputBindings>
@@ -82,9 +82,6 @@
                     <CompositeCollection>
                         <MenuItem Header="Online Help"
                                       Command="{s:Action Help}"/>
-                        <Separator />
-                        <MenuItem Header="About"
-                                      Command="{s:Action About}"/>
                     </CompositeCollection>
                 </MenuItem.ItemsSource>
             </MenuItem>
@@ -101,6 +98,7 @@
                                 OptionsItemsSource="{Binding OptionItems}"
                                 IsPaneOpen="True" 
                                 SelectedItem="{Binding ActiveItem}"
+                                SelectedOptionsItem="{Binding ActiveOptionsItem}"
                                 DisplayMode="CompactInline"
                                 HamburgerVisibility="Collapsed"
                                 ItemTemplate="{StaticResource MenuItemTemplate}"

@@ -36,22 +36,20 @@
                          Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
                          Margin="5"/>
 
-            <Label Grid.Row="1" Grid.Column="0" 
-                       Content="Web site logo (250x50px)"
-                       Margin="5"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" 
+                       TextWrapping="Wrap"
+                       Text="Web site logo (Recommended max 75px high)"
+                       Margin="10 5 5 5"/>
             <Border Grid.Row="1" Grid.Column="1"
                         BorderThickness="1"
                         BorderBrush="{StaticResource MahApps.Brushes.Control.Border}"
                         Margin="5"
-                        Width="250"
-                        HorizontalAlignment="Left"
-                        Height="50">
+                        HorizontalAlignment="Left">
                 <Image Source="{Binding Image}"
                            Stretch="Uniform" 
                            HorizontalAlignment="Left" 
                            VerticalAlignment="Center" 
-                           MaxWidth="250" 
-                           MaxHeight="50"
+                           MaxHeight="75"
                            Margin="5"/>
             </Border>
             <Button Grid.Row="1"

@@ -10,7 +10,7 @@
 
         public string GroupNameTemplate { get; set; }
 
-        public GroupType GroupType { get; set; }
+        public GroupType GroupType { get; set; } = GroupType.DomainLocal;
 
         public string GroupDescription { get; set; }
 

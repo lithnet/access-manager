@@ -65,7 +65,7 @@ namespace Lithnet.AccessManager
             else
             {
                 this.logger.LogTrace("Creating a new dynamic group {groupName} in {ou} with ttl of {ttl}", groupName, mapping.GroupOU, grantedExpiry);
-                dynamicGroup = this.directory.CreateTtlGroup(groupName, groupName, description, mapping.GroupOU, grantedExpiry, true);
+                dynamicGroup = this.directory.CreateTtlGroup(groupName, groupName, description, mapping.GroupOU, grantedExpiry, mapping.GroupType, true);
                 this.logger.LogInformation(EventIDs.JitDynamicGroupCreated, "Created a new dynamic group {groupName} in {ou} with ttl of {ttl}", groupName, mapping.GroupOU, grantedExpiry);
             }
 
@@ -124,13 +124,14 @@ namespace Lithnet.AccessManager
         {
             if (string.IsNullOrWhiteSpace(mapping.GroupNameTemplate))
             {
-                return $"LITHNET-AMS-JIT-{group.SamAccountName}-{user.SamAccountName}";
+                return $"AMS-JIT-{group.SamAccountName}-{user.SamAccountName}";
             }
             else
             {
                 return mapping.GroupNameTemplate
                     .Replace("{user}", user.SamAccountName, StringComparison.OrdinalIgnoreCase)
-                    .Replace("{group}", group.SamAccountName, StringComparison.OrdinalIgnoreCase);
+                    .Replace("{group}", group.SamAccountName, StringComparison.OrdinalIgnoreCase)
+                    .Replace("{guid}", Guid.NewGuid().ToString(), StringComparison.OrdinalIgnoreCase);
             }
         }
 

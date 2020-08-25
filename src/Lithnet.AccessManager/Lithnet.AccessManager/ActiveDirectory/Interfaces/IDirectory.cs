@@ -29,7 +29,7 @@ namespace Lithnet.AccessManager
 
         string GetForestDnsNameForOU(string ou);
 
-        IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl, bool removeAccountOperators);
+        IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl, GroupType groupType, bool removeAccountOperators);
 
         IComputer GetComputer(string name);
 

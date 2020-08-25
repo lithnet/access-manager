@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager
 {
     public class PasswordProvider : IPasswordProvider
     {
         private readonly IMsMcsAdmPwdProvider msLapsProvider;
-
         private readonly ILithnetAdminPasswordProvider lithnetProvider;
-
         private readonly IEncryptionProvider encryptionProvider;
-
         private readonly ICertificateProvider certificateProvider;
+        private readonly ILogger logger;
 
-        public PasswordProvider(IMsMcsAdmPwdProvider msMcsAdmPwdProvider, ILithnetAdminPasswordProvider lithnetProvider, IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider)
+        public PasswordProvider(IMsMcsAdmPwdProvider msMcsAdmPwdProvider, ILithnetAdminPasswordProvider lithnetProvider, IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider, ILogger<PasswordProvider> logger)
         {
             this.msLapsProvider = msMcsAdmPwdProvider;
             this.lithnetProvider = lithnetProvider;
             this.encryptionProvider = encryptionProvider;
             this.certificateProvider = certificateProvider;
+            this.logger = logger;
         }
 
         public PasswordEntry GetCurrentPassword(IComputer computer, DateTime? newExpiry, PasswordStorageLocation retrievalLocation)
@@ -84,9 +84,26 @@ namespace Lithnet.AccessManager
                 PasswordEntry p = new PasswordEntry()
                 {
                     Created = item.Created,
-                    Password = this.encryptionProvider.Decrypt(item.EncryptedData, (thumbprint) => this.certificateProvider.FindDecryptionCertificate(thumbprint, Constants.ServiceName)),
                     ExpiryDate = item.Retired
                 };
+
+                string tp = null;
+
+                try
+                {
+
+                    p.Password = this.encryptionProvider.Decrypt(item.EncryptedData,
+                        (thumbprint) =>
+                        {
+                            tp = thumbprint;
+                           return  this.certificateProvider.FindDecryptionCertificate(thumbprint, Constants.ServiceName);
+                        });
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(EventIDs.LapsPasswordHistoryError, ex, $"Could not decrypt a password history item. Certificate thumbprint {tp}, Created: {p.Created}, Expired: {p.ExpiryDate}");
+                    p.DecryptionFailed = true;
+                }
 
                 list.Add(p);
             }

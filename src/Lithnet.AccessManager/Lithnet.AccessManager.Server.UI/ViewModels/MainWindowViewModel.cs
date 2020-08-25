@@ -66,7 +66,9 @@ namespace Lithnet.AccessManager.Server.UI
 
         private HostingViewModel hosting { get; }
 
-        public string HelpLink => (this.ActiveItem as IHelpLink)?.HelpLink;
+        public PropertyChangedBase ActiveOptionsItem { get; set; }
+
+        public string HelpLink => (this.ActiveItem as IHelpLink)?.HelpLink ?? (this.ActiveOptionsItem as IHelpLink)?.HelpLink;
 
         public async Task<bool> Save()
         {

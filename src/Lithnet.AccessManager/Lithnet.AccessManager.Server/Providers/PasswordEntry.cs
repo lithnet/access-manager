@@ -4,6 +4,8 @@ namespace Lithnet.AccessManager
 {
     public class PasswordEntry
     {
+        public bool DecryptionFailed { get; set; }
+
         public string Password { get; set; }
 
         public DateTime? ExpiryDate { get; set; }

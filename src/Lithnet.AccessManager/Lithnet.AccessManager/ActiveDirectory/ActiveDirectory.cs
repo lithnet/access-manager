@@ -158,6 +158,11 @@ namespace Lithnet.AccessManager
                 samAccountName = name.Split('\\')[1];
             }
 
+            if (groupType == 0)
+            {
+                groupType = GroupType.DomainLocal;
+            }
+
             DirectoryEntry de = oude.Children.Add($"CN={samAccountName}", "group");
             de.Properties["samAccountName"].Add(samAccountName);
             de.Properties["description"].Add(description);
@@ -223,18 +228,22 @@ namespace Lithnet.AccessManager
             return NativeMethods.CrackNames(nameFormat, requiredFormat, name, dnsDomainName).Name;
         }
 
-        public IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl, bool removeAccountOperators)
+        public IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl, GroupType groupType, bool removeAccountOperators)
         {
             DirectoryEntry container = new DirectoryEntry($"LDAP://{ou}");
             dynamic[] objectClasses = new dynamic[] { "dynamicObject", "group" };
 
             DirectoryEntry group = container.Children.Add($"CN={accountName}", "group");
+            if (groupType == 0)
+            {
+                groupType = GroupType.DomainLocal;
+            }
 
             group.Invoke("Put", "objectClass", objectClasses);
             group.Properties["samAccountName"].Add(accountName);
             group.Properties["displayName"].Add(displayName);
             group.Properties["description"].Add(description);
-            group.Properties["groupType"].Add(-2147483644);
+            group.Properties["groupType"].Add(unchecked((int)groupType));
             group.Properties["entryTTL"].Add((int)ttl.TotalSeconds);
             group.CommitChanges();
 

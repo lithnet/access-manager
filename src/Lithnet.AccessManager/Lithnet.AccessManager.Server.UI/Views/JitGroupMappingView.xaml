@@ -82,7 +82,7 @@
                            TextWrapping="Wrap">Specify the name of the group, and include the {computerName} placeholder. For example, "JIT-{computername}"</TextBlock>
             </StackPanel>
            
-            <Label Grid.Row="5" Grid.Column="0"
+            <!--<Label Grid.Row="5" Grid.Column="0"
                    Content="Group type"
                    Margin="5"/>
             <ComboBox Grid.Row="5" Grid.Column="1" 
@@ -97,7 +97,7 @@
                         <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"></TextBlock>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
-            </ComboBox>
+            </ComboBox>-->
         </Grid>
     </AdornerDecorator>
 </UserControl>
