@@ -3,6 +3,7 @@ using Moq;
 using Microsoft.Extensions.Logging;
 using System.Security.Principal;
 using System.Collections.Generic;
+using System.DirectoryServices;
 using NUnit.Framework;
 
 namespace Lithnet.AccessManager.Agent.Test
@@ -19,12 +20,15 @@ namespace Lithnet.AccessManager.Agent.Test
 
         private ActiveDirectory directory;
 
+        private IDiscoveryServices discoveryServices;
+
         private LocalSam sam;
 
         [SetUp()]
         public void TestInitialize()
         {
-            this.directory = new ActiveDirectory();
+            this.discoveryServices = new DiscoveryServices();
+            this.directory = new ActiveDirectory(this.discoveryServices);
             this.sam = new LocalSam(Mock.Of<ILogger<LocalSam>>());
             this.mockSam = new Mock<ILocalSam>();
             this.mockSettings = new Mock<IJitSettings>();

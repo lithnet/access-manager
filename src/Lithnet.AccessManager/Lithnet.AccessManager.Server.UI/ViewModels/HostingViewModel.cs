@@ -39,8 +39,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ICertificateProvider certProvider;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IEventAggregator eventAggregator;
+        private readonly IDirectory directory;
 
-        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator)
+        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory)
         {
             this.logger = logger;
             this.pathProvider = pathProvider;
@@ -51,6 +52,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.shellExecuteProvider = shellExecuteProvider;
             this.eventAggregator = eventAggregator;
             this.Validator = validator;
+            this.directory = directory;
 
             this.WorkingModel = this.CloneModel(model);
             this.Certificate = this.GetCertificate();
@@ -587,7 +589,6 @@ namespace Lithnet.AccessManager.Server.UI
 
             try
             {
-                ActiveDirectory directory = new ActiveDirectory();
                 if (directory.TryGetPrincipal(r.Username, out ISecurityPrincipal o))
                 {
                     if (o is IGroup)

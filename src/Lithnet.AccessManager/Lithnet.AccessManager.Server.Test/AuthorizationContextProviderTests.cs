@@ -16,12 +16,15 @@ namespace Lithnet.AccessManager.Server.Test
     {
         private IDirectory directory;
 
+        private IDiscoveryServices discoveryServices;
+
         private ILogger<AuthorizationContextProvider> logger;
 
         [SetUp()]
         public void TestInitialize()
         {
-            directory = new ActiveDirectory();
+            discoveryServices = new DiscoveryServices();
+            directory = new ActiveDirectory(discoveryServices);
             logger = Global.LogFactory.CreateLogger<AuthorizationContextProvider>();
         }
 
@@ -30,8 +33,8 @@ namespace Lithnet.AccessManager.Server.Test
         {
             IUser user = directory.GetUser(username);
             IComputer computer = directory.GetComputer(computerName);
-            string dnsDomain = this.directory.GetDomainNameDnsFromSid(user.Sid);
-            string dc = this.directory.GetDomainControllerForDomain(dnsDomain);
+            string dnsDomain = this.discoveryServices.GetDomainNameDns(user.Sid);
+            string dc = this.discoveryServices.GetDomainController(dnsDomain);
 
             var options = new AuthorizationOptions
             {
@@ -58,7 +61,7 @@ namespace Lithnet.AccessManager.Server.Test
                 }
             };
 
-            var authorizationContextProvider = new AuthorizationContextProvider(this.SetupOptions(options), directory, logger);
+            var authorizationContextProvider = new AuthorizationContextProvider(this.SetupOptions(options), logger, discoveryServices);
             var c = authorizationContextProvider.GetAuthorizationContext(user, computer.Sid);
 
             c = authorizationContextProvider.GetAuthorizationContext(user, computer.Sid);
@@ -71,7 +74,7 @@ namespace Lithnet.AccessManager.Server.Test
         {
             IUser user = directory.GetUser(username);
             IComputer computer = directory.GetComputer(computerName);
-            string dnsDomain = this.directory.GetDomainNameDnsFromSid(user.Sid);
+            string dnsDomain = this.discoveryServices.GetDomainNameDns(user.Sid);
 
             var options = new AuthorizationOptions
             {
@@ -103,7 +106,7 @@ namespace Lithnet.AccessManager.Server.Test
                 }
             };
 
-            var authorizationContextProvider = new AuthorizationContextProvider(this.SetupOptions(options), directory, logger);
+            var authorizationContextProvider = new AuthorizationContextProvider(this.SetupOptions(options), logger, discoveryServices);
             Assert.Throws<AuthorizationContextException>(() => authorizationContextProvider.GetAuthorizationContext(user, computer.Sid));
         }
 
@@ -112,7 +115,7 @@ namespace Lithnet.AccessManager.Server.Test
         {
             IUser user = directory.GetUser(username);
             IComputer computer = directory.GetComputer(computerName);
-            string dnsDomain = this.directory.GetDomainNameDnsFromSid(user.Sid);
+            string dnsDomain = this.discoveryServices.GetDomainNameDns(user.Sid);
 
             var options = new AuthorizationOptions
             {
@@ -134,7 +137,7 @@ namespace Lithnet.AccessManager.Server.Test
                 }
             };
 
-            var authorizationContextProvider = new AuthorizationContextProvider(this.SetupOptions(options), directory, logger);
+            var authorizationContextProvider = new AuthorizationContextProvider(this.SetupOptions(options), logger, discoveryServices);
             var c = authorizationContextProvider.GetAuthorizationContext(user, computer.Sid);
 
             Assert.AreEqual(c.Server, null);

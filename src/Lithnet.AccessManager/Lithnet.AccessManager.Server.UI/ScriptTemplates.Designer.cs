@@ -69,10 +69,10 @@ namespace Lithnet.AccessManager.Server.UI {
         ///#
         ///# Version 1.0
         ///
+        ///
         ///#-------------------------------------------------------------------------
         ///# Do not modify below here
-        ///$domain = &quot;{domainDns}&quot;
-        ///$serviceAccountSid = &quot;{serviceAc [rest of string was truncated]&quot;;.
+        ///#------------------------------------------------------ [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AddDomainGroupMembershipPermissions {
             get {
@@ -119,7 +119,7 @@ namespace Lithnet.AccessManager.Server.UI {
         ///	Write-Information &quot;Checking if $($user.MsDsPrincipalName) is allowed access to $($computer.MsDsPrincipalName)&quot;
         ///
         ///	# Create an object to hold our authorization decisions
-        ///	# Set IsAllowed to true to allow access, or set IsDenied to explicitly deny access, or leave both as false if no decision was made. This will allow other rules to be e [rest of string was truncated]&quot;;.
+        ///	# Set IsAllowed to true to allow access, or set IsDenied to explicitly deny access, or leave both as false if no decision was made. This will allow other rules to be  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string AuthorizationScriptTemplate {
             get {

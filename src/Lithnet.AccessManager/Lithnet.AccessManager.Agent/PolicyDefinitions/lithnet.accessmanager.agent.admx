@@ -35,7 +35,7 @@
         <decimal value="0" />
       </disabledValue>
       <elements>
-        <decimal id="dtxt_interval" key="Software\Policies\Lithnet\Access Manager Agent" valueName="Interval" required="true" minValue="1" maxValue="1440"/>
+        <decimal id="dtxt_interval" key="Software\Policies\Lithnet\Access Manager Agent" valueName="Interval" required="true" minValue="5" maxValue="1440"/>
       </elements>
     </policy>
   </policies>

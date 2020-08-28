@@ -26,11 +26,14 @@ namespace Lithnet.AccessManager.Test
 
         private IDirectory directory;
 
+        private IDiscoveryServices discoveryServices;
+
         [SetUp()]
         public void TestInitialize()
         {
             sam = new LocalSam(Mock.Of<ILogger<LocalSam>>());
-            directory = new ActiveDirectory();
+            discoveryServices = new DiscoveryServices();
+            directory = new ActiveDirectory(discoveryServices);
         }
 
         [Test]

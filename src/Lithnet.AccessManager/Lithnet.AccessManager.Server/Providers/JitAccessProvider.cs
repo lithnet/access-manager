@@ -10,16 +10,16 @@ namespace Lithnet.AccessManager
     public class JitAccessProvider : IJitAccessProvider
     {
         private readonly IDirectory directory;
-
         private readonly ILogger<JitAccessProvider> logger;
-
         private readonly JitConfigurationOptions options;
+        private readonly IDiscoveryServices discoveryServices;
 
-        public JitAccessProvider(IDirectory directory, ILogger<JitAccessProvider> logger, IOptionsSnapshot<JitConfigurationOptions> options)
+        public JitAccessProvider(IDirectory directory, ILogger<JitAccessProvider> logger, IOptionsSnapshot<JitConfigurationOptions> options, IDiscoveryServices discoveryServices)
         {
             this.directory = directory;
             this.logger = logger;
             this.options = options.Value;
+            this.discoveryServices = discoveryServices;
         }
 
         public TimeSpan GrantJitAccess(IGroup group, IUser user, bool canExtend, TimeSpan requestedExpiry, out Action undo)
@@ -137,7 +137,7 @@ namespace Lithnet.AccessManager
 
         public string BuildGroupDomain(IGroup group)
         {
-            return directory.GetDomainNameNetBiosFromSid(group.Sid.AccountDomainSid);
+            return this.discoveryServices.GetDomainNameNetBios(group.Sid.AccountDomainSid);
         }
 
         private JitDynamicGroupMapping FindDomainMapping(IGroup group)

@@ -10,14 +10,14 @@ namespace Lithnet.AccessManager.Server.Authorization
 {
     public class AuthorizationContextDomainDetails
     {
-        private readonly IDirectory directory;
+        private readonly IDiscoveryServices discoveryServices;
 
         private IEnumerator<AuthorizationServer> searchResults;
 
-        public AuthorizationContextDomainDetails(SecurityIdentifier sid, string domainDnsName, IDirectory directory)
+        public AuthorizationContextDomainDetails(SecurityIdentifier sid, string domainDnsName, IDiscoveryServices discoveryServices)
         {
-            this.directory = directory;
             this.SecurityIdentifier = sid;
+            this.discoveryServices = discoveryServices;
             this.DomainDnsName = domainDnsName;
             this.IsInCurrentForest = this.GetIsInCurrentForest();
             this.IsRemoteOneWayTrust = this.GetIsOneWayTrust();
@@ -38,7 +38,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             {
                 return new AuthorizationServer
                 {
-                    Name = this.directory.GetDomainControllerForDomain(this.DomainDnsName, requireNew),
+                    Name = this.discoveryServices.GetDomainController(this.DomainDnsName, Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_8_REQUIRED | (requireNew ? Interop.DsGetDcNameFlags.DS_FORCE_REDISCOVERY : 0)),
                     Type = AuthorizationServerType.Default
                 };
             }

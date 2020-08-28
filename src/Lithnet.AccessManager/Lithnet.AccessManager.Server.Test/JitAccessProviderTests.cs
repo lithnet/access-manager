@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Threading;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Exceptions;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
-using NLog.Extensions.Logging;
 using NUnit.Framework;
 
 namespace Lithnet.AccessManager.Server.Test
@@ -15,6 +13,8 @@ namespace Lithnet.AccessManager.Server.Test
     public class JitAccessProviderTests
     {
         private IDirectory directory;
+
+        private IDiscoveryServices discoveryServices;
 
         private JitAccessProvider provider;
 
@@ -29,7 +29,8 @@ namespace Lithnet.AccessManager.Server.Test
         [SetUp()]
         public void TestInitialize()
         {
-            directory = new ActiveDirectory();
+            discoveryServices = new DiscoveryServices();
+            directory = new ActiveDirectory(discoveryServices);
             options = new JitConfigurationOptions
             {
                 DynamicGroupMappings = new List<JitDynamicGroupMapping>()
@@ -61,7 +62,7 @@ namespace Lithnet.AccessManager.Server.Test
                 GroupNameTemplate = groupname
             });
 
-            this.provider = new JitAccessProvider(directory, logger, this.GetOptions());
+            this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
             provider.GrantJitAccessDynamicGroup(jitGroup, user, false, TimeSpan.FromMinutes(1), out _);
             Thread.Sleep(TimeSpan.FromSeconds(20));
@@ -94,7 +95,7 @@ namespace Lithnet.AccessManager.Server.Test
                 GroupNameTemplate = groupname
             });
 
-            this.provider = new JitAccessProvider(directory, logger, this.GetOptions());
+            this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
             TimeSpan allowedAccess = provider.GrantJitAccessDynamicGroup(jitGroup, user, false, TimeSpan.FromMinutes(1), out _);
 
@@ -126,7 +127,7 @@ namespace Lithnet.AccessManager.Server.Test
                 GroupNameTemplate = groupname
             });
 
-            this.provider = new JitAccessProvider(directory, logger, this.GetOptions());
+            this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
             TimeSpan allowedAccess = provider.GrantJitAccessDynamicGroup(jitGroup, user, true, TimeSpan.FromMinutes(1), out _);
 
@@ -162,7 +163,7 @@ namespace Lithnet.AccessManager.Server.Test
                 GroupNameTemplate = groupname
             });
 
-            this.provider = new JitAccessProvider(directory, logger, this.GetOptions());
+            this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
             provider.GrantJitAccessDynamicGroup(jitGroup, user, true, TimeSpan.FromMinutes(1), out Action undo);
 
@@ -188,7 +189,7 @@ namespace Lithnet.AccessManager.Server.Test
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
 
-            this.provider = new JitAccessProvider(directory, logger, this.GetOptions());
+            this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
             TimeSpan allowedAccess = provider.GrantJitAccessPam(jitGroup, user, true, TimeSpan.FromMinutes(1), out _);
             TimeSpan? actualTtl = jitGroup.GetMemberTtl(user);
@@ -221,7 +222,7 @@ namespace Lithnet.AccessManager.Server.Test
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
 
-            this.provider = new JitAccessProvider(directory, logger, this.GetOptions());
+            this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
             TimeSpan allowedAccess = provider.GrantJitAccessPam(jitGroup, user, false, TimeSpan.FromMinutes(1), out _);
             TimeSpan? actualTtl = jitGroup.GetMemberTtl(user);
@@ -254,7 +255,7 @@ namespace Lithnet.AccessManager.Server.Test
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
 
-            this.provider = new JitAccessProvider(directory, logger, this.GetOptions());
+            this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
             TimeSpan allowedAccess = provider.GrantJitAccessPam(jitGroup, user, false, TimeSpan.FromMinutes(1), out Action undo);
             TimeSpan? actualTtl = jitGroup.GetMemberTtl(user);
@@ -275,7 +276,7 @@ namespace Lithnet.AccessManager.Server.Test
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
 
-            this.provider = new JitAccessProvider(directory, logger, this.GetOptions());
+            this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
             Assert.Throws<NoDynamicGroupMappingForDomainException>(() => provider.GrantJitAccessDynamicGroup(jitGroup, user, false, TimeSpan.FromMinutes(1), out _));
         }
@@ -293,7 +294,7 @@ namespace Lithnet.AccessManager.Server.Test
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
 
-            this.provider = new JitAccessProvider(directory, logger, this.GetOptions());
+            this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
             provider.GrantJitAccessPam(jitGroup, user, false, TimeSpan.FromMinutes(1), out _);
 

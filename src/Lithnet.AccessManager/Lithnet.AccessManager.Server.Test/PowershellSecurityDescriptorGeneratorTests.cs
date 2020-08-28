@@ -13,6 +13,8 @@ namespace Lithnet.AccessManager.Server.Test
     {
         private IDirectory directory;
 
+        private IDiscoveryServices discoveryServices;
+
         private PowerShellSecurityDescriptorGenerator generator;
 
         private ILogger<PowerShellSecurityDescriptorGenerator> psLogger;
@@ -22,7 +24,8 @@ namespace Lithnet.AccessManager.Server.Test
         [SetUp()]
         public void TestInitialize()
         {
-            directory = new ActiveDirectory();
+            discoveryServices = new DiscoveryServices();
+            directory = new ActiveDirectory(discoveryServices);
             psLogger = Global.LogFactory.CreateLogger<PowerShellSecurityDescriptorGenerator>();
             sessionLogger = Global.LogFactory.CreateLogger<CachedPowerShellSessionProvider>();
 

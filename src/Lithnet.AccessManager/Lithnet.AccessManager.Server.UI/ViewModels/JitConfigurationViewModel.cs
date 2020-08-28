@@ -8,7 +8,6 @@ using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using MahApps.Metro.SimpleChildWindow;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Stylet;
 using NativeMethods = Lithnet.AccessManager.Server.UI.Interop.NativeMethods;
@@ -18,7 +17,6 @@ namespace Lithnet.AccessManager.Server.UI
     public class JitConfigurationViewModel : Screen, IHelpLink
     {
         private readonly JitConfigurationOptions jitOptions;
-        private readonly IDirectory directory;
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IJitGroupMappingViewModelFactory groupMappingFactory;
         private readonly IJitDomainStatusViewModelFactory jitDomainStatusFactory;
@@ -26,20 +24,21 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly INotifyModelChangedEventPublisher eventPublisher;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IDomainTrustProvider domainTrustProvider;
+        private readonly IDiscoveryServices discoveryServices;
 
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.UserClockSolid;
 
-        public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IDirectory directory, IJitGroupMappingViewModelFactory groupMappingFactory, INotifyModelChangedEventPublisher eventPublisher, IJitDomainStatusViewModelFactory jitDomainStatusFactory, IServiceSettingsProvider serviceSettings, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider)
+        public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IJitGroupMappingViewModelFactory groupMappingFactory, INotifyModelChangedEventPublisher eventPublisher, IJitDomainStatusViewModelFactory jitDomainStatusFactory, IServiceSettingsProvider serviceSettings, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.dialogCoordinator = dialogCoordinator;
-            this.directory = directory;
             this.jitOptions = jitOptions;
             this.groupMappingFactory = groupMappingFactory;
             this.jitDomainStatusFactory = jitDomainStatusFactory;
             this.serviceSettings = serviceSettings;
             this.eventPublisher = eventPublisher;
             this.domainTrustProvider = domainTrustProvider;
+            this.discoveryServices = discoveryServices;
 
             this.DisplayName = "Just-in-time access";
             this.GroupMappings = new BindableCollection<JitGroupMappingViewModel>();
@@ -174,14 +173,14 @@ namespace Lithnet.AccessManager.Server.UI
             JitDomainStatusViewModel current = this.SelectedDomain;
             string oldOU = current.DynamicGroupOU;
 
-            string basePath = this.directory.GetFullyQualifiedDomainControllerAdsPath(current.DynamicGroupOU);
-            string initialPath = this.directory.GetFullyQualifiedAdsPath(current.DynamicGroupOU);
+            string basePath = this.discoveryServices.GetFullyQualifiedDomainControllerAdsPath(current.DynamicGroupOU);
+            string initialPath = this.discoveryServices.GetFullyQualifiedAdsPath(current.DynamicGroupOU);
 
             var container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select container", "Select container", basePath, initialPath);
 
             if (container != null)
             {
-                if (!string.Equals(current.Domain.Name, this.directory.GetDomainNameDnsFromDn(container)))
+                if (!string.Equals(current.Domain.Name, this.discoveryServices.GetDomainNameDns(container)))
                 {
                     await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The dynamic group OU must be in the {current.Domain.Name} domain");
                     return;
@@ -222,7 +221,7 @@ namespace Lithnet.AccessManager.Server.UI
                 ScriptText = ScriptTemplates.GrantGroupPermissions
                     .Replace("{serviceAccount}", this.serviceSettings.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
                     .Replace("{ou}", current.GroupOU)
-                    .Replace("{domain}", directory.GetDomainNameDnsFromDn(current.GroupOU))
+                    .Replace("{domain}", discoveryServices.GetDomainNameDns(current.GroupOU))
             };
 
             ExternalDialogWindow w = new ExternalDialogWindow

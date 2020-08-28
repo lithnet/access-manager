@@ -12,16 +12,16 @@ namespace Lithnet.AccessManager.Server.Authorization
 {
     public class AuthorizationContextProvider : IAuthorizationContextProvider
     {
-        private readonly IDirectory directory;
         private readonly ILogger<AuthorizationContextProvider> logger;
         private readonly ConcurrentDictionary<SecurityIdentifier, AuthorizationContextDomainDetails> domainCache;
         private readonly AuthorizationOptions options;
+        private readonly IDiscoveryServices discoveryServices;
 
-        public AuthorizationContextProvider(IOptions<AuthorizationOptions> options, IDirectory directory, ILogger<AuthorizationContextProvider> logger)
+        public AuthorizationContextProvider(IOptions<AuthorizationOptions> options, ILogger<AuthorizationContextProvider> logger, IDiscoveryServices discoveryServices)
         {
-            this.directory = directory;
             this.logger = logger;
             this.options = options.Value;
+            this.discoveryServices = discoveryServices;
             this.domainCache = new ConcurrentDictionary<SecurityIdentifier, AuthorizationContextDomainDetails>();
         }
 
@@ -104,8 +104,8 @@ namespace Lithnet.AccessManager.Server.Authorization
         {
             if (!domainCache.TryGetValue(sid.AccountDomainSid, out AuthorizationContextDomainDetails value))
             {
-                string domainDnsName = this.directory.GetDomainNameDnsFromSid(sid);
-                value = new AuthorizationContextDomainDetails(sid.AccountDomainSid, domainDnsName, this.directory)
+                string domainDnsName = this.discoveryServices.GetDomainNameDns(sid);
+                value = new AuthorizationContextDomainDetails(sid.AccountDomainSid, domainDnsName, this.discoveryServices)
                 {
                     Mapping = this.GetMapping(domainDnsName)
                 };

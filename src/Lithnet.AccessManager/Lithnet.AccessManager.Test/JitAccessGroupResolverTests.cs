@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Security.Principal;
-using System.Text;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
@@ -12,17 +8,20 @@ namespace Lithnet.AccessManager.Test
     {
         private Mock<IAppPathProvider> env;
 
-        private ActiveDirectory directory;
+        private IDirectory directory;
 
-        private JitAccessGroupResolver resolver; 
+        private IDiscoveryServices discoveryServices;
+
+        private JitAccessGroupResolver resolver;
 
         [SetUp()]
         public void TestInitialize()
         {
             this.env = new Mock<IAppPathProvider>();
             this.env.SetupGet(t => t.AppPath).Returns(Environment.CurrentDirectory);
-            this.directory = new ActiveDirectory();
-            this.resolver = new JitAccessGroupResolver(directory);
+            this.discoveryServices = new DiscoveryServices();
+            this.directory = new ActiveDirectory(discoveryServices);
+            this.resolver = new JitAccessGroupResolver(directory, discoveryServices);
         }
 
         [TestCase("PC1", "IDMDEV1", "{computerDomain}\\{computerName}", "IDMDEV1\\PC1")]

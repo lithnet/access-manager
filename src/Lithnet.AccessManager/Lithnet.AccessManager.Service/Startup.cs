@@ -45,6 +45,7 @@ namespace Lithnet.AccessManager.Service
             services.TryAddScoped<SecurityDescriptorAuthorizationService>();
             services.TryAddScoped<IPowerShellSecurityDescriptorGenerator, PowerShellSecurityDescriptorGenerator>();
             services.TryAddSingleton<IDirectory, ActiveDirectory>();
+            services.TryAddSingleton<IDiscoveryServices, DiscoveryServices>();
             services.TryAddScoped<IAuditEventProcessor, AuditEventProcessor>();
             services.TryAddScoped<ITemplateProvider, TemplateProvider>();
             services.TryAddScoped<IRateLimiter, RateLimiter>();

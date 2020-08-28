@@ -27,16 +27,18 @@ namespace Lithnet.AccessManager.Server.Test
 
         private IAuthorizationContextProvider authorizationContextProvider;
 
+        private IDiscoveryServices discoveryServices;
 
         [SetUp()]
         public void TestInitialize()
         {
-            directory = new ActiveDirectory();
+            discoveryServices = new DiscoveryServices();
+            directory = new ActiveDirectory(discoveryServices);
             cache = new AuthorizationInformationMemoryCache();
             logger = Global.LogFactory.CreateLogger<AuthorizationInformationBuilder>();
             powershell = Mock.Of<IPowerShellSecurityDescriptorGenerator>();
             targetDataProvider = new TargetDataProvider(new TargetDataCache(), Global.LogFactory.CreateLogger<TargetDataProvider>());
-            authorizationContextProvider = new AuthorizationContextProvider(Mock.Of<IOptions<AuthorizationOptions>>(), directory, Global.LogFactory.CreateLogger<AuthorizationContextProvider>());
+            authorizationContextProvider = new AuthorizationContextProvider(Mock.Of<IOptions<AuthorizationOptions>>(), Global.LogFactory.CreateLogger<AuthorizationContextProvider>(), discoveryServices);
         }
 
         [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.LocalAdminPassword, AccessMask.None, AccessMask.LocalAdminPassword)]
@@ -419,10 +421,10 @@ namespace Lithnet.AccessManager.Server.Test
 
         // EXTDEV1\\user1 can access PCs via global groups only in their home domain
         [TestCase("EXTDEV1\\user1", "EXTDEV1\\G-GG-1", "EXTDEV1\\PC1")]
-        
+
         // EXTDEV1\\user1 can access PCs via universal groups in their home domain forest
         [TestCase("EXTDEV1\\user1", "EXTDEV1\\G-UG-1", "EXTDEV1\\PC1")]
-        
+
         // EXTDEV1\\user1 can access PCs in their own forest via domain local groups
         [TestCase("EXTDEV1\\user1", "EXTDEV1\\G-DL-1", "EXTDEV1\\PC1")]
 

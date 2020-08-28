@@ -5,7 +5,6 @@ using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using System.Windows;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
@@ -24,8 +23,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILogger<LapsConfigurationViewModel> logger;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IDomainTrustProvider domainTrustProvider;
+        private readonly IDiscoveryServices discoveryServices;
 
-        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IDirectory directory, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IServiceSettingsProvider serviceSettings, ILogger<LapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider)
+        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IDirectory directory, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IServiceSettingsProvider serviceSettings, ILogger<LapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.directory = directory;
@@ -35,6 +35,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.serviceSettings = serviceSettings;
             this.logger = logger;
             this.domainTrustProvider = domainTrustProvider;
+            this.discoveryServices = discoveryServices;
 
             this.Forests = new List<Forest>();
             this.AvailableCertificates = new BindableCollection<X509Certificate2ViewModel>();
@@ -87,7 +88,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public void PublishSelectedCertificate()
         {
-            var de = this.directory.GetConfigurationNamingContext(this.SelectedForest.RootDomain.Name);
+            var de = this.discoveryServices.GetConfigurationNamingContext(this.SelectedForest.RootDomain.Name);
             var certData = Convert.ToBase64String(this.SelectedCertificate.Model.RawData, Base64FormattingOptions.InsertLineBreaks);
 
             var vm = new ScriptContentViewModel(this.dialogCoordinator)

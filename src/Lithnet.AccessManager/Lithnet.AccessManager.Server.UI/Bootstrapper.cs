@@ -112,6 +112,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<RandomNumberGenerator>().ToInstance(RandomNumberGenerator.Create());
                 builder.Bind<IDialogCoordinator>().To<DialogCoordinator>();
                 builder.Bind<IDirectory>().To<ActiveDirectory>();
+                builder.Bind<IDiscoveryServices>().To<DiscoveryServices>();
                 builder.Bind<IServiceSettingsProvider>().To<ServiceSettingsProvider>();
                 builder.Bind<INotificationSubscriptionProvider>().To<NotificationSubscriptionProvider>();
                 builder.Bind<IEncryptionProvider>().To<EncryptionProvider>();

@@ -9,18 +9,29 @@ namespace Lithnet.AccessManager.Test
 {
     public class LithnetAdminPasswordProviderTests
     {
-        private ActiveDirectory directory;
+        private IDirectory directory;
+
+        private IDiscoveryServices discoveryServices;
 
         private LithnetAdminPasswordProvider provider;
+
+        private IEncryptionProvider encryptionProvider;
+
+        private ICertificateProvider certificateProvider;
 
         [SetUp()]
         public void TestInitialize()
         {
-            directory = new ActiveDirectory();
-            provider = new LithnetAdminPasswordProvider(Mock.Of<ILogger<LithnetAdminPasswordProvider>>(), new EncryptionProvider(), new CertificateProvider(Mock.Of<ILogger<CertificateProvider>>(), directory, Mock.Of<IAppPathProvider>()));
+            encryptionProvider = new EncryptionProvider();
+            discoveryServices = new DiscoveryServices();
+            directory = new ActiveDirectory(discoveryServices);
+            certificateProvider = new CertificateProvider(Mock.Of<ILogger<CertificateProvider>>(), directory, Mock.Of<IAppPathProvider>(), discoveryServices);
+            provider = new LithnetAdminPasswordProvider(Mock.Of<ILogger<LithnetAdminPasswordProvider>>(), encryptionProvider, certificateProvider);
         }
 
         [TestCase("EXTDEV1\\PC1")]
+        [TestCase("IDMDEV1\\PC1")]
+        [TestCase("SUBDEV1\\PC1")]
         public void SetFirstPassword(string computerName)
         {
             IComputer computer = directory.GetComputer(computerName);
@@ -41,13 +52,15 @@ namespace Lithnet.AccessManager.Test
             ProtectedPasswordHistoryItem current = this.provider.GetCurrentPassword(computer, null);
             IReadOnlyList<ProtectedPasswordHistoryItem> history = this.provider.GetPasswordHistory(computer);
 
-            Assert.AreEqual(password, current.EncryptedData);
+            Assert.IsNotNull(current.EncryptedData);
             Assert.AreEqual(created, current.Created);
 
             CollectionAssert.IsEmpty(history);
         }
 
         [TestCase("EXTDEV1\\PC1")]
+        [TestCase("IDMDEV1\\PC1")]
+        [TestCase("SUBDEV1\\PC1")]
         public void AddToPasswordHistory(string computerName)
         {
             IComputer computer = directory.GetComputer(computerName);
@@ -60,15 +73,15 @@ namespace Lithnet.AccessManager.Test
             string firstPassword = "first password";
 
             provider.UpdateCurrentPassword(computer, firstPassword, firstCreated, firstExpiry, 0, MsMcsAdmPwdBehaviour.Ignore);
-            IReadOnlyList<ProtectedPasswordHistoryItem> history =  provider.GetPasswordHistory(computer);
+            IReadOnlyList<ProtectedPasswordHistoryItem> history = provider.GetPasswordHistory(computer);
             ProtectedPasswordHistoryItem currentPassword = provider.GetCurrentPassword(computer, null);
             DateTime? currentExpiry = provider.GetExpiry(computer);
-            
+
             Assert.IsNotNull(currentExpiry);
             Assert.AreEqual(0, history.Count);
             Assert.AreEqual(firstCreated, currentPassword.Created);
             Assert.AreEqual(null, currentPassword.Retired);
-            Assert.AreEqual(firstPassword, currentPassword.EncryptedData);
+            Assert.IsNotEmpty(currentPassword.EncryptedData);
             Assert.AreEqual(firstExpiry.Ticks, currentExpiry.Value.Ticks);
             Assert.AreEqual(firstExpiry, currentExpiry);
 
@@ -88,16 +101,18 @@ namespace Lithnet.AccessManager.Test
             ProtectedPasswordHistoryItem firstHistoryItem = history.First();
 
             Assert.AreEqual(firstCreated, firstHistoryItem.Created);
-            Assert.AreEqual(firstPassword, firstHistoryItem.EncryptedData);
-            
+            Assert.IsNotEmpty(firstHistoryItem.EncryptedData);
+
             Assert.AreEqual(secondCreated, firstHistoryItem.Retired);
             Assert.AreEqual(secondExpiry, currentExpiry);
-            Assert.AreEqual(secondPassword, currentPassword.EncryptedData);
+            Assert.IsNotEmpty(currentPassword.EncryptedData);
             Assert.AreEqual(secondCreated, currentPassword.Created);
             Assert.AreEqual(null, currentPassword.Retired);
         }
 
         [TestCase("EXTDEV1\\PC1")]
+        [TestCase("IDMDEV1\\PC1")]
+        [TestCase("SUBDEV1\\PC1")]
         public void AgeOutPasswordHistory(string computerName)
         {
             IComputer computer = directory.GetComputer(computerName);
@@ -113,12 +128,12 @@ namespace Lithnet.AccessManager.Test
             IReadOnlyList<ProtectedPasswordHistoryItem> history = provider.GetPasswordHistory(computer);
             ProtectedPasswordHistoryItem currentPassword = provider.GetCurrentPassword(computer, null);
             DateTime? currentExpiry = provider.GetExpiry(computer);
-            
+
             Assert.IsNotNull(currentExpiry);
             Assert.AreEqual(0, history.Count);
             Assert.AreEqual(firstCreated, currentPassword.Created);
             Assert.AreEqual(null, currentPassword.Retired);
-            Assert.AreEqual(firstPassword, currentPassword.EncryptedData);
+            Assert.IsNotNull(currentPassword.EncryptedData);
             Assert.AreEqual(firstExpiry.Ticks, currentExpiry.Value.Ticks);
             Assert.AreEqual(firstExpiry, currentExpiry);
 
@@ -130,16 +145,16 @@ namespace Lithnet.AccessManager.Test
             history = provider.GetPasswordHistory(computer);
             currentPassword = provider.GetCurrentPassword(computer, null);
             currentExpiry = provider.GetExpiry(computer);
-            
+
             Assert.IsNotNull(currentExpiry);
             Assert.AreEqual(1, history.Count);
             ProtectedPasswordHistoryItem firstHistoryItem = history.First();
             Assert.AreEqual(firstCreated, firstHistoryItem.Created);
-            Assert.AreEqual(firstPassword, firstHistoryItem.EncryptedData);
+            Assert.IsNotNull(firstHistoryItem.EncryptedData);
 
             Assert.AreEqual(secondCreated, firstHistoryItem.Retired);
             Assert.AreEqual(secondExpiry, currentExpiry);
-            Assert.AreEqual(secondPassword, currentPassword.EncryptedData);
+            Assert.IsNotNull(currentPassword.EncryptedData);
             Assert.AreEqual(secondCreated, currentPassword.Created);
             Assert.AreEqual(null, currentPassword.Retired);
 
@@ -149,12 +164,12 @@ namespace Lithnet.AccessManager.Test
 
             provider.UpdateCurrentPassword(computer, thirdPassword, thirdCreated, thirdExpiry, 2, MsMcsAdmPwdBehaviour.Ignore);
             history = provider.GetPasswordHistory(computer);
-            
+
             Assert.AreEqual(1, history.Count);
             firstHistoryItem = history.First();
 
             Assert.AreEqual(secondCreated, firstHistoryItem.Created);
-            Assert.AreEqual(secondPassword, firstHistoryItem.EncryptedData);
+            Assert.IsNotNull(firstHistoryItem.EncryptedData);
             Assert.AreEqual(thirdCreated, firstHistoryItem.Retired);
         }
     }

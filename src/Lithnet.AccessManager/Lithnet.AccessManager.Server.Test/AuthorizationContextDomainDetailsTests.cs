@@ -9,19 +9,22 @@ namespace Lithnet.AccessManager.Server.Test
     {
         private IDirectory directory;
 
+        private IDiscoveryServices discoveryServices;
+
         [SetUp]
         public void TestInitialize()
         {
-            directory = new ActiveDirectory();
+            discoveryServices = new DiscoveryServices();
+            directory = new ActiveDirectory(discoveryServices);
         }
 
         [Test]
         public void TestGetServerOrder()
         {
             IUser user = directory.GetUser("IDMDEV1\\user1");
-            string dnsDomain = this.directory.GetDomainNameDnsFromSid(user.Sid);
+            string dnsDomain = this.discoveryServices.GetDomainNameDns(user.Sid);
 
-            AuthorizationContextDomainDetails d = new AuthorizationContextDomainDetails(user.Sid.AccountDomainSid, dnsDomain, directory);
+            AuthorizationContextDomainDetails d = new AuthorizationContextDomainDetails(user.Sid.AccountDomainSid, dnsDomain, discoveryServices);
             d.Mapping = new AuthorizationServerMapping
             {
                 Domain = dnsDomain,
@@ -52,9 +55,9 @@ namespace Lithnet.AccessManager.Server.Test
         public void TestExternalDomainDetails()
         {
             IUser user = directory.GetUser("EXTDEV1\\user1");
-            string dnsDomain = this.directory.GetDomainNameDnsFromSid(user.Sid);
+            string dnsDomain = this.discoveryServices.GetDomainNameDns(user.Sid);
 
-            AuthorizationContextDomainDetails d = new AuthorizationContextDomainDetails(user.Sid.AccountDomainSid, dnsDomain, directory);
+            AuthorizationContextDomainDetails d = new AuthorizationContextDomainDetails(user.Sid.AccountDomainSid, dnsDomain, discoveryServices);
             Assert.IsFalse(d.IsInCurrentForest);
             Assert.IsTrue(d.IsRemoteOneWayTrust);
         }
@@ -63,9 +66,9 @@ namespace Lithnet.AccessManager.Server.Test
         public void TestThisDomainDetails()
         {
             IUser user = directory.GetUser("IDMDEV1\\user1");
-            string dnsDomain = this.directory.GetDomainNameDnsFromSid(user.Sid);
+            string dnsDomain = this.discoveryServices.GetDomainNameDns(user.Sid);
 
-            AuthorizationContextDomainDetails d = new AuthorizationContextDomainDetails(user.Sid.AccountDomainSid, dnsDomain, directory);
+            AuthorizationContextDomainDetails d = new AuthorizationContextDomainDetails(user.Sid.AccountDomainSid, dnsDomain, discoveryServices);
             Assert.IsTrue(d.IsInCurrentForest);
             Assert.IsFalse(d.IsRemoteOneWayTrust);
         }
@@ -74,9 +77,9 @@ namespace Lithnet.AccessManager.Server.Test
         public void TestChildDomainDetails()
         {
             IUser user = directory.GetUser("SUBDEV1\\user1");
-            string dnsDomain = this.directory.GetDomainNameDnsFromSid(user.Sid);
+            string dnsDomain = this.discoveryServices.GetDomainNameDns(user.Sid);
 
-            AuthorizationContextDomainDetails d = new AuthorizationContextDomainDetails(user.Sid.AccountDomainSid, dnsDomain, directory);
+            AuthorizationContextDomainDetails d = new AuthorizationContextDomainDetails(user.Sid.AccountDomainSid, dnsDomain, discoveryServices);
             Assert.IsTrue(d.IsInCurrentForest);
             Assert.IsFalse(d.IsRemoteOneWayTrust);
         }
@@ -85,10 +88,10 @@ namespace Lithnet.AccessManager.Server.Test
         public void TestGetDC()
         {
             IUser user = directory.GetUser("IDMDEV1\\user1");
-            string dnsDomain = this.directory.GetDomainNameDnsFromSid(user.Sid);
-            string dc = this.directory.GetDomainControllerForDomain(dnsDomain);
+            string dnsDomain = this.discoveryServices.GetDomainNameDns(user.Sid);
+            string dc = this.discoveryServices.GetDomainController(dnsDomain);
 
-            AuthorizationContextDomainDetails d = new AuthorizationContextDomainDetails(user.Sid.AccountDomainSid, dnsDomain, directory);
+            AuthorizationContextDomainDetails d = new AuthorizationContextDomainDetails(user.Sid.AccountDomainSid, dnsDomain, discoveryServices);
             d.Mapping = new AuthorizationServerMapping
             {
                 Domain = dnsDomain,

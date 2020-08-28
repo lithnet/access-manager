@@ -17,15 +17,18 @@ namespace Lithnet.AccessManager.Test
 
         private CertificateProvider provider;
 
-        private ActiveDirectory directory;
+        private IDirectory directory;
+
+        private IDiscoveryServices discoveryServices;
 
         [SetUp()]
         public void TestInitialize()
         {
             this.env = new Mock<IAppPathProvider>();
             this.env.SetupGet(t => t.AppPath).Returns(Environment.CurrentDirectory);
-            this.directory = new ActiveDirectory();
-            provider = new CertificateProvider(Mock.Of<ILogger<CertificateProvider>>(), directory, env.Object);
+            this.discoveryServices = new DiscoveryServices();
+            this.directory = new ActiveDirectory(this.discoveryServices);
+            provider = new CertificateProvider(Mock.Of<ILogger<CertificateProvider>>(), directory, env.Object, discoveryServices);
         }
 
         [TestCase(StoreLocation.CurrentUser)]

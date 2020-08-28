@@ -8,6 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
 using Lithnet.AccessManager.Interop;
+using Lithnet.Security.Authorization;
 
 namespace Lithnet.AccessManager
 {
@@ -15,8 +16,30 @@ namespace Lithnet.AccessManager
     {
         private static readonly Guid PamFeatureGuid = new Guid("ec43e873-cce8-4640-b4ab-07ffe4ab5bcd");
 
+        private static readonly Dictionary<string, bool> pamEnabledDomainCache = new Dictionary<string, bool>();
 
-        private readonly Dictionary<string, bool> pamEnabledDomainCache = new Dictionary<string, bool>();
+        private readonly IDiscoveryServices discoveryServices;
+
+        private static SecurityIdentifier currentDomainSid;
+
+        private static SecurityIdentifier CurrentDomainSid
+        {
+            get
+            {
+                if (currentDomainSid == null)
+                {
+                    Domain domain = Domain.GetComputerDomain();
+                    currentDomainSid = new SecurityIdentifier((byte[])(domain.GetDirectoryEntry().Properties["objectSid"][0]), 0);
+                }
+
+                return currentDomainSid;
+            }
+        }
+
+        public ActiveDirectory(IDiscoveryServices discoveryServices)
+        {
+            this.discoveryServices = discoveryServices;
+        }
 
         public bool TryGetUser(string name, out IUser user)
         {
@@ -50,7 +73,7 @@ namespace Lithnet.AccessManager
 
         public ISecurityPrincipal GetPrincipal(SecurityIdentifier sid)
         {
-            var result = NativeMethods.GetDirectoryEntry(sid);
+            var result = GetDirectoryEntry(sid);
 
             if (result.HasPropertyValue("objectClass", "computer"))
             {
@@ -169,7 +192,7 @@ namespace Lithnet.AccessManager
             de.Properties["groupType"].Add(unchecked((int)groupType));
 
             de.CommitChanges();
-            
+
             if (removeAccountOperators)
             {
                 de.ObjectSecurity.RemoveAccess(new SecurityIdentifier(WellKnownSidType.BuiltinAccountOperatorsSid, null), AccessControlType.Allow);
@@ -190,7 +213,7 @@ namespace Lithnet.AccessManager
 
         public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, ISecurityPrincipal principal, SecurityIdentifier targetDomainSid)
         {
-            return NativeMethods.CheckForSidInToken(principal.Sid, sidToFindInToken, targetDomainSid);
+            return CheckForSidInToken(principal.Sid, sidToFindInToken, targetDomainSid);
         }
 
         public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, SecurityIdentifier principal)
@@ -200,7 +223,7 @@ namespace Lithnet.AccessManager
 
         public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, SecurityIdentifier principal, SecurityIdentifier targetDomainSid)
         {
-            return NativeMethods.CheckForSidInToken(principal, sidToFindInToken, targetDomainSid);
+            return CheckForSidInToken(principal, sidToFindInToken, targetDomainSid);
         }
 
         public IEnumerable<SecurityIdentifier> GetTokenGroups(ISecurityPrincipal principal)
@@ -210,7 +233,7 @@ namespace Lithnet.AccessManager
 
         public IEnumerable<SecurityIdentifier> GetTokenGroups(ISecurityPrincipal principal, SecurityIdentifier targetDomainSid)
         {
-            return NativeMethods.GetTokenGroups(principal.Sid, targetDomainSid);
+            return GetTokenGroups(principal.Sid, targetDomainSid);
         }
 
         public bool IsSidInPrincipalToken(SecurityIdentifier sidToFind, IEnumerable<SecurityIdentifier> tokenSids)
@@ -225,7 +248,7 @@ namespace Lithnet.AccessManager
 
         public string TranslateName(string name, DsNameFormat nameFormat, DsNameFormat requiredFormat, string dnsDomainName)
         {
-            return NativeMethods.CrackNames(nameFormat, requiredFormat, name, dnsDomainName).Name;
+            return this.discoveryServices.FindDcAndExecuteWithRetry(dnsDomainName, dc => NativeMethods.CrackNames(nameFormat, requiredFormat, name, dc, dnsDomainName).Name);
         }
 
         public IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl, GroupType groupType, bool removeAccountOperators)
@@ -260,7 +283,7 @@ namespace Lithnet.AccessManager
         {
             SecurityIdentifier sid = domainSid.AccountDomainSid;
 
-            return this.IsPamFeatureEnabled(NativeMethods.GetDnsDomainNameFromSid(sid), forceRefresh);
+            return this.IsPamFeatureEnabled(this.discoveryServices.GetDomainNameDns(sid), forceRefresh);
         }
 
         public bool IsPamFeatureEnabled(string dnsDomain, bool forceRefresh)
@@ -279,7 +302,7 @@ namespace Lithnet.AccessManager
 
             DirectorySearcher d = new DirectorySearcher
             {
-                SearchRoot = this.GetConfigurationNamingContext(dnsDomain),
+                SearchRoot = this.discoveryServices.GetConfigurationNamingContext(dnsDomain),
                 SearchScope = SearchScope.Subtree,
                 Filter = $"(&(objectClass=msDS-OptionalFeature)(msDS-OptionalFeatureGUID={PamFeatureGuid.ToOctetString()}))",
             };
@@ -299,129 +322,13 @@ namespace Lithnet.AccessManager
             return result;
         }
 
-        internal string GetContextDn(string contextName, string dnsDomain)
-        {
-            var rootDse = new DirectoryEntry($"LDAP://{dnsDomain}/rootDSE");
-
-            var context = (string)rootDse.Properties[contextName]?.Value;
-
-            if (context == null)
-            {
-                throw new ObjectNotFoundException($"Naming context lookup failed for {contextName}");
-            }
-
-            return context;
-        }
-
-        public string GetDomainNameNetBiosFromSid(SecurityIdentifier sid)
-        {
-            return TranslateName(sid.AccountDomainSid.ToString(), DsNameFormat.SecurityIdentifier, DsNameFormat.Nt4Name).Trim('\\');
-        }
-
-        public string GetDomainNameDnsFromSid(SecurityIdentifier sid)
-        {
-            return NativeMethods.GetDnsDomainNameFromSid(sid);
-        }
-
-        public string GetDomainNameDnsFromDn(string dn)
-        {
-            var result = NativeMethods.CrackNames(DsNameFormat.DistinguishedName, DsNameFormat.DistinguishedName, dn);
-            return result.Domain;
-        }
-
-        public string GetDomainControllerForDomain(string domainDns)
-        {
-            return this.GetDomainControllerForDomain(domainDns, false);
-        }
-
-        public string GetDomainControllerForDomain(string domainDns, bool forceRediscovery)
-        {
-            return NativeMethods.GetDomainControllerForDnsDomain(domainDns, forceRediscovery);
-        }
-
-        public string GetDomainControllerForOUOrDefault(string ou)
-        {
-            if (ou != null)
-            {
-                try
-                {
-                    string domain = this.GetDomainNameDnsFromDn(ou);
-                    return this.GetDomainControllerForDomain(domain);
-                }
-                catch
-                {
-                }
-            }
-
-            return Domain.GetComputerDomain().FindDomainController().Name;
-        }
-
-        public string GetForestDnsNameForOU(string ou)
-        {
-            var domain = this.GetDomainNameDnsFromDn(ou);
-            
-            if (domain != null)
-            {
-                var domainObject = Domain.GetDomain(new DirectoryContext(DirectoryContextType.Domain, domain));
-                return domainObject.Forest.Name;
-            }
-
-            return null;
-        }
-
-        public string GetDomainControllerForOU(string ou)
-        {
-            string domain = this.GetDomainNameDnsFromDn(ou);
-            return this.GetDomainControllerForDomain(domain);
-        }
-
-        public string GetFullyQualifiedAdsPath(string ou)
-        {
-            string server = this.GetDomainControllerForOUOrDefault(ou);
-            return $"LDAP://{server}/{ou}";
-        }
-
-        public string GetFullyQualifiedDomainControllerAdsPath(string ou)
-        {
-            string server = this.GetDomainControllerForOUOrDefault(ou);
-            return $"LDAP://{server}";
-        }
-
-        public DirectoryEntry GetConfigurationNamingContext(SecurityIdentifier domain)
-        {
-            SecurityIdentifier sid = domain.AccountDomainSid;
-
-            string dc = NativeMethods.GetDnsDomainNameFromSid(sid);
-
-            return new DirectoryEntry($"LDAP://{this.GetConfigurationNamingContext(dc)}");
-        }
-
-        public DirectoryEntry GetConfigurationNamingContext(string dnsDomain)
-        {
-            return new DirectoryEntry($"LDAP://{this.GetContextDn("configurationNamingContext", dnsDomain)}");
-        }
-
-        public DirectoryEntry GetSchemaNamingContext(SecurityIdentifier domain)
-        {
-            SecurityIdentifier sid = domain.AccountDomainSid;
-
-            string dc = NativeMethods.GetDnsDomainNameFromSid(sid);
-
-            return new DirectoryEntry($"LDAP://{this.GetSchemaNamingContext(dc)}");
-        }
-
-        public DirectoryEntry GetSchemaNamingContext(string dnsDomain)
-        {
-            return new DirectoryEntry($"LDAP://{this.GetContextDn("schemaNamingContext", dnsDomain)}");
-        }
-
         public bool DoesSchemaAttributeExist(string dnsDomain, string attributeName)
         {
             DirectorySearcher d = new DirectorySearcher
             {
-                SearchRoot = this.GetSchemaNamingContext(dnsDomain),
+                SearchRoot = this.discoveryServices.GetSchemaNamingContext(dnsDomain),
                 SearchScope = SearchScope.Subtree,
-                Filter = $"(&(objectClass=attributeSchema)(lDAPDisplayName={attributeName}))"
+                Filter = $"(&(objectClass=attributeSchema)(lDAPDisplayName={attributeName})(!(isDefunct=true)))"
             };
 
             d.PropertiesToLoad.Add("distinguishedName");
@@ -447,7 +354,7 @@ namespace Lithnet.AccessManager
 
             if (objectName.TryParseAsSid(out SecurityIdentifier sid))
             {
-                de = NativeMethods.GetDirectoryEntry(sid);
+                de = GetDirectoryEntry(sid);
             }
             else if (objectName.Contains("."))
             {
@@ -463,7 +370,7 @@ namespace Lithnet.AccessManager
             }
             else if (this.IsDistinguishedName(objectName))
             {
-                de = NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.DistinguishedName);
+                de = GetDirectoryEntry(objectName, DsNameFormat.DistinguishedName);
             }
             else
             {
@@ -474,11 +381,11 @@ namespace Lithnet.AccessManager
 
                 if (objectName.Contains("\\"))
                 {
-                    return NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.Nt4Name);
+                    return GetDirectoryEntry(objectName, DsNameFormat.Nt4Name);
                 }
                 else
                 {
-                    string dn = ActiveDirectory.GcGetDnFromAttributeSearch("samAccountName", objectName, "computer");
+                    string dn = GcGetDnFromAttributeSearch("samAccountName", objectName, "computer");
 
                     if (dn == null)
                     {
@@ -507,24 +414,24 @@ namespace Lithnet.AccessManager
 
             if (objectName.TryParseAsSid(out SecurityIdentifier sid))
             {
-                de = NativeMethods.GetDirectoryEntry(sid);
+                de = GetDirectoryEntry(sid);
             }
 
             else if (objectName.Contains("\\"))
             {
-                de = NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.Nt4Name);
+                de = GetDirectoryEntry(objectName, DsNameFormat.Nt4Name);
             }
             else if (objectName.Contains("@"))
             {
-                de = NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.UserPrincipalName);
+                de = GetDirectoryEntry(objectName, DsNameFormat.UserPrincipalName);
             }
             else if (this.IsDistinguishedName(objectName))
             {
-                de = NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.DistinguishedName);
+                de = GetDirectoryEntry(objectName, DsNameFormat.DistinguishedName);
             }
             else
             {
-                string dn = ActiveDirectory.GcGetDnFromAttributeSearch("samAccountName", objectName, "user");
+                string dn = GcGetDnFromAttributeSearch("samAccountName", objectName, "user");
 
                 if (dn == null)
                 {
@@ -552,20 +459,20 @@ namespace Lithnet.AccessManager
 
             if (objectName.TryParseAsSid(out SecurityIdentifier sid))
             {
-                de = NativeMethods.GetDirectoryEntry(sid);
+                de = GetDirectoryEntry(sid);
             }
 
             else if (objectName.Contains("\\"))
             {
-                de = NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.Nt4Name);
+                de = GetDirectoryEntry(objectName, DsNameFormat.Nt4Name);
             }
             else if (this.IsDistinguishedName(objectName))
             {
-                de = NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.DistinguishedName);
+                de = GetDirectoryEntry(objectName, DsNameFormat.DistinguishedName);
             }
             else
             {
-                string dn = ActiveDirectory.GcGetDnFromAttributeSearch("samAccountName", objectName, "group");
+                string dn = GcGetDnFromAttributeSearch("samAccountName", objectName, "group");
 
                 if (dn == null)
                 {
@@ -591,7 +498,7 @@ namespace Lithnet.AccessManager
         {
             if (objectName.TryParseAsSid(out SecurityIdentifier sid))
             {
-                return NativeMethods.GetDirectoryEntry(sid);
+                return GetDirectoryEntry(sid);
             }
 
             if (objectClass.Equals("computer", StringComparison.OrdinalIgnoreCase) && !objectName.Contains(".") && !objectName.EndsWith("$"))
@@ -601,24 +508,23 @@ namespace Lithnet.AccessManager
 
             if (objectName.Contains("\\"))
             {
-                return NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.Nt4Name);
+                return GetDirectoryEntry(objectName, DsNameFormat.Nt4Name);
             }
             else if (objectName.Contains("@"))
             {
-                return NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.UserPrincipalName);
+                return GetDirectoryEntry(objectName, DsNameFormat.UserPrincipalName);
             }
             else if (this.IsDistinguishedName(objectName))
             {
-                return NativeMethods.GetDirectoryEntry(objectName, DsNameFormat.DistinguishedName);
+                return GetDirectoryEntry(objectName, DsNameFormat.DistinguishedName);
             }
             else
             {
-                string dn = ActiveDirectory.GcGetDnFromAttributeSearch("samAccountName", objectName, objectClass);
+                string dn = GcGetDnFromAttributeSearch("samAccountName", objectName, objectClass);
 
                 if (dn == null)
                 {
-                    throw new ObjectNotFoundException(
-                        $"An object {objectName} of type {objectClass} was not found in the global catalog");
+                    throw new ObjectNotFoundException($"An object {objectName} of type {objectClass} was not found in the global catalog");
                 }
 
                 var de = new DirectoryEntry($"LDAP://{dn}");
@@ -627,35 +533,124 @@ namespace Lithnet.AccessManager
             }
         }
 
-        private static string GcGetDnFromAttributeSearch(string attributeName, string attributeValue, string objectClass)
+        private string GcGetDnFromAttributeSearch(string attributeName, string attributeValue, string objectClass)
         {
-            DirectorySearcher d = new DirectorySearcher
+            return this.discoveryServices.FindGcAndExecuteWithRetry(Forest.GetCurrentForest().Name, dc =>
             {
-                SearchRoot = new DirectoryEntry($"GC://{Forest.GetCurrentForest().Name}"),
-                SearchScope = SearchScope.Subtree,
-                Filter = $"(&(objectClass={objectClass})({attributeName}={ActiveDirectory.EscapeSearchFilterParameter(attributeValue)}))"
-            };
+                DirectorySearcher d = new DirectorySearcher
+                {
+                    SearchRoot = new DirectoryEntry($"GC://{dc}"),
+                    SearchScope = SearchScope.Subtree,
+                    Filter = $"(&(objectClass={objectClass})({attributeName}={EscapeSearchFilterParameter(attributeValue)}))"
+                };
 
-            d.PropertiesToLoad.Add("distinguishedName");
+                d.PropertiesToLoad.Add("distinguishedName");
 
-            using (SearchResultCollection result = d.FindAll())
+                using (SearchResultCollection result = d.FindAll())
+                {
+
+                    if (result.Count > 1)
+                    {
+                        throw new AmbiguousNameException($"There was more than one value in the directory that matched the criteria of ({attributeName}={attributeValue})");
+                    }
+
+                    if (result.Count == 0)
+                    {
+                        return null;
+                    }
+
+                    return result[0].Properties["distinguishedName"][0].ToString();
+                }
+            });
+        }
+
+        private DirectoryEntry GetDirectoryEntry(string nameToFind, DsNameFormat nameFormat)
+        {
+            return this.discoveryServices.FindDcAndExecuteWithRetry(dc =>
             {
+                var result = NativeMethods.CrackNames(nameFormat, DsNameFormat.DistinguishedName, nameToFind, dc, null);
 
-                if (result.Count > 1)
+                return this.discoveryServices.FindDcAndExecuteWithRetry(result.Domain, dc2 =>
                 {
-                    throw new AmbiguousNameException($"There was more than one value in the directory that matched the criteria of ({attributeName}={attributeValue})");
-                }
+                    var de = new DirectoryEntry($"LDAP://{dc2}/{result.Name}");
+                    _ = de.Guid;
+                    return de;
+                });
+            });
+        }
 
-                if (result.Count == 0)
+        private DirectoryEntry GetDirectoryEntry(SecurityIdentifier nameToFind)
+        {
+            return GetDirectoryEntry(nameToFind.ToString(), DsNameFormat.SecurityIdentifier);
+        }
+
+        private bool CheckForSidInToken(SecurityIdentifier principalSid, SecurityIdentifier sidToCheck, SecurityIdentifier requestContext = null)
+        {
+            if (principalSid == null)
+            {
+                throw new ArgumentNullException(nameof(principalSid));
+            }
+
+            if (sidToCheck == null)
+            {
+                throw new ArgumentNullException(nameof(sidToCheck));
+            }
+
+            if (principalSid == sidToCheck)
+            {
+                return true;
+            }
+
+            if (requestContext == null || requestContext.IsEqualDomainSid(CurrentDomainSid))
+            {
+                using (AuthorizationContext context = new AuthorizationContext(principalSid))
                 {
-                    return null;
+                    return context.ContainsSid(sidToCheck);
                 }
+            }
+            else
+            {
+                string dnsDomain = discoveryServices.GetDomainNameDns(requestContext.AccountDomainSid);
 
-                return result[0].Properties["distinguishedName"][0].ToString();
+                return this.discoveryServices.Find2012DcAndExecuteWithRetry(dnsDomain, dc =>
+                {
+                    using (AuthorizationContext context = new AuthorizationContext(principalSid, dc))
+                    {
+                        return context.ContainsSid(sidToCheck);
+                    }
+                });
             }
         }
 
-        private static string EscapeSearchFilterParameter(string p)
+        private IEnumerable<SecurityIdentifier> GetTokenGroups(SecurityIdentifier principalSid, SecurityIdentifier requestContext = null)
+        {
+            if (principalSid == null)
+            {
+                throw new ArgumentNullException(nameof(principalSid));
+            }
+
+            if (requestContext == null || requestContext.IsEqualDomainSid(CurrentDomainSid))
+            {
+                using (AuthorizationContext context = new AuthorizationContext(principalSid))
+                {
+                    return context.GetTokenGroups().ToList(); // Force the enumeration now before the context goes out of scope
+                }
+            }
+            else
+            {
+                string dnsDomain = discoveryServices.GetDomainNameDns(requestContext.AccountDomainSid);
+
+                return this.discoveryServices.Find2012DcAndExecuteWithRetry(dnsDomain, dc =>
+                {
+                    using (AuthorizationContext context = new AuthorizationContext(principalSid, dc))
+                    {
+                        return context.GetTokenGroups().ToList(); // Force the enumeration now before the context goes out of scope
+                    }
+                });
+            }
+        }
+
+        private string EscapeSearchFilterParameter(string p)
         {
             StringBuilder escapedValue = new StringBuilder();
 

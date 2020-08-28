@@ -3,29 +3,26 @@ using System.Collections.Generic;
 using System.DirectoryServices;
 using System.DirectoryServices.Protocols;
 using System.Linq;
-using System.Net;
-using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text.RegularExpressions;
-using System.Threading;
-using Lithnet.AccessManager.Interop;
-using NLog.LayoutRenderers.Wrappers;
 using SearchScope = System.DirectoryServices.SearchScope;
 
 namespace Lithnet.AccessManager
 {
     public sealed class ActiveDirectoryGroup : IGroup
     {
-
         private readonly DirectoryEntry de;
 
-        internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "tokenGroups", "displayName", "objectGuid", "objectSid", "samAccountName", "msDS-PrincipalName", "objectClass", "entryTTL" };
+        private static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "tokenGroups", "displayName", "objectGuid", "objectSid", "samAccountName", "msDS-PrincipalName", "objectClass", "entryTTL" };
+
+        private readonly IDiscoveryServices discoveryServices;
 
         public ActiveDirectoryGroup(DirectoryEntry directoryEntry)
         {
             directoryEntry.ThrowIfNotObjectClass("group");
             this.de = directoryEntry;
             this.de.RefreshCache(PropertiesToGet);
+            this.discoveryServices = new DiscoveryServices();
         }
 
         public Guid? Guid => this.de.GetPropertyGuid("objectGuid");
@@ -66,40 +63,47 @@ namespace Lithnet.AccessManager
 
         public IEnumerable<string> GetMemberTtlDNs()
         {
-            LdapDirectoryIdentifier directory = new LdapDirectoryIdentifier(NativeMethods.GetDnsDomainNameFromSid(this.Sid));
-
-            var connection = new LdapConnection(directory);
-
-            List<string> attributesToGet = new List<string>() { "member" };
-
-            SearchRequest r = new SearchRequest(
-                this.DistinguishedName,
-                "(objectClass=*)",
-                System.DirectoryServices.Protocols.SearchScope.Base,
-                attributesToGet.ToArray()
-            );
-
-            r.Controls.Add(new DirectoryControl("1.2.840.113556.1.4.2309", null, true, true));
-
-            SearchResponse response = connection.SendRequest(r) as SearchResponse;
-
-            if (response?.ResultCode != ResultCode.Success)
+            return this.discoveryServices.FindDcAndExecuteWithRetry(this.discoveryServices.GetDomainNameDns(this.Sid), dc =>
             {
-                throw new DirectoryException($"The LDAP operation failed with result code {response?.ResultCode}");
-            }
+                LdapDirectoryIdentifier directory = new LdapDirectoryIdentifier(dc);
 
-            foreach (SearchResultEntry entry in response.Entries)
-            {
-                if (!entry.Attributes.Contains("member"))
+                var connection = new LdapConnection(directory);
+
+                List<string> attributesToGet = new List<string>() {"member"};
+
+                SearchRequest r = new SearchRequest(
+                    this.DistinguishedName,
+                    "(objectClass=*)",
+                    System.DirectoryServices.Protocols.SearchScope.Base,
+                    attributesToGet.ToArray()
+                );
+
+                r.Controls.Add(new DirectoryControl("1.2.840.113556.1.4.2309", null, true, true));
+
+                SearchResponse response = connection.SendRequest(r) as SearchResponse;
+
+                if (response?.ResultCode != ResultCode.Success)
                 {
-                    continue;
+                    throw new DirectoryException($"The LDAP operation failed with result code {response?.ResultCode}");
                 }
 
-                foreach (var s in entry.Attributes["member"].GetValues(typeof(string)).OfType<string>())
+                List<string> items = new List<string>();
+
+                foreach (SearchResultEntry entry in response.Entries)
                 {
-                    yield return s;
+                    if (!entry.Attributes.Contains("member"))
+                    {
+                        continue;
+                    }
+
+                    foreach (var s in entry.Attributes["member"].GetValues(typeof(string)).OfType<string>())
+                    {
+                        items.Add(s);
+                    }
                 }
-            }
+
+                return items;
+            });
         }
 
         public TimeSpan? GetMemberTtl(IUser user)

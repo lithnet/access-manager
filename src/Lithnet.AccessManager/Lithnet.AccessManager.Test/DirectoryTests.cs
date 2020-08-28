@@ -23,12 +23,14 @@ namespace Lithnet.AccessManager.Test
     {
         private Mock<ILogger> dummyLogger;
         private ActiveDirectory directory;
+        private IDiscoveryServices discoveryServices;
 
         [SetUp()]
         public void TestInitialize()
         {
+            this.discoveryServices = new DiscoveryServices();
             dummyLogger = new Mock<ILogger>();
-            this.directory = new ActiveDirectory();
+            this.directory = new ActiveDirectory(this.discoveryServices);
         }
 
         [Test]
@@ -260,27 +262,10 @@ namespace Lithnet.AccessManager.Test
             Assert.Throws<AmbiguousNameException>(() => this.directory.GetUser(user));
         }
 
-        [TestCase("IDMDEV1\\PC2")]
-        [TestCase("SUBDEV1\\PC2")]
-        public void TestSetPasswordExpiry(string computerName)
-        {
-            //var computer = this.directory.GetComputer(computerName);
-            //DateTime now = DateTime.Now;
-            //MsMcsAdmPwdProvider msMcsAdmPwdProvider = new MsMcsAdmPwdProvider(this.directory, dummyLogger);
-
-            //msMcsAdmPwdProvider.GetPasswordEntries(computer, now);
-
-            //var password = this.directory.GetPassword(computer);
-
-            //Assert.AreEqual(now, password.ExpirationTime);
-
-            var x =  NativeMethods.GetDirectoryEntry("CN=G-GG-1,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", DsNameFormat.DistinguishedName);
-        }
-
         [Test]
         public void CreateTtlTestGroup()
         {
-            this.directory.CreateTtlGroup("G-DL-Test-TTL", "G-DL-Test-TTL", "TTL test group", "OU=Computers,OU=Laps Testing,DC=idmdev1,DC=local", TimeSpan.FromMinutes(1), true);
+            this.directory.CreateTtlGroup("G-DL-Test-TTL", "G-DL-Test-TTL", "TTL test group", "OU=Computers,OU=Laps Testing,DC=idmdev1,DC=local", TimeSpan.FromMinutes(1), GroupType.DomainLocal, true);
         }
 
         [Test]
@@ -348,9 +333,9 @@ namespace Lithnet.AccessManager.Test
         [Test]
         public void AddGroupMemberToTtlGroup()
         {
-            string groupName =  TestContext.CurrentContext.Random.GetString(10, "abcdefghijklmnop");
+            string groupName = TestContext.CurrentContext.Random.GetString(10, "abcdefghijklmnop");
 
-            this.directory.CreateTtlGroup(groupName, groupName, "TTL test group 2", "OU=Laps Testing,DC=idmdev1,DC=local", TimeSpan.FromMinutes(1), true);
+            this.directory.CreateTtlGroup(groupName, groupName, "TTL test group 2", "OU=Laps Testing,DC=idmdev1,DC=local", TimeSpan.FromMinutes(1), GroupType.DomainLocal, true);
 
             Thread.Sleep(20000);
             IGroup group = this.directory.GetGroup($"IDMDEV1\\{groupName}");

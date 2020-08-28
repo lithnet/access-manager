@@ -15,22 +15,22 @@ namespace Lithnet.AccessManager.Server.UI
     public sealed class JitGroupMappingViewModel : ValidatingModelBase, IViewAware
     {
         private readonly IDirectory directory;
-
         private readonly ILogger<JitGroupMappingViewModel> logger;
-
         private readonly IDialogCoordinator dialogCoordinator;
+        private readonly IDiscoveryServices discoveryServices;
 
         public JitGroupMapping Model { get; }
 
         public UIElement View { get; set; }
 
-        public JitGroupMappingViewModel(JitGroupMapping model, IDirectory directory, ILogger<JitGroupMappingViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<JitGroupMappingViewModel> validator)
+        public JitGroupMappingViewModel(JitGroupMapping model, IDirectory directory, ILogger<JitGroupMappingViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<JitGroupMappingViewModel> validator, IDiscoveryServices discoveryServices)
         {
             this.directory = directory;
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
             this.Model = model;
             this.Validator = validator;
+            this.discoveryServices = discoveryServices;
         }
 
         public string ComputerOU
@@ -81,8 +81,8 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                string basePath = this.directory.GetFullyQualifiedDomainControllerAdsPath(this.ComputerOU);
-                string initialPath = this.directory.GetFullyQualifiedAdsPath(this.ComputerOU);
+                string basePath = this.discoveryServices.GetFullyQualifiedDomainControllerAdsPath(this.ComputerOU);
+                string initialPath = this.discoveryServices.GetFullyQualifiedAdsPath(this.ComputerOU);
 
                 var container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select OU", "Select computer OU", basePath, initialPath);
                 if (container != null)
@@ -101,12 +101,12 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                string basePath = this.directory.GetFullyQualifiedDomainControllerAdsPath(this.ComputerOU);
-                string initialPath = this.directory.GetFullyQualifiedAdsPath(this.GroupOU);
+                string basePath = this.discoveryServices.GetFullyQualifiedDomainControllerAdsPath(this.ComputerOU);
+                string initialPath = this.discoveryServices.GetFullyQualifiedAdsPath(this.GroupOU);
 
                 var container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select OU", "Select group OU", basePath, initialPath);
 
-                if (!string.Equals(this.directory.GetDomainNameDnsFromDn(this.ComputerOU), this.directory.GetDomainNameDnsFromDn(container), StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(this.discoveryServices.GetDomainNameDns(this.ComputerOU), this.discoveryServices.GetDomainNameDns(container), StringComparison.OrdinalIgnoreCase))
                 {
                     await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The group container must belong to the same domain as the computers");
                     return;

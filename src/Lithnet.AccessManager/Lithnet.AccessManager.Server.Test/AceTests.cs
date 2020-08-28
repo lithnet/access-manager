@@ -12,9 +12,16 @@ namespace Lithnet.AccessManager.Server.Test
     {
         private Mock<NLog.ILogger> dummyLogger;
 
+        private IDirectory directory;
+
+        private IDiscoveryServices discoveryServices;
+
         [SetUp()]
         public void TestInitialize()
         {
+            this.discoveryServices = new DiscoveryServices();
+            this.directory = new ActiveDirectory(discoveryServices);
+
             dummyLogger = new Mock<NLog.ILogger>();
         }
 
@@ -115,7 +122,6 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase("extdev1\\G-UG-3", "extdev1\\user3")]
         public void TestAceMatch(string acePrincipal, string requestor)
         {
-            ActiveDirectory d = new ActiveDirectory();
             Assert.IsTrue(this.IsMatch(acePrincipal, requestor, null));
         }
 
@@ -156,9 +162,8 @@ namespace Lithnet.AccessManager.Server.Test
 
         private bool IsMatch(string trustee, string requestor, string domainName, AccessControlType aceType = AccessControlType.Allow)
         {
-            ActiveDirectory d = new ActiveDirectory();
-            var user = d.GetUser(requestor);
-            var p = d.GetPrincipal(trustee);
+            var user = directory.GetUser(requestor);
+            var p = directory.GetPrincipal(trustee);
 
             DiscretionaryAcl dacl = new DiscretionaryAcl(false, false, 1);
             dacl.AddAccess(aceType, p.Sid, (int)AccessMask.Jit, InheritanceFlags.None, PropagationFlags.None);
@@ -168,11 +173,11 @@ namespace Lithnet.AccessManager.Server.Test
 
             if (domainName == null)
             {
-                serverName = d.GetDomainControllerForDomain(d.GetDomainNameDnsFromSid(p.Sid));
+                serverName = discoveryServices.GetDomainController(discoveryServices.GetDomainNameDns(p.Sid));
             }
             else
             {
-                serverName = d.GetDomainControllerForDomain(domainName);
+                serverName = discoveryServices.GetDomainController(domainName);
             }
 
             using AuthorizationContext c = new AuthorizationContext(user.Sid, serverName);

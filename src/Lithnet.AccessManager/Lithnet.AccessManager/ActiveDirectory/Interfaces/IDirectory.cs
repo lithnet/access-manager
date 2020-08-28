@@ -9,26 +9,6 @@ namespace Lithnet.AccessManager
 {
     public interface IDirectory
     {
-        string GetDomainNameDnsFromDn(string dn);
-
-        string GetDomainNameDnsFromSid(SecurityIdentifier sid);
-
-        string GetDomainNameNetBiosFromSid(SecurityIdentifier sid);
-
-        string GetDomainControllerForDomain(string domainDns);
-
-        string GetDomainControllerForDomain(string domainDns, bool forceRediscovery);
-
-        string GetDomainControllerForOUOrDefault(string ou);
-
-        string GetDomainControllerForOU(string ou);
-
-        string GetFullyQualifiedAdsPath(string ou);
-
-        string GetFullyQualifiedDomainControllerAdsPath(string ou);
-
-        string GetForestDnsNameForOU(string ou);
-
         IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl, GroupType groupType, bool removeAccountOperators);
 
         IComputer GetComputer(string name);
@@ -66,14 +46,6 @@ namespace Lithnet.AccessManager
         bool IsObjectInOu(IDirectoryObject computer, string ou);
 
         bool IsContainer(DirectoryEntry path);
-
-        DirectoryEntry GetConfigurationNamingContext(SecurityIdentifier domain);
-
-        DirectoryEntry GetConfigurationNamingContext(string dnsDomain);
-
-        DirectoryEntry GetSchemaNamingContext(SecurityIdentifier domain);
-
-        DirectoryEntry GetSchemaNamingContext(string dnsDomain);
 
         bool DoesSchemaAttributeExist(string dnsDomain, string attributeName);
 

@@ -26,10 +26,11 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly INotificationChannelSelectionViewModelFactory notificationChannelFactory;
         private readonly IDomainTrustProvider domainTrustProvider;
+        private readonly IDiscoveryServices discoveryServices;
 
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices)
         {
             this.directory = directory;
             this.Model = model;
@@ -38,6 +39,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.notificationChannelFactory = notificationChannelFactory;
             this.Validator = validator;
             this.domainTrustProvider = domainTrustProvider;
+            this.discoveryServices = discoveryServices;
 
             this.Script = fileSelectionViewModelFactory.CreateViewModel(model, () => model.Script, appPathProvider.ScriptsPath);
             this.Script.DefaultFileExtension = "ps1";
@@ -214,24 +216,24 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 if (this.Type == TargetType.Container)
                 {
-                    domain = this.directory.GetDomainNameDnsFromDn(this.Target);
+                    domain = this.discoveryServices.GetDomainNameDns(this.Target);
                 }
                 else if (this.Target.TryParseAsSid(out SecurityIdentifier sid))
                 {
-                    domain = this.directory.GetDomainNameDnsFromSid(sid);
+                    domain = this.discoveryServices.GetDomainNameDns(sid);
                 }
             }
             catch (Exception ex)
             {
-                this.logger.LogWarning(EventIDs.UIGenericWarning, ex, "Error dc for target");
+                this.logger.LogWarning(EventIDs.UIGenericWarning, ex, "Error getting dc for target");
             }
 
-            return this.directory.GetDomainControllerForDomain(domain ?? currentDomain.Name);
+            return this.discoveryServices.GetDomainController(domain ?? currentDomain.Name);
         }
 
         private string GetForestDcForTargetOrDefault()
         {
-            return this.directory.GetDomainControllerForDomain(GetForestForTargetOrDefault() ?? currentForest.Name);
+            return this.discoveryServices.GetDomainController(GetForestForTargetOrDefault() ?? currentForest.Name);
         }
 
         private string GetForestForTargetOrDefault()
@@ -246,11 +248,11 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 if (this.Type == TargetType.Container)
                 {
-                    forest = directory.GetForestDnsNameForOU(this.Target);
+                    forest = discoveryServices.GetForestNameDns(this.Target);
                 }
                 else if (this.Target.TryParseAsSid(out SecurityIdentifier sid))
                 {
-                    forest = Domain.GetDomain(new DirectoryContext(DirectoryContextType.Domain, this.directory.GetDomainNameDnsFromSid(sid))).Forest.Name;
+                    forest = Domain.GetDomain(new DirectoryContext(DirectoryContextType.Domain, this.discoveryServices.GetDomainNameDns(sid))).Forest.Name;
                 }
             }
             catch (Exception ex)
@@ -411,7 +413,7 @@ namespace Lithnet.AccessManager.Server.UI
                              DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS |
                              DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
 
-            string targetServer = this.directory.GetDomainControllerForDomain(forest ?? currentForest.Name);
+            string targetServer = this.discoveryServices.GetDomainController(forest ?? currentForest.Name);
 
             var result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), targetServer, scope, "objectClass", "objectSid").FirstOrDefault();
 
@@ -433,8 +435,8 @@ namespace Lithnet.AccessManager.Server.UI
         {
             string path = this.Target ?? currentDomain.GetDirectoryEntry().GetPropertyString("distinguishedName");
 
-            string basePath = this.directory.GetFullyQualifiedDomainControllerAdsPath(path);
-            string initialPath = this.directory.GetFullyQualifiedAdsPath(path);
+            string basePath = this.discoveryServices.GetFullyQualifiedDomainControllerAdsPath(path);
+            string initialPath = this.discoveryServices.GetFullyQualifiedAdsPath(path);
 
             var container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select container", "Select container", basePath, initialPath);
 

@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.DirectoryServices;
-using System.DirectoryServices.ActiveDirectory;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
-using Lithnet.Security.Authorization;
-using Vanara.PInvoke;
 
 namespace Lithnet.AccessManager.Interop
 {
@@ -20,22 +15,6 @@ namespace Lithnet.AccessManager.Interop
         internal const int InsufficientBuffer = 122;
 
         private const int ErrorMoreData = 234;
-
-        private static SecurityIdentifier currentDomainSid;
-
-        private static SecurityIdentifier CurrentDomainSid
-        {
-            get
-            {
-                if (NativeMethods.currentDomainSid == null)
-                {
-                    Domain domain = Domain.GetComputerDomain();
-                    NativeMethods.currentDomainSid = new SecurityIdentifier((byte[])(domain.GetDirectoryEntry().Properties["objectSid"][0]), 0);
-                }
-
-                return NativeMethods.currentDomainSid;
-            }
-        }
 
         [DllImport("Ntdsapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern int DsBind(string domainControllerName, string dnsDomainName, out IntPtr hds);
@@ -143,58 +122,6 @@ namespace Lithnet.AccessManager.Interop
             return new SecurityIdentifier(sidType, GetLocalMachineAuthoritySid());
         }
 
-        //public static SecurityIdentifier CreateWellKnownSid(WellKnownSidType sidType, SecurityIdentifier domainSid)
-        //{
-        //    IntPtr pSid = IntPtr.Zero;
-        //    IntPtr pDomainSid = IntPtr.Zero;
-            
-        //    try
-        //    {
-        //        int pSidLength = 0;
-        //        string sidString = string.Empty;
-
-        //        pDomainSid = Marshal.AllocHGlobal(domainSid.BinaryLength);
-        //        byte[] bDomainSid = new byte[domainSid.BinaryLength];
-        //        domainSid.GetBinaryForm(bDomainSid, 0);
-        //        Marshal.Copy(bDomainSid, 0, pDomainSid, bDomainSid.Length);
-
-        //        if (!CreateWellKnownSid(sidType, pDomainSid, pSid, ref pSidLength))
-        //        {
-        //            var result = Marshal.GetLastWin32Error();
-
-        //            if (result != InsufficientBuffer)
-        //            {
-        //                throw new DirectoryException("CreateWellKnownSid failed", new Win32Exception(result));
-        //            }
-        //        }
-        //        else
-        //        {
-        //            throw new DirectoryException("CreateWellKnownSid should have failed");
-        //        }
-
-        //        pSid = Marshal.AllocHGlobal(pSidLength);
-        //        if (!NativeMethods.CreateWellKnownSid(sidType, pDomainSid, pSid, ref pSidLength))
-        //        {
-        //            throw new DirectoryException("CreateWellKnownSid failed", new Win32Exception(Marshal.GetLastWin32Error()));
-        //        }
-
-        //        return new SecurityIdentifier(pSid);
-        //    }
-        //    finally
-        //    {
-        //        if (pDomainSid != IntPtr.Zero)
-        //        {
-        //            Marshal.FreeHGlobal(pDomainSid);
-        //        }
-
-        //        if (pSid != IntPtr.Zero)
-        //        {
-        //            Marshal.FreeHGlobal(pSid);
-        //        }
-        //    }
-
-        //}
-
         public static void AddLocalGroupMember(string groupName, SecurityIdentifier sid)
         {
             var sidBytes = new byte[sid.BinaryLength];
@@ -242,7 +169,6 @@ namespace Lithnet.AccessManager.Interop
                 Marshal.FreeHGlobal(pSid);
             }
         }
-
 
         public static IList<SecurityIdentifier> GetLocalGroupMembers(string groupName)
         {
@@ -340,118 +266,35 @@ namespace Lithnet.AccessManager.Interop
             }
         }
 
-        public static string GetDn(SecurityIdentifier nameToFind)
+        public static string GetDomainControllerForDnsDomain(string dnsDomain)
         {
-            return GetDn(nameToFind.ToString(), DsNameFormat.SecurityIdentifier);
+            return GetDomainControllerForDnsDomain(dnsDomain, false);
         }
 
-        public static string GetDn(string nameToFind)
+        public static string GetDomainControllerForDnsDomain(string dnsDomain, bool forceRediscovery)
         {
-            return GetDn(nameToFind, DsNameFormat.Unknown);
+            var flags = DsGetDcNameFlags.DS_FORCE_REDISCOVERY;
+            return GetDomainControllerForDnsDomain(dnsDomain, flags);
         }
 
-        public static string GetDn(string nameToFind, DsNameFormat nameFormat)
-        {
-            return GetDn(nameToFind, nameFormat, null);
-        }
-
-        public static string GetDn(string nameToFind, DsNameFormat nameFormat, string server)
-        {
-            var result = CrackNames(nameFormat, DsNameFormat.DistinguishedName, nameToFind, server);
-            return result.Name;
-        }
-
-        public static DirectoryEntry GetDirectoryEntry(string nameToFind, DsNameFormat nameFormat)
-        {
-            return GetDirectoryEntry(nameToFind, nameFormat, null);
-        }
-
-        public static DirectoryEntry GetDirectoryEntry(string nameToFind, DsNameFormat nameFormat, string server)
-        {
-            var result = CrackNames(nameFormat, DsNameFormat.DistinguishedName, nameToFind, server);
-            return new DirectoryEntry($"LDAP://{result.Domain}/{result.Name}");
-        }
-
-        public static DirectoryEntry GetDirectoryEntry(SecurityIdentifier nameToFind)
-        {
-            return GetDirectoryEntry(nameToFind.ToString(), DsNameFormat.SecurityIdentifier);
-        }
-
-        public static bool CheckForSidInToken(SecurityIdentifier principalSid, SecurityIdentifier sidToCheck, SecurityIdentifier requestContext = null)
-        {
-            if (principalSid == null)
-            {
-                throw new ArgumentNullException(nameof(principalSid));
-            }
-
-            if (sidToCheck == null)
-            {
-                throw new ArgumentNullException(nameof(sidToCheck));
-            }
-
-            if (principalSid == sidToCheck)
-            {
-                return true;
-            }
-
-            string server;
-
-            if (requestContext == null || requestContext.IsEqualDomainSid(NativeMethods.CurrentDomainSid))
-            {
-                server = null;
-            }
-            else
-            {
-                string dnsDomain = NativeMethods.GetDnsDomainNameFromSid(requestContext.AccountDomainSid);
-                server = NativeMethods.GetDomainControllerForDnsDomain(dnsDomain);
-            }
-
-            using (AuthorizationContext context = new AuthorizationContext(principalSid, server))
-            {
-                return context.ContainsSid(sidToCheck);
-            }
-        }
-
-        public static IEnumerable<SecurityIdentifier> GetTokenGroups(SecurityIdentifier principalSid, SecurityIdentifier requestContext = null)
-        {
-            if (principalSid == null)
-            {
-                throw new ArgumentNullException(nameof(principalSid));
-            }
-
-            string server;
-
-            if (requestContext == null || requestContext.IsEqualDomainSid(NativeMethods.CurrentDomainSid))
-            {
-                server = null;
-            }
-            else
-            {
-                string dnsDomain = NativeMethods.GetDnsDomainNameFromSid(requestContext.AccountDomainSid);
-                server = NativeMethods.GetDomainControllerForDnsDomain(dnsDomain);
-            }
-
-            using (AuthorizationContext context = new AuthorizationContext(principalSid, server))
-            {
-                return context.GetTokenGroups().ToList(); // Force the enumeration now before the context goes out of scope
-            }
-        }
-
-        public static string GetDomainControllerForDnsDomain(string dnsDomain, bool forceRediscovery = false)
+        public static string GetDomainControllerForDnsDomain(string dnsDomain, DsGetDcNameFlags flags)
         {
             IntPtr pdcInfo = IntPtr.Zero;
 
+            flags |= DsGetDcNameFlags.DS_RETURN_DNS_NAME;
+            flags |= DsGetDcNameFlags.DS_WRITABLE_REQUIRED;
+
+            if (!flags.HasFlag(DsGetDcNameFlags.DS_DIRECTORY_SERVICE_8_REQUIRED) &&
+                !flags.HasFlag(DsGetDcNameFlags.DS_DIRECTORY_SERVICE_6_REQUIRED) &&
+                !flags.HasFlag(DsGetDcNameFlags.DS_GC_SERVER_REQUIRED) &&
+                !flags.HasFlag(DsGetDcNameFlags.DS_DIRECTORY_SERVICE_PREFERRED))
+            {
+                flags |= DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED;
+            }
+
             try
             {
-                int result = DsGetDcName(
-                    null,
-                    dnsDomain,
-                    IntPtr.Zero,
-                    null,
-                    DsGetDcNameFlags.DS_DIRECTORY_SERVICE_8_REQUIRED |
-                    DsGetDcNameFlags.DS_RETURN_DNS_NAME |
-                    (forceRediscovery ? DsGetDcNameFlags.DS_FORCE_REDISCOVERY : 0),
-                    out pdcInfo);
+                int result = DsGetDcName(null, dnsDomain, IntPtr.Zero, null, flags, out pdcInfo);
 
                 if (result != 0)
                 {
@@ -471,19 +314,13 @@ namespace Lithnet.AccessManager.Interop
             }
         }
 
-        public static string GetDnsDomainNameFromSid(SecurityIdentifier sid)
-        {
-            var result = CrackNames(DsNameFormat.SecurityIdentifier, DsNameFormat.Nt4Name, sid.Value);
-            return result.Domain;
-        }
-
-        public static DsNameResultItem CrackNames(DsNameFormat formatOffered, DsNameFormat formatDesired, string name, string dnsDomainName = null, int referralLevel = 0)
+        public static DsNameResultItem CrackNames(DsNameFormat formatOffered, DsNameFormat formatDesired, string name, string dc, string dnsDomainName, int referralLevel = 0)
         {
             IntPtr hds = IntPtr.Zero;
 
             try
             {
-                int result = NativeMethods.DsBind(null, dnsDomainName, out hds);
+                int result = NativeMethods.DsBind(dc, dnsDomainName, out hds);
                 if (result != 0)
                 {
                     throw new DirectoryException("DsBind failed", new Win32Exception(result));
@@ -505,7 +342,7 @@ namespace Lithnet.AccessManager.Interop
                         {
                             if (referralLevel < NativeMethods.DirectoryReferralLimit)
                             {
-                                return NativeMethods.CrackNames(formatOffered, formatDesired, name, nameResult.Domain, ++referralLevel);
+                                return NativeMethods.CrackNames(formatOffered, formatDesired, name, null, nameResult.Domain, ++referralLevel);
                             }
 
                             throw new ReferralLimitExceededException("The referral limit exceeded the maximum configured value");

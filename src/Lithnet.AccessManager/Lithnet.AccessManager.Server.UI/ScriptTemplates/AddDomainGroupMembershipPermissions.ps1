@@ -13,14 +13,15 @@
 
 $domain = "{domainDns}"
 $serviceAccountSid = "{serviceAccountSid}"
+$server = (Get-ADDomainController -DomainName domain -Discover -ForceDiscover -Writable).HostName[0]
 
 # Get the Windows Authorization Access Group by it's well-known SID "S-1-5-32-560"
-$de = new-object "System.DirectoryServices.DirectoryEntry" "LDAP://$domain/<SID=S-1-5-32-560>"
+$de = new-object "System.DirectoryServices.DirectoryEntry" "LDAP://$server/<SID=S-1-5-32-560>"
 $de.Properties["member"].Add("<SID=$serviceAccountSid>") ## Add our service account as a member
 $de.CommitChanges()
 
 # Get the Access Control Assistance Operators group by it's well-known SID "S-1-5-32-560"
-$de = new-object "System.DirectoryServices.DirectoryEntry" "LDAP://$domain/<SID=S-1-5-32-579>"
+$de = new-object "System.DirectoryServices.DirectoryEntry" "LDAP://$server/<SID=S-1-5-32-579>"
 $de.Properties["member"].Add("<SID=$serviceAccountSid>") ## Add our service account as a member
 $de.CommitChanges()
 

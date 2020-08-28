@@ -14,15 +14,11 @@ namespace Lithnet.AccessManager.Server.Workers
     public class JitGroupWorker : BackgroundService
     {
         private readonly ILogger logger;
-
         private readonly JitConfigurationOptions options;
-
         private readonly IJitAccessGroupResolver groupResolver;
-
         private readonly IDirectory directory;
-
-        private readonly Dictionary<string, SearchParameters>
-            deltaInformation = new Dictionary<string, SearchParameters>(StringComparer.CurrentCultureIgnoreCase);
+        private readonly IDiscoveryServices discoveryServices;
+        private readonly Dictionary<string, SearchParameters> deltaInformation = new Dictionary<string, SearchParameters>(StringComparer.CurrentCultureIgnoreCase);
 
         private readonly int fullSyncInterval;
 
@@ -30,12 +26,13 @@ namespace Lithnet.AccessManager.Server.Workers
 
         private readonly int timerInterval;
 
-        public JitGroupWorker(ILogger<JitGroupWorker> logger, IOptions<JitConfigurationOptions> options, IJitAccessGroupResolver groupResolver, IDirectory directory)
+        public JitGroupWorker(ILogger<JitGroupWorker> logger, IOptions<JitConfigurationOptions> options, IJitAccessGroupResolver groupResolver, IDirectory directory, IDiscoveryServices discoveryServices)
         {
             this.logger = logger;
             this.options = options.Value;
             this.groupResolver = groupResolver;
             this.directory = directory;
+            this.discoveryServices = discoveryServices;
             this.fullSyncInterval = Math.Max(1, this.options.FullSyncInterval ?? 60);
             this.deltaSyncInterval = Math.Max(0, this.options.DeltaSyncInterval ?? 1);
 
@@ -131,7 +128,7 @@ namespace Lithnet.AccessManager.Server.Workers
                 usnData = new SearchParameters
                 {
                     Server = mapping.PreferredDC,
-                    DnsDomain = this.directory.GetDomainNameDnsFromDn(mapping.ComputerOU),
+                    DnsDomain = this.discoveryServices.GetDomainNameDns(mapping.ComputerOU),
                     LastUsn = 0
                 };
 

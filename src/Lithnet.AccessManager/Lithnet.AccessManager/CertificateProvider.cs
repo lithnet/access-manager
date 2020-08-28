@@ -25,6 +25,8 @@ namespace Lithnet.AccessManager
 
         private readonly IAppPathProvider appPathProvider;
 
+        private readonly IDiscoveryServices discoveryServices;
+
         public const string LithnetAccessManagerEku = "1.3.6.1.4.1.55989.2.1.1";
 
         public X509Store OpenServiceStore(string serviceName, OpenFlags openFlags)
@@ -81,11 +83,12 @@ namespace Lithnet.AccessManager
             return f;
         }
 
-        public CertificateProvider(ILogger<CertificateProvider> logger, IDirectory directory, IAppPathProvider appPathProvider)
+        public CertificateProvider(ILogger<CertificateProvider> logger, IDirectory directory, IAppPathProvider appPathProvider, IDiscoveryServices discoveryServices)
         {
             this.directory = directory;
             this.logger = logger;
             this.appPathProvider = appPathProvider;
+            this.discoveryServices = discoveryServices;
         }
 
         public X509Certificate2 FindDecryptionCertificate(string thumbprint)
@@ -171,7 +174,7 @@ namespace Lithnet.AccessManager
 
         public X509Certificate2 GetCertificateFromDirectory(string dnsDomain)
         {
-            var cnc = this.directory.GetConfigurationNamingContext(dnsDomain);
+            var cnc = this.discoveryServices.GetConfigurationNamingContext(dnsDomain);
             string dn = cnc.GetPropertyString("distinguishedName");
             dn = $"LDAP://CN=AccessManagerConfig,CN=Lithnet,CN=Services,{dn}";
             DirectoryEntry amobject = new DirectoryEntry(dn);

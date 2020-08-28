@@ -16,11 +16,14 @@ namespace Lithnet.AccessManager.Server.Test
 
         private JitAccessGroupResolver resolver;
 
+        private IDiscoveryServices discoveryServices;
+
         [SetUp()]
         public void TestInitialize()
         {
-            directory = new ActiveDirectory();
-            this.resolver = new JitAccessGroupResolver(directory);
+            discoveryServices = new DiscoveryServices();
+            directory = new ActiveDirectory(discoveryServices);
+            this.resolver = new JitAccessGroupResolver(directory, discoveryServices);
         }
 
         [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1")]

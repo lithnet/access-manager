@@ -6,14 +6,17 @@ namespace Lithnet.AccessManager.Test
 {
     public class MsMcsAdmPwdProviderTests
     {
-        private ActiveDirectory directory;
+        private IDirectory directory;
+
+        private IDiscoveryServices discoveryServices;
 
         private MsMcsAdmPwdProvider provider;
 
         [SetUp()]
         public void TestInitialize()
         {
-            directory = new ActiveDirectory();
+            discoveryServices = new DiscoveryServices();
+            directory = new ActiveDirectory(discoveryServices);
             provider = new MsMcsAdmPwdProvider(Mock.Of<Microsoft.Extensions.Logging.ILogger<MsMcsAdmPwdProvider>>());
         }
 

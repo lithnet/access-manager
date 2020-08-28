@@ -13,7 +13,7 @@ namespace Lithnet.AccessManager.Test
         [SetUp()]
         public void TestInitialize()
         {
-            this.certificateProvider = new CertificateProvider(Mock.Of<ILogger<CertificateProvider>>(), Mock.Of<IDirectory>(), Mock.Of<IAppPathProvider>());
+            this.certificateProvider = new CertificateProvider(Mock.Of<ILogger<CertificateProvider>>(), Mock.Of<IDirectory>(), Mock.Of<IAppPathProvider>(), Mock.Of<IDiscoveryServices>());
         }
 
         [TestCase("A simple test", TestName = "Simple test v1")]

@@ -33,8 +33,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly INotifyModelChangedEventPublisher eventPublisher;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IDomainTrustProvider domainTrustProvider;
+        private readonly IDiscoveryServices discoveryServices;
 
-        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, RandomNumberGenerator rng, IDirectory directory, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider)
+        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, RandomNumberGenerator rng, IDirectory directory, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.model = model;
@@ -45,6 +46,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.directory = directory;
             this.eventPublisher = eventPublisher;
             this.domainTrustProvider = domainTrustProvider;
+            this.discoveryServices = discoveryServices;
 
             this.DisplayName = "Authentication";
 
@@ -145,7 +147,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                 scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS | DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
 
-                var targetServer = this.directory.GetDomainControllerForDomain(vm.SelectedForest ?? Forest.GetCurrentForest().Name);
+                var targetServer = this.discoveryServices.GetDomainController(vm.SelectedForest ?? Forest.GetCurrentForest().Name);
 
                 var result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), targetServer, scope, "objectClass", "objectSid").FirstOrDefault();
 

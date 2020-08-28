@@ -23,6 +23,7 @@ namespace Lithnet.AccessManager.Agent
                 {
                     services.AddHostedService<Worker>();
                     services.AddTransient<IDirectory, ActiveDirectory>();
+                    services.AddTransient<IDiscoveryServices, DiscoveryServices>();
                     services.AddTransient<IAgentSettings, RegistrySettingsAgent>();
                     services.AddTransient<IJitSettings, RegistrySettingsJit>();
                     services.AddTransient<IJitAgent, JitAgent>();

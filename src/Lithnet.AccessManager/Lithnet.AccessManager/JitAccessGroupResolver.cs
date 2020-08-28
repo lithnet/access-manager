@@ -6,10 +6,12 @@ namespace Lithnet.AccessManager
     public class JitAccessGroupResolver : IJitAccessGroupResolver
     {
         private readonly IDirectory directory;
+        private readonly IDiscoveryServices discoveryServices;
 
-        public JitAccessGroupResolver(IDirectory directory)
+        public JitAccessGroupResolver(IDirectory directory, IDiscoveryServices discoveryServices)
         {
             this.directory = directory;
+            this.discoveryServices = discoveryServices;
         }
 
         public IGroup GetJitGroup(IComputer computer, string groupName)
@@ -36,7 +38,7 @@ namespace Lithnet.AccessManager
             }
             else
             {
-                string domain = this.directory.GetDomainNameNetBiosFromSid(computer.Sid);
+                string domain = this.discoveryServices.GetDomainNameNetBios(computer.Sid);
                 string computerName = computer.SamAccountName.TrimEnd('$');
 
                 return this.GetJitGroup(authorizingGroupName, computerName, domain);
