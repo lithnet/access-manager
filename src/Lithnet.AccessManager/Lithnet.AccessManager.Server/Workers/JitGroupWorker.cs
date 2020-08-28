@@ -266,7 +266,7 @@ namespace Lithnet.AccessManager.Server.Workers
 
         private IList<SearchResult> GetGroups(JitGroupMapping mapping)
         {
-            string filter = $"(&(objectClass=group))";
+            string filter = $"(&(objectCategory=group))";
             string path = $"LDAP://{mapping.GroupOU}";
             return this.GetObjects(path, SearchScope.OneLevel, filter);
         }
@@ -292,9 +292,9 @@ namespace Lithnet.AccessManager.Server.Workers
             return result.OfType<SearchResult>().ToList();
         }
 
-        private IList<SearchResult> GetObjects(string server, string ou, string objectClass, SearchScope scope, long lowUsn, long highUsn)
+        private IList<SearchResult> GetObjects(string server, string ou, string objectCategory, SearchScope scope, long lowUsn, long highUsn)
         {
-            string filter = $"(&(objectClass={objectClass})(uSNCreated<={highUsn})(uSNCreated>={lowUsn + 1}))";
+            string filter = $"(&(objectCategory={objectCategory})(uSNCreated<={highUsn})(uSNCreated>={lowUsn + 1}))";
             string path = $"LDAP://{server}/{ou}";
             return this.GetObjects(path, scope, filter);
         }

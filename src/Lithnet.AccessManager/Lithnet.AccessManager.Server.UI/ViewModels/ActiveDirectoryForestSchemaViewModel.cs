@@ -10,11 +10,13 @@ namespace Lithnet.AccessManager.Server.UI
     public class ActiveDirectoryForestSchemaViewModel : PropertyChangedBase, IViewAware
     {
         private readonly ILogger<ActiveDirectoryForestSchemaViewModel> logger;
+        private readonly IDirectory directory;
 
-        public ActiveDirectoryForestSchemaViewModel(Forest forest, ILogger<ActiveDirectoryForestSchemaViewModel> logger)
+        public ActiveDirectoryForestSchemaViewModel(Forest forest, ILogger<ActiveDirectoryForestSchemaViewModel> logger, IDirectory directory)
         {
             this.Forest = forest;
             this.logger = logger;
+            this.directory = directory;
             this.LithnetAccessManagerSchemaPresentText = "Checking...";
             this.LithnetSchemaLookupInProgress = true;
             this.MsLapsSchemaPresentText = "Checking...";
@@ -67,16 +69,17 @@ namespace Lithnet.AccessManager.Server.UI
                 this.LithnetSchemaLookupInProgress = true;
                 this.IsLithnetSchemaPresent = false;
                 this.IsNotLithnetSchemaPresent = false;
-                
-                var schema = ActiveDirectorySchema.GetSchema(new DirectoryContext(DirectoryContextType.Forest, this.Forest.Name));
-                schema.FindProperty("lithnetAdminPassword");
-                this.IsLithnetSchemaPresent = true;
-                this.LithnetAccessManagerSchemaPresentText = "Present";
-            }
-            catch (ActiveDirectoryObjectNotFoundException)
-            {
-                this.IsNotLithnetSchemaPresent = true;
-                this.LithnetAccessManagerSchemaPresentText = "Not present";
+
+                if (this.directory.DoesSchemaAttributeExist(this.Forest.Name, "lithnetAdminPassword"))
+                {
+                    this.IsLithnetSchemaPresent = true;
+                    this.LithnetAccessManagerSchemaPresentText = "Present";
+                }
+                else
+                {
+                    this.IsNotLithnetSchemaPresent = true;
+                    this.LithnetAccessManagerSchemaPresentText = "Not present";
+                }
             }
             catch (Exception ex)
             {
@@ -99,15 +102,20 @@ namespace Lithnet.AccessManager.Server.UI
                 this.IsMsLapsSchemaPresent = false;
                 this.IsNotMsLapsSchemaPresent = false;
 
-                var schema = ActiveDirectorySchema.GetSchema(new DirectoryContext(DirectoryContextType.Forest, this.Forest.Name));
-                schema.FindProperty("ms-Mcs-AdmPwd");
-                this.IsMsLapsSchemaPresent = true;
-                this.MsLapsSchemaPresentText = "Present";
+                if (this.directory.DoesSchemaAttributeExist(this.Forest.Name, "lithnetAdminPassword"))
+                {
+                    this.IsMsLapsSchemaPresent = true;
+                    this.MsLapsSchemaPresentText = "Present";
+                }
+                else
+                {
+                    this.IsNotMsLapsSchemaPresent = true;
+                    this.MsLapsSchemaPresentText = "Not present";
+                }
             }
             catch (ActiveDirectoryObjectNotFoundException)
             {
-                this.IsNotMsLapsSchemaPresent = true;
-                this.MsLapsSchemaPresentText = "Not present";
+               
             }
             catch (Exception ex)
             {
