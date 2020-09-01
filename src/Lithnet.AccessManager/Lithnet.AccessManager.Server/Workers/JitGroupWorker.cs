@@ -206,7 +206,7 @@ namespace Lithnet.AccessManager.Server.Workers
             {
                 var groupsToDelete = groups
                     .Where(t => !expectedGroupNames.Contains(t.GetPropertyString("cn"), StringComparer.CurrentCultureIgnoreCase))
-                    .Select(t => t.GetPropertyString("ms-DSPrincipalName")).ToList();
+                    .Select(t => t.GetPropertyString("msDS-PrincipalName")).ToList();
 
                 if (groupsToDelete.Count > 0)
                 {

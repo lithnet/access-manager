@@ -457,6 +457,11 @@ namespace Lithnet.AccessManager
         {
             DirectoryEntry de;
 
+            if (objectName == null)
+            {
+                throw new ArgumentNullException(nameof(objectName));
+            }
+
             if (objectName.TryParseAsSid(out SecurityIdentifier sid))
             {
                 de = GetDirectoryEntry(sid);
