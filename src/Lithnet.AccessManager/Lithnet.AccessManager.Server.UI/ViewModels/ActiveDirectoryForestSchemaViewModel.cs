@@ -102,7 +102,7 @@ namespace Lithnet.AccessManager.Server.UI
                 this.IsMsLapsSchemaPresent = false;
                 this.IsNotMsLapsSchemaPresent = false;
 
-                if (this.directory.DoesSchemaAttributeExist(this.Forest.Name, "lithnetAdminPassword"))
+                if (this.directory.DoesSchemaAttributeExist(this.Forest.Name, "ms-Mcs-AdmPwd"))
                 {
                     this.IsMsLapsSchemaPresent = true;
                     this.MsLapsSchemaPresentText = "Present";
