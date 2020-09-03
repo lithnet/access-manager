@@ -71,6 +71,12 @@ namespace Lithnet.AccessManager.Server.UI
                     return;
                 }
 
+                if (!this.GroupExists(this.acaoSid))
+                {
+                    this.AcaoStatus = "Group not found in domain";
+                    return;
+                }
+
                 if (this.IsGroupMember(this.acaoSid, this.serviceAccountSid))
                 {
                     this.AcaoStatus = "Group membership confirmed";
@@ -114,6 +120,12 @@ namespace Lithnet.AccessManager.Server.UI
                     return;
                 }
 
+                if (!this.GroupExists(this.waagSid))
+                {
+                    this.AcaoStatus = "Group not found";
+                    return;
+                }
+
                 if (this.IsGroupMember(this.waagSid, this.serviceAccountSid))
                 {
                     this.WaagStatus = "Group membership confirmed";
@@ -137,10 +149,25 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
+        private bool GroupExists(SecurityIdentifier groupSid)
+        {
+            using PrincipalContext p = new PrincipalContext(ContextType.Domain, this.domain.Name);
+            using GroupPrincipal g = GroupPrincipal.FindByIdentity(p, IdentityType.Sid, groupSid.ToString());
+
+            return g != null;
+        }
+
         private bool IsGroupMember(SecurityIdentifier groupSid, SecurityIdentifier userSid)
         {
             using PrincipalContext p = new PrincipalContext(ContextType.Domain, this.domain.Name);
             using GroupPrincipal g = GroupPrincipal.FindByIdentity(p, IdentityType.Sid, groupSid.ToString());
+
+            if (g == null)
+            {
+                this.logger.LogTrace($"The group {groupSid.Value} does not exist");
+                return false;
+            }
+
             return IsGroupMember(g, userSid, new HashSet<string>());
         }
 
