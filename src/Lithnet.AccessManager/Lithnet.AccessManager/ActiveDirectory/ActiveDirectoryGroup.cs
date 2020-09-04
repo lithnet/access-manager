@@ -25,6 +25,8 @@ namespace Lithnet.AccessManager
             this.discoveryServices = new DiscoveryServices();
         }
 
+        public string Path => this.de.Path;
+
         public Guid? Guid => this.de.GetPropertyGuid("objectGuid");
 
         public string MsDsPrincipalName => this.de.GetPropertyString("msDS-PrincipalName");

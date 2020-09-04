@@ -15,13 +15,13 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 dotnet publish "%uiproject%" --runtime win8-x64 --output "%outputdir%" --framework netcoreapp3.1 --self-contained false
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-"C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe" sign /sha1 %CSCERTTHUMBPRINT% /t http://timestamp.digicert.com /fd sha256 /v "%outputdir%\Lithnet*.exe"
+"%SIGNTOOLPATH%\signtool.exe" sign /sha1 %CSCERTTHUMBPRINT% /t http://timestamp.digicert.com /fd sha256 /v "%outputdir%\Lithnet*.exe"
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-"C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe" sign /sha1 %CSCERTTHUMBPRINT% /t http://timestamp.digicert.com /fd sha256 /v "%outputdir%\Lithnet*.dll"
+"%SIGNTOOLPATH%\signtool.exe" sign /sha1 %CSCERTTHUMBPRINT% /t http://timestamp.digicert.com /fd sha256 /v "%outputdir%\Lithnet*.dll"
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-"C:\Program Files (x86)\Caphyon\Advanced Installer 17.3\bin\x86\AdvancedInstaller.com" /build "%setupProject%"
+"%AIPATH%\AdvancedInstaller.com" /build "%setupProject%"
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 ENDLOCAL

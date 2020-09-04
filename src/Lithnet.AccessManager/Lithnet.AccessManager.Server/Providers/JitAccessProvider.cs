@@ -45,11 +45,11 @@ namespace Lithnet.AccessManager
 
             TimeSpan grantedExpiry = requestedExpiry;
 
-            this.logger.LogTrace("Processing request to have {user} added to the JIT group {group} via dynamicObject {dynamicGroup}", user.MsDsPrincipalName, group.MsDsPrincipalName, fqGroupName);
+            this.logger.LogTrace("Processing request to have {user} added to the JIT group {group} via dynamicObject {dynamicGroup}", user.MsDsPrincipalName, group.Path, fqGroupName);
 
             if (directory.TryGetGroup(fqGroupName, out IGroup dynamicGroup))
             {
-                this.logger.LogTrace("Dynamic group {dynamicGroup} already exists in the directory with a remaining ttl of {ttl}", dynamicGroup.MsDsPrincipalName, dynamicGroup.EntryTtl);
+                this.logger.LogTrace("Dynamic group {dynamicGroup} already exists in the directory with a remaining ttl of {ttl}", dynamicGroup.Path, dynamicGroup.EntryTtl);
 
                 if (!canExtend)
                 {
@@ -69,10 +69,10 @@ namespace Lithnet.AccessManager
                 this.logger.LogInformation(EventIDs.JitDynamicGroupCreated, "Created a new dynamic group {groupName} in {ou} with ttl of {ttl}", groupName, mapping.GroupOU, grantedExpiry);
             }
 
-            this.logger.LogTrace("Adding user {user} to dynamic group {dynamicGroup}", user.MsDsPrincipalName, dynamicGroup.MsDsPrincipalName);
+            this.logger.LogTrace("Adding user {user} to dynamic group {dynamicGroup}", user.MsDsPrincipalName, dynamicGroup.Path);
             dynamicGroup.AddMember(user);
 
-            this.logger.LogTrace("Adding dynamic group {dynamicGroup} to the JIT group {jitGroup}", dynamicGroup.MsDsPrincipalName, group.MsDsPrincipalName);
+            this.logger.LogTrace("Adding dynamic group {dynamicGroup} to the JIT group {jitGroup}", dynamicGroup.Path, group.Path);
             group.AddMember(dynamicGroup);
 
             undo = () =>

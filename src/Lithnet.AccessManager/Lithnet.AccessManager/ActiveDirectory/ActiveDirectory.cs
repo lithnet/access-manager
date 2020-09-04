@@ -174,30 +174,33 @@ namespace Lithnet.AccessManager
 
         public void CreateGroup(string name, string description, GroupType groupType, string ou, bool removeAccountOperators)
         {
-            DirectoryEntry oude = new DirectoryEntry($"LDAP://{ou}");
-            string samAccountName = name;
-            if (name.Contains('\\'))
+            this.discoveryServices.FindDcAndExecuteWithRetry(this.discoveryServices.GetDomainNameDns(ou), dc =>
             {
-                samAccountName = name.Split('\\')[1];
-            }
+                DirectoryEntry oude = new DirectoryEntry($"LDAP://{dc}/{ou}");
+                string samAccountName = name;
+                if (name.Contains('\\'))
+                {
+                    samAccountName = name.Split('\\')[1];
+                }
 
-            if (groupType == 0)
-            {
-                groupType = GroupType.DomainLocal;
-            }
+                if (groupType == 0)
+                {
+                    groupType = GroupType.DomainLocal;
+                }
 
-            DirectoryEntry de = oude.Children.Add($"CN={samAccountName}", "group");
-            de.Properties["samAccountName"].Add(samAccountName);
-            de.Properties["description"].Add(description);
-            de.Properties["groupType"].Add(unchecked((int)groupType));
+                DirectoryEntry de = oude.Children.Add($"CN={samAccountName}", "group");
+                de.Properties["samAccountName"].Add(samAccountName);
+                de.Properties["description"].Add(description);
+                de.Properties["groupType"].Add(unchecked((int)groupType));
 
-            de.CommitChanges();
-
-            if (removeAccountOperators)
-            {
-                de.ObjectSecurity.RemoveAccess(new SecurityIdentifier(WellKnownSidType.BuiltinAccountOperatorsSid, null), AccessControlType.Allow);
                 de.CommitChanges();
-            }
+
+                if (removeAccountOperators)
+                {
+                    de.ObjectSecurity.RemoveAccess(new SecurityIdentifier(WellKnownSidType.BuiltinAccountOperatorsSid, null), AccessControlType.Allow);
+                    de.CommitChanges();
+                }
+            });
         }
 
         public void DeleteGroup(string name)
@@ -253,30 +256,33 @@ namespace Lithnet.AccessManager
 
         public IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl, GroupType groupType, bool removeAccountOperators)
         {
-            DirectoryEntry container = new DirectoryEntry($"LDAP://{ou}");
-            dynamic[] objectClasses = new dynamic[] { "dynamicObject", "group" };
-
-            DirectoryEntry group = container.Children.Add($"CN={accountName}", "group");
-            if (groupType == 0)
+            return this.discoveryServices.FindDcAndExecuteWithRetry(this.discoveryServices.GetDomainNameDns(ou), dc =>
             {
-                groupType = GroupType.DomainLocal;
-            }
+                DirectoryEntry container = new DirectoryEntry($"LDAP://{dc}/{ou}");
+                dynamic[] objectClasses = new dynamic[] { "dynamicObject", "group" };
 
-            group.Invoke("Put", "objectClass", objectClasses);
-            group.Properties["samAccountName"].Add(accountName);
-            group.Properties["displayName"].Add(displayName);
-            group.Properties["description"].Add(description);
-            group.Properties["groupType"].Add(unchecked((int)groupType));
-            group.Properties["entryTTL"].Add((int)ttl.TotalSeconds);
-            group.CommitChanges();
+                DirectoryEntry group = container.Children.Add($"CN={accountName}", "group");
+                if (groupType == 0)
+                {
+                    groupType = GroupType.DomainLocal;
+                }
 
-            if (removeAccountOperators)
-            {
-                group.ObjectSecurity.RemoveAccess(new SecurityIdentifier(WellKnownSidType.BuiltinAccountOperatorsSid, null), AccessControlType.Allow);
+                group.Invoke("Put", "objectClass", objectClasses);
+                group.Properties["samAccountName"].Add(accountName);
+                group.Properties["displayName"].Add(displayName);
+                group.Properties["description"].Add(description);
+                group.Properties["groupType"].Add(unchecked((int)groupType));
+                group.Properties["entryTTL"].Add((int)ttl.TotalSeconds);
                 group.CommitChanges();
-            }
 
-            return new ActiveDirectoryGroup(group);
+                if (removeAccountOperators)
+                {
+                    group.ObjectSecurity.RemoveAccess(new SecurityIdentifier(WellKnownSidType.BuiltinAccountOperatorsSid, null), AccessControlType.Allow);
+                    group.CommitChanges();
+                }
+
+                return new ActiveDirectoryGroup(group);
+            });
         }
 
         public bool IsPamFeatureEnabled(SecurityIdentifier domainSid, bool forceRefresh)

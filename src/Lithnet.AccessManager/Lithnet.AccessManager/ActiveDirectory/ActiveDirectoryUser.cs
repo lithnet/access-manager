@@ -17,6 +17,8 @@ namespace Lithnet.AccessManager
             this.de.RefreshCache(PropertiesToGet);
         }
 
+        public string Path => this.de.Path;
+
         public string SamAccountName => this.de.GetPropertyString("samAccountName");
 
         public string MsDsPrincipalName => this.de.GetPropertyString("msDS-PrincipalName");
