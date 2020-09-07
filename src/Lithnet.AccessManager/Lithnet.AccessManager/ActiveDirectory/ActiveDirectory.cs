@@ -82,7 +82,7 @@ namespace Lithnet.AccessManager
 
             if (result.HasPropertyValue("objectClass", "group"))
             {
-                return new ActiveDirectoryGroup(result);
+                return new ActiveDirectoryGroup(result, this.discoveryServices);
             }
 
             if (result.HasPropertyValue("objectClass", "user"))
@@ -104,7 +104,7 @@ namespace Lithnet.AccessManager
 
             if (result.HasPropertyValue("objectClass", "group"))
             {
-                return new ActiveDirectoryGroup(result);
+                return new ActiveDirectoryGroup(result, this.discoveryServices);
             }
 
             if (result.HasPropertyValue("objectClass", "user"))
@@ -154,7 +154,7 @@ namespace Lithnet.AccessManager
 
         public IGroup GetGroup(string groupName)
         {
-            return new ActiveDirectoryGroup(this.FindGroupInGc(groupName));
+            return new ActiveDirectoryGroup(this.FindGroupInGc(groupName), this.discoveryServices);
         }
 
         public bool TryGetGroup(string name, out IGroup group)
@@ -164,7 +164,7 @@ namespace Lithnet.AccessManager
 
         public IGroup GetGroup(SecurityIdentifier sid)
         {
-            return new ActiveDirectoryGroup(this.FindGroupInGc(sid.ToString()));
+            return new ActiveDirectoryGroup(this.FindGroupInGc(sid.ToString()), this.discoveryServices);
         }
 
         public bool TryGetGroup(SecurityIdentifier sid, out IGroup group)
@@ -254,35 +254,32 @@ namespace Lithnet.AccessManager
             return this.discoveryServices.FindDcAndExecuteWithRetry(dnsDomainName, dc => NativeMethods.CrackNames(nameFormat, requiredFormat, name, dc, dnsDomainName).Name);
         }
 
-        public IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl, GroupType groupType, bool removeAccountOperators)
+        public IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, string targetDc, TimeSpan ttl, GroupType groupType, bool removeAccountOperators)
         {
-            return this.discoveryServices.FindDcAndExecuteWithRetry(this.discoveryServices.GetDomainNameDns(ou), dc =>
+            DirectoryEntry container = new DirectoryEntry($"LDAP://{targetDc}/{ou}");
+            dynamic[] objectClasses = new dynamic[] { "dynamicObject", "group" };
+
+            DirectoryEntry group = container.Children.Add($"CN={accountName}", "group");
+            if (groupType == 0)
             {
-                DirectoryEntry container = new DirectoryEntry($"LDAP://{dc}/{ou}");
-                dynamic[] objectClasses = new dynamic[] { "dynamicObject", "group" };
+                groupType = GroupType.DomainLocal;
+            }
 
-                DirectoryEntry group = container.Children.Add($"CN={accountName}", "group");
-                if (groupType == 0)
-                {
-                    groupType = GroupType.DomainLocal;
-                }
+            group.Invoke("Put", "objectClass", objectClasses);
+            group.Properties["samAccountName"].Add(accountName);
+            group.Properties["displayName"].Add(displayName);
+            group.Properties["description"].Add(description);
+            group.Properties["groupType"].Add(unchecked((int)groupType));
+            group.Properties["entryTTL"].Add((int)ttl.TotalSeconds);
+            group.CommitChanges();
 
-                group.Invoke("Put", "objectClass", objectClasses);
-                group.Properties["samAccountName"].Add(accountName);
-                group.Properties["displayName"].Add(displayName);
-                group.Properties["description"].Add(description);
-                group.Properties["groupType"].Add(unchecked((int)groupType));
-                group.Properties["entryTTL"].Add((int)ttl.TotalSeconds);
+            if (removeAccountOperators)
+            {
+                group.ObjectSecurity.RemoveAccess(new SecurityIdentifier(WellKnownSidType.BuiltinAccountOperatorsSid, null), AccessControlType.Allow);
                 group.CommitChanges();
+            }
 
-                if (removeAccountOperators)
-                {
-                    group.ObjectSecurity.RemoveAccess(new SecurityIdentifier(WellKnownSidType.BuiltinAccountOperatorsSid, null), AccessControlType.Allow);
-                    group.CommitChanges();
-                }
-
-                return new ActiveDirectoryGroup(group);
-            });
+            return new ActiveDirectoryGroup(group, this.discoveryServices);
         }
 
         public bool IsPamFeatureEnabled(SecurityIdentifier domainSid, bool forceRefresh)
@@ -372,7 +369,7 @@ namespace Lithnet.AccessManager
                         $"An object {objectName} of type computer was not found in the global catalog");
                 }
 
-                de = new DirectoryEntry($"LDAP://{dn}");
+                de = GetDirectoryEntry(dn, DsNameFormat.DistinguishedName);
             }
             else if (this.IsDistinguishedName(objectName))
             {
@@ -399,7 +396,7 @@ namespace Lithnet.AccessManager
                             $"An object {objectName} of type computer was not found in the global catalog");
                     }
 
-                    de = new DirectoryEntry($"LDAP://{dn}");
+                    de = GetDirectoryEntry(dn, DsNameFormat.DistinguishedName);
                 }
             }
 
@@ -445,7 +442,7 @@ namespace Lithnet.AccessManager
                         $"An object {objectName} of type user was not found in the global catalog");
                 }
 
-                de = new DirectoryEntry($"LDAP://{dn}");
+                de = GetDirectoryEntry(dn, DsNameFormat.DistinguishedName);
             }
 
             if (de == null)
@@ -487,17 +484,15 @@ namespace Lithnet.AccessManager
 
                 if (dn == null)
                 {
-                    throw new ObjectNotFoundException(
-                        $"An object {objectName} of type group was not found in the global catalog");
+                    throw new ObjectNotFoundException($"An object {objectName} of type group was not found in the global catalog");
                 }
 
-                de = new DirectoryEntry($"LDAP://{dn}");
+                de = GetDirectoryEntry(dn, DsNameFormat.DistinguishedName);
             }
 
             if (de == null)
             {
-                throw new ObjectNotFoundException(
-                    $"An object {objectName} of type group was not found in the global catalog");
+                throw new ObjectNotFoundException($"An object {objectName} of type group was not found in the global catalog");
             }
 
             de.ThrowIfNotObjectClass("group");
@@ -538,9 +533,7 @@ namespace Lithnet.AccessManager
                     throw new ObjectNotFoundException($"An object {objectName} of type {objectClass} was not found in the global catalog");
                 }
 
-                var de = new DirectoryEntry($"LDAP://{dn}");
-
-                return de;
+                return GetDirectoryEntry(dn, DsNameFormat.DistinguishedName);
             }
         }
 

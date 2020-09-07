@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
+using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 
 namespace Lithnet.AccessManager.Server.Test
@@ -14,7 +16,7 @@ namespace Lithnet.AccessManager.Server.Test
         [SetUp]
         public void TestInitialize()
         {
-            discoveryServices = new DiscoveryServices();
+            this.discoveryServices = new DiscoveryServices(Mock.Of<ILogger<DiscoveryServices>>());
             directory = new ActiveDirectory(discoveryServices);
         }
 

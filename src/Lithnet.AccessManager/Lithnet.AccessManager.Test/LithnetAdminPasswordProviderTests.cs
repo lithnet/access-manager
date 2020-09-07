@@ -23,7 +23,7 @@ namespace Lithnet.AccessManager.Test
         public void TestInitialize()
         {
             encryptionProvider = new EncryptionProvider();
-            discoveryServices = new DiscoveryServices();
+            this.discoveryServices = new DiscoveryServices(Mock.Of<ILogger<DiscoveryServices>>());
             directory = new ActiveDirectory(discoveryServices);
             certificateProvider = new CertificateProvider(Mock.Of<ILogger<CertificateProvider>>(), directory, Mock.Of<IAppPathProvider>(), discoveryServices);
             provider = new LithnetAdminPasswordProvider(Mock.Of<ILogger<LithnetAdminPasswordProvider>>(), encryptionProvider, certificateProvider);

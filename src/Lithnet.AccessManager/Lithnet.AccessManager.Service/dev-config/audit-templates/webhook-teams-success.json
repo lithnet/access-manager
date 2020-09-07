@@ -24,8 +24,8 @@
           "value": "{computer.MsDsPrincipalName}"
         },
         {
-          "name": "Password expiry",
-          "value": "{computer.LapsExpiryDate}"
+          "name": "Access expiry",
+          "value": "{AuthzResult.AccessExpiryDate}"
         },
         {
           "name": "Matched rule description",

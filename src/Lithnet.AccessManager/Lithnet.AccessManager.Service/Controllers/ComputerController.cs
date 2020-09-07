@@ -327,7 +327,7 @@ namespace Lithnet.AccessManager.Service.Controllers
                     User = user,
                     Computer = computer,
                     EventID = EventIDs.ComputerPasswordActiveAccessGranted,
-                    ComputerExpiryDate = current.ExpiryDate?.ToLocalTime().ToString(CultureInfo.CurrentUICulture)
+                    AccessExpiryDate = current.ExpiryDate?.ToLocalTime().ToString(CultureInfo.CurrentUICulture)
                 });
 
                 return this.View("AccessResponseCurrentPassword", new CurrentPasswordModel()
@@ -472,7 +472,7 @@ namespace Lithnet.AccessManager.Service.Controllers
 
             try
             {
-                TimeSpan grantedAccessLength = this.jitAccessProvider.GrantJitAccess(this.directory.GetGroup(authResponse.AuthorizingGroup), user, authResponse.AllowExtension, authResponse.ExpireAfter, out undo);
+                TimeSpan grantedAccessLength = this.jitAccessProvider.GrantJitAccess(this.directory.GetGroup(authResponse.AuthorizingGroup), user, computer, authResponse.AllowExtension, authResponse.ExpireAfter, out undo);
 
                 DateTime expiryDate = DateTime.Now.Add(grantedAccessLength);
 
@@ -485,7 +485,7 @@ namespace Lithnet.AccessManager.Service.Controllers
                     User = user,
                     Computer = computer,
                     EventID = EventIDs.ComputerJitAccessGranted,
-                    ComputerExpiryDate = expiryDate.ToString(CultureInfo.CurrentCulture)
+                    AccessExpiryDate = expiryDate.ToString(CultureInfo.CurrentCulture)
                 });
 
                 var jitDetails = new JitDetailsModel(computer.MsDsPrincipalName, user.MsDsPrincipalName, expiryDate);

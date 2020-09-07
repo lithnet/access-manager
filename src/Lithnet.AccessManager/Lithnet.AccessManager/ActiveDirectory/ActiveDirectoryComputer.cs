@@ -7,7 +7,7 @@ namespace Lithnet.AccessManager
 {
     public sealed class ActiveDirectoryComputer : IComputer
     {
-        internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "description", "displayName", "objectGuid", "objectSid", "msDS-PrincipalName", "objectClass" };
+        internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "description", "displayName", "objectGuid", "objectSid", "msDS-PrincipalName", "objectClass" , "dNSHostName"};
 
         private readonly DirectoryEntry de;
 
@@ -29,6 +29,8 @@ namespace Lithnet.AccessManager
         public string Description => this.de.GetPropertyString("description");
 
         public string DisplayName => this.de.GetPropertyString("displayName");
+        
+        public string DnsHostName => this.de.GetPropertyString("dNSHostName");
 
         public Guid? Guid => this.de.GetPropertyGuid("objectGuid");
 

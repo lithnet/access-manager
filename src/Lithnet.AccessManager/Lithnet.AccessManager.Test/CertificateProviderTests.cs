@@ -26,7 +26,7 @@ namespace Lithnet.AccessManager.Test
         {
             this.env = new Mock<IAppPathProvider>();
             this.env.SetupGet(t => t.AppPath).Returns(Environment.CurrentDirectory);
-            this.discoveryServices = new DiscoveryServices();
+            this.discoveryServices = new DiscoveryServices(Mock.Of<ILogger<DiscoveryServices>>());
             this.directory = new ActiveDirectory(this.discoveryServices);
             provider = new CertificateProvider(Mock.Of<ILogger<CertificateProvider>>(), directory, env.Object, discoveryServices);
         }

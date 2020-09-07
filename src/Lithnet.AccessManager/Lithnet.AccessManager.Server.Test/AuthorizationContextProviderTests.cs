@@ -23,7 +23,7 @@ namespace Lithnet.AccessManager.Server.Test
         [SetUp()]
         public void TestInitialize()
         {
-            discoveryServices = new DiscoveryServices();
+            this.discoveryServices = new DiscoveryServices(Mock.Of<ILogger<DiscoveryServices>>());
             directory = new ActiveDirectory(discoveryServices);
             logger = Global.LogFactory.CreateLogger<AuthorizationContextProvider>();
         }

@@ -9,7 +9,7 @@ Requestor IP:              {request.IPAddress}
 Requestor Hostname:        {request.HostName}
 Computer name:             {computer.MsDsPrincipalName}
 Computer DN:               {computer.DistinguishedName}
-Password expiry:           {computer.LapsExpiryDate}
+Access expiry:             {AuthzResult.AccessExpiryDate}
 Matched rule:              {AuthzResult.MatchedRule}
 Matched rule description:  {AuthzResult.MatchedRuleDescription}
 AuthZ response:            {AuthzResult.ResponseCode}

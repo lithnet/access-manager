@@ -23,6 +23,6 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         public string Message { get; set; }
 
-        public string ComputerExpiryDate { get; set; }
+        public string AccessExpiryDate { get; set; }
     }
 }

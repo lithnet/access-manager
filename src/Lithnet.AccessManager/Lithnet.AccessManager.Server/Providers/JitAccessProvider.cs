@@ -22,21 +22,21 @@ namespace Lithnet.AccessManager
             this.discoveryServices = discoveryServices;
         }
 
-        public TimeSpan GrantJitAccess(IGroup group, IUser user, bool canExtend, TimeSpan requestedExpiry, out Action undo)
+        public TimeSpan GrantJitAccess(IGroup group, IUser user, IComputer computer, bool canExtend, TimeSpan requestedExpiry, out Action undo)
         {
             this.logger.LogTrace("Adding user {user} to JIT group {group}", user.MsDsPrincipalName, group.MsDsPrincipalName);
 
             if (this.directory.IsPamFeatureEnabled(group.Sid, false))
             {
-                return this.GrantJitAccessPam(group, user, canExtend, requestedExpiry, out undo);
+                return this.GrantJitAccessPam(group, user, computer, canExtend, requestedExpiry, out undo);
             }
             else
             {
-                return this.GrantJitAccessDynamicGroup(group, user, canExtend, requestedExpiry, out undo);
+                return this.GrantJitAccessDynamicGroup(group, user, computer, canExtend, requestedExpiry, out undo);
             }
         }
 
-        public TimeSpan GrantJitAccessDynamicGroup(IGroup group, IUser user, bool canExtend, TimeSpan requestedExpiry, out Action undo)
+        public TimeSpan GrantJitAccessDynamicGroup(IGroup group, IUser user, IComputer computer, bool canExtend, TimeSpan requestedExpiry, out Action undo)
         {
             JitDynamicGroupMapping mapping = this.FindDomainMapping(group);
             string groupName = this.BuildGroupSamAccountName(mapping, user, group);
@@ -47,45 +47,61 @@ namespace Lithnet.AccessManager
 
             this.logger.LogTrace("Processing request to have {user} added to the JIT group {group} via dynamicObject {dynamicGroup}", user.MsDsPrincipalName, group.Path, fqGroupName);
 
-            if (directory.TryGetGroup(fqGroupName, out IGroup dynamicGroup))
+            IGroup dynamicGroup = null;
+
+            this.discoveryServices.FindDcAndExecuteWithRetry(computer.DnsHostName ?? computer.SamAccountName.TrimEnd('$'), this.discoveryServices.GetDomainNameDns(mapping.GroupOU), Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | Interop.DsGetDcNameFlags.DS_WRITABLE_REQUIRED, dc =>
             {
-                this.logger.LogTrace("Dynamic group {dynamicGroup} already exists in the directory with a remaining ttl of {ttl}", dynamicGroup.Path, dynamicGroup.EntryTtl);
+                this.logger.LogTrace("Attempting to perform dynamic group operation against DC {dc}", dc);
 
-                if (!canExtend)
-                {
-                    this.logger.LogTrace("User {user} is not permitted to extend the access, so the ttl will remain unchanged", user.MsDsPrincipalName);
-                    grantedExpiry = dynamicGroup.EntryTtl ?? new TimeSpan();
-                }
-                else
-                {
-                    dynamicGroup.ExtendTtl(requestedExpiry);
-                    this.logger.LogTrace("User {user} is permitted to extend the access, so the ttl will was updated to {ttl}", user.MsDsPrincipalName, requestedExpiry);
-                }
-            }
-            else
-            {
-                this.logger.LogTrace("Creating a new dynamic group {groupName} in {ou} with ttl of {ttl}", groupName, mapping.GroupOU, grantedExpiry);
-                dynamicGroup = this.directory.CreateTtlGroup(groupName, groupName, description, mapping.GroupOU, grantedExpiry, mapping.GroupType, true);
-                this.logger.LogInformation(EventIDs.JitDynamicGroupCreated, "Created a new dynamic group {groupName} in {ou} with ttl of {ttl}", groupName, mapping.GroupOU, grantedExpiry);
-            }
+                group.RetargetToDc(dc);
 
-            this.logger.LogTrace("Adding user {user} to dynamic group {dynamicGroup}", user.MsDsPrincipalName, dynamicGroup.Path);
-            dynamicGroup.AddMember(user);
+                 if (directory.TryGetGroup(fqGroupName, out dynamicGroup))
+                 {
+                     dynamicGroup.RetargetToDc(dc);
 
-            this.logger.LogTrace("Adding dynamic group {dynamicGroup} to the JIT group {jitGroup}", dynamicGroup.Path, group.Path);
-            group.AddMember(dynamicGroup);
+                    this.logger.LogTrace("Dynamic group {dynamicGroup} already exists in the directory with a remaining TTL of {ttl}", dynamicGroup.Path, dynamicGroup.EntryTtl);
+
+                     if (!canExtend)
+                     {
+                         this.logger.LogTrace("User {user} is not permitted to extend the access, so the TTL will remain unchanged", user.MsDsPrincipalName);
+                         grantedExpiry = dynamicGroup.EntryTtl ?? new TimeSpan();
+                     }
+                     else
+                     {
+                         dynamicGroup.ExtendTtl(requestedExpiry);
+                         this.logger.LogTrace("User {user} is permitted to extend the access, so the TTL will was updated to {ttl}", user.MsDsPrincipalName, requestedExpiry);
+                     }
+                 }
+                 else
+                 {
+                     this.logger.LogTrace("Creating a new dynamic group {groupName} in {ou} with TTL of {ttl}", groupName, mapping.GroupOU, grantedExpiry);
+                     dynamicGroup = this.directory.CreateTtlGroup(groupName, groupName, description, mapping.GroupOU, dc, grantedExpiry, mapping.GroupType, true);
+                     this.logger.LogInformation(EventIDs.JitDynamicGroupCreated, "Created a new dynamic group {group}", dynamicGroup.Path, grantedExpiry);
+                 }
+
+                 this.logger.LogTrace("Adding user {user} to dynamic group {dynamicGroup}", user.MsDsPrincipalName, dynamicGroup.Path);
+                 dynamicGroup.AddMember(user);
+
+                 this.logger.LogTrace("Adding dynamic group {dynamicGroup} to the JIT group {jitGroup}", dynamicGroup.Path, group.Path);
+                 group.AddMember(dynamicGroup);
+
+                 return true;
+             });
 
             undo = () =>
             {
-                this.logger.LogTrace("Rolling back JIT access by deleting dynamic group {dynamicGroup} created for {user} to become a member of {group}", dynamicGroup.MsDsPrincipalName, user.MsDsPrincipalName, group.MsDsPrincipalName);
-                this.directory.DeleteGroup(fqGroupName);
-                this.logger.LogInformation(EventIDs.JitDynamicGroupDeleted, "Rolled back JIT access by deleting dynamic group {dynamicGroup} created for {user} to become a member of {group}", dynamicGroup.MsDsPrincipalName, user.MsDsPrincipalName, group.MsDsPrincipalName);
+                if (dynamicGroup != null)
+                {
+                    this.logger.LogTrace("Rolling back JIT access by deleting dynamic group {dynamicGroup} created for {user} to become a member of {group}", dynamicGroup?.MsDsPrincipalName, user.MsDsPrincipalName, group.MsDsPrincipalName);
+                    this.directory.DeleteGroup(fqGroupName);
+                    this.logger.LogInformation(EventIDs.JitDynamicGroupDeleted, "Rolled back JIT access by deleting dynamic group {dynamicGroup} created for {user} to become a member of {group}", dynamicGroup?.MsDsPrincipalName, user.MsDsPrincipalName, group.MsDsPrincipalName);
+                }
             };
 
             return grantedExpiry;
         }
 
-        public TimeSpan GrantJitAccessPam(IGroup group, IUser user, bool canExtend, TimeSpan requestedExpiry, out Action undo)
+        public TimeSpan GrantJitAccessPam(IGroup group, IUser user, IComputer computer, bool canExtend, TimeSpan requestedExpiry, out Action undo)
         {
             TimeSpan? existingTtl = group.GetMemberTtl(user);
 
@@ -101,8 +117,18 @@ namespace Lithnet.AccessManager
                 return existingTtl.Value;
             }
 
-            group.AddMember(user, requestedExpiry);
-            this.logger.LogInformation(EventIDs.JitPamAccessGranted, "User {user} was added to group {group} with a membership expiry of {ttl}", user.MsDsPrincipalName, group.MsDsPrincipalName, requestedExpiry);
+            this.discoveryServices.FindDcAndExecuteWithRetry(computer.DnsHostName ?? computer.SamAccountName.TrimEnd('$'), this.discoveryServices.GetDomainNameDns(group.Sid), Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | Interop.DsGetDcNameFlags.DS_WRITABLE_REQUIRED, dc =>
+            {
+                this.logger.LogTrace("Attempting to perform pam group operation against DC {dc}", dc);
+                group.RetargetToDc(dc);
+
+                this.logger.LogTrace("Adding user {user} to group {group}", user.MsDsPrincipalName, group.Path);
+
+                group.AddMember(user, requestedExpiry);
+                this.logger.LogInformation(EventIDs.JitPamAccessGranted, "User {user} was added to group {group} with a membership expiry of {ttl}", user.MsDsPrincipalName, group.MsDsPrincipalName, requestedExpiry);
+
+                return true;
+            });
 
             undo = () =>
             {

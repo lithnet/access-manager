@@ -27,7 +27,7 @@ namespace Lithnet.AccessManager.Agent.Test
         [SetUp()]
         public void TestInitialize()
         {
-            this.discoveryServices = new DiscoveryServices();
+            this.discoveryServices = new DiscoveryServices(Mock.Of<ILogger<DiscoveryServices>>());
             this.directory = new ActiveDirectory(this.discoveryServices);
             this.sam = new LocalSam(Mock.Of<ILogger<LocalSam>>());
             this.mockSam = new Mock<ILocalSam>();

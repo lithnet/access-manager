@@ -28,7 +28,7 @@
         },
         {
           "type": "mrkdwn",
-          "text": "*Password expiry:*\n{computer.LapsExpiryDate}"
+          "text": "*Access expiry:*\n{AuthzResult.AccessExpiryDate}"
         },
         {
           "type": "mrkdwn",

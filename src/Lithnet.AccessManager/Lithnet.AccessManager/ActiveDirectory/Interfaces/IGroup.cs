@@ -5,6 +5,8 @@ namespace Lithnet.AccessManager
 {
     public interface IGroup : ISecurityPrincipal
     {
+        void RetargetToDc(string dc);
+
         void AddMember(ISecurityPrincipal principal);
 
         void AddMember(ISecurityPrincipal principal, TimeSpan ttl);

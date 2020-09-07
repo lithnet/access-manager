@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using Castle.Core.Logging;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.Security.Authorization;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
@@ -10,8 +12,6 @@ namespace Lithnet.AccessManager.Server.Test
 {
     public class AceTests
     {
-        private Mock<NLog.ILogger> dummyLogger;
-
         private IDirectory directory;
 
         private IDiscoveryServices discoveryServices;
@@ -19,10 +19,8 @@ namespace Lithnet.AccessManager.Server.Test
         [SetUp()]
         public void TestInitialize()
         {
-            this.discoveryServices = new DiscoveryServices();
+            this.discoveryServices = new DiscoveryServices(Mock.Of<ILogger<DiscoveryServices>>());
             this.directory = new ActiveDirectory(discoveryServices);
-
-            dummyLogger = new Mock<NLog.ILogger>();
         }
 
         /// <summary>

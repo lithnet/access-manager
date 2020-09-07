@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
@@ -15,9 +16,9 @@ namespace Lithnet.AccessManager.Test
         [SetUp()]
         public void TestInitialize()
         {
-            discoveryServices = new DiscoveryServices();
+            this.discoveryServices = new DiscoveryServices(Mock.Of<ILogger<DiscoveryServices>>());
             directory = new ActiveDirectory(discoveryServices);
-            provider = new MsMcsAdmPwdProvider(Mock.Of<Microsoft.Extensions.Logging.ILogger<MsMcsAdmPwdProvider>>());
+            provider = new MsMcsAdmPwdProvider(Mock.Of<ILogger<MsMcsAdmPwdProvider>>());
         }
 
         [TestCase("IDMDEV1\\PC1")]

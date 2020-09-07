@@ -10,6 +10,8 @@ namespace Lithnet.AccessManager
 
         string DisplayName { get; }
 
+        string DnsHostName { get; }
+
         DirectoryEntry DirectoryEntry { get; }
 
         IEnumerable<Guid> GetParentGuids();

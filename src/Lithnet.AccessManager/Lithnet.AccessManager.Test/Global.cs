@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using NUnit.Framework;
 
-namespace Lithnet.AccessManager.Server.Test
+namespace Lithnet.AccessManager.Test
 {
     [SetUpFixture]
     public class Global

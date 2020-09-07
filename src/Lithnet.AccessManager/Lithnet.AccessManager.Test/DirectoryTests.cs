@@ -6,9 +6,10 @@ using System.Security.Principal;
 using System.Threading;
 using Lithnet.AccessManager.Interop;
 using Lithnet.Security.Authorization;
+using Microsoft.Extensions.Logging;
 using Moq;
-using NLog;
 using NUnit.Framework;
+using ILogger = NLog.ILogger;
 
 namespace Lithnet.AccessManager.Test
 {
@@ -28,7 +29,7 @@ namespace Lithnet.AccessManager.Test
         [SetUp()]
         public void TestInitialize()
         {
-            this.discoveryServices = new DiscoveryServices();
+            this.discoveryServices = new DiscoveryServices(Mock.Of<ILogger<DiscoveryServices>>());
             dummyLogger = new Mock<ILogger>();
             this.directory = new ActiveDirectory(this.discoveryServices);
         }
@@ -265,7 +266,9 @@ namespace Lithnet.AccessManager.Test
         [Test]
         public void CreateTtlTestGroup()
         {
-            this.directory.CreateTtlGroup("G-DL-Test-TTL", "G-DL-Test-TTL", "TTL test group", "OU=Computers,OU=Laps Testing,DC=idmdev1,DC=local", TimeSpan.FromMinutes(1), GroupType.DomainLocal, true);
+            string dc = discoveryServices.GetDomainController("idmdev1.local");
+
+            this.directory.CreateTtlGroup("G-DL-Test-TTL", "G-DL-Test-TTL", "TTL test group", "OU=Computers,OU=Laps Testing,DC=idmdev1,DC=local", dc, TimeSpan.FromMinutes(1), GroupType.DomainLocal, true);
         }
 
         [Test]
@@ -334,8 +337,8 @@ namespace Lithnet.AccessManager.Test
         public void AddGroupMemberToTtlGroup()
         {
             string groupName = TestContext.CurrentContext.Random.GetString(10, "abcdefghijklmnop");
-
-            this.directory.CreateTtlGroup(groupName, groupName, "TTL test group 2", "OU=Laps Testing,DC=idmdev1,DC=local", TimeSpan.FromMinutes(1), GroupType.DomainLocal, true);
+            string dc = discoveryServices.GetDomainController("idmdev1.local");
+            this.directory.CreateTtlGroup(groupName, groupName, "TTL test group 2", "OU=Laps Testing,DC=idmdev1,DC=local", dc, TimeSpan.FromMinutes(1), GroupType.DomainLocal, true);
 
             Thread.Sleep(20000);
             IGroup group = this.directory.GetGroup($"IDMDEV1\\{groupName}");

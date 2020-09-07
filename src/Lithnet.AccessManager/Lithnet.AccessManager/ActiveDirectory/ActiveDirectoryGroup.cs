@@ -11,18 +11,29 @@ namespace Lithnet.AccessManager
 {
     public sealed class ActiveDirectoryGroup : IGroup
     {
-        private readonly DirectoryEntry de;
+        private DirectoryEntry de;
 
-        private static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "tokenGroups", "displayName", "objectGuid", "objectSid", "samAccountName", "msDS-PrincipalName", "objectClass", "entryTTL" };
+        private static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "displayName", "objectGuid", "objectSid", "samAccountName", "msDS-PrincipalName", "objectClass", "entryTTL" };
 
         private readonly IDiscoveryServices discoveryServices;
 
-        public ActiveDirectoryGroup(DirectoryEntry directoryEntry)
+        public ActiveDirectoryGroup(DirectoryEntry directoryEntry, IDiscoveryServices discoveryServices)
         {
             directoryEntry.ThrowIfNotObjectClass("group");
             this.de = directoryEntry;
             this.de.RefreshCache(PropertiesToGet);
-            this.discoveryServices = new DiscoveryServices();
+            this.discoveryServices = discoveryServices;
+        }
+
+        public void RetargetToDc(string dc)
+        {
+            string newPath = $"LDAP://{dc}/{this.DistinguishedName}";
+
+            if (!string.Equals(newPath, this.Path, StringComparison.OrdinalIgnoreCase))
+            {
+                this.de = new DirectoryEntry(newPath);
+                this.de.RefreshCache(PropertiesToGet);
+            }
         }
 
         public string Path => this.de.Path;
@@ -71,7 +82,7 @@ namespace Lithnet.AccessManager
 
                 var connection = new LdapConnection(directory);
 
-                List<string> attributesToGet = new List<string>() {"member"};
+                List<string> attributesToGet = new List<string>() { "member" };
 
                 SearchRequest r = new SearchRequest(
                     this.DistinguishedName,

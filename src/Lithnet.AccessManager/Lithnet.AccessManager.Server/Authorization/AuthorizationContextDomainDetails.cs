@@ -38,7 +38,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             {
                 return new AuthorizationServer
                 {
-                    Name = this.discoveryServices.GetDomainController(this.DomainDnsName, Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_8_REQUIRED | (requireNew ? Interop.DsGetDcNameFlags.DS_FORCE_REDISCOVERY : 0)),
+                    Name = this.discoveryServices.GetDomainController(null, this.DomainDnsName, Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_8_REQUIRED | (requireNew ? Interop.DsGetDcNameFlags.DS_FORCE_REDISCOVERY : 0)),
                     Type = AuthorizationServerType.Default
                 };
             }

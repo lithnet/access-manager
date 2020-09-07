@@ -32,7 +32,7 @@ namespace Lithnet.AccessManager.Test
         public void TestInitialize()
         {
             sam = new LocalSam(Mock.Of<ILogger<LocalSam>>());
-            discoveryServices = new DiscoveryServices();
+            this.discoveryServices = new DiscoveryServices(Mock.Of<ILogger<DiscoveryServices>>());
             directory = new ActiveDirectory(discoveryServices);
         }
 

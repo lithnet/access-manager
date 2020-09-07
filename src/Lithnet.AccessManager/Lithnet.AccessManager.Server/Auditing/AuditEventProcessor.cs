@@ -123,12 +123,13 @@ namespace Lithnet.AccessManager.Service.Internal
                 { "{AuthzResult.ResponseCode}", action.AuthzResponse?.Code.ToString()},
                 { "{AuthzResult.AccessType}", action.AuthzResponse?.EvaluatedAccess.ToString()},
                 { "{AuthzResult.AccessTypeDescription}", action.AuthzResponse?.EvaluatedAccess.ToDescription()},
+                { "{AuthZResult.AccessExpiryDate}", action.AccessExpiryDate},
                 { "{message}", action.Message},
                 { "{request.IPAddress}", httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString()},
                 { "{request.Hostname}", this.TryResolveHostName(httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress)},
                 { "{datetime}", DateTime.Now.ToString(CultureInfo.CurrentCulture)},
                 { "{datetimeutc}", DateTime.UtcNow.ToString(CultureInfo.CurrentCulture)},
-                { "{computer.LapsExpiryDate}", action.ComputerExpiryDate},
+                { "{computer.LapsExpiryDate}", action.AccessExpiryDate}, //deprecated
             };
 
             return pairs;
@@ -153,7 +154,7 @@ namespace Lithnet.AccessManager.Service.Internal
 
             try
             {
-                return Dns.GetHostEntry(address)?.HostName;
+                return Dns.GetHostEntry(address).HostName;
             }
             catch
             {

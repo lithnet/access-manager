@@ -17,17 +17,23 @@ namespace Lithnet.AccessManager
 
         T FindDcAndExecuteWithRetry<T>(string domain, Func<string, T> action);
 
-        T FindDcAndExecuteWithRetry<T>(string domain, DsGetDcNameFlags flags, Func<string, T> action);
+        T FindDcAndExecuteWithRetry<T>(string domain,  DsGetDcNameFlags flags, Func<string, T> action);
+
+        T FindDcAndExecuteWithRetry<T>(string server, string domain, DsGetDcNameFlags flags, Func<string, T> action);
 
         T FindGcAndExecuteWithRetry<T>(string domain, Func<string, T> action);
 
         DirectoryEntry GetConfigurationNamingContext(string dnsDomain);
 
+        string GetComputerSiteName(string computerName);
+
+        bool TryGetComputerSiteName(string computerName, out string siteName);
+
         string GetDomainController(string domainDns);
 
         string GetDomainController(string domainDns, bool forceRediscovery);
 
-        string GetDomainController(string domainDns, DsGetDcNameFlags flags);
+        string GetDomainController(string server, string domainDns, DsGetDcNameFlags flags);
 
         string GetDomainControllerFromDN(string dn);
 

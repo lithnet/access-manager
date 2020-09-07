@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
@@ -19,7 +20,7 @@ namespace Lithnet.AccessManager.Test
         {
             this.env = new Mock<IAppPathProvider>();
             this.env.SetupGet(t => t.AppPath).Returns(Environment.CurrentDirectory);
-            this.discoveryServices = new DiscoveryServices();
+            this.discoveryServices = new DiscoveryServices(Mock.Of<ILogger<DiscoveryServices>>());
             this.directory = new ActiveDirectory(discoveryServices);
             this.resolver = new JitAccessGroupResolver(directory, discoveryServices);
         }

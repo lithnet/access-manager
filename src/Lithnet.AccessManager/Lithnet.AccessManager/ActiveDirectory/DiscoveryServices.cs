@@ -7,6 +7,7 @@ using System.DirectoryServices.ActiveDirectory;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Lithnet.AccessManager.Interop;
+using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager
 {
@@ -16,6 +17,14 @@ namespace Lithnet.AccessManager
 
         private static readonly ConcurrentDictionary<SecurityIdentifier, string> domainDnsCache = new ConcurrentDictionary<SecurityIdentifier, string>();
         private static readonly ConcurrentDictionary<SecurityIdentifier, string> domainNetBiosCache = new ConcurrentDictionary<SecurityIdentifier, string>();
+        private static readonly ConcurrentDictionary<string, string> dcCache = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        private readonly ILogger logger;
+
+        public DiscoveryServices(ILogger<DiscoveryServices> logger)
+        {
+            this.logger = logger;
+        }
 
         public void FindDcAndExecuteWithRetry(Action<string> action)
         {
@@ -51,6 +60,11 @@ namespace Lithnet.AccessManager
 
         public T FindDcAndExecuteWithRetry<T>(string domain, DsGetDcNameFlags flags, Func<string, T> action)
         {
+            return this.FindDcAndExecuteWithRetry(null, domain, flags, action);
+        }
+
+        public T FindDcAndExecuteWithRetry<T>(string server, string domain, DsGetDcNameFlags flags, Func<string, T> action)
+        {
             int retryCount = 0;
             Exception lastException = null;
             HashSet<string> attemptedDCs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -60,10 +74,12 @@ namespace Lithnet.AccessManager
                 domain = Domain.GetComputerDomain().Name;
             }
 
-            string dc = this.GetDomainController(domain, false);
+            string dc = this.GetDomainController(server, domain, flags);
 
             while (retryCount < MaxRetry && attemptedDCs.Add(dc))
             {
+                //this.logger.LogTrace("Attempting to execute operation in domain {domain} against DC {dc}", domain, dc);
+
                 try
                 {
                     return action.Invoke(dc);
@@ -72,18 +88,33 @@ namespace Lithnet.AccessManager
                 {
                     lastException = ex;
                 }
-                catch (Win32Exception ex) when (ex.HResult == -2147467259) //RPC_NOT_AVAILABLE
+                catch (Win32Exception we) when (we.HResult == -2147467259            // RPC_NOT_AVAILABLE 
+                                                || we.NativeErrorCode == 0x000020E1  // ERROR_DS_GCVERIFY_ERROR 
+                                                || we.NativeErrorCode == 0x0000200E  // ERROR_DS_BUSY
+                                                || we.NativeErrorCode == 0x0000200F  // ERROR_DS_UNAVAILABLE
+                                                || we.NativeErrorCode == 0x0000203A  // ERROR_DS_SERVER_DOWN
+                                                )
                 {
-                    lastException = ex;
+                    lastException = we;
                 }
-                catch (Exception ex) when (ex.InnerException is Win32Exception we && we.HResult == -2147467259) //RPC_NOT_AVAILABLE
+                catch (Exception ex) when (ex.InnerException is Win32Exception we &&
+                                           (we.HResult == -2147467259            // RPC_NOT_AVAILABLE 
+                                            || we.NativeErrorCode == 0x000020E1  // ERROR_DS_GCVERIFY_ERROR 
+                                            || we.NativeErrorCode == 0x0000200E  // ERROR_DS_BUSY
+                                            || we.NativeErrorCode == 0x0000200F  // ERROR_DS_UNAVAILABLE
+                                            || we.NativeErrorCode == 0x0000203A  // ERROR_DS_SERVER_DOWN
+                                            ))
                 {
                     lastException = ex;
                 }
 
-                dc = this.GetDomainController(domain, flags | DsGetDcNameFlags.DS_FORCE_REDISCOVERY);
+                this.logger.LogTrace(lastException, "Operation failed in domain {domain} against DC {dc} due to retry-able error", domain, dc);
+
+                dc = this.GetDomainController(server, domain, flags | DsGetDcNameFlags.DS_FORCE_REDISCOVERY);
                 retryCount++;
             }
+
+            dcCache.TryRemove(BuildDcCacheKey(server, domain, flags), out _);
 
             if (lastException != null)
             {
@@ -93,6 +124,11 @@ namespace Lithnet.AccessManager
             {
                 throw new DirectoryException("Unable to execute command against DC");
             }
+        }
+
+        private static string BuildDcCacheKey(string server, string domain, DsGetDcNameFlags flags)
+        {
+            return $"{server}{domain}{flags}";
         }
 
         private string GetContextDn(string contextName, string dnsDomain)
@@ -120,6 +156,25 @@ namespace Lithnet.AccessManager
         public DirectoryEntry GetSchemaNamingContext(string dnsDomain)
         {
             return new DirectoryEntry($"LDAP://{this.GetContextDn("schemaNamingContext", dnsDomain)}");
+        }
+
+        public string GetComputerSiteName(string computerName)
+        {
+            return NativeMethods.GetComputerSiteName(computerName);
+        }
+
+        public bool TryGetComputerSiteName(string computerName, out string siteName)
+        {
+            siteName = null;
+            try
+            {
+                siteName = this.GetComputerSiteName(computerName);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public string GetDomainNameNetBios(SecurityIdentifier sid)
@@ -165,17 +220,51 @@ namespace Lithnet.AccessManager
 
         public string GetDomainController(string domainDns)
         {
-            return NativeMethods.GetDomainControllerForDnsDomain(domainDns, false);
+            return this.GetDomainController(null, domainDns, DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED);
         }
 
         public string GetDomainController(string domainDns, bool forceRediscovery)
         {
-            return NativeMethods.GetDomainControllerForDnsDomain(domainDns, forceRediscovery);
+            return this.GetDomainController(null, domainDns, DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | DsGetDcNameFlags.DS_FORCE_REDISCOVERY);
         }
 
-        public string GetDomainController(string domainDns, DsGetDcNameFlags flags)
+        public string GetDomainController(string server, string domainDns, DsGetDcNameFlags flags)
         {
-            return NativeMethods.GetDomainControllerForDnsDomain(domainDns, flags);
+            string key = BuildDcCacheKey(server, domainDns, flags);
+
+            if (flags.HasFlag(DsGetDcNameFlags.DS_FORCE_REDISCOVERY))
+            {
+                return dcCache.AddOrUpdate(
+                    key,
+                    a => this.GetDc(server, domainDns, flags),
+                    (a, b) =>
+                    {
+                        this.logger.LogTrace("New DC requested");
+                        return this.GetDc(server, domainDns, flags);
+                    });
+            }
+
+            return dcCache.GetOrAdd(key, k => this.GetDc(server, domainDns, flags));
+        }
+
+        private string GetDc(string server, string domainDns, DsGetDcNameFlags flags)
+        {
+            string dc;
+
+            try
+            {
+                this.logger.LogTrace("Finding domain controller for server {server}, domain {domainDns} with flags {flags}", server, domainDns, flags.ToString());
+                dc = NativeMethods.GetDomainControllerForDnsDomain(server, domainDns, null, flags);
+                this.logger.LogTrace("DC locator found DC {dc} for domain {domainDns}, with flags {flags}", dc, domainDns, flags.ToString());
+            }
+            catch (DirectoryException dex) when (dex.InnerException is Win32Exception wex && wex.NativeErrorCode == 1722 && server != null)
+            {
+                this.logger.LogWarning(dex, "Could not connect to server {server} to find DC, local machine will be used to find a DC", server);
+                dc = NativeMethods.GetDomainControllerForDnsDomain(null, domainDns, null, flags);
+                this.logger.LogTrace("DC locator found DC {dc} for domain {domainDns}, with flags {flags}", dc, domainDns, flags.ToString());
+            }
+
+            return dc;
         }
 
         public string GetDomainControllerFromDNOrDefault(string dn)

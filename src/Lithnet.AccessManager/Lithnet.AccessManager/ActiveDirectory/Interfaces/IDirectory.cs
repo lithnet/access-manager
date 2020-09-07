@@ -9,7 +9,7 @@ namespace Lithnet.AccessManager
 {
     public interface IDirectory
     {
-        IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, TimeSpan ttl, GroupType groupType, bool removeAccountOperators);
+        IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, string targetDc, TimeSpan ttl, GroupType groupType, bool removeAccountOperators);
 
         IComputer GetComputer(string name);
 

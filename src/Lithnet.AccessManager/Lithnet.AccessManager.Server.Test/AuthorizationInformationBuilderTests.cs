@@ -32,7 +32,7 @@ namespace Lithnet.AccessManager.Server.Test
         [SetUp()]
         public void TestInitialize()
         {
-            discoveryServices = new DiscoveryServices();
+            this.discoveryServices = new DiscoveryServices(Mock.Of<ILogger<DiscoveryServices>>());
             directory = new ActiveDirectory(discoveryServices);
             cache = new AuthorizationInformationMemoryCache();
             logger = Global.LogFactory.CreateLogger<AuthorizationInformationBuilder>();

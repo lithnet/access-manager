@@ -23,7 +23,8 @@ namespace Lithnet.AccessManager.Interop
         private static extern int DsUnBind(IntPtr hds);
 
         [DllImport("ntdsapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern int DsCrackNames(IntPtr hds, DsNameFlags flags, DsNameFormat formatOffered, DsNameFormat formatDesired, uint cNames, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPTStr, SizeParamIndex = 4)] string[] rpNames, out IntPtr ppResult);
+        private static extern int DsCrackNames(IntPtr hds, DsNameFlags flags, DsNameFormat formatOffered, DsNameFormat formatDesired, uint cNames, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPTStr, SizeParamIndex = 4)]
+            string[] rpNames, out IntPtr ppResult);
 
         [DllImport("ntdsapi.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern void DsFreeNameResult(IntPtr pResult);
@@ -41,7 +42,9 @@ namespace Lithnet.AccessManager.Interop
         private static extern int NetApiBufferFree(IntPtr buffer);
 
         [DllImport("NetAPI32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern int NetLocalGroupGetMembers([MarshalAs(UnmanagedType.LPWStr)] string servername, [MarshalAs(UnmanagedType.LPWStr)] string localgroupname, int level, out IntPtr bufptr, int prefmaxlen, out int entriesread, out int totalentries, IntPtr resume_handle);
+        private static extern int NetLocalGroupGetMembers([MarshalAs(UnmanagedType.LPWStr)]
+            string servername, [MarshalAs(UnmanagedType.LPWStr)]
+            string localgroupname, int level, out IntPtr bufptr, int prefmaxlen, out int entriesread, out int totalentries, IntPtr resume_handle);
 
         [DllImport("netapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern int NetLocalGroupAddMember(string server, string groupName, IntPtr sid);
@@ -56,7 +59,9 @@ namespace Lithnet.AccessManager.Interop
         private static extern int LsaQueryInformationPolicy(IntPtr pPolicyHandle, PolicyInformationClass informationClass, out IntPtr pData);
 
         [DllImport("advapi32.dll", SetLastError = true, PreserveSig = true, CharSet = CharSet.Unicode)]
-        private static extern int LsaOpenPolicy([In] in IntPtr pSystemName, [In] in LsaObjectAttributes objectAttributes, LsaAccessPolicy desiredAccess, out IntPtr pPolicyHandle);
+        private static extern int LsaOpenPolicy([In]
+            in IntPtr pSystemName, [In]
+            in LsaObjectAttributes objectAttributes, LsaAccessPolicy desiredAccess, out IntPtr pPolicyHandle);
 
         [DllImport("advapi32.dll", CharSet = CharSet.Unicode)]
         private static extern int LsaClose(IntPtr hPolicy);
@@ -66,6 +71,35 @@ namespace Lithnet.AccessManager.Interop
 
         [DllImport("advapi32.dll", SetLastError = true)]
         private static extern int LsaFreeMemory(IntPtr buffer);
+
+        [DllImport("netapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        private static extern int DsGetSiteName(string computerName, out IntPtr siteName);
+
+        private const int ERROR_SUCCESS = 0;
+
+        public static string GetComputerSiteName(string computerName)
+        {
+            IntPtr pSiteName = IntPtr.Zero;
+
+            try
+            {
+                int result = DsGetSiteName(computerName, out pSiteName);
+
+                if (result != 0)
+                {
+                    throw new Win32Exception(result);
+                }
+
+                return Marshal.PtrToStringUni(pSiteName);
+            }
+            finally
+            {
+                if (pSiteName != IntPtr.Zero)
+                {
+                    NetApiBufferFree(pSiteName);
+                }
+            }
+        }
 
         public static SecurityIdentifier GetLocalMachineAuthoritySid()
         {
@@ -266,18 +300,7 @@ namespace Lithnet.AccessManager.Interop
             }
         }
 
-        public static string GetDomainControllerForDnsDomain(string dnsDomain)
-        {
-            return GetDomainControllerForDnsDomain(dnsDomain, false);
-        }
-
-        public static string GetDomainControllerForDnsDomain(string dnsDomain, bool forceRediscovery)
-        {
-            var flags = DsGetDcNameFlags.DS_FORCE_REDISCOVERY;
-            return GetDomainControllerForDnsDomain(dnsDomain, flags);
-        }
-
-        public static string GetDomainControllerForDnsDomain(string dnsDomain, DsGetDcNameFlags flags)
+        public static string GetDomainControllerForDnsDomain(string computerName, string dnsDomain, string siteName, DsGetDcNameFlags flags)
         {
             IntPtr pdcInfo = IntPtr.Zero;
 
@@ -294,7 +317,7 @@ namespace Lithnet.AccessManager.Interop
 
             try
             {
-                int result = DsGetDcName(null, dnsDomain, IntPtr.Zero, null, flags, out pdcInfo);
+                int result = DsGetDcName(computerName, dnsDomain, IntPtr.Zero, siteName, flags, out pdcInfo);
 
                 if (result != 0)
                 {

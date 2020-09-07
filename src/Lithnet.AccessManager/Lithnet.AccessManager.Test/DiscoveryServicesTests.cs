@@ -1,4 +1,6 @@
 ﻿using System.Security.Principal;
+using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 
 namespace Lithnet.AccessManager.Test
@@ -10,7 +12,7 @@ namespace Lithnet.AccessManager.Test
         [SetUp()]
         public void TestInitialize()
         {
-            this.discoveryServices = new DiscoveryServices();
+            this.discoveryServices = new DiscoveryServices(Global.LogFactory.CreateLogger<DiscoveryServices>());
         }
 
         [TestCase("idmdev1.local", "CN=Configuration,DC=IDMDEV1,DC=local")]
@@ -91,6 +93,26 @@ namespace Lithnet.AccessManager.Test
         public void GetDomainControllerFromDN(string dn, string expected)
         {
             StringAssert.AreEqualIgnoringCase(expected, discoveryServices.GetDomainControllerFromDN(dn));
+        }
+
+
+        [TestCase("IDMD1AD1.idmdev1.local", "idmdev1.local", "IDMD1AD1.IDMDEV1.LOCAL")]
+        [TestCase("PC1.idmdev1.local", "idmdev1.local", "IDMD1AD1.IDMDEV1.LOCAL")]
+        [TestCase("IDMD1AD2.subdev1.idmdev1.local", "subdev1.idmdev1.local", "IDMD1AD2.SUBDEV1.IDMDEV1.LOCAL")]
+        [TestCase("IDMD1AD3.extdev1.local", "extdev1.local", "IDMD1AD3.EXTDEV1.LOCAL")]
+        public void GetDomainControllerForComputer(string computerName, string domain, string expected)
+        {
+            StringAssert.AreEqualIgnoringCase(expected, discoveryServices.GetDomainController(computerName, domain, Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED));
+        }
+
+        [TestCase("IDMD1AD1", "IDMDEV1-Default-Site")]
+        [TestCase("IDMD1AD3", "EXTDEV1-Default-Site")]
+        [TestCase("IDMD1AD1.idmdev1.local", "IDMDEV1-Default-Site")]
+        [TestCase("IDMD1AD2.subdev1.idmdev1.local", "IDMDEV1-Default-Site")]
+        [TestCase("IDMD1AD3.extdev1.local", "EXTDEV1-Default-Site")]
+        public void GetSiteForComputer(string computer, string expected)
+        {
+            StringAssert.AreEqualIgnoringCase(expected, discoveryServices.GetComputerSiteName(computer));
         }
     }
 }

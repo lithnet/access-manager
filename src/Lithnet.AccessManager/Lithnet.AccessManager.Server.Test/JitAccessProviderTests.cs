@@ -29,24 +29,24 @@ namespace Lithnet.AccessManager.Server.Test
         [SetUp()]
         public void TestInitialize()
         {
-            discoveryServices = new DiscoveryServices();
+            this.discoveryServices = new DiscoveryServices(Global.LogFactory.CreateLogger<DiscoveryServices>());
             directory = new ActiveDirectory(discoveryServices);
             options = new JitConfigurationOptions
             {
                 DynamicGroupMappings = new List<JitDynamicGroupMapping>()
             };
-         
+
             logger = Global.LogFactory.CreateLogger<JitAccessProvider>();
         }
 
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        public void CreateDynamicGroup(string groupou, string jitGroupName, string userName)
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\PC1$", "IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\PC1$", "IDMDEV1\\JIT-PC1", "SUBDEV1\\user1")]
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\PC1$", "SUBDEV1\\JIT-PC1", "SUBDEV1\\user1")]
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\PC1$", "SUBDEV1\\JIT-PC1", "IDMDEV1\\user1")]
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\PC1$", "EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\PC1$", "EXTDEV1\\JIT-PC1", "IDMDEV1\\user1")]
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\PC1$", "EXTDEV1\\JIT-PC1", "SUBDEV1\\user1")]
+        public void CreateDynamicGroup(string groupou, string computerName, string jitGroupName, string userName)
         {
             string groupname = Guid.NewGuid().ToString();
             string fqGroupName = $"{jitGroupName.Split('\\')[0]}\\{groupname}";
@@ -54,6 +54,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
+            IComputer computer = directory.GetComputer(computerName);
 
             options.DynamicGroupMappings.Add(new JitDynamicGroupMapping()
             {
@@ -64,7 +65,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            provider.GrantJitAccessDynamicGroup(jitGroup, user, false, TimeSpan.FromMinutes(1), out _);
+            provider.GrantJitAccessDynamicGroup(jitGroup, user, computer, false, TimeSpan.FromMinutes(1), out _);
             Thread.Sleep(TimeSpan.FromSeconds(20));
 
             IGroup ttlGroup = directory.GetGroup(fqGroupName);
@@ -76,10 +77,10 @@ namespace Lithnet.AccessManager.Server.Test
             directory.IsSidInPrincipalToken(user.Sid, jitGroup.Sid);
         }
 
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        public void TestDynamicGroupAccessExtensionNotAllowed(string groupou, string jitGroupName, string userName)
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\PC1$", "IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\PC1$", "EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\PC1$", "SUBDEV1\\JIT-PC1", "SUBDEV1\\user1")]
+        public void TestDynamicGroupAccessExtensionNotAllowed(string groupou, string computerName, string jitGroupName, string userName)
         {
             string groupname = Guid.NewGuid().ToString();
             string fqGroupName = $"{jitGroupName.Split('\\')[0]}\\{groupname}";
@@ -87,6 +88,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
+            IComputer computer = directory.GetComputer(computerName);
 
             options.DynamicGroupMappings.Add(new JitDynamicGroupMapping()
             {
@@ -97,21 +99,21 @@ namespace Lithnet.AccessManager.Server.Test
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            TimeSpan allowedAccess = provider.GrantJitAccessDynamicGroup(jitGroup, user, false, TimeSpan.FromMinutes(1), out _);
+            TimeSpan allowedAccess = provider.GrantJitAccessDynamicGroup(jitGroup, user, computer, false, TimeSpan.FromMinutes(1), out _);
 
             Assert.AreEqual(1, allowedAccess.TotalMinutes);
 
             Thread.Sleep(TimeSpan.FromSeconds(20));
 
-            TimeSpan allowedAccess2 = provider.GrantJitAccessDynamicGroup(jitGroup, user, false, TimeSpan.FromMinutes(1), out _);
+            TimeSpan allowedAccess2 = provider.GrantJitAccessDynamicGroup(jitGroup, user, computer, false, TimeSpan.FromMinutes(1), out _);
 
             Assert.LessOrEqual(allowedAccess2.TotalSeconds, 50);
         }
 
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        public void TestDynamicGroupAccessExtensionAllowed(string groupou, string jitGroupName, string userName)
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\PC1$", "IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\PC1$", "EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\PC1$", "SUBDEV1\\JIT-PC1", "SUBDEV1\\user1")]
+        public void TestDynamicGroupAccessExtensionAllowed(string groupou, string computerName, string jitGroupName, string userName)
         {
             string groupname = Guid.NewGuid().ToString();
             string fqGroupName = $"{jitGroupName.Split('\\')[0]}\\{groupname}";
@@ -119,6 +121,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
+            IComputer computer = directory.GetComputer(computerName);
 
             options.DynamicGroupMappings.Add(new JitDynamicGroupMapping()
             {
@@ -129,25 +132,25 @@ namespace Lithnet.AccessManager.Server.Test
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            TimeSpan allowedAccess = provider.GrantJitAccessDynamicGroup(jitGroup, user, true, TimeSpan.FromMinutes(1), out _);
+            TimeSpan allowedAccess = provider.GrantJitAccessDynamicGroup(jitGroup, user, computer, true, TimeSpan.FromMinutes(1), out _);
 
             Assert.AreEqual(1, allowedAccess.TotalMinutes);
 
             Thread.Sleep(TimeSpan.FromSeconds(20));
 
-            TimeSpan allowedAccess2 = provider.GrantJitAccessDynamicGroup(jitGroup, user, true, TimeSpan.FromMinutes(1), out _);
+            TimeSpan allowedAccess2 = provider.GrantJitAccessDynamicGroup(jitGroup, user, computer, true, TimeSpan.FromMinutes(1), out _);
 
             Assert.AreEqual(allowedAccess2.TotalSeconds, 60);
         }
 
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        public void TestDynamicGroupAccessUndo(string groupou, string jitGroupName, string userName)
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\PC1$", "IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\PC1$", "IDMDEV1\\JIT-PC1", "SUBDEV1\\user1")]
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\PC1$", "SUBDEV1\\JIT-PC1", "SUBDEV1\\user1")]
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\PC1$", "SUBDEV1\\JIT-PC1", "IDMDEV1\\user1")]
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\PC1$", "EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\PC1$", "EXTDEV1\\JIT-PC1", "IDMDEV1\\user1")]
+        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\PC1$", "EXTDEV1\\JIT-PC1", "SUBDEV1\\user1")]
+        public void TestDynamicGroupAccessUndo(string groupou, string computerName, string jitGroupName, string userName)
         {
             string groupname = Guid.NewGuid().ToString();
             string fqGroupName = $"{jitGroupName.Split('\\')[0]}\\{groupname}";
@@ -155,6 +158,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
+            IComputer computer = directory.GetComputer(computerName);
 
             options.DynamicGroupMappings.Add(new JitDynamicGroupMapping()
             {
@@ -165,7 +169,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            provider.GrantJitAccessDynamicGroup(jitGroup, user, true, TimeSpan.FromMinutes(1), out Action undo);
+            provider.GrantJitAccessDynamicGroup(jitGroup, user, computer, true, TimeSpan.FromMinutes(1), out Action undo);
 
             Thread.Sleep(TimeSpan.FromSeconds(20));
 
@@ -176,22 +180,24 @@ namespace Lithnet.AccessManager.Server.Test
             Assert.IsFalse(this.directory.TryGetGroup(fqGroupName, out _));
         }
 
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("IDMDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        public void TestPamGroupAccessExtensionAllowed(string jitGroupName, string userName)
+
+        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "IDMDEV1\\user1")]
+        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1$", "SUBDEV1\\user1")]
+        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "SUBDEV1\\user1")]
+        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1$", "IDMDEV1\\user1")]
+        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "SUBDEV1\\user1")]
+        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "EXTDEV1\\user1")]
+        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "IDMDEV1\\user1")]
+        public void TestPamGroupAccessExtensionAllowed(string jitGroupName, string computerName, string userName)
         {
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
+            IComputer computer = directory.GetComputer(computerName);
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            TimeSpan allowedAccess = provider.GrantJitAccessPam(jitGroup, user, true, TimeSpan.FromMinutes(1), out _);
+            TimeSpan allowedAccess = provider.GrantJitAccessPam(jitGroup, user, computer, true, TimeSpan.FromMinutes(1), out _);
             TimeSpan? actualTtl = jitGroup.GetMemberTtl(user);
 
             Assert.AreEqual(1, allowedAccess.TotalMinutes);
@@ -200,7 +206,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             Thread.Sleep(TimeSpan.FromSeconds(10));
 
-            TimeSpan allowedAccess2 = provider.GrantJitAccessPam(jitGroup, user, true, TimeSpan.FromMinutes(2), out _);
+            TimeSpan allowedAccess2 = provider.GrantJitAccessPam(jitGroup, user, computer, true, TimeSpan.FromMinutes(2), out _);
 
             actualTtl = jitGroup.GetMemberTtl(user);
 
@@ -209,22 +215,24 @@ namespace Lithnet.AccessManager.Server.Test
             Assert.LessOrEqual(actualTtl.Value.TotalSeconds, 3600);
         }
 
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("IDMDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        public void TestPamGroupAccessExtensionNotAllowed(string jitGroupName, string userName)
+
+        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "IDMDEV1\\user1")]
+        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1$", "SUBDEV1\\user1")]
+        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "SUBDEV1\\user1")]
+        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1$", "IDMDEV1\\user1")]
+        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "SUBDEV1\\user1")]
+        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "EXTDEV1\\user1")]
+        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "IDMDEV1\\user1")]
+        public void TestPamGroupAccessExtensionNotAllowed(string jitGroupName, string computerName, string userName)
         {
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
+            IComputer computer = directory.GetComputer(computerName);
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            TimeSpan allowedAccess = provider.GrantJitAccessPam(jitGroup, user, false, TimeSpan.FromMinutes(1), out _);
+            TimeSpan allowedAccess = provider.GrantJitAccessPam(jitGroup, user, computer, false, TimeSpan.FromMinutes(1), out _);
             TimeSpan? actualTtl = jitGroup.GetMemberTtl(user);
 
             Assert.AreEqual(1, allowedAccess.TotalMinutes);
@@ -233,7 +241,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             Thread.Sleep(TimeSpan.FromSeconds(10));
 
-            TimeSpan allowedAccess2 = provider.GrantJitAccessPam(jitGroup, user, false, TimeSpan.FromMinutes(2), out _);
+            TimeSpan allowedAccess2 = provider.GrantJitAccessPam(jitGroup, user, computer, false, TimeSpan.FromMinutes(2), out _);
 
             actualTtl = jitGroup.GetMemberTtl(user);
 
@@ -242,22 +250,23 @@ namespace Lithnet.AccessManager.Server.Test
             Assert.LessOrEqual(allowedAccess2.TotalSeconds, 60);
         }
 
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("IDMDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        public void TestPamGroupAccessUndo(string jitGroupName, string userName)
+        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "IDMDEV1\\user1")]
+        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1$", "SUBDEV1\\user1")]
+        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "SUBDEV1\\user1")]
+        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1$", "IDMDEV1\\user1")]
+        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "SUBDEV1\\user1")]
+        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "EXTDEV1\\user1")]
+        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "IDMDEV1\\user1")]
+        public void TestPamGroupAccessUndo(string jitGroupName, string computerName, string userName)
         {
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
+            IComputer computer = directory.GetComputer(computerName);
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            TimeSpan allowedAccess = provider.GrantJitAccessPam(jitGroup, user, false, TimeSpan.FromMinutes(1), out Action undo);
+            TimeSpan allowedAccess = provider.GrantJitAccessPam(jitGroup, user, computer, false, TimeSpan.FromMinutes(1), out Action undo);
             TimeSpan? actualTtl = jitGroup.GetMemberTtl(user);
 
             Assert.AreEqual(1, allowedAccess.TotalMinutes);
@@ -269,34 +278,36 @@ namespace Lithnet.AccessManager.Server.Test
         }
 
 
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        public void ThrowOnNoMappingForDomain(string jitGroupName, string userName)
+        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "IDMDEV1\\user1")]
+        public void ThrowOnNoMappingForDomain(string jitGroupName, string computerName, string userName)
         {
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
+            IComputer computer = directory.GetComputer(computerName);
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            Assert.Throws<NoDynamicGroupMappingForDomainException>(() => provider.GrantJitAccessDynamicGroup(jitGroup, user, false, TimeSpan.FromMinutes(1), out _));
+            Assert.Throws<NoDynamicGroupMappingForDomainException>(() => provider.GrantJitAccessDynamicGroup(jitGroup, user, computer, false, TimeSpan.FromMinutes(1), out _));
         }
 
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("IDMDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        public void AddUserToGroupPam(string jitGroupName, string userName)
+        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "IDMDEV1\\user1")]
+        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1$", "SUBDEV1\\user1")]
+        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "SUBDEV1\\user1")]
+        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1$", "IDMDEV1\\user1")]
+        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "SUBDEV1\\user1")]
+        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "EXTDEV1\\user1")]
+        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "IDMDEV1\\user1")]
+        public void AddUserToGroupPam(string jitGroupName, string computerName, string userName)
         {
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
+            IComputer computer = directory.GetComputer(computerName);
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            provider.GrantJitAccessPam(jitGroup, user, false, TimeSpan.FromMinutes(1), out _);
+            provider.GrantJitAccessPam(jitGroup, user, computer, false, TimeSpan.FromMinutes(1), out _);
 
             directory.IsSidInPrincipalToken(user.Sid, jitGroup.Sid);
         }
