@@ -9,6 +9,14 @@
 
 @model Lithnet.AccessManager.Service.Models.AccessRequestModel
 
+
+<div class="loading-overlay">
+    <div class="loading-content d-flex justify-content-center">
+        <div class="spinner-border color-ams-blue" role="status"></div>
+        <div class="loading-text">Submitting request...</div>
+    </div>
+</div>
+
 <div class="form-container">
     <div class="form-content-header">
         @UIMessages.HeadingRequestAccess
@@ -70,10 +78,7 @@
 
         <footer>
             @Html.AntiForgeryToken()
-            <button type="submit" class="btn btn-primary">
-                <span class="wait-content hidden"><span class="spinner-border app-spinner" role="status" aria-hidden="true"></span>Please wait...</span>
-                <span class="default-button-text">Next</span>
-            </button>
+            <button type="submit" class="btn btn-primary button-loading-overlay">Next</button>
         </footer>
     }
 </div>

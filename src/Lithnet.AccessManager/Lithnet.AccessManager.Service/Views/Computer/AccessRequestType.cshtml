@@ -9,60 +9,71 @@
 
 @model Lithnet.AccessManager.Service.Models.AccessRequestModel
 
-<div class="form-container">
-    <div class="form-content-header">
-        Request type
+
+    <div class="loading-overlay">
+        <div class="loading-content d-flex justify-content-center">
+            <div class="spinner-border color-ams-blue" role="status"></div>
+            <div class="loading-text">Requesting access...</div>
+        </div>
     </div>
-    <div class="form-content">
-        @using (Html.BeginForm("AccessResponse", "Computer", FormMethod.Post))
-        {
-            <section>
-                <label class="title">Computer</label>
-                <p class="lead">@Model.ComputerName</p>
-            </section>
 
-            <section>
-                <label class="title">Select the type of access you require</label>
-                <div>
-                    @if (Model.AllowedRequestTypes.HasFlag(AccessMask.LocalAdminPassword))
-                    {
-                        @Html.RadioButtonFor(m => m.RequestType, "LocalAdminPassword", new {  @id = "lapscheck" })
-                        <label  for="lapscheck">Current local admin password</label>
-                    }
-                </div>
-                <div>
-                    @if (Model.AllowedRequestTypes.HasFlag(AccessMask.LocalAdminPasswordHistory))
-                    {
-                        @Html.RadioButtonFor(m => m.RequestType, "LocalAdminPasswordHistory", new { @id = "lapshistorycheck" })
-                        <label  for="lapshistorycheck">Previous local admin passwords</label>
-                    }
-                </div>
-                <div>
-                    @if (Model.AllowedRequestTypes.HasFlag(AccessMask.Jit))
-                    {
-                        @Html.RadioButtonFor(m => m.RequestType, "Jit", new {  @id = "jitcheck" })
-                        <label  for="jitcheck">Just-in-time access</label>
-                    }
-                </div>
-                <div>
-                    @if (Model.AllowedRequestTypes.HasFlag(AccessMask.BitLocker))
-                    {
-                        @Html.RadioButtonFor(m => m.RequestType, "BitLocker", new {  @id = "bitlockercheck" })
-                        <label  for="bitlockercheck">BitLocker recovery passwords</label>
-                    }
-                </div>
-            </section>
 
-            @Html.HiddenFor(m => m.ComputerName)
-            @Html.HiddenFor(m => m.UserRequestReason)
-            @Html.AntiForgeryToken()
+    <div class="form-container">
+        <div class="form-content-header">
+            Request type
+        </div>
+        <div class="form-content">
+            @using (Html.BeginForm("AccessResponse", "Computer", FormMethod.Post))
+            {
+                <section>
+                    <label class="title">Computer</label>
+                    <p class="lead">@Model.ComputerName</p>
+                </section>
 
-            <footer>
-                <div class="center-content">
-                    <button type="submit" class="btn btn-primary">@UIMessages.ButtonRequestAccess</button>
-                    @Html.ActionLink(UIMessages.ButtonNewRequest, "AccessRequest", "Computer", null, new { @class="btn btn-outline-secondary" })
-                </div>
-            </footer>
-        }
+                <section>
+                    <label class="title">Select the type of access you require</label>
+                    <div>
+                        @if (Model.AllowedRequestTypes.HasFlag(AccessMask.LocalAdminPassword))
+                        {
+                            @Html.RadioButtonFor(m => m.RequestType, "LocalAdminPassword", new { @id = "lapscheck" })
+                            <label for="lapscheck">Current local admin password</label>
+                        }
+                    </div>
+                    <div>
+                        @if (Model.AllowedRequestTypes.HasFlag(AccessMask.LocalAdminPasswordHistory))
+                        {
+                            @Html.RadioButtonFor(m => m.RequestType, "LocalAdminPasswordHistory", new { @id = "lapshistorycheck" })
+                            <label for="lapshistorycheck">Previous local admin passwords</label>
+                        }
+                    </div>
+                    <div>
+                        @if (Model.AllowedRequestTypes.HasFlag(AccessMask.Jit))
+                        {
+                            @Html.RadioButtonFor(m => m.RequestType, "Jit", new { @id = "jitcheck" })
+                            <label for="jitcheck">Just-in-time access</label>
+                        }
+                    </div>
+                    <div>
+                        @if (Model.AllowedRequestTypes.HasFlag(AccessMask.BitLocker))
+                        {
+                            @Html.RadioButtonFor(m => m.RequestType, "BitLocker", new { @id = "bitlockercheck" })
+                            <label for="bitlockercheck">BitLocker recovery passwords</label>
+                        }
+                    </div>
+                </section>
+
+
+                @Html.HiddenFor(m => m.ComputerName)
+                @Html.HiddenFor(m => m.UserRequestReason)
+                @Html.AntiForgeryToken()
+
+                <footer>
+                    <div class="center-content">
+                        <button type="submit" class="btn btn-primary button-loading-overlay">@UIMessages.ButtonRequestAccess</button>
+                        @Html.ActionLink(UIMessages.ButtonNewRequest, "AccessRequest", "Computer", null, new { @class = "btn btn-outline-secondary" })
+                    </div>
+                </footer>
+            }
+
+        </div>
     </div>
-</div>
