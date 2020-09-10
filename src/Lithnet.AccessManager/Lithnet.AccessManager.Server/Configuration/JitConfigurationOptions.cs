@@ -13,5 +13,7 @@ namespace Lithnet.AccessManager.Server.Configuration
         public int? DeltaSyncInterval { get; set; }
 
         public IList<JitDynamicGroupMapping> DynamicGroupMappings { get; set; } = new List<JitDynamicGroupMapping>();
+
+        public JitDcLocatorMode DcLocatorMode { get; set; }
     }
 }

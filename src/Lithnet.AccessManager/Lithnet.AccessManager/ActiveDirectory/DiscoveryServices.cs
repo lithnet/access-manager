@@ -255,13 +255,13 @@ namespace Lithnet.AccessManager
             {
                 this.logger.LogTrace("Finding domain controller for server {server}, domain {domainDns} with flags {flags}", server, domainDns, flags.ToString());
                 dc = NativeMethods.GetDomainControllerForDnsDomain(server, domainDns, null, flags);
-                this.logger.LogTrace("DC locator found DC {dc} for domain {domainDns}, with flags {flags}", dc, domainDns, flags.ToString());
+                this.logger.LogTrace("DC locator on server {server} found DC {dc} for domain {domainDns}, with flags {flags}", server, dc, domainDns, flags.ToString());
             }
             catch (DirectoryException dex) when (dex.InnerException is Win32Exception wex && wex.NativeErrorCode == 1722 && server != null)
             {
                 this.logger.LogWarning(dex, "Could not connect to server {server} to find DC, local machine will be used to find a DC", server);
                 dc = NativeMethods.GetDomainControllerForDnsDomain(null, domainDns, null, flags);
-                this.logger.LogTrace("DC locator found DC {dc} for domain {domainDns}, with flags {flags}", dc, domainDns, flags.ToString());
+                this.logger.LogTrace("DC locator on local machine found DC {dc} for domain {domainDns}, with flags {flags}", dc, domainDns, flags.ToString());
             }
 
             return dc;

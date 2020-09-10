@@ -49,7 +49,7 @@ namespace Lithnet.AccessManager
 
             IGroup dynamicGroup = null;
 
-            this.discoveryServices.FindDcAndExecuteWithRetry(computer.DnsHostName ?? computer.SamAccountName.TrimEnd('$'), this.discoveryServices.GetDomainNameDns(mapping.GroupOU), Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | Interop.DsGetDcNameFlags.DS_WRITABLE_REQUIRED, dc =>
+            this.discoveryServices.FindDcAndExecuteWithRetry(this.GetDcLocatorTarget(computer), this.discoveryServices.GetDomainNameDns(mapping.GroupOU), Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | Interop.DsGetDcNameFlags.DS_WRITABLE_REQUIRED, dc =>
             {
                 this.logger.LogTrace("Attempting to perform dynamic group operation against DC {dc}", dc);
 
@@ -117,7 +117,7 @@ namespace Lithnet.AccessManager
                 return existingTtl.Value;
             }
 
-            this.discoveryServices.FindDcAndExecuteWithRetry(computer.DnsHostName ?? computer.SamAccountName.TrimEnd('$'), this.discoveryServices.GetDomainNameDns(group.Sid), Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | Interop.DsGetDcNameFlags.DS_WRITABLE_REQUIRED, dc =>
+            this.discoveryServices.FindDcAndExecuteWithRetry(this.GetDcLocatorTarget(computer), this.discoveryServices.GetDomainNameDns(group.Sid), Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | Interop.DsGetDcNameFlags.DS_WRITABLE_REQUIRED, dc =>
             {
                 this.logger.LogTrace("Attempting to perform pam group operation against DC {dc}", dc);
                 group.RetargetToDc(dc);
@@ -164,6 +164,16 @@ namespace Lithnet.AccessManager
         public string BuildGroupDomain(IGroup group)
         {
             return this.discoveryServices.GetDomainNameNetBios(group.Sid.AccountDomainSid);
+        }
+
+        private string GetDcLocatorTarget(IComputer computer)
+        {
+            if (options.DcLocatorMode == JitDcLocatorMode.Local)
+            {
+                return null;
+            }
+
+            return computer.DnsHostName ?? computer.SamAccountName.TrimEnd('$');
         }
 
         private JitDynamicGroupMapping FindDomainMapping(IGroup group)
