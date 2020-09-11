@@ -741,7 +741,12 @@ namespace Lithnet.AccessManager.Server.UI
 
         private static async Task<string> DownloadFile(string url)
         {
-            using HttpClient client = new HttpClient();
+            using HttpClientHandler handler = new HttpClientHandler
+            { 
+                DefaultProxyCredentials = CredentialCache.DefaultCredentials
+            };
+
+            using HttpClient client = new HttpClient(handler);
             using HttpResponseMessage result = await client.GetAsync(url);
 
             if (result.IsSuccessStatusCode)
