@@ -1,13 +1,16 @@
-﻿using System.Security.Principal;
+﻿using System;
+using System.Diagnostics.Contracts;
+using System.Security.Principal;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using Vanara.PInvoke;
 
 namespace Lithnet.AccessManager.Test
 {
     class DiscoveryServicesTests
     {
-        private IDiscoveryServices discoveryServices;
+        private DiscoveryServices discoveryServices;
 
         [SetUp()]
         public void TestInitialize()
@@ -112,7 +115,17 @@ namespace Lithnet.AccessManager.Test
         [TestCase("IDMD1AD3.extdev1.local", "EXTDEV1-Default-Site")]
         public void GetSiteForComputer(string computer, string expected)
         {
-            StringAssert.AreEqualIgnoringCase(expected, discoveryServices.GetComputerSiteName(computer));
+            StringAssert.AreEqualIgnoringCase(expected, discoveryServices.GetComputerSiteNameRpc(computer));
+        }
+
+        [Test]
+        public void Text()
+        {
+            DcLocatorMode mode = DcLocatorMode.RemoteDcLocator | DcLocatorMode.SiteLookup;
+            discoveryServices.GetDc("idmd1lds1.idmdev1.local", "idmdev1.local", Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED, ref mode);
+            discoveryServices.GetDc("idmd1lds1.idmdev1.local", "idmdev1.local", Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED, ref mode);
+
+            discoveryServices.GetComputerSiteNameManual("idmdev1.local", "idmd1lds1.idmdev1.local");
         }
     }
 }

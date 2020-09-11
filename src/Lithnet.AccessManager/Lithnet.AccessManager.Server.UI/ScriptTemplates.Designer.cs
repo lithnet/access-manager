@@ -291,9 +291,9 @@ namespace Lithnet.AccessManager.Server.UI {
         ///# that contains the public key of the certificate Lithnet Access Manager Agents should use to encrypt their local
         ///# admin passwords and password history
         ///#
-        ///# This script requires membership in their the Enterprise Admin group, or the Domain Admin group on the root domain of the forest
+        ///# This script requires membership in the Enterprise Admin group, or the Domain Admin group on the root domain of the forest
         ///# 
-        ///# Note, this script has been pre-populated with the inform [rest of string was truncated]&quot;;.
+        ///# Note, this script has been pre-populated with the information  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string PublishCertificateTemplate {
             get {

@@ -49,7 +49,7 @@ namespace Lithnet.AccessManager
 
             IGroup dynamicGroup = null;
 
-            this.discoveryServices.FindDcAndExecuteWithRetry(this.GetDcLocatorTarget(computer), this.discoveryServices.GetDomainNameDns(mapping.GroupOU), Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | Interop.DsGetDcNameFlags.DS_WRITABLE_REQUIRED, dc =>
+            this.discoveryServices.FindDcAndExecuteWithRetry(this.GetDcLocatorTarget(computer), this.discoveryServices.GetDomainNameDns(mapping.GroupOU), Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | Interop.DsGetDcNameFlags.DS_WRITABLE_REQUIRED, this.GetDcLocatorMode(), dc =>
             {
                 this.logger.LogTrace("Attempting to perform dynamic group operation against DC {dc}", dc);
 
@@ -117,7 +117,7 @@ namespace Lithnet.AccessManager
                 return existingTtl.Value;
             }
 
-            this.discoveryServices.FindDcAndExecuteWithRetry(this.GetDcLocatorTarget(computer), this.discoveryServices.GetDomainNameDns(group.Sid), Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | Interop.DsGetDcNameFlags.DS_WRITABLE_REQUIRED, dc =>
+            this.discoveryServices.FindDcAndExecuteWithRetry(this.GetDcLocatorTarget(computer), this.discoveryServices.GetDomainNameDns(group.Sid), Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | Interop.DsGetDcNameFlags.DS_WRITABLE_REQUIRED, this.GetDcLocatorMode(), dc =>
             {
                 this.logger.LogTrace("Attempting to perform pam group operation against DC {dc}", dc);
                 group.RetargetToDc(dc);
@@ -168,12 +168,29 @@ namespace Lithnet.AccessManager
 
         private string GetDcLocatorTarget(IComputer computer)
         {
-            if (options.DcLocatorMode == JitDcLocatorMode.Local)
+            return computer.DnsHostName ?? computer.SamAccountName.TrimEnd('$');
+        }
+
+        private DcLocatorMode GetDcLocatorMode()
+        {
+            if (this.options.DcLocatorMode == JitDcLocatorMode.Default)
             {
-                return null;
+                return DcLocatorMode.RemoteDcLocator | DcLocatorMode.SiteLookup;
             }
 
-            return computer.DnsHostName ?? computer.SamAccountName.TrimEnd('$');
+            DcLocatorMode mode = DcLocatorMode.LocalDcLocator;
+
+            if (this.options.DcLocatorMode.HasFlag(JitDcLocatorMode.RemoteDcLocator))
+            {
+                mode |= DcLocatorMode.RemoteDcLocator;
+            }
+
+            if (this.options.DcLocatorMode.HasFlag(JitDcLocatorMode.SiteLookup))
+            {
+                mode |= DcLocatorMode.SiteLookup;
+            }
+
+            return mode;
         }
 
         private JitDynamicGroupMapping FindDomainMapping(IGroup group)

@@ -19,15 +19,15 @@ namespace Lithnet.AccessManager
 
         T FindDcAndExecuteWithRetry<T>(string domain,  DsGetDcNameFlags flags, Func<string, T> action);
 
-        T FindDcAndExecuteWithRetry<T>(string server, string domain, DsGetDcNameFlags flags, Func<string, T> action);
+        T FindDcAndExecuteWithRetry<T>(string server, string domain, DsGetDcNameFlags flags, DcLocatorMode mode, Func<string, T> action);
 
         T FindGcAndExecuteWithRetry<T>(string domain, Func<string, T> action);
 
         DirectoryEntry GetConfigurationNamingContext(string dnsDomain);
 
-        string GetComputerSiteName(string computerName);
+        string GetComputerSiteNameRpc(string computerName);
 
-        bool TryGetComputerSiteName(string computerName, out string siteName);
+        bool TryGetComputerSiteNameRpc(string computerName, out string siteName);
 
         string GetDomainController(string domainDns);
 

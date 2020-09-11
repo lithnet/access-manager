@@ -967,7 +967,7 @@ namespace Lithnet.AccessManager.Server.UI
             IRule firewallRule = FirewallManager.Instance.CreateApplicationRule(FirewallProfiles.Domain | FirewallProfiles.Private | FirewallProfiles.Public,
                 Constants.FirewallRuleName,
                 FirewallAction.Allow,
-                this.pathProvider.GetFullPath(Constants.ServiceExeName, this.pathProvider.AppPath),
+               "System",
                 FirewallProtocol.TCP
             );
 

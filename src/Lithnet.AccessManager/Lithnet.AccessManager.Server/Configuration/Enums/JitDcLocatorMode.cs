@@ -6,8 +6,10 @@ namespace Lithnet.AccessManager.Server.Configuration
     {
         Default = 0,
 
-        JitTarget = 1,
+        LocalDcLocator = 1,
 
-        Local = 2,
+        RemoteDcLocator = 2,
+
+        SiteLookup = 4,
     }
 }

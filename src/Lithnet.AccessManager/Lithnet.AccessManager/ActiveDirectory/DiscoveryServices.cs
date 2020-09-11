@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
+using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using Lithnet.AccessManager.Interop;
 using Microsoft.Extensions.Logging;
+using Vanara.PInvoke;
 
 namespace Lithnet.AccessManager
 {
@@ -60,10 +63,10 @@ namespace Lithnet.AccessManager
 
         public T FindDcAndExecuteWithRetry<T>(string domain, DsGetDcNameFlags flags, Func<string, T> action)
         {
-            return this.FindDcAndExecuteWithRetry(null, domain, flags, action);
+            return this.FindDcAndExecuteWithRetry(null, domain, flags, DcLocatorMode.LocalDcLocator, action);
         }
 
-        public T FindDcAndExecuteWithRetry<T>(string server, string domain, DsGetDcNameFlags flags, Func<string, T> action)
+        public T FindDcAndExecuteWithRetry<T>(string server, string domain, DsGetDcNameFlags flags, DcLocatorMode mode, Func<string, T> action)
         {
             int retryCount = 0;
             Exception lastException = null;
@@ -74,7 +77,9 @@ namespace Lithnet.AccessManager
                 domain = Domain.GetComputerDomain().Name;
             }
 
-            string dc = this.GetDomainController(server, domain, flags);
+            DcLocatorMode cachedMode = mode;
+
+            string dc = this.GetDomainController(server, domain, flags, ref cachedMode);
 
             while (retryCount < MaxRetry && attemptedDCs.Add(dc))
             {
@@ -110,7 +115,7 @@ namespace Lithnet.AccessManager
 
                 this.logger.LogTrace(lastException, "Operation failed in domain {domain} against DC {dc} due to retry-able error", domain, dc);
 
-                dc = this.GetDomainController(server, domain, flags | DsGetDcNameFlags.DS_FORCE_REDISCOVERY);
+                dc = this.GetDomainController(server, domain, flags | DsGetDcNameFlags.DS_FORCE_REDISCOVERY, ref cachedMode);
                 retryCount++;
             }
 
@@ -158,23 +163,119 @@ namespace Lithnet.AccessManager
             return new DirectoryEntry($"LDAP://{this.GetContextDn("schemaNamingContext", dnsDomain)}");
         }
 
-        public string GetComputerSiteName(string computerName)
+        public string GetComputerSiteNameRpc(string computerName)
         {
             return NativeMethods.GetComputerSiteName(computerName);
         }
 
-        public bool TryGetComputerSiteName(string computerName, out string siteName)
+        public bool TryGetComputerSiteNameRpc(string computerName, out string siteName)
         {
             siteName = null;
             try
             {
-                siteName = this.GetComputerSiteName(computerName);
+                siteName = this.GetComputerSiteNameRpc(computerName);
                 return true;
             }
             catch
             {
                 return false;
             }
+        }
+
+        public string GetComputerSiteNameManual(string dnsDomain, string dnsHostName)
+        {
+            this.logger.LogTrace("Attempting to query IP addresses for {host}", dnsHostName);
+            IPAddress[] ipAddresses;
+
+            try
+            {
+                ipAddresses = Dns.GetHostAddresses(dnsHostName);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogTrace(ex, "Unable to resolve DNS entry for {host}", dnsHostName);
+                return null;
+            }
+
+            if (ipAddresses.Length == 0)
+            {
+                return null;
+            }
+
+            this.logger.LogTrace("Host {host} has addresses {addresses}", dnsHostName, string.Join(", ", ipAddresses.Select(t => t.ToString())));
+
+            List<Ws2_32.SOCKADDR> resolvedAddresses = new List<Ws2_32.SOCKADDR>();
+
+            Win32Error result;
+
+            foreach (IPAddress ipAddress in ipAddresses.OrderBy(t => (int)t.AddressFamily))
+            {
+                Ws2_32.SOCKADDR socketAddress;
+
+                if (ipAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    socketAddress = new Ws2_32.SOCKADDR_IN();
+                }
+                else if (ipAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+                {
+                    socketAddress = new Ws2_32.SOCKADDR_IN6();
+                }
+                else
+                {
+                    this.logger.LogTrace("Ignoring unknown address type {ipAddressFamily}", ipAddress.AddressFamily.ToString());
+                    continue;
+                }
+
+                int length = socketAddress.Size;
+                string addr = ipAddress.ToString();
+
+                result = Ws2_32.WSAStringToAddress(addr, (Ws2_32.ADDRESS_FAMILY)ipAddress.AddressFamily, IntPtr.Zero, socketAddress, ref length);
+
+                if (result.Failed)
+                {
+                    this.logger.LogTrace(result.GetException(), "WSAStringToAddress failed");
+                }
+
+                resolvedAddresses.Add(socketAddress);
+            }
+
+            if (resolvedAddresses.Count == 0)
+            {
+                return null;
+            }
+
+            var socketAddresses = new Ws2_32.SOCKET_ADDRESS[resolvedAddresses.Count];
+            for (int i = 0; i < resolvedAddresses.Count; i++)
+            {
+                socketAddresses[i].iSockaddrLength = resolvedAddresses[i].Size;
+                socketAddresses[i].lpSockaddr = resolvedAddresses[i].DangerousGetHandle();
+            }
+
+            NetApi32.SafeNetApiBuffer siteNames = null;
+
+            this.FindDcAndExecuteWithRetry(dnsDomain, dc =>
+            {
+                result = NetApi32.DsAddressToSiteNames(dc, (uint)socketAddresses.Length, socketAddresses, out siteNames);
+                result.ThrowIfFailed("DsAddressToSiteNames failed");
+            });
+
+            if (siteNames == null || siteNames.IsInvalid)
+            {
+                return null;
+            }
+
+            List<string> sites = siteNames.ToStringEnum(resolvedAddresses.Count).ToList();
+            string site = sites.FirstOrDefault(t => !string.IsNullOrWhiteSpace(t));
+
+            if (site == null)
+            {
+                this.logger.LogTrace("There was no site found for host {host} in domain {domain}", dnsHostName, dnsDomain);
+                return null;
+            }
+
+            this.logger.LogTrace("Selecting site {site} from site list {sites}", site, string.Join(", ", sites));
+
+            return site;
         }
 
         public string GetDomainNameNetBios(SecurityIdentifier sid)
@@ -220,52 +321,133 @@ namespace Lithnet.AccessManager
 
         public string GetDomainController(string domainDns)
         {
-            return this.GetDomainController(null, domainDns, DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED);
+            DcLocatorMode mode = DcLocatorMode.LocalDcLocator;
+            return this.GetDomainController(null, domainDns, DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED, ref mode);
         }
 
         public string GetDomainController(string domainDns, bool forceRediscovery)
         {
-            return this.GetDomainController(null, domainDns, DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | DsGetDcNameFlags.DS_FORCE_REDISCOVERY);
+            DcLocatorMode mode = DcLocatorMode.LocalDcLocator;
+            return this.GetDomainController(null, domainDns, DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | DsGetDcNameFlags.DS_FORCE_REDISCOVERY, ref mode);
         }
 
         public string GetDomainController(string server, string domainDns, DsGetDcNameFlags flags)
         {
-            string key = BuildDcCacheKey(server, domainDns, flags);
-
-            if (flags.HasFlag(DsGetDcNameFlags.DS_FORCE_REDISCOVERY))
-            {
-                return dcCache.AddOrUpdate(
-                    key,
-                    a => this.GetDc(server, domainDns, flags),
-                    (a, b) =>
-                    {
-                        this.logger.LogTrace("New DC requested");
-                        return this.GetDc(server, domainDns, flags);
-                    });
-            }
-
-            return dcCache.GetOrAdd(key, k => this.GetDc(server, domainDns, flags));
+            DcLocatorMode mode = DcLocatorMode.LocalDcLocator;
+            return this.GetDomainController(null, domainDns, flags, ref mode);
         }
 
-        private string GetDc(string server, string domainDns, DsGetDcNameFlags flags)
+        private string GetDomainController(string server, string domainDns, DsGetDcNameFlags flags, ref DcLocatorMode mode)
         {
-            string dc;
+            string key = BuildDcCacheKey(server, domainDns, flags);
+
+            DcLocatorMode mode2 = mode;
 
             try
             {
-                this.logger.LogTrace("Finding domain controller for server {server}, domain {domainDns} with flags {flags}", server, domainDns, flags.ToString());
-                dc = NativeMethods.GetDomainControllerForDnsDomain(server, domainDns, null, flags);
-                this.logger.LogTrace("DC locator on server {server} found DC {dc} for domain {domainDns}, with flags {flags}", server, dc, domainDns, flags.ToString());
+                if (flags.HasFlag(DsGetDcNameFlags.DS_FORCE_REDISCOVERY))
+                {
+                    return dcCache.AddOrUpdate(
+                        key,
+                        a  => this.GetDc(server, domainDns, flags, ref mode2),
+                        (a, b) =>
+                        {
+                            this.logger.LogTrace("New DC requested");
+                            return this.GetDc(server, domainDns, flags, ref mode2);
+                        });
+                }
+
+                return dcCache.GetOrAdd(key, k => this.GetDc(server, domainDns, flags, ref mode2));
             }
-            catch (DirectoryException dex) when (dex.InnerException is Win32Exception wex && wex.NativeErrorCode == 1722 && server != null)
+            finally
             {
-                this.logger.LogWarning(dex, "Could not connect to server {server} to find DC, local machine will be used to find a DC", server);
-                dc = NativeMethods.GetDomainControllerForDnsDomain(null, domainDns, null, flags);
-                this.logger.LogTrace("DC locator on local machine found DC {dc} for domain {domainDns}, with flags {flags}", dc, domainDns, flags.ToString());
+                mode = mode2;
+            }
+        }
+
+        public string GetDc(string server, string domainDns, DsGetDcNameFlags flags, ref DcLocatorMode mode)
+        {
+            string dc;
+
+            if (server != null)
+            {
+                bool hadNextClosestSite = flags.HasFlag(DsGetDcNameFlags.DS_TRY_NEXTCLOSEST_SITE);
+
+                if (mode.HasFlag(DcLocatorMode.RemoteDcLocator))
+                {
+                    try
+                    {
+                        flags |= DsGetDcNameFlags.DS_TRY_NEXTCLOSEST_SITE;
+                        this.logger.LogTrace("Remote DCLocator: Finding domain controller for server {server}, domain {domainDns} with flags {flags}", server, domainDns, flags.ToString());
+                        dc = NativeMethods.GetDomainControllerForDnsDomain(server, domainDns, null, flags);
+                        this.logger.LogTrace("Remote DCLocator: Found DC {dc} for server {server} in domain {domainDns}, with flags {flags}", dc, server, domainDns, flags.ToString());
+                        return dc;
+                    }
+                    catch (DirectoryException dex) when (dex.InnerException is Win32Exception wex && wex.NativeErrorCode == 1722)
+                    {
+                        mode &= ~DcLocatorMode.RemoteDcLocator;
+                        this.logger.LogWarning(dex, "Could not connect to server {server} to find DC", server);
+                    }
+                }
+
+                if (!hadNextClosestSite)
+                {
+                    flags &= ~DsGetDcNameFlags.DS_TRY_NEXTCLOSEST_SITE;
+                }
+
+                if (mode.HasFlag(DcLocatorMode.SiteLookup))
+                {
+                    this.logger.LogTrace("Manual DCLocator: Finding site for server {server}, domain {domainDns} with flags {flags}", server, domainDns, flags.ToString());
+                    string site = this.GetComputerSiteNameManual(domainDns, server);
+
+                    if (site != null)
+                    {
+                        try
+                        {
+                            this.logger.LogTrace("Manual DCLocator: Attempting to find domain controller for site {site}, in domain {domainDns} with flags {flags}", site, domainDns, flags.ToString());
+
+                            dc = NativeMethods.GetDomainControllerForDnsDomain(null, domainDns, site, flags);
+                            this.logger.LogTrace("Manual DCLocator: Found DC {dc} for site {site} in domain {domainDns}, with flags {flags}", dc, site, domainDns, flags.ToString());
+                            return dc;
+                        }
+                        catch (DirectoryException dex) when (dex.InnerException is Win32Exception wex && wex.NativeErrorCode == 1355)
+                        {
+                            mode &= ~DcLocatorMode.SiteLookup;
+                            this.logger.LogWarning(dex, "There are no domain controllers in the site {site}", site);
+                        }
+                    }
+                    else
+                    {
+                        this.logger.LogTrace("Manual DCLocator: No site found for server {server}", server);
+                    }
+                }
             }
 
+            this.logger.LogTrace("Local DCLocator: Finding domain controller for domain {domainDns} with flags {flags}", server, domainDns, flags.ToString());
+            dc = NativeMethods.GetDomainControllerForDnsDomain(null, domainDns, null, flags);
+            this.logger.LogTrace("Local DCLocator: Found DC {dc} for domain {domainDns}, with flags {flags}", dc, domainDns, flags.ToString());
             return dc;
         }
+
+        //private string GetDc(string server, string domainDns, DsGetDcNameFlags flags)
+        //{
+        //    string dc;
+
+        //    try
+        //    {
+        //        this.logger.LogTrace("Finding domain controller for server {server}, domain {domainDns} with flags {flags}", server, domainDns, flags.ToString());
+        //        dc = NativeMethods.GetDomainControllerForDnsDomain(server, domainDns, null, flags);
+        //        this.logger.LogTrace("DC locator on server {server} found DC {dc} for domain {domainDns}, with flags {flags}", server, dc, domainDns, flags.ToString());
+        //    }
+        //    catch (DirectoryException dex) when (dex.InnerException is Win32Exception wex && wex.NativeErrorCode == 1722 && server != null)
+        //    {
+        //        this.logger.LogWarning(dex, "Could not connect to server {server} to find DC, local machine will be used to find a DC", server);
+        //        dc = NativeMethods.GetDomainControllerForDnsDomain(null, domainDns, null, flags);
+        //        this.logger.LogTrace("DC locator on local machine found DC {dc} for domain {domainDns}, with flags {flags}", dc, domainDns, flags.ToString());
+        //    }
+
+        //    return dc;
+        //}
 
         public string GetDomainControllerFromDNOrDefault(string dn)
         {
