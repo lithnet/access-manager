@@ -129,8 +129,9 @@ namespace Lithnet.AccessManager.Server.UI {
         
         /// <summary>
         ///   Looks up a localized string similar to # Create-GroupManagedServiceAccount
-        ///# 
-        ///# This script enables the KDS service in the domain if it is not already enabled, and creates a new group-managed service account to use with the Access Manager service
+        ///#
+        ///# This script enables the KDS service in the domain if it is not already enabled,
+        ///# and creates a new group-managed service account to use with the Access Manager service
         ///#
         ///# This script requires membership in the Domain Admins group
         ///#
@@ -138,8 +139,7 @@ namespace Lithnet.AccessManager.Server.UI {
         ///
         ///#-------------------------------------------------------------------------
         ///# Set the following values as appropriate for your environment
-        ///#-------------------------------------------------------------------------
-        /// [rest of string was truncated]&quot;;.
+        ///#------------------------------------------------------------------------- [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string CreateGmsa {
             get {
