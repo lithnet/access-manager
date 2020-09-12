@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Lithnet.AccessManager.Server.Configuration;
 
@@ -11,6 +12,55 @@ namespace Lithnet.AccessManager.Server.Extensions
 {
     public static class Extensions
     {
+        public static string ToCommaSeparatedString(this X500DistinguishedName dn)
+        {
+            string decoded = dn?.Decode(X500DistinguishedNameFlags.UseNewLines | X500DistinguishedNameFlags.Reversed);
+
+            if (decoded == null)
+            {
+                return null;
+            }
+
+            return string.Join(',', decoded.Split("\r\n"));
+        }
+
+        public static string ToHexString(this byte[] hash)
+        {
+            if (hash == null)
+            {
+                throw new ArgumentNullException(nameof(hash), "The binary value provided was null");
+            }
+
+            return hash.ToHexString(0, hash.Length);
+        }
+
+        public static string ToHexString(this byte[] hash, int offset, int count)
+        {
+            if (hash == null)
+            {
+                throw new ArgumentNullException(nameof(hash), "The binary value provided was null");
+            }
+
+            if (offset >= hash.Length)
+            {
+                throw new ArgumentException("The value for offset cannot exceed the length of the hash", nameof(offset));
+            }
+
+            if (count + offset > hash.Length)
+            {
+                throw new ArgumentException("The combined values of offset and count cannot exceed the length of the hash", nameof(offset));
+            }
+
+            StringBuilder sb = new StringBuilder(hash.Length * 2);
+
+            for (int i = offset; i < count; i++)
+            {
+                sb.Append(hash[i].ToString("X2"));
+            }
+
+            return sb.ToString();
+        }
+
         public static string GetSecret(this EncryptedData data)
         {
             try

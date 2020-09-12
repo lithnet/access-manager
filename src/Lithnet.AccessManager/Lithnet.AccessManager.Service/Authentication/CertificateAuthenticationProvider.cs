@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Extensions;
@@ -40,7 +41,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
             this.logger = logger;
             this.cache = new MemoryCache(new MemoryCacheOptions
             {
-                 
+
             });
 
             this.options = options.Value;
@@ -64,7 +65,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
                 {
                     OnCertificateValidated = context =>
                     {
-                        if(this.cache.TryGetValue(context.ClientCertificate.Thumbprint, out ClaimsPrincipal identity))
+                        if (this.cache.TryGetValue(context.ClientCertificate.Thumbprint, out ClaimsPrincipal identity))
                         {
                             context.Principal = identity;
                             context.Success();
@@ -112,7 +113,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
                         return Task.CompletedTask;
                     },
                     OnChallenge = context =>
-                    { 
+                    {
                         this.logger.LogEventError(EventIDs.CertificateAuthNAccessDenied, string.Format(LogMessages.CertificateAuthNValidationFailure, context.HttpContext.Connection.ClientCertificate));
                         context.HandleResponse();
                         context.Response.Redirect($"/Home/AuthNError?messageID={(int)AuthNFailureMessageID.InvalidCertificate}");
@@ -148,22 +149,116 @@ namespace Lithnet.AccessManager.Service.AppSettings
         private void ResolveIdentity(CertificateValidatedContext context)
         {
             ClaimsIdentity user = context.Principal.Identity as ClaimsIdentity;
-            Claim c = user?.FindFirst(ClaimTypes.Upn);
 
-            if (c?.Value == null)
+            if ((this.options.IdentityResolutionMode == CertificateIdentityResolutionMode.Default ||
+                this.options.IdentityResolutionMode.HasFlag(CertificateIdentityResolutionMode.UpnSan)))
             {
-                string message = $"The certificate for subject '{context.ClientCertificate.Subject}' did not contain an alternate subject name containing the user's UPN";
-                throw new CertificateIdentityNotFoundException(message);
+                this.logger.LogTrace("Attempting identity resolution using UPN");
+                string upn = user?.FindFirst(ClaimTypes.Upn)?.Value;
+
+                if (upn == null)
+                {
+                    string warning = $"The certificate for subject '{context.ClientCertificate.Subject}' did not contain an subject alternative name containing the user's UPN";
+                    if (!this.options.IdentityResolutionMode.HasFlag(CertificateIdentityResolutionMode.AltSecurityIdentities))
+                    {
+                        throw new CertificateIdentityNotFoundException(warning);
+                    }
+                    else
+                    {
+                        this.logger.LogWarning(warning);
+                    }
+                }
+                else
+                {
+                    if (this.TryResolveIdentityUpnSan(context, user, upn))
+                    {
+                        return;
+                    }
+                }
             }
 
-            if (!this.directory.TryGetUser(c.Value, out IUser u))
+            if (this.options.IdentityResolutionMode.HasFlag(CertificateIdentityResolutionMode.AltSecurityIdentities))
             {
-                string message = string.Format(LogMessages.UserNotFoundInDirectory, user.ToClaimList());
-                throw new CertificateIdentityNotFoundException(message);
+                this.logger.LogTrace("Attempting identity resolution using altSecurityIdentities");
+
+                if (this.TryResolveIdentityAltSecurityIdentities(context, user))
+                {
+                    return;
+                }
             }
 
-            user.AddClaim(new Claim(ClaimTypes.PrimarySid, u.Sid.ToString(), context.Options.ClaimsIssuer));
-            this.AddAuthZClaims(u, user);
+            string message = string.Format(LogMessages.UserNotFoundInDirectory, user.ToClaimList());
+            throw new CertificateIdentityNotFoundException(message);
+        }
+
+        private bool TryResolveIdentityUpnSan(CertificateValidatedContext context, ClaimsIdentity user, string upn)
+        {
+            if (this.directory.TryGetUser(upn, out IUser u))
+            {
+                this.logger.LogTrace("Found user {user} with upn {upn}", u.MsDsPrincipalName, upn);
+                user.AddClaim(new Claim(ClaimTypes.PrimarySid, u.Sid.ToString(), context.Options.ClaimsIssuer));
+                this.AddAuthZClaims(u, user);
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool TryResolveIdentityAltSecurityIdentities(CertificateValidatedContext context, ClaimsIdentity user)
+        {
+            string subject = context.ClientCertificate.SubjectName.ToCommaSeparatedString();
+            string issuer = context.ClientCertificate.IssuerName.ToCommaSeparatedString();
+            string serialNumber = context.ClientCertificate.GetSerialNumber().ToHexString();
+            string ski = context.ClientCertificate.Extensions.OfType<X509SubjectKeyIdentifierExtension>().FirstOrDefault()?.SubjectKeyIdentifier;
+            string sha1keyhash = SHA1.Create().ComputeHash(context.ClientCertificate.GetPublicKey()).ToHexString();
+            string rfc822 = context.ClientCertificate.GetNameInfo(X509NameType.EmailName, false);
+
+            List<string> altSecurityIdentities = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(issuer) && !string.IsNullOrWhiteSpace(subject))
+            {
+                altSecurityIdentities.Add($"X509:<I>{issuer}<S>{subject}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(subject) && this.options.ValidationMethod == ClientCertificateValidationMethod.NtAuthStore)
+            {
+                altSecurityIdentities.Add($"X509:<S>{subject}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(issuer) && !string.IsNullOrWhiteSpace(serialNumber))
+            {
+                altSecurityIdentities.Add($"X509:<I>{issuer}<SR>{serialNumber}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(ski))
+            {
+                altSecurityIdentities.Add($"X509:<SKI>{ski}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(sha1keyhash))
+            {
+                altSecurityIdentities.Add($"X509:<SHA1-PUKEY>{sha1keyhash}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(rfc822) && this.options.ValidationMethod == ClientCertificateValidationMethod.NtAuthStore)
+            {
+                altSecurityIdentities.Add($"X509:<RFC822>{rfc822}");
+            }
+
+            foreach (string altSecurityIdentity in altSecurityIdentities)
+            {
+                this.logger.LogTrace("Attempting to find user with altSecurityIdentity {altSecurityIdentity}", altSecurityIdentity);
+
+                if (this.directory.TryGetUserByAltSecurityIdentity(altSecurityIdentity, out IUser u))
+                {
+                    this.logger.LogTrace("Found user {user} with altSecurityIdentity {altSecurityIdentity}", u.MsDsPrincipalName, altSecurityIdentity);
+                    user.AddClaim(new Claim(ClaimTypes.PrimarySid, u.Sid.ToString(), context.Options.ClaimsIssuer));
+                    this.AddAuthZClaims(u, user);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private bool ValidateNtAuthStore(X509Chain chain)

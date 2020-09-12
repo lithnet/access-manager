@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Security.Claims;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -15,5 +14,8 @@ namespace Lithnet.AccessManager.Server.Configuration
         public bool RequireSmartCardLogonEku { get; set; } = true;
 
         public List<string> TrustedIssuers { get; set; } = new List<string>();
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public CertificateIdentityResolutionMode IdentityResolutionMode { get; set; } = CertificateIdentityResolutionMode.Default;
     }
 }

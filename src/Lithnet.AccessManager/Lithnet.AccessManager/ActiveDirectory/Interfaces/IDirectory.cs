@@ -40,6 +40,8 @@ namespace Lithnet.AccessManager
         IUser GetUser(string userName);
 
         IUser GetUser(SecurityIdentifier sid);
+        
+        bool TryGetUserByAltSecurityIdentity(string altSecurityIdentityValue, out IUser user);
 
         bool TryGetUser(string name, out IUser user);
 

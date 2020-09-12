@@ -51,6 +51,21 @@ namespace Lithnet.AccessManager
             return new ActiveDirectoryUser(this.FindUserInGc(name));
         }
 
+        public bool TryGetUserByAltSecurityIdentity(string altSecurityIdentityValue, out IUser user)
+        {
+            user = null;
+            string dn = this.GcGetDnFromAttributeSearch("altSecurityIdentities", altSecurityIdentityValue, "user");
+
+            if (dn == null)
+            {
+                return false;
+            }
+
+            user = new ActiveDirectoryUser(this.GetDirectoryEntry(dn, DsNameFormat.DistinguishedName));
+
+            return true;
+        }
+
         public IUser GetUser(SecurityIdentifier sid)
         {
             return new ActiveDirectoryUser(this.FindUserInGc(sid.ToString()));
@@ -552,7 +567,6 @@ namespace Lithnet.AccessManager
 
                 using (SearchResultCollection result = d.FindAll())
                 {
-
                     if (result.Count > 1)
                     {
                         throw new AmbiguousNameException($"There was more than one value in the directory that matched the criteria of ({attributeName}={attributeValue})");
