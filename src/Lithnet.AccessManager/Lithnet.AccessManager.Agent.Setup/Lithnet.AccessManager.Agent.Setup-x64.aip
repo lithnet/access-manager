@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="17.3" version="17.4" Modules="professional" RootPath="." Language="en" Id="{6231D1B4-23AF-4C6E-998C-070D74534FAD}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="17.3" version="17.4.1" Modules="professional" RootPath="." Language="en" Id="{6231D1B4-23AF-4C6E-998C-070D74534FAD}">
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
     <ROW Property="AI_PREDEF_LCONDS_PROPS" Value="AI_DETECTED_DOTNET_VERSION"/>
@@ -9,10 +9,10 @@
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="ARPPRODUCTICON" Value="accessmanager.exe" Type="8"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
-    <ROW Property="ProductCode" Value="1033:{39A37BC2-5AE0-4EDF-AA9A-56FFC474F0DB} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{24D603FB-E46B-445B-9390-BDC3550A0682} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Agent"/>
-    <ROW Property="ProductVersion" Value="1.0.7605.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7608.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
     <ROW Property="SETUPEXEDIR" Value="1"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{EEDECF4C-BABB-4AE0-9CB9-DC051FF1AE75}"/>
@@ -87,7 +87,11 @@
     <ROW Component="System.ValueTuple.dll" ComponentId="{F696B69F-F3F7-43E8-AD58-06750A498805}" Directory_="APPDIR" Attributes="0" KeyPath="System.ValueTuple.dll"/>
     <ROW Component="Vanara.Core.dll" ComponentId="{CFCD86A9-2EDB-4BF7-8F09-5862F7EA4104}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.Core.dll"/>
     <ROW Component="Vanara.PInvoke.Cryptography.dll" ComponentId="{81C8D0F0-7585-4142-B90D-BCF12246985D}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Cryptography.dll"/>
+    <ROW Component="Vanara.PInvoke.Kernel32.dll" ComponentId="{C230CE3D-3FDD-41FB-8E9F-95D98B715A2E}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Kernel32.dll"/>
+    <ROW Component="Vanara.PInvoke.NetApi32.dll" ComponentId="{8BE9E015-5EBC-47CE-AACB-F094D76A5093}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.NetApi32.dll"/>
+    <ROW Component="Vanara.PInvoke.Security.dll" ComponentId="{01A6902D-5D05-43BF-A6E7-4F8147C13732}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Security.dll"/>
     <ROW Component="Vanara.PInvoke.Shared.dll" ComponentId="{2C3FFC0D-466F-447E-857E-1F22D2759AB9}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Shared.dll"/>
+    <ROW Component="Vanara.PInvoke.Ws2_32.dll" ComponentId="{371C689F-75C7-400C-B76A-A815FAECDDFD}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Ws2_32.dll"/>
     <ROW Component="Version" ComponentId="{5E6BFD52-23FB-46D2-B0B6-A3A806E70C44}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
     <ROW Component="appsettings.json" ComponentId="{9522F0E5-24DE-424A-9BEE-59B7F462F9E6}" Directory_="APPDIR" Attributes="0" KeyPath="appsettings.json" Type="0"/>
     <ROW Component="lithnet.accessmanager.agent.adml" ComponentId="{26248AAD-5537-4D99-A826-1379B0A4FCBA}" Directory_="enUS_Dir" Attributes="0" KeyPath="lithnet.accessmanager.agent.adml" Type="0"/>
@@ -166,6 +170,10 @@
     <ROW File="Vanara.PInvoke.Shared.dll" Component_="Vanara.PInvoke.Shared.dll" FileName="VANARA~3.DLL|Vanara.PInvoke.Shared.dll" Attributes="0" SourcePath="output-x64\Vanara.PInvoke.Shared.dll" SelfReg="false"/>
     <ROW File="lithnet.accessmanager.agent.password.adml" Component_="lithnet.accessmanager.agent.password.adml" FileName="LITHNE~3.ADM|lithnet.accessmanager.agent.password.adml" Attributes="0" SourcePath="output-x64\PolicyDefinitions\en-US\lithnet.accessmanager.agent.password.adml" SelfReg="false"/>
     <ROW File="lithnet.adml" Component_="lithnet.accessmanager.agent.password.adml" FileName="LITHNE~4.ADM|lithnet.adml" Attributes="0" SourcePath="output-x64\PolicyDefinitions\en-US\lithnet.adml" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.Kernel32.dll" Component_="Vanara.PInvoke.Kernel32.dll" FileName="VANARA~4.DLL|Vanara.PInvoke.Kernel32.dll" Attributes="0" SourcePath="output-x64\Vanara.PInvoke.Kernel32.dll" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.NetApi32.dll" Component_="Vanara.PInvoke.NetApi32.dll" FileName="VANARA~5.DLL|Vanara.PInvoke.NetApi32.dll" Attributes="0" SourcePath="output-x64\Vanara.PInvoke.NetApi32.dll" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.Security.dll" Component_="Vanara.PInvoke.Security.dll" FileName="VANARA~6.DLL|Vanara.PInvoke.Security.dll" Attributes="0" SourcePath="output-x64\Vanara.PInvoke.Security.dll" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.Ws2_32.dll" Component_="Vanara.PInvoke.Ws2_32.dll" FileName="VANARA~7.DLL|Vanara.PInvoke.Ws2_32.dll" Attributes="0" SourcePath="output-x64\Vanara.PInvoke.Ws2_32.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" GeneralOptions="o" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites"/>
@@ -310,6 +318,10 @@
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Shared.dll"/>
     <ROW Feature_="MainFeature" Component_="Version"/>
     <ROW Feature_="MainFeature" Component_="lithnet.accessmanager.agent.password.adml"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Kernel32.dll"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.NetApi32.dll"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Security.dll"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Ws2_32.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>

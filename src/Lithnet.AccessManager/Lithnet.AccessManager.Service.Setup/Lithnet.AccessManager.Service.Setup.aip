@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="17.1.2" version="17.4" Modules="enterprise" RootPath="." Language="en" Id="{8ADA5C46-1F9D-45B3-A39D-37B0D337D0DD}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="17.1.2" version="17.4.1" Modules="enterprise" RootPath="." Language="en" Id="{8ADA5C46-1F9D-45B3-A39D-37B0D337D0DD}">
   <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
     <ROW Name="MigrationUninstallCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
   </COMPONENT>
@@ -17,10 +17,10 @@
     <ROW Property="CTRLS" Value="2"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{F794F4F3-DF58-4F80-9A3A-A16FF2D52702} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{E2F26068-7DE2-4931-A013-E394DA0CF9DD} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7605.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7608.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="RUNAPPLICATION" Value="1" Type="4"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
@@ -397,7 +397,11 @@
     <ROW Component="System.dll" ComponentId="{84336F9B-39A6-4BA7-B320-7517905A55A2}" Directory_="ref_Dir" Attributes="0" KeyPath="System.dll"/>
     <ROW Component="Vanara.Core.dll" ComponentId="{98C61AC2-A51F-4494-A552-C6193AC52B44}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.Core.dll"/>
     <ROW Component="Vanara.PInvoke.Cryptography.dll" ComponentId="{E364F82B-6AE3-4C9E-8782-ACF33BF83A7A}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Cryptography.dll"/>
+    <ROW Component="Vanara.PInvoke.Kernel32.dll" ComponentId="{EA7BF147-861D-4A8A-94F1-B404D103823F}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Kernel32.dll"/>
+    <ROW Component="Vanara.PInvoke.NetApi32.dll" ComponentId="{8A5B51CB-3063-4A30-ABCE-B1E2DA8AF103}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.NetApi32.dll"/>
+    <ROW Component="Vanara.PInvoke.Security.dll" ComponentId="{2C614A1C-48DB-4394-A907-E9BA9BE4CEB1}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Security.dll"/>
     <ROW Component="Vanara.PInvoke.Shared.dll" ComponentId="{E7A3EFE6-B53C-4E22-981D-BB99B883514C}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Shared.dll"/>
+    <ROW Component="Vanara.PInvoke.Ws2_32.dll" ComponentId="{C1ADD727-83D1-474F-A7AF-F30C3DD13600}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Ws2_32.dll"/>
     <ROW Component="WindowsBase.dll" ComponentId="{5FEB7CF7-9184-4567-B6EE-BA06B26334CC}" Directory_="ref_Dir" Attributes="0" KeyPath="WindowsBase.dll"/>
     <ROW Component="WindowsFirewallHelper.dll" ComponentId="{D7719CCD-5293-4ABF-AD98-0F9FBC2D803B}" Directory_="APPDIR" Attributes="0" KeyPath="WindowsFirewallHelper.dll"/>
     <ROW Component="all.css" ComponentId="{B40E0286-ED2B-4ADC-921D-7D72ACCB4816}" Directory_="css_2_Dir" Attributes="0" KeyPath="all.css" Type="0"/>
@@ -875,6 +879,10 @@
     <ROW File="miutils.dll" Component_="miutils.dll" FileName="miutils.dll" Attributes="0" SourcePath="output\miutils.dll" SelfReg="false"/>
     <ROW File="WindowsFirewallHelper.dll" Component_="WindowsFirewallHelper.dll" FileName="WINDOW~1.DLL|WindowsFirewallHelper.dll" Attributes="0" SourcePath="output\WindowsFirewallHelper.dll" SelfReg="false"/>
     <ROW File="PropertyChanged.dll" Component_="PropertyChanged.dll" FileName="PROPER~1.DLL|PropertyChanged.dll" Attributes="0" SourcePath="output\PropertyChanged.dll" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.Kernel32.dll" Component_="Vanara.PInvoke.Kernel32.dll" FileName="VANARA~4.DLL|Vanara.PInvoke.Kernel32.dll" Attributes="0" SourcePath="output\Vanara.PInvoke.Kernel32.dll" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.NetApi32.dll" Component_="Vanara.PInvoke.NetApi32.dll" FileName="VANARA~5.DLL|Vanara.PInvoke.NetApi32.dll" Attributes="0" SourcePath="output\Vanara.PInvoke.NetApi32.dll" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.Security.dll" Component_="Vanara.PInvoke.Security.dll" FileName="VANARA~6.DLL|Vanara.PInvoke.Security.dll" Attributes="0" SourcePath="output\Vanara.PInvoke.Security.dll" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.Ws2_32.dll" Component_="Vanara.PInvoke.Ws2_32.dll" FileName="VANARA~7.DLL|Vanara.PInvoke.Ws2_32.dll" Attributes="0" SourcePath="output\Vanara.PInvoke.Ws2_32.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.AiPersistentDataComponent">
     <ROW PersistentRow="config_Dir" Type="1" Condition="1"/>
@@ -1472,6 +1480,10 @@
     <ROW Feature_="MainFeature" Component_="PropertyChanged.dll"/>
     <ROW Feature_="MainFeature" Component_="AI_ExePath"/>
     <ROW Feature_="MainFeature" Component_="AccessManagerService"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Kernel32.dll"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.NetApi32.dll"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Security.dll"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Ws2_32.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>
