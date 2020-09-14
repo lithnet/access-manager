@@ -25,8 +25,8 @@ namespace Lithnet.AccessManager.Test
             this.resolver = new JitAccessGroupResolver(directory, discoveryServices);
         }
 
-        [TestCase("PC1", "IDMDEV1", "{computerDomain}\\{computerName}", "IDMDEV1\\PC1")]
-        [TestCase("PC1", "IDMDEV1", "IDMDEV2\\{computerName}", "IDMDEV2\\PC1")]
+        [TestCase("PC1", "IDMDEV1", "%computerDomain%\\%computerName%", "IDMDEV1\\PC1")]
+        [TestCase("PC1", "IDMDEV1", "IDMDEV2\\%computerName%", "IDMDEV2\\PC1")]
         [TestCase("PC1", "IDMDEV1", "IDMDEV2\\PC3", "IDMDEV2\\PC3")]
         [TestCase("PC1", "IDMDEV1", "Something", "IDMDEV1\\Something")]
         public void TestBuildNameFromTemplate(string computerName, string domain, string template, string expected)
@@ -35,9 +35,9 @@ namespace Lithnet.AccessManager.Test
             Assert.AreEqual(expected, actual);
         }
 
-        [TestCase("IDMDEV1\\PC1", "IDMDEV1\\JIT-{ComputerName}", "IDMDEV1\\JIT-PC1")]
+        [TestCase("IDMDEV1\\PC1", "IDMDEV1\\JIT-%ComputerName%", "IDMDEV1\\JIT-PC1")]
         [TestCase("IDMDEV1\\PC1", "IDMDEV1\\JIT-PC2", "IDMDEV1\\JIT-PC2")]
-        [TestCase("IDMDEV1\\PC1", "{computerDomain}\\JIT-{computerName}", "IDMDEV1\\JIT-PC1")]
+        [TestCase("IDMDEV1\\PC1", "%computerDomain%\\JIT-%computerName%", "IDMDEV1\\JIT-PC1")]
         public void GetGroupFromName(string computerName, string template, string expected)
         {
             IComputer computer = this.directory.GetComputer(computerName);

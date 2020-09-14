@@ -79,15 +79,21 @@ namespace Lithnet.AccessManager
 #if NETCOREAPP
             groupNameTemplate = groupNameTemplate
                 .Replace("{computerName}", computerName, StringComparison.OrdinalIgnoreCase)
+                .Replace("%computerName%", computerName, StringComparison.OrdinalIgnoreCase)
                 .Replace("{domain}", computerDomain, StringComparison.OrdinalIgnoreCase)
-                .Replace("{computerDomain}", computerDomain, StringComparison.OrdinalIgnoreCase);
+                .Replace("%domain%", computerName, StringComparison.OrdinalIgnoreCase)
+                .Replace("{computerDomain}", computerDomain, StringComparison.OrdinalIgnoreCase)
+                .Replace("%computerDomain%", computerDomain, StringComparison.OrdinalIgnoreCase);
 #else
             groupNameTemplate = groupNameTemplate.ToLowerInvariant()
                 .Replace("{computername}", computerName)
+                .Replace("%computername%", computerName)
                 .Replace("{domain}", computerDomain)
-                .Replace("{computerdomain}", computerDomain);
+                .Replace("%domain%", computerDomain)
+                .Replace("{computerdomain}", computerDomain)
+                .Replace("%computerdomain%", computerDomain);
 #endif
-            
+
             if (!groupNameTemplate.Contains("\\"))
             {
                 groupNameTemplate = $"{computerDomain}\\{groupNameTemplate}";
@@ -98,7 +104,9 @@ namespace Lithnet.AccessManager
 
         public bool IsTemplatedName(string groupNameTemplate)
         {
-            return groupNameTemplate.IndexOf("{computerName}", StringComparison.OrdinalIgnoreCase) > -1;
+            return groupNameTemplate.IndexOf("{computerName}", StringComparison.OrdinalIgnoreCase) > -1
+                || groupNameTemplate.IndexOf("%computerName%", StringComparison.OrdinalIgnoreCase) > -1
+                ;
         }
     }
 }

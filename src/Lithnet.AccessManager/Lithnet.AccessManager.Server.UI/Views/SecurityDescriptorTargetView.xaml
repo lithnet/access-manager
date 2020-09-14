@@ -205,7 +205,7 @@
                                     Margin="5"/>
 
                 <TextBlock Grid.Row="1" Grid.Column="1"
-                                   Text="Select the group to add the user to, or build a template using the {computername} and {computerdomain} placeholders. For example, if you specify '{computerdomain}\G-JIT-{computername}', for a computer in the domain LITHNET with the name PC1, the user will be added to a group called 'LITHNET\G-JIT-PC1'"
+                                   Text="Select the group to add the user to, or build a template using the %computername% and %computerdomain% placeholders. For example, if you specify '%computerdomain%\JIT-%computername%', for a computer in the domain LITHNET with the name PC1, the user will be added to a group called 'LITHNET\JIT-PC1'"
                                    TextWrapping="Wrap"
                                    HorizontalAlignment="Left"
                                    VerticalAlignment="Center"

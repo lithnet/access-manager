@@ -115,7 +115,7 @@ namespace Lithnet.AccessManager.Server.Workers
             if (!this.groupResolver.IsTemplatedName(mapping.GroupNameTemplate))
             {
                 throw new ConfigurationException(
-                    $"The mapping for computers in OU '{mapping.ComputerOU}' contains a template without the {{computerName}} placeholder and cannot be processed");
+                    $"The mapping for computers in OU '{mapping.ComputerOU}' contains a template without the %computerName% placeholder and cannot be processed");
             }
         }
 

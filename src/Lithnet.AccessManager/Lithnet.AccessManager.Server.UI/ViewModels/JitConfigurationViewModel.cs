@@ -106,7 +106,7 @@ namespace Lithnet.AccessManager.Server.UI
             DialogWindow w = new DialogWindow();
             w.Title = "Add mapping";
             w.SaveButtonIsDefault = true;
-            var m = new JitGroupMapping() { GroupType = GroupType.DomainLocal, GroupNameTemplate = "JIT-{computerName}" };
+            var m = new JitGroupMapping() { GroupType = GroupType.DomainLocal, GroupNameTemplate = "JIT-%computerName%" };
             var vm = this.groupMappingFactory.CreateViewModel(m);
             w.DataContext = vm;
 

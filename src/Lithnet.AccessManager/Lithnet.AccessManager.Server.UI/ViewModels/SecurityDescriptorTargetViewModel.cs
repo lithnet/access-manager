@@ -92,7 +92,10 @@ namespace Lithnet.AccessManager.Server.UI
             get => this.TryGetNameIfSid(this.JitAuthorizingGroup);
             set
             {
-                if (value.Contains("{computerName}", StringComparison.OrdinalIgnoreCase) || value.Contains("{computerDomain}", StringComparison.OrdinalIgnoreCase))
+                if (value.Contains("{computerName}", StringComparison.OrdinalIgnoreCase) || 
+                    value.Contains("%computerName%", StringComparison.OrdinalIgnoreCase) ||
+                    value.Contains("{computerDomain}", StringComparison.OrdinalIgnoreCase) ||
+                    value.Contains("%computerDomain%", StringComparison.OrdinalIgnoreCase))
                 {
                     this.JitAuthorizingGroup = value;
                 }

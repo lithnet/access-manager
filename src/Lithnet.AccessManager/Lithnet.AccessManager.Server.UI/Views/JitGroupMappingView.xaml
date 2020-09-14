@@ -79,7 +79,7 @@
                 <TextBox Text="{Binding GroupNameTemplate, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
                          Margin="5"/>
                 <TextBlock Margin="5 0 5 5"
-                           TextWrapping="Wrap">Specify the name of the group, and include the {computerName} placeholder. For example, "JIT-{computername}"</TextBlock>
+                           TextWrapping="Wrap">Specify the name of the group, and include the %computerName% placeholder. For example, "JIT-%computername%"</TextBlock>
             </StackPanel>
            
             <!--<Label Grid.Row="5" Grid.Column="0"

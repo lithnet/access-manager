@@ -32,7 +32,7 @@ namespace Lithnet.AccessManager.Server.Test
         public void GetGroupByTemplate(string groupName, string computerName)
         {
             IComputer computer = directory.GetComputer(computerName);
-            IGroup group = resolver.GetJitGroup(computer, "{computerDomain}\\JIT-{computerName}");
+            IGroup group = resolver.GetJitGroup(computer, "%computerDomain%\\JIT-%computerName%");
             Assert.AreEqual(groupName, group.MsDsPrincipalName);
         }
 

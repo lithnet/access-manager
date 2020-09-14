@@ -15,7 +15,7 @@ namespace Lithnet.AccessManager.Test
 {
     /// <summary>
     /// These test cases require two computers in each domain called 'PC1' and PC2' located in an OU called OU=Computers,OU=LAPS Testing at the root of the domain.
-    /// This computers should have a LAPS password with the value "{domain}\{ComputerName} Password" (eg "IDMDEV1\PC1 Password")
+    /// This computers should have a LAPS password with the value "%computerDomain%\%ComputerName% Password" (eg "IDMDEV1\PC1 Password")
     /// The computers named PC1 should have an expiry date of 9999999999999
     ///
     /// These test cases also depend on the users and group structure defined in the AceTests class

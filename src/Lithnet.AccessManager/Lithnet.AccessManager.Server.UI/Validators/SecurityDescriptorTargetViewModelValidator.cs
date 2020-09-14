@@ -22,10 +22,11 @@ namespace Lithnet.AccessManager.Server.UI
                 .WithMessage("A JIT group must be selected")
                 .Must((item, propertyValue) => propertyValue == null ||
                                                propertyValue.Contains("{computerName}", StringComparison.OrdinalIgnoreCase) ||
+                                               propertyValue.Contains("%computerName%", StringComparison.OrdinalIgnoreCase) ||
                                                (item.JitAuthorizingGroup?.TryParseAsSid(out _) ?? false) ||
                                                directory.TryGetGroup(propertyValue, out _))
                 .When(t => t.ShowJitOptions && !t.IsModeScript)
-                .WithMessage("Select a group using the group selector, or enter a template containing the '{computerName}' placeholder");
+                .WithMessage("Select a group using the group selector, or enter a template containing the '%computerName%' placeholder");
 
             this.RuleFor(r => r.Script)
                 .SetValidator(new FileSelectionViewModelValidator(appPathProvider))

@@ -19,20 +19,15 @@
 
   <ItemGroup>
     <None Remove="PolicyDefinitions\en-US\lithnet.accessmanager.agent.adml" />
-    <None Remove="PolicyDefinitions\en-US\lithnet.accessmanager.agent.jit.adml" />
     <None Remove="PolicyDefinitions\en-US\lithnet.accessmanager.agent.password.adml" />
     <None Remove="PolicyDefinitions\en-US\lithnet.adml" />
     <None Remove="PolicyDefinitions\lithnet.accessmanager.agent.admx" />
-    <None Remove="PolicyDefinitions\lithnet.accessmanager.agent.jit.admx" />
     <None Remove="PolicyDefinitions\lithnet.accessmanager.agent.password.admx" />
     <None Remove="PolicyDefinitions\lithnet.admx" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="PolicyDefinitions\en-US\lithnet.accessmanager.agent.adml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="PolicyDefinitions\en-US\lithnet.accessmanager.agent.jit.adml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PolicyDefinitions\en-US\lithnet.accessmanager.agent.password.adml">
@@ -42,9 +37,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PolicyDefinitions\lithnet.accessmanager.agent.admx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="PolicyDefinitions\lithnet.accessmanager.agent.jit.admx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PolicyDefinitions\lithnet.accessmanager.agent.password.admx">
