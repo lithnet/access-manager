@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
+using System.Text;
 using Lithnet.AccessManager.Interop;
 using Microsoft.Extensions.Logging;
 using Vanara.PInvoke;
@@ -21,6 +22,8 @@ namespace Lithnet.AccessManager
         private static readonly ConcurrentDictionary<SecurityIdentifier, string> domainDnsCache = new ConcurrentDictionary<SecurityIdentifier, string>();
         private static readonly ConcurrentDictionary<SecurityIdentifier, string> domainNetBiosCache = new ConcurrentDictionary<SecurityIdentifier, string>();
         private static readonly ConcurrentDictionary<string, string> dcCache = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private static Domain currentDomain;
+        private static Forest currentForest;
 
         private readonly ILogger logger;
 
@@ -294,6 +297,26 @@ namespace Lithnet.AccessManager
             });
         }
 
+        public string GetDomainNameDns()
+        {
+            if (currentDomain == null)
+            {
+                currentDomain = Domain.GetComputerDomain();
+            }
+
+            return currentDomain.Name;
+        }
+
+        public string GetForestNameDns()
+        {
+            if (currentForest == null)
+            {
+                currentForest = Domain.GetComputerDomain().Forest;
+            }
+
+            return currentForest.Name;
+        }
+
         public string GetDomainNameDns(SecurityIdentifier sid)
         {
             if (domainDnsCache.TryGetValue(sid.AccountDomainSid, out string value))
@@ -349,7 +372,7 @@ namespace Lithnet.AccessManager
                 {
                     return dcCache.AddOrUpdate(
                         key,
-                        a  => this.GetDc(server, domainDns, flags, ref mode2),
+                        a => this.GetDc(server, domainDns, flags, ref mode2),
                         (a, b) =>
                         {
                             this.logger.LogTrace("New DC requested");

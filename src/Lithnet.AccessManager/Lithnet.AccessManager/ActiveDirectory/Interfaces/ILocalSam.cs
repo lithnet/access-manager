@@ -9,7 +9,13 @@ namespace Lithnet.AccessManager
 
         string GetBuiltInAdministratorsGroupName();
 
+        string GetBuiltInAdministratorsGroupNameOrDefault(string server);
+
+        string GetBuiltInAdministratorsGroupName(string server);
+
         IList<SecurityIdentifier> GetLocalGroupMembers(string name);
+
+        IList<SecurityIdentifier> GetLocalGroupMembers(string server, string name);
 
         string GetMachineNetbiosDomainName();
 
@@ -18,7 +24,11 @@ namespace Lithnet.AccessManager
         SecurityIdentifier GetWellKnownSid(WellKnownSidType sidType);
 
         SecurityIdentifier GetWellKnownSid(WellKnownSidType sidType, SecurityIdentifier domainSid);
-
+        
+        SecurityIdentifier GetWellKnownSid(string server, WellKnownSidType sidType);
+        
+        SecurityIdentifier GetLocalMachineAuthoritySid(string server);
+        
         bool IsDomainController();
 
         void RemoveLocalGroupMember(string groupName, SecurityIdentifier member);

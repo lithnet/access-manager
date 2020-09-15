@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
+using System.Text;
+using Vanara.PInvoke;
 
 namespace Lithnet.AccessManager.Interop
 {
@@ -59,9 +62,7 @@ namespace Lithnet.AccessManager.Interop
         private static extern int LsaQueryInformationPolicy(IntPtr pPolicyHandle, PolicyInformationClass informationClass, out IntPtr pData);
 
         [DllImport("advapi32.dll", SetLastError = true, PreserveSig = true, CharSet = CharSet.Unicode)]
-        private static extern int LsaOpenPolicy([In]
-            in IntPtr pSystemName, [In]
-            in LsaObjectAttributes objectAttributes, LsaAccessPolicy desiredAccess, out IntPtr pPolicyHandle);
+        private static extern int LsaOpenPolicy([In] in LsaUnicodeString server, [In] in LsaObjectAttributes objectAttributes, LsaAccessPolicy desiredAccess, out IntPtr pPolicyHandle);
 
         [DllImport("advapi32.dll", CharSet = CharSet.Unicode)]
         private static extern int LsaClose(IntPtr hPolicy);
@@ -108,48 +109,61 @@ namespace Lithnet.AccessManager.Interop
                 return localMachineSid;
             }
 
-            IntPtr pPolicyHandle = IntPtr.Zero;
-            IntPtr pPolicyData = IntPtr.Zero;
 
-            try
-            {
-                LsaObjectAttributes lsaObjectAttributes = new LsaObjectAttributes();
 
-                var result = LsaOpenPolicy(in IntPtr.Zero, in lsaObjectAttributes, LsaAccessPolicy.PolicyViewLocalInformation, out pPolicyHandle);
-
-                if (result != 0)
-                {
-                    result = LsaNtStatusToWinError(result);
-                    throw new DirectoryException("LsaOpenPolicy failed", new Win32Exception(result));
-                }
-
-                result = LsaQueryInformationPolicy(pPolicyHandle, PolicyInformationClass.PolicyAccountDomainInformation, out pPolicyData);
-
-                if (result != 0)
-                {
-                    result = LsaNtStatusToWinError(result);
-                    throw new DirectoryException("LsaQueryInformationPolicy failed", new Win32Exception(result));
-                }
-
-                PolicyAccountDomainInfo info = Marshal.PtrToStructure<PolicyAccountDomainInfo>(pPolicyData);
-
-                localMachineSid = new SecurityIdentifier(info.DomainSid);
-
-                return localMachineSid;
-            }
-            finally
-            {
-                if (pPolicyData != IntPtr.Zero)
-                {
-                    LsaFreeMemory(pPolicyData);
-                }
-
-                if (pPolicyHandle != IntPtr.Zero)
-                {
-                    LsaClose(pPolicyHandle);
-                }
-            }
+            localMachineSid = GetLocalMachineAuthoritySid(null);
+            return localMachineSid;
         }
+
+        public static SecurityIdentifier GetLocalMachineAuthoritySid(string server)
+        {
+            AdvApi32.LSA_OBJECT_ATTRIBUTES lsaObjectAttributes = new AdvApi32.LSA_OBJECT_ATTRIBUTES();
+
+            var result = AdvApi32.LsaOpenPolicy(server, lsaObjectAttributes, AdvApi32.LsaPolicyRights.POLICY_VIEW_LOCAL_INFORMATION, out AdvApi32.SafeLSA_HANDLE pPolicyHandle);
+
+            result.ThrowIfFailed("LsaOpenPolicy failed");
+
+            result = AdvApi32.LsaQueryInformationPolicy(pPolicyHandle, AdvApi32.POLICY_INFORMATION_CLASS.PolicyAccountDomainInformation, out AdvApi32.SafeLsaMemoryHandle pPolicyData);
+
+            result.ThrowIfFailed("LsaQueryInformationPolicy failed");
+
+            var info = Marshal.PtrToStructure<PolicyAccountDomainInfo>(pPolicyData.DangerousGetHandle());
+
+            return new SecurityIdentifier(info.DomainSid);
+        }
+
+        public static string GetBuiltInAdministratorsGroupName(string server)
+        {
+            var sid = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
+
+            byte[] sidbytes = new byte[sid.BinaryLength];
+            sid.GetBinaryForm(sidbytes, 0);
+
+            int accountNameSize = 0;
+            int domainNameSize = 0;
+            AdvApi32.SID_NAME_USE use;
+
+            StringBuilder accountName = new StringBuilder(accountNameSize);
+            StringBuilder domainName = new StringBuilder(domainNameSize);
+
+            if (!AdvApi32.LookupAccountSid(server, sidbytes, accountName, ref accountNameSize, domainName, ref domainNameSize, out use))
+            {
+                int error = Marshal.GetLastWin32Error();
+                if (error != Vanara.PInvoke.Win32Error.ERROR_INSUFFICIENT_BUFFER)
+                {
+                    throw new Win32Exception(error);
+                }
+            }
+
+            if (!AdvApi32.LookupAccountSid(server, sidbytes, accountName, ref accountNameSize, domainName, ref domainNameSize, out use))
+            {
+                int error = Marshal.GetLastWin32Error();
+                throw new Win32Exception(error);
+            }
+
+            return accountName.ToString();
+        }
+
 
         public static SecurityIdentifier CreateWellKnownSid(WellKnownSidType sidType)
         {
@@ -204,7 +218,7 @@ namespace Lithnet.AccessManager.Interop
             }
         }
 
-        public static IList<SecurityIdentifier> GetLocalGroupMembers(string groupName)
+        public static IList<SecurityIdentifier> GetLocalGroupMembers(string server, string groupName)
         {
             int result;
 
@@ -219,7 +233,7 @@ namespace Lithnet.AccessManager.Interop
 
                 try
                 {
-                    result = NetLocalGroupGetMembers(null, groupName, 0, out pLocalGroupMemberInfo, -1, out entriesRead, out totalEntries, resume);
+                    result = NetLocalGroupGetMembers(server, groupName, 0, out pLocalGroupMemberInfo, -1, out entriesRead, out totalEntries, resume);
 
                     if (result != 0 && result != InsufficientBuffer)
                     {

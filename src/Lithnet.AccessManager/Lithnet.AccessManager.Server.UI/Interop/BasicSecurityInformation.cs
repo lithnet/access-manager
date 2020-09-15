@@ -51,7 +51,6 @@ namespace Lithnet.AccessManager.Server.UI.Interop
         {
             string s = NativeMethods.GetSecurityDescriptor(securityDescriptor, requestInformation);
             this.SecurityDescriptor = new RawSecurityDescriptor(s);
-             
             return S_OK;
         }
 

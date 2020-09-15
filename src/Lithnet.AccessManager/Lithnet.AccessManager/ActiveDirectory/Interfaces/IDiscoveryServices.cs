@@ -17,7 +17,7 @@ namespace Lithnet.AccessManager
 
         T FindDcAndExecuteWithRetry<T>(string domain, Func<string, T> action);
 
-        T FindDcAndExecuteWithRetry<T>(string domain,  DsGetDcNameFlags flags, Func<string, T> action);
+        T FindDcAndExecuteWithRetry<T>(string domain, DsGetDcNameFlags flags, Func<string, T> action);
 
         T FindDcAndExecuteWithRetry<T>(string server, string domain, DsGetDcNameFlags flags, DcLocatorMode mode, Func<string, T> action);
 
@@ -39,6 +39,8 @@ namespace Lithnet.AccessManager
 
         string GetDomainControllerFromDNOrDefault(string dn);
 
+        string GetDomainNameDns();
+
         string GetDomainNameDns(SecurityIdentifier sid);
 
         string GetDomainNameDns(string dn);
@@ -46,6 +48,8 @@ namespace Lithnet.AccessManager
         string GetDomainNameNetBios(SecurityIdentifier sid);
 
         string GetForestNameDns(string dn);
+
+        string GetForestNameDns();
 
         string GetFullyQualifiedAdsPath(string dn);
 

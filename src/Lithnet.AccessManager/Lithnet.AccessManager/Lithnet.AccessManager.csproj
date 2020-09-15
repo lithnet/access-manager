@@ -25,8 +25,9 @@
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.7.0" />
     <PackageReference Include="System.DirectoryServices.Protocols" Version="4.7.0" />
     <PackageReference Include="system.security.Cryptography.Cng" Version="4.7.0" />
-    <PackageReference Include="Vanara.PInvoke.Cryptography" Version="3.2.16" />
+    <PackageReference Include="Vanara.PInvoke.Cryptography" Version="3.2.17" />
     <PackageReference Include="vanara.pinvoke.netapi32" Version="3.2.16" />
+    <PackageReference Include="Vanara.pinvoke.Security" Version="3.2.17" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">

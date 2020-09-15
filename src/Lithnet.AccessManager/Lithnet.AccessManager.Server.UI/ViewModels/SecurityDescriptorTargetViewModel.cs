@@ -18,19 +18,17 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public sealed class SecurityDescriptorTargetViewModel : ValidatingModelBase, IViewAware
     {
-        private static readonly Domain currentDomain = Domain.GetCurrentDomain();
-        private static readonly Forest currentForest = Forest.GetCurrentForest();
-        
         private readonly IDirectory directory;
         private readonly ILogger<SecurityDescriptorTargetViewModel> logger;
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly INotificationChannelSelectionViewModelFactory notificationChannelFactory;
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IDiscoveryServices discoveryServices;
-
+        private readonly ILocalSam localSam;
+      
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam)
         {
             this.directory = directory;
             this.Model = model;
@@ -40,6 +38,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.Validator = validator;
             this.domainTrustProvider = domainTrustProvider;
             this.discoveryServices = discoveryServices;
+            this.localSam = localSam;
 
             this.Script = fileSelectionViewModelFactory.CreateViewModel(model, () => model.Script, appPathProvider.ScriptsPath);
             this.Script.DefaultFileExtension = "ps1";
@@ -92,7 +91,7 @@ namespace Lithnet.AccessManager.Server.UI
             get => this.TryGetNameIfSid(this.JitAuthorizingGroup);
             set
             {
-                if (value.Contains("{computerName}", StringComparison.OrdinalIgnoreCase) || 
+                if (value.Contains("{computerName}", StringComparison.OrdinalIgnoreCase) ||
                     value.Contains("%computerName%", StringComparison.OrdinalIgnoreCase) ||
                     value.Contains("{computerDomain}", StringComparison.OrdinalIgnoreCase) ||
                     value.Contains("%computerDomain%", StringComparison.OrdinalIgnoreCase))
@@ -156,9 +155,14 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task EditPermissions()
         {
+            await this.EditPermissionsInternal(this.SecurityDescriptor);
+        }
+
+        private async Task EditPermissionsInternal(string startingSd)
+        {
             try
             {
-                var rights = new List<SiAccess>
+                List<SiAccess> rights = new List<SiAccess>
                 {
                     new SiAccess((uint)AccessMask.LocalAdminPassword, "Local admin password", InheritFlags.SiAccessGeneral),
                     new SiAccess((uint)AccessMask.LocalAdminPasswordHistory, "Local admin password history", InheritFlags.SiAccessGeneral),
@@ -166,9 +170,7 @@ namespace Lithnet.AccessManager.Server.UI
                     new SiAccess((uint)AccessMask.BitLocker, "BitLocker recovery passwords", InheritFlags.SiAccessGeneral),
                 };
 
-                this.SecurityDescriptor ??= "O:SYD:";
-
-                RawSecurityDescriptor sd = new RawSecurityDescriptor(this.SecurityDescriptor);
+                RawSecurityDescriptor sd = new RawSecurityDescriptor(startingSd);
 
                 string targetServer = this.GetDcForTargetOrDefault();
 
@@ -210,7 +212,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             if (this.Target == null)
             {
-                return currentDomain.Name;
+                return this.discoveryServices.GetDomainNameDns();
             }
 
             string domain = null;
@@ -231,19 +233,14 @@ namespace Lithnet.AccessManager.Server.UI
                 this.logger.LogWarning(EventIDs.UIGenericWarning, ex, "Error getting dc for target");
             }
 
-            return this.discoveryServices.GetDomainController(domain ?? currentDomain.Name);
-        }
-
-        private string GetForestDcForTargetOrDefault()
-        {
-            return this.discoveryServices.GetDomainController(GetForestForTargetOrDefault() ?? currentForest.Name);
+            return this.discoveryServices.GetDomainController(domain ?? this.discoveryServices.GetDomainNameDns());
         }
 
         private string GetForestForTargetOrDefault()
         {
             if (string.IsNullOrWhiteSpace(this.Target))
             {
-                return currentForest.Name;
+                return this.discoveryServices.GetForestNameDns();
             }
 
             string forest = null;
@@ -263,7 +260,7 @@ namespace Lithnet.AccessManager.Server.UI
                 this.logger.LogWarning(EventIDs.UIGenericWarning, ex, "Error resolving forest name");
             }
 
-            forest ??= currentForest.Name;
+            forest ??= this.discoveryServices.GetForestNameDns();
 
             return forest;
         }
@@ -273,28 +270,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                //var vm = new SelectForestViewModel
-                //{
-                //    AvailableForests = BuildAvailableForests(),
-                //    SelectedForest = this.GetForestForTargetOrDefault()
-                //};
-
-                //ExternalDialogWindow w = new ExternalDialogWindow
-                //{
-                //    Title = "Select forest",
-                //    DataContext = vm,
-                //    SizeToContent = SizeToContent.WidthAndHeight,
-                //    SaveButtonName = "Next...",
-                //    SaveButtonIsDefault = true,
-                //    Owner = this.GetWindow()
-                //};
-
-                //if (!w.ShowDialog() ?? false)
-                //{
-                //    return;
-                //}
-
-                var sid = ShowObjectPickerGroups(this.GetDcForTargetOrDefault());
+                SecurityIdentifier sid = ShowObjectPickerGroups(this.GetDcForTargetOrDefault());
                 if (sid != null)
                 {
                     this.JitAuthorizingGroup = sid.ToString();
@@ -304,6 +280,87 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 this.logger.LogError(EventIDs.UIGenericError, ex, "Select JIT group error");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred when processing the request\r\n{ex.Message}");
+            }
+        }
+
+        public bool CanImportJitAdminsFromComputer => this.CanEdit && this.AuthorizationMode == AuthorizationMode.SecurityDescriptor && this.Target != null;
+
+        public async Task ImportJitAdminsFromComputer()
+        {
+            try
+            {
+                SecurityIdentifier sid = this.ShowObjectPickerDialogComputer(this.GetForestForTargetOrDefault());
+
+                if (sid == null)
+                {
+                    return;
+                }
+
+                if (!this.directory.TryGetComputer(sid, out IComputer computer))
+                {
+                    await this.dialogCoordinator.ShowMessageAsync(this, "Error", "Unable to locate computer in the directory");
+                    return;
+                }
+
+                SecurityIdentifier localMachineSid = null;
+
+                try
+                {
+                    localMachineSid = localSam.GetLocalMachineAuthoritySid(computer.DnsHostName);
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogWarning(EventIDs.UIGenericWarning, ex, "Unable to connect to get SID from remote computer {computer}", computer.DnsHostName);
+                }
+
+                IList<SecurityIdentifier> members;
+
+                try
+                {
+                    members = this.localSam.GetLocalGroupMembers(computer.DnsHostName, this.localSam.GetBuiltInAdministratorsGroupNameOrDefault(computer.DnsHostName));
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(EventIDs.UIGenericError, ex, "Unable to connect to remote computer {computer}", computer.DnsHostName);
+                    await this.dialogCoordinator.ShowMessageAsync(this, "Error", "Unable to locate computer in the directory");
+                    return;
+                }
+
+                this.SecurityDescriptor ??= "O:SYD:";
+                CommonSecurityDescriptor csd = new CommonSecurityDescriptor(false, false, this.SecurityDescriptor);
+
+
+                foreach (var member in members)
+                {
+                    if (localMachineSid != null)
+                    {
+                        if (member.IsEqualDomainSid(localMachineSid))
+                        {
+                            continue;
+                        }
+                    }
+
+                    try
+                    {
+                        if (!directory.TryGetPrincipal(member, out _))
+                        {
+                            continue;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        this.logger.LogTrace(ex, "Unable to find principal {principal} in the directory", member);
+                    }
+
+                    csd.DiscretionaryAcl.AddAccess(AccessControlType.Allow, member, (int)AccessMask.Jit, InheritanceFlags.None, PropagationFlags.None);
+                }
+
+                await this.EditPermissionsInternal(csd.GetSddlForm(AccessControlSections.All));
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Unable to import users from computer");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", "Unable to import users from computer");
             }
         }
 
@@ -323,7 +380,7 @@ namespace Lithnet.AccessManager.Server.UI
             scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS |
                              DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
 
-            var result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), targetServer, scope, "objectClass", "objectSid").FirstOrDefault();
+            DsopResult result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), targetServer, scope, "objectClass", "objectSid").FirstOrDefault();
 
             if (result != null)
             {
@@ -343,7 +400,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                var vm = new SelectTargetTypeViewModel
+                SelectTargetTypeViewModel vm = new SelectTargetTypeViewModel
                 {
                     TargetType = this.Type,
                     AvailableForests = this.domainTrustProvider.GetForests().Select(t => t.Name).ToList()
@@ -374,7 +431,7 @@ namespace Lithnet.AccessManager.Server.UI
                 }
                 else
                 {
-                    var sid = ShowObjectPickerDialogComputersAndGroups(vm.TargetType, vm.SelectedForest);
+                    SecurityIdentifier sid = ShowObjectPickerDialogComputersAndGroups(vm.TargetType, vm.SelectedForest);
 
                     if (sid != null)
                     {
@@ -416,9 +473,9 @@ namespace Lithnet.AccessManager.Server.UI
                              DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS |
                              DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
 
-            string targetServer = this.discoveryServices.GetDomainController(forest ?? currentForest.Name);
+            string targetServer = this.discoveryServices.GetDomainController(forest ?? this.discoveryServices.GetForestNameDns());
 
-            var result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), targetServer, scope, "objectClass", "objectSid").FirstOrDefault();
+            DsopResult result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), targetServer, scope, "objectClass", "objectSid").FirstOrDefault();
 
             if (result != null)
             {
@@ -434,14 +491,50 @@ namespace Lithnet.AccessManager.Server.UI
             return null;
         }
 
+        private SecurityIdentifier ShowObjectPickerDialogComputer(string forest)
+        {
+            DsopScopeInitInfo scope = new DsopScopeInitInfo
+            {
+                Filter = new DsFilterFlags()
+            };
+
+            scope.Filter.UpLevel.BothModeFilter = DsopObjectFilterFlags.DSOP_FILTER_COMPUTERS;
+
+            scope.ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_ENTERPRISE_DOMAIN |
+                              DsopScopeTypeFlags.DSOP_SCOPE_TYPE_USER_ENTERED_UPLEVEL_SCOPE |
+                              DsopScopeTypeFlags.DSOP_SCOPE_TYPE_EXTERNAL_UPLEVEL_DOMAIN;
+
+            scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_COMPUTERS |
+                             DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS |
+                             DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
+
+            string targetServer = this.discoveryServices.GetDomainController(forest ?? this.discoveryServices.GetForestNameDns());
+
+            DsopResult result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), targetServer, scope, "objectClass", "objectSid").FirstOrDefault();
+
+            if (result != null)
+            {
+                byte[] sid = result.Attributes["objectSid"] as byte[];
+                if (sid == null)
+                {
+                    return null;
+                }
+
+                return new SecurityIdentifier(sid, 0);
+            }
+
+            return null;
+        }
+
+
         private void ShowContainerDialog()
         {
-            string path = this.Target ?? currentDomain.GetDirectoryEntry().GetPropertyString("distinguishedName");
+            string path = this.Target ?? Domain.GetComputerDomain().GetDirectoryEntry().GetPropertyString("distinguishedName");
 
             string basePath = this.discoveryServices.GetFullyQualifiedDomainControllerAdsPath(path);
             string initialPath = this.discoveryServices.GetFullyQualifiedAdsPath(path);
 
-            var container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select container", "Select container", basePath, initialPath);
+            string container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select container", "Select container", basePath, initialPath);
 
             if (container != null)
             {
@@ -486,7 +579,7 @@ namespace Lithnet.AccessManager.Server.UI
             try
             {
                 SecurityIdentifier s = new SecurityIdentifier(sid);
-                if (this.directory.TryGetPrincipal(sid, out ISecurityPrincipal principal))
+                if (this.directory.TryGetPrincipal(s, out ISecurityPrincipal principal))
                 {
                     return principal.MsDsPrincipalName;
                 }
@@ -517,7 +610,7 @@ namespace Lithnet.AccessManager.Server.UI
                     return false;
                 }
 
-                foreach (var ace in sd.DiscretionaryAcl.OfType<CommonAce>())
+                foreach (CommonAce ace in sd.DiscretionaryAcl.OfType<CommonAce>())
                 {
                     if (ace.AceType == AceType.AccessAllowed && ((ace.AccessMask & (int)mask) == (int)mask))
                     {

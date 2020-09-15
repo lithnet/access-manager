@@ -88,6 +88,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition />
                         <RowDefinition />
+                        <RowDefinition />
                     </Grid.RowDefinitions>
 
                     <RadioButton Grid.Row="0" Grid.Column="0"
@@ -103,7 +104,13 @@
                                     HorizontalAlignment="Left"
                                     Margin="2"/>
 
-                    <RadioButton Grid.Row="1" Grid.Column="0"
+                    <Button Grid.Row="1" Grid.Column="1" 
+                            Command="{s:Action ImportJitAdminsFromComputer}" 
+                            Content="Import JIT permissions from computer..."
+                            HorizontalAlignment="Left"
+                            Margin="2"/>
+
+                    <RadioButton Grid.Row="2" Grid.Column="0"
                                      IsChecked="{Binding IsModeScript}" 
                                      Content="Use an external script"
                                      VerticalAlignment="Top"
@@ -111,7 +118,7 @@
                                      IsEnabled="{Binding CanEdit, Mode=OneWay}"
                                      Margin="2 2 5 2"/>
 
-                    <ContentControl Grid.Row="1" Grid.Column="1"
+                    <ContentControl Grid.Row="2" Grid.Column="1"
                                         s:View.Model="{Binding Script}" 
                                         VerticalAlignment="Top"
                                         IsEnabled="{Binding IsModeScript}"

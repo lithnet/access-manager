@@ -1,5 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Threading;
 using FluentValidation;
 using Lithnet.AccessManager.Server.Configuration;
@@ -18,6 +21,8 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILogger logger;
 
         private readonly ILoggerFactory loggerFactory;
+
+        private IApplicationConfig appconfig;
 
         public Bootstrapper()
         {
@@ -40,17 +45,46 @@ namespace Lithnet.AccessManager.Server.UI
         protected override void OnStart()
         {
             AppDomain.CurrentDomain.UnhandledException += AppDomain_UnhandledException;
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
             base.OnStart();
+        }
+
+        private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            this.HandleException(e.Exception);
         }
 
         private void AppDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            logger.LogCritical(e.ExceptionObject as Exception, "An unhandled exception occurred in the app domain");
+            this.HandleException(e.ExceptionObject as Exception ?? new Exception("An unhandled exception occurred in the app domain, but no exception was present"));
         }
 
         protected override void OnUnhandledException(DispatcherUnhandledExceptionEventArgs e)
         {
-            logger.LogCritical(e.Exception, "An unhandled exception occurred in the user interface");
+            this.HandleException(e.Exception);
+        }
+
+        private void HandleException(Exception ex)
+        {
+            logger.LogCritical(ex, "An unhandled exception occurred in the user interface");
+
+            string errorMessage = $"An unhandled error occurred and the application will terminate. Do you want to attempt to save the current configuration?";
+
+            if (MessageBox.Show(errorMessage, "Error", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    File.Copy(appconfig.Path, appconfig.Path + ".backup", true);
+                    appconfig?.Save(appconfig.Path);
+                }
+                catch (Exception ex2)
+                {
+                    logger.LogCritical(ex2, "Unable to save app config");
+                    MessageBox.Show("Unable to save the current configuration");
+                }
+            }
+
+            Environment.Exit(1);
         }
 
         protected override void ConfigureIoC(IStyletIoCBuilder builder)
@@ -59,9 +93,9 @@ namespace Lithnet.AccessManager.Server.UI
 
             try
             {
-                var appconfig = ApplicationConfig.Load(pathProvider.ConfigFile);
+                appconfig = ApplicationConfig.Load(pathProvider.ConfigFile);
                 var hosting = HostingOptions.Load(pathProvider.HostingConfigFile);
-
+                
                 //Config
                 builder.Bind<IApplicationConfig>().ToInstance(appconfig);
                 builder.Bind<AuthenticationOptions>().ToInstance(appconfig.Authentication);
@@ -112,6 +146,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<RandomNumberGenerator>().ToInstance(RandomNumberGenerator.Create());
                 builder.Bind<IDialogCoordinator>().To<DialogCoordinator>();
                 builder.Bind<IDirectory>().To<ActiveDirectory>();
+                builder.Bind<ILocalSam>().To<LocalSam>();
                 builder.Bind<IDiscoveryServices>().To<DiscoveryServices>();
                 builder.Bind<IServiceSettingsProvider>().To<ServiceSettingsProvider>();
                 builder.Bind<INotificationSubscriptionProvider>().To<NotificationSubscriptionProvider>();

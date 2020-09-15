@@ -9,10 +9,10 @@
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="ARPPRODUCTICON" Value="accessmanager.exe" Type="8"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
-    <ROW Property="ProductCode" Value="1033:{24D603FB-E46B-445B-9390-BDC3550A0682} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{9C43FCA1-AF4F-401A-823D-A23017EF1F66} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Agent"/>
-    <ROW Property="ProductVersion" Value="1.0.7608.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7612.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
     <ROW Property="SETUPEXEDIR" Value="1"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{EEDECF4C-BABB-4AE0-9CB9-DC051FF1AE75}"/>
@@ -107,9 +107,7 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
     <ROW File="Lithnet.AccessManager.Agent.exe" Component_="Lithnet.AccessManager.Agent.exe" FileName="LITHNE~1.EXE|Lithnet.AccessManager.Agent.exe" Attributes="0" SourcePath="output-x64\Lithnet.AccessManager.Agent.exe" SelfReg="false" DigSign="true"/>
     <ROW File="lithnet.accessmanager.agent.adml" Component_="lithnet.accessmanager.agent.adml" FileName="LITHNE~1.ADM|lithnet.accessmanager.agent.adml" Attributes="0" SourcePath="output-x64\PolicyDefinitions\en-US\lithnet.accessmanager.agent.adml" SelfReg="false"/>
-    <ROW File="lithnet.accessmanager.agent.jit.adml" Component_="lithnet.accessmanager.agent.adml" FileName="LITHNE~2.ADM|lithnet.accessmanager.agent.jit.adml" Attributes="0" SourcePath="output-x64\PolicyDefinitions\en-US\lithnet.accessmanager.agent.jit.adml" SelfReg="false"/>
     <ROW File="lithnet.accessmanager.agent.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~1.ADM|lithnet.accessmanager.agent.admx" Attributes="0" SourcePath="output-x64\PolicyDefinitions\lithnet.accessmanager.agent.admx" SelfReg="false"/>
-    <ROW File="lithnet.accessmanager.agent.jit.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~2.ADM|lithnet.accessmanager.agent.jit.admx" Attributes="0" SourcePath="output-x64\PolicyDefinitions\lithnet.accessmanager.agent.jit.admx" SelfReg="false"/>
     <ROW File="lithnet.accessmanager.agent.password.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~3.ADM|lithnet.accessmanager.agent.password.admx" Attributes="0" SourcePath="output-x64\PolicyDefinitions\lithnet.accessmanager.agent.password.admx" SelfReg="false"/>
     <ROW File="lithnet.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~4.ADM|lithnet.admx" Attributes="0" SourcePath="output-x64\PolicyDefinitions\lithnet.admx" SelfReg="false"/>
     <ROW File="appsettings.json" Component_="appsettings.json" FileName="APPSET~1.JSO|appsettings.json" Attributes="0" SourcePath="output-x64\appsettings.json" SelfReg="false"/>

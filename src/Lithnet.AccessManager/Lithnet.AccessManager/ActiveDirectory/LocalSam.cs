@@ -28,9 +28,20 @@ namespace Lithnet.AccessManager
             return NativeMethods.CreateWellKnownSid(sidType);
         }
 
+        public SecurityIdentifier GetWellKnownSid(string server, WellKnownSidType sidType)
+        {
+            var localMachineAuthoritySid = NativeMethods.GetLocalMachineAuthoritySid(server);
+            return new SecurityIdentifier(sidType, localMachineAuthoritySid);
+        }
+
         public SecurityIdentifier GetWellKnownSid(WellKnownSidType sidType, SecurityIdentifier domainSid)
         {
             return new SecurityIdentifier(sidType, domainSid.AccountDomainSid);
+        }
+
+        public SecurityIdentifier GetLocalMachineAuthoritySid(string server)
+        {
+            return NativeMethods.GetLocalMachineAuthoritySid(server);
         }
 
         public string GetMachineNetbiosDomainName()
@@ -57,13 +68,35 @@ namespace Lithnet.AccessManager
 
         public IList<SecurityIdentifier> GetLocalGroupMembers(string name)
         {
-            return NativeMethods.GetLocalGroupMembers(name);
+            return this.GetLocalGroupMembers(null, name);
+        }
+
+        public IList<SecurityIdentifier> GetLocalGroupMembers(string server, string name)
+        {
+            return NativeMethods.GetLocalGroupMembers(server, name);
         }
 
         public string GetBuiltInAdministratorsGroupName()
         {
             NTAccount adminGroup = (NTAccount)this.GetWellKnownSid(WellKnownSidType.BuiltinAdministratorsSid).Translate(typeof(NTAccount));
             return adminGroup.Value.Split('\\')[1];
+        }
+        public string GetBuiltInAdministratorsGroupName(string server)
+        {
+            return NativeMethods.GetBuiltInAdministratorsGroupName(server);
+        }
+        public string GetBuiltInAdministratorsGroupNameOrDefault(string server)
+        {
+            try
+            {
+                return this.GetBuiltInAdministratorsGroupName(server);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogTrace(ex, "Unable to get built-in administrators group name from computer {server}, falling back to default value", server);
+            }
+
+            return "Administrators";
         }
 
         public void AddLocalGroupMember(string groupName, SecurityIdentifier member)

@@ -86,6 +86,12 @@ namespace Lithnet.AccessManager
             return DirectoryExtensions.TryGet(() => this.GetComputer(name), out computer);
         }
 
+        public bool TryGetComputer(SecurityIdentifier sid, out IComputer computer)
+        {
+            return DirectoryExtensions.TryGet(() => this.GetComputer(sid), out computer);
+        }
+
+
         public ISecurityPrincipal GetPrincipal(SecurityIdentifier sid)
         {
             var result = GetDirectoryEntry(sid);

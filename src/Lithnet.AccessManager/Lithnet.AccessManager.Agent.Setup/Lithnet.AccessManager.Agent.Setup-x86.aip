@@ -9,10 +9,10 @@
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="ARPPRODUCTICON" Value="accessmanager.exe" Type="8"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
-    <ROW Property="ProductCode" Value="1033:{8142C48D-542B-4995-9852-CD984B6C7763} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{E74D036B-0560-4179-AB4A-1C7B9098D17B} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Agent"/>
-    <ROW Property="ProductVersion" Value="1.0.7608.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7612.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
     <ROW Property="SETUPEXEDIR" Value="1"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{EEDECF4C-BABB-4AE0-9CB9-DC051FF1AE75}"/>
@@ -162,11 +162,9 @@
     <ROW File="Vanara.PInvoke.Cryptography.dll" Component_="Vanara.PInvoke.Cryptography.dll" FileName="VANARA~2.DLL|Vanara.PInvoke.Cryptography.dll" Attributes="0" SourcePath="output-x86\Vanara.PInvoke.Cryptography.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.Shared.dll" Component_="Vanara.PInvoke.Shared.dll" FileName="VANARA~3.DLL|Vanara.PInvoke.Shared.dll" Attributes="0" SourcePath="output-x86\Vanara.PInvoke.Shared.dll" SelfReg="false"/>
     <ROW File="lithnet.accessmanager.agent.adml" Component_="lithnet.accessmanager.agent.adml" FileName="LITHNE~1.ADM|lithnet.accessmanager.agent.adml" Attributes="0" SourcePath="output-x86\PolicyDefinitions\en-US\lithnet.accessmanager.agent.adml" SelfReg="false"/>
-    <ROW File="lithnet.accessmanager.agent.jit.adml" Component_="lithnet.accessmanager.agent.adml" FileName="LITHNE~2.ADM|lithnet.accessmanager.agent.jit.adml" Attributes="0" SourcePath="output-x86\PolicyDefinitions\en-US\lithnet.accessmanager.agent.jit.adml" SelfReg="false"/>
     <ROW File="lithnet.accessmanager.agent.password.adml" Component_="lithnet.accessmanager.agent.adml" FileName="LITHNE~3.ADM|lithnet.accessmanager.agent.password.adml" Attributes="0" SourcePath="output-x86\PolicyDefinitions\en-US\lithnet.accessmanager.agent.password.adml" SelfReg="false"/>
     <ROW File="lithnet.adml" Component_="lithnet.accessmanager.agent.adml" FileName="LITHNE~4.ADM|lithnet.adml" Attributes="0" SourcePath="output-x86\PolicyDefinitions\en-US\lithnet.adml" SelfReg="false"/>
     <ROW File="lithnet.accessmanager.agent.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~1.ADM|lithnet.accessmanager.agent.admx" Attributes="0" SourcePath="output-x86\PolicyDefinitions\lithnet.accessmanager.agent.admx" SelfReg="false"/>
-    <ROW File="lithnet.accessmanager.agent.jit.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~2.ADM|lithnet.accessmanager.agent.jit.admx" Attributes="0" SourcePath="output-x86\PolicyDefinitions\lithnet.accessmanager.agent.jit.admx" SelfReg="false"/>
     <ROW File="lithnet.accessmanager.agent.password.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~3.ADM|lithnet.accessmanager.agent.password.admx" Attributes="0" SourcePath="output-x86\PolicyDefinitions\lithnet.accessmanager.agent.password.admx" SelfReg="false"/>
     <ROW File="lithnet.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~4.ADM|lithnet.admx" Attributes="0" SourcePath="output-x86\PolicyDefinitions\lithnet.admx" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.Kernel32.dll" Component_="Vanara.PInvoke.Kernel32.dll" FileName="VANARA~4.DLL|Vanara.PInvoke.Kernel32.dll" Attributes="0" SourcePath="output-x86\Vanara.PInvoke.Kernel32.dll" SelfReg="false"/>

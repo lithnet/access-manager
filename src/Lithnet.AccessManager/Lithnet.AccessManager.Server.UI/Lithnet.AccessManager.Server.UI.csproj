@@ -11,7 +11,7 @@
     <Copyright>(c) 2020 Lithnet</Copyright>
     <PackageProjectUrl>https://github.com/lithnet/access-manager</PackageProjectUrl>
     <Deterministic>false</Deterministic>
-    <Platforms>AnyCPU</Platforms>
+    <Platforms>AnyCPU;x86</Platforms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <ApplicationIcon>access-manager.ico</ApplicationIcon>

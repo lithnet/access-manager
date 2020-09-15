@@ -17,6 +17,7 @@ namespace Lithnet.AccessManager
 
         bool TryGetComputer(string name, out IComputer computer);
 
+        bool TryGetComputer(SecurityIdentifier sid, out IComputer computer);
         void DeleteGroup(string name);
 
         IGroup GetGroup(string groupName);
