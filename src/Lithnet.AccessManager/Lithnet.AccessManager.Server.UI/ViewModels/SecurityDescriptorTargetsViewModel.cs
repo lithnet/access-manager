@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.AccessManager.Server.UI.Interop;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.SimpleChildWindow;
 using Newtonsoft.Json;
@@ -15,6 +19,8 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly SecurityDescriptorTargetViewModelFactory factory;
 
+        private readonly IDiscoveryServices discoveryServices;
+
         protected IList<SecurityDescriptorTarget> Model { get; }
 
         protected IDialogCoordinator DialogCoordinator { get; }
@@ -22,10 +28,11 @@ namespace Lithnet.AccessManager.Server.UI
         [NotifyModelChangedCollection]
         public BindableCollection<SecurityDescriptorTargetViewModel> ViewModels { get; }
 
-        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, SecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher)
+        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, SecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, IDiscoveryServices discoveryServices)
         {
             this.factory = factory;
             this.Model = model;
+            this.discoveryServices = discoveryServices;
             this.DialogCoordinator = dialogCoordinator;
             this.ViewModels = new BindableCollection<SecurityDescriptorTargetViewModel>(this.Model.Select(factory.CreateViewModel));
             eventPublisher.Register(this);
@@ -81,6 +88,27 @@ namespace Lithnet.AccessManager.Server.UI
                 this.ViewModels.Insert(Math.Min(existingPosition, this.ViewModels.Count), vm);
                 this.SelectedItem = vm;
             }
+        }
+
+        public async Task ImportRules()
+        {
+            string container = this.ShowContainerDialog();
+
+            if (container == null)
+            {
+                return;
+            }
+
+
+        }
+
+        private string ShowContainerDialog()
+        {
+            string path = Domain.GetComputerDomain().GetDirectoryEntry().GetPropertyString("distinguishedName");
+            string basePath = this.discoveryServices.GetFullyQualifiedDomainControllerAdsPath(path);
+            string initialPath = this.discoveryServices.GetFullyQualifiedAdsPath(path);
+
+            return NativeMethods.ShowContainerDialog(this.GetHandle(), "Select container", "Select container", basePath, initialPath);
         }
 
         public bool CanEdit => this.SelectedItem != null;

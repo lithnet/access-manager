@@ -72,11 +72,14 @@ namespace Lithnet.AccessManager.Service.AppSettings
                             return Task.CompletedTask;
                         }
 
+                        this.logger.LogTrace("Certificate passed basic validations");
+
                         var claims = (context.Principal?.Identity as ClaimsIdentity)?.ToClaimList();
 
                         try
                         {
                             this.ValidateCertificate(context);
+                            this.logger.LogTrace("Certificate passed all required validation checks");
                         }
                         catch (Exception ex)
                         {
@@ -89,6 +92,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
                         try
                         {
                             this.ResolveIdentity(context);
+                            this.logger.LogTrace("Identity successfully resolved");
                         }
                         catch (Exception ex)
                         {
@@ -140,6 +144,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
                 throw new CertificateValidationException("One of the required issuers was not found in the certificate chain");
             }
 
+            
             if (!this.ValidateNtAuthStore(chain))
             {
                 throw new CertificateValidationException("The certificate chain did not validate to an issuer that is trusted by the enterprise to issue smart card certificates");
@@ -149,6 +154,8 @@ namespace Lithnet.AccessManager.Service.AppSettings
         private void ResolveIdentity(CertificateValidatedContext context)
         {
             ClaimsIdentity user = context.Principal.Identity as ClaimsIdentity;
+
+            this.logger.LogTrace("Attempting to resolve certificate identity. Resolution mode: {mode}", this.options.IdentityResolutionMode);
 
             if ((this.options.IdentityResolutionMode == CertificateIdentityResolutionMode.Default ||
                 this.options.IdentityResolutionMode.HasFlag(CertificateIdentityResolutionMode.UpnSan)))
@@ -170,6 +177,8 @@ namespace Lithnet.AccessManager.Service.AppSettings
                 }
                 else
                 {
+                    this.logger.LogTrace("UPN value found {upn}", upn);
+
                     if (this.TryResolveIdentityUpnSan(context, user, upn))
                     {
                         return;
@@ -268,6 +277,8 @@ namespace Lithnet.AccessManager.Service.AppSettings
                 return true;
             }
 
+            this.logger.LogTrace("Attempting to validate certificate against the NTAuth store");
+
             Crypt32.CERT_CHAIN_POLICY_STATUS status = new Crypt32.CERT_CHAIN_POLICY_STATUS();
             var para = new Crypt32.CERT_CHAIN_POLICY_PARA
             {
@@ -276,7 +287,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
 
             if (!Crypt32.CertVerifyCertificateChainPolicy(6, chain.ChainContext, para, ref status))
             {
-                throw new CertificateValidationException("The function used to validated the certificate chain failed", new Win32Exception(Marshal.GetLastWin32Error()));
+                throw new CertificateValidationException("The function used to validate the certificate chain failed", new Win32Exception(Marshal.GetLastWin32Error()));
             }
 
             if (status.dwError != 0)
@@ -284,6 +295,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
                 throw new CertificateValidationException("The certificate could not be validated against the NTAuth store. Ensure the issuer is from a trusted enterprise smart-card issuing CA", new Win32Exception((int)status.dwError));
             }
 
+            this.logger.LogTrace("Certificate successfully validated against the NTAuth store");
             return true;
         }
 
@@ -320,6 +332,8 @@ namespace Lithnet.AccessManager.Service.AppSettings
             }
 
             int count = 0;
+            
+            this.logger.LogTrace("Attempting to validate certificate against the list of trusted issuers");
 
             foreach (var issuerEncoded in this.options.TrustedIssuers)
             {
@@ -333,6 +347,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
                     {
                         if (string.Equals(item.Certificate.Thumbprint, issuer.Thumbprint, StringComparison.OrdinalIgnoreCase))
                         {
+                            this.logger.LogTrace("Certificate validated against specific issuer {issuer}", issuer.Subject);
                             return true;
                         }
                     }
@@ -342,6 +357,8 @@ namespace Lithnet.AccessManager.Service.AppSettings
                     this.logger.LogError(EventIDs.CertificateTrustChainParsingIssue, ex, $"Unable to parse trusted issuer certificate at index {count}");
                 }
             }
+
+            this.logger.LogTrace("Certificate could not be validated against a specific issuer");
 
             return false;
         }

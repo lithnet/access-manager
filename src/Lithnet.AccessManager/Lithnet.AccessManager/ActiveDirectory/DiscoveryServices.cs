@@ -446,7 +446,7 @@ namespace Lithnet.AccessManager
                 }
             }
 
-            this.logger.LogTrace("Local DCLocator: Finding domain controller for domain {domainDns} with flags {flags}", server, domainDns, flags.ToString());
+            this.logger.LogTrace("Local DCLocator: Finding domain controller for domain {domainDns} with flags {flags}", domainDns, flags.ToString());
             dc = NativeMethods.GetDomainControllerForDnsDomain(null, domainDns, null, flags);
             this.logger.LogTrace("Local DCLocator: Found DC {dc} for domain {domainDns}, with flags {flags}", dc, domainDns, flags.ToString());
             return dc;

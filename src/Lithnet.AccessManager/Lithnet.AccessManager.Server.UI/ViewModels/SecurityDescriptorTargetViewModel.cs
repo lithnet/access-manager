@@ -322,7 +322,7 @@ namespace Lithnet.AccessManager.Server.UI
                 catch (Exception ex)
                 {
                     this.logger.LogError(EventIDs.UIGenericError, ex, "Unable to connect to remote computer {computer}", computer.DnsHostName);
-                    await this.dialogCoordinator.ShowMessageAsync(this, "Error", "Unable to locate computer in the directory");
+                    await this.dialogCoordinator.ShowMessageAsync(this, "Error", "Unable to connect to the computer");
                     return;
                 }
 
