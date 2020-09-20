@@ -412,6 +412,32 @@ namespace Lithnet.AccessManager.Interop
             }
         }
 
+        public static string GetNetbiosNameForDomain(string dns)
+        {
+            IntPtr pDomainInfo = IntPtr.Zero;
+
+            try
+            {
+                int result = DsGetDcName(null, dns, IntPtr.Zero, null, DsGetDcNameFlags.DS_IS_DNS_NAME | DsGetDcNameFlags.DS_RETURN_FLAT_NAME, out pDomainInfo);
+            
+                if (result != 0)
+                {
+                    throw new Win32Exception(result);
+                }
+
+                DomainControllerInfo info = Marshal.PtrToStructure<DomainControllerInfo>(pDomainInfo);
+
+                return info.DomainName;
+            }
+            finally
+            {
+                if (pDomainInfo != IntPtr.Zero)
+                {
+                    NetApiBufferFree(pDomainInfo);
+                }
+            }
+        }
+
         private static DsNameResultItem CrackNames(IntPtr hds, DsNameFlags flags, DsNameFormat formatOffered, DsNameFormat formatDesired, string name)
         {
             DsNameResultItem[] resultItems = NativeMethods.CrackNames(hds, flags, formatOffered, formatDesired, new[] { name });

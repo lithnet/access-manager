@@ -47,6 +47,8 @@ namespace Lithnet.AccessManager
 
         string GetDomainNameNetBios(SecurityIdentifier sid);
 
+        string GetDomainNameNetBios(string domainDns);
+
         string GetForestNameDns(string dn);
 
         string GetForestNameDns();

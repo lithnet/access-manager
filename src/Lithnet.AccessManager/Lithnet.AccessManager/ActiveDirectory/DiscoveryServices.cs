@@ -281,6 +281,11 @@ namespace Lithnet.AccessManager
             return site;
         }
 
+        public string GetDomainNameNetBios(string domainDns)
+        {
+            return NativeMethods.GetNetbiosNameForDomain(domainDns);
+        }
+
         public string GetDomainNameNetBios(SecurityIdentifier sid)
         {
             if (domainNetBiosCache.TryGetValue(sid.AccountDomainSid, out string value))

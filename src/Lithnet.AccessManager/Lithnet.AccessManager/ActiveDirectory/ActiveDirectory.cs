@@ -7,6 +7,7 @@ using System.Security.AccessControl;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
+using System.Threading;
 using Lithnet.AccessManager.Interop;
 using Lithnet.Security.Authorization;
 
@@ -386,8 +387,20 @@ namespace Lithnet.AccessManager
 
                 if (dn == null)
                 {
-                    throw new ObjectNotFoundException(
-                        $"An object {objectName} of type computer was not found in the global catalog");
+                    var parts = objectName.Split('.');
+
+                    if (parts.Length < 2)
+                    {
+                        throw new ObjectNotFoundException($"An object {objectName} of type computer was not found in the global catalog");
+                    }
+
+                    string hostname = parts[0];
+                    string domain = string.Join(".", parts.Skip(1).ToArray());
+                    string netbiosDomain = this.discoveryServices.GetDomainNameNetBios(domain);
+
+                    string nt4Name = $"{netbiosDomain}\\{hostname}$";
+
+                    return GetDirectoryEntry(nt4Name, DsNameFormat.Nt4Name);
                 }
 
                 de = GetDirectoryEntry(dn, DsNameFormat.DistinguishedName);
