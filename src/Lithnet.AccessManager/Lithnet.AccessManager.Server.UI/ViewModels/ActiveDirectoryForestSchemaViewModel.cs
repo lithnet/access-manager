@@ -10,13 +10,13 @@ namespace Lithnet.AccessManager.Server.UI
     public class ActiveDirectoryForestSchemaViewModel : PropertyChangedBase, IViewAware
     {
         private readonly ILogger<ActiveDirectoryForestSchemaViewModel> logger;
-        private readonly IDirectory directory;
+        private readonly IDiscoveryServices discoveryServices;
 
-        public ActiveDirectoryForestSchemaViewModel(Forest forest, ILogger<ActiveDirectoryForestSchemaViewModel> logger, IDirectory directory)
+        public ActiveDirectoryForestSchemaViewModel(Forest forest, ILogger<ActiveDirectoryForestSchemaViewModel> logger, IDiscoveryServices discoveryServices)
         {
             this.Forest = forest;
             this.logger = logger;
-            this.directory = directory;
+            this.discoveryServices = discoveryServices;
             this.LithnetAccessManagerSchemaPresentText = "Checking...";
             this.LithnetSchemaLookupInProgress = true;
             this.MsLapsSchemaPresentText = "Checking...";
@@ -70,7 +70,7 @@ namespace Lithnet.AccessManager.Server.UI
                 this.IsLithnetSchemaPresent = false;
                 this.IsNotLithnetSchemaPresent = false;
 
-                if (this.directory.DoesSchemaAttributeExist(this.Forest.Name, "lithnetAdminPassword"))
+                if (this.discoveryServices.DoesSchemaAttributeExist(this.Forest.Name, "lithnetAdminPassword"))
                 {
                     this.IsLithnetSchemaPresent = true;
                     this.LithnetAccessManagerSchemaPresentText = "Present";
@@ -102,7 +102,7 @@ namespace Lithnet.AccessManager.Server.UI
                 this.IsMsLapsSchemaPresent = false;
                 this.IsNotMsLapsSchemaPresent = false;
 
-                if (this.directory.DoesSchemaAttributeExist(this.Forest.Name, "ms-Mcs-AdmPwd"))
+                if (this.discoveryServices.DoesSchemaAttributeExist(this.Forest.Name, "ms-Mcs-AdmPwd"))
                 {
                     this.IsMsLapsSchemaPresent = true;
                     this.MsLapsSchemaPresentText = "Present";

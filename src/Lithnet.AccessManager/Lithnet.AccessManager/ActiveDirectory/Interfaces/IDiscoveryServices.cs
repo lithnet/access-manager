@@ -58,5 +58,11 @@ namespace Lithnet.AccessManager
         string GetFullyQualifiedDomainControllerAdsPath(string dn);
 
         DirectoryEntry GetSchemaNamingContext(string dnsDomain);
+        
+        bool DoesSchemaAttributeExist(string dnsDomain, string attributeName);
+        
+        Guid? GetSchemaAttributeGuid(string dnsDomain, string attributeName);
+        
+        Guid? GetSchemaObjectGuid(string dnsDomain, string objectName);
     }
 }

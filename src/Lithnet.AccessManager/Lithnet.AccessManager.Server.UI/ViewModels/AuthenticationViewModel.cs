@@ -429,38 +429,18 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task OktaHelp()
         {
-            await this.OpenLink(Constants.HelpLinkAuthNSetupOkta);
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkAuthNSetupOkta);
         }
 
         public async Task AadHelp()
         {
-            await this.OpenLink(Constants.HelpLinkAuthNSetupAzureAD);
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkAuthNSetupAzureAD);
         }
 
         public async Task AdfsHelp()
         {
-            await this.OpenLink(Constants.HelpLinkAuthNSetupAdfs);
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkAuthNSetupAdfs);
         }
-
-        private async Task OpenLink(string link)
-        {
-            try
-            {
-                var psi = new ProcessStartInfo
-                {
-                    FileName = link,
-                    UseShellExecute = true
-                };
-
-                Process.Start(psi);
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not open link");
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not open the default link handler\r\n{ex.Message}");
-            }
-        }
-
 
         public bool CanRemoveEku => this.SelectedEku != null;
 

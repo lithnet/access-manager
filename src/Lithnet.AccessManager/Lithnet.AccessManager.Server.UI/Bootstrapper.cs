@@ -139,6 +139,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IX509Certificate2ViewModelFactory>().To<X509Certificate2ViewModelFactory>();
                 builder.Bind<IJitGroupMappingViewModelFactory>().To<JitGroupMappingViewModelFactory>();
                 builder.Bind<IJitDomainStatusViewModelFactory>().To<JitDomainStatusViewModelFactory>();
+                builder.Bind<IImportTargetsViewModelFactory>().To<ImportTargetsViewModelFactory>();
                 builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
                 builder.Bind(typeof(INotificationChannelDefinitionViewModelFactory<,>)).ToAllImplementations();
 
@@ -147,6 +148,11 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IDialogCoordinator>().To<DialogCoordinator>();
                 builder.Bind<IDirectory>().To<ActiveDirectory>();
                 builder.Bind<ILocalSam>().To<LocalSam>();
+                builder.Bind<IComputerPrincipalProviderRpc>().To<ComputerPrincipalProviderRpc>();
+                builder.Bind<IComputerPrincipalProviderCsv>().To<ComputerPrincipalProviderCsv>();
+                builder.Bind<IComputerPrincipalProviderMsLaps>().To<ComputerPrincipalProviderMsLaps>();
+                builder.Bind<IComputerPrincipalProviderBitLocker>().To<ComputerPrincipalProviderBitLocker>();
+                builder.Bind<IAuthorizationRuleImportProvider>().To<AuthorizationRuleImportProvider>();
                 builder.Bind<IDiscoveryServices>().To<DiscoveryServices>();
                 builder.Bind<IServiceSettingsProvider>().To<ServiceSettingsProvider>();
                 builder.Bind<INotificationSubscriptionProvider>().To<NotificationSubscriptionProvider>();

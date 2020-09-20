@@ -347,31 +347,6 @@ namespace Lithnet.AccessManager
             return result;
         }
 
-        public bool DoesSchemaAttributeExist(string dnsDomain, string attributeName)
-        {
-            DirectorySearcher d = new DirectorySearcher
-            {
-                SearchRoot = this.discoveryServices.GetSchemaNamingContext(dnsDomain),
-                SearchScope = SearchScope.Subtree,
-                Filter = $"(&(objectClass=attributeSchema)(lDAPDisplayName={attributeName})(!(isDefunct=true)))"
-            };
-
-            d.PropertiesToLoad.Add("distinguishedName");
-
-            SearchResultCollection result = d.FindAll();
-
-            if (result.Count > 1)
-            {
-                throw new InvalidOperationException($"More than one attribute called {attributeName} was found");
-            }
-
-            if (result.Count == 0)
-            {
-                return false;
-            }
-
-            return true;
-        }
 
         private DirectoryEntry FindComputerInGc(string objectName)
         {

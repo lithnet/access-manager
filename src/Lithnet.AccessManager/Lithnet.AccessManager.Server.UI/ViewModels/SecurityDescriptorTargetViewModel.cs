@@ -25,7 +25,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IDiscoveryServices discoveryServices;
         private readonly ILocalSam localSam;
-      
+
+        private string jitGroupDisplayName;
+
         public SecurityDescriptorTarget Model { get; }
 
         public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam)
@@ -46,11 +48,17 @@ namespace Lithnet.AccessManager.Server.UI
             this.Script.NewFileContent = ScriptTemplates.AuthorizationScriptTemplate;
             this.Script.ShouldValidate = false;
             this.Script.PropertyChanged += Script_PropertyChanged;
+            _ = this.Initialize();
         }
+
 
         public async Task Initialize()
         {
             this.Notifications = notificationChannelFactory.CreateViewModel(this.Model.Notifications);
+            this.DisplayName = this.Target;
+            this.jitGroupDisplayName = this.JitAuthorizingGroup;
+            await this.UpdateDisplayName();
+            await this.UpdateJitGroupDisplayName();
             await this.ValidateAsync();
         }
 
@@ -74,7 +82,37 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool IsModeScript { get => this.AuthorizationMode == AuthorizationMode.PowershellScript; set => this.AuthorizationMode = value ? AuthorizationMode.PowershellScript : AuthorizationMode.SecurityDescriptor; }
 
-        public string Target { get => this.Model.Target; set => this.Model.Target = value; }
+        public string Target
+        {
+            get => this.Model.Target;
+            set
+            {
+                this.Model.Target = value;
+                _ = this.UpdateDisplayName();
+            }
+        }
+
+        private async Task UpdateDisplayName()
+        {
+            if (this.Target == null)
+            {
+                this.DisplayName = null;
+            }
+            else if (this.Type == TargetType.Container)
+            {
+                this.DisplayName = this.Target;
+            }
+            else
+            {
+                this.DisplayName = $"{await this.GetNameFromSidOrDefaultAsync(this.Target)} ({this.Type})";
+            }
+        }
+
+        private async Task UpdateJitGroupDisplayName()
+        {
+            this.jitGroupDisplayName = await this.GetNameFromSidOrDefaultAsync(this.JitAuthorizingGroup);
+            this.NotifyOfPropertyChange(nameof(JitGroupDisplayName));
+        }
 
         public FileSelectionViewModel Script { get; }
 
@@ -86,9 +124,11 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string JitAuthorizingGroup { get => this.Model.Jit.AuthorizingGroup; set => this.Model.Jit.AuthorizingGroup = value; }
 
+        public bool IsScriptVisible { get; set; } = true;
+
         public string JitGroupDisplayName
         {
-            get => this.TryGetNameIfSid(this.JitAuthorizingGroup);
+            get => jitGroupDisplayName; //this.GetNameFromSidOrDefault(this.JitAuthorizingGroup);
             set
             {
                 if (value.Contains("{computerName}", StringComparison.OrdinalIgnoreCase) ||
@@ -109,6 +149,8 @@ namespace Lithnet.AccessManager.Server.UI
                         this.JitAuthorizingGroup = value;
                     }
                 }
+
+                _ = this.UpdateJitGroupDisplayName();
             }
         }
 
@@ -141,7 +183,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public PasswordStorageLocation RetrievalLocation { get => this.Model.Laps.RetrievalLocation; set => this.Model.Laps.RetrievalLocation = value; }
 
-        public string DisplayName => this.Target == null ? null : this.Type == TargetType.Container ? this.Target : $"{this.TryGetNameFromSid(this.Target)} ({this.Type})";
+        public string DisplayName { get; private set; }
 
         public bool ShowLapsOptions => this.IsModeScript || SdHasMask(this.SecurityDescriptor, AccessMask.LocalAdminPassword);
 
@@ -544,32 +586,12 @@ namespace Lithnet.AccessManager.Server.UI
 
         public UIElement View { get; set; }
 
-        private string TryGetNameFromSid(string sid)
+        private async Task<string> GetNameFromSidOrDefaultAsync(string sid)
         {
-            if (string.IsNullOrWhiteSpace(sid))
-            {
-                return null;
-            }
-
-            try
-            {
-                if (sid.TryParseAsSid(out SecurityIdentifier s))
-                {
-                    if (this.directory.TryGetPrincipal(s, out ISecurityPrincipal principal))
-                    {
-                        return principal.MsDsPrincipalName;
-                    }
-                }
-
-                return sid;
-            }
-            catch (Exception)
-            {
-                return "<invalid SID>";
-            }
+            return await Task.Run(() => GetNameFromSidOrDefault(sid));
         }
 
-        private string TryGetNameIfSid(string sid)
+        private string GetNameFromSidOrDefault(string sid)
         {
             if (string.IsNullOrWhiteSpace(sid))
             {
@@ -579,14 +601,7 @@ namespace Lithnet.AccessManager.Server.UI
             try
             {
                 SecurityIdentifier s = new SecurityIdentifier(sid);
-                if (this.directory.TryGetPrincipal(s, out ISecurityPrincipal principal))
-                {
-                    return principal.MsDsPrincipalName;
-                }
-                else
-                {
-                    return sid;
-                }
+                return this.directory.TryGetPrincipal(s, out ISecurityPrincipal principal) ? principal.MsDsPrincipalName : sid;
             }
             catch (Exception)
             {

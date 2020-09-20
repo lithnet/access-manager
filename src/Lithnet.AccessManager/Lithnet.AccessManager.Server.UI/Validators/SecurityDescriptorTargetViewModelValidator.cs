@@ -6,7 +6,7 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class SecurityDescriptorTargetViewModelValidator : AbstractValidator<SecurityDescriptorTargetViewModel>
     {
-        public SecurityDescriptorTargetViewModelValidator(IAppPathProvider appPathProvider, IDirectory directory)
+        public SecurityDescriptorTargetViewModelValidator(IAppPathProvider appPathProvider)
         {
             this.RuleFor(r => r.Target)
                 .NotEmpty()
@@ -23,10 +23,9 @@ namespace Lithnet.AccessManager.Server.UI
                 .Must((item, propertyValue) => propertyValue == null ||
                                                propertyValue.Contains("{computerName}", StringComparison.OrdinalIgnoreCase) ||
                                                propertyValue.Contains("%computerName%", StringComparison.OrdinalIgnoreCase) ||
-                                               (item.JitAuthorizingGroup?.TryParseAsSid(out _) ?? false) ||
-                                               directory.TryGetGroup(propertyValue, out _))
+                                               (item.JitAuthorizingGroup?.TryParseAsSid(out _) ?? false))
                 .When(t => t.ShowJitOptions && !t.IsModeScript)
-                .WithMessage("Select a group using the group selector, or enter a template containing the '%computerName%' placeholder");
+                .WithMessage("Select a group using the group selector, or enter a templated name containing the '%computerName%' placeholder");
 
             this.RuleFor(r => r.Script)
                 .SetValidator(new FileSelectionViewModelValidator(appPathProvider))

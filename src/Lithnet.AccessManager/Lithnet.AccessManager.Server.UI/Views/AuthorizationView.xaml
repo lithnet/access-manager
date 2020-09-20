@@ -16,6 +16,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Row="0">
@@ -24,9 +26,15 @@
             </Button>
             <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Computer authorization rules" />
         </DockPanel>
-      
+
         <ContentControl Grid.Row="1"
             s:View.Model="{Binding Targets}" 
                                     IsTabStop="False"/>
+
+        <Button Grid.Row="2"
+                Content="Import authorization rules..."
+                HorizontalAlignment="Left"
+                Command="{s:Action Import}" 
+                Margin="10 5 5 5"/>
     </Grid>
 </UserControl>

@@ -8,7 +8,6 @@ using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
-using System.Text;
 using Lithnet.AccessManager.Interop;
 using Microsoft.Extensions.Logging;
 using Vanara.PInvoke;
@@ -22,6 +21,8 @@ namespace Lithnet.AccessManager
         private static readonly ConcurrentDictionary<SecurityIdentifier, string> domainDnsCache = new ConcurrentDictionary<SecurityIdentifier, string>();
         private static readonly ConcurrentDictionary<SecurityIdentifier, string> domainNetBiosCache = new ConcurrentDictionary<SecurityIdentifier, string>();
         private static readonly ConcurrentDictionary<string, string> dcCache = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        private static readonly ConcurrentDictionary<string, Guid?> attributeGuidCache = new ConcurrentDictionary<string, Guid?>(StringComparer.OrdinalIgnoreCase);
+        private static readonly ConcurrentDictionary<string, Guid?> objectGuidCache = new ConcurrentDictionary<string, Guid?>(StringComparer.OrdinalIgnoreCase);
         private static Domain currentDomain;
         private static Forest currentForest;
 
@@ -457,25 +458,72 @@ namespace Lithnet.AccessManager
             return dc;
         }
 
-        //private string GetDc(string server, string domainDns, DsGetDcNameFlags flags)
-        //{
-        //    string dc;
+        public bool DoesSchemaAttributeExist(string dnsDomain, string attributeName)
+        {
+            return this.GetSchemaAttributeGuid(dnsDomain, attributeName) == null;
+        }
 
-        //    try
-        //    {
-        //        this.logger.LogTrace("Finding domain controller for server {server}, domain {domainDns} with flags {flags}", server, domainDns, flags.ToString());
-        //        dc = NativeMethods.GetDomainControllerForDnsDomain(server, domainDns, null, flags);
-        //        this.logger.LogTrace("DC locator on server {server} found DC {dc} for domain {domainDns}, with flags {flags}", server, dc, domainDns, flags.ToString());
-        //    }
-        //    catch (DirectoryException dex) when (dex.InnerException is Win32Exception wex && wex.NativeErrorCode == 1722 && server != null)
-        //    {
-        //        this.logger.LogWarning(dex, "Could not connect to server {server} to find DC, local machine will be used to find a DC", server);
-        //        dc = NativeMethods.GetDomainControllerForDnsDomain(null, domainDns, null, flags);
-        //        this.logger.LogTrace("DC locator on local machine found DC {dc} for domain {domainDns}, with flags {flags}", dc, domainDns, flags.ToString());
-        //    }
+        public Guid? GetSchemaAttributeGuid(string dnsDomain, string attributeName)
+        {
+            string key = $"{dnsDomain}-{attributeName}";
 
-        //    return dc;
-        //}
+            return attributeGuidCache.GetOrAdd(key, k =>
+            {
+                DirectorySearcher d = new DirectorySearcher
+                {
+                    SearchRoot = this.GetSchemaNamingContext(dnsDomain),
+                    SearchScope = SearchScope.Subtree,
+                    Filter = $"(&(objectClass=attributeSchema)(lDAPDisplayName={attributeName})(!(isDefunct=true)))"
+                };
+
+                d.PropertiesToLoad.Add("schemaIDGUID");
+
+                SearchResultCollection result = d.FindAll();
+
+                if (result.Count > 1)
+                {
+                    throw new InvalidOperationException($"More than one attribute called {attributeName} was found");
+                }
+
+                if (result.Count == 0)
+                {
+                    return null;
+                }
+
+                return result[0].GetPropertyGuid("schemaIDGUID");
+            });
+        }
+
+        public Guid? GetSchemaObjectGuid(string dnsDomain, string objectName)
+        {
+            string key = $"{dnsDomain}-{objectName}";
+
+            return objectGuidCache.GetOrAdd(key, k =>
+            {
+                DirectorySearcher d = new DirectorySearcher
+                {
+                    SearchRoot = this.GetSchemaNamingContext(dnsDomain),
+                    SearchScope = SearchScope.Subtree,
+                    Filter = $"(&(objectClass=classSchema)(lDAPDisplayName={objectName})(!(isDefunct=true)))"
+                };
+
+                d.PropertiesToLoad.Add("schemaIDGUID");
+
+                SearchResultCollection result = d.FindAll();
+
+                if (result.Count > 1)
+                {
+                    throw new InvalidOperationException($"More than one object called {objectName} was found");
+                }
+
+                if (result.Count == 0)
+                {
+                    return null;
+                }
+
+                return result[0].GetPropertyGuid("schemaIDGUID");
+            });
+        }
 
         public string GetDomainControllerFromDNOrDefault(string dn)
         {

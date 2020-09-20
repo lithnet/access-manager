@@ -50,8 +50,6 @@ namespace Lithnet.AccessManager
 
         bool IsContainer(DirectoryEntry path);
 
-        bool DoesSchemaAttributeExist(string dnsDomain, string attributeName);
-
         bool IsPamFeatureEnabled(SecurityIdentifier domainSid, bool forceRefresh);
 
         bool IsPamFeatureEnabled(string dnsDomain, bool forceRefresh);

@@ -80,7 +80,7 @@ namespace Lithnet.AccessManager
 
             try
             {
-                if (s == null)
+                if (s == null || !s.StartsWith("S-", StringComparison.OrdinalIgnoreCase))
                 {
                     return false;
                 }
@@ -173,12 +173,14 @@ namespace Lithnet.AccessManager
 
 
         public static string GetPropertyString(this SearchResult result, string propertyName)
+        
         {
             if (!result.Properties.Contains(propertyName))
             {
                 return null;
             }
 
+            
             return result.Properties[propertyName][0]?.ToString();
         }
 

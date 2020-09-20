@@ -116,12 +116,14 @@
                                      VerticalAlignment="Top"
                                      Background="Transparent"
                                      IsEnabled="{Binding CanEdit, Mode=OneWay}"
+                                     Visibility="{Binding IsScriptVisible, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
                                      Margin="2 2 5 2"/>
 
                     <ContentControl Grid.Row="2" Grid.Column="1"
                                         s:View.Model="{Binding Script}" 
                                         VerticalAlignment="Top"
                                         IsEnabled="{Binding IsModeScript}"
+                                        Visibility="{Binding IsScriptVisible, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
                                         Margin="2"/>
                 </Grid>
             </Grid>

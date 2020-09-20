@@ -7,6 +7,7 @@
              xmlns:s="https://github.com/canton7/Stylet"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
@@ -20,12 +21,16 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <ListView Grid.Row="0" Grid.Column="0" 
+                  x:Name="listbox"
                       ItemsSource="{Binding ViewModels}"
                       SelectedItem="{Binding SelectedItem}" 
                       BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" 
                       BorderThickness="1" 
                       Margin="5"
                       MouseDoubleClick="{s:Action Edit}">
+            <b:Interaction.Behaviors>
+                <local:ListViewScrollBarBehavior />
+            </b:Interaction.Behaviors>
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Name" DisplayMemberBinding="{Binding DisplayName}" Width="300"/>
@@ -38,7 +43,7 @@
             <Button Command="{s:Action Add}" 
                         Content="Add..." 
                         Margin="5"/>
-            <Button Command="{s:Action Delete}"
+            <Button Command="{s:Action Delete}" CommandParameter="{Binding SelectedItems, ElementName=listbox}"
                         Content="Delete selected..."
                          Margin="5"/>
             <Button Command="{s:Action Edit}"

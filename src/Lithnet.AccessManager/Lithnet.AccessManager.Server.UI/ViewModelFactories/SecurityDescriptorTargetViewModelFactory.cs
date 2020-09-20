@@ -2,7 +2,6 @@
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
-using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -13,20 +12,18 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory;
         private readonly IFileSelectionViewModelFactory fileSelectionViewModelFactory;
         private readonly ILogger<SecurityDescriptorTargetViewModel> logger;
-        private readonly IModelValidator<SecurityDescriptorTargetViewModel> validator;
         private readonly IDiscoveryServices discoveryServices;
         private readonly IDirectory directory;
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly ILocalSam localSam;
 
-        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IDirectory directory, ILocalSam localsam)
+        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IDirectory directory, ILocalSam localsam)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.appPathProvider = appPathProvider;
             this.channelSelectionViewModelFactory = channelSelectionViewModelFactory;
             this.fileSelectionViewModelFactory = fileSelectionViewModelFactory;
             this.logger = logger;
-            this.validator = validator;
             this.directory = directory;
             this.discoveryServices = discoveryServices;
             this.domainTrustProvider = domainTrustProvider;
@@ -35,7 +32,9 @@ namespace Lithnet.AccessManager.Server.UI
 
         public SecurityDescriptorTargetViewModel CreateViewModel(SecurityDescriptorTarget model)
         {
-            return new SecurityDescriptorTargetViewModel(model, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, validator, directory, domainTrustProvider, discoveryServices, localSam);
+            var validator = new SecurityDescriptorTargetViewModelValidator(this.appPathProvider);
+            var v = new FluentModelValidator<SecurityDescriptorTargetViewModel>(validator);
+            return new SecurityDescriptorTargetViewModel(model, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, v, directory, domainTrustProvider, discoveryServices, localSam);
         }
     }
 }

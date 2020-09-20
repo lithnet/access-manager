@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
-using System.Security.AccessControl;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.SimpleChildWindow;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Stylet;
 
@@ -18,22 +17,23 @@ namespace Lithnet.AccessManager.Server.UI
     public class SecurityDescriptorTargetsViewModel : PropertyChangedBase, IHaveDisplayName, IViewAware
     {
         private readonly SecurityDescriptorTargetViewModelFactory factory;
-
         private readonly IDiscoveryServices discoveryServices;
+        private readonly IDialogCoordinator dialogCoordinator;
+        private readonly ILogger<SecurityDescriptorTargetsViewModel> logger;
 
-        protected IList<SecurityDescriptorTarget> Model { get; }
 
-        protected IDialogCoordinator DialogCoordinator { get; }
+        public IList<SecurityDescriptorTarget> Model { get; }
 
         [NotifyModelChangedCollection]
         public BindableCollection<SecurityDescriptorTargetViewModel> ViewModels { get; }
 
-        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, SecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, IDiscoveryServices discoveryServices)
+        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, SecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, IDiscoveryServices discoveryServices, ILogger<SecurityDescriptorTargetsViewModel> logger)
         {
             this.factory = factory;
             this.Model = model;
             this.discoveryServices = discoveryServices;
-            this.DialogCoordinator = dialogCoordinator;
+            this.dialogCoordinator = dialogCoordinator;
+            this.logger = logger;
             this.ViewModels = new BindableCollection<SecurityDescriptorTargetViewModel>(this.Model.Select(factory.CreateViewModel));
             eventPublisher.Register(this);
         }
@@ -65,41 +65,39 @@ namespace Lithnet.AccessManager.Server.UI
         }
         public async Task Edit()
         {
-            DialogWindow w = new DialogWindow();
-            w.Title = "Edit target";
-            w.SaveButtonIsDefault = true;
+            var selectedItem = this.SelectedItem;
 
-            var m = JsonConvert.DeserializeObject<SecurityDescriptorTarget>(JsonConvert.SerializeObject(this.SelectedItem.Model));
+            if (selectedItem == null)
+            {
+                return;
+            }
+
+            DialogWindow w = new DialogWindow
+            {
+                Title = "Edit target",
+                SaveButtonIsDefault = true
+            };
+
+            var m = JsonConvert.DeserializeObject<SecurityDescriptorTarget>(JsonConvert.SerializeObject(selectedItem.Model));
             var vm = this.factory.CreateViewModel(m);
             await vm.Initialize();
 
             w.DataContext = vm;
+            vm.IsScriptVisible = selectedItem.IsScriptVisible;
 
             await this.GetWindow().ShowChildWindowAsync(w);
 
             if (w.Result == MessageDialogResult.Affirmative)
             {
-                this.Model.Remove(this.SelectedItem.Model);
+                this.Model.Remove(selectedItem.Model);
 
-                int existingPosition = this.ViewModels.IndexOf(this.SelectedItem);
+                int existingPosition = this.ViewModels.IndexOf(selectedItem);
 
-                this.ViewModels.Remove(this.SelectedItem);
+                this.ViewModels.Remove(selectedItem);
                 this.Model.Add(m);
                 this.ViewModels.Insert(Math.Min(existingPosition, this.ViewModels.Count), vm);
                 this.SelectedItem = vm;
             }
-        }
-
-        public async Task ImportRules()
-        {
-            string container = this.ShowContainerDialog();
-
-            if (container == null)
-            {
-                return;
-            }
-
-
         }
 
         private string ShowContainerDialog()
@@ -113,14 +111,14 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool CanEdit => this.SelectedItem != null;
 
-        public async Task Delete()
+        public async Task Delete(System.Collections.IList items)
         {
-            var deleting = this.SelectedItem;
-
-            if (deleting == null)
+            if (items == null)
             {
                 return;
             }
+
+            var itemsToDelete = items.Cast<SecurityDescriptorTargetViewModel>().ToList();
 
             MetroDialogSettings s = new MetroDialogSettings
             {
@@ -128,13 +126,20 @@ namespace Lithnet.AccessManager.Server.UI
                 AnimateHide = false
             };
 
-            if (await this.DialogCoordinator.ShowMessageAsync(this, "Confirm", "Are you sure you want to delete this target?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
+            string message = itemsToDelete.Count == 1 ? "Are you sure you want to delete this rule?" : $"Are you sure you want to delete {itemsToDelete.Count} rules?";
+
+            if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", message, MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
             {
-                this.Model.Remove(deleting.Model);
-                this.ViewModels.Remove(deleting);
+                foreach (var deleting in itemsToDelete)
+                {
+                    this.Model.Remove(deleting.Model);
+                    this.ViewModels.Remove(deleting);
+                }
+
                 this.SelectedItem = this.ViewModels.FirstOrDefault();
             }
         }
+
 
         public bool CanDelete => this.SelectedItem != null;
 

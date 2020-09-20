@@ -226,18 +226,27 @@ namespace Lithnet.AccessManager.Interop
 
             do
             {
-                int entriesRead;
                 int totalEntries;
                 IntPtr resume = IntPtr.Zero;
                 IntPtr pLocalGroupMemberInfo = IntPtr.Zero;
 
                 try
                 {
-                    result = NetLocalGroupGetMembers(server, groupName, 0, out pLocalGroupMemberInfo, -1, out entriesRead, out totalEntries, resume);
+                    result = NetLocalGroupGetMembers(server, groupName, 0, out pLocalGroupMemberInfo, -1, out int entriesRead, out totalEntries, resume);
 
                     if (result != 0 && result != InsufficientBuffer)
                     {
-                        throw new DirectoryException("NetLocalGroupGetMembers returned an error", new Win32Exception(result));
+                        if (result == Win32Error.ERROR_ACCESS_DENIED)
+                        {
+                            throw new UnauthorizedAccessException("Access denied. Ensure you are a member of the local administrators group on the computer");
+                        }
+
+                        if (result == Win32Error.RPC_S_SERVER_UNAVAILABLE)
+                        {
+                            throw new DirectoryException("The RPC server is not available");
+                        }
+                        
+                        throw new Win32Exception(result);
                     }
 
                     IntPtr currentPosition = pLocalGroupMemberInfo;

@@ -33,4 +33,10 @@
     <ProjectReference Include="..\Lithnet.AccessManager\Lithnet.AccessManager.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestFiles\ComputerList.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
