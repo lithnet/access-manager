@@ -460,7 +460,7 @@ namespace Lithnet.AccessManager
 
         public bool DoesSchemaAttributeExist(string dnsDomain, string attributeName)
         {
-            return this.GetSchemaAttributeGuid(dnsDomain, attributeName) == null;
+            return this.GetSchemaAttributeGuid(dnsDomain, attributeName) != null;
         }
 
         public Guid? GetSchemaAttributeGuid(string dnsDomain, string attributeName)

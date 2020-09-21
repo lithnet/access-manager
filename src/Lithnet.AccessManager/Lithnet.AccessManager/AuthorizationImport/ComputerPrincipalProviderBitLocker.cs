@@ -10,10 +10,10 @@ namespace Lithnet.AccessManager
 {
     public class ComputerPrincipalProviderBitLocker : IComputerPrincipalProviderBitLocker
     {
-        private readonly ILogger<ComputerPrincipalProviderRpc> logger;
+        private readonly ILogger logger;
         private readonly IDiscoveryServices discoveryServices;
 
-        public ComputerPrincipalProviderBitLocker(IDiscoveryServices discoveryServices, ILogger<ComputerPrincipalProviderRpc> logger)
+        public ComputerPrincipalProviderBitLocker(IDiscoveryServices discoveryServices, ILogger<ComputerPrincipalProviderBitLocker> logger)
         {
             this.logger = logger;
             this.discoveryServices = discoveryServices;

@@ -245,7 +245,7 @@ namespace Lithnet.AccessManager
 
         public void WriteReport(AuthorizationRuleImportResults results, string path)
         {
-            string errorPath = $"{Path.GetDirectoryName(path)}\\{Path.GetFileNameWithoutExtension(path)}-errors.{Path.GetExtension(path)}";
+            string errorPath = $"{Path.GetDirectoryName(path)}\\{Path.GetFileNameWithoutExtension(path)}-errors{Path.GetExtension(path)}";
             using (var errorWriter = new StreamWriter(errorPath, false))
             {
                 using (var writer = new StreamWriter(path, false))
@@ -279,11 +279,11 @@ namespace Lithnet.AccessManager
                     try
                     {
                         NTAccount account = (NTAccount)item.Translate(typeof(NTAccount));
-                        dataWriter.WriteLine("\t" + account.ToString());
+                        dataWriter.WriteLine("\t" + account);
                     }
                     catch
                     {
-                        dataWriter.WriteLine("\t" + item.ToString());
+                        dataWriter.WriteLine("\t" + item);
                     }
                 }
 

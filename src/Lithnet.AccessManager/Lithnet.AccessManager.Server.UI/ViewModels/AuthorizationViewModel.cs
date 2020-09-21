@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
@@ -72,7 +69,8 @@ namespace Lithnet.AccessManager.Server.UI
                 DataContext = vm,
                 SaveButtonVisible = true,
                 CancelButtonName = "Close",
-                SaveButtonName = "Import",
+                SaveButtonName = "Import", 
+                Height = 600
             };
 
             if (window.ShowDialog() == false)
@@ -136,6 +134,7 @@ namespace Lithnet.AccessManager.Server.UI
                     SaveButtonVisible = true,
                     CancelButtonName = "Cancel",
                     SaveButtonName = "Save and import rules",
+                    SizeToContent= System.Windows.SizeToContent.Height
                 };
 
                 if (window.ShowDialog() == false)
@@ -376,8 +375,9 @@ namespace Lithnet.AccessManager.Server.UI
         private void ImportProvider_OnStartProcessingComputer(object sender, ProcessingComputerArgs e)
         {
             this.progress.SetMessage($"Processing {e.ComputerName}");
-            this.progress.SetProgress(Math.Min(++this.progressCurrent, this.progressMaximum));
+            var val = Interlocked.Increment(ref this.progressCurrent);
+            this.logger.LogTrace("Progress {count}/{max}", val, this.progressMaximum);
+            this.progress.SetProgress(Math.Min(val, this.progressMaximum));
         }
-
     }
 }

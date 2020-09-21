@@ -13,10 +13,10 @@ namespace Lithnet.AccessManager
 {
     public class ComputerPrincipalProviderMsLaps : IComputerPrincipalProviderMsLaps
     {
-        private readonly ILogger<ComputerPrincipalProviderRpc> logger;
+        private readonly ILogger logger;
         private readonly IDiscoveryServices discoveryServices;
 
-        public ComputerPrincipalProviderMsLaps(IDiscoveryServices discoveryServices, ILogger<ComputerPrincipalProviderRpc> logger)
+        public ComputerPrincipalProviderMsLaps(IDiscoveryServices discoveryServices, ILogger<ComputerPrincipalProviderMsLaps> logger)
         {
             this.logger = logger;
             this.discoveryServices = discoveryServices;

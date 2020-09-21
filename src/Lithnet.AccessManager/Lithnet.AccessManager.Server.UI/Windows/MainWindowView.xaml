@@ -129,9 +129,9 @@
                             </Grid>
                         </StackPanel>
                         <ScrollViewer DockPanel.Dock="Bottom">
-                            <ContentControl s:View.Model="{Binding}" 
-                                        Margin="10 0 10 0"
-                                        IsTabStop="False"/>
+                            <ContentControl s:View.Model="{Binding}"  
+                                            Margin="10 0 10 0"
+                                            IsTabStop="False"/>
                         </ScrollViewer>
                     </DockPanel>
                 </DataTemplate>

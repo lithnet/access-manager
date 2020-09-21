@@ -14,7 +14,7 @@ namespace Lithnet.AccessManager.Server.Extensions
     {
         public static string ToCommaSeparatedString(this X500DistinguishedName dn)
         {
-            string decoded = dn?.Decode(X500DistinguishedNameFlags.UseNewLines | X500DistinguishedNameFlags.Reversed);
+            string decoded = dn?.Decode(X500DistinguishedNameFlags.UseNewLines);
 
             if (decoded == null)
             {

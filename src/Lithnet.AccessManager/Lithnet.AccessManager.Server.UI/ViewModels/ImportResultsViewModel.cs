@@ -20,5 +20,10 @@ namespace Lithnet.AccessManager.Server.UI
         public bool HasDiscoveryErrors => DiscoveryErrors.Count > 0;
 
         public List<ComputerPrincipalMapping> DiscoveryErrors { get; set; }
+
+        public string DiscoveryErrorCount => $"{DiscoveryErrors.Count} discovery error{(DiscoveryErrors.Count == 1 ? "" : "s")}";
+
+        public string TargetCount => $"{Targets.ViewModels.Count} rule{(Targets.ViewModels.Count == 1 ? "" : "s")} found";
+
     }
 }
