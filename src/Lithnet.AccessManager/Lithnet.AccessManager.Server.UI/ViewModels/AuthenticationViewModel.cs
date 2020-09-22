@@ -131,11 +131,14 @@ namespace Lithnet.AccessManager.Server.UI
 
                 vm.SelectedForest = vm.AvailableForests.FirstOrDefault();
 
-                w.Owner = this.GetWindow();
-
-                if (!w.ShowDialog() ?? false)
+                if (vm.AvailableForests.Count > 1)
                 {
-                    return;
+                    w.Owner = this.GetWindow();
+
+                    if (!w.ShowDialog() ?? false)
+                    {
+                        return;
+                    }
                 }
 
                 DsopScopeInitInfo scope = new DsopScopeInitInfo();

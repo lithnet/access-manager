@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using FluentValidation;
+using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
+using Microsoft.Extensions.Options;
 using NLog.Extensions.Logging;
 using Stylet;
 using StyletIoC;
@@ -162,10 +164,23 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<INotifyModelChangedEventPublisher>().To<NotifyModelChangedEventPublisher>();
                 builder.Bind<IShellExecuteProvider>().To<ShellExecuteProvider>();
                 builder.Bind<IDomainTrustProvider>().To<DomainTrustProvider>();
+                builder.Bind<IComputerTargetProvider>().To<ComputerTargetProvider>();
+                builder.Bind<ITargetDataProvider>().To<TargetDataProvider>();
+                builder.Bind<ITargetDataCache>().To<TargetDataCache>();
+                builder.Bind<IAuthorizationContextProvider>().To<AuthorizationContextProvider>();
+                builder.Bind<IAuthorizationInformationBuilder>().To<AuthorizationInformationBuilder>();
+                builder.Bind<IPowerShellSecurityDescriptorGenerator>().To<PowerShellSecurityDescriptorGenerator>();
+                builder.Bind<IAuthorizationInformationMemoryCache>().To<AuthorizationInformationMemoryCache>();
+                builder.Bind<IPowerShellSessionProvider>().To<CachedPowerShellSessionProvider>();
+
+
+
                 builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentModelValidator<>));
                 builder.Bind(typeof(IValidator<>)).ToAllImplementations();
                 builder.Bind<ILoggerFactory>().ToInstance(this.loggerFactory);
                 builder.Bind(typeof(ILogger<>)).To(typeof(Logger<>));
+                builder.Bind(typeof(IOptions<>)).To(typeof(OptionsWrapper<>));
+                builder.Bind(typeof(IOptionsSnapshot<>)).To(typeof(UiOptionsSnapshotProvider<>));
 
                 base.ConfigureIoC(builder);
             }

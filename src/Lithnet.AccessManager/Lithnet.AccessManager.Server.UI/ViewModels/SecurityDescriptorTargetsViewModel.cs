@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.DirectoryServices.ActiveDirectory;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
+using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.UI.Interop;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.SimpleChildWindow;
 using Microsoft.Extensions.Logging;
@@ -14,46 +18,65 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class SecurityDescriptorTargetsViewModel : PropertyChangedBase, IHaveDisplayName, IViewAware
+    public class SecurityDescriptorTargetsViewModel : Screen
     {
-        private readonly SecurityDescriptorTargetViewModelFactory factory;
-        private readonly IDiscoveryServices discoveryServices;
+        private readonly IComputerTargetProvider computerTargetProvider;
+        private readonly SecurityDescriptorTargetViewModelComparer customComparer;
         private readonly IDialogCoordinator dialogCoordinator;
+        private readonly IDirectory directory;
+        private readonly SecurityDescriptorTargetViewModelFactory factory;
         private readonly ILogger<SecurityDescriptorTargetsViewModel> logger;
 
+        private bool firstSearch;
+        private ListSortDirection currentSortDirection = ListSortDirection.Ascending;
+        private GridViewColumnHeader lastHeaderClicked;
+        private HashSet<string> matchedComputerViewModels;
 
-        public IList<SecurityDescriptorTarget> Model { get; }
-
-        [NotifyModelChangedCollection]
-        public BindableCollection<SecurityDescriptorTargetViewModel> ViewModels { get; }
-
-        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, SecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, IDiscoveryServices discoveryServices, ILogger<SecurityDescriptorTargetsViewModel> logger)
+        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, SecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IComputerTargetProvider computerTargetProvider)
         {
             this.factory = factory;
             this.Model = model;
-            this.discoveryServices = discoveryServices;
             this.dialogCoordinator = dialogCoordinator;
             this.logger = logger;
-            this.ViewModels = new BindableCollection<SecurityDescriptorTargetViewModel>(this.Model.Select(factory.CreateViewModel));
+            this.directory = directory;
+            this.computerTargetProvider = computerTargetProvider;
+            this.customComparer = new SecurityDescriptorTargetViewModelComparer();
+            this.ChildDisplaySettings = new SecurityDescriptorTargetViewModelDisplaySettings();
+
+            _ = this.Initialize();
             eventPublisher.Register(this);
         }
 
-        protected SecurityDescriptorTarget CreateModel()
-        {
-            return new SecurityDescriptorTarget();
-        }
+        public bool CanDelete => this.SelectedItem != null;
+
+        public bool CanEdit => this.SelectedItem != null;
+
+        public SecurityDescriptorTargetViewModelDisplaySettings ChildDisplaySettings { get; }
+
+        public bool HasLoaded => !this.IsLoading;
+
+        public bool IsLoading { get; set; }
+
+        public ListCollectionView Items { get; private set; }
+
+        public IList<SecurityDescriptorTarget> Model { get; }
+
+        public string SearchText { get; set; }
 
         public SecurityDescriptorTargetViewModel SelectedItem { get; set; }
+
+        [NotifyModelChangedCollection]
+        public BindableCollection<SecurityDescriptorTargetViewModel> ViewModels { get; private set; }
 
         public async Task Add()
         {
             DialogWindow w = new DialogWindow();
             w.Title = "Add target";
-            var m = this.CreateModel();
-            var vm = this.factory.CreateViewModel(m);
+            var m = new SecurityDescriptorTarget();
+            var vm = this.factory.CreateViewModel(m, this.ChildDisplaySettings);
             w.DataContext = vm;
             w.SaveButtonIsDefault = true;
-            await vm.Initialize();
+            // await vm.Initialize();
 
             await this.GetWindow().ShowChildWindowAsync(w);
 
@@ -63,53 +86,65 @@ namespace Lithnet.AccessManager.Server.UI
                 this.ViewModels.Add(vm);
             }
         }
-        public async Task Edit()
+
+        public async Task ApplySearchFilter()
         {
-            var selectedItem = this.SelectedItem;
+            ProgressDialogController controller = null;
 
-            if (selectedItem == null)
+            try
             {
-                return;
+                controller = await this.dialogCoordinator.ShowProgressAsync(this, "Searching", "Searching...", false);
+                controller.SetProgress(0);
+                controller.SetIndeterminate();
+
+                await Task.Run(() =>
+                {
+                    if (this.directory.TryGetComputer(this.SearchText, out IComputer computer))
+                    {
+                        if (!firstSearch)
+                        {
+                            firstSearch = true;
+                            controller.SetMessage($"Please wait while we build the cache and search for rules that apply to computer {computer.MsDsPrincipalName}. This may take a minute.");
+                        }
+                        else
+                        {
+                            controller.SetMessage($"Searching for rules that apply to computer {computer.MsDsPrincipalName}...");
+                        }
+
+                        this.matchedComputerViewModels = new HashSet<string>();
+
+                        foreach (var item in this.computerTargetProvider.GetMatchingTargetsForComputer(computer, this.Model))
+                        {
+                            this.matchedComputerViewModels.Add(item.Id);
+                        }
+                    }
+                    else
+                    {
+                        controller.SetMessage($"Searching for rules containing text '{this.SearchText}'...");
+                        this.matchedComputerViewModels = null;
+                    }
+                });
+
+                this.Items.Refresh();
             }
-
-            DialogWindow w = new DialogWindow
+            finally
             {
-                Title = "Edit target",
-                SaveButtonIsDefault = true
-            };
-
-            var m = JsonConvert.DeserializeObject<SecurityDescriptorTarget>(JsonConvert.SerializeObject(selectedItem.Model));
-            var vm = this.factory.CreateViewModel(m);
-            await vm.Initialize();
-
-            w.DataContext = vm;
-            vm.IsScriptVisible = selectedItem.IsScriptVisible;
-
-            await this.GetWindow().ShowChildWindowAsync(w);
-
-            if (w.Result == MessageDialogResult.Affirmative)
-            {
-                this.Model.Remove(selectedItem.Model);
-
-                int existingPosition = this.ViewModels.IndexOf(selectedItem);
-
-                this.ViewModels.Remove(selectedItem);
-                this.Model.Add(m);
-                this.ViewModels.Insert(Math.Min(existingPosition, this.ViewModels.Count), vm);
-                this.SelectedItem = vm;
+                if (controller != null)
+                {
+                    if (controller.IsOpen)
+                    {
+                        await controller.CloseAsync();
+                    }
+                }
             }
         }
 
-        private string ShowContainerDialog()
+        public void ClearSearchFilter()
         {
-            string path = Domain.GetComputerDomain().GetDirectoryEntry().GetPropertyString("distinguishedName");
-            string basePath = this.discoveryServices.GetFullyQualifiedDomainControllerAdsPath(path);
-            string initialPath = this.discoveryServices.GetFullyQualifiedAdsPath(path);
-
-            return NativeMethods.ShowContainerDialog(this.GetHandle(), "Select container", "Select container", basePath, initialPath);
+            this.SearchText = null;
+            this.matchedComputerViewModels = null;
+            this.Items.Refresh();
         }
-
-        public bool CanEdit => this.SelectedItem != null;
 
         public async Task Delete(System.Collections.IList items)
         {
@@ -140,16 +175,140 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-
-        public bool CanDelete => this.SelectedItem != null;
-
-        public void AttachView(UIElement view)
+        public async Task Edit()
         {
-            this.View = view;
+            var selectedItem = this.SelectedItem;
+
+            if (selectedItem == null)
+            {
+                return;
+            }
+
+            DialogWindow w = new DialogWindow
+            {
+                Title = "Edit target",
+                SaveButtonIsDefault = true
+            };
+
+            var m = JsonConvert.DeserializeObject<SecurityDescriptorTarget>(JsonConvert.SerializeObject(selectedItem.Model));
+            var vm = this.factory.CreateViewModel(m, this.ChildDisplaySettings);
+            // await vm.Initialize();
+
+            w.DataContext = vm;
+
+
+            await this.GetWindow().ShowChildWindowAsync(w);
+
+            if (w.Result == MessageDialogResult.Affirmative)
+            {
+                this.Model.Remove(selectedItem.Model);
+
+                int existingPosition = this.ViewModels.IndexOf(selectedItem);
+
+                this.ViewModels.Remove(selectedItem);
+                this.Model.Add(m);
+                this.ViewModels.Insert(Math.Min(existingPosition, this.ViewModels.Count), vm);
+                this.SelectedItem = vm;
+            }
         }
 
-        public string DisplayName { get; set; }
+        public async Task SearchTextBoxKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                await this.ApplySearchFilter();
+            }
+        }
 
-        public UIElement View { get; set; }
+        private async Task Initialize()
+        {
+            await Task.Run(() =>
+            {
+                this.IsLoading = true;
+                this.ViewModels = new BindableCollection<SecurityDescriptorTargetViewModel>(this.Model.Select(t => factory.CreateViewModel(t, this.ChildDisplaySettings)));
+
+                Execute.OnUIThread(() =>
+                {
+                    this.Items = (ListCollectionView)CollectionViewSource.GetDefaultView(this.ViewModels);
+                    this.Items.Filter = this.IsFiltered;
+                    this.Items.CustomSort = this.customComparer;
+                    this.customComparer.SortDirection = currentSortDirection;
+                    this.Items.Refresh();
+                });
+
+                this.IsLoading = false;
+            });
+        }
+
+        private bool IsFiltered(object item)
+        {
+            if (string.IsNullOrWhiteSpace(this.SearchText))
+            {
+                return true;
+            }
+
+            SecurityDescriptorTargetViewModel vm = (SecurityDescriptorTargetViewModel)item;
+
+            if (this.matchedComputerViewModels != null)
+            {
+                return this.matchedComputerViewModels.Contains(vm.Id);
+            }
+            else
+            {
+
+                return (vm.DisplayName != null && vm.DisplayName.Contains(this.SearchText, StringComparison.OrdinalIgnoreCase)) || (vm.Description != null && vm.Description.Contains(this.SearchText, StringComparison.OrdinalIgnoreCase));
+            }
+        }
+
+        public void OnGridViewColumnHeaderClick(object sender, RoutedEventArgs e)
+        {
+            if (!(e.OriginalSource is GridViewColumnHeader gridViewColumnHeader))
+            {
+                return;
+            }
+
+            ListSortDirection newSortDirection = ListSortDirection.Ascending;
+
+            if ((lastHeaderClicked == null || lastHeaderClicked == gridViewColumnHeader) && currentSortDirection == ListSortDirection.Ascending)
+            {
+                newSortDirection = ListSortDirection.Descending;
+            }
+
+            string propertyName = (gridViewColumnHeader.Column.DisplayMemberBinding as Binding)?.Path.Path;
+            propertyName ??= gridViewColumnHeader.Column.Header as string;
+
+            SortListView(propertyName, newSortDirection);
+
+            lastHeaderClicked = gridViewColumnHeader;
+            currentSortDirection = newSortDirection;
+        }
+
+        private void SortListView(string propertyName, ListSortDirection sortDirection)
+        {
+            if (propertyName == null)
+            {
+                return;
+            }
+
+            this.Items.SortDescriptions.Clear();
+
+            if (propertyName == nameof(DisplayName))
+            {
+                if (this.Items.CustomSort == null)
+                {
+                    this.Items.CustomSort = this.customComparer;
+                }
+
+                this.customComparer.SortDirection = sortDirection;
+            }
+            else
+            {
+                this.Items.CustomSort = null;
+                SortDescription sd = new SortDescription(propertyName, sortDirection);
+                this.Items.SortDescriptions.Add(sd);
+            }
+
+            this.Items.Refresh();
+        }
     }
 }

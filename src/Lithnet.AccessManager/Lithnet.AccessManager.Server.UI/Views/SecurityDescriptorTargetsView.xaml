@@ -14,29 +14,60 @@
              d:DesignHeight="450" d:DesignWidth="800"
              Margin="5">
     <views:CanvasEx>
-        <DockPanel Height="{Binding Path=BindableActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}" 
-                   Width="{Binding Path=BindableActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}">
+        <Grid Height="{Binding Path=BindableActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}" 
+                    Width="{Binding Path=BindableActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}">
 
-            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
-                <Button Command="{s:Action Add}" 
-                        Content="Add..." 
-                        Margin="5"/>
-                <Button Command="{s:Action Delete}" CommandParameter="{Binding SelectedItems, ElementName=listbox}"
-                        Content="Delete selected..."
-                         Margin="5"/>
-                <Button Command="{s:Action Edit}"
-                        Content="Edit selected..."
-                         Margin="5"/>
-            </StackPanel>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-            <ListView DockPanel.Dock="Top"
+            <Grid Grid.Row="0"
+                  Visibility="{Binding HasLoaded, Converter={StaticResource  BooleanToVisibilityConverter}}"
+                  Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0"
+                       Content="Search"
+                       Margin="5 2 2 2"/>
+                <TextBox Grid.Column="1"
+                         Margin="2"
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                        KeyUp="{s:Action SearchTextBoxKeyUp}" />
+                <Button Grid.Column="2"
+                        Content="Search"
+                        MinWidth="65"
+                        Command="{s:Action ApplySearchFilter}"
+                        Margin="2"/>
+                <Button Grid.Column="3"
+                        Content="Clear"
+                        MinWidth="65"
+                        Command="{s:Action ClearSearchFilter}"
+                        Margin="2"/>
+
+            </Grid>
+
+            <TextBlock Grid.Row="1"
+                       Margin="5"
+                       Visibility="{Binding IsLoading, Converter={StaticResource  BooleanToVisibilityConverter}}"
+                       Text="Loading rules.."/>
+
+            <ListView Grid.Row="2"
                   x:Name="listbox"
-                  ItemsSource="{Binding ViewModels}"
+                  ItemsSource="{Binding Items}"
                   SelectedItem="{Binding SelectedItem}" 
                   BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" 
                   BorderThickness="1" 
                   Margin="5"
-                  GridViewColumnHeader.Click="listbox_Click"    
+                  Visibility="{Binding HasLoaded, Converter={StaticResource  BooleanToVisibilityConverter}}"
+                  GridViewColumnHeader.Click="{s:Action OnGridViewColumnHeaderClick}"    
                   MouseDoubleClick="{s:Action Edit}">
                 <b:Interaction.Behaviors>
                     <local:ListViewScrollBarBehavior />
@@ -51,6 +82,18 @@
                 </ListView.View>
             </ListView>
 
-        </DockPanel>
+            <StackPanel Grid.Row="3" Orientation="Horizontal"
+                  Visibility="{Binding HasLoaded, Converter={StaticResource  BooleanToVisibilityConverter}}">
+                <Button Command="{s:Action Add}" 
+                        Content="Add..." 
+                        Margin="5"/>
+                <Button Command="{s:Action Delete}" CommandParameter="{Binding SelectedItems, ElementName=listbox}"
+                        Content="Delete selected..."
+                        Margin="5"/>
+                <Button Command="{s:Action Edit}"
+                        Content="Edit selected..."
+                        Margin="5"/>
+            </StackPanel>
+        </Grid>
     </views:CanvasEx>
 </UserControl>

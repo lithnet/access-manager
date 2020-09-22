@@ -4,7 +4,6 @@ using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.Extensions;
 using Lithnet.Security.Authorization;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -24,18 +23,18 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         private readonly IAuthorizationInformationMemoryCache authzCache;
 
-        private readonly ITargetDataProvider targetDataProvider;
+        private readonly IComputerTargetProvider computerTargetProvider;
 
         private readonly IAuthorizationContextProvider authorizationContextProvider;
 
-        public AuthorizationInformationBuilder(IOptionsSnapshot<AuthorizationOptions> options, IDirectory directory, ILogger<AuthorizationInformationBuilder> logger, IPowerShellSecurityDescriptorGenerator powershell, IAuthorizationInformationMemoryCache authzCache, ITargetDataProvider targetDataProvider, IAuthorizationContextProvider authorizationContextProvider)
+        public AuthorizationInformationBuilder(IOptionsSnapshot<AuthorizationOptions> options, IDirectory directory, ILogger<AuthorizationInformationBuilder> logger, IPowerShellSecurityDescriptorGenerator powershell, IAuthorizationInformationMemoryCache authzCache, IComputerTargetProvider computerTargetProvider, IAuthorizationContextProvider authorizationContextProvider)
         {
             this.directory = directory;
             this.logger = logger;
             this.options = options.Value;
             this.powershell = powershell;
             this.authzCache = authzCache;
-            this.targetDataProvider = targetDataProvider;
+            this.computerTargetProvider = computerTargetProvider;
             this.authorizationContextProvider = authorizationContextProvider;
         }
 
@@ -56,7 +55,8 @@ namespace Lithnet.AccessManager.Server.Authorization
             }
 
             this.logger.LogTrace($"Building authorization information for {key}");
-            info = this.BuildAuthorizationInformation(user, computer);
+            var targets = this.computerTargetProvider.GetMatchingTargetsForComputer(computer, this.options.ComputerTargets);
+            info = this.BuildAuthorizationInformation(user, computer, targets);
 
             if (options.AuthZCacheDuration >= 0)
             {
@@ -66,11 +66,11 @@ namespace Lithnet.AccessManager.Server.Authorization
             return info;
         }
 
-        private AuthorizationInformation BuildAuthorizationInformation(IUser user, IComputer computer)
+        public AuthorizationInformation BuildAuthorizationInformation(IUser user, IComputer computer, IList<SecurityDescriptorTarget> targets)
         {
             AuthorizationInformation info = new AuthorizationInformation
             {
-                MatchedComputerTargets = this.GetMatchingTargetsForComputer(computer),
+                MatchedComputerTargets = targets,
                 EffectiveAccess = 0,
                 Computer = computer,
                 User = user
@@ -170,53 +170,6 @@ namespace Lithnet.AccessManager.Server.Authorization
             this.logger.LogTrace($"User {user.MsDsPrincipalName} has effective access of {info.EffectiveAccess} on computer {computer.MsDsPrincipalName}");
 
             return info;
-        }
-
-        public IList<SecurityDescriptorTarget> GetMatchingTargetsForComputer(IComputer computer)
-        {
-            List<SecurityDescriptorTarget> matchingTargets = new List<SecurityDescriptorTarget>();
-
-            Lazy<List<SecurityIdentifier>> computerTokenSids = new Lazy<List<SecurityIdentifier>>(() => this.directory.GetTokenGroups(computer, computer.Sid.AccountDomainSid).ToList());
-            Lazy<List<Guid>> computerParents = new Lazy<List<Guid>>(() => computer.GetParentGuids().ToList());
-
-            foreach (var target in this.options.ComputerTargets.OrderBy(t => (int)t.Type).ThenByDescending(this.targetDataProvider.GetSortOrder))
-            {
-                TargetData targetData = this.targetDataProvider.GetTargetData(target);
-
-                try
-                {
-                    if (target.Type == TargetType.Container)
-                    {
-                        if (computerParents.Value.Any(t => t == targetData.ContainerGuid))
-                        {
-                            this.logger.LogTrace($"Matched {computer.MsDsPrincipalName} to target OU {target.Target}");
-                            matchingTargets.Add(target);
-                        }
-                    }
-                    else if (target.Type == TargetType.Computer)
-                    {
-                        if (targetData.Sid == computer.Sid)
-                        {
-                            this.logger.LogTrace($"Matched {computer.MsDsPrincipalName} to target {target.Id}");
-                            matchingTargets.Add(target);
-                        }
-                    }
-                    else
-                    {
-                        if (this.directory.IsSidInPrincipalToken(targetData.Sid, computerTokenSids.Value))
-                        {
-                            this.logger.LogTrace($"Matched {computer.MsDsPrincipalName} to target {target.Id}");
-                            matchingTargets.Add(target);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    this.logger.LogEventError(EventIDs.TargetRuleProcessingError, $"An error occurred processing the target {target.Id}:{target.Type}:{target.Target}", ex);
-                }
-            }
-
-            return matchingTargets;
         }
     }
 }

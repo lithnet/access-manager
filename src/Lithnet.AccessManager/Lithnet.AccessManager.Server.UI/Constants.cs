@@ -45,6 +45,9 @@ namespace Lithnet.AccessManager.Server.UI
         public const string LinkFaqs = "https://go.lithnet.io/fwlink/xuzzzbat";
         public const string LinkSupportInformation = "https://go.lithnet.io/fwlink/ktayuqvb";
 
+        public const string HelpLinkImportCsv = "https://go.lithnet.io/fwlink/okfclsla";
+        public const string HelpLinkImportLocalAdmins = "https://go.lithnet.io/fwlink/varohhyv";
+        
         public const string EventSourceName = "Lithnet Access Manager Configuration Tool";
         public const string EventLogName = "Lithnet Access Manager";
         public const string FirewallRuleName = "Lithnet Access Manager Web Service (HTTP/HTTPS-In)"; // This value also needs to be updated in the installer

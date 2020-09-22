@@ -60,6 +60,7 @@ namespace Lithnet.AccessManager.Service
             services.TryAddScoped<IAuthorizationInformationBuilder, AuthorizationInformationBuilder>();
             services.TryAddScoped<ITargetDataProvider, TargetDataProvider>();
             services.TryAddScoped<IBitLockerRecoveryPasswordProvider, BitLockerRecoveryPasswordProvider>();
+            services.TryAddScoped<IComputerTargetProvider, ComputerTargetProvider>();
 
             services.TryAddSingleton<IAppPathProvider, WebAppPathProvider>();
             services.TryAddSingleton<RandomNumberGenerator>(RandomNumberGenerator.Create());

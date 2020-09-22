@@ -287,14 +287,12 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task HelpRpcLocalAdmin()
         {
-            return;
-            await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkAuthNSetupOkta);
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkImportLocalAdmins);
         }
 
         public async Task HelpCsvFileFormat()
         {
-            return;
-            await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkAuthNSetupOkta);
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkImportCsv);
         }
 
         public async Task SelectImportFile()
@@ -343,28 +341,6 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                SelectForestViewModel vm = new SelectForestViewModel()
-                {
-                    AvailableForests = this.domainTrustProvider.GetForests().Select(t => t.Name).ToList()
-                };
-
-                DialogWindow w = new DialogWindow
-                {
-                    Title = "Select target forest",
-                    DataContext = vm,
-                    SaveButtonName = "Next...",
-                    SaveButtonIsDefault = true
-                };
-
-                vm.SelectedForest = this.GetForestForTargetOrDefault();
-
-                await this.GetWindow().ShowChildWindowAsync(w);
-
-                if (w.Result != MessageDialogResult.Affirmative)
-                {
-                    return;
-                }
-
                 ShowContainerDialog();
             }
             catch (Exception ex)

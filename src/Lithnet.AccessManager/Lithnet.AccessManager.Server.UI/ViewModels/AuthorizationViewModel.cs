@@ -69,7 +69,7 @@ namespace Lithnet.AccessManager.Server.UI
                 DataContext = vm,
                 SaveButtonVisible = true,
                 CancelButtonName = "Close",
-                SaveButtonName = "Import", 
+                SaveButtonName = "Import",
                 Height = 600
             };
 
@@ -119,11 +119,7 @@ namespace Lithnet.AccessManager.Server.UI
                 ImportResultsViewModel irvm = new ImportResultsViewModel();
                 irvm.Targets = factory.CreateViewModel(targets);
                 irvm.DiscoveryErrors = results.ComputerErrors;
-
-                foreach (var t in irvm.Targets.ViewModels)
-                {
-                    t.IsScriptVisible = false;
-                }
+                irvm.Targets.ChildDisplaySettings.IsScriptVisible = false;
 
                 await this.progress.CloseAsync();
 
@@ -134,7 +130,7 @@ namespace Lithnet.AccessManager.Server.UI
                     SaveButtonVisible = true,
                     CancelButtonName = "Cancel",
                     SaveButtonName = "Save and import rules",
-                    SizeToContent= System.Windows.SizeToContent.Height
+                    Height = 600
                 };
 
                 if (window.ShowDialog() == false)
@@ -167,7 +163,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 if (!merge)
                 {
-                    this.Targets.ViewModels.Add(newTarget);
+                    Execute.OnUIThread(() => this.Targets.ViewModels.Add(newTarget));
                     this.Targets.Model.Add(newTarget.Model);
                     continue;
                 }
@@ -176,7 +172,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                 if (existingTarget == null)
                 {
-                    this.Targets.ViewModels.Add(newTarget);
+                    Execute.OnUIThread(() => this.Targets.ViewModels.Add(newTarget));
                     continue;
                 }
 

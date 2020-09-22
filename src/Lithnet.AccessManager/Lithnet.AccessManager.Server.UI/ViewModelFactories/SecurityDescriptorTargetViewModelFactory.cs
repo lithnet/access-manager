@@ -30,11 +30,11 @@ namespace Lithnet.AccessManager.Server.UI
             this.localSam = localsam;
         }
 
-        public SecurityDescriptorTargetViewModel CreateViewModel(SecurityDescriptorTarget model)
+        public SecurityDescriptorTargetViewModel CreateViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings settings)
         {
             var validator = new SecurityDescriptorTargetViewModelValidator(this.appPathProvider);
             var v = new FluentModelValidator<SecurityDescriptorTargetViewModel>(validator);
-            return new SecurityDescriptorTargetViewModel(model, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, v, directory, domainTrustProvider, discoveryServices, localSam);
+            return new SecurityDescriptorTargetViewModel(model, settings, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, v, directory, domainTrustProvider, discoveryServices, localSam);
         }
     }
 }

@@ -25,12 +25,13 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IDiscoveryServices discoveryServices;
         private readonly ILocalSam localSam;
+        private readonly SecurityDescriptorTargetViewModelDisplaySettings displaySettings;
 
         private string jitGroupDisplayName;
 
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam)
         {
             this.directory = directory;
             this.Model = model;
@@ -41,6 +42,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.domainTrustProvider = domainTrustProvider;
             this.discoveryServices = discoveryServices;
             this.localSam = localSam;
+            this.displaySettings = displaySettings ?? new SecurityDescriptorTargetViewModelDisplaySettings();
 
             this.Script = fileSelectionViewModelFactory.CreateViewModel(model, () => model.Script, appPathProvider.ScriptsPath);
             this.Script.DefaultFileExtension = "ps1";
@@ -52,7 +54,7 @@ namespace Lithnet.AccessManager.Server.UI
         }
 
 
-        public async Task Initialize()
+        private async Task Initialize()
         {
             this.Notifications = notificationChannelFactory.CreateViewModel(this.Model.Notifications);
             this.DisplayName = this.Target;
@@ -116,6 +118,8 @@ namespace Lithnet.AccessManager.Server.UI
 
         public FileSelectionViewModel Script { get; }
 
+        public string Id => this.Model.Id;
+
         public TargetType Type { get => this.Model.Type; set => this.Model.Type = value; }
 
         public string SecurityDescriptor { get => this.Model.SecurityDescriptor; set => this.Model.SecurityDescriptor = value; }
@@ -124,7 +128,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string JitAuthorizingGroup { get => this.Model.Jit.AuthorizingGroup; set => this.Model.Jit.AuthorizingGroup = value; }
 
-        public bool IsScriptVisible { get; set; } = true;
+        public bool IsScriptVisible => this.displaySettings.IsScriptVisible;
 
         public string JitGroupDisplayName
         {
