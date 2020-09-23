@@ -290,7 +290,7 @@ namespace Lithnet.AccessManager.Server.UI
                 Target = computerSid.ToString(),
                 Type = TargetType.Computer,
                 Id = Guid.NewGuid().ToString(),
-                Notifications = vm?.Notifications?.Model,
+                Notifications = vm.Notifications?.Model,
                 Jit = new SecurityDescriptorTargetJitDetails()
                 {
                     AuthorizingGroup = vm.JitAuthorizingGroup,
@@ -331,7 +331,7 @@ namespace Lithnet.AccessManager.Server.UI
                 Target = entry.OUName,
                 Type = TargetType.Container,
                 Id = Guid.NewGuid().ToString(),
-                Notifications = vm?.Notifications?.Model,
+                Notifications = vm.Notifications?.Model,
                 Jit = new SecurityDescriptorTargetJitDetails()
                 {
                     AuthorizingGroup = vm.JitAuthorizingGroup,

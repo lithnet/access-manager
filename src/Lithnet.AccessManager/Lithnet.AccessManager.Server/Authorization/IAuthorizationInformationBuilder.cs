@@ -9,6 +9,6 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         AuthorizationInformation GetAuthorizationInformation(IUser user, IComputer computer);
 
-        AuthorizationInformation BuildAuthorizationInformation(IUser user, IComputer computer, IList<SecurityDescriptorTarget> targets);
+        AuthorizationInformation BuildAuthorizationInformation(IUser user, IComputer computer, IList<SecurityDescriptorTarget> matchedComputerTargets);
     }
 }

@@ -142,6 +142,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IJitGroupMappingViewModelFactory>().To<JitGroupMappingViewModelFactory>();
                 builder.Bind<IJitDomainStatusViewModelFactory>().To<JitDomainStatusViewModelFactory>();
                 builder.Bind<IImportTargetsViewModelFactory>().To<ImportTargetsViewModelFactory>();
+                builder.Bind<IEffectiveAccessViewModelFactory>().To<EffectiveAccessViewModelFactory>();
                 builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
                 builder.Bind(typeof(INotificationChannelDefinitionViewModelFactory<,>)).ToAllImplementations();
 

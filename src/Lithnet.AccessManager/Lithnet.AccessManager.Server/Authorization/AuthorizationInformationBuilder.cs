@@ -66,11 +66,11 @@ namespace Lithnet.AccessManager.Server.Authorization
             return info;
         }
 
-        public AuthorizationInformation BuildAuthorizationInformation(IUser user, IComputer computer, IList<SecurityDescriptorTarget> targets)
+        public AuthorizationInformation BuildAuthorizationInformation(IUser user, IComputer computer, IList<SecurityDescriptorTarget> matchedComputerTargets)
         {
             AuthorizationInformation info = new AuthorizationInformation
             {
-                MatchedComputerTargets = targets,
+                MatchedComputerTargets = matchedComputerTargets,
                 EffectiveAccess = 0,
                 Computer = computer,
                 User = user

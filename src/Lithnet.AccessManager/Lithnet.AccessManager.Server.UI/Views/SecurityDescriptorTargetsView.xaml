@@ -20,6 +20,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -33,33 +34,50 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-
-                <Label Grid.Column="0"
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Column="0" Grid.Row="0"
                        Content="Search"
                        Margin="5 2 2 2"/>
-                <TextBox Grid.Column="1"
+                <TextBox Grid.Column="1" Grid.Row="0"
                          Margin="2"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                         KeyUp="{s:Action SearchTextBoxKeyUp}" />
-                <Button Grid.Column="2"
+                <Button Grid.Column="2" Grid.Row="0"
                         Content="Search"
                         MinWidth="65"
                         Command="{s:Action ApplySearchFilter}"
                         Margin="2"/>
-                <Button Grid.Column="3"
+                <Button Grid.Column="3" Grid.Row="0"
                         Content="Clear"
                         MinWidth="65"
                         Command="{s:Action ClearSearchFilter}"
                         Margin="2"/>
-
             </Grid>
 
-            <TextBlock Grid.Row="1"
-                       Margin="5"
-                       Visibility="{Binding IsLoading, Converter={StaticResource  BooleanToVisibilityConverter}}"
-                       Text="Loading rules.."/>
+            <StackPanel  Grid.Row="1"
+                         Orientation="Horizontal"
+                         Visibility="{Binding HasLoaded, Converter={StaticResource  BooleanToVisibilityConverter}}"
+                         HorizontalAlignment="Right">
+                <Button Content="Effective access..."
+                    MinWidth="65"
+                    Command="{s:Action ShowEffectivePermissions}"
+                    Margin="5"/>
+            </StackPanel>
 
-            <ListView Grid.Row="2"
+            <StackPanel Grid.Row="2" 
+                        Visibility="{Binding IsLoading, Converter={StaticResource  BooleanToVisibilityConverter}}"
+                        Orientation="Horizontal"
+                        Margin="5">
+                <mah:ProgressRing Height="15" Width="15"/>
+                <TextBlock Margin="5 0 0 0"
+                          Text="Loading rules.."/>
+
+            </StackPanel>
+
+            <ListView Grid.Row="3"
                   x:Name="listbox"
                   ItemsSource="{Binding Items}"
                   SelectedItem="{Binding SelectedItem}" 
@@ -82,7 +100,7 @@
                 </ListView.View>
             </ListView>
 
-            <StackPanel Grid.Row="3" Orientation="Horizontal"
+            <StackPanel Grid.Row="4" Orientation="Horizontal"
                   Visibility="{Binding HasLoaded, Converter={StaticResource  BooleanToVisibilityConverter}}">
                 <Button Command="{s:Action Add}" 
                         Content="Add..." 
@@ -93,6 +111,7 @@
                 <Button Command="{s:Action Edit}"
                         Content="Edit selected..."
                         Margin="5"/>
+
             </StackPanel>
         </Grid>
     </views:CanvasEx>

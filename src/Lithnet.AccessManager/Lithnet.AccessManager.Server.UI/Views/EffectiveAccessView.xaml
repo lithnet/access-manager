@@ -1,0 +1,210 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.EffectiveAccessView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             Dialog:DialogParticipation.Register="{Binding}"
+             mc:Ignorable="d" 
+            d:DesignWidth="800"
+             Margin="5">
+    <StackPanel>
+        <DockPanel>
+            <!--<Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
+                <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
+            </Button>-->
+            <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Effective access" />
+        </DockPanel>
+
+        <Label Margin="5"
+               Style="{DynamicResource SubDescriptionHeaderStyle}"
+               Content="User and computer details" />
+
+        <TextBlock Margin="15 0 0 10" TextWrapping="Wrap">
+            Permissions calculations are performed using your own account. If you are not a member of the 'Windows Authorization Access Group' and 'Access Control Assistance Operators' groups in the domains where this user and computer are located, the access shown may not be complete.
+        </TextBlock>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0"
+                   Content="Username"
+                   Margin="5"/>
+            <TextBox Grid.Row="0" Grid.Column="1"
+                     Text="{Binding Username}"
+                     Margin="5"/>
+
+
+            <Label Grid.Row="1" Grid.Column="0"
+                   Content="Computer name"
+                   Margin="5"/>
+            <TextBox Grid.Row="1" Grid.Column="1"
+                     Text="{Binding ComputerName}"
+                     Margin="5"
+                     KeyUp="{s:Action ComputerNameTextBoxKeyUp}"/>
+
+            <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+                <Button Content="Clear results"
+                        Command="{s:Action ClearResults}"
+                        Margin="5"/>
+                <Button Content="Evaluate access" IsDefault="True"
+                        Command="{s:Action CalculateEffectiveAccess}"
+                        Margin="5"/>
+            </StackPanel>
+
+        </Grid>
+
+        <StackPanel Visibility="{Binding HasResults, Converter={StaticResource BooleanToVisibilityConverter}}">
+
+            <Label Margin="5" Style="{DynamicResource SubDescriptionHeaderStyle}" Content="Permissions" />
+
+
+
+            <Grid Margin="10 0 0 0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0"
+                           Text="Local admin password"
+                           Margin="5 2 2 2" />
+
+                <iconPacks:PackIconFontAwesome Grid.Row="0" Grid.Column="1"
+                                               Margin="2"
+                                           Kind="CheckSolid" 
+                                           Visibility="{Binding HasLaps, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           Foreground="Green"
+                                           />
+
+                <iconPacks:PackIconFontAwesome Grid.Row="0" Grid.Column="1"
+                                           Kind="TimesSolid"
+                                               Margin="2"
+                                           Visibility="{Binding HasNoLaps, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           Foreground="Crimson"
+                                          />
+
+                <TextBlock Grid.Row="1" Grid.Column="0"
+                   Text="Local admin password history"
+                   Margin="5 2 2 2" />
+
+                <iconPacks:PackIconFontAwesome Grid.Row="1" Grid.Column="1"
+                                           Kind="CheckSolid" 
+                                               Margin="2"
+                                           Visibility="{Binding HasLapsHistory, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           Foreground="Green"
+                                           />
+
+                <iconPacks:PackIconFontAwesome Grid.Row="1" Grid.Column="1"
+                                           Kind="TimesSolid"
+                                               Margin="2"
+                                           Visibility="{Binding HasNoLapsHistory, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           Foreground="Crimson"
+                                           />
+
+                <TextBlock Grid.Row="0" Grid.Column="2"
+                           Text="Just-in-time access"
+                           Margin="5 2 2 2" />
+
+                <iconPacks:PackIconFontAwesome Grid.Row="0" Grid.Column="3"
+                                           Kind="CheckSolid" 
+                                               Margin="2"
+                                           Visibility="{Binding HasJit, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           Foreground="Green"
+                                           />
+
+                <iconPacks:PackIconFontAwesome Grid.Row="0" Grid.Column="3"
+                                           Kind="TimesSolid"
+                                               Margin="2"
+                                           Visibility="{Binding HasNoJit, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           Foreground="Crimson"
+                                           />
+
+                <TextBlock Grid.Row="1" Grid.Column="2"
+                   Text="BitLocker recovery password"
+                   Margin="5 2 2 2" />
+
+                <iconPacks:PackIconFontAwesome Grid.Row="1" Grid.Column="3"
+                                           Kind="CheckSolid" 
+                                               Margin="2"
+                                           Visibility="{Binding HasBitLocker, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           Foreground="Green"
+                                           />
+
+                <iconPacks:PackIconFontAwesome Grid.Row="1" Grid.Column="3"
+                                           Kind="TimesSolid"
+                                               Margin="2"
+                                           Visibility="{Binding HasNoBitLocker, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           Foreground="Crimson"
+                                           />
+            </Grid>
+
+            <StackPanel  Visibility="{Binding ShowMatchTable, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Label Margin="5" Style="{DynamicResource SubDescriptionHeaderStyle}" Content="Matched rules" />
+
+
+                <ListView BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
+                  ItemsSource="{Binding MatchedTargets}"
+                  SelectedItem="{Binding SelectedItem}" 
+                  ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  Height="200"
+                  Margin="10"
+                  MouseDoubleClick="{s:Action Edit}"
+                  Width="Auto">
+                    <b:Interaction.Behaviors>
+                        <local:ListViewScrollBarBehavior />
+                    </b:Interaction.Behaviors>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Name" 
+                                    DisplayMemberBinding="{Binding DisplayName}" 
+                                    Width="Auto"/>
+                            <GridViewColumn Header="Type"
+                                    DisplayMemberBinding="{Binding Type}" 
+                                    Width="Auto"/>
+                            <GridViewColumn Header="Effective Access"
+                                    DisplayMemberBinding="{Binding EffectiveAccess}" 
+                                    Width="Auto"/>
+                            <GridViewColumn Header="Description"
+                                    DisplayMemberBinding="{Binding Description}" 
+                                    Width="Auto"/>
+
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+
+
+                <StackPanel HorizontalAlignment="Left"
+                        Orientation="Horizontal"
+                        Margin="5">
+                    <Button Content="Edit" 
+                        Command="{s:Action Edit}"
+                        MinWidth="55"
+                        Margin="5"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+</UserControl>

@@ -14,8 +14,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILogger<SecurityDescriptorTargetsViewModel> logger;
         private readonly IDirectory directory;
         private readonly IComputerTargetProvider computerTargetProvider;
+        private readonly IEffectiveAccessViewModelFactory effectiveAccessFactory;
 
-        public SecurityDescriptorTargetsViewModelFactory(IDialogCoordinator dialogCoordinator, SecurityDescriptorTargetViewModelFactory factory, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IComputerTargetProvider computerTargetProvider)
+        public SecurityDescriptorTargetsViewModelFactory(IDialogCoordinator dialogCoordinator, SecurityDescriptorTargetViewModelFactory factory, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IComputerTargetProvider computerTargetProvider, IEffectiveAccessViewModelFactory effectiveAccessFactory)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.factory = factory;
@@ -23,11 +24,12 @@ namespace Lithnet.AccessManager.Server.UI
             this.logger = logger;
             this.directory = directory;
             this.computerTargetProvider = computerTargetProvider;
+            this.effectiveAccessFactory = effectiveAccessFactory;
         }
 
         public SecurityDescriptorTargetsViewModel CreateViewModel(IList<SecurityDescriptorTarget> model)
         {
-            return new SecurityDescriptorTargetsViewModel(model, factory, dialogCoordinator, eventPublisher, logger, directory, computerTargetProvider);
+            return new SecurityDescriptorTargetsViewModel(model, factory, dialogCoordinator, eventPublisher, logger, directory, computerTargetProvider, effectiveAccessFactory);
         }
     }
 }

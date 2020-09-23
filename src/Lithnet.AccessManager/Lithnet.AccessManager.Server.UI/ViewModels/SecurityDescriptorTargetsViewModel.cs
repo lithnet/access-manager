@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,7 +10,6 @@ using System.Windows.Input;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
-using MahApps.Metro.SimpleChildWindow;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Stylet;
@@ -26,13 +24,15 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDirectory directory;
         private readonly SecurityDescriptorTargetViewModelFactory factory;
         private readonly ILogger<SecurityDescriptorTargetsViewModel> logger;
+        private readonly IEffectiveAccessViewModelFactory effectiveAccessFactory;
+        private readonly INotifyModelChangedEventPublisher eventPublisher;
 
         private bool firstSearch;
         private ListSortDirection currentSortDirection = ListSortDirection.Ascending;
         private GridViewColumnHeader lastHeaderClicked;
         private HashSet<string> matchedComputerViewModels;
 
-        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, SecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IComputerTargetProvider computerTargetProvider)
+        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, SecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IComputerTargetProvider computerTargetProvider, IEffectiveAccessViewModelFactory effectiveAccessFactory)
         {
             this.factory = factory;
             this.Model = model;
@@ -40,11 +40,12 @@ namespace Lithnet.AccessManager.Server.UI
             this.logger = logger;
             this.directory = directory;
             this.computerTargetProvider = computerTargetProvider;
+            this.effectiveAccessFactory = effectiveAccessFactory;
             this.customComparer = new SecurityDescriptorTargetViewModelComparer();
             this.ChildDisplaySettings = new SecurityDescriptorTargetViewModelDisplaySettings();
+            this.eventPublisher = eventPublisher;
 
             _ = this.Initialize();
-            eventPublisher.Register(this);
         }
 
         public bool CanDelete => this.SelectedItem != null;
@@ -68,19 +69,20 @@ namespace Lithnet.AccessManager.Server.UI
         [NotifyModelChangedCollection]
         public BindableCollection<SecurityDescriptorTargetViewModel> ViewModels { get; private set; }
 
-        public async Task Add()
+        public void Add()
         {
-            DialogWindow w = new DialogWindow();
-            w.Title = "Add target";
+            ExternalDialogWindow w = new ExternalDialogWindow
+            {
+                Title = "Add authorization rule",
+                SaveButtonIsDefault = true,
+                Height = 735
+            };
+
             var m = new SecurityDescriptorTarget();
             var vm = this.factory.CreateViewModel(m, this.ChildDisplaySettings);
             w.DataContext = vm;
-            w.SaveButtonIsDefault = true;
-            // await vm.Initialize();
 
-            await this.GetWindow().ShowChildWindowAsync(w);
-
-            if (w.Result == MessageDialogResult.Affirmative)
+            if (w.ShowDialog() == true)
             {
                 this.Model.Add(m);
                 this.ViewModels.Add(vm);
@@ -146,6 +148,25 @@ namespace Lithnet.AccessManager.Server.UI
             this.Items.Refresh();
         }
 
+        public void ShowEffectivePermissions()
+        {
+            var vm = this.effectiveAccessFactory.CreateViewModel(this);
+
+            ExternalDialogWindow window = new ExternalDialogWindow
+            {
+                Title = "Effective Access",
+                DataContext = vm,
+                CancelButtonName = "Close",
+                SaveButtonVisible = false,
+                Height = 600
+            };
+
+            if (window.ShowDialog() == false)
+            {
+                return;
+            }
+        }
+
         public async Task Delete(System.Collections.IList items)
         {
             if (items == null)
@@ -177,38 +198,46 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task Edit()
         {
-            var selectedItem = this.SelectedItem;
+            await this.EditItem(this.SelectedItem, this.GetWindow());
+        }
 
-            if (selectedItem == null)
+        public async Task EditItem(SecurityDescriptorTargetViewModel selectedItem, Window owner)
+        {
+            try
             {
-                return;
+                if (selectedItem == null)
+                {
+                    return;
+                }
+
+                ExternalDialogWindow w = new ExternalDialogWindow
+                {
+                    Title = "Edit rule",
+                    SaveButtonIsDefault = true,
+                    Height = 735
+                };
+
+                var m = JsonConvert.DeserializeObject<SecurityDescriptorTarget>(JsonConvert.SerializeObject(selectedItem.Model));
+                var vm = this.factory.CreateViewModel(m, this.ChildDisplaySettings);
+
+                w.DataContext = vm;
+
+                if (w.ShowDialog() == true)
+                {
+                    this.Model.Remove(selectedItem.Model);
+
+                    int existingPosition = this.ViewModels.IndexOf(selectedItem);
+
+                    this.ViewModels.Remove(selectedItem);
+                    this.Model.Add(m);
+                    this.ViewModels.Insert(Math.Min(Math.Max(existingPosition, 0), this.ViewModels.Count), vm);
+                    this.SelectedItem = vm;
+                }
             }
-
-            DialogWindow w = new DialogWindow
+            catch (Exception ex)
             {
-                Title = "Edit target",
-                SaveButtonIsDefault = true
-            };
-
-            var m = JsonConvert.DeserializeObject<SecurityDescriptorTarget>(JsonConvert.SerializeObject(selectedItem.Model));
-            var vm = this.factory.CreateViewModel(m, this.ChildDisplaySettings);
-            // await vm.Initialize();
-
-            w.DataContext = vm;
-
-
-            await this.GetWindow().ShowChildWindowAsync(w);
-
-            if (w.Result == MessageDialogResult.Affirmative)
-            {
-                this.Model.Remove(selectedItem.Model);
-
-                int existingPosition = this.ViewModels.IndexOf(selectedItem);
-
-                this.ViewModels.Remove(selectedItem);
-                this.Model.Add(m);
-                this.ViewModels.Insert(Math.Min(existingPosition, this.ViewModels.Count), vm);
-                this.SelectedItem = vm;
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Error editing item");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not edit the selected item. {ex.Message}");
             }
         }
 
@@ -227,9 +256,9 @@ namespace Lithnet.AccessManager.Server.UI
                 this.IsLoading = true;
                 this.ViewModels = new BindableCollection<SecurityDescriptorTargetViewModel>(this.Model.Select(t => factory.CreateViewModel(t, this.ChildDisplaySettings)));
 
-                Execute.OnUIThread(() =>
+                Execute.OnUIThreadSync(() =>
                 {
-                    this.Items = (ListCollectionView)CollectionViewSource.GetDefaultView(this.ViewModels);
+                    this.Items = (ListCollectionView) CollectionViewSource.GetDefaultView(this.ViewModels);
                     this.Items.Filter = this.IsFiltered;
                     this.Items.CustomSort = this.customComparer;
                     this.customComparer.SortDirection = currentSortDirection;
@@ -237,6 +266,8 @@ namespace Lithnet.AccessManager.Server.UI
                 });
 
                 this.IsLoading = false;
+
+                eventPublisher.Register(this);
             });
         }
 

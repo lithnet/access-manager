@@ -17,6 +17,8 @@ namespace Lithnet.AccessManager.Server.Authorization
         private readonly AuthorizationOptions options;
         private readonly IDiscoveryServices discoveryServices;
 
+        public static bool DisableLocalFallback { get; set; }
+
         public AuthorizationContextProvider(IOptions<AuthorizationOptions> options, ILogger<AuthorizationContextProvider> logger, IDiscoveryServices discoveryServices)
         {
             this.logger = logger;
@@ -43,7 +45,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                 // If we only have a one-way trust to the remote domain, don't bother trying to fallback because it will fail locally
                 // as that user can't log on in this domain at all
 
-                if (!domainDetails.IsRemoteOneWayTrust && !domainDetails.Mapping.DisableLocalFallback)
+                if (!DisableLocalFallback && !domainDetails.IsRemoteOneWayTrust && !domainDetails.Mapping.DisableLocalFallback)
                 {
                     logger.LogWarning(EventIDs.AuthZContextFallback, "Unable to establish authorization context for user {user} against an appropriate target server. The authorization context will be built locally, but information about membership in domain local groups in the target domain may missed", user.MsDsPrincipalName);
                     return new AuthorizationContext(user.Sid);
