@@ -576,7 +576,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task SelectServiceAccountUser()
         {
-            LoginDialogData r = await this.dialogCoordinator.ShowLoginAsync(this, "Service account", "Enter the credentials for the service account", new LoginDialogSettings
+            LoginDialogData r = await this.dialogCoordinator.ShowLoginAsync(this, "Service account", "Enter the credentials for the service account. If you are using a group-managed service account, leave the password field blank, and don't forget to include the '$' sign at the end of the account name", new LoginDialogSettings
             {
                 EnablePasswordPreview = true,
                 AffirmativeButtonText = "OK"

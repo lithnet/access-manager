@@ -16,12 +16,17 @@ namespace Lithnet.AccessManager
 {
     public static class DirectoryExtensions
     {
-        internal static void ThrowIfNotObjectClass(this DirectoryEntry de, string objectClass)
+        internal static void ThrowIfNotObjectClass(this DirectoryEntry de, params string[] objectClasses)
         {
-            if (!string.Equals(de.SchemaClassName, objectClass, StringComparison.OrdinalIgnoreCase))
+            foreach (string objectClass in objectClasses)
             {
-                throw new UnsupportedPrincipalTypeException($"An object of type {de.SchemaClassName} was provided, but an object of type '{objectClass}' was expected");
+                if (string.Equals(de.SchemaClassName, objectClass, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
             }
+
+            throw new UnsupportedPrincipalTypeException($"An object of type {de.SchemaClassName} was provided, but an object of one of the following types was expected '{string.Join(",", objectClasses)}'");
         }
 
         internal static byte[] ToBytes(this SecurityIdentifier s)

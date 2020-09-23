@@ -97,6 +97,11 @@ namespace Lithnet.AccessManager
         {
             var result = GetDirectoryEntry(sid);
 
+            if (result.HasPropertyValue("objectClass", "msDS-GroupManagedServiceAccount"))
+            {
+                return new ActiveDirectoryGroupManagedServiceAccount(result);
+            }
+
             if (result.HasPropertyValue("objectClass", "computer"))
             {
                 return new ActiveDirectoryComputer(result);
@@ -118,6 +123,11 @@ namespace Lithnet.AccessManager
         public ISecurityPrincipal GetPrincipal(string name)
         {
             var result = this.FindInGc(name, "*");
+
+            if (result.HasPropertyValue("objectClass", "msDS-GroupManagedServiceAccount"))
+            {
+                return new ActiveDirectoryGroupManagedServiceAccount(result);
+            }
 
             if (result.HasPropertyValue("objectClass", "computer"))
             {
