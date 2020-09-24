@@ -11,6 +11,6 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string SelectedForest { get; set; }
 
-        public List<string> AvailableForests { get; set; }
+        public List<string> AvailableForests { get; } = new List<string>();
     }
 }

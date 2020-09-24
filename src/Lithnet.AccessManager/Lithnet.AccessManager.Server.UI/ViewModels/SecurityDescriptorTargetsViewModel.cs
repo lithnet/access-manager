@@ -64,6 +64,8 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string SearchText { get; set; }
 
+        public bool IsFilterApplied { get; set; }
+
         public SecurityDescriptorTargetViewModel SelectedItem { get; set; }
 
         [NotifyModelChangedCollection]
@@ -89,9 +91,16 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
+        public bool CanApplySearchFilter => !string.IsNullOrWhiteSpace(this.SearchText);
+
         public async Task ApplySearchFilter()
         {
             ProgressDialogController controller = null;
+
+            if (string.IsNullOrWhiteSpace(this.SearchText))
+            {
+                return;
+            }
 
             try
             {
@@ -101,7 +110,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                 await Task.Run(() =>
                 {
-                    if (this.directory.TryGetComputer(this.SearchText, out IComputer computer))
+                    if (!this.SearchText.StartsWith('?') && this.directory.TryGetComputer(this.SearchText, out IComputer computer))
                     {
                         if (!firstSearch)
                         {
@@ -128,6 +137,7 @@ namespace Lithnet.AccessManager.Server.UI
                 });
 
                 this.Items.Refresh();
+                this.IsFilterApplied = true;
             }
             finally
             {
@@ -141,10 +151,13 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
+        public bool CanClearSearchFilter => this.IsFilterApplied;
+
         public void ClearSearchFilter()
         {
             this.SearchText = null;
             this.matchedComputerViewModels = null;
+            this.IsFilterApplied = false;
             this.Items.Refresh();
         }
 
@@ -158,7 +171,7 @@ namespace Lithnet.AccessManager.Server.UI
                 DataContext = vm,
                 CancelButtonName = "Close",
                 SaveButtonVisible = false,
-                Height = 600
+                Height = 770
             };
 
             if (window.ShowDialog() == false)
@@ -243,7 +256,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task SearchTextBoxKeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
+            if (e.Key == Key.Enter && this.CanApplySearchFilter)
             {
                 await this.ApplySearchFilter();
             }
@@ -258,7 +271,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                 Execute.OnUIThreadSync(() =>
                 {
-                    this.Items = (ListCollectionView) CollectionViewSource.GetDefaultView(this.ViewModels);
+                    this.Items = (ListCollectionView)CollectionViewSource.GetDefaultView(this.ViewModels);
                     this.Items.Filter = this.IsFiltered;
                     this.Items.CustomSort = this.customComparer;
                     this.customComparer.SortDirection = currentSortDirection;
@@ -273,7 +286,9 @@ namespace Lithnet.AccessManager.Server.UI
 
         private bool IsFiltered(object item)
         {
-            if (string.IsNullOrWhiteSpace(this.SearchText))
+            var trimmedText = this.SearchText?.TrimStart('?');
+
+            if (string.IsNullOrWhiteSpace(trimmedText))
             {
                 return true;
             }
@@ -286,8 +301,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             else
             {
-
-                return (vm.DisplayName != null && vm.DisplayName.Contains(this.SearchText, StringComparison.OrdinalIgnoreCase)) || (vm.Description != null && vm.Description.Contains(this.SearchText, StringComparison.OrdinalIgnoreCase));
+                return (vm.DisplayName != null && vm.DisplayName.Contains(trimmedText, StringComparison.OrdinalIgnoreCase)) || (vm.Description != null && vm.Description.Contains(trimmedText, StringComparison.OrdinalIgnoreCase));
             }
         }
 

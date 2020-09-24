@@ -1,6 +1,4 @@
-﻿using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.UI.Providers;
-using Lithnet.AccessManager.Server.UI.ViewModels;
+﻿using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Stylet;
@@ -19,8 +17,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDirectory directory;
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IShellExecuteProvider shellExecuteProvider;
+        private readonly IObjectSelectionProvider objectSelectionProvider;
 
-        public ImportTargetsViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<ImportSettingsViewModel> logger, IModelValidator<ImportSettingsViewModel> validator, IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IDirectory directory, IShellExecuteProvider shellExecuteProvider)
+        public ImportTargetsViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<ImportSettingsViewModel> logger, IModelValidator<ImportSettingsViewModel> validator, IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IDirectory directory, IShellExecuteProvider shellExecuteProvider, IObjectSelectionProvider objectSelectionProvider)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.appPathProvider = appPathProvider;
@@ -32,11 +31,12 @@ namespace Lithnet.AccessManager.Server.UI
             this.discoveryServices = discoveryServices;
             this.domainTrustProvider = domainTrustProvider;
             this.shellExecuteProvider = shellExecuteProvider;
+            this.objectSelectionProvider = objectSelectionProvider;
         }
 
         public ImportSettingsViewModel CreateViewModel()
         {
-            return new ImportSettingsViewModel(channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, validator, directory, domainTrustProvider, discoveryServices, shellExecuteProvider );
+            return new ImportSettingsViewModel(channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, validator, directory, domainTrustProvider, discoveryServices, shellExecuteProvider, objectSelectionProvider);
         }
     }
 }

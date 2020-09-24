@@ -55,7 +55,7 @@ namespace Lithnet.AccessManager
 
         string GetFullyQualifiedAdsPath(string dn);
 
-        string GetFullyQualifiedDomainControllerAdsPath(string dn);
+        string GetFullyQualifiedRootAdsPath(string dn);
 
         DirectoryEntry GetSchemaNamingContext(string dnsDomain);
         

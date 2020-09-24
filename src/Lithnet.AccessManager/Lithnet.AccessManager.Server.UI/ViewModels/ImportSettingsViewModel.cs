@@ -1,14 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media.Animation;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
-using MahApps.Metro.SimpleChildWindow;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using PropertyChanged;
@@ -25,8 +28,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IDiscoveryServices discoveryServices;
         private readonly IShellExecuteProvider shellExecuteProvider;
+        private readonly IObjectSelectionProvider objectSelectionProvider;
 
-        public ImportSettingsViewModel(INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<ImportSettingsViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportSettingsViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IShellExecuteProvider shellExecuteProvider)
+        public ImportSettingsViewModel(INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<ImportSettingsViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportSettingsViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IShellExecuteProvider shellExecuteProvider, IObjectSelectionProvider objectSelectionProvider)
         {
             this.directory = directory;
             this.logger = logger;
@@ -36,6 +40,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.domainTrustProvider = domainTrustProvider;
             this.discoveryServices = discoveryServices;
             this.shellExecuteProvider = shellExecuteProvider;
+            this.objectSelectionProvider = objectSelectionProvider;
             _ = this.Initialize();
         }
 
@@ -54,6 +59,8 @@ namespace Lithnet.AccessManager.Server.UI
         public string Description { get; set; }
 
         public string JitAuthorizingGroup { get; set; }
+
+        public bool ImportFileHasHeaderRow { get; set; }
 
         public string JitGroupDisplayName
         {
@@ -240,8 +247,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                SecurityIdentifier sid = ShowObjectPickerGroups(this.GetDcForTargetOrDefault());
-                if (sid != null)
+                if (this.objectSelectionProvider.GetGroup(this, out SecurityIdentifier sid))
                 {
                     this.JitAuthorizingGroup = sid.ToString();
                 }
@@ -251,38 +257,6 @@ namespace Lithnet.AccessManager.Server.UI
                 this.logger.LogError(EventIDs.UIGenericError, ex, "Select JIT group error");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred when processing the request\r\n{ex.Message}");
             }
-        }
-
-        private SecurityIdentifier ShowObjectPickerGroups(string targetServer)
-        {
-            DsopScopeInitInfo scope = new DsopScopeInitInfo();
-            scope.Filter = new DsFilterFlags();
-            scope.Filter.UpLevel.BothModeFilter =
-                DsopObjectFilterFlags.DSOP_FILTER_DOMAIN_LOCAL_GROUPS_SE |
-                DsopObjectFilterFlags.DSOP_FILTER_GLOBAL_GROUPS_SE |
-                DsopObjectFilterFlags.DSOP_FILTER_UNIVERSAL_GROUPS_SE;
-
-            scope.ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_ENTERPRISE_DOMAIN |
-                              DsopScopeTypeFlags.DSOP_SCOPE_TYPE_USER_ENTERED_UPLEVEL_SCOPE |
-                              DsopScopeTypeFlags.DSOP_SCOPE_TYPE_EXTERNAL_UPLEVEL_DOMAIN;
-
-            scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS |
-                             DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
-
-            DsopResult result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), targetServer, scope, "objectClass", "objectSid").FirstOrDefault();
-
-            if (result != null)
-            {
-                byte[] sid = result.Attributes["objectSid"] as byte[];
-                if (sid == null)
-                {
-                    return null;
-                }
-
-                return new SecurityIdentifier(sid, 0);
-            }
-
-            return null;
         }
 
         public async Task HelpRpcLocalAdmin()
@@ -323,9 +297,9 @@ namespace Lithnet.AccessManager.Server.UI
                 return;
             }
 
-            foreach (var line in File.ReadLines(openFileDialog.FileName))
+            foreach (var line in File.ReadLines(openFileDialog.FileName).Skip(this.ImportFileHasHeaderRow ? 1 : 0))
             {
-                if (line.Count(t => t == ',') != 1)
+                if (line.Count(t => t == ',') < 1)
                 {
                     await dialogCoordinator.ShowMessageAsync(this, "File format error", "The file was not in the expected format. View the help topic for this page for information on the correct format");
                     return;
@@ -350,16 +324,53 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
+        public async Task AddFilteredSid()
+        {
+            try
+            {
+                if (this.objectSelectionProvider.GetUserOrGroup(this, out SecurityIdentifier sid))
+                {
+                    SecurityIdentifierViewModel sidvm = new SecurityIdentifierViewModel(sid, directory);
+
+                    if (this.FilteredSids.Any(t => string.Equals(t.Sid, sidvm.Sid, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        return;
+                    }
+
+                    this.FilteredSids.Add(sidvm);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Select group error");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred when processing the request\r\n{ex.Message}");
+            }
+        }
+
+        public void DeleteFilteredSid()
+        {
+            SecurityIdentifierViewModel selected = this.SelectedFilteredSid;
+
+            if (selected == null)
+            {
+                return;
+            }
+
+            this.FilteredSids.Remove(selected);
+        }
+
+        public SecurityIdentifierViewModel SelectedFilteredSid { get; set; }
+
+        public ObservableCollection<SecurityIdentifierViewModel> FilteredSids { get; } = new ObservableCollection<SecurityIdentifierViewModel>();
+
         private void ShowContainerDialog()
         {
             string path = this.Target ?? Domain.GetComputerDomain().GetDirectoryEntry().GetPropertyString("distinguishedName");
 
-            string basePath = this.discoveryServices.GetFullyQualifiedDomainControllerAdsPath(path);
+            string basePath = this.discoveryServices.GetFullyQualifiedRootAdsPath(path);
             string initialPath = this.discoveryServices.GetFullyQualifiedAdsPath(path);
 
-            string container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select container", "Select container", basePath, initialPath);
-
-            if (container != null)
+            if (this.objectSelectionProvider.SelectContainer(this, "Select container", "Select container", basePath, initialPath, out string container))
             {
                 this.Target = container;
             }

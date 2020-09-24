@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.DirectoryServices;
 using System.IO;
+using System.Linq;
 using System.Security.Principal;
 using Microsoft.Extensions.Logging;
 
@@ -21,11 +22,11 @@ namespace Lithnet.AccessManager
             this.ComputerPropertiesToGet = new List<string>() {"samAccountName", "msDS-PrincipalName"};
         }
 
-        public void ImportPrincipalMappings(string file)
+        public void ImportPrincipalMappings(string file, bool hasHeaderRow)
         {
             this.cache = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var line in File.ReadAllLines(file))
+            foreach (var line in File.ReadAllLines(file).Skip(hasHeaderRow ? 1 : 0))
             {
                 var items = line.Split(',');
 

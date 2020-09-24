@@ -37,7 +37,7 @@ namespace Lithnet.AccessManager
             switch (settings.DiscoveryMode)
             {
                 case UserDiscoveryMode.File:
-                    csvProvider.ImportPrincipalMappings(settings.ImportFile);
+                    csvProvider.ImportPrincipalMappings(settings.ImportFile, settings.HasHeaderRow);
                     provider = csvProvider;
                     break;
 
@@ -218,16 +218,21 @@ namespace Lithnet.AccessManager
         {
             string name = null;
 
-            if (!settings.FilterUnresolvablePrincipals && (settings.PrincipalFilters == null || settings.PrincipalFilters.Count == 0))
-            {
-                return false;
-            }
-
             if (!sid.IsAccountSid())
             {
                 return true;
             }
-           
+
+            if (settings.PrincipalSidFilter.Contains(sid))
+            {
+                return true;
+            }
+
+            if (settings.FilterUnresolvablePrincipals == false && settings.PrincipalFilters.Count == 0)
+            {
+                return false;
+            }
+
             try
             {
                 name = nameCache.GetOrAdd(sid, (value) => this.directory.TranslateName(sid.ToString(), Interop.DsNameFormat.SecurityIdentifier, Interop.DsNameFormat.Nt4Name));
@@ -239,6 +244,7 @@ namespace Lithnet.AccessManager
                     return true;
                 }
             }
+
 
             return settings.PrincipalFilters.Any(t => t.IsMatch(sid.ToString()) || (name != null && t.IsMatch(name)));
         }

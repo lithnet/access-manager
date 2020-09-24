@@ -29,7 +29,6 @@
                   Visibility="{Binding HasLoaded, Converter={StaticResource  BooleanToVisibilityConverter}}"
                   Margin="5">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
@@ -37,35 +36,33 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <Label Grid.Column="0" Grid.Row="0"
-                       Content="Search"
-                       Margin="5 2 2 2"/>
-                <TextBox Grid.Column="1" Grid.Row="0"
+                
+                <TextBox Grid.Column="0" Grid.Row="0"
                          Margin="2"
+                         mah:TextBoxHelper.Watermark="Computer name or search text"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         ToolTip="Enter a computer name to show all rules that match that computer. Otherwise, enter any text to search the target and description fields"
                         KeyUp="{s:Action SearchTextBoxKeyUp}" />
-                <Button Grid.Column="2" Grid.Row="0"
+                <Button Grid.Column="1" Grid.Row="0"
                         Content="Search"
                         MinWidth="65"
                         Command="{s:Action ApplySearchFilter}"
                         Margin="2"/>
-                <Button Grid.Column="3" Grid.Row="0"
+                <Button Grid.Column="2" Grid.Row="0"
                         Content="Clear"
                         MinWidth="65"
                         Command="{s:Action ClearSearchFilter}"
                         Margin="2"/>
-            </Grid>
 
-            <StackPanel  Grid.Row="1"
-                         Orientation="Horizontal"
-                         Visibility="{Binding HasLoaded, Converter={StaticResource  BooleanToVisibilityConverter}}"
-                         HorizontalAlignment="Right">
-                <Button Content="Effective access..."
-                    MinWidth="65"
+                <Button Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                    Content="Effective access..."
+                    Height="Auto"
+                    VerticalAlignment="Top"
                     Command="{s:Action ShowEffectivePermissions}"
-                    Margin="5"/>
-            </StackPanel>
+                    Margin="2"/>
+            </Grid>
 
             <StackPanel Grid.Row="2" 
                         Visibility="{Binding IsLoading, Converter={StaticResource  BooleanToVisibilityConverter}}"
@@ -93,7 +90,7 @@
 
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding DisplayName}" Width="Auto"/>
+                        <GridViewColumn Header="Target" DisplayMemberBinding="{Binding DisplayName}" Width="Auto"/>
                         <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="Auto"/>
                         <GridViewColumn Header="Description" DisplayMemberBinding="{Binding Description}" Width="Auto"/>
                     </GridView>

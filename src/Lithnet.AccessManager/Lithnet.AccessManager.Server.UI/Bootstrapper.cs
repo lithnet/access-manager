@@ -166,6 +166,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IShellExecuteProvider>().To<ShellExecuteProvider>();
                 builder.Bind<IDomainTrustProvider>().To<DomainTrustProvider>();
                 builder.Bind<IComputerTargetProvider>().To<ComputerTargetProvider>();
+                builder.Bind<IObjectSelectionProvider>().To<ObjectSelectionProvider>();
                 builder.Bind<ITargetDataProvider>().To<TargetDataProvider>();
                 builder.Bind<ITargetDataCache>().To<TargetDataCache>();
                 builder.Bind<IAuthorizationContextProvider>().To<AuthorizationContextProvider>();
@@ -173,8 +174,6 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IPowerShellSecurityDescriptorGenerator>().To<PowerShellSecurityDescriptorGenerator>();
                 builder.Bind<IAuthorizationInformationMemoryCache>().To<AuthorizationInformationMemoryCache>();
                 builder.Bind<IPowerShellSessionProvider>().To<CachedPowerShellSessionProvider>();
-
-
 
                 builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentModelValidator<>));
                 builder.Bind(typeof(IValidator<>)).ToAllImplementations();

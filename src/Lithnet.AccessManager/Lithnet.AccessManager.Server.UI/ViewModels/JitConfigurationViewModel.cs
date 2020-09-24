@@ -10,7 +10,6 @@ using MahApps.Metro.IconPacks;
 using MahApps.Metro.SimpleChildWindow;
 using Newtonsoft.Json;
 using Stylet;
-using NativeMethods = Lithnet.AccessManager.Server.UI.Interop.NativeMethods;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -25,10 +24,11 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IDiscoveryServices discoveryServices;
+        private readonly IObjectSelectionProvider objectSelectionProvider;
 
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.UserClockSolid;
 
-        public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IJitGroupMappingViewModelFactory groupMappingFactory, INotifyModelChangedEventPublisher eventPublisher, IJitDomainStatusViewModelFactory jitDomainStatusFactory, IServiceSettingsProvider serviceSettings, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices)
+        public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IJitGroupMappingViewModelFactory groupMappingFactory, INotifyModelChangedEventPublisher eventPublisher, IJitDomainStatusViewModelFactory jitDomainStatusFactory, IServiceSettingsProvider serviceSettings, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IObjectSelectionProvider objectSelectionProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.dialogCoordinator = dialogCoordinator;
@@ -39,6 +39,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.eventPublisher = eventPublisher;
             this.domainTrustProvider = domainTrustProvider;
             this.discoveryServices = discoveryServices;
+            this.objectSelectionProvider = objectSelectionProvider;
 
             this.DisplayName = "Just-in-time access";
             this.GroupMappings = new BindableCollection<JitGroupMappingViewModel>();
@@ -173,33 +174,33 @@ namespace Lithnet.AccessManager.Server.UI
             JitDomainStatusViewModel current = this.SelectedDomain;
             string oldOU = current.DynamicGroupOU;
 
-            string basePath = this.discoveryServices.GetFullyQualifiedDomainControllerAdsPath(current.DynamicGroupOU);
+            string basePath = this.discoveryServices.GetFullyQualifiedRootAdsPath(current.DynamicGroupOU);
             string initialPath = this.discoveryServices.GetFullyQualifiedAdsPath(current.DynamicGroupOU);
 
-            var container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select container", "Select container", basePath, initialPath);
-
-            if (container != null)
+            if (!this.objectSelectionProvider.SelectContainer(this, "Select container", "Select container", basePath, initialPath, out string container))
             {
-                if (!string.Equals(current.Domain.Name, this.discoveryServices.GetDomainNameDns(container)))
-                {
-                    await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The dynamic group OU must be in the {current.Domain.Name} domain");
-                    return;
-                }
-                
-                if (current.Mapping == null)
-                {
-                    current.Mapping = new JitDynamicGroupMapping();
-                    current.Mapping.Domain = current.Domain.GetDirectoryEntry().GetPropertySid("objectSid").ToString();
-                    this.jitOptions.DynamicGroupMappings.Add(current.Mapping);
-                }
+                return;
+            }
 
-                current.Mapping.GroupOU = container;
-                current.DynamicGroupOU = container;
+            if (!string.Equals(current.Domain.Name, this.discoveryServices.GetDomainNameDns(container)))
+            {
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The dynamic group OU must be in the {current.Domain.Name} domain");
+                return;
+            }
 
-                if (oldOU != container)
-                {
-                    this.HasBeenChanged++;
-                }
+            if (current.Mapping == null)
+            {
+                current.Mapping = new JitDynamicGroupMapping();
+                current.Mapping.Domain = current.Domain.GetDirectoryEntry().GetPropertySid("objectSid").ToString();
+                this.jitOptions.DynamicGroupMappings.Add(current.Mapping);
+            }
+
+            current.Mapping.GroupOU = container;
+            current.DynamicGroupOU = container;
+
+            if (oldOU != container)
+            {
+                this.HasBeenChanged++;
             }
 
             this.NotifyOfPropertyChange(nameof(CanDelegateJitGroupPermission));

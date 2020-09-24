@@ -14,21 +14,21 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public sealed class JitGroupMappingViewModel : ValidatingModelBase, IViewAware
     {
-        private readonly IDirectory directory;
         private readonly ILogger<JitGroupMappingViewModel> logger;
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IDiscoveryServices discoveryServices;
+        private readonly IObjectSelectionProvider objectSelectionProvider;
 
         public JitGroupMapping Model { get; }
 
         public UIElement View { get; set; }
 
-        public JitGroupMappingViewModel(JitGroupMapping model, IDirectory directory, ILogger<JitGroupMappingViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<JitGroupMappingViewModel> validator, IDiscoveryServices discoveryServices)
+        public JitGroupMappingViewModel(JitGroupMapping model, ILogger<JitGroupMappingViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<JitGroupMappingViewModel> validator, IDiscoveryServices discoveryServices, IObjectSelectionProvider objectSelectionProvider)
         {
-            this.directory = directory;
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
             this.Model = model;
+            this.objectSelectionProvider = objectSelectionProvider;
             this.Validator = validator;
             this.discoveryServices = discoveryServices;
         }
@@ -69,23 +69,16 @@ namespace Lithnet.AccessManager.Server.UI
             set => this.Model.Subtree = !value;
         }
 
-        //public GroupType GroupType
-        //{
-        //    get => this.Model.GroupType;
-        //    set => this.Model.GroupType = value;
-        //}
-
         public IEnumerable<GroupType> GroupTypeValues => Enum.GetValues(typeof(GroupType)).Cast<GroupType>();
 
         public async Task SelectComputerOU()
         {
             try
             {
-                string basePath = this.discoveryServices.GetFullyQualifiedDomainControllerAdsPath(this.ComputerOU);
+                string basePath = this.discoveryServices.GetFullyQualifiedRootAdsPath(this.ComputerOU);
                 string initialPath = this.discoveryServices.GetFullyQualifiedAdsPath(this.ComputerOU);
 
-                var container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select OU", "Select computer OU", basePath, initialPath);
-                if (container != null)
+                if (this.objectSelectionProvider.SelectContainer(this, "Select OU", "Select computer OU", basePath, initialPath, out string container))
                 {
                     this.ComputerOU = container;
                 }
@@ -101,10 +94,13 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                string basePath = this.discoveryServices.GetFullyQualifiedDomainControllerAdsPath(this.ComputerOU);
+                string basePath = this.discoveryServices.GetFullyQualifiedRootAdsPath(this.ComputerOU);
                 string initialPath = this.discoveryServices.GetFullyQualifiedAdsPath(this.GroupOU);
 
-                var container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select OU", "Select group OU", basePath, initialPath);
+                if (!this.objectSelectionProvider.SelectContainer(this, "Select OU", "Select group OU", basePath, initialPath, out string container))
+                {
+                    return;
+                }
 
                 if (!string.Equals(this.discoveryServices.GetDomainNameDns(this.ComputerOU), this.discoveryServices.GetDomainNameDns(container), StringComparison.OrdinalIgnoreCase))
                 {

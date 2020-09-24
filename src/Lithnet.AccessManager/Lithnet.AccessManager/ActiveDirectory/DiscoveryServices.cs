@@ -567,7 +567,7 @@ namespace Lithnet.AccessManager
             return $"LDAP://{server}/{dn}";
         }
 
-        public string GetFullyQualifiedDomainControllerAdsPath(string dn)
+        public string GetFullyQualifiedRootAdsPath(string dn)
         {
             string server = this.GetDomainControllerFromDNOrDefault(dn);
             return $"LDAP://{server}";

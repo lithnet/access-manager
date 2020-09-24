@@ -26,12 +26,13 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDiscoveryServices discoveryServices;
         private readonly ILocalSam localSam;
         private readonly SecurityDescriptorTargetViewModelDisplaySettings displaySettings;
+        private readonly IObjectSelectionProvider objectSelectionProvider;
 
         private string jitGroupDisplayName;
 
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider)
         {
             this.directory = directory;
             this.Model = model;
@@ -43,6 +44,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.discoveryServices = discoveryServices;
             this.localSam = localSam;
             this.displaySettings = displaySettings ?? new SecurityDescriptorTargetViewModelDisplaySettings();
+            this.objectSelectionProvider = objectSelectionProvider;
 
             this.Script = fileSelectionViewModelFactory.CreateViewModel(model, () => model.Script, appPathProvider.ScriptsPath);
             this.Script.DefaultFileExtension = "ps1";
@@ -316,8 +318,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                SecurityIdentifier sid = ShowObjectPickerGroups(this.GetDcForTargetOrDefault());
-                if (sid != null)
+                if (this.objectSelectionProvider.GetGroup(this, this.GetDcForTargetOrDefault(), out SecurityIdentifier sid))
                 {
                     this.JitAuthorizingGroup = sid.ToString();
                 }
@@ -335,9 +336,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                SecurityIdentifier sid = this.ShowObjectPickerDialogComputer(this.GetForestForTargetOrDefault());
-
-                if (sid == null)
+                if (!this.objectSelectionProvider.GetComputer(this, this.GetForestForTargetOrDefault(), out SecurityIdentifier sid))
                 {
                     return;
                 }
@@ -410,38 +409,6 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        private SecurityIdentifier ShowObjectPickerGroups(string targetServer)
-        {
-            DsopScopeInitInfo scope = new DsopScopeInitInfo();
-            scope.Filter = new DsFilterFlags();
-            scope.Filter.UpLevel.BothModeFilter =
-                DsopObjectFilterFlags.DSOP_FILTER_DOMAIN_LOCAL_GROUPS_SE |
-                DsopObjectFilterFlags.DSOP_FILTER_GLOBAL_GROUPS_SE |
-                DsopObjectFilterFlags.DSOP_FILTER_UNIVERSAL_GROUPS_SE;
-
-            scope.ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_ENTERPRISE_DOMAIN |
-                              DsopScopeTypeFlags.DSOP_SCOPE_TYPE_USER_ENTERED_UPLEVEL_SCOPE |
-                              DsopScopeTypeFlags.DSOP_SCOPE_TYPE_EXTERNAL_UPLEVEL_DOMAIN;
-
-            scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS |
-                             DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
-
-            DsopResult result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), targetServer, scope, "objectClass", "objectSid").FirstOrDefault();
-
-            if (result != null)
-            {
-                byte[] sid = result.Attributes["objectSid"] as byte[];
-                if (sid == null)
-                {
-                    return null;
-                }
-
-                return new SecurityIdentifier(sid, 0);
-            }
-
-            return null;
-        }
-
         public async Task SelectTarget()
         {
             try
@@ -477,11 +444,21 @@ namespace Lithnet.AccessManager.Server.UI
                 }
                 else
                 {
-                    SecurityIdentifier sid = ShowObjectPickerDialogComputersAndGroups(vm.TargetType, vm.SelectedForest);
+                    string targetServer = this.discoveryServices.GetDomainController(vm.SelectedForest ?? this.discoveryServices.GetForestNameDns());
 
-                    if (sid != null)
+                    if (vm.TargetType == TargetType.Group)
                     {
-                        this.Target = sid.ToString();
+                        if (this.objectSelectionProvider.GetGroup(this, targetServer, out SecurityIdentifier sid))
+                        {
+                            this.Target = sid.ToString();
+                        }
+                    }
+                    else
+                    {
+                        if (this.objectSelectionProvider.GetComputer(this, targetServer, out SecurityIdentifier sid))
+                        {
+                            this.Target = sid.ToString();
+                        }
                     }
                 }
             }
@@ -492,97 +469,14 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        private SecurityIdentifier ShowObjectPickerDialogComputersAndGroups(TargetType targetType, string forest)
-        {
-            DsopScopeInitInfo scope = new DsopScopeInitInfo
-            {
-                Filter = new DsFilterFlags()
-            };
-
-            if (targetType == TargetType.Computer)
-            {
-                scope.Filter.UpLevel.BothModeFilter = DsopObjectFilterFlags.DSOP_FILTER_COMPUTERS;
-            }
-            else
-            {
-                scope.Filter.UpLevel.BothModeFilter =
-                    DsopObjectFilterFlags.DSOP_FILTER_DOMAIN_LOCAL_GROUPS_SE |
-                    DsopObjectFilterFlags.DSOP_FILTER_GLOBAL_GROUPS_SE |
-                    DsopObjectFilterFlags.DSOP_FILTER_UNIVERSAL_GROUPS_SE;
-            }
-
-            scope.ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_ENTERPRISE_DOMAIN |
-                              DsopScopeTypeFlags.DSOP_SCOPE_TYPE_USER_ENTERED_UPLEVEL_SCOPE |
-                              DsopScopeTypeFlags.DSOP_SCOPE_TYPE_EXTERNAL_UPLEVEL_DOMAIN;
-
-            scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_COMPUTERS |
-                             DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS |
-                             DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
-
-            string targetServer = this.discoveryServices.GetDomainController(forest ?? this.discoveryServices.GetForestNameDns());
-
-            DsopResult result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), targetServer, scope, "objectClass", "objectSid").FirstOrDefault();
-
-            if (result != null)
-            {
-                byte[] sid = result.Attributes["objectSid"] as byte[];
-                if (sid == null)
-                {
-                    return null;
-                }
-
-                return new SecurityIdentifier(sid, 0);
-            }
-
-            return null;
-        }
-
-        private SecurityIdentifier ShowObjectPickerDialogComputer(string forest)
-        {
-            DsopScopeInitInfo scope = new DsopScopeInitInfo
-            {
-                Filter = new DsFilterFlags()
-            };
-
-            scope.Filter.UpLevel.BothModeFilter = DsopObjectFilterFlags.DSOP_FILTER_COMPUTERS;
-
-            scope.ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_ENTERPRISE_DOMAIN |
-                              DsopScopeTypeFlags.DSOP_SCOPE_TYPE_USER_ENTERED_UPLEVEL_SCOPE |
-                              DsopScopeTypeFlags.DSOP_SCOPE_TYPE_EXTERNAL_UPLEVEL_DOMAIN;
-
-            scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_COMPUTERS |
-                             DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS |
-                             DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
-
-            string targetServer = this.discoveryServices.GetDomainController(forest ?? this.discoveryServices.GetForestNameDns());
-
-            DsopResult result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), targetServer, scope, "objectClass", "objectSid").FirstOrDefault();
-
-            if (result != null)
-            {
-                byte[] sid = result.Attributes["objectSid"] as byte[];
-                if (sid == null)
-                {
-                    return null;
-                }
-
-                return new SecurityIdentifier(sid, 0);
-            }
-
-            return null;
-        }
-
-
         private void ShowContainerDialog()
         {
             string path = this.Target ?? Domain.GetComputerDomain().GetDirectoryEntry().GetPropertyString("distinguishedName");
 
-            string basePath = this.discoveryServices.GetFullyQualifiedDomainControllerAdsPath(path);
+            string basePath = this.discoveryServices.GetFullyQualifiedRootAdsPath(path);
             string initialPath = this.discoveryServices.GetFullyQualifiedAdsPath(path);
 
-            string container = NativeMethods.ShowContainerDialog(this.GetHandle(), "Select container", "Select container", basePath, initialPath);
-
-            if (container != null)
+            if (this.objectSelectionProvider.SelectContainer(this, "Select container", "Select container", basePath, initialPath, out string container))
             {
                 this.Target = container;
             }

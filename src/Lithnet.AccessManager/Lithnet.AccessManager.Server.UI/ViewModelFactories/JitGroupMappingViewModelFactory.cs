@@ -10,12 +10,12 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IModelValidator<JitGroupMappingViewModel> validator;
         private readonly ILogger<JitGroupMappingViewModel> logger;
         private readonly IDialogCoordinator dialogCoordinator;
-        private readonly IDirectory directory;
+        private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly IDiscoveryServices discoveryServices;
 
-        public JitGroupMappingViewModelFactory(IModelValidator<JitGroupMappingViewModel> validator, IDirectory directory, ILogger<JitGroupMappingViewModel> logger, IDialogCoordinator dialogCoordinator, IDiscoveryServices discoveryServices)
+        public JitGroupMappingViewModelFactory(IModelValidator<JitGroupMappingViewModel> validator, IObjectSelectionProvider objectSelectionProvider, ILogger<JitGroupMappingViewModel> logger, IDialogCoordinator dialogCoordinator, IDiscoveryServices discoveryServices)
         {
-            this.directory = directory;
+            this.objectSelectionProvider = objectSelectionProvider;
             this.validator = validator;
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
@@ -24,7 +24,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public JitGroupMappingViewModel CreateViewModel(JitGroupMapping model)
         {
-            return new JitGroupMappingViewModel(model, directory, logger, dialogCoordinator, validator, discoveryServices);
+            return new JitGroupMappingViewModel(model, logger, dialogCoordinator, validator, discoveryServices, objectSelectionProvider);
         }
     }
 }

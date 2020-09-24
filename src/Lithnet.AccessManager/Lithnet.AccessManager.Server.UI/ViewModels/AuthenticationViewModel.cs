@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.Cryptography;
@@ -12,7 +11,6 @@ using System.Windows;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using Lithnet.AccessManager.Server.UI.Providers;
-using Lithnet.AccessManager.Server.UI.ViewModels;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Microsoft.Extensions.Logging;
@@ -34,8 +32,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IDiscoveryServices discoveryServices;
+        private readonly IObjectSelectionProvider objectSelectionProvider;
 
-        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, RandomNumberGenerator rng, IDirectory directory, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices)
+        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, RandomNumberGenerator rng, IDirectory directory, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IObjectSelectionProvider objectSelectionProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.model = model;
@@ -47,6 +46,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.eventPublisher = eventPublisher;
             this.domainTrustProvider = domainTrustProvider;
             this.discoveryServices = discoveryServices;
+            this.objectSelectionProvider = objectSelectionProvider;
 
             this.DisplayName = "Authentication";
 
@@ -83,12 +83,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 if (item.TryParseAsSid(out SecurityIdentifier sid))
                 {
-                    SecurityIdentifierViewModel vm = new SecurityIdentifierViewModel
-                    {
-                        Sid = sid.ToString(),
-                        DisplayName = this.GetSidDisplayName(sid)
-                    };
-
+                    SecurityIdentifierViewModel vm = new SecurityIdentifierViewModel(sid, directory);
                     this.AllowedPrincipals.Add(vm);
                 }
             }
@@ -115,63 +110,14 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                ExternalDialogWindow w = new ExternalDialogWindow();
-                w.Title = "Select forest";
-                var vm = new SelectForestViewModel();
-                w.DataContext = vm;
-                w.SaveButtonName = "Next...";
-                w.SizeToContent = SizeToContent.WidthAndHeight;
-                w.SaveButtonIsDefault = true;
-                vm.AvailableForests = new List<string>();
-
-                foreach (var forest in this.domainTrustProvider.GetForests())
+                if (this.objectSelectionProvider.GetUserOrGroup(this, out SecurityIdentifier sid))
                 {
-                    vm.AvailableForests.Add(forest.Name);
-                }
-
-                vm.SelectedForest = vm.AvailableForests.FirstOrDefault();
-
-                if (vm.AvailableForests.Count > 1)
-                {
-                    w.Owner = this.GetWindow();
-
-                    if (!w.ShowDialog() ?? false)
-                    {
-                        return;
-                    }
-                }
-
-                DsopScopeInitInfo scope = new DsopScopeInitInfo();
-                scope.Filter = new DsFilterFlags();
-
-                scope.Filter.UpLevel.BothModeFilter = DsopObjectFilterFlags.DSOP_FILTER_DOMAIN_LOCAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_GLOBAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_UNIVERSAL_GROUPS_SE | DsopObjectFilterFlags.DSOP_FILTER_USERS | DsopObjectFilterFlags.DSOP_FILTER_WELL_KNOWN_PRINCIPALS;
-
-                scope.ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_ENTERPRISE_DOMAIN | DsopScopeTypeFlags.DSOP_SCOPE_TYPE_USER_ENTERED_UPLEVEL_SCOPE | DsopScopeTypeFlags.DSOP_SCOPE_TYPE_EXTERNAL_UPLEVEL_DOMAIN;
-
-                scope.InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_GROUPS | DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE;
-
-                var targetServer = this.discoveryServices.GetDomainController(vm.SelectedForest ?? Forest.GetCurrentForest().Name);
-
-                var result = NativeMethods.ShowObjectPickerDialog(this.GetHandle(), targetServer, scope, "objectClass", "objectSid").FirstOrDefault();
-
-                if (result != null)
-                {
-                    byte[] sidraw = result.Attributes["objectSid"] as byte[];
-                    if (sidraw == null)
-                    {
-                        return;
-                    }
-
-                    SecurityIdentifierViewModel sidvm = new SecurityIdentifierViewModel();
-                    var sid = new SecurityIdentifier(sidraw, 0);
-                    sidvm.Sid = sid.ToString();
+                    SecurityIdentifierViewModel sidvm = new SecurityIdentifierViewModel(sid, directory);
 
                     if (this.model.AllowedPrincipals.Any(t => string.Equals(t, sidvm.Sid, StringComparison.OrdinalIgnoreCase)))
                     {
                         return;
                     }
-
-                    sidvm.DisplayName = this.GetSidDisplayName(sid);
 
                     this.model.AllowedPrincipals.Add(sidvm.Sid);
                     this.AllowedPrincipals.Add(sidvm);
@@ -181,26 +127,6 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 this.logger.LogError(EventIDs.UIGenericError, ex, "Select group error");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred when processing the request\r\n{ex.Message}");
-            }
-        }
-
-        private string GetSidDisplayName(SecurityIdentifier sid)
-        {
-            try
-            {
-                NTAccount adminGroup = (NTAccount)sid.Translate(typeof(NTAccount));
-                return adminGroup.Value;
-            }
-            catch
-            {
-                try
-                {
-                    return this.directory.TranslateName(sid.ToString(), AccessManager.Interop.DsNameFormat.SecurityIdentifier, AccessManager.Interop.DsNameFormat.Nt4Name);
-                }
-                catch
-                {
-                    return sid.ToString();
-                }
             }
         }
 

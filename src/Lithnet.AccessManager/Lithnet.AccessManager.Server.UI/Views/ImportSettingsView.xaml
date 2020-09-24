@@ -7,6 +7,7 @@
              xmlns:s="https://github.com/canton7/Stylet"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              Dialog:DialogParticipation.Register="{Binding}"
               d:DesignWidth="800"
              mc:Ignorable="d" 
@@ -92,6 +93,10 @@
 
                 <Grid Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2"
                       IsEnabled="{Binding ImportTypeFile}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -109,6 +114,11 @@
                         Content="..."
                         Width="30"
                         Margin="2"/>
+
+                    <CheckBox Grid.Column="1" Grid.Row="1"
+                              Content="CSV file has a header row"
+                              IsChecked="{Binding ImportFileHasHeaderRow}"
+                              Margin="5"/>
                 </Grid>
 
                 <TextBlock Grid.Column="0" 
@@ -129,6 +139,44 @@
                           Margin="2">
                     <TextBlock TextWrapping="Wrap">Do not consolidate common permissions for a given OU if computers are uncontactable or missing (If one or more computers in an OU cannot be processed, an individual access rule will be created for all computers in that OU</TextBlock>
                 </CheckBox>
+            </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="175"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Grid.Column="0" 
+                           TextWrapping="Wrap"
+                           Text="Users and groups to exclude"
+                           Margin="5"/>
+                <ListView Grid.Row="0" Grid.Column="1" 
+                         ItemsSource="{Binding FilteredSids}"
+                         SelectedItem="{Binding SelectedFilteredSid}"
+                         DisplayMemberPath="DisplayName"
+                         Height="100"
+                         BorderBrush="{DynamicResource MahApps.Brushes.Control.Border}"
+                         BorderThickness="1"
+                         Margin="5">
+                    <b:Interaction.Behaviors>
+                        <local:ListViewScrollBarBehavior />
+                    </b:Interaction.Behaviors>
+                </ListView>
+                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                    <Button Command="{s:Action AddFilteredSid}" 
+                            Content="Add..."
+                            HorizontalAlignment="Left"
+                            Margin="5"/>
+                    <Button Command="{s:Action DeleteFilteredSid}" 
+                            Content="Remove selected"
+                            HorizontalAlignment="Left"
+                            Margin="5"/>
+                </StackPanel>
             </Grid>
 
             <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 

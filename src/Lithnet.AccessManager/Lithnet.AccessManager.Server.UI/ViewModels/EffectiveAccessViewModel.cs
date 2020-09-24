@@ -8,9 +8,7 @@ using System.Windows.Input;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
-using MahApps.Metro.SimpleChildWindow;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -62,11 +60,30 @@ namespace Lithnet.AccessManager.Server.UI
             this.logger = logger;
         }
 
+        public bool CanCalculateEffectiveAccess => !string.IsNullOrWhiteSpace(this.Username) && !string.IsNullOrWhiteSpace(this.ComputerName);
+        
         public async Task CalculateEffectiveAccess()
         {
             this.ClearResults();
 
             ProgressDialogController controller = null;
+            MetroDialogSettings settings = new MetroDialogSettings
+            {
+                AnimateShow = false,
+                AnimateHide = false,
+            };
+
+            if (string.IsNullOrWhiteSpace(this.Username))
+            {
+                await this.dialogCoordinator.ShowMessageAsync(this, "Enter a user name", "A user name must be provided", MessageDialogStyle.Affirmative, settings);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(this.ComputerName))
+            {
+                await this.dialogCoordinator.ShowMessageAsync(this, "Enter a computer name", "A computer name must be provided", MessageDialogStyle.Affirmative, settings);
+                return;
+            }
 
             try
             {
@@ -78,13 +95,13 @@ namespace Lithnet.AccessManager.Server.UI
                 {
                     if (!this.directory.TryGetUser(this.Username, out IUser user))
                     {
-                        await this.dialogCoordinator.ShowMessageAsync(this, "Could not find user", "Could not find a matching user in the directory");
+                        await this.dialogCoordinator.ShowMessageAsync(this, "Could not find user", "Could not find a matching user in the directory", MessageDialogStyle.Affirmative, settings);
                         return;
                     }
 
                     if (!this.directory.TryGetComputer(this.ComputerName, out IComputer computer))
                     {
-                        await this.dialogCoordinator.ShowMessageAsync(this, "Could not find computer", "Could not find a matching computer in the directory");
+                        await this.dialogCoordinator.ShowMessageAsync(this, "Could not find computer", "Could not find a matching computer in the directory", MessageDialogStyle.Affirmative, settings);
                         return;
                     }
 
@@ -144,6 +161,8 @@ namespace Lithnet.AccessManager.Server.UI
                 }
             }
         }
+
+        public bool CanClearResults => this.HasResults;
 
         public void ClearResults()
         {

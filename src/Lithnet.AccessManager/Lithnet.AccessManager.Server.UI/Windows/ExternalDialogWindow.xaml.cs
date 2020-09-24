@@ -24,9 +24,9 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool SaveButtonVisible { get; set; } = true;
 
-        public bool CancelButtonIsDefault { get; set; } = true;
+        public bool CancelButtonIsDefault { get; set; } = false;
 
-        public bool SaveButtonIsDefault { get => !this.CancelButtonIsDefault; set => this.CancelButtonIsDefault = !value; }
+        public bool SaveButtonIsDefault { get; set; } = true;
 
         public string SaveButtonName { get; set; } = "Save";
 

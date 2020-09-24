@@ -16,8 +16,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDirectory directory;
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly ILocalSam localSam;
+        private readonly IObjectSelectionProvider objectSelectionProvider;
 
-        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IDirectory directory, ILocalSam localsam)
+        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IDirectory directory, ILocalSam localsam, IObjectSelectionProvider objectSelectionProvider)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.appPathProvider = appPathProvider;
@@ -28,13 +29,15 @@ namespace Lithnet.AccessManager.Server.UI
             this.discoveryServices = discoveryServices;
             this.domainTrustProvider = domainTrustProvider;
             this.localSam = localsam;
+            this.objectSelectionProvider = objectSelectionProvider; 
         }
+
 
         public SecurityDescriptorTargetViewModel CreateViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings settings)
         {
             var validator = new SecurityDescriptorTargetViewModelValidator(this.appPathProvider);
             var v = new FluentModelValidator<SecurityDescriptorTargetViewModel>(validator);
-            return new SecurityDescriptorTargetViewModel(model, settings, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, v, directory, domainTrustProvider, discoveryServices, localSam);
+            return new SecurityDescriptorTargetViewModel(model, settings, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, v, directory, domainTrustProvider, discoveryServices, localSam, objectSelectionProvider);
         }
     }
 }

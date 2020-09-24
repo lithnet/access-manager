@@ -44,7 +44,7 @@
                    Content="Username"
                    Margin="5"/>
             <TextBox Grid.Row="0" Grid.Column="1"
-                     Text="{Binding Username}"
+                     Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"
                      Margin="5"/>
 
 
@@ -52,7 +52,7 @@
                    Content="Computer name"
                    Margin="5"/>
             <TextBox Grid.Row="1" Grid.Column="1"
-                     Text="{Binding ComputerName}"
+                     Text="{Binding ComputerName, UpdateSourceTrigger=PropertyChanged}"
                      Margin="5"
                      KeyUp="{s:Action ComputerNameTextBoxKeyUp}"/>
 

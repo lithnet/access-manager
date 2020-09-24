@@ -105,6 +105,7 @@ namespace Lithnet.AccessManager.Server.UI
                     DoNotConsolidateOnError = settingsVm.DoNotConsolidateOnError,
                     ImportFile = settingsVm.ImportFile,
                     ImportOU = settingsVm.Target,
+                    HasHeaderRow = settingsVm.ImportFileHasHeaderRow,
                     DiscoveryMode = settingsVm.ImportType
                 };
 
@@ -128,6 +129,8 @@ namespace Lithnet.AccessManager.Server.UI
                     Title = "Validate authorization rules",
                     DataContext = irvm,
                     SaveButtonVisible = true,
+                    CancelButtonIsDefault = false,
+                    SaveButtonIsDefault = false,
                     CancelButtonName = "Cancel",
                     SaveButtonName = "Save and import rules",
                     Height = 600
