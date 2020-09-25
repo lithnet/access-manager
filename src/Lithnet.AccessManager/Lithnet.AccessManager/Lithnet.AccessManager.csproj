@@ -16,6 +16,7 @@
   </PropertyGroup>
   
   <ItemGroup>
+    <PackageReference Include="CSVHelper" Version="15.0.5" />
     <PackageReference Include="lithnet.security.authorization" Version="1.0.7518.2238" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.6" />

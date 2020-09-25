@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.DirectoryServices;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Principal;
+using CsvHelper;
 using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager
@@ -19,72 +21,77 @@ namespace Lithnet.AccessManager
         {
             this.directory = directory;
             this.logger = logger;
-            this.ComputerPropertiesToGet = new List<string>() {"samAccountName", "msDS-PrincipalName"};
+            this.ComputerPropertiesToGet = new List<string>() { "samAccountName", "msDS-PrincipalName" };
         }
 
         public void ImportPrincipalMappings(string file, bool hasHeaderRow)
         {
             this.cache = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
 
-            foreach (var line in File.ReadAllLines(file).Skip(hasHeaderRow ? 1 : 0))
+            using (StreamReader reader = new StreamReader(file))
             {
-                var items = line.Split(',');
-
-                if (items.Length < 2)
+                using (CsvReader csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                 {
-                    this.logger.LogTrace("Ignoring line: {line} as it does not appear to be correctly formatted. Correct format is 'DOMAIN\\computer,DOMAIN\\user'", line);
-                    continue;
-                }
-
-                string computerRaw = items[0];
-                string principal = items[1];
-                string key;
-
-                if (!computerRaw.Contains("\\"))
-                {
-                    if (computerRaw.TryParseAsSid(out SecurityIdentifier sid))
+                    if (hasHeaderRow)
                     {
-                        try
-                        {
-                            key = this.directory.TranslateName(sid.ToString(), Interop.DsNameFormat.SecurityIdentifier, Interop.DsNameFormat.Nt4Name).TrimEnd('$');
-                        }
-                        catch(Exception ex)
-                        {
-                            this.logger.LogWarning(ex, "Computer {computer} was not found in the directory", computerRaw);
-                            continue;
-                        }
+                        csv.Read();
+                        csv.ReadHeader();
                     }
-                    else
+
+                    while (csv.Read())
                     {
-                        if (this.directory.TryGetComputer(computerRaw, out IComputer c))
+                        string computerRaw = csv.GetField(0);
+                        string principal = csv.GetField(1);
+
+                        string key;
+
+                        if (!computerRaw.Contains("\\"))
                         {
-                            key = c.MsDsPrincipalName.TrimEnd('$');
+                            if (computerRaw.TryParseAsSid(out SecurityIdentifier sid))
+                            {
+                                try
+                                {
+                                    key = this.directory.TranslateName(sid.ToString(), Interop.DsNameFormat.SecurityIdentifier, Interop.DsNameFormat.Nt4Name).TrimEnd('$');
+                                }
+                                catch (Exception ex)
+                                {
+                                    this.logger.LogWarning(ex, "Computer {computer} was not found in the directory", computerRaw);
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                if (this.directory.TryGetComputer(computerRaw, out IComputer c))
+                                {
+                                    key = c.MsDsPrincipalName.TrimEnd('$');
+                                }
+                                else
+                                {
+                                    this.logger.LogWarning("Computer {computer} was not found in the directory", computerRaw);
+                                    continue;
+                                }
+                            }
                         }
                         else
                         {
-                            this.logger.LogWarning("Computer {computer} was not found in the directory", computerRaw);
-                            continue;
+                            key = computerRaw;
                         }
+
+                        HashSet<string> list;
+
+                        if (!this.cache.ContainsKey(key))
+                        {
+                            list = new HashSet<string>();
+                            this.cache.Add(key, list);
+                        }
+                        else
+                        {
+                            list = this.cache[key];
+                        }
+
+                        list.Add(principal);
                     }
                 }
-                else
-                {
-                    key = computerRaw;
-                }
-
-                HashSet<string> list;
-
-                if (!this.cache.ContainsKey(key))
-                {
-                    list = new HashSet<string>();
-                    this.cache.Add(key, list);
-                }
-                else
-                {
-                    list = this.cache[key];
-                }
-
-                list.Add(principal);
             }
         }
 
