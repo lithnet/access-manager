@@ -82,6 +82,7 @@ namespace Lithnet.AccessManager.Service
             services.AddHostedService<JitGroupWorker>();
 
             services.Configure<UserInterfaceOptions>(Configuration.GetSection("UserInterface"));
+            services.Configure<ConfigurationMetadata>(Configuration.GetSection("Metadata"));
             services.Configure<RateLimitOptions>(Configuration.GetSection("RateLimits"));
             services.Configure<EmailOptions>(Configuration.GetSection("Email"));
             services.Configure<AuditOptions>(Configuration.GetSection("Auditing"));
@@ -99,8 +100,10 @@ namespace Lithnet.AccessManager.Service
             this.ConfigureAuthorization(services);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider provider)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider provider, IOptions<ConfigurationMetadata> metadata)
         {
+            metadata.Value.ValidateMetadata();
+
             var fwdOptions = provider.GetRequiredService<IOptions<ForwardedHeadersAppOptions>>().Value;
             app.UseForwardedHeaders(fwdOptions.ToNativeOptions());
             app.UseStatusCodePagesWithReExecute("/StatusCode", "?code={0}");

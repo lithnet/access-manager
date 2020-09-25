@@ -9,7 +9,6 @@ namespace Lithnet.AccessManager.Server.UI
     {
         public ServiceController ServiceController { get; } = new ServiceController(AccessManager.Constants.ServiceName);
 
-
         public SecurityIdentifier GetServiceAccount()
         {
             RegistryKey key = Registry.LocalMachine.OpenSubKey($@"SYSTEM\CurrentControlSet\Services\{AccessManager.Constants.ServiceName}", false);

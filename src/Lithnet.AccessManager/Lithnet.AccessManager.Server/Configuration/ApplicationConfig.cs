@@ -9,9 +9,9 @@ namespace Lithnet.AccessManager.Server.Configuration
         [JsonIgnore]
         public string Path { get; set; }
 
-        public AuthenticationOptions Authentication { get; set; } = new AuthenticationOptions();
+        public ConfigurationMetadata Metadata { get; set; } = new ConfigurationMetadata();
 
-        public AuthorizationOptions Authorization { get; set; } = new AuthorizationOptions();
+        public AuthenticationOptions Authentication { get; set; } = new AuthenticationOptions();
 
         public AuditOptions Auditing { get; set; } = new AuditOptions();
 
@@ -28,6 +28,8 @@ namespace Lithnet.AccessManager.Server.Configuration
         [JsonExtensionData]
         public IDictionary<string, object> OtherData { get; set; }
 
+        public AuthorizationOptions Authorization { get; set; } = new AuthorizationOptions();
+
         public void Save(string file)
         {
             JsonSerializerSettings settings = new JsonSerializerSettings
@@ -35,6 +37,8 @@ namespace Lithnet.AccessManager.Server.Configuration
                 Formatting = Formatting.Indented,
                 NullValueHandling = NullValueHandling.Ignore,
             };
+
+            this.Metadata.Usn++;
 
             string data = JsonConvert.SerializeObject(this, settings);
             File.WriteAllText(file, data);
@@ -45,6 +49,8 @@ namespace Lithnet.AccessManager.Server.Configuration
             string data = File.ReadAllText(file);
             var result = JsonConvert.DeserializeObject<ApplicationConfig>(data);
             result.Path = file;
+
+            result.Metadata.ValidateMetadata();
 
             return result;
         }

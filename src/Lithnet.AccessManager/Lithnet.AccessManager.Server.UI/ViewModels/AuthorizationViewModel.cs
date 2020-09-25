@@ -22,13 +22,14 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IImportTargetsViewModelFactory importTargetsFactory;
         private readonly IAuthorizationRuleImportProvider importProvider;
         private readonly ILogger logger;
+        private readonly IServiceSettingsProvider serviceSettings;
 
         private ProgressDialogController progress;
         private int progressCurrent;
         private int progressMaximum;
         private CancellationTokenSource progressCts;
 
-        public AuthorizationViewModel(AuthorizationOptions model, SecurityDescriptorTargetsViewModelFactory factory, IShellExecuteProvider shellExecuteProvider, IDialogCoordinator dialogCoordinator, IImportTargetsViewModelFactory importTargetsFactory, IAuthorizationRuleImportProvider importProvider, ILogger<AuthorizationViewModel> logger)
+        public AuthorizationViewModel(AuthorizationOptions model, SecurityDescriptorTargetsViewModelFactory factory, IShellExecuteProvider shellExecuteProvider, IDialogCoordinator dialogCoordinator, IImportTargetsViewModelFactory importTargetsFactory, IAuthorizationRuleImportProvider importProvider, ILogger<AuthorizationViewModel> logger, IServiceSettingsProvider serviceSettings)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.model = model;
@@ -37,6 +38,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.importTargetsFactory = importTargetsFactory;
             this.importProvider = importProvider;
             this.logger = logger;
+            this.serviceSettings = serviceSettings;
             this.DisplayName = "Authorization";
         }
 
@@ -108,6 +110,12 @@ namespace Lithnet.AccessManager.Server.UI
                     HasHeaderRow = settingsVm.ImportFileHasHeaderRow,
                     DiscoveryMode = settingsVm.ImportType
                 };
+
+                var serviceAccount = this.serviceSettings.GetServiceAccount();
+                if (serviceAccount != null)
+                {
+                    settings.PrincipalSidFilter.Add(serviceAccount);
+                }
 
                 var results = await Task.Run(() => this.importProvider.BuildPrincipalMap(settings));
 

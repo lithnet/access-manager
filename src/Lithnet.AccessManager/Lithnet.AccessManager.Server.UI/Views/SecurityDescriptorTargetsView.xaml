@@ -82,12 +82,12 @@
                   BorderThickness="1" 
                   Margin="5"
                   Visibility="{Binding HasLoaded, Converter={StaticResource  BooleanToVisibilityConverter}}"
-                  GridViewColumnHeader.Click="{s:Action OnGridViewColumnHeaderClick}"    
-                  MouseDoubleClick="{s:Action Edit}">
+                  GridViewColumnHeader.Click="{s:Action OnGridViewColumnHeaderClick}" 
+                  MouseDoubleClick="{s:Action OnListViewDoubleClick}"
+                 >
                 <b:Interaction.Behaviors>
                     <local:ListViewScrollBarBehavior />
                 </b:Interaction.Behaviors>
-
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Target" DisplayMemberBinding="{Binding DisplayName}" Width="Auto"/>

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -265,23 +267,36 @@ namespace Lithnet.AccessManager.Server.UI
         private async Task Initialize()
         {
             await Task.Run(() =>
-            {
-                this.IsLoading = true;
-                this.ViewModels = new BindableCollection<SecurityDescriptorTargetViewModel>(this.Model.Select(t => factory.CreateViewModel(t, this.ChildDisplaySettings)));
+             {
+                 this.IsLoading = true;
+                 this.ViewModels = new BindableCollection<SecurityDescriptorTargetViewModel>();
+                 
+                 var items = this.Model.Select(t => factory.CreateViewModel(t, this.ChildDisplaySettings)).ToList();
 
-                Execute.OnUIThreadSync(() =>
-                {
-                    this.Items = (ListCollectionView)CollectionViewSource.GetDefaultView(this.ViewModels);
-                    this.Items.Filter = this.IsFiltered;
-                    this.Items.CustomSort = this.customComparer;
-                    this.customComparer.SortDirection = currentSortDirection;
-                    this.Items.Refresh();
-                });
+                 // Force the evaluation of these values on another thread to prevent the UI locking up when these are loaded into the view
+                 Parallel.ForEach(items, item =>
+                 {
+                     var x = item.DisplayName;
+                     var y = item.Type;
+                     var z = item.Description;
+                     var a = item.JitGroupDisplayName;
+                 });
 
-                this.IsLoading = false;
+                 this.ViewModels.AddRange(items);
 
-                eventPublisher.Register(this);
-            });
+                 Execute.OnUIThreadSync(() =>
+                 {
+                     this.Items = (ListCollectionView)CollectionViewSource.GetDefaultView(this.ViewModels);
+                     this.Items.Filter = this.IsFiltered;
+                     this.Items.CustomSort = this.customComparer;
+                     this.customComparer.SortDirection = currentSortDirection;
+                     this.Items.Refresh();
+                 });
+
+                 this.IsLoading = false;
+
+                 eventPublisher.Register(this);
+             });
         }
 
         private bool IsFiltered(object item)
@@ -305,6 +320,16 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
+        public async Task OnListViewDoubleClick(object sender, RoutedEventArgs e)
+        {
+            if (!(((FrameworkElement)(e.OriginalSource)).DataContext is SecurityDescriptorTargetViewModel))
+            {
+                return;
+            }
+
+            await this.Edit();
+        }
+
         public void OnGridViewColumnHeaderClick(object sender, RoutedEventArgs e)
         {
             if (!(e.OriginalSource is GridViewColumnHeader gridViewColumnHeader))
@@ -326,6 +351,8 @@ namespace Lithnet.AccessManager.Server.UI
 
             lastHeaderClicked = gridViewColumnHeader;
             currentSortDirection = newSortDirection;
+
+            e.Handled = true;
         }
 
         private void SortListView(string propertyName, ListSortDirection sortDirection)

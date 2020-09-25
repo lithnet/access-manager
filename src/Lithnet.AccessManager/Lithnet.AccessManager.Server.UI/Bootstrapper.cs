@@ -70,7 +70,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             logger.LogCritical(ex, "An unhandled exception occurred in the user interface");
 
-            string errorMessage = $"An unhandled error occurred and the application will terminate. Do you want to attempt to save the current configuration?";
+            string errorMessage = $"An unhandled error occurred and the application will terminate.\r\n\r\n{ex.Message}\r\n\r\n Do you want to attempt to save the current configuration?";
 
             if (MessageBox.Show(errorMessage, "Error", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
             {
@@ -82,7 +82,7 @@ namespace Lithnet.AccessManager.Server.UI
                 catch (Exception ex2)
                 {
                     logger.LogCritical(ex2, "Unable to save app config");
-                    MessageBox.Show("Unable to save the current configuration");
+                    MessageBox.Show("Unable to save the current configuration", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
 
@@ -183,6 +183,12 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind(typeof(IOptionsSnapshot<>)).To(typeof(UiOptionsSnapshotProvider<>));
 
                 base.ConfigureIoC(builder);
+            }
+            catch (ConfigurationException ex)
+            {
+                logger.LogCritical(ex, "Configuration load error");
+                MessageBox.Show($"There was a problem loading the configuration file, and the application will now terminate\r\n\r\nError message: {ex.Message}\r\n\r\nAdditional information may be available in the application log", "Error", MessageBoxButton.OK,  MessageBoxImage.Error);
+                Environment.Exit(1);
             }
             catch (Exception ex)
             {
