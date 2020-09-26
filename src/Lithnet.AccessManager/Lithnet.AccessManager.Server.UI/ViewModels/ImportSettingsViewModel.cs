@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.DirectoryServices.ActiveDirectory;
 using System.IO;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media.Animation;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.UI.Interop;
+using Lithnet.AccessManager.Server.UI.AuthorizationRuleImport;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
@@ -138,16 +135,16 @@ namespace Lithnet.AccessManager.Server.UI
         public string ImportFile { get; set; }
 
         [AlsoNotifyFor(nameof(ImportFile))]
-        public UserDiscoveryMode ImportType { get; set; } = UserDiscoveryMode.Laps;
+        public ImportMode ImportType { get; set; } = ImportMode.Laps;
 
         public bool ImportTypeLaps
         {
-            get => this.ImportType == UserDiscoveryMode.Laps;
+            get => this.ImportType == ImportMode.Laps;
             set
             {
                 if (value)
                 {
-                    this.ImportType = UserDiscoveryMode.Laps;
+                    this.ImportType = ImportMode.Laps;
                     this.AllowLaps = true;
                 }
             }
@@ -155,12 +152,12 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool ImportTypeBitLocker
         {
-            get => this.ImportType == UserDiscoveryMode.BitLocker;
+            get => this.ImportType == ImportMode.BitLocker;
             set
             {
                 if (value)
                 {
-                    this.ImportType = UserDiscoveryMode.BitLocker;
+                    this.ImportType = ImportMode.BitLocker;
                     this.AllowBitlocker = true;
                 }
             }
@@ -168,12 +165,12 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool ImportTypeLocalAdmins
         {
-            get => this.ImportType == UserDiscoveryMode.LocalAdminRpc;
+            get => this.ImportType == ImportMode.Rpc;
             set
             {
                 if (value)
                 {
-                    this.ImportType = UserDiscoveryMode.LocalAdminRpc;
+                    this.ImportType = ImportMode.Rpc;
                     this.AllowJit = true;
                 }
             }
@@ -181,12 +178,12 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool ImportTypeFile
         {
-            get => this.ImportType == UserDiscoveryMode.File;
+            get => this.ImportType == ImportMode.CsvFile;
             set
             {
                 if (value)
                 {
-                    this.ImportType = UserDiscoveryMode.File;
+                    this.ImportType = ImportMode.CsvFile;
                     this.AllowJit = true;
                 }
             }

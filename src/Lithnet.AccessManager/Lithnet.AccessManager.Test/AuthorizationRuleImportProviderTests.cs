@@ -47,7 +47,7 @@ namespace Lithnet.AccessManager.Test
         {
             AuthorizationRuleImportSettings settings = new AuthorizationRuleImportSettings()
             {
-                DiscoveryMode = UserDiscoveryMode.File,
+                DiscoveryMode = ImportMode.File,
                 ImportFile = "TestFiles\\ComputerList.csv",
                 ImportOU = "OU=Admin,DC=IDMDEV1,DC=LOCAL"
             };
@@ -62,7 +62,7 @@ namespace Lithnet.AccessManager.Test
         {
             AuthorizationRuleImportSettings settings = new AuthorizationRuleImportSettings()
             {
-                DiscoveryMode = UserDiscoveryMode.BitLocker,
+                DiscoveryMode = ImportMode.BitLocker,
                 ImportOU = "OU=Admin,DC=IDMDEV1,DC=LOCAL"
             };
 
@@ -76,7 +76,7 @@ namespace Lithnet.AccessManager.Test
         {
             AuthorizationRuleImportSettings settings = new AuthorizationRuleImportSettings()
             {
-                DiscoveryMode = UserDiscoveryMode.Laps,
+                DiscoveryMode = ImportMode.Laps,
                 ImportOU = "OU=Admin,DC=IDMDEV1,DC=LOCAL"
             };
 

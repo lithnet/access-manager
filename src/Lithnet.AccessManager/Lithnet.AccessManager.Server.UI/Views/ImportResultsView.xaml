@@ -57,11 +57,35 @@
             </b:Interaction.Behaviors>
             <ListView.View>
                 <GridView>
+                    <GridViewColumn Width="Auto">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <iconPacks:PackIconFontAwesome Kind="ExclamationTriangleSolid"
+                                                                   Margin="0 0 5 0"
+                                                                   Visibility="{Binding IsWarning, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                                   Foreground="DarkOrange"/>
+                                    <iconPacks:PackIconFontAwesome Kind="ExclamationTriangleSolid"
+                                                                   Margin="0 0 5 0"
+                                                                   Visibility="{Binding IsError, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                                   Foreground="Red"/>
+                                    <iconPacks:PackIconBoxIcons Kind="RegularInfoCircle" 
+                                                                Foreground="CornflowerBlue" 
+                                                                Visibility="{Binding IsInformational, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                                VerticalAlignment="Center"/>
+                                   </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+
                     <GridViewColumn Header="Computer" 
-                                    DisplayMemberBinding="{Binding PrincipalName}" 
+                                    DisplayMemberBinding="{Binding Computer}" 
                                     Width="200"/>
-                    <GridViewColumn Header="Error"
-                                    DisplayMemberBinding="{Binding ExceptionMessage}" 
+                    <GridViewColumn Header="Principal" 
+                                    DisplayMemberBinding="{Binding Principal}" 
+                                    Width="200"/>
+                    <GridViewColumn Header="Message"
+                                    DisplayMemberBinding="{Binding Message}" 
                                     Width="600"/>
                 </GridView>
             </ListView.View>

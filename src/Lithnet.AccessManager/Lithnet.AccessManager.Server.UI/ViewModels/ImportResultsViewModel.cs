@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Lithnet.AccessManager.Server.UI.AuthorizationRuleImport;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Stylet;
@@ -19,7 +20,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool HasDiscoveryErrors => DiscoveryErrors.Count > 0;
 
-        public List<ComputerPrincipalMapping> DiscoveryErrors { get; set; }
+        public List<DiscoveryError> DiscoveryErrors { get; set; }
 
         public string DiscoveryErrorCount => $"{DiscoveryErrors.Count} discovery error{(DiscoveryErrors.Count == 1 ? "" : "s")}";
 

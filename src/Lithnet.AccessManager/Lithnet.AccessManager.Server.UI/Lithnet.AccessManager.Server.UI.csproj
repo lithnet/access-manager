@@ -88,6 +88,9 @@
     <Compile Update="Views\SelectTargetTypeView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Windows\ImportWizardWindowView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Windows\ExternalDialogWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -102,6 +105,24 @@
 
   <ItemGroup>
     <Page Update="Views\EffectiveAccessView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\ImportWizardImportReadyView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\ImportWizardLapsWebSettingsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\ImportWizardRuleSettingsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\ImportWizardImportContainerView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\ImportWizardCsvSettingsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\ImportWizardImportTypeView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\JitConfigurationView.xaml">
@@ -126,6 +147,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\SelectTargetTypeView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Windows\ImportWizardWindowView.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Windows\ExternalDialogWindow.xaml">

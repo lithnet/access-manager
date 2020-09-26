@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.AccessControl;
-using System.Security.Principal;
-using System.Threading;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
@@ -16,29 +13,19 @@ namespace Lithnet.AccessManager.Server.UI
     public class AuthorizationViewModel : Screen, IHelpLink
     {
         private readonly AuthorizationOptions model;
-        private readonly SecurityDescriptorTargetsViewModelFactory factory;
+        private readonly SecurityDescriptorTargetsViewModelFactory targetViewModelFactory;
         private readonly IShellExecuteProvider shellExecuteProvider;
-        private readonly IDialogCoordinator dialogCoordinator;
-        private readonly IImportTargetsViewModelFactory importTargetsFactory;
-        private readonly IAuthorizationRuleImportProvider importProvider;
         private readonly ILogger logger;
-        private readonly IServiceSettingsProvider serviceSettings;
+        private readonly ImportWizardWindowViewModel importWizardWindow;
 
-        private ProgressDialogController progress;
-        private int progressCurrent;
-        private int progressMaximum;
-        private CancellationTokenSource progressCts;
-
-        public AuthorizationViewModel(AuthorizationOptions model, SecurityDescriptorTargetsViewModelFactory factory, IShellExecuteProvider shellExecuteProvider, IDialogCoordinator dialogCoordinator, IImportTargetsViewModelFactory importTargetsFactory, IAuthorizationRuleImportProvider importProvider, ILogger<AuthorizationViewModel> logger, IServiceSettingsProvider serviceSettings)
+        public AuthorizationViewModel(AuthorizationOptions model, SecurityDescriptorTargetsViewModelFactory targetViewModelFactory, IShellExecuteProvider shellExecuteProvider, IDialogCoordinator dialogCoordinator, ILogger<AuthorizationViewModel> logger, ImportWizardWindowViewModel importWizardWindow)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.model = model;
-            this.factory = factory;
-            this.dialogCoordinator = dialogCoordinator;
-            this.importTargetsFactory = importTargetsFactory;
-            this.importProvider = importProvider;
+            this.targetViewModelFactory = targetViewModelFactory;
             this.logger = logger;
-            this.serviceSettings = serviceSettings;
+            this.importWizardWindow = importWizardWindow;
+            this.importWizardWindow.AuthorizationViewModel = this;
             this.DisplayName = "Authorization";
         }
 
@@ -46,7 +33,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             Task.Run(() =>
             {
-                this.Targets = this.factory.CreateViewModel(model.ComputerTargets);
+                this.Targets = this.targetViewModelFactory.CreateViewModel(model.ComputerTargets);
             });
         }
 
@@ -61,114 +48,20 @@ namespace Lithnet.AccessManager.Server.UI
             await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
         }
 
-        public async Task Import()
+        public void Import()
         {
-            var vm = importTargetsFactory.CreateViewModel();
-
-            ExternalDialogWindow window = new ExternalDialogWindow
+            ImportWizardWindowView windowView = new ImportWizardWindowView()
             {
                 Title = "Import authorization rules",
-                DataContext = vm,
-                SaveButtonVisible = true,
-                CancelButtonName = "Close",
-                SaveButtonName = "Import",
-                Height = 600
+                Height = 800,
+                ShowInTaskbar = true
             };
 
-            if (window.ShowDialog() == false)
-            {
-                return;
-            }
-
-            await this.Import(vm);
+            windowView.DataContext = this.importWizardWindow;
+            windowView.ShowDialog();
         }
 
-        private async Task Import(ImportSettingsViewModel settingsVm)
-        {
-            try
-            {
-                this.progress = await this.dialogCoordinator.ShowProgressAsync(this, "Importing...", "Discovering directory objects", true);
-                this.progress.Canceled += Progress_Canceled;
-                this.importProvider.OnStartProcessingComputer += ImportProvider_OnStartProcessingComputer;
-                this.progress.SetIndeterminate();
-                this.progressCts = new CancellationTokenSource();
-                this.progressCurrent = 0;
-
-                await Task.Run(() =>
-                {
-                    this.progressMaximum = this.importProvider.GetComputerCount(settingsVm.Target);
-                    this.progress.Maximum = this.progressMaximum;
-                });
-
-                AuthorizationRuleImportSettings settings = new AuthorizationRuleImportSettings
-                {
-                    CancellationToken = this.progressCts.Token,
-                    DoNotConsolidate = settingsVm.DoNotConsolidate,
-                    DoNotConsolidateOnError = settingsVm.DoNotConsolidateOnError,
-                    ImportFile = settingsVm.ImportFile,
-                    ImportOU = settingsVm.Target,
-                    HasHeaderRow = settingsVm.ImportFileHasHeaderRow,
-                    DiscoveryMode = settingsVm.ImportType
-                };
-
-                var serviceAccount = this.serviceSettings.GetServiceAccount();
-                if (serviceAccount != null)
-                {
-                    settings.PrincipalSidFilter.Add(serviceAccount);
-                }
-
-                var results = await Task.Run(() => this.importProvider.BuildPrincipalMap(settings));
-
-                this.progress.SetIndeterminate();
-                this.progress.SetMessage("Building authorization rules...");
-
-                List<SecurityDescriptorTarget> targets = new List<SecurityDescriptorTarget>();
-                this.PopulateTargets(results.MappedOU, settingsVm, targets);
-
-                ImportResultsViewModel irvm = new ImportResultsViewModel();
-                irvm.Targets = factory.CreateViewModel(targets);
-                irvm.DiscoveryErrors = results.ComputerErrors;
-                irvm.Targets.ChildDisplaySettings.IsScriptVisible = false;
-
-                await this.progress.CloseAsync();
-
-                ExternalDialogWindow window = new ExternalDialogWindow
-                {
-                    Title = "Validate authorization rules",
-                    DataContext = irvm,
-                    SaveButtonVisible = true,
-                    CancelButtonIsDefault = false,
-                    SaveButtonIsDefault = false,
-                    CancelButtonName = "Cancel",
-                    SaveButtonName = "Save and import rules",
-                    Height = 600
-                };
-
-                if (window.ShowDialog() == false)
-                {
-                    return;
-                }
-
-                this.Merge(irvm.Targets, irvm.Merge, irvm.MergeOverwrite);
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(EventIDs.UIGenericError, ex, "Import error");
-                await this.dialogCoordinator.ShowMessageAsync(this, "Import error", $"Could not perform the import. {ex.Message}");
-            }
-            finally
-            {
-                if (this.progress.IsOpen)
-                {
-                    await this.progress.CloseAsync();
-                }
-            }
-        }
-
-        private void Merge(SecurityDescriptorTargetsViewModel newTargets, bool merge, bool overwriteExisting)
+        public void Merge(SecurityDescriptorTargetsViewModel newTargets, bool merge, bool overwriteExisting)
         {
             foreach (var newTarget in newTargets.ViewModels)
             {
@@ -262,129 +155,6 @@ namespace Lithnet.AccessManager.Server.UI
 
                 existingTarget.SecurityDescriptor = existingsd.GetSddlForm(AccessControlSections.All);
             }
-        }
-
-        private void PopulateTargets(OUPrincipalMapping entry, ImportSettingsViewModel vm, List<SecurityDescriptorTarget> targets)
-        {
-            bool doNotConsolidate = vm.DoNotConsolidate || (vm.DoNotConsolidateOnError && entry.HasDescendantsWithErrors);
-
-            if (!doNotConsolidate)
-            {
-                if (entry.UniquePrincipals.Count > 0)
-                {
-                    this.ConvertToTarget(entry, vm, targets);
-                }
-            }
-
-            foreach (var computer in entry.Computers)
-            {
-                var admins = doNotConsolidate ? computer.Principals : computer.UniquePrincipals;
-
-                if (!computer.HasError && admins.Count > 0)
-                {
-                    this.ConvertToTarget(computer.Sid, admins, vm, targets);
-                }
-            }
-
-            foreach (var ou in entry.DescendantOUs)
-            {
-                this.PopulateTargets(ou, vm, targets);
-            }
-        }
-
-        private void ConvertToTarget(SecurityIdentifier computerSid, HashSet<SecurityIdentifier> admins, ImportSettingsViewModel vm, List<SecurityDescriptorTarget> targets)
-        {
-            SecurityDescriptorTarget target = new SecurityDescriptorTarget()
-            {
-                AuthorizationMode = AuthorizationMode.SecurityDescriptor,
-                Description = vm.Description,
-                Target = computerSid.ToString(),
-                Type = TargetType.Computer,
-                Id = Guid.NewGuid().ToString(),
-                Notifications = vm.Notifications?.Model,
-                Jit = new SecurityDescriptorTargetJitDetails()
-                {
-                    AuthorizingGroup = vm.JitAuthorizingGroup,
-                    ExpireAfter = vm.JitExpireAfter
-                },
-                Laps = new SecurityDescriptorTargetLapsDetails()
-                {
-                    ExpireAfter = vm.LapsExpireAfter
-                }
-            };
-
-            AccessMask mask = 0;
-            mask |= vm.AllowLaps ? AccessMask.LocalAdminPassword : 0;
-            mask |= vm.AllowJit ? AccessMask.Jit : 0;
-            mask |= vm.AllowLapsHistory ? AccessMask.LocalAdminPasswordHistory : 0;
-            mask |= vm.AllowBitlocker ? AccessMask.BitLocker : 0;
-
-            DiscretionaryAcl acl = new DiscretionaryAcl(false, false, admins.Count);
-
-            foreach (var sid in admins)
-            {
-                acl.AddAccess(AccessControlType.Allow, sid, (int)mask, InheritanceFlags.None, PropagationFlags.None);
-            }
-
-            CommonSecurityDescriptor sd = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, acl);
-
-            target.SecurityDescriptor = sd.GetSddlForm(AccessControlSections.All);
-
-            targets.Add(target);
-        }
-
-        private void ConvertToTarget(OUPrincipalMapping entry, ImportSettingsViewModel vm, List<SecurityDescriptorTarget> targets)
-        {
-            SecurityDescriptorTarget target = new SecurityDescriptorTarget()
-            {
-                AuthorizationMode = AuthorizationMode.SecurityDescriptor,
-                Description = vm.Description,
-                Target = entry.OUName,
-                Type = TargetType.Container,
-                Id = Guid.NewGuid().ToString(),
-                Notifications = vm.Notifications?.Model,
-                Jit = new SecurityDescriptorTargetJitDetails()
-                {
-                    AuthorizingGroup = vm.JitAuthorizingGroup,
-                    ExpireAfter = vm.JitExpireAfter
-                },
-                Laps = new SecurityDescriptorTargetLapsDetails()
-                {
-                    ExpireAfter = vm.LapsExpireAfter
-                }
-            };
-
-            AccessMask mask = 0;
-            mask |= vm.AllowLaps ? AccessMask.LocalAdminPassword : 0;
-            mask |= vm.AllowJit ? AccessMask.Jit : 0;
-            mask |= vm.AllowLapsHistory ? AccessMask.LocalAdminPasswordHistory : 0;
-            mask |= vm.AllowBitlocker ? AccessMask.BitLocker : 0;
-
-            DiscretionaryAcl acl = new DiscretionaryAcl(false, false, entry.UniquePrincipals.Count);
-
-            foreach (var sid in entry.UniquePrincipals)
-            {
-                acl.AddAccess(AccessControlType.Allow, sid, (int)mask, InheritanceFlags.None, PropagationFlags.None);
-            }
-
-            CommonSecurityDescriptor sd = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, acl);
-
-            target.SecurityDescriptor = sd.GetSddlForm(AccessControlSections.All);
-
-            targets.Add(target);
-        }
-
-        private void Progress_Canceled(object sender, EventArgs e)
-        {
-            this.progressCts?.Cancel();
-        }
-
-        private void ImportProvider_OnStartProcessingComputer(object sender, ProcessingComputerArgs e)
-        {
-            this.progress.SetMessage($"Processing {e.ComputerName}");
-            var val = Interlocked.Increment(ref this.progressCurrent);
-            this.logger.LogTrace("Progress {count}/{max}", val, this.progressMaximum);
-            this.progress.SetProgress(Math.Min(val, this.progressMaximum));
         }
     }
 }

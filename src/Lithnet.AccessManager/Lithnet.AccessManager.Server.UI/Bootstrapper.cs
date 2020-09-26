@@ -7,6 +7,7 @@ using System.Windows.Threading;
 using FluentValidation;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.AccessManager.Server.UI.AuthorizationRuleImport;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
@@ -18,7 +19,7 @@ using StyletIoC;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class Bootstrapper : Bootstrapper<MainWindowViewModel>
+    public class Bootstrapper : Bootstrapper<ImportWizardWindowViewModel>
     {
         private readonly ILogger logger;
 
@@ -110,26 +111,31 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<UserInterfaceOptions>().ToInstance(appconfig.UserInterface);
                 builder.Bind<JitConfigurationOptions>().ToInstance(appconfig.JitConfiguration);
 
-                // ViewModels
-                builder.Bind<AuthenticationViewModel>().ToSelf();
-                builder.Bind<EmailViewModel>().ToSelf();
-                builder.Bind<HostingViewModel>().ToSelf();
-                builder.Bind<AuditingViewModel>().ToSelf();
-                builder.Bind<AuthorizationViewModel>().ToSelf();
-                builder.Bind<ActiveDirectoryConfigurationViewModel>().ToSelf();
-                builder.Bind<IpDetectionViewModel>().ToSelf();
-                builder.Bind<PowershellNotificationChannelDefinitionsViewModel>().ToSelf();
-                builder.Bind<PowershellNotificationChannelDefinitionViewModel>().ToSelf();
-                builder.Bind<RateLimitsViewModel>().ToSelf();
-                builder.Bind<SmtpNotificationChannelDefinitionsViewModel>().ToSelf();
-                builder.Bind<SmtpNotificationChannelDefinitionViewModel>().ToSelf();
-                builder.Bind<UserInterfaceViewModel>().ToSelf();
-                builder.Bind<WebhookNotificationChannelDefinitionsViewModel>().ToSelf();
-                builder.Bind<WebhookNotificationChannelDefinitionViewModel>().ToSelf();
-                builder.Bind<HelpViewModel>().ToSelf();
-                builder.Bind<LapsConfigurationViewModel>().ToSelf();
-                builder.Bind<JitConfigurationViewModel>().ToSelf();
-                builder.Bind<BitLockerViewModel>().ToSelf();
+                //// ViewModels
+                //builder.Bind<AuthenticationViewModel>().ToSelf();
+                //builder.Bind<EmailViewModel>().ToSelf();
+                //builder.Bind<HostingViewModel>().ToSelf();
+                //builder.Bind<AuditingViewModel>().ToSelf();
+                //builder.Bind<AuthorizationViewModel>().ToSelf();
+                //builder.Bind<ActiveDirectoryConfigurationViewModel>().ToSelf();
+                //builder.Bind<IpDetectionViewModel>().ToSelf();
+                //builder.Bind<PowershellNotificationChannelDefinitionsViewModel>().ToSelf();
+                //builder.Bind<PowershellNotificationChannelDefinitionViewModel>().ToSelf();
+                //builder.Bind<RateLimitsViewModel>().ToSelf();
+                //builder.Bind<SmtpNotificationChannelDefinitionsViewModel>().ToSelf();
+                //builder.Bind<SmtpNotificationChannelDefinitionViewModel>().ToSelf();
+                //builder.Bind<UserInterfaceViewModel>().ToSelf();
+                //builder.Bind<WebhookNotificationChannelDefinitionsViewModel>().ToSelf();
+                //builder.Bind<WebhookNotificationChannelDefinitionViewModel>().ToSelf();
+                //builder.Bind<HelpViewModel>().ToSelf();
+                //builder.Bind<LapsConfigurationViewModel>().ToSelf();
+                //builder.Bind<JitConfigurationViewModel>().ToSelf();
+                //builder.Bind<BitLockerViewModel>().ToSelf();
+                //builder.Bind<ImportWizardImportTypeViewModel>().ToSelf();
+                //builder.Bind<ImportWizardWindowViewModel>().ToSelf();
+                //builder.Bind<ImportWizardCsvSettingsViewModel>().ToSelf();
+                //builder.Bind<ImportWizardImportContainerViewModel>().ToSelf();
+                //builder.Bind<ImportWizardRuleSettingsViewModel>().ToSelf();
 
                 // ViewModel factories
                 builder.Bind<INotificationChannelSelectionViewModelFactory>().To<NotificationChannelSelectionViewModelFactory>();
@@ -143,6 +149,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IJitDomainStatusViewModelFactory>().To<JitDomainStatusViewModelFactory>();
                 builder.Bind<IImportTargetsViewModelFactory>().To<ImportTargetsViewModelFactory>();
                 builder.Bind<IEffectiveAccessViewModelFactory>().To<EffectiveAccessViewModelFactory>();
+                builder.Bind<IImportProviderFactory>().To<ImportProviderFactory>();
                 builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
                 builder.Bind(typeof(INotificationChannelDefinitionViewModelFactory<,>)).ToAllImplementations();
 
@@ -153,9 +160,8 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<ILocalSam>().To<LocalSam>();
                 builder.Bind<IComputerPrincipalProviderRpc>().To<ComputerPrincipalProviderRpc>();
                 builder.Bind<IComputerPrincipalProviderCsv>().To<ComputerPrincipalProviderCsv>();
-                builder.Bind<IComputerPrincipalProviderMsLaps>().To<ComputerPrincipalProviderMsLaps>();
+                builder.Bind<IComputerPrincipalProviderLaps>().To<ComputerPrincipalProviderLaps>();
                 builder.Bind<IComputerPrincipalProviderBitLocker>().To<ComputerPrincipalProviderBitLocker>();
-                builder.Bind<IAuthorizationRuleImportProvider>().To<AuthorizationRuleImportProvider>();
                 builder.Bind<IDiscoveryServices>().To<DiscoveryServices>();
                 builder.Bind<IServiceSettingsProvider>().To<ServiceSettingsProvider>();
                 builder.Bind<INotificationSubscriptionProvider>().To<NotificationSubscriptionProvider>();

@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.ImportWizardImportReadyView"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             Dialog:DialogParticipation.Register="{Binding}"
+              d:DesignWidth="800"
+             mc:Ignorable="d" 
+             Margin="5" >
+
+    <AdornerDecorator>
+        <StackPanel>
+
+            <Label Style="{DynamicResource DescriptionHeaderStyle}" 
+                   Content="Ready to import"/>
+            <Separator Margin="5 0 0 10" Height="1"
+                       Width="Auto"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Top"                   
+                       Background="#11000000" />
+
+            <TextBlock Margin="5" TextWrapping="Wrap">
+                Click next to begin the import process
+            </TextBlock>
+ 
+        </StackPanel>
+    </AdornerDecorator>
+</UserControl>
+    

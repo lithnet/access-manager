@@ -1,0 +1,80 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.ImportWizardImportTypeView"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             Dialog:DialogParticipation.Register="{Binding}"
+              d:DesignWidth="800"
+             mc:Ignorable="d" 
+             Margin="5" >
+
+    <AdornerDecorator>
+        <StackPanel>
+
+            <Label Style="{DynamicResource DescriptionHeaderStyle}" 
+                   Content="Select import type"
+                   Margin="0 5 0 0"/>
+            <Separator Margin="5 0 0 10" Height="1"
+                       Width="Auto"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Top"                   
+                       Background="#11000000" />
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+            
+
+                <StackPanel Grid.Row="2"
+                            Grid.Column="1">
+                    <RadioButton Margin="5"
+                                 Background="Transparent"
+                                 IsChecked="{Binding ImportTypeLaps}">
+                        <TextBlock TextWrapping="Wrap">Discover users with directory permission to read the Microsoft LAPS attribute on the selected computers</TextBlock>
+                    </RadioButton>
+                    <RadioButton Margin="5"
+                                 Background="Transparent"
+                                 IsChecked="{Binding ImportTypeBitLocker}" >
+                        <TextBlock TextWrapping="Wrap">Discover users with directory permission to read BitLocker recovery passwords on the selected computers</TextBlock>
+                    </RadioButton>
+                    <RadioButton Margin="5"
+                                 Background="Transparent"
+                                 IsChecked="{Binding ImportTypeLocalAdmins}" >
+                        <TextBlock TextWrapping="Wrap">Import local administrators from computers (<Hyperlink Click="{s:Action HelpRpcLocalAdmin}">read access and network requirements</Hyperlink>)</TextBlock>
+                    </RadioButton>
+                    <RadioButton Margin="5" 
+                                 Background="Transparent"
+                                 IsChecked="{Binding ImportTypeFile}">
+                        <TextBlock>Import user-to-computer mappings from a <Hyperlink Click="{s:Action HelpCsvFileFormat}">CSV file</Hyperlink></TextBlock>
+                    </RadioButton>
+                    <RadioButton Margin="5" 
+                                 Background="Transparent"
+                                 IsChecked="{Binding ImportTypeLapsWeb}">
+                        <TextBlock>Import targets from a Lithnet LAPS web app configuration file</TextBlock>
+                    </RadioButton>
+                </StackPanel>
+
+            </Grid>
+
+        </StackPanel>
+    </AdornerDecorator>
+</UserControl>
+    

@@ -1,0 +1,54 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.ImportWizardLapsWebSettingsView"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             Dialog:DialogParticipation.Register="{Binding}"
+              d:DesignWidth="800"
+             mc:Ignorable="d" 
+             Margin="5" >
+
+    <AdornerDecorator>
+        <StackPanel>
+
+            <Label Style="{DynamicResource DescriptionHeaderStyle}" 
+                   Content="Select Lithnet LAPS Web App web.config file"/>
+            <Separator Margin="5 0 0 10" Height="1"
+                       Width="Auto"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Top"                   
+                       Background="#11000000" />
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Row="0" Grid.Column="0" 
+                               Content="Import file"
+                               Margin="5 2 5 2"/>
+                <TextBox Grid.Row="0" Grid.Column="1" 
+                         Text="{Binding ImportFile, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                         IsReadOnly="True"
+                         Margin="2"/>
+                <Button Grid.Row="0" Grid.Column="2" 
+                        Command="{s:Action SelectImportFile}" 
+                        Content="..."
+                        Width="30"
+                        Margin="2"/>
+            </Grid>
+        </StackPanel>
+    </AdornerDecorator>
+</UserControl>
+    
