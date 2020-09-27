@@ -10,8 +10,7 @@ namespace Lithnet.AccessManager.Server.UI
         public WebhookNotificationChannelDefinitionsViewModel(IList<WebhookNotificationChannelDefinition> model, WebhookNotificationChannelDefinitionViewModelFactory factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator, INotifyModelChangedEventPublisher eventPublisher) :
             base(model, factory, dialogCoordinator, eventAggregator, eventPublisher)
         {
+            this.DisplayName = "Webhook";
         }
-
-        public override string DisplayName { get; set; } = "Webhook";
     }
 }

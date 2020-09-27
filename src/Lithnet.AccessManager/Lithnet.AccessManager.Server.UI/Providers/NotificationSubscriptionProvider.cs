@@ -6,7 +6,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class NotificationSubscriptionProvider : INotificationSubscriptionProvider, IHandle<NotificationSubscriptionChangedEvent>
+    public class NotificationSubscriptionProvider : INotificationSubscriptionProvider, IHandle<NotificationSubscriptionChangedEvent>, IHandle<NotificationSubscriptionReloadEvent>
     {
         private readonly AuditOptions audit;
 
@@ -16,12 +16,15 @@ namespace Lithnet.AccessManager.Server.UI
 
         public BindableCollection<SubscriptionViewModel> Subscriptions { get; }
 
+        private List<SubscriptionViewModel> TransientSubscriptions { get; }
+
         public NotificationSubscriptionProvider(AuditOptions audit, IEventAggregator eventAggregator)
         {
             this.audit = audit;
             this.eventAggregator = eventAggregator;
             this.eventAggregator.Subscribe(this);
             this.Subscriptions = new BindableCollection<SubscriptionViewModel>();
+            this.TransientSubscriptions = new List<SubscriptionViewModel>();
             this.Rebuild();
         }
 
@@ -29,7 +32,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             BindableCollection<SubscriptionViewModel> list = new BindableCollection<SubscriptionViewModel>();
 
-            foreach(string id in ids)
+            foreach (string id in ids)
             {
                 var item = this.Subscriptions.FirstOrDefault(t => string.Equals(t.Id, id, StringComparison.OrdinalIgnoreCase));
 
@@ -67,10 +70,43 @@ namespace Lithnet.AccessManager.Server.UI
                 {
                     this.Subscriptions.Add(new SubscriptionViewModel(item.Id, item.DisplayName, "Webhook"));
                 }
+
+                foreach (var item in this.TransientSubscriptions)
+                {
+                    this.Subscriptions.Add(item);
+                }
             }
         }
 
         public void Handle(NotificationSubscriptionChangedEvent message)
+        {
+            if (message.IsTransient)
+            {
+                if (message.ModificationType == ModificationType.Added)
+                {
+                    if (message.ModifiedObject is PowershellNotificationChannelDefinition)
+                    {
+                        this.TransientSubscriptions.Add(new SubscriptionViewModel(message.ModifiedObject.Id, message.ModifiedObject.DisplayName, "PowerShell"));
+                    }
+                    else if (message.ModifiedObject is SmtpNotificationChannelDefinition)
+                    {
+                        this.TransientSubscriptions.Add(new SubscriptionViewModel(message.ModifiedObject.Id, message.ModifiedObject.DisplayName, "Smtp"));
+                    }
+                    else if (message.ModifiedObject is WebhookNotificationChannelDefinition)
+                    {
+                        this.TransientSubscriptions.Add(new SubscriptionViewModel(message.ModifiedObject.Id, message.ModifiedObject.DisplayName, "Webhook"));
+                    }
+                }
+                else if (message.ModificationType == ModificationType.Deleted)
+                {
+                    this.TransientSubscriptions.RemoveAll(t => t.Id == message.ModifiedObject.Id);
+                }
+            }
+
+            this.Rebuild();
+        }
+
+        public void Handle(NotificationSubscriptionReloadEvent message)
         {
             this.Rebuild();
         }

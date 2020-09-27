@@ -1,4 +1,5 @@
-﻿using Lithnet.AccessManager.Server.Configuration;
+﻿using System;
+using Lithnet.AccessManager.Server.Configuration;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -7,9 +8,9 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly IAppPathProvider appPathProvider;
         private readonly IFileSelectionViewModelFactory fileSelectionViewModelFactory;
-        private readonly IModelValidator<PowershellNotificationChannelDefinitionViewModel> validator;
+        private readonly Func<IModelValidator<PowershellNotificationChannelDefinitionViewModel>> validator;
 
-        public PowershellNotificationChannelDefinitionViewModelFactory(IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IModelValidator<PowershellNotificationChannelDefinitionViewModel> validator)
+        public PowershellNotificationChannelDefinitionViewModelFactory(IAppPathProvider appPathProvider, IFileSelectionViewModelFactory fileSelectionViewModelFactory, Func<IModelValidator<PowershellNotificationChannelDefinitionViewModel>> validator)
         {
             this.appPathProvider = appPathProvider;
             this.fileSelectionViewModelFactory = fileSelectionViewModelFactory;
@@ -23,7 +24,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public override PowershellNotificationChannelDefinitionViewModel CreateViewModel(PowershellNotificationChannelDefinition model)
         {
-            return new PowershellNotificationChannelDefinitionViewModel(model, validator, fileSelectionViewModelFactory, appPathProvider);
+            return new PowershellNotificationChannelDefinitionViewModel(model, validator.Invoke(), fileSelectionViewModelFactory, appPathProvider);
         }
     }
 }

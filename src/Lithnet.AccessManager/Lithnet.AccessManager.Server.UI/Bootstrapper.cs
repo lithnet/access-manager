@@ -19,7 +19,7 @@ using StyletIoC;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class Bootstrapper : Bootstrapper<ImportWizardWindowViewModel>
+    public class Bootstrapper : Bootstrapper<MainWindowViewModel>
     {
         private readonly ILogger logger;
 
@@ -98,7 +98,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 appconfig = ApplicationConfig.Load(pathProvider.ConfigFile);
                 var hosting = HostingOptions.Load(pathProvider.HostingConfigFile);
-                
+
                 //Config
                 builder.Bind<IApplicationConfig>().ToInstance(appconfig);
                 builder.Bind<AuthenticationOptions>().ToInstance(appconfig.Authentication);
@@ -122,7 +122,7 @@ namespace Lithnet.AccessManager.Server.UI
                 //builder.Bind<PowershellNotificationChannelDefinitionsViewModel>().ToSelf();
                 //builder.Bind<PowershellNotificationChannelDefinitionViewModel>().ToSelf();
                 //builder.Bind<RateLimitsViewModel>().ToSelf();
-                //builder.Bind<SmtpNotificationChannelDefinitionsViewModel>().ToSelf();
+               // builder.Bind<SmtpNotificationChannelDefinitionsViewModel>().ToSelf();
                 //builder.Bind<SmtpNotificationChannelDefinitionViewModel>().ToSelf();
                 //builder.Bind<UserInterfaceViewModel>().ToSelf();
                 //builder.Bind<WebhookNotificationChannelDefinitionsViewModel>().ToSelf();
@@ -138,6 +138,8 @@ namespace Lithnet.AccessManager.Server.UI
                 //builder.Bind<ImportWizardRuleSettingsViewModel>().ToSelf();
 
                 // ViewModel factories
+                builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
+                builder.Bind(typeof(INotificationChannelDefinitionViewModelFactory<,>)).ToAllImplementations();
                 builder.Bind<INotificationChannelSelectionViewModelFactory>().To<NotificationChannelSelectionViewModelFactory>();
                 builder.Bind<ISecurityDescriptorTargetViewModelFactory>().To<SecurityDescriptorTargetViewModelFactory>();
                 builder.Bind<ISecurityDescriptorTargetsViewModelFactory>().To<SecurityDescriptorTargetsViewModelFactory>();
@@ -147,11 +149,10 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IX509Certificate2ViewModelFactory>().To<X509Certificate2ViewModelFactory>();
                 builder.Bind<IJitGroupMappingViewModelFactory>().To<JitGroupMappingViewModelFactory>();
                 builder.Bind<IJitDomainStatusViewModelFactory>().To<JitDomainStatusViewModelFactory>();
-                builder.Bind<IImportTargetsViewModelFactory>().To<ImportTargetsViewModelFactory>();
                 builder.Bind<IEffectiveAccessViewModelFactory>().To<EffectiveAccessViewModelFactory>();
                 builder.Bind<IImportProviderFactory>().To<ImportProviderFactory>();
-                builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
-                builder.Bind(typeof(INotificationChannelDefinitionViewModelFactory<,>)).ToAllImplementations();
+                builder.Bind<IImportResultsViewModelFactory>().To<ImportResultsViewModelFactory>();
+
 
                 // Services
                 builder.Bind<RandomNumberGenerator>().ToInstance(RandomNumberGenerator.Create());
@@ -193,7 +194,7 @@ namespace Lithnet.AccessManager.Server.UI
             catch (ConfigurationException ex)
             {
                 logger.LogCritical(ex, "Configuration load error");
-                MessageBox.Show($"There was a problem loading the configuration file, and the application will now terminate\r\n\r\nError message: {ex.Message}\r\n\r\nAdditional information may be available in the application log", "Error", MessageBoxButton.OK,  MessageBoxImage.Error);
+                MessageBox.Show($"There was a problem loading the configuration file, and the application will now terminate\r\n\r\nError message: {ex.Message}\r\n\r\nAdditional information may be available in the application log", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Environment.Exit(1);
             }
             catch (Exception ex)

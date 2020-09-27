@@ -1,4 +1,5 @@
-﻿using Lithnet.AccessManager.Server.Configuration;
+﻿using System;
+using Lithnet.AccessManager.Server.Configuration;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -6,13 +7,11 @@ namespace Lithnet.AccessManager.Server.UI
     public class SmtpNotificationChannelDefinitionViewModelFactory : NotificationChannelDefinitionViewModelFactory<SmtpNotificationChannelDefinition, SmtpNotificationChannelDefinitionViewModel>
     {
         private readonly IAppPathProvider appPathProvider;
-        private readonly INotificationSubscriptionProvider notificationSubscriptionProvider;
-        private readonly IModelValidator<SmtpNotificationChannelDefinitionViewModel> validator;
+        private readonly Func<IModelValidator<SmtpNotificationChannelDefinitionViewModel>> validator;
 
-        public SmtpNotificationChannelDefinitionViewModelFactory(IAppPathProvider appPathProvider, INotificationSubscriptionProvider notificationSubscriptionProvider, IModelValidator<SmtpNotificationChannelDefinitionViewModel> validator)
+        public SmtpNotificationChannelDefinitionViewModelFactory(IAppPathProvider appPathProvider, Func<IModelValidator<SmtpNotificationChannelDefinitionViewModel>> validator)
         {
             this.appPathProvider = appPathProvider;
-            this.notificationSubscriptionProvider = notificationSubscriptionProvider;
             this.validator = validator;
         }
 
@@ -23,7 +22,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public override SmtpNotificationChannelDefinitionViewModel CreateViewModel(SmtpNotificationChannelDefinition model)
         {
-            return new SmtpNotificationChannelDefinitionViewModel(model, validator, notificationSubscriptionProvider, appPathProvider);
+            return new SmtpNotificationChannelDefinitionViewModel(model, validator.Invoke(), appPathProvider);
         }
     }
 }

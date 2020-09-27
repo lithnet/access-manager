@@ -26,21 +26,21 @@
                Content="Import settings" />
 
 
-        <CheckBox Margin="10 5 5 5"
+        <CheckBox Margin="10 5 5 2"
                   Content="Where a rule for a target already exists, merge the permissions into that rule"
                   Background="Transparent"
                   IsChecked="{Binding Merge}"/>
 
-        <CheckBox Margin="10 5 5 5"
+        <CheckBox Margin="10 2 5 5"
                   Content="Overwrite conflicting settings in the existing rule with the values from the new rule"
                   Background="Transparent"
                   IsEnabled="{Binding Merge}"
                   IsChecked="{Binding MergeOverwrite}"/>
 
-        <Label Margin="5" Style="{DynamicResource SubDescriptionHeaderStyle}" Content="Discovery errors" 
+        <Label Margin="5" Style="{DynamicResource SubDescriptionHeaderStyle}" Content="Discovery issues" 
                   Visibility="{Binding HasDiscoveryErrors, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-        <TextBlock Margin="10 5 5 5" 
+        <TextBlock Margin="10 2 5 2" 
            Visibility="{Binding HasDiscoveryErrors, Converter={StaticResource BooleanToVisibilityConverter}}"
            Text="{Binding DiscoveryErrorCount}"/>
 
@@ -50,7 +50,7 @@
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                   Visibility="{Binding HasDiscoveryErrors, Converter={StaticResource BooleanToVisibilityConverter}}"
                   Height="200"
-                  Margin="10"
+                  Margin="10 5 5 5"
                   Width="Auto">
             <b:Interaction.Behaviors>
                 <local:ListViewScrollBarBehavior />
@@ -78,8 +78,8 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Header="Computer" 
-                                    DisplayMemberBinding="{Binding Computer}" 
+                    <GridViewColumn Header="Target" 
+                                    DisplayMemberBinding="{Binding Target}" 
                                     Width="200"/>
                     <GridViewColumn Header="Principal" 
                                     DisplayMemberBinding="{Binding Principal}" 
@@ -90,6 +90,14 @@
                 </GridView>
             </ListView.View>
         </ListView>
+
+        <StackPanel Orientation="Horizontal"
+                    Visibility="{Binding HasDiscoveryErrors, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    HorizontalAlignment="Right">
+            <Button Content="Export to CSV..."
+                    Command="{s:Action Export}"
+                    Margin="5"/>
+        </StackPanel>
 
         <Label Margin="5" Style="{DynamicResource SubDescriptionHeaderStyle}" Content="Discovered rules" />
 

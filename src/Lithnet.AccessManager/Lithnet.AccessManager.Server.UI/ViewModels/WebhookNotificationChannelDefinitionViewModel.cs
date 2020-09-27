@@ -10,7 +10,7 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly IAppPathProvider appPathProvider;
 
-        public WebhookNotificationChannelDefinitionViewModel(WebhookNotificationChannelDefinition model, IModelValidator<WebhookNotificationChannelDefinitionViewModel> validator, INotificationSubscriptionProvider subscriptionProvider, IAppPathProvider appPathProvider)
+        public WebhookNotificationChannelDefinitionViewModel(WebhookNotificationChannelDefinition model, IModelValidator<WebhookNotificationChannelDefinitionViewModel> validator, IAppPathProvider appPathProvider)
             :base(model)
         {
             this.appPathProvider = appPathProvider;

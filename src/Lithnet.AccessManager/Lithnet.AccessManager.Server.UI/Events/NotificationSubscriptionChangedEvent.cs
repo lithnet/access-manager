@@ -6,6 +6,8 @@ namespace Lithnet.AccessManager.Server.UI
     {
         public ModificationType ModificationType { get; set; }
 
-        public NotificationChannelDefinition ModifiedObject {get;set;}
+        public NotificationChannelDefinition ModifiedObject { get; set; }
+
+        public bool IsTransient { get; set; }
     }
 }

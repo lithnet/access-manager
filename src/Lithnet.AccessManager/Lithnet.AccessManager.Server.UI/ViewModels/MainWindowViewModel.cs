@@ -113,7 +113,7 @@ namespace Lithnet.AccessManager.Server.UI
                 else
                 {
                     this.IsPendingServiceRestart = true;
-                    _ = Task.Run(() =>
+                    await Task.Run(() =>
                       {
                           try
                           {

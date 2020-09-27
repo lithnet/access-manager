@@ -1,4 +1,5 @@
-﻿using Lithnet.AccessManager.Server.Configuration;
+﻿using System;
+using Lithnet.AccessManager.Server.Configuration;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -6,13 +7,11 @@ namespace Lithnet.AccessManager.Server.UI
     public class WebhookNotificationChannelDefinitionViewModelFactory : NotificationChannelDefinitionViewModelFactory<WebhookNotificationChannelDefinition, WebhookNotificationChannelDefinitionViewModel>
     {
         private readonly IAppPathProvider appPathProvider;
-        private readonly INotificationSubscriptionProvider notificationSubscriptionProvider;
-        private readonly IModelValidator<WebhookNotificationChannelDefinitionViewModel> validator;
+        private readonly Func<IModelValidator<WebhookNotificationChannelDefinitionViewModel>> validator;
 
-        public WebhookNotificationChannelDefinitionViewModelFactory(IAppPathProvider appPathProvider, INotificationSubscriptionProvider notificationSubscriptionProvider, IModelValidator<WebhookNotificationChannelDefinitionViewModel> validator)
+        public WebhookNotificationChannelDefinitionViewModelFactory(IAppPathProvider appPathProvider, Func<IModelValidator<WebhookNotificationChannelDefinitionViewModel>> validator)
         {
             this.appPathProvider = appPathProvider;
-            this.notificationSubscriptionProvider = notificationSubscriptionProvider;
             this.validator = validator;
         }
 
@@ -23,7 +22,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public override WebhookNotificationChannelDefinitionViewModel CreateViewModel(WebhookNotificationChannelDefinition model)
         {
-            return new WebhookNotificationChannelDefinitionViewModel(model, validator, notificationSubscriptionProvider, appPathProvider);
+            return new WebhookNotificationChannelDefinitionViewModel(model, validator.Invoke(), appPathProvider);
         }
     }
 }

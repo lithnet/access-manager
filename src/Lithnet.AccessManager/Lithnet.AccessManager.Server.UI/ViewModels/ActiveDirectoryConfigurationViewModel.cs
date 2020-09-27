@@ -42,10 +42,10 @@ namespace Lithnet.AccessManager.Server.UI
 
         protected override void OnInitialActivate()
         {
-            Task.Run(this.PopulateForestsAndDomains);
+            Task.Run(async () => await this.PopulateForestsAndDomains());
         }
 
-        private void PopulateForestsAndDomains()
+        private async Task PopulateForestsAndDomains()
         {
             foreach (Forest forest in this.domainTrustProvider.GetForests())
             {
@@ -57,19 +57,19 @@ namespace Lithnet.AccessManager.Server.UI
                 }
             }
 
-            this.RefreshData();
+            await this.RefreshData();
         }
 
-        private void RefreshData()
+        private async Task RefreshData()
         {
             foreach (var forest in this.Forests)
             {
-                _ = forest.RefreshSchemaStatusAsync();
+                await forest.RefreshSchemaStatusAsync();
             }
 
             foreach (var domain in this.Domains)
             {
-                _ = domain.RefreshGroupMembershipAsync();
+                await domain.RefreshGroupMembershipAsync();
             }
         }
 

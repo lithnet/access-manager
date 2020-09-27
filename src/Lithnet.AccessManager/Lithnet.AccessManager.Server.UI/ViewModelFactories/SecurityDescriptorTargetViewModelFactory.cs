@@ -1,7 +1,10 @@
-﻿using Lithnet.AccessManager.Server.Configuration;
+﻿using System;
+using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
+using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -17,8 +20,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly ILocalSam localSam;
         private readonly IObjectSelectionProvider objectSelectionProvider;
+        private readonly Func<IModelValidator<SecurityDescriptorTargetViewModel>> validator;
 
-        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IDirectory directory, ILocalSam localsam, IObjectSelectionProvider objectSelectionProvider)
+        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IDirectory directory, ILocalSam localsam, IObjectSelectionProvider objectSelectionProvider, Func<IModelValidator<SecurityDescriptorTargetViewModel>> validator)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.appPathProvider = appPathProvider;
@@ -29,15 +33,18 @@ namespace Lithnet.AccessManager.Server.UI
             this.discoveryServices = discoveryServices;
             this.domainTrustProvider = domainTrustProvider;
             this.localSam = localsam;
-            this.objectSelectionProvider = objectSelectionProvider; 
+            this.objectSelectionProvider = objectSelectionProvider;
+            this.validator = validator;
         }
 
-
-        public SecurityDescriptorTargetViewModel CreateViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings settings)
+        public async Task<SecurityDescriptorTargetViewModel> CreateViewModelAsync(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings settings)
         {
-            var validator = new SecurityDescriptorTargetViewModelValidator(this.appPathProvider);
-            var v = new FluentModelValidator<SecurityDescriptorTargetViewModel>(validator);
-            return new SecurityDescriptorTargetViewModel(model, settings, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, v, directory, domainTrustProvider, discoveryServices, localSam, objectSelectionProvider);
+
+            var item = new SecurityDescriptorTargetViewModel(model, settings, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, validator.Invoke(), directory, domainTrustProvider, discoveryServices, localSam, objectSelectionProvider);
+
+            await item.Initialization;
+
+            return item;
         }
     }
 }

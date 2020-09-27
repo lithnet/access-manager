@@ -1,17 +1,18 @@
 ﻿using System.Linq;
-using System.Windows;
 using Lithnet.AccessManager.Server.Configuration;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class NotificationChannelSelectionViewModel : PropertyChangedBase, IHandle<NotificationSubscriptionChangedEvent>, IViewAware
+    public class NotificationChannelSelectionViewModel : Screen, IHandle<NotificationSubscriptionChangedEvent>, IHandle<NotificationSubscriptionReloadEvent>
     {
+        private readonly INotificationSubscriptionProvider subscriptionProvider;
         public AuditNotificationChannels Model { get; }
 
         public NotificationChannelSelectionViewModel(AuditNotificationChannels model, INotificationSubscriptionProvider subscriptionProvider, IEventAggregator eventAggregator, INotifyModelChangedEventPublisher eventPublisher)
         {
             this.Model = model;
+            this.subscriptionProvider = subscriptionProvider;
 
             this.SuccessSubscriptions = subscriptionProvider.GetSubscriptions(this.Model.OnSuccess);
             this.FailureSubscriptions = subscriptionProvider.GetSubscriptions(this.Model.OnFailure);
@@ -22,11 +23,11 @@ namespace Lithnet.AccessManager.Server.UI
             eventAggregator.Subscribe(this);
             eventPublisher.Register(this);
         }
-        
+
         [NotifyModelChangedCollection]
         public BindableCollection<SubscriptionViewModel> SuccessSubscriptions { get; set; }
 
-        [NotifyModelChangedCollection] 
+        [NotifyModelChangedCollection]
         public BindableCollection<SubscriptionViewModel> FailureSubscriptions { get; set; }
 
         public BindableCollection<SubscriptionViewModel> AvailableSuccessSubscriptions { get; }
@@ -79,10 +80,22 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool CanRemoveFailure => this.SelectedFailureSubscription != null;
 
-        public UIElement View { get; set; }
+        public void Handle(NotificationSubscriptionReloadEvent message)
+        {
+            this.AvailableSuccessSubscriptions.Clear();
+            this.AvailableSuccessSubscriptions.AddRange(subscriptionProvider.Subscriptions.Except(this.SuccessSubscriptions));
+
+            this.AvailableFailureSubscriptions.Clear();
+            this.AvailableFailureSubscriptions.AddRange(subscriptionProvider.Subscriptions.Except(this.FailureSubscriptions));
+        }
 
         public void Handle(NotificationSubscriptionChangedEvent message)
         {
+            if (message.IsTransient)
+            {
+                return;
+            }
+
             var sub = new SubscriptionViewModel(message.ModifiedObject);
 
             if (message.ModificationType == ModificationType.Added)
@@ -132,11 +145,6 @@ namespace Lithnet.AccessManager.Server.UI
                     }
                 }
             }
-        }
-
-        public void AttachView(UIElement view)
-        {
-            this.View = view;
         }
     }
 }

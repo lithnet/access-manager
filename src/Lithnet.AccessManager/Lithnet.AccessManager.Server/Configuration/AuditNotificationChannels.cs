@@ -4,8 +4,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 {
     public class AuditNotificationChannels
     {
-        public IList<string> OnFailure { get; set; } = new List<string>();
+        public HashSet<string> OnFailure { get; set; } = new HashSet<string>();
 
-        public IList<string> OnSuccess { get; set; } = new List<string>();
+        public HashSet<string> OnSuccess { get; set; } = new HashSet<string>();
     }
 }

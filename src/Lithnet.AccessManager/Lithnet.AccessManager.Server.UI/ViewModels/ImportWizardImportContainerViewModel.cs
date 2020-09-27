@@ -19,6 +19,8 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDirectory directory;
         private readonly IServiceSettingsProvider serviceSettings;
 
+        public Task Initialization { get; private set; }
+
         public ImportWizardImportContainerViewModel(ILogger<ImportWizardImportContainerViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardImportContainerViewModel> validator, IObjectSelectionProvider objectSelectionProvider, IDiscoveryServices discoveryServices, IDirectory directory,  IServiceSettingsProvider serviceSettings)
         {
             this.logger = logger;
@@ -28,8 +30,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.directory = directory;
             this.Validator = validator;
             this.serviceSettings = serviceSettings;
-
-            _ = this.Initialize();
+            this.Initialization = this.Initialize();
         }
 
         public async Task Initialize()

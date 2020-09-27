@@ -16,30 +16,36 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly SecurityDescriptorTargetsViewModelFactory targetViewModelFactory;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly ILogger logger;
-        private readonly ImportWizardWindowViewModel importWizardWindow;
+        private readonly Func<ImportWizardWindowViewModel> importWizardFactory;
+        private readonly IWindowManager windowManager;
 
-        public AuthorizationViewModel(AuthorizationOptions model, SecurityDescriptorTargetsViewModelFactory targetViewModelFactory, IShellExecuteProvider shellExecuteProvider, IDialogCoordinator dialogCoordinator, ILogger<AuthorizationViewModel> logger, ImportWizardWindowViewModel importWizardWindow)
+        public AuthorizationViewModel(AuthorizationOptions model, SecurityDescriptorTargetsViewModelFactory targetViewModelFactory, IShellExecuteProvider shellExecuteProvider, IDialogCoordinator dialogCoordinator, ILogger<AuthorizationViewModel> logger, Func<ImportWizardWindowViewModel> importWizardFactory, IWindowManager windowManager)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.model = model;
             this.targetViewModelFactory = targetViewModelFactory;
             this.logger = logger;
-            this.importWizardWindow = importWizardWindow;
-            this.importWizardWindow.AuthorizationViewModel = this;
+            this.importWizardFactory = importWizardFactory;
+            this.windowManager = windowManager;
             this.DisplayName = "Authorization";
         }
 
         protected override void OnInitialActivate()
         {
-            Task.Run(() =>
+            Task.Run(async () =>
             {
-                this.Targets = this.targetViewModelFactory.CreateViewModel(model.ComputerTargets);
+                this.Targets = await this.targetViewModelFactory.CreateViewModelAsync(model.ComputerTargets);
+                this.IsLoading = false;
             });
         }
 
         public SecurityDescriptorTargetsViewModel Targets { get; set; }
 
         public PackIconModernKind Icon => PackIconModernKind.Lock;
+
+        public bool IsLoading { get; set; } = true;
+
+        public bool HasLoaded => !this.IsLoading;
 
         public string HelpLink => Constants.HelpLinkPageAuthorization;
 
@@ -50,15 +56,10 @@ namespace Lithnet.AccessManager.Server.UI
 
         public void Import()
         {
-            ImportWizardWindowView windowView = new ImportWizardWindowView()
-            {
-                Title = "Import authorization rules",
-                Height = 800,
-                ShowInTaskbar = true
-            };
+            var vm = importWizardFactory.Invoke();
+            vm.AuthorizationViewModel = this;
 
-            windowView.DataContext = this.importWizardWindow;
-            windowView.ShowDialog();
+            windowManager.ShowDialog(vm);
         }
 
         public void Merge(SecurityDescriptorTargetsViewModel newTargets, bool merge, bool overwriteExisting)

@@ -24,7 +24,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly SecurityDescriptorTargetViewModelComparer customComparer;
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IDirectory directory;
-        private readonly SecurityDescriptorTargetViewModelFactory factory;
+        private readonly ISecurityDescriptorTargetViewModelFactory factory;
         private readonly ILogger<SecurityDescriptorTargetsViewModel> logger;
         private readonly IEffectiveAccessViewModelFactory effectiveAccessFactory;
         private readonly INotifyModelChangedEventPublisher eventPublisher;
@@ -34,7 +34,9 @@ namespace Lithnet.AccessManager.Server.UI
         private GridViewColumnHeader lastHeaderClicked;
         private HashSet<string> matchedComputerViewModels;
 
-        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, SecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IComputerTargetProvider computerTargetProvider, IEffectiveAccessViewModelFactory effectiveAccessFactory)
+        public Task Initialization { get; private set; }
+        
+        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, ISecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IComputerTargetProvider computerTargetProvider, IEffectiveAccessViewModelFactory effectiveAccessFactory)
         {
             this.factory = factory;
             this.Model = model;
@@ -47,7 +49,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.ChildDisplaySettings = new SecurityDescriptorTargetViewModelDisplaySettings();
             this.eventPublisher = eventPublisher;
 
-            _ = this.Initialize();
+            this.Initialization = this.Initialize();
         }
 
         public bool CanDelete => this.SelectedItem != null;
@@ -73,7 +75,7 @@ namespace Lithnet.AccessManager.Server.UI
         [NotifyModelChangedCollection]
         public BindableCollection<SecurityDescriptorTargetViewModel> ViewModels { get; private set; }
 
-        public void Add()
+        public async Task Add()
         {
             ExternalDialogWindow w = new ExternalDialogWindow
             {
@@ -83,7 +85,7 @@ namespace Lithnet.AccessManager.Server.UI
             };
 
             var m = new SecurityDescriptorTarget();
-            var vm = this.factory.CreateViewModel(m, this.ChildDisplaySettings);
+            var vm = await this.factory.CreateViewModelAsync(m, this.ChildDisplaySettings);
             w.DataContext = vm;
 
             if (w.ShowDialog() == true)
@@ -233,7 +235,7 @@ namespace Lithnet.AccessManager.Server.UI
                 };
 
                 var m = JsonConvert.DeserializeObject<SecurityDescriptorTarget>(JsonConvert.SerializeObject(selectedItem.Model));
-                var vm = this.factory.CreateViewModel(m, this.ChildDisplaySettings);
+                var vm = await this.factory.CreateViewModelAsync(m, this.ChildDisplaySettings);
 
                 w.DataContext = vm;
 
@@ -266,22 +268,24 @@ namespace Lithnet.AccessManager.Server.UI
 
         private async Task Initialize()
         {
-            await Task.Run(() =>
+            await Task.Run(async () =>
              {
                  this.IsLoading = true;
                  this.ViewModels = new BindableCollection<SecurityDescriptorTargetViewModel>();
                  
-                 var items = this.Model.Select(t => factory.CreateViewModel(t, this.ChildDisplaySettings)).ToList();
-
+                 var items = (await Task.WhenAll(this.Model.Select(t => factory.CreateViewModelAsync(t, this.ChildDisplaySettings)))).ToList();
+                 
                  // Force the evaluation of these values on another thread to prevent the UI locking up when these are loaded into the view
-                 Parallel.ForEach(items, item =>
+                 Parallel.ForEach(items, async item =>
                  {
                      var x = item.DisplayName;
                      var y = item.Type;
                      var z = item.Description;
                      var a = item.JitGroupDisplayName;
-                 });
 
+                     await item.Initialization;
+                 });
+                 
                  this.ViewModels.AddRange(items);
 
                  Execute.OnUIThreadSync(() =>

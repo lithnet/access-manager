@@ -29,9 +29,10 @@
                     <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="175"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
@@ -47,6 +48,41 @@
                         Content="..."
                         Width="30"
                         Margin="2"/>
+
+                <CheckBox Grid.Row="1" Grid.Column="1"
+                          IsChecked="{Binding ImportNotifications ,ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
+                          Content="Import email notification rules"
+                          Margin="5"/>
+
+                <Label Grid.Row="2" Grid.Column="0"
+                       Content="Success email template"
+                       Visibility="{Binding ImportNotifications, Converter={StaticResource BooleanToVisibilityConverter}}"
+                       Margin="5"/>
+                <TextBox Grid.Row="2" Grid.Column="1" 
+                         Text="{Binding TemplateSuccess, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
+                       Visibility="{Binding ImportNotifications, Converter={StaticResource BooleanToVisibilityConverter}}"
+                         Margin="5"/>
+                <Button Grid.Row="2" Grid.Column="2" 
+                        Command="{s:Action ShowTemplateSuccessDialog}" 
+                        Width="30"
+                        Content="..."
+                       Visibility="{Binding ImportNotifications, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Margin="5"/>
+
+                <Label Grid.Row="3" Grid.Column="0"
+                       Content="Failure email template"
+                       Visibility="{Binding ImportNotifications, Converter={StaticResource BooleanToVisibilityConverter}}"
+                       Margin="5"/>
+                <TextBox Grid.Row="3" Grid.Column="1" 
+                         Text="{Binding TemplateFailure, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
+                       Visibility="{Binding ImportNotifications, Converter={StaticResource BooleanToVisibilityConverter}}"
+                         Margin="5"/>
+                <Button Grid.Row="3" Grid.Column="2" 
+                        Command="{s:Action ShowTemplateFailureDialog}" 
+                        Width="30"
+                        Content="..."
+                       Visibility="{Binding ImportNotifications, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Margin="5"/>
             </Grid>
         </StackPanel>
     </AdornerDecorator>

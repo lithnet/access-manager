@@ -15,6 +15,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
 
@@ -27,11 +28,21 @@
             <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Computer authorization rules" />
         </DockPanel>
 
-        <ContentControl Grid.Row="1"
-            s:View.Model="{Binding Targets}" 
-                                    IsTabStop="False"/>
+        <StackPanel Grid.Row="1" 
+                    Visibility="{Binding IsLoading, Converter={StaticResource  BooleanToVisibilityConverter}}"
+                    Orientation="Horizontal"
+                    Margin="5">
+            <mah:ProgressRing Height="15" Width="15"/>
+            <TextBlock Margin="5 0 0 0"
+                       Text="Loading rules.."/>
 
-        <Button Grid.Row="2"
+        </StackPanel>
+        <ContentControl Grid.Row="2"
+                        s:View.Model="{Binding Targets}" 
+                        Visibility="{Binding HasLoaded, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        IsTabStop="False"/>
+
+        <Button Grid.Row="3"
                 Content="Import authorization rules..."
                 HorizontalAlignment="Left"
                 Command="{s:Action Import}" 

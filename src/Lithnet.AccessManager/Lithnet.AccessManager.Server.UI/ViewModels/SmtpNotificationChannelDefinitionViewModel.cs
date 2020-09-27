@@ -10,7 +10,7 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly IAppPathProvider appPathProvider;
 
-        public SmtpNotificationChannelDefinitionViewModel(SmtpNotificationChannelDefinition model, IModelValidator<SmtpNotificationChannelDefinitionViewModel> validator, INotificationSubscriptionProvider subscriptionProvider, IAppPathProvider appPathProvider)
+        public SmtpNotificationChannelDefinitionViewModel(SmtpNotificationChannelDefinition model, IModelValidator<SmtpNotificationChannelDefinitionViewModel> validator, IAppPathProvider appPathProvider)
             : base(model)
         {
             this.appPathProvider = appPathProvider;

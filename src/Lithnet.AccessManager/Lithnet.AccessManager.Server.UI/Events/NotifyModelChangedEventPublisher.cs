@@ -10,6 +10,8 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly IEventAggregator eventAggregator;
 
+        private bool paused;
+
         public NotifyModelChangedEventPublisher(IEventAggregator eventAggregator)
         {
             this.eventAggregator = eventAggregator;
@@ -41,13 +43,33 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
+        public void Pause()
+        {
+            this.paused = true;
+        }
+
+        public void Unpause()
+        {
+            this.paused = false;
+        }
+
         private void V_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e, bool restartService)
         {
+            if (paused)
+            {
+                return;
+            }
+
             this.eventAggregator.Publish(new ModelChangedEvent(sender, "Collection", restartService));
         }
 
         private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (paused)
+            {
+                return;
+            }
+
             Type t = sender.GetType();
             PropertyInfo pi = t.GetProperty(e.PropertyName);
 

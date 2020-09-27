@@ -10,8 +10,7 @@ namespace Lithnet.AccessManager.Server.UI
         public SmtpNotificationChannelDefinitionsViewModel(IList<SmtpNotificationChannelDefinition> model, SmtpNotificationChannelDefinitionViewModelFactory factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator, INotifyModelChangedEventPublisher eventPublisher) :
             base(model, factory, dialogCoordinator, eventAggregator, eventPublisher)
         {
+            this.DisplayName = "SMTP";
         }
-
-        public override string DisplayName { get; set; } = "SMTP";
     }
 }

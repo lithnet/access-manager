@@ -106,7 +106,7 @@
 
                     <Button Grid.Row="1" Grid.Column="1" 
                             Command="{s:Action ImportJitAdminsFromComputer}" 
-                            Content="Import JIT permissions from computer..."
+                            Content="Import admins from computer..."
                             HorizontalAlignment="Left"
                             Margin="2"/>
 

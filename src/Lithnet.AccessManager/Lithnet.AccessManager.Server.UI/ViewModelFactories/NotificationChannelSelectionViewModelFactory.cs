@@ -1,4 +1,5 @@
-﻿using Lithnet.AccessManager.Server.Configuration;
+﻿using System;
+using Lithnet.AccessManager.Server.Configuration;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -6,10 +7,10 @@ namespace Lithnet.AccessManager.Server.UI
     public class NotificationChannelSelectionViewModelFactory : INotificationChannelSelectionViewModelFactory
     {
         private readonly INotificationSubscriptionProvider subscriptionProvider;
-        private readonly IEventAggregator eventAggregator;
-        private readonly INotifyModelChangedEventPublisher eventPublisher;
+        private readonly Func<IEventAggregator> eventAggregator;
+        private readonly Func<INotifyModelChangedEventPublisher> eventPublisher;
 
-        public NotificationChannelSelectionViewModelFactory(INotificationSubscriptionProvider subscriptionProvider, IEventAggregator eventAggregator, INotifyModelChangedEventPublisher eventPublisher)
+        public NotificationChannelSelectionViewModelFactory(INotificationSubscriptionProvider subscriptionProvider, Func<IEventAggregator> eventAggregator, Func<INotifyModelChangedEventPublisher> eventPublisher)
         {
             this.subscriptionProvider = subscriptionProvider;
             this.eventAggregator = eventAggregator;
@@ -18,7 +19,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public NotificationChannelSelectionViewModel CreateViewModel(AuditNotificationChannels notificationChannels)
         {
-            return new NotificationChannelSelectionViewModel(notificationChannels, this.subscriptionProvider, this.eventAggregator, this.eventPublisher);
+            return new NotificationChannelSelectionViewModel(notificationChannels, this.subscriptionProvider, this.eventAggregator.Invoke(), this.eventPublisher.Invoke());
         }
     }
 }

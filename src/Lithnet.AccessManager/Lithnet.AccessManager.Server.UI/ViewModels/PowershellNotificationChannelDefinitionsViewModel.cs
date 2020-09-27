@@ -10,8 +10,7 @@ namespace Lithnet.AccessManager.Server.UI
         public PowershellNotificationChannelDefinitionsViewModel(IList<PowershellNotificationChannelDefinition> model, PowershellNotificationChannelDefinitionViewModelFactory factory, IDialogCoordinator dialogCoordinator,  IEventAggregator eventAggregator, INotifyModelChangedEventPublisher eventPublisher) :
             base (model, factory, dialogCoordinator, eventAggregator, eventPublisher)
         {
+            this.DisplayName = "PowerShell";
         }
-
-        public override string DisplayName { get; set; } = "PowerShell";
     }
 }

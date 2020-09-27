@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
+using System.Windows.Controls;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.SimpleChildWindow;
 using Newtonsoft.Json;
-using PropertyChanged;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public abstract class NotificationChannelDefinitionsViewModel<TModel, TViewModel> : PropertyChangedBase, IHaveDisplayName, IViewAware where TViewModel : NotificationChannelDefinitionViewModel<TModel> where TModel : NotificationChannelDefinition
+    public abstract class NotificationChannelDefinitionsViewModel<TModel, TViewModel> : Screen, IHandle<NotificationSubscriptionReloadEvent> where TViewModel : NotificationChannelDefinitionViewModel<TModel> where TModel : NotificationChannelDefinition
     {
+        private readonly INotifyModelChangedEventPublisher eventPublisher;
+
         protected IList<TModel> Model { get; }
 
         protected IDialogCoordinator DialogCoordinator { get; }
@@ -32,7 +33,9 @@ namespace Lithnet.AccessManager.Server.UI
             this.EventAggregator = eventAggregator;
             this.DialogCoordinator = dialogCoordinator;
             this.ViewModels = new BindableCollection<TViewModel>(this.Model.Select(t => this.factory.CreateViewModel(t)));
-            eventPublisher.Register(this);
+            this.eventPublisher = eventPublisher; 
+            this.eventPublisher.Register(this);
+            this.EventAggregator.Subscribe(this);
         }
 
         public TViewModel SelectedItem { get; set; }
@@ -57,9 +60,23 @@ namespace Lithnet.AccessManager.Server.UI
                 this.EventAggregator.Publish(new NotificationSubscriptionChangedEvent { ModificationType = ModificationType.Added, ModifiedObject = m });
             }
         }
+
+        public void AddModel(TModel m)
+        {
+            this.Model.Add(m);
+            this.ViewModels.Add(this.factory.CreateViewModel(m));
+            this.EventAggregator.Publish(new NotificationSubscriptionChangedEvent { ModificationType = ModificationType.Added, ModifiedObject = m });
+        }
+
         public async Task Edit()
         {
             var item = this.SelectedItem;
+
+            if (item == null)
+            {
+                return;
+            }
+
             var model = item.Model;
 
             DialogWindow w = new DialogWindow();
@@ -91,12 +108,12 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task Delete()
         {
-            if (this.SelectedItem == null)
+            var deleting = this.SelectedItem;
+
+            if (deleting == null)
             {
                 return;
             }
-
-            var deleting = this.SelectedItem;
 
             MetroDialogSettings s = new MetroDialogSettings
             {
@@ -115,14 +132,12 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool CanDelete => this.SelectedItem != null;
 
-        public void AttachView(UIElement view)
+        public void Handle(NotificationSubscriptionReloadEvent message)
         {
-            this.View = view;
+            this.eventPublisher.Pause();
+            this.ViewModels.Clear();
+            this.ViewModels.AddRange(this.Model.Select(t => this.factory.CreateViewModel(t)));
+            this.eventPublisher.Unpause();
         }
-
-        [SuppressPropertyChangedWarnings]
-        public abstract string DisplayName { get; set; }
-
-        public UIElement View { get; set; }
     }
 }

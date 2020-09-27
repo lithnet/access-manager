@@ -13,8 +13,8 @@ namespace Lithnet.AccessManager.Server.Test
         public void SerializeAuditNotificationChannels()
         {
             AuditNotificationChannels channels = new AuditNotificationChannels();
-            channels.OnFailure = new List<string>() { "1" };
-            channels.OnSuccess = new List<string>() { "2" };
+            channels.OnFailure = new HashSet<string>() { "1" };
+            channels.OnSuccess = new HashSet<string>() { "2" };
 
             AuditNotificationChannels newChannels = JsonConvert.DeserializeObject<AuditNotificationChannels>(JsonConvert.SerializeObject(channels));
 

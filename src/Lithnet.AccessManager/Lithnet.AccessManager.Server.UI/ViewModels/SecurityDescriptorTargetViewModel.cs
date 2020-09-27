@@ -30,6 +30,8 @@ namespace Lithnet.AccessManager.Server.UI
 
         private string jitGroupDisplayName;
 
+        public Task Initialization { get; }
+
         public SecurityDescriptorTarget Model { get; }
 
         public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider)
@@ -52,7 +54,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.Script.NewFileContent = ScriptTemplates.AuthorizationScriptTemplate;
             this.Script.ShouldValidate = false;
             this.Script.PropertyChanged += Script_PropertyChanged;
-            _ = this.Initialize();
+            this.Initialization = this.Initialize();
         }
 
 
@@ -134,7 +136,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string JitGroupDisplayName
         {
-            get => jitGroupDisplayName; //this.GetNameFromSidOrDefault(this.JitAuthorizingGroup);
+            get => jitGroupDisplayName;
             set
             {
                 if (value.Contains("{computerName}", StringComparison.OrdinalIgnoreCase) ||
@@ -321,6 +323,7 @@ namespace Lithnet.AccessManager.Server.UI
                 if (this.objectSelectionProvider.GetGroup(this, this.GetDcForTargetOrDefault(), out SecurityIdentifier sid))
                 {
                     this.JitAuthorizingGroup = sid.ToString();
+                    await this.UpdateJitGroupDisplayName();
                 }
             }
             catch (Exception ex)

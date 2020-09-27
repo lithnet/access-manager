@@ -18,6 +18,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly INotificationChannelSelectionViewModelFactory notificationChannelFactory;
         private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly AuditNotificationChannels channels = new AuditNotificationChannels();
+        public Task Initialization { get; private set; }
 
         public ImportWizardRuleSettingsViewModel(INotificationChannelSelectionViewModelFactory notificationChannelFactory, ILogger<ImportWizardRuleSettingsViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardRuleSettingsViewModel> validator, IDirectory directory, IObjectSelectionProvider objectSelectionProvider)
         {
@@ -27,7 +28,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.notificationChannelFactory = notificationChannelFactory;
             this.Validator = validator;
             this.objectSelectionProvider = objectSelectionProvider;
-            _ = this.Initialize();
+            this.Initialization = this.Initialize();
         }
 
         public async Task Initialize()

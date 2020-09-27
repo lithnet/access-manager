@@ -272,7 +272,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 
                             if (this.ShouldFilter(principal, out DiscoveryError filterReason))
                             {
-                                filterReason.Computer = computerName;
+                                filterReason.Target = computerName;
                                 ce.DiscoveryErrors.Add(filterReason);
                                 this.logger.LogTrace("Filtering principal {principal} with reason: {reason}", principal.ToString(), filterReason);
                             }
@@ -292,7 +292,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
                         ce.HasError = true;
                         ce.Exception = ex;
                         ce.IsMissing = ex is ObjectNotFoundException;
-                        ce.DiscoveryErrors.Add(new DiscoveryError() { Computer = computerName, Message = ex.Message, Type = DiscoveryErrorType.Error });
+                        ce.DiscoveryErrors.Add(new DiscoveryError() { Target = computerName, Message = ex.Message, Type = DiscoveryErrorType.Error });
                     }
 
                     if (ce.DiscoveryErrors.Count > 0)

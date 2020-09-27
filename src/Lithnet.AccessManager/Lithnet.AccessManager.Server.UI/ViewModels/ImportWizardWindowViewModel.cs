@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.AuthorizationRuleImport;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
@@ -22,13 +23,19 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ImportWizardRuleSettingsViewModel ruleVm;
         private readonly ImportWizardLapsWebSettingsViewModel lapsWebVm;
         private readonly ImportWizardImportReadyViewModel importReadyVm;
-        private readonly SecurityDescriptorTargetsViewModelFactory targetFactory;
         private readonly IImportProviderFactory importProviderFactory;
+        private readonly SmtpNotificationChannelDefinitionsViewModel smtpDefinitions;
+        private readonly PowershellNotificationChannelDefinitionsViewModel powerShellDefinitions;
+        private readonly WebhookNotificationChannelDefinitionsViewModel webHookDefinitions;
+        private readonly IImportResultsViewModelFactory resultsFactory;
+        private readonly AuditOptions auditOptions;
+        private readonly IEventAggregator eventAggregator;
 
         private ProgressDialogController progress;
         private int progressCurrent;
         private int progressMaximum;
         private CancellationTokenSource progressCts;
+        private bool isSaved;
 
         public bool NextButtonIsDefault { get; set; } = true;
 
@@ -48,14 +55,19 @@ namespace Lithnet.AccessManager.Server.UI
 
         public AuthorizationViewModel AuthorizationViewModel { get; set; }
 
-        public ImportWizardWindowViewModel(IDialogCoordinator dialogCoordinator, ILogger<ImportWizardWindowViewModel> logger, ImportWizardImportTypeViewModel importTypeVm, ImportWizardCsvSettingsViewModel csvSettingsVm, ImportWizardImportContainerViewModel containerVm, ImportWizardRuleSettingsViewModel ruleVm, ImportWizardLapsWebSettingsViewModel lapsWebVm, ImportWizardImportReadyViewModel importReadyVm, SecurityDescriptorTargetsViewModelFactory targetFactory, IImportProviderFactory importProviderFactory)
+        public ImportWizardWindowViewModel(IDialogCoordinator dialogCoordinator, ILogger<ImportWizardWindowViewModel> logger, ImportWizardImportTypeViewModel importTypeVm, ImportWizardCsvSettingsViewModel csvSettingsVm, ImportWizardImportContainerViewModel containerVm, ImportWizardRuleSettingsViewModel ruleVm, ImportWizardLapsWebSettingsViewModel lapsWebVm, ImportWizardImportReadyViewModel importReadyVm, IImportProviderFactory importProviderFactory, SmtpNotificationChannelDefinitionsViewModel smtpDefinitions, PowershellNotificationChannelDefinitionsViewModel powerShellDefinitions, WebhookNotificationChannelDefinitionsViewModel webHookDefinitions, IImportResultsViewModelFactory resultsFactory, AuditOptions auditOptions, IEventAggregator eventAggregator)
         {
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
             this.DisplayName = Constants.AppName;
             this.dialogCoordinator = dialogCoordinator;
-            this.targetFactory = targetFactory;
             this.importProviderFactory = importProviderFactory;
+            this.smtpDefinitions = smtpDefinitions;
+            this.powerShellDefinitions = powerShellDefinitions;
+            this.webHookDefinitions = webHookDefinitions;
+            this.resultsFactory = resultsFactory;
+            this.auditOptions = auditOptions;
+            this.eventAggregator = eventAggregator;
 
             // VM mappings
             this.importTypeVm = importTypeVm;
@@ -70,7 +82,15 @@ namespace Lithnet.AccessManager.Server.UI
 
             // Initial binds
             this.Items.Add(importTypeVm);
+            this.BuildPages(ImportMode.Laps);
             this.ActiveItem = this.Items.First();
+        }
+
+        protected override void OnActivate()
+        {
+            base.OnActivate();
+
+
         }
 
         [SuppressPropertyChangedWarnings]
@@ -92,7 +112,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.UpdateNavigationCapabilities();
         }
-        
+
         public override void DeactivateItem(PropertyChangedBase item)
         {
             base.DeactivateItem(item);
@@ -109,7 +129,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.UpdateNavigationCapabilities();
         }
-        
+
         private void E_ErrorsChanged(object sender, DataErrorsChangedEventArgs e)
         {
             this.UpdateNavigationCapabilities();
@@ -170,12 +190,24 @@ namespace Lithnet.AccessManager.Server.UI
             this.UpdateNavigationCapabilities();
         }
 
-        public async Task Cancel()
+        public void Cancel()
         {
-            if (await this.dialogCoordinator.ShowMessageAsync(this, "Cancel", "Are you sure you want to cancel the import process?", MessageDialogStyle.AffirmativeAndNegative) == MessageDialogResult.Affirmative)
+            this.RequestClose();
+        }
+
+        public override async Task<bool> CanCloseAsync()
+        {
+            if (this.ActiveItem is ImportWizardImportTypeViewModel)
             {
-                this.RequestClose(false);
+                return true;
             }
+
+            if (isSaved)
+            {
+                return true;
+            }
+
+            return await this.dialogCoordinator.ShowMessageAsync(this, "Cancel", "Are you sure you want to cancel the import process?", MessageDialogStyle.AffirmativeAndNegative) == MessageDialogResult.Affirmative;
         }
 
         public async Task Save()
@@ -187,7 +219,14 @@ namespace Lithnet.AccessManager.Server.UI
                     return;
                 }
 
+                this.auditOptions.NotificationChannels.Merge(irvm.NotificationChannels);
                 this.AuthorizationViewModel.Merge(irvm.Targets, irvm.Merge, irvm.MergeOverwrite);
+
+                this.eventAggregator.Publish(new NotificationSubscriptionReloadEvent());
+
+                this.isSaved = true;
+
+                this.RequestClose();
             }
             catch (Exception ex)
             {
@@ -209,24 +248,25 @@ namespace Lithnet.AccessManager.Server.UI
                 ImportSettings settings = this.GetImportSettings();
                 settings.CancellationToken = this.progressCts.Token;
                 IImportProvider provider = this.importProviderFactory.CreateImportProvider(settings);
-                provider.OnItemProcessStart += ImportProvider_OnStartProcessingComputer;
 
                 await Task.Run(() =>
                 {
                     this.progressMaximum = provider.GetEstimatedItemCount();
                     this.progress.Maximum = this.progressMaximum;
-                });
 
+                    if (this.progressMaximum > 0)
+                    {
+                        provider.OnItemProcessStart += ImportProvider_OnStartProcessingComputer;
+                    }
+                });
 
                 var results = await Task.Run(() => provider.Import());
 
                 this.progress.SetIndeterminate();
                 this.progress.SetMessage("Building authorization rules...");
 
-                ImportResultsViewModel irvm = new ImportResultsViewModel();
-                irvm.Targets = targetFactory.CreateViewModel(results.Targets);
-                irvm.DiscoveryErrors = results.DiscoveryErrors;
-                irvm.Targets.ChildDisplaySettings.IsScriptVisible = false;
+                ImportResultsViewModel irvm = await resultsFactory.CreateViewModelAsync(results);
+
 
                 await this.progress.CloseAsync();
 
@@ -273,15 +313,22 @@ namespace Lithnet.AccessManager.Server.UI
                     importSettings = new ImportSettingsBitLocker();
                     break;
 
+                case ImportMode.Laps:
+                    importSettings = new ImportSettingsLaps();
+                    break;
+
                 case ImportMode.LapsWeb:
                     importSettings = new ImportSettingsLapsWeb
                     {
-                        ImportFile = this.lapsWebVm.ImportFile
+                        ImportFile = this.lapsWebVm.ImportFile,
+                        ImportNotifications = this.lapsWebVm.ImportNotifications,
+                        FailureTemplate = this.lapsWebVm.TemplateFailure,
+                        SuccessTemplate = this.lapsWebVm.TemplateSuccess
                     };
                     break;
 
                 default:
-                    throw new InvalidOperationException();
+                    throw new InvalidOperationException("Unsupported import type");
             }
 
             if (importSettings is ImportSettingsComputerDiscovery cd)
