@@ -11,14 +11,11 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
         public bool DoNotConsolidateOnError { get; set; }
 
         public bool FilterLocalAccounts { get; set; } = true;
-        public bool FilterUnresolvablePrincipals { get; set; } = true;
 
-        public List<Regex> PrincipalFilters { get; } = new List<Regex>();
-
-        public List<Regex> ComputerFilters { get; } = new List<Regex>();
-
-        public HashSet<SecurityIdentifier> PrincipalSidFilter { get; } = new HashSet<SecurityIdentifier>();
+        public bool FilterNonAccountSids { get; set; } = true;
 
         public string ImportOU { get; set; }
+
+        public HashSet<SecurityIdentifier> ComputerFilter { get; } = new HashSet<SecurityIdentifier>();
     }
 }

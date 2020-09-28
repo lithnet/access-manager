@@ -249,10 +249,11 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
                 {
                     this.OnItemProcessStart?.Invoke(this, new ImportProcessingEventArgs(computerName));
 
-                    //if (settings.ComputerFilters.Any(t => t.IsMatch(computerName)))
-                    //{
-                    //    continue;
-                    //}
+                    if (settings.ComputerFilter.Contains(computer.GetPropertySid("objectSid")))
+                    {
+                        this.logger.LogTrace("Filtering computer {computer}", computerName);
+                        continue;
+                    }
 
                     this.logger.LogTrace("Found computer {computer} in ou {ou}", computerName, ou.OUName);
 
@@ -272,9 +273,12 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 
                             if (this.ShouldFilter(principal, out DiscoveryError filterReason))
                             {
-                                filterReason.Target = computerName;
-                                ce.DiscoveryErrors.Add(filterReason);
-                                this.logger.LogTrace("Filtering principal {principal} with reason: {reason}", principal.ToString(), filterReason);
+                                if (filterReason != null)
+                                {
+                                    filterReason.Target = computerName;
+                                    ce.DiscoveryErrors.Add(filterReason);
+                                    this.logger.LogTrace("Filtering principal {principal} with reason: {reason}", principal.ToString(), filterReason);
+                                }
                             }
                             else
                             {
@@ -323,8 +327,18 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
         {
             if (!sid.IsAccountSid())
             {
-                filteredReason = new DiscoveryError() { Message = "The principal is not an account SID", Principal = sid.ToString(), Type = DiscoveryErrorType.Warning };
-                return true;
+                filteredReason = null;
+
+                if (settings.FilterNonAccountSids)
+                {
+                    logger.LogInformation("Silently filtering non-account SID {sid}", sid);
+                    //filteredReason = new DiscoveryError() { Message = "The principal is not an account SID", Principal = sid.ToString(), Type = DiscoveryErrorType.Warning };
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
 
             ISecurityPrincipal principal = principalCache.GetOrAdd(sid, (value) =>
@@ -339,7 +353,6 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
                 }
             });
 
-
             if (settings.PrincipalFilter.Contains(sid))
             {
                 filteredReason = new DiscoveryError() { Message = "The principal matched the import filter", Principal = principal?.MsDsPrincipalName ?? sid.ToString(), Type = DiscoveryErrorType.Informational };
@@ -352,19 +365,11 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
                 return true;
             }
 
-
-
             if (!(principal is IUser || principal is IGroup))
             {
                 filteredReason = new DiscoveryError() { Message = "The principal was not a user or group", Principal = principal.MsDsPrincipalName, Type = DiscoveryErrorType.Error };
                 return true;
             }
-
-            //if (settings.PrincipalFilters.Any(t => t.IsMatch(sid.ToString()) || (principal.MsDsPrincipalName != null && t.IsMatch(principal.MsDsPrincipalName))))
-            //{
-            //    filteredReason = new DiscoveryError() { Message = "The principal matched the import regex filter", Principal = principal.MsDsPrincipalName, Type = DiscoveryErrorType.Informational };
-            //    return true;
-            //}
 
             filteredReason = null;
             return false;

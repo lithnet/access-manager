@@ -127,12 +127,12 @@ namespace Lithnet.AccessManager.Server.UI.Interop
             }
         }
 
-        public static IEnumerable<DsopResult> ShowObjectPickerDialog(IntPtr hwnd, string targetComputer, DsopScopeInitInfo scope, params string[] attributesToGet)
+        public static IEnumerable<DsopResult> ShowObjectPickerDialog(IntPtr hwnd, string targetComputer, DsopDialogInitializationOptions options, DsopScopeInitInfo scope, params string[] attributesToGet)
         {
-            return ShowObjectPickerDialog(hwnd, targetComputer, new List<DsopScopeInitInfo> { scope }, attributesToGet);
+            return ShowObjectPickerDialog(hwnd, targetComputer, options, new List<DsopScopeInitInfo> { scope }, attributesToGet);
         }
 
-        public static IEnumerable<DsopResult> ShowObjectPickerDialog(IntPtr hwnd, string targetComputer, IList<DsopScopeInitInfo> scopes, params string[] attributesToGet)
+        public static IEnumerable<DsopResult> ShowObjectPickerDialog(IntPtr hwnd, string targetComputer, DsopDialogInitializationOptions options, IList<DsopScopeInitInfo> scopes, params string[] attributesToGet)
         {
             IDsObjectPicker idsObjectPicker = (IDsObjectPicker)new DSObjectPicker();
 
@@ -140,7 +140,7 @@ namespace Lithnet.AccessManager.Server.UI.Interop
             {
                 using LpStructArrayMarshaller<DsopScopeInitInfo> scopeInitInfoArray = CreateScopes(scopes);
                 using LpStringArrayConverter attributes = new LpStringArrayConverter(attributesToGet);
-                DsopDialogInitializationInfo initInfo = CreateInitInfo(scopeInitInfoArray.Ptr, targetComputer, scopeInitInfoArray.Count, attributes.Ptr, attributes.Count);
+                DsopDialogInitializationInfo initInfo = CreateInitInfo(scopeInitInfoArray.Ptr, targetComputer, scopeInitInfoArray.Count, options, attributes.Ptr, attributes.Count);
 
                 int hresult = idsObjectPicker.Initialize(ref initInfo);
 
@@ -279,7 +279,7 @@ namespace Lithnet.AccessManager.Server.UI.Interop
             return pSD;
         }
 
-        private static DsopDialogInitializationInfo CreateInitInfo(IntPtr pScopeInitInfo, string targetComputer, int scopeCount, IntPtr attrributesToGet, int attributesToGetCount)
+        private static DsopDialogInitializationInfo CreateInitInfo(IntPtr pScopeInitInfo, string targetComputer, int scopeCount, DsopDialogInitializationOptions options, IntPtr attrributesToGet, int attributesToGetCount)
         {
             var initInfo = new DsopDialogInitializationInfo
             {
@@ -287,7 +287,7 @@ namespace Lithnet.AccessManager.Server.UI.Interop
                 TargetComputer = targetComputer,
                 ScopeInfoCount = scopeCount,
                 ScopeInfo = pScopeInitInfo,
-                Options = 0
+                Options = options
             };
 
             initInfo.AttributesToFetchCount = attributesToGetCount;

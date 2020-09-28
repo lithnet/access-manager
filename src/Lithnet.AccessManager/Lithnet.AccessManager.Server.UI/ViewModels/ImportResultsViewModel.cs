@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
+using System.Windows.Data;
 using CsvHelper;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.AuthorizationRuleImport;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
+using PropertyChanged;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -23,6 +23,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IEventAggregator eventAggregator;
         private readonly ILogger<ImportResultsViewModel> logger;
         private readonly IDialogCoordinator dialogCoordinator;
+        private ListCollectionView errorItems;
 
         public Task Initialization { get; private set; }
 
@@ -40,18 +41,61 @@ namespace Lithnet.AccessManager.Server.UI
         {
             this.Targets = await targetsFactory.CreateViewModelAsync(results.Targets);
             this.Targets.ChildDisplaySettings.IsScriptVisible = false;
+            this.Targets.ViewModels.CollectionChanged += ViewModels_CollectionChanged;
+
+            this.errorItems = (ListCollectionView)CollectionViewSource.GetDefaultView(this.DiscoveryErrors);
+            this.errorItems.Filter = x =>
+            {
+                DiscoveryError e = (DiscoveryError)x;
+                if (e.IsError && this.ShowErrors)
+                {
+                    return true;
+                }
+
+                if (e.IsInformational && this.ShowInformational)
+                {
+                    return true;
+                }
+
+                if (e.IsWarning && this.ShowWarnings)
+                {
+                    return true;
+                }
+
+                return false;
+            };
+
             this.PublishNotificationChannels();
+        }
+
+        private void ViewModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            this.NotifyOfPropertyChange(nameof(TargetCount));
         }
 
         public NotificationChannels NotificationChannels => this.results.NotificationChannels;
 
         public SecurityDescriptorTargetsViewModel Targets { get; private set; }
 
-        public bool Merge { get; set; }
+        public bool Merge { get; set; } = true;
 
         public bool MergeOverwrite { get; set; }
 
         public bool HasDiscoveryErrors => DiscoveryErrors.Count > 0;
+
+        [OnChangedMethod(nameof(RefreshFilter))]
+        public bool ShowErrors { get; set; } = true;
+
+        [OnChangedMethod(nameof(RefreshFilter))]
+        public bool ShowWarnings { get; set; } = true;
+
+        [OnChangedMethod(nameof(RefreshFilter))]
+        public bool ShowInformational { get; set; } = true;
+
+        private void RefreshFilter()
+        {
+            this.errorItems.Refresh();
+        }
 
         public List<DiscoveryError> DiscoveryErrors => this.results.DiscoveryErrors;
 

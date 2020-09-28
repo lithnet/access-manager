@@ -10,8 +10,7 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              Dialog:DialogParticipation.Register="{Binding}"
               d:DesignWidth="800"
-             mc:Ignorable="d" 
-             Margin="5" >
+             mc:Ignorable="d">
 
     <AdornerDecorator>
         <StackPanel>
@@ -19,7 +18,7 @@
             <Label Style="{DynamicResource DescriptionHeaderStyle}" 
                    Content="Select CSV file"
                    Margin="0 5 0 0"/>
-            <Separator Margin="5 0 0 10" Height="1"
+            <Separator Margin="5 0 5 0" Height="1"
                        Width="Auto"
                        HorizontalAlignment="Stretch"
                        VerticalAlignment="Top"                   

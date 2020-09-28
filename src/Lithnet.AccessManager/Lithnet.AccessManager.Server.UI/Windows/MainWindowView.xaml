@@ -130,7 +130,7 @@
                         </StackPanel>
                         <ScrollViewer DockPanel.Dock="Bottom">
                             <ContentControl s:View.Model="{Binding}"  
-                                            Margin="10 0 10 0"
+                                            Margin="10 0 10 10"
                                             IsTabStop="False"/>
                         </ScrollViewer>
                     </DockPanel>

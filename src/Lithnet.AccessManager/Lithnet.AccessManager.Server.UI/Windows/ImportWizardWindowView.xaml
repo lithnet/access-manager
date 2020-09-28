@@ -8,7 +8,8 @@
                       d:DesignWidth="300"
                       BorderBrush="{DynamicResource MahApps.Brushes.AccentBase}"
                       BorderThickness="1"
-                      Padding="10"
+                      Padding="0"
+                      Margin="0"
                       WindowStartupLocation="CenterScreen"
                       ShowInTaskbar="True"
                       ShowCloseButton="True"
@@ -21,14 +22,13 @@
                       xmlns:s="https://github.com/canton7/Stylet"
                       controls:DialogParticipation.Register="{Binding}"
                       mc:Ignorable="d">
-    <AdornerDecorator>
-        <DockPanel LastChildFill="True"
-                   Margin="15">
-            <StackPanel DockPanel.Dock="Bottom"
+    <DockPanel LastChildFill="True">
+        <StackPanel DockPanel.Dock="Bottom"
                         Orientation="Horizontal" 
-                        HorizontalAlignment="Right">
+                        HorizontalAlignment="Right"
+                        Margin="15">
 
-                <Button Content="Cancel" 
+            <Button Content="Cancel" 
                         IsCancel="True"
                         Visibility="{Binding Path=CancelButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Margin="5"
@@ -37,7 +37,7 @@
                         MinWidth="75"
                         Width="Auto"/>
 
-                <Button x:Name="BackButton"
+            <Button x:Name="BackButton"
                         Content="Back" 
                         Visibility="{Binding Path=BackButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Margin="5"
@@ -46,7 +46,7 @@
                         MinWidth="75"
                         Width="Auto"/>
 
-                <Button x:Name="NextButton"
+            <Button x:Name="NextButton"
                         Content="Next" 
                         IsDefault="{Binding Path=NextButtonIsDefault, Mode=OneWay}"
                         Visibility="{Binding Path=NextButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
@@ -56,7 +56,16 @@
                         MinWidth="75"
                         Width="Auto"/>
 
-                <Button Content="Import" 
+            <Button Content="Next" 
+                        IsDefault="{Binding Path=DoDiscoveryButtonIsDefault, Mode=OneWay}"
+                        Visibility="{Binding Path=DoDiscoveryButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Margin="5"
+                        s:View.ActionTarget="{Binding}"
+                        Command="{s:Action DoDiscovery}"
+                        MinWidth="75"
+                        Width="Auto"/>
+
+            <Button Content="Import" 
                         IsDefault="{Binding Path=ImportButtonIsDefault, Mode=OneWay}"
                         Visibility="{Binding Path=ImportButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Margin="5"
@@ -64,24 +73,14 @@
                         Command="{s:Action Import}"
                         MinWidth="75"
                         Width="Auto"/>
+        </StackPanel>
 
-                <Button Content="Save" 
-                        IsDefault="{Binding Path=SaveButtonIsDefault, Mode=OneWay}"
-                        Visibility="{Binding Path=SaveButtonVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                        Margin="5"
-                        s:View.ActionTarget="{Binding}"
-                        Command="{s:Action Save}"
-                        MinWidth="75"
-                        Width="Auto"/>
-            </StackPanel>
-
-            <ScrollViewer DockPanel.Dock="Top"
+        <ScrollViewer DockPanel.Dock="Top"
                           VerticalScrollBarVisibility="Auto"
-                          Margin="5">
-                <AdornerDecorator>
-                    <ContentControl s:View.Model="{Binding ActiveItem}"/>
-                </AdornerDecorator>
-            </ScrollViewer>
-        </DockPanel>
-    </AdornerDecorator>
+                          Padding="20 15 20 15">
+            <AdornerDecorator>
+                <ContentControl s:View.Model="{Binding ActiveItem}"/>
+            </AdornerDecorator>
+        </ScrollViewer>
+    </DockPanel>
 </controls:MetroWindow>

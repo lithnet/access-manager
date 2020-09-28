@@ -10,15 +10,14 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              Dialog:DialogParticipation.Register="{Binding}"
               d:DesignWidth="800"
-             mc:Ignorable="d" 
-             Margin="5" >
+             mc:Ignorable="d">
 
     <AdornerDecorator>
         <StackPanel>
 
             <Label Style="{DynamicResource DescriptionHeaderStyle}" 
                    Content="Select Lithnet LAPS Web App web.config file"/>
-            <Separator Margin="5 0 0 10" Height="1"
+            <Separator Margin="5 0 5 5" Height="1"
                        Width="Auto"
                        HorizontalAlignment="Stretch"
                        VerticalAlignment="Top"                   
@@ -38,7 +37,7 @@
                 </Grid.ColumnDefinitions>
                 <Label Grid.Row="0" Grid.Column="0" 
                                Content="Import file"
-                               Margin="5 2 5 2"/>
+                               Margin="5"/>
                 <TextBox Grid.Row="0" Grid.Column="1" 
                          Text="{Binding ImportFile, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                          IsReadOnly="True"

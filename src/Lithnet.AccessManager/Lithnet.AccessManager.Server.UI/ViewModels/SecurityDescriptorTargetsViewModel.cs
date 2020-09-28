@@ -258,10 +258,11 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public async Task SearchTextBoxKeyUp(object sender, KeyEventArgs e)
+        public async Task SearchTextBoxKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter && this.CanApplySearchFilter)
             {
+                e.Handled = true;
                 await this.ApplySearchFilter();
             }
         }

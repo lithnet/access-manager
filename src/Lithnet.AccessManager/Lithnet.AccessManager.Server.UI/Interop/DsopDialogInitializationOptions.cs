@@ -5,6 +5,8 @@ namespace Lithnet.AccessManager.Server.UI.Interop
     [Flags]
     public enum DsopDialogInitializationOptions
     {
+        DSOP_NONE = 0x00000000,
+
         /// <summary>
         /// If this flag is set, the user can select multiple objects. If this flag is not set, the user can select only one object.
         /// </summary>

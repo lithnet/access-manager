@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
+using System.Management.Automation.Language;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.UI.AuthorizationRuleImport;
@@ -21,7 +23,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public Task Initialization { get; private set; }
 
-        public ImportWizardImportContainerViewModel(ILogger<ImportWizardImportContainerViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardImportContainerViewModel> validator, IObjectSelectionProvider objectSelectionProvider, IDiscoveryServices discoveryServices, IDirectory directory,  IServiceSettingsProvider serviceSettings)
+        public ImportWizardImportContainerViewModel(ILogger<ImportWizardImportContainerViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardImportContainerViewModel> validator, IObjectSelectionProvider objectSelectionProvider, IDiscoveryServices discoveryServices, IDirectory directory, IServiceSettingsProvider serviceSettings)
         {
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
@@ -43,7 +45,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             await this.ValidateAsync();
         }
-  
+
         public string Target { get; set; }
 
         public bool DoNotConsolidate { get; set; }
@@ -61,21 +63,27 @@ namespace Lithnet.AccessManager.Server.UI
         public SecurityIdentifierViewModel SelectedFilteredSid { get; set; }
 
         public BindableCollection<SecurityIdentifierViewModel> FilteredSids { get; } = new BindableCollection<SecurityIdentifierViewModel>();
-        
-        public async Task AddFilteredSid()
+
+        public BindableCollection<SecurityIdentifierViewModel> FilteredComputers { get; } = new BindableCollection<SecurityIdentifierViewModel>();
+
+
+        public async Task AddFilteredComputer()
         {
             try
             {
-                if (this.objectSelectionProvider.GetUserOrGroup(this, out SecurityIdentifier sid))
+                if (this.objectSelectionProvider.GetComputers(this, out List<SecurityIdentifier> sids))
                 {
-                    SecurityIdentifierViewModel sidvm = new SecurityIdentifierViewModel(sid, directory);
-
-                    if (this.FilteredSids.Any(t => string.Equals(t.Sid, sidvm.Sid, StringComparison.OrdinalIgnoreCase)))
+                    foreach (SecurityIdentifier sid in sids)
                     {
-                        return;
-                    }
+                        SecurityIdentifierViewModel sidvm = await Task.Run(() => new SecurityIdentifierViewModel(sid, directory));
 
-                    this.FilteredSids.Add(sidvm);
+                        if (this.FilteredComputers.Any(t => string.Equals(t.Sid, sidvm.Sid, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            continue;
+                        }
+
+                        this.FilteredComputers.Add(sidvm);
+                    }
                 }
             }
             catch (Exception ex)
@@ -85,18 +93,85 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public void DeleteFilteredSid()
-        {
-            SecurityIdentifierViewModel selected = this.SelectedFilteredSid;
 
-            if (selected == null)
+        public async Task DeleteFilteredComputer(System.Collections.IList items)
+        {
+            if (items == null)
             {
                 return;
             }
 
-            this.FilteredSids.Remove(selected);
+            var itemsToDelete = items.Cast<SecurityIdentifierViewModel>().ToList();
+
+            MetroDialogSettings s = new MetroDialogSettings
+            {
+                AnimateShow = false,
+                AnimateHide = false
+            };
+
+            string message = itemsToDelete.Count == 1 ? "Are you sure you want to delete this item?" : $"Are you sure you want to delete {itemsToDelete.Count} items?";
+
+            if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", message, MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
+            {
+                foreach (var deleting in itemsToDelete)
+                {
+                    this.FilteredComputers.Remove(deleting);
+                }
+            }
         }
-        
+
+        public async Task AddFilteredSid()
+        {
+            try
+            {
+                if (this.objectSelectionProvider.GetUserOrGroups(this, out List<SecurityIdentifier> sids))
+                {
+                    foreach (SecurityIdentifier sid in sids)
+                    {
+                        SecurityIdentifierViewModel sidvm = await Task.Run(() => new SecurityIdentifierViewModel(sid, directory));
+
+                        if (this.FilteredSids.Any(t => string.Equals(t.Sid, sidvm.Sid, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            continue;
+                        }
+
+                        this.FilteredSids.Add(sidvm);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Select group error");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred when processing the request\r\n{ex.Message}");
+            }
+        }
+
+        public async Task DeleteFilteredSid(System.Collections.IList items)
+        {
+            if (items == null)
+            {
+                return;
+            }
+
+            var itemsToDelete = items.Cast<SecurityIdentifierViewModel>().ToList();
+
+            MetroDialogSettings s = new MetroDialogSettings
+            {
+                AnimateShow = false,
+                AnimateHide = false
+            };
+
+            string message = itemsToDelete.Count == 1 ? "Are you sure you want to delete this item?" : $"Are you sure you want to delete {itemsToDelete.Count} items?";
+
+            if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", message, MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
+            {
+                foreach (var deleting in itemsToDelete)
+                {
+                    this.FilteredSids.Remove(deleting);
+                }
+            }
+        }
+
         public void SetImportMode(ImportMode mode)
         {
             switch (mode)

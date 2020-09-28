@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Xml;
@@ -38,9 +35,10 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
         public ImportResults Import()
         {
             ImportResults results = new ImportResults();
-            SmtpNotificationChannelDefinition globalChannel = null;
+            string globalChannelId = null;
             bool onSuccessGlobal = false;
             bool onFailureGlobal = false;
+            Dictionary<string, SmtpNotificationChannelDefinition> notificationDefinitions = null;
 
             string xml = File.ReadAllText(settings.ImportFile);
             XmlDocument doc = new XmlDocument();
@@ -54,12 +52,14 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 
             if (settings.ImportNotifications)
             {
-                globalChannel = this.GetNotificationChannelDefinition(appRootNode, out onSuccessGlobal, out onFailureGlobal);
+                notificationDefinitions = CreateNotificationChannelDefinitions(appRootNode);
 
-                if (globalChannel != null)
+                foreach (KeyValuePair<string, SmtpNotificationChannelDefinition> item in notificationDefinitions)
                 {
-                    results.NotificationChannels.Smtp.Add(globalChannel);
+                    results.NotificationChannels.Smtp.Add(item.Value);
                 }
+
+                globalChannelId = this.GetNotificationChannelDefinitionId(appRootNode, notificationDefinitions, out onSuccessGlobal, out onFailureGlobal);
             }
 
             XmlNodeList targetNodes = doc.SelectNodes("/configuration/lithnet-laps/targets/target");
@@ -87,31 +87,29 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 
                 if (settings.ImportNotifications)
                 {
-                    SmtpNotificationChannelDefinition channel = this.GetNotificationChannelDefinition(targetNode, out bool onSuccess, out bool onFailure);
+                    string channelId = this.GetNotificationChannelDefinitionId(targetNode, notificationDefinitions, out bool onSuccess, out bool onFailure);
 
-                    if (channel != null)
+                    if (channelId != null)
                     {
                         if (onSuccess)
                         {
-                            target.Notifications.OnSuccess.Add(channel.Id);
+                            target.Notifications.OnSuccess.Add(channelId);
                         }
 
                         if (onFailure)
                         {
-                            target.Notifications.OnFailure.Add(channel.Id);
+                            target.Notifications.OnFailure.Add(channelId);
                         }
-
-                        results.NotificationChannels.Smtp.Add(channel);
                     }
 
-                    if (onSuccessGlobal && globalChannel != null)
+                    if (onSuccessGlobal && globalChannelId != null)
                     {
-                        target.Notifications.OnSuccess.Add(globalChannel.Id);
+                        target.Notifications.OnSuccess.Add(globalChannelId);
                     }
 
-                    if (onFailureGlobal && globalChannel != null)
+                    if (onFailureGlobal && globalChannelId != null)
                     {
-                        target.Notifications.OnFailure.Add(globalChannel.Id);
+                        target.Notifications.OnFailure.Add(globalChannelId);
                     }
                 }
 
@@ -198,12 +196,12 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
             target.AuthorizationMode = AuthorizationMode.SecurityDescriptor;
             target.Description = settings.RuleDescription;
 
-            foreach (var onSuccess in settings.Notifications.OnSuccess)
+            foreach (string onSuccess in settings.Notifications.OnSuccess)
             {
                 target.Notifications.OnSuccess.Add(onSuccess);
             }
 
-            foreach (var onFailure in settings.Notifications.OnFailure)
+            foreach (string onFailure in settings.Notifications.OnFailure)
             {
                 target.Notifications.OnFailure.Add(onFailure);
             }
@@ -237,44 +235,110 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 
             target.SecurityDescriptor = sd.GetSddlForm(AccessControlSections.All);
 
+            target.Jit.AuthorizingGroup = settings.JitAuthorizingGroup;
+            target.Jit.ExpireAfter = settings.JitExpireAfter;
+
             return target;
         }
 
-        private SmtpNotificationChannelDefinition GetNotificationChannelDefinition(XmlNode node, out bool onSuccess, out bool onFailure)
+        private Dictionary<string, SmtpNotificationChannelDefinition> CreateNotificationChannelDefinitions(XmlNode document)
+        {
+            Dictionary<string, SmtpNotificationChannelDefinition> definitions = new Dictionary<string, SmtpNotificationChannelDefinition>();
+
+            IEnumerable<XmlElement> auditNodes = document.SelectNodes("//audit")?.OfType<XmlElement>();
+
+            if (auditNodes == null)
+            {
+                return definitions;
+            }
+
+            foreach (XmlElement node in auditNodes)
+            {
+                string key = this.GetNotificationChannelKey(node);
+
+                if (key == null)
+                {
+                    continue;
+                }
+
+                if (!definitions.ContainsKey(key))
+                {
+                    SmtpNotificationChannelDefinition definition = this.CreateNotificationChannelDefinition(node);
+                    definitions.Add(key, definition);
+                }
+            }
+
+            return definitions;
+        }
+
+        private SmtpNotificationChannelDefinition CreateNotificationChannelDefinition(XmlNode node)
+        {
+            string addresses = node.SelectSingleNode("@emailAddresses")?.Value;
+            string displayName = $"Send email to {addresses}";
+
+            SmtpNotificationChannelDefinition channel = new SmtpNotificationChannelDefinition
+            {
+                DisplayName = displayName,
+                Enabled = true,
+                Mandatory = false,
+                EmailAddresses = addresses?.Split(',', ';', StringSplitOptions.RemoveEmptyEntries)?.ToList() ?? new List<string>(),
+                TemplateSuccess = settings.SuccessTemplate,
+                TemplateFailure = settings.FailureTemplate
+            };
+
+            if (channel.EmailAddresses.Count > 0)
+            {
+                return channel;
+            }
+
+            return null;
+        }
+
+        private string GetNotificationChannelDefinitionId(XmlNode node, Dictionary<string, SmtpNotificationChannelDefinition> definitions, out bool onSuccess, out bool onFailure)
         {
             onSuccess = false;
             onFailure = false;
+
+            if (definitions == null)
+            {
+                return null;
+            }
 
             XmlNode notificationNode = node.SelectSingleNode("audit");
 
             if (notificationNode != null)
             {
-                string addresses = notificationNode.SelectSingleNode("@emailAddresses")?.Value;
-                string displayName = $"Send email to {addresses}";
+                string key = this.GetNotificationChannelKey(notificationNode);
 
                 bool.TryParse(notificationNode.SelectSingleNode("@emailOnSuccess")?.Value, out onSuccess);
                 bool.TryParse(notificationNode.SelectSingleNode("@emailOnFailure")?.Value, out onFailure);
 
                 if (onSuccess || onFailure)
                 {
-                    SmtpNotificationChannelDefinition channel = new SmtpNotificationChannelDefinition
+                    if (definitions.ContainsKey(key))
                     {
-                        DisplayName = displayName,
-                        Enabled = true,
-                        Mandatory = false,
-                        EmailAddresses = addresses?.Split(',', ';', StringSplitOptions.RemoveEmptyEntries)?.ToList() ?? new List<string>(),
-                        TemplateSuccess = settings.SuccessTemplate,
-                        TemplateFailure = settings.FailureTemplate
-                    };
-
-                    if (channel.EmailAddresses.Count > 0)
-                    {
-                        return channel;
+                        return definitions[key]?.Id;
                     }
                 }
             }
 
             return null;
+        }
+
+        private string GetNotificationChannelKey(XmlNode node)
+        {
+            string addresses = node.SelectSingleNode("@emailAddresses")?.Value?.ToLowerInvariant();
+
+            if (addresses == null)
+            {
+                return null;
+            }
+
+            List<string> addressList = addresses.Split(',', ';', StringSplitOptions.RemoveEmptyEntries).OrderBy(t => t).ToList();
+
+            string normalizedAddresses = string.Join(",", addressList);
+
+            return normalizedAddresses;
         }
     }
 }

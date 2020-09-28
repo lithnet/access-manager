@@ -10,22 +10,21 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              Dialog:DialogParticipation.Register="{Binding}"
               d:DesignWidth="800"
-             mc:Ignorable="d" 
-             Margin="5" >
+             mc:Ignorable="d">
 
     <AdornerDecorator>
         <StackPanel>
 
             <Label Style="{DynamicResource DescriptionHeaderStyle}" 
-                   Content="Ready to import"/>
-            <Separator Margin="5 0 0 10" Height="1"
+                   Content="Ready to perform discovery"/>
+            <Separator Margin="5 0 5 0" Height="1"
                        Width="Auto"
                        HorizontalAlignment="Stretch"
                        VerticalAlignment="Top"                   
                        Background="#11000000" />
 
             <TextBlock Margin="5" TextWrapping="Wrap">
-                Click next to begin the import process
+                Click next to begin the discovery process. You'll have the opportunity to review any discovered rules before they are saved.
             </TextBlock>
  
         </StackPanel>

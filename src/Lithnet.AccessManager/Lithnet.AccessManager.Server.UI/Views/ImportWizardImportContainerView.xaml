@@ -10,8 +10,7 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              Dialog:DialogParticipation.Register="{Binding}"
               d:DesignWidth="800"
-             mc:Ignorable="d" 
-             Margin="5" >
+             mc:Ignorable="d">
 
     <AdornerDecorator>
         <StackPanel>
@@ -19,7 +18,7 @@
             <Label Style="{DynamicResource DescriptionHeaderStyle}" 
                    Content="Discovery settings"
                    Margin="0 5 0 0"/>
-            <Separator Margin="5 0 0 10" Height="1"
+            <Separator Margin="5 0 5 0" Height="1"
                        Width="Auto"
                        HorizontalAlignment="Stretch"
                        VerticalAlignment="Top"                   
@@ -89,13 +88,16 @@
                 <Grid.RowDefinitions>
                     <RowDefinition />
                     <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" 
                            TextWrapping="Wrap"
                            Text="Do not import permissions for the following users and groups"
                            Margin="5"/>
-                <ListView Grid.Row="0" Grid.Column="1" 
+                <ListView Grid.Row="0" Grid.Column="1"  
+                          x:Name="filteredSids"
                           ItemsSource="{Binding FilteredSids}"
                           SelectedItem="{Binding SelectedFilteredSid}"
                           DisplayMemberPath="DisplayName"
@@ -113,6 +115,36 @@
                             HorizontalAlignment="Left"
                             Margin="5"/>
                     <Button Command="{s:Action DeleteFilteredSid}" 
+                            CommandParameter="{Binding SelectedItems, ElementName=filteredSids}"
+                            Content="Remove selected"
+                            HorizontalAlignment="Left"
+                            Margin="5"/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" 
+                           TextWrapping="Wrap"
+                           Text="Ignore these computers"
+                           Margin="5"/>
+                <ListView Grid.Row="2" Grid.Column="1"  
+                          x:Name="filteredComputerSids"
+                          ItemsSource="{Binding FilteredComputers}"
+                          SelectedItem="{Binding SelectedFilteredComputers}"
+                          DisplayMemberPath="DisplayName"
+                          Height="100"
+                          BorderBrush="{DynamicResource MahApps.Brushes.Control.Border}"
+                          BorderThickness="1"
+                          Margin="5">
+                    <b:Interaction.Behaviors>
+                        <local:ListViewScrollBarBehavior />
+                    </b:Interaction.Behaviors>
+                </ListView>
+                <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal">
+                    <Button Command="{s:Action AddFilteredComputer}" 
+                            Content="Add..."
+                            HorizontalAlignment="Left"
+                            Margin="5"/>
+                    <Button Command="{s:Action DeleteFilteredComputer}" 
+                            CommandParameter="{Binding SelectedItems, ElementName=filteredComputerSids}"
                             Content="Remove selected"
                             HorizontalAlignment="Left"
                             Margin="5"/>

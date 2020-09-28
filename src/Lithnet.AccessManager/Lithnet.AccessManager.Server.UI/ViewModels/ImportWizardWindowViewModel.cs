@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading;
@@ -24,9 +23,6 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ImportWizardLapsWebSettingsViewModel lapsWebVm;
         private readonly ImportWizardImportReadyViewModel importReadyVm;
         private readonly IImportProviderFactory importProviderFactory;
-        private readonly SmtpNotificationChannelDefinitionsViewModel smtpDefinitions;
-        private readonly PowershellNotificationChannelDefinitionsViewModel powerShellDefinitions;
-        private readonly WebhookNotificationChannelDefinitionsViewModel webHookDefinitions;
         private readonly IImportResultsViewModelFactory resultsFactory;
         private readonly AuditOptions auditOptions;
         private readonly IEventAggregator eventAggregator;
@@ -37,7 +33,7 @@ namespace Lithnet.AccessManager.Server.UI
         private CancellationTokenSource progressCts;
         private bool isSaved;
 
-        public bool NextButtonIsDefault { get; set; } = true;
+        public bool NextButtonIsDefault { get; set; } = false;
 
         public bool CancelButtonVisible { get; set; } = true;
 
@@ -45,26 +41,23 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool BackButtonVisible { get; set; } = true;
 
-        public bool SaveButtonVisible { get; set; } = false;
-
-        public bool SaveButtonIsDefault { get; set; } = false;
-
         public bool ImportButtonVisible { get; set; } = false;
 
         public bool ImportButtonIsDefault { get; set; } = false;
 
+        public bool DoDiscoveryButtonVisible { get; set; } = false;
+
+        public bool DoDiscoveryButtonIsDefault { get; set; } = false;
+
         public AuthorizationViewModel AuthorizationViewModel { get; set; }
 
-        public ImportWizardWindowViewModel(IDialogCoordinator dialogCoordinator, ILogger<ImportWizardWindowViewModel> logger, ImportWizardImportTypeViewModel importTypeVm, ImportWizardCsvSettingsViewModel csvSettingsVm, ImportWizardImportContainerViewModel containerVm, ImportWizardRuleSettingsViewModel ruleVm, ImportWizardLapsWebSettingsViewModel lapsWebVm, ImportWizardImportReadyViewModel importReadyVm, IImportProviderFactory importProviderFactory, SmtpNotificationChannelDefinitionsViewModel smtpDefinitions, PowershellNotificationChannelDefinitionsViewModel powerShellDefinitions, WebhookNotificationChannelDefinitionsViewModel webHookDefinitions, IImportResultsViewModelFactory resultsFactory, AuditOptions auditOptions, IEventAggregator eventAggregator)
+        public ImportWizardWindowViewModel(IDialogCoordinator dialogCoordinator, ILogger<ImportWizardWindowViewModel> logger, ImportWizardImportTypeViewModel importTypeVm, ImportWizardCsvSettingsViewModel csvSettingsVm, ImportWizardImportContainerViewModel containerVm, ImportWizardRuleSettingsViewModel ruleVm, ImportWizardLapsWebSettingsViewModel lapsWebVm, ImportWizardImportReadyViewModel importReadyVm, IImportProviderFactory importProviderFactory, IImportResultsViewModelFactory resultsFactory, AuditOptions auditOptions, IEventAggregator eventAggregator)
         {
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
             this.DisplayName = Constants.AppName;
             this.dialogCoordinator = dialogCoordinator;
             this.importProviderFactory = importProviderFactory;
-            this.smtpDefinitions = smtpDefinitions;
-            this.powerShellDefinitions = powerShellDefinitions;
-            this.webHookDefinitions = webHookDefinitions;
             this.resultsFactory = resultsFactory;
             this.auditOptions = auditOptions;
             this.eventAggregator = eventAggregator;
@@ -84,13 +77,6 @@ namespace Lithnet.AccessManager.Server.UI
             this.Items.Add(importTypeVm);
             this.BuildPages(ImportMode.Laps);
             this.ActiveItem = this.Items.First();
-        }
-
-        protected override void OnActivate()
-        {
-            base.OnActivate();
-
-
         }
 
         [SuppressPropertyChangedWarnings]
@@ -122,8 +108,9 @@ namespace Lithnet.AccessManager.Server.UI
                 e.ErrorsChanged -= E_ErrorsChanged;
             }
 
-            if (item is ImportResultsViewModel)
+            if (item is ImportResultsViewModel irvm)
             {
+                irvm.Targets.ViewModels.CollectionChanged -= ViewModels_CollectionChanged;
                 this.Items.Remove(item);
             }
 
@@ -207,14 +194,35 @@ namespace Lithnet.AccessManager.Server.UI
                 return true;
             }
 
-            return await this.dialogCoordinator.ShowMessageAsync(this, "Cancel", "Are you sure you want to cancel the import process?", MessageDialogStyle.AffirmativeAndNegative) == MessageDialogResult.Affirmative;
+            MetroDialogSettings settings = new MetroDialogSettings()
+            {
+                AffirmativeButtonText = "Yes",
+                NegativeButtonText = "No"
+            };
+
+            return await this.dialogCoordinator.ShowMessageAsync(this, "Cancel", "Are you sure you want to cancel the import process?", MessageDialogStyle.AffirmativeAndNegative, settings) == MessageDialogResult.Affirmative;
         }
 
-        public async Task Save()
+        public bool CanImport => this.ActiveItem is ImportResultsViewModel irvm && irvm.Targets.ViewModels.Count > 0;
+
+        public async Task Import()
         {
             try
             {
                 if (!(this.ActiveItem is ImportResultsViewModel irvm))
+                {
+                    return;
+                }
+
+                bool plural = irvm.Targets.ViewModels.Count != 1;
+                
+                MetroDialogSettings settings = new MetroDialogSettings()
+                {
+                    AffirmativeButtonText = "Yes",
+                    NegativeButtonText = "No"
+                };
+                
+                if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm import", $"Are you sure you want to import {(plural ? $"these {irvm.Targets.ViewModels.Count}" : "this")} authorization rule{(plural ? "s" : "")}?", MessageDialogStyle.AffirmativeAndNegative, settings) != MessageDialogResult.Affirmative)
                 {
                     return;
                 }
@@ -235,11 +243,11 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public async Task Import()
+        public async Task DoDiscovery()
         {
             try
             {
-                this.progress = await this.dialogCoordinator.ShowProgressAsync(this, "Importing...", "Discovering import objects", true);
+                this.progress = await this.dialogCoordinator.ShowProgressAsync(this, "Discovering authorization rules...", "Discovering objects", true);
                 this.progress.Canceled += Progress_Canceled;
                 this.progress.SetIndeterminate();
                 this.progressCts = new CancellationTokenSource();
@@ -267,6 +275,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                 ImportResultsViewModel irvm = await resultsFactory.CreateViewModelAsync(results);
 
+                irvm.Targets.ViewModels.CollectionChanged += ViewModels_CollectionChanged;
 
                 await this.progress.CloseAsync();
 
@@ -278,8 +287,8 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                this.logger.LogError(EventIDs.UIGenericError, ex, "Import error");
-                await this.dialogCoordinator.ShowMessageAsync(this, "Import error", $"Could not perform the import. {ex.Message}");
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Discovery error");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Discovery error", $"Could not perform the import. {ex.Message}");
             }
             finally
             {
@@ -290,6 +299,10 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
+        private void ViewModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            this.NotifyOfPropertyChange(nameof(this.CanImport));
+        }
 
         private ImportSettings GetImportSettings()
         {
@@ -336,6 +349,11 @@ namespace Lithnet.AccessManager.Server.UI
                 cd.ImportOU = this.containerVm.Target;
                 cd.DoNotConsolidate = this.containerVm.DoNotConsolidate;
                 cd.DoNotConsolidateOnError = this.containerVm.DoNotConsolidateOnError;
+
+                foreach (var sid in this.containerVm.FilteredComputers)
+                {
+                    cd.ComputerFilter.Add(sid.SecurityIdentifier);
+                }
             }
 
             importSettings.ImportMode = this.importTypeVm.ImportType;
@@ -347,9 +365,6 @@ namespace Lithnet.AccessManager.Server.UI
             importSettings.JitExpireAfter = this.ruleVm.JitExpireAfter;
             importSettings.Notifications = this.ruleVm.Notifications?.Model;
             importSettings.RuleDescription = this.ruleVm.Description;
-
-            importSettings.PrincipalFilter = new List<System.Security.Principal.SecurityIdentifier>();
-
 
             foreach (var sid in this.containerVm.FilteredSids)
             {
@@ -408,32 +423,33 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 this.NextButtonIsDefault = false;
                 this.NextButtonVisible = false;
-                this.SaveButtonIsDefault = false;
-                this.SaveButtonVisible = false;
-                this.ImportButtonVisible = true;
-                this.ImportButtonIsDefault = true;
+                this.ImportButtonIsDefault = false;
+                this.ImportButtonVisible = false;
+                this.DoDiscoveryButtonVisible = true;
+                this.DoDiscoveryButtonIsDefault = true;
             }
             else if (this.ActiveItem is ImportResultsViewModel)
             {
                 this.NextButtonIsDefault = false;
                 this.NextButtonVisible = false;
-                this.SaveButtonIsDefault = true;
-                this.SaveButtonVisible = true;
-                this.ImportButtonVisible = false;
                 this.ImportButtonIsDefault = false;
+                this.ImportButtonVisible = true;
+                this.DoDiscoveryButtonVisible = false;
+                this.DoDiscoveryButtonIsDefault = false;
             }
             else
             {
                 this.NextButtonIsDefault = true;
                 this.NextButtonVisible = true;
-                this.SaveButtonIsDefault = false;
-                this.SaveButtonVisible = false;
-                this.ImportButtonVisible = false;
                 this.ImportButtonIsDefault = false;
+                this.ImportButtonVisible = false;
+                this.DoDiscoveryButtonVisible = false;
+                this.DoDiscoveryButtonIsDefault = false;
             }
 
             this.NotifyOfPropertyChange(nameof(this.CanNext));
             this.NotifyOfPropertyChange(nameof(this.CanBack));
+            this.NotifyOfPropertyChange(nameof(this.CanImport));
         }
 
         private void RemoveWizardPages()

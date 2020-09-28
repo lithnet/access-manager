@@ -17,10 +17,10 @@
     <ROW Property="CTRLS" Value="2"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{5F62EE1A-CF6A-4A20-96D7-77ECB09A81C0} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{322EC2CA-6820-4D0F-BDDC-5E44531F88AF} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7619.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7622.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="RUNAPPLICATION" Value="1" Type="4"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
@@ -93,6 +93,7 @@
     <ROW Component="AccessManagerService" ComponentId="{7A348F02-D471-4E9B-AE59-21D38089B507}" Directory_="APPDIR" Attributes="260" KeyPath="AccessManagerService"/>
     <ROW Component="CimCmdlets.psd1" ComponentId="{19FC76BC-BDB2-4D1B-A139-14DCF06BCB86}" Directory_="CimCmdlets_Dir" Attributes="0" KeyPath="CimCmdlets.psd1" Type="0"/>
     <ROW Component="ControlzEx.dll" ComponentId="{5AA8ACA1-3B5E-4E83-B240-2B29E1469B74}" Directory_="APPDIR" Attributes="0" KeyPath="ControlzEx.dll"/>
+    <ROW Component="CsvHelper.dll" ComponentId="{CD84DF5B-B067-4AAC-B06F-09695964D674}" Directory_="APPDIR" Attributes="0" KeyPath="CsvHelper.dll"/>
     <ROW Component="Diagnostics.format.ps1xml" ComponentId="{BB25EE07-1937-49B5-A660-D7C1A6FA7152}" Directory_="Microsoft.PowerShell.Diagnostic_Dir" Attributes="0" KeyPath="Diagnostics.format.ps1xml" Type="0"/>
     <ROW Component="EventLogMessages.dll" ComponentId="{CC7CC44A-3874-498B-9545-DEB5C8710543}" Directory_="APPDIR" Attributes="256" KeyPath="EventLogMessages.dll"/>
     <ROW Component="FluentValidation.dll" ComponentId="{8BFEC7C5-222F-4A6B-8D54-FCB9CFEA515D}" Directory_="APPDIR" Attributes="0" KeyPath="FluentValidation.dll"/>
@@ -883,6 +884,7 @@
     <ROW File="Vanara.PInvoke.NetApi32.dll" Component_="Vanara.PInvoke.NetApi32.dll" FileName="VANARA~5.DLL|Vanara.PInvoke.NetApi32.dll" Attributes="0" SourcePath="output\Vanara.PInvoke.NetApi32.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.Security.dll" Component_="Vanara.PInvoke.Security.dll" FileName="VANARA~6.DLL|Vanara.PInvoke.Security.dll" Attributes="0" SourcePath="output\Vanara.PInvoke.Security.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.Ws2_32.dll" Component_="Vanara.PInvoke.Ws2_32.dll" FileName="VANARA~7.DLL|Vanara.PInvoke.Ws2_32.dll" Attributes="0" SourcePath="output\Vanara.PInvoke.Ws2_32.dll" SelfReg="false"/>
+    <ROW File="CsvHelper.dll" Component_="CsvHelper.dll" FileName="CSVHEL~1.DLL|CsvHelper.dll" Attributes="0" SourcePath="output\CsvHelper.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.AiPersistentDataComponent">
     <ROW PersistentRow="config_Dir" Type="1" Condition="1"/>
@@ -1484,6 +1486,7 @@
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.NetApi32.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Security.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Ws2_32.dll"/>
+    <ROW Feature_="MainFeature" Component_="CsvHelper.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>

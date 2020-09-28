@@ -11,103 +11,132 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
-            d:DesignWidth="800"
-             Margin="5">
+            d:DesignWidth="800">
     <StackPanel>
-        <DockPanel>
-            <!--<Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
-                <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
-            </Button>-->
-            <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Import results" />
-        </DockPanel>
 
-        <Label Margin="5"
+        <Label Style="{DynamicResource DescriptionHeaderStyle}" 
+               Content="Review import results"/>
+        <Separator Margin="5 0 5 0" Height="1"
+                   Width="Auto"
+                   HorizontalAlignment="Stretch"
+                   VerticalAlignment="Top"                   
+                   Background="#11000000" />
+
+        <Label Margin="5" 
                Style="{DynamicResource SubDescriptionHeaderStyle}"
                Content="Import settings" />
 
-
-        <CheckBox Margin="10 5 5 2"
+        <StackPanel Margin="15 0 15 0">
+            <CheckBox Margin="0 5 5 2"
                   Content="Where a rule for a target already exists, merge the permissions into that rule"
                   Background="Transparent"
                   IsChecked="{Binding Merge}"/>
 
-        <CheckBox Margin="10 2 5 5"
+            <CheckBox Margin="0 2 5 5"
                   Content="Overwrite conflicting settings in the existing rule with the values from the new rule"
                   Background="Transparent"
                   IsEnabled="{Binding Merge}"
                   IsChecked="{Binding MergeOverwrite}"/>
 
+        </StackPanel>
+
         <Label Margin="5" Style="{DynamicResource SubDescriptionHeaderStyle}" Content="Discovery issues" 
                   Visibility="{Binding HasDiscoveryErrors, Converter={StaticResource BooleanToVisibilityConverter}}"/>
 
-        <TextBlock Margin="10 2 5 2" 
-           Visibility="{Binding HasDiscoveryErrors, Converter={StaticResource BooleanToVisibilityConverter}}"
-           Text="{Binding DiscoveryErrorCount}"/>
+        <StackPanel Visibility="{Binding HasDiscoveryErrors, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    Margin="15 0 15 0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-        <ListView BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
+                <TextBlock Grid.Column="0" 
+                           Text="{Binding DiscoveryErrorCount, FallbackValue='0 discovery issues'}" 
+                           TextWrapping="Wrap"
+                           Padding="0 2 0 2"/>
+
+                <StackPanel Grid.Column="1"
+                    Orientation="Horizontal"  HorizontalAlignment="Right" >
+
+                    <CheckBox Content="Errors"
+                          IsChecked="{Binding ShowErrors}"
+                          Margin="10 0 0 0"/>
+                    <CheckBox Content="Warnings"
+                          IsChecked="{Binding ShowWarnings}"
+                          Margin="10 0 0 0"/>
+                    <CheckBox Content="Informational"
+                          IsChecked="{Binding ShowInformational}"
+                          Margin="10 0 0 0"/>
+                </StackPanel>
+            </Grid>
+
+            <ListView BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
                   ItemsSource="{Binding DiscoveryErrors}"
                   ScrollViewer.VerticalScrollBarVisibility="Auto" 
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                  Visibility="{Binding HasDiscoveryErrors, Converter={StaticResource BooleanToVisibilityConverter}}"
                   Height="200"
-                  Margin="10 5 5 5"
+                  Margin="0 10 0 0"
                   Width="Auto">
-            <b:Interaction.Behaviors>
-                <local:ListViewScrollBarBehavior />
-            </b:Interaction.Behaviors>
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Width="Auto">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <iconPacks:PackIconFontAwesome Kind="ExclamationTriangleSolid"
+                <b:Interaction.Behaviors>
+                    <local:ListViewScrollBarBehavior />
+                </b:Interaction.Behaviors>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Width="Auto">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconFontAwesome Kind="ExclamationTriangleSolid"
                                                                    Margin="0 0 5 0"
                                                                    Visibility="{Binding IsWarning, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                                    Foreground="DarkOrange"/>
-                                    <iconPacks:PackIconFontAwesome Kind="ExclamationTriangleSolid"
+                                        <iconPacks:PackIconFontAwesome Kind="ExclamationTriangleSolid"
                                                                    Margin="0 0 5 0"
                                                                    Visibility="{Binding IsError, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                                    Foreground="Red"/>
-                                    <iconPacks:PackIconBoxIcons Kind="RegularInfoCircle" 
+                                        <iconPacks:PackIconBoxIcons Kind="RegularInfoCircle" 
                                                                 Foreground="CornflowerBlue" 
                                                                 Visibility="{Binding IsInformational, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                                 VerticalAlignment="Center"/>
-                                   </StackPanel>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
 
-                    <GridViewColumn Header="Target" 
+                        <GridViewColumn Header="Target" 
                                     DisplayMemberBinding="{Binding Target}" 
                                     Width="200"/>
-                    <GridViewColumn Header="Principal" 
+                        <GridViewColumn Header="Principal" 
                                     DisplayMemberBinding="{Binding Principal}" 
                                     Width="200"/>
-                    <GridViewColumn Header="Message"
+                        <GridViewColumn Header="Message"
                                     DisplayMemberBinding="{Binding Message}" 
                                     Width="600"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
+                    </GridView>
+                </ListView.View>
+            </ListView>
 
-        <StackPanel Orientation="Horizontal"
-                    Visibility="{Binding HasDiscoveryErrors, Converter={StaticResource BooleanToVisibilityConverter}}"
+            <StackPanel Orientation="Horizontal"
                     HorizontalAlignment="Right">
-            <Button Content="Export to CSV..."
+                <Button Content="Export to CSV..."
                     Command="{s:Action Export}"
-                    Margin="5"/>
+                    Margin="5 5 0 0"/>
+            </StackPanel>
+
         </StackPanel>
 
         <Label Margin="5" Style="{DynamicResource SubDescriptionHeaderStyle}" Content="Discovered rules" />
 
-        <TextBlock Margin="10 5 5 5" 
-                   Text="{Binding TargetCount}"/>
+        <StackPanel Margin="15 0 15 0" >
+            <TextBlock Text="{Binding TargetCount, FallbackValue='0 rules found'}" 
+                       TextWrapping="Wrap"
+                       Padding="2 2 0 2"/>
 
-        <ContentControl Height="300"
+            <ContentControl Height="300" d:Content="List view goes here"
                         s:View.Model="{Binding Targets}" 
                         IsTabStop="False"/>
-
+        </StackPanel>
 
     </StackPanel>
 </UserControl>

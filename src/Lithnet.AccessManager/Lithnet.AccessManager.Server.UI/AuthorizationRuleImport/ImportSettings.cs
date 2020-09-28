@@ -28,7 +28,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 
         public TimeSpan LapsExpireAfter { get; set; }
 
-        public List<SecurityIdentifier> PrincipalFilter { get; set; }
+        public HashSet<SecurityIdentifier> PrincipalFilter { get; } = new HashSet<SecurityIdentifier>();
 
         public AuditNotificationChannels Notifications { get; set; }
     }

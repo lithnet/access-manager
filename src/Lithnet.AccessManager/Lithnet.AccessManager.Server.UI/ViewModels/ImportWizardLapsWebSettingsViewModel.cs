@@ -89,7 +89,7 @@ namespace Lithnet.AccessManager.Server.UI
                 openFileDialog.CheckPathExists = true;
                 openFileDialog.DefaultExt = "config";
                 openFileDialog.DereferenceLinks = true;
-                openFileDialog.Filter = "web.config File (web.config)|web.config";
+                openFileDialog.Filter = "web.config File (web.config)|web.config|Config files (*.config)|*.config|All files (*.*)|*.*";
                 openFileDialog.Multiselect = false;
 
                 if (!string.IsNullOrWhiteSpace(this.ImportFile))

@@ -38,6 +38,8 @@
 
         </StackPanel>
         <ContentControl Grid.Row="2"
+                        Margin="10 0 10 0"
+                        d:Content="View model"
                         s:View.Model="{Binding Targets}" 
                         Visibility="{Binding HasLoaded, Converter={StaticResource BooleanToVisibilityConverter}}"
                         IsTabStop="False"/>
