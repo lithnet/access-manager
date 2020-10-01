@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -23,7 +24,6 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IEventAggregator eventAggregator;
         private readonly ILogger<ImportResultsViewModel> logger;
         private readonly IDialogCoordinator dialogCoordinator;
-        private ListCollectionView errorItems;
 
         public Task Initialization { get; private set; }
 
@@ -43,27 +43,6 @@ namespace Lithnet.AccessManager.Server.UI
             this.Targets.ChildDisplaySettings.IsScriptVisible = false;
             this.Targets.ViewModels.CollectionChanged += ViewModels_CollectionChanged;
 
-            this.errorItems = (ListCollectionView)CollectionViewSource.GetDefaultView(this.DiscoveryErrors);
-            this.errorItems.Filter = x =>
-            {
-                DiscoveryError e = (DiscoveryError)x;
-                if (e.IsError && this.ShowErrors)
-                {
-                    return true;
-                }
-
-                if (e.IsInformational && this.ShowInformational)
-                {
-                    return true;
-                }
-
-                if (e.IsWarning && this.ShowWarnings)
-                {
-                    return true;
-                }
-
-                return false;
-            };
 
             this.PublishNotificationChannels();
         }
@@ -81,7 +60,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool MergeOverwrite { get; set; }
 
-        public bool HasDiscoveryErrors => DiscoveryErrors.Count > 0;
+        public bool HasDiscoveryErrors => this.results.DiscoveryErrors.Count > 0;
 
         [OnChangedMethod(nameof(RefreshFilter))]
         public bool ShowErrors { get; set; } = true;
@@ -94,12 +73,33 @@ namespace Lithnet.AccessManager.Server.UI
 
         private void RefreshFilter()
         {
-            this.errorItems.Refresh();
+            Task.Run(() =>
+            {
+                foreach (var item in this.DiscoveryErrors)
+                {
+                    item.IsVisible = item.Type == DiscoveryErrorType.Informational && this.ShowInformational ||
+                                     item.Type == DiscoveryErrorType.Warning && this.ShowWarnings ||
+                                     item.Type == DiscoveryErrorType.Error && this.ShowErrors;
+                }
+            });
         }
 
-        public List<DiscoveryError> DiscoveryErrors => this.results.DiscoveryErrors;
+        public async Task BuildDiscoveryErrorsAsync()
+        {
+            await Task.Run(() =>
+            {
+                foreach (var item in results.DiscoveryErrors)
+                {
+                    this.DiscoveryErrors.Add(item);
+                }
+            });
 
-        public string DiscoveryErrorCount => BuildDiscoveryIssueCountString();
+            this.DiscoveryErrorCount = BuildDiscoveryIssueCountString();
+        }
+
+        public BindableCollection<DiscoveryError> DiscoveryErrors { get; set; } = new BindableCollection<DiscoveryError>();
+
+        public string DiscoveryErrorCount { get; set; }
 
         public string TargetCount => $"{Targets.ViewModels.Count} rule{(Targets.ViewModels.Count == 1 ? "" : "s")} found";
 
@@ -147,9 +147,10 @@ namespace Lithnet.AccessManager.Server.UI
 
         private string BuildDiscoveryIssueCountString()
         {
-            int errors = DiscoveryErrors.Count(t => t.IsError);
-            int warnings = DiscoveryErrors.Count(t => t.IsWarning);
-            int info = DiscoveryErrors.Count(t => t.IsInformational);
+            var list = DiscoveryErrors.ToList();
+            int errors = list.Count(t => t.IsError);
+            int warnings = list.Count(t => t.IsWarning);
+            int info = list.Count(t => t.IsInformational);
 
             if (errors + warnings + info == 0)
             {

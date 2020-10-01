@@ -1,5 +1,8 @@
-﻿namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
+﻿using PropertyChanged;
+
+namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 {
+    [AddINotifyPropertyChangedInterface]
     public class DiscoveryError
     {
         public DiscoveryErrorType Type { get; set; }
@@ -18,5 +21,8 @@
 
         [CsvHelper.Configuration.Attributes.Ignore]
         public bool IsInformational => this.Type == DiscoveryErrorType.Informational;
+
+        [CsvHelper.Configuration.Attributes.Ignore]
+        public bool IsVisible { get; set; } = true;
     }
 }

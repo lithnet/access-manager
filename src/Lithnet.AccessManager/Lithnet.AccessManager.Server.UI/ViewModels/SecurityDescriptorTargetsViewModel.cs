@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -33,6 +34,7 @@ namespace Lithnet.AccessManager.Server.UI
         private ListSortDirection currentSortDirection = ListSortDirection.Ascending;
         private GridViewColumnHeader lastHeaderClicked;
         private HashSet<string> matchedComputerViewModels;
+        private IList selectedItems;
 
         public Task Initialization { get; private set; }
         
@@ -52,9 +54,15 @@ namespace Lithnet.AccessManager.Server.UI
             this.Initialization = this.Initialize();
         }
 
+        public void SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.selectedItems ??= (e.Source as ListView)?.SelectedItems;
+            this.NotifyOfPropertyChange(nameof(CanEdit));
+        }
+
         public bool CanDelete => this.SelectedItem != null;
 
-        public bool CanEdit => this.SelectedItem != null;
+        public bool CanEdit => this.SelectedItem != null && this.selectedItems?.Count == 1;
 
         public SecurityDescriptorTargetViewModelDisplaySettings ChildDisplaySettings { get; }
 

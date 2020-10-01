@@ -77,9 +77,11 @@
                   Visibility="{Binding HasLoaded, Converter={StaticResource  BooleanToVisibilityConverter}}"
                   GridViewColumnHeader.Click="{s:Action OnGridViewColumnHeaderClick}" 
                   MouseDoubleClick="{s:Action OnListViewDoubleClick}"
+                  SelectionChanged="{s:Action SelectionChanged}"
                  >
                 <b:Interaction.Behaviors>
                     <local:ListViewScrollBarBehavior />
+                    
                 </b:Interaction.Behaviors>
                 <ListView.View>
                     <GridView>

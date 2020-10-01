@@ -73,14 +73,27 @@
 
             <ListView BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
                   ItemsSource="{Binding DiscoveryErrors}"
-                  ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  
                   Height="200"
                   Margin="0 10 0 0"
+                  VirtualizingPanel.IsContainerVirtualizable="True"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                  VirtualizingPanel.VirtualizationMode="Recycling" 
+                  ScrollViewer.IsDeferredScrollingEnabled="True" 
                   Width="Auto">
                 <b:Interaction.Behaviors>
                     <local:ListViewScrollBarBehavior />
                 </b:Interaction.Behaviors>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.ItemContainerStyle>
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Width="Auto">

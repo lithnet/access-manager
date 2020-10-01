@@ -271,16 +271,19 @@ namespace Lithnet.AccessManager.Server.UI
                 var results = await Task.Run(() => provider.Import());
 
                 this.progress.SetIndeterminate();
-                this.progress.SetMessage("Building authorization rules...");
+                this.progress.SetMessage("Building rule set...");
 
                 ImportResultsViewModel irvm = await resultsFactory.CreateViewModelAsync(results);
 
                 irvm.Targets.ViewModels.CollectionChanged += ViewModels_CollectionChanged;
 
-                await this.progress.CloseAsync();
-
                 this.Items.Add(irvm);
                 this.ActiveItem = irvm;
+
+                this.progress.SetMessage("Processing discovery issues...");
+
+                await irvm.BuildDiscoveryErrorsAsync();
+                await this.progress.CloseAsync();
             }
             catch (OperationCanceledException)
             {
