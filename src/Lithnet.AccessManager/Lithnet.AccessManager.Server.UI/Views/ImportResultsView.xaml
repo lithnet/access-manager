@@ -14,8 +14,13 @@
             d:DesignWidth="800">
     <StackPanel>
 
-        <Label Style="{DynamicResource DescriptionHeaderStyle}" 
-               Content="Review import results"/>
+        <DockPanel>
+            <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
+                <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
+            </Button>
+            <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Review discovery results" />
+        </DockPanel>
+
         <Separator Margin="5 0 5 0" Height="1"
                    Width="Auto"
                    HorizontalAlignment="Stretch"
@@ -24,7 +29,7 @@
 
         <Label Margin="5" 
                Style="{DynamicResource SubDescriptionHeaderStyle}"
-               Content="Import settings" />
+               Content="Merge settings" />
 
         <StackPanel Margin="15 0 15 0">
             <CheckBox Margin="0 5 5 2"

@@ -9,15 +9,17 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public sealed class ImportWizardCsvSettingsViewModel : Screen
+    public sealed class ImportWizardCsvSettingsViewModel : Screen, IHelpLink
     {
         private readonly ILogger<ImportWizardCsvSettingsViewModel> logger;
         private readonly IDialogCoordinator dialogCoordinator;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public ImportWizardCsvSettingsViewModel(ILogger<ImportWizardCsvSettingsViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardCsvSettingsViewModel> validator)
+        public ImportWizardCsvSettingsViewModel(ILogger<ImportWizardCsvSettingsViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardCsvSettingsViewModel> validator, IShellExecuteProvider shellExecuteProvider)
         {
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
+            this.shellExecuteProvider = shellExecuteProvider;
             this.Validator = validator;
             this.Validate();
         }
@@ -65,5 +67,18 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.ImportFile = openFileDialog.FileName;
         }
+
+        public string HelpLink => Constants.HelpLinkImportWizardCsvSettings;
+
+        public async Task Help()
+        {
+            if (this.HelpLink == null)
+            {
+                return;
+            }
+
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
+        }
+
     }
 }

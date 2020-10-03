@@ -10,7 +10,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public sealed class ImportWizardRuleSettingsViewModel : Screen
+    public sealed class ImportWizardRuleSettingsViewModel : Screen, IHelpLink
     {
         private readonly IDirectory directory;
         private readonly ILogger<ImportWizardRuleSettingsViewModel> logger;
@@ -18,9 +18,11 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly INotificationChannelSelectionViewModelFactory notificationChannelFactory;
         private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly AuditNotificationChannels channels = new AuditNotificationChannels();
+        private readonly IShellExecuteProvider shellExecuteProvider;
+
         public Task Initialization { get; private set; }
 
-        public ImportWizardRuleSettingsViewModel(INotificationChannelSelectionViewModelFactory notificationChannelFactory, ILogger<ImportWizardRuleSettingsViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardRuleSettingsViewModel> validator, IDirectory directory, IObjectSelectionProvider objectSelectionProvider)
+        public ImportWizardRuleSettingsViewModel(INotificationChannelSelectionViewModelFactory notificationChannelFactory, ILogger<ImportWizardRuleSettingsViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardRuleSettingsViewModel> validator, IDirectory directory, IObjectSelectionProvider objectSelectionProvider, IShellExecuteProvider shellExecuteProvider)
         {
             this.directory = directory;
             this.logger = logger;
@@ -28,6 +30,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.notificationChannelFactory = notificationChannelFactory;
             this.Validator = validator;
             this.objectSelectionProvider = objectSelectionProvider;
+            this.shellExecuteProvider = shellExecuteProvider;
             this.Initialization = this.Initialize();
         }
 
@@ -35,6 +38,16 @@ namespace Lithnet.AccessManager.Server.UI
         {
             this.Notifications = notificationChannelFactory.CreateViewModel(this.channels);
             await this.ValidateAsync();
+        }
+
+        public async Task Help()
+        {
+            if (this.HelpLink == null)
+            {
+                return;
+            }
+
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
         }
 
         public void SetImportMode(ImportMode mode)
@@ -48,21 +61,29 @@ namespace Lithnet.AccessManager.Server.UI
             switch (mode)
             {
                 case ImportMode.BitLocker:
+                    this.HelpLink = Constants.HelpLinkImportWizardBitLockerRuleSettings;
                     this.AllowBitlocker = true;
                     break;
 
                 case ImportMode.LapsWeb:
+                    this.HelpLink = Constants.HelpLinkImportWizardLapsWebRuleSettings;
                     this.AllowLaps = true;
                     this.LapsEnabled = false;
                     break;
 
                 case ImportMode.Laps:
-                case ImportMode.CsvFile:
+                    this.HelpLink = Constants.HelpLinkImportWizardLapsRuleSettings;
                     this.AllowLaps = true;
                     break;
 
+                case ImportMode.CsvFile:
+                    this.HelpLink = Constants.HelpLinkImportWizardCsvRuleSettings;
+                    this.AllowJit = true;
+                    break;
+
                 case ImportMode.Rpc:
-                    this.AllowBitlocker = true;
+                    this.HelpLink = Constants.HelpLinkImportWizardLocalAdminRpcRuleSettings;
+                    this.AllowJit = true;
                     break;
             }
 
@@ -195,5 +216,7 @@ namespace Lithnet.AccessManager.Server.UI
                 return sid;
             }
         }
+
+        public string HelpLink { get; private set; }
     }
 }

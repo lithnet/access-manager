@@ -12,7 +12,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public sealed class ImportWizardImportContainerViewModel : Screen
+    public sealed class ImportWizardImportContainerViewModel : Screen, IHelpLink
     {
         private readonly ILogger<ImportWizardImportContainerViewModel> logger;
         private readonly IDialogCoordinator dialogCoordinator;
@@ -20,10 +20,10 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly IDirectory directory;
         private readonly IServiceSettingsProvider serviceSettings;
-
+        private readonly IShellExecuteProvider shellExecuteProvider;
         public Task Initialization { get; private set; }
 
-        public ImportWizardImportContainerViewModel(ILogger<ImportWizardImportContainerViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardImportContainerViewModel> validator, IObjectSelectionProvider objectSelectionProvider, IDiscoveryServices discoveryServices, IDirectory directory, IServiceSettingsProvider serviceSettings)
+        public ImportWizardImportContainerViewModel(ILogger<ImportWizardImportContainerViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardImportContainerViewModel> validator, IObjectSelectionProvider objectSelectionProvider, IDiscoveryServices discoveryServices, IDirectory directory, IServiceSettingsProvider serviceSettings, IShellExecuteProvider shellExecuteProvider)
         {
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
@@ -32,6 +32,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.directory = directory;
             this.Validator = validator;
             this.serviceSettings = serviceSettings;
+            this.shellExecuteProvider = shellExecuteProvider;
             this.Initialization = this.Initialize();
         }
 
@@ -177,21 +178,30 @@ namespace Lithnet.AccessManager.Server.UI
             switch (mode)
             {
                 case ImportMode.BitLocker:
-                case ImportMode.Laps:
+                    this.HelpLink = Constants.HelpLinkImportWizardBitLockerContainer;
                     this.ContainerHelperText = "Select the container that contains the permissions you want to import";
                     this.DoNotConsolidateOnErrorVisible = false;
                     this.DoNotConsolidateOnErrorText = null;
                     this.DoNotConsolidateOnError = false;
+                    break;
 
+                case ImportMode.Laps:
+                    this.HelpLink = Constants.HelpLinkImportWizardLapsContainer;
+                    this.ContainerHelperText = "Select the container that contains the permissions you want to import";
+                    this.DoNotConsolidateOnErrorVisible = false;
+                    this.DoNotConsolidateOnErrorText = null;
+                    this.DoNotConsolidateOnError = false;
                     break;
 
                 case ImportMode.Rpc:
+                    this.HelpLink = Constants.HelpLinkImportWizardLocalAdminRpcContainer;
                     this.ContainerHelperText = "Select the container that contains the computers you want to import the local admin membership from";
                     this.DoNotConsolidateOnErrorVisible = true;
                     this.DoNotConsolidateOnErrorText = "Do not consolidate common permissions for a given OU if any of its child computers are not contactable. (If one or more computers in an OU cannot be processed, an individual access rule will be created for all computers in that OU";
                     break;
 
                 case ImportMode.CsvFile:
+                    this.HelpLink = Constants.HelpLinkImportWizardCsvContainer;
                     this.ContainerHelperText = "Select the container that contains the computers contained in the import file. The OU structure will be used to build the permission structure, and consolidate as many permissions as possible into OU-level authorization rules";
                     this.DoNotConsolidateOnErrorVisible = true;
                     this.DoNotConsolidateOnErrorText = "Do not consolidate common permissions for a given OU if any of its child computers are missing from the import file. (If one or more computers in an OU cannot be processed, an individual access rule will be created for all computers in that OU";
@@ -223,6 +233,18 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 this.Target = container;
             }
+        }
+
+        public string HelpLink { get; private set; }
+
+        public async Task Help()
+        {
+            if (this.HelpLink == null)
+            {
+                return;
+            }
+
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
         }
     }
 }

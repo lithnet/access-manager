@@ -20,6 +20,9 @@
                       xmlns:s="https://github.com/canton7/Stylet"
                       controls:DialogParticipation.Register="{Binding}"
                       mc:Ignorable="d">
+    <Window.InputBindings>
+        <KeyBinding Key="F1" Command="{s:Action Help,ActionNotFound=Disable,NullTarget=Disable}" s:View.ActionTarget="{Binding Path=., Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"/>
+    </Window.InputBindings>
     <AdornerDecorator>
         <DockPanel LastChildFill="True"
                    Margin="15">

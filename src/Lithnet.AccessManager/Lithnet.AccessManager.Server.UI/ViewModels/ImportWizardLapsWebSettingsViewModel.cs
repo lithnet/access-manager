@@ -11,18 +11,20 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public sealed class ImportWizardLapsWebSettingsViewModel : Screen
+    public sealed class ImportWizardLapsWebSettingsViewModel : Screen, IHelpLink
     {
         private readonly ILogger<ImportWizardLapsWebSettingsViewModel> logger;
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IAppPathProvider appPathProvider;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public ImportWizardLapsWebSettingsViewModel(ILogger<ImportWizardLapsWebSettingsViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardLapsWebSettingsViewModel> validator, IAppPathProvider appPathProvider)
+        public ImportWizardLapsWebSettingsViewModel(ILogger<ImportWizardLapsWebSettingsViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardLapsWebSettingsViewModel> validator, IAppPathProvider appPathProvider, IShellExecuteProvider shellExecuteProvider)
         {
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
             this.Validator = validator;
             this.appPathProvider = appPathProvider;
+            this.shellExecuteProvider = shellExecuteProvider;
             this.Validate();
         }
 
@@ -128,6 +130,18 @@ namespace Lithnet.AccessManager.Server.UI
                 await dialogCoordinator.ShowMessageAsync(this, "File open error", $"There was an error opening the LAPS web config file\r\n\r\n{ex.Message}");
 
             }
+        }
+
+        public string HelpLink => Constants.HelpLinkImportWizardLapsWebSettings;
+
+        public async Task Help()
+        {
+            if (this.HelpLink == null)
+            {
+                return;
+            }
+
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
         }
     }
 }

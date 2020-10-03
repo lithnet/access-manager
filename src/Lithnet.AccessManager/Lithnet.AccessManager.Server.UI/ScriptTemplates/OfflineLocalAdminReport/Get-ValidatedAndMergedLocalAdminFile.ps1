@@ -85,6 +85,23 @@ Process
             }
 
             $CSV = Import-CSV -Path $CSV -Header Host,SID
+
+            foreach ($row in $csv)
+            {
+                if ($row.Host -ne $ownerFqName)
+                {
+                    if (-not $IgnoreOwnerErrors)
+                    {
+                        Write-Warning "File contained an unexpected entry. The file should only contain records for the computer $ownerFqName, but an entry was found for $($row.Host). This record has been skipped. Use the -IgnoreOwnerErrors switch to include these records"
+                        continue;
+                    }
+                    else
+                    {
+                        Write-Warning "File contained an unexpected entry. The file should only contain records for the computer $ownerFqName, but an entry was found for $($row.Host)"
+                    }
+                }
+            }
+
             $Merged += $CSV 
         } 
         else 

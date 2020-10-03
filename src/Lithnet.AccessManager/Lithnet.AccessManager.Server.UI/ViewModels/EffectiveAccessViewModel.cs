@@ -13,7 +13,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class EffectiveAccessViewModel : Screen
+    public class EffectiveAccessViewModel : Screen, IHelpLink
     {
         private readonly IAuthorizationInformationBuilder authorizationBuilder;
         private readonly IDialogCoordinator dialogCoordinator;
@@ -186,10 +186,11 @@ namespace Lithnet.AccessManager.Server.UI
             await this.targets.EditItem(this.SelectedItem?.Model, this.GetWindow());
         }
 
-        public async Task ComputerNameTextBoxKeyUp(object sender, KeyEventArgs e)
+        public async Task ComputerNameTextBoxKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
+                e.Handled = true;
                 await this.CalculateEffectiveAccess();
             }
         }
@@ -213,5 +214,7 @@ namespace Lithnet.AccessManager.Server.UI
                 }
             }
         }
+
+        public string HelpLink => Constants.HelpLinkPageEffectiveAccess;
     }
 }

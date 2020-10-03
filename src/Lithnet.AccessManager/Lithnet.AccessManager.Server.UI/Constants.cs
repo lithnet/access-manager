@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Text;
-
-namespace Lithnet.AccessManager.Server.UI
+﻿namespace Lithnet.AccessManager.Server.UI
 {
     public static class Constants
     {
@@ -29,10 +24,39 @@ namespace Lithnet.AccessManager.Server.UI
         public const string HelpLinkPageBitLocker = "https://go.lithnet.io/fwlink/lixfecyh";
         public const string HelpLinkPageUserInterface = "https://go.lithnet.io/fwlink/cfsimvws";
         public const string HelpLinkPageWebHosting = "https://go.lithnet.io/fwlink/qxdzonfv";
+        
+        public const string HelpLinkPageEffectiveAccess = "https://go.lithnet.io/fwlink/okfclsla";
 
         public const string HelpLinkAuthNSetupOkta = "https://go.lithnet.io/fwlink/qxdzonfv";
         public const string HelpLinkAuthNSetupAzureAD = "https://go.lithnet.io/fwlink/lqcuxctn";
         public const string HelpLinkAuthNSetupAdfs = "https://go.lithnet.io/fwlink/nynyrawq";
+
+        public const string HelpLinkImportWizard = "https://go.lithnet.io/fwlink/tveqorxj";
+        public const string HelpLinkImportWizardImportType = "https://go.lithnet.io/fwlink/gfttnigp";
+
+        public const string HelpLinkImportWizardCsvSettings = "https://go.lithnet.io/fwlink/utjgyeei";
+        public const string HelpLinkImportWizardLapsWebSettings = "https://go.lithnet.io/fwlink/xqciglez";
+        
+        public const string HelpLinkImportWizardLapsWebResults = "https://go.lithnet.io/fwlink/vhrxzvzv";
+        public const string HelpLinkImportWizardCsvResults = "https://go.lithnet.io/fwlink/hczpjlgf";
+        public const string HelpLinkImportWizardLocalAdminRpcResults = "https://go.lithnet.io/fwlink/zsrqggoe";
+        public const string HelpLinkImportWizardLapsResults = "https://go.lithnet.io/fwlink/qkixadrq";
+        public const string HelpLinkImportWizardBitLockerResults = "https://go.lithnet.io/fwlink/fxhftbwf";
+
+        public const string HelpLinkImportWizardCsvContainer = "https://go.lithnet.io/fwlink/jiuudrnj";
+        public const string HelpLinkImportWizardLocalAdminRpcContainer = "https://go.lithnet.io/fwlink/bvwmbeil";
+        public const string HelpLinkImportWizardLapsContainer = "https://go.lithnet.io/fwlink/lzmwvbjd";
+        public const string HelpLinkImportWizardBitLockerContainer = "https://go.lithnet.io/fwlink/vbposczv";
+
+        public const string HelpLinkImportWizardLapsWebRuleSettings = "https://go.lithnet.io/fwlink/hoqowjnl";
+        public const string HelpLinkImportWizardCsvRuleSettings = "https://go.lithnet.io/fwlink/ufjwpkjo";
+        public const string HelpLinkImportWizardLocalAdminRpcRuleSettings = "https://go.lithnet.io/fwlink/vflsobyn";
+        public const string HelpLinkImportWizardLapsRuleSettings = "https://go.lithnet.io/fwlink/gevzqpku";
+        public const string HelpLinkImportWizardBitLockerRuleSettings = "https://go.lithnet.io/fwlink/cxuwgcwq";
+
+
+        public const string HelpLinkImportWizardImportTypeCsvHelp = "https://go.lithnet.io/fwlink/varohhyv";
+        public const string HelpLinkImportWizardImportTypeLocalAdminRpcHelp = "https://go.lithnet.io/fwlink/ugrrixqx";
 
         public const string LinkGettingStarted = "https://go.lithnet.io/fwlink/yynjgebg";
         public const string LinkInstallingAms = "https://go.lithnet.io/fwlink/garieonh";
@@ -44,9 +68,6 @@ namespace Lithnet.AccessManager.Server.UI
         public const string LinkTroubleshooting = "https://go.lithnet.io/fwlink/oubfibxc";
         public const string LinkFaqs = "https://go.lithnet.io/fwlink/xuzzzbat";
         public const string LinkSupportInformation = "https://go.lithnet.io/fwlink/ktayuqvb";
-
-        public const string HelpLinkImportCsv = "https://go.lithnet.io/fwlink/okfclsla";
-        public const string HelpLinkImportLocalAdmins = "https://go.lithnet.io/fwlink/varohhyv";
         
         public const string EventSourceName = "Lithnet Access Manager Configuration Tool";
         public const string EventLogName = "Lithnet Access Manager";

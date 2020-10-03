@@ -54,7 +54,7 @@
             <TextBox Grid.Row="1" Grid.Column="1"
                      Text="{Binding ComputerName, UpdateSourceTrigger=PropertyChanged}"
                      Margin="5"
-                     KeyUp="{s:Action ComputerNameTextBoxKeyUp}"/>
+                     KeyDown="{s:Action ComputerNameTextBoxKeyDown}"/>
 
             <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                         Orientation="Horizontal"

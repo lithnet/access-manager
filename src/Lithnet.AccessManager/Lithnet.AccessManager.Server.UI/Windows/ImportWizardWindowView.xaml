@@ -22,6 +22,10 @@
                       xmlns:s="https://github.com/canton7/Stylet"
                       controls:DialogParticipation.Register="{Binding}"
                       mc:Ignorable="d">
+    <Window.InputBindings>
+        <KeyBinding Key="F1"
+                    Command="{s:Action Help}" />
+    </Window.InputBindings>
     <DockPanel LastChildFill="True">
         <StackPanel DockPanel.Dock="Bottom"
                         Orientation="Horizontal" 

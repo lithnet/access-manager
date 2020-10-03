@@ -8,16 +8,21 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              Dialog:DialogParticipation.Register="{Binding}"
               d:DesignWidth="800"
              mc:Ignorable="d">
 
     <AdornerDecorator>
         <StackPanel>
+  
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
+                    <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
+                </Button>
+                <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Discovery settings" />
+            </DockPanel>
 
-            <Label Style="{DynamicResource DescriptionHeaderStyle}" 
-                   Content="Discovery settings"
-                   Margin="0 5 0 0"/>
             <Separator Margin="5 0 5 0" Height="1"
                        Width="Auto"
                        HorizontalAlignment="Stretch"

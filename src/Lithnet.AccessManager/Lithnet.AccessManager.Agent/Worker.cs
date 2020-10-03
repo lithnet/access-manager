@@ -15,18 +15,15 @@ namespace Lithnet.AccessManager.Agent
 
         private readonly IHostApplicationLifetime appLifetime;
 
-        private readonly IJitAgent jitAgent;
-
         private readonly ILapsAgent lapsAgent;
 
         private readonly ILocalSam sam;
 
-        public Worker(ILogger<Worker> logger, IAgentSettings settings, IHostApplicationLifetime appLifetime, IJitAgent jitWorker, ILapsAgent lapsWorker, ILocalSam sam)
+        public Worker(ILogger<Worker> logger, IAgentSettings settings, IHostApplicationLifetime appLifetime, ILapsAgent lapsWorker, ILocalSam sam)
         {
             this.logger = logger;
             this.settings = settings;
             this.appLifetime = appLifetime;
-            this.jitAgent = jitWorker;
             this.lapsAgent = lapsWorker;
             this.sam = sam;
         }
@@ -69,16 +66,7 @@ namespace Lithnet.AccessManager.Agent
                     logger.LogTrace(EventIDs.AgentDisabled, "Lithnet Access Manager agent is not enabled");
                     return;
                 }
-
-                try
-                {
-                    this.jitAgent.DoCheck();
-                }
-                catch (Exception ex)
-                {
-                    this.logger.LogError(EventIDs.JitUnexpectedException, ex, "The JIT worker encountered an exception");
-                }
-
+              
                 try
                 {
                     this.lapsAgent.DoCheck();

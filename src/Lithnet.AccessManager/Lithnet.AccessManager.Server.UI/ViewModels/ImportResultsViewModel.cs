@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Data;
 using CsvHelper;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.AuthorizationRuleImport;
@@ -17,21 +15,23 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public sealed class ImportResultsViewModel : Screen
+    public sealed class ImportResultsViewModel : Screen, IHelpLink
     {
         private readonly ImportResults results;
         private readonly ISecurityDescriptorTargetsViewModelFactory targetsFactory;
         private readonly IEventAggregator eventAggregator;
         private readonly ILogger<ImportResultsViewModel> logger;
         private readonly IDialogCoordinator dialogCoordinator;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
         public Task Initialization { get; private set; }
 
-        public ImportResultsViewModel(ImportResults results, ISecurityDescriptorTargetsViewModelFactory targetsFactory, IEventAggregator eventAggregator, ILogger<ImportResultsViewModel> logger, IDialogCoordinator dialogCoordinator)
+        public ImportResultsViewModel(ImportResults results, ISecurityDescriptorTargetsViewModelFactory targetsFactory, IEventAggregator eventAggregator, ILogger<ImportResultsViewModel> logger, IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider)
         {
             this.results = results;
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
+            this.shellExecuteProvider = shellExecuteProvider;
             this.targetsFactory = targetsFactory;
             this.eventAggregator = eventAggregator;
             this.Initialization = this.Initialize();
@@ -206,6 +206,44 @@ namespace Lithnet.AccessManager.Server.UI
                 this.logger.LogError(EventIDs.UIGenericError, ex, "Unable to save file");
                 await dialogCoordinator.ShowMessageAsync(this, "File save error", $"There was an error saving the data\r\n\r\n{ex.Message}");
             }
+        }
+
+        public void SetImportMode(ImportMode mode)
+        {
+            switch (mode)
+            {
+                case ImportMode.BitLocker:
+                    this.HelpLink = Constants.HelpLinkImportWizardBitLockerResults;
+                    break;
+
+                case ImportMode.Laps:
+                    this.HelpLink = Constants.HelpLinkImportWizardLapsResults;
+                    break;
+
+                case ImportMode.Rpc:
+                    this.HelpLink = Constants.HelpLinkImportWizardLocalAdminRpcResults;
+                    break;
+
+                case ImportMode.CsvFile:
+                    this.HelpLink = Constants.HelpLinkImportWizardCsvResults;
+                    break;
+
+                case ImportMode.LapsWeb:
+                    this.HelpLink = Constants.HelpLinkImportWizardLapsWebResults;
+                    break;
+            }
+        }
+
+        public string HelpLink { get; private set; }
+
+        public async Task Help()
+        {
+            if (this.HelpLink == null)
+            {
+                return;
+            }
+
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
         }
     }
 }

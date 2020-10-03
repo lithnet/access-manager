@@ -5,7 +5,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public sealed class ImportWizardImportTypeViewModel : Screen
+    public sealed class ImportWizardImportTypeViewModel : Screen, IHelpLink
     {
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly ILogger logger;
@@ -80,12 +80,24 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task HelpRpcLocalAdmin()
         {
-            await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkImportLocalAdmins);
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkImportWizardImportTypeLocalAdminRpcHelp);
         }
 
         public async Task HelpCsvFileFormat()
         {
-            await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkImportCsv);
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkImportWizardImportTypeCsvHelp);
+        }
+
+        public string HelpLink => Constants.HelpLinkImportWizardImportType;
+
+        public async Task Help()
+        {
+            if (this.HelpLink == null)
+            {
+                return;
+            }
+
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
         }
     }
 }

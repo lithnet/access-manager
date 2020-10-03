@@ -12,7 +12,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class ImportWizardWindowViewModel : Conductor<PropertyChangedBase>.Collection.OneActive
+    public class ImportWizardWindowViewModel : Conductor<PropertyChangedBase>.Collection.OneActive, IHelpLink
     {
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly ILogger<ImportWizardWindowViewModel> logger;
@@ -26,6 +26,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IImportResultsViewModelFactory resultsFactory;
         private readonly AuditOptions auditOptions;
         private readonly IEventAggregator eventAggregator;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
         private ProgressDialogController progress;
         private int progressCurrent;
@@ -51,7 +52,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public AuthorizationViewModel AuthorizationViewModel { get; set; }
 
-        public ImportWizardWindowViewModel(IDialogCoordinator dialogCoordinator, ILogger<ImportWizardWindowViewModel> logger, ImportWizardImportTypeViewModel importTypeVm, ImportWizardCsvSettingsViewModel csvSettingsVm, ImportWizardImportContainerViewModel containerVm, ImportWizardRuleSettingsViewModel ruleVm, ImportWizardLapsWebSettingsViewModel lapsWebVm, ImportWizardImportReadyViewModel importReadyVm, IImportProviderFactory importProviderFactory, IImportResultsViewModelFactory resultsFactory, AuditOptions auditOptions, IEventAggregator eventAggregator)
+        public ImportWizardWindowViewModel(IDialogCoordinator dialogCoordinator, ILogger<ImportWizardWindowViewModel> logger, ImportWizardImportTypeViewModel importTypeVm, ImportWizardCsvSettingsViewModel csvSettingsVm, ImportWizardImportContainerViewModel containerVm, ImportWizardRuleSettingsViewModel ruleVm, ImportWizardLapsWebSettingsViewModel lapsWebVm, ImportWizardImportReadyViewModel importReadyVm, IImportProviderFactory importProviderFactory, IImportResultsViewModelFactory resultsFactory, AuditOptions auditOptions, IEventAggregator eventAggregator, IShellExecuteProvider shellExecuteProvider)
         {
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
@@ -61,6 +62,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.resultsFactory = resultsFactory;
             this.auditOptions = auditOptions;
             this.eventAggregator = eventAggregator;
+            this.shellExecuteProvider = shellExecuteProvider;
 
             // VM mappings
             this.importTypeVm = importTypeVm;
@@ -75,12 +77,17 @@ namespace Lithnet.AccessManager.Server.UI
 
             // Initial binds
             this.Items.Add(importTypeVm);
-            this.BuildPages(ImportMode.Laps);
+            this.UpdateImportModeOnViewModels();
             this.ActiveItem = this.Items.First();
         }
 
         [SuppressPropertyChangedWarnings]
         private void OnImportModeChanged(object x, PropertyChangedExtendedEventArgs<ImportMode> y)
+        {
+            this.UpdateImportModeOnViewModels();
+        }
+
+        private void UpdateImportModeOnViewModels()
         {
             this.containerVm.SetImportMode(this.importTypeVm.ImportType);
             this.ruleVm.SetImportMode(this.importTypeVm.ImportType);
@@ -181,7 +188,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             this.RequestClose();
         }
-
+        
         public override async Task<bool> CanCloseAsync()
         {
             if (this.ActiveItem is ImportWizardImportTypeViewModel)
@@ -276,6 +283,7 @@ namespace Lithnet.AccessManager.Server.UI
                 ImportResultsViewModel irvm = await resultsFactory.CreateViewModelAsync(results);
 
                 irvm.Targets.ViewModels.CollectionChanged += ViewModels_CollectionChanged;
+                irvm.SetImportMode(this.importTypeVm.ImportType);
 
                 this.Items.Add(irvm);
                 this.ActiveItem = irvm;
@@ -377,6 +385,17 @@ namespace Lithnet.AccessManager.Server.UI
             return importSettings;
         }
 
+        public string HelpLink => (this.ActiveItem as IHelpLink)?.HelpLink ?? Constants.HelpLinkImportWizard;
+
+        public async Task Help()
+        {
+            if (this.HelpLink == null)
+            {
+                return;
+            }
+
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
+        }
 
         private void BuildPages(ImportMode mode)
         {

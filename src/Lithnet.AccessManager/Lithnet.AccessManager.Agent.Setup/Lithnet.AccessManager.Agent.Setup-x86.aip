@@ -9,10 +9,10 @@
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="ARPPRODUCTICON" Value="accessmanager.exe" Type="8"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
-    <ROW Property="ProductCode" Value="1033:{C70FDB19-AFA8-448F-A3F9-8EA697EB130E} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{99008DD9-5CCB-4A8D-81AC-404BFD6CE763} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Agent"/>
-    <ROW Property="ProductVersion" Value="1.0.7616.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7623.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
     <ROW Property="SETUPEXEDIR" Value="1"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{EEDECF4C-BABB-4AE0-9CB9-DC051FF1AE75}"/>
@@ -36,6 +36,7 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
     <ROW Component="APPDIR" ComponentId="{EAB761F8-6670-4FCD-BA74-C8A0A6728E79}" Directory_="APPDIR" Attributes="0"/>
+    <ROW Component="CsvHelper.dll" ComponentId="{996438E0-24F7-4B18-A216-99FA990B8438}" Directory_="APPDIR" Attributes="0" KeyPath="CsvHelper.dll"/>
     <ROW Component="Lithnet.AccessManager.Agent.exe" ComponentId="{FC28B581-C649-40ED-8567-583F066D6BED}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Agent.exe"/>
     <ROW Component="Lithnet.AccessManager.dll" ComponentId="{4179A33C-62B0-42B7-9D04-6136929D0B19}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.dll"/>
     <ROW Component="Lithnet.Security.Authorization.dll" ComponentId="{AEFC29AF-0317-4898-8716-5856F34209CC}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.Security.Authorization.dll"/>
@@ -171,6 +172,7 @@
     <ROW File="Vanara.PInvoke.NetApi32.dll" Component_="Vanara.PInvoke.NetApi32.dll" FileName="VANARA~5.DLL|Vanara.PInvoke.NetApi32.dll" Attributes="0" SourcePath="output-x86\Vanara.PInvoke.NetApi32.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.Security.dll" Component_="Vanara.PInvoke.Security.dll" FileName="VANARA~6.DLL|Vanara.PInvoke.Security.dll" Attributes="0" SourcePath="output-x86\Vanara.PInvoke.Security.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.Ws2_32.dll" Component_="Vanara.PInvoke.Ws2_32.dll" FileName="VANARA~7.DLL|Vanara.PInvoke.Ws2_32.dll" Attributes="0" SourcePath="output-x86\Vanara.PInvoke.Ws2_32.dll" SelfReg="false"/>
+    <ROW File="CsvHelper.dll" Component_="CsvHelper.dll" FileName="CSVHEL~1.DLL|CsvHelper.dll" Attributes="0" SourcePath="output-x86\CsvHelper.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" GeneralOptions="o" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites"/>
@@ -319,6 +321,7 @@
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.NetApi32.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Security.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Ws2_32.dll"/>
+    <ROW Feature_="MainFeature" Component_="CsvHelper.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>

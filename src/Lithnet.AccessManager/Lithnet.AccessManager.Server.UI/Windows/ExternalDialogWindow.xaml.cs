@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using MahApps.Metro.Controls;
@@ -13,11 +14,19 @@ namespace Lithnet.AccessManager.Server.UI
     [AddINotifyPropertyChangedInterface]
     public partial class ExternalDialogWindow : MetroWindow
     {
+        private readonly IShellExecuteProvider shellExecuteProvider;
+
         public ExternalDialogWindow()
         {
             InitializeComponent();
             this.SaveButton.Focus();
             this.Owner ??= Application.Current.MainWindow;
+        }
+
+        public ExternalDialogWindow(IShellExecuteProvider shellExecuteProvider)
+        : this()
+        {
+            this.shellExecuteProvider = shellExecuteProvider;
         }
 
         public bool CancelButtonVisible { get; set; } = true;
@@ -33,6 +42,18 @@ namespace Lithnet.AccessManager.Server.UI
         public string CancelButtonName { get; set; } = "Cancel";
 
         public MessageDialogResult Result { get; set; }
+
+        public string HelpLink => (this.DataContext as IHelpLink)?.HelpLink;
+
+        public async Task Help()
+        {
+            if (this.HelpLink == null || this.shellExecuteProvider == null)
+            {
+                return;
+            }
+
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
+        }
 
         private void Close_Click(object sender, RoutedEventArgs e)
         {

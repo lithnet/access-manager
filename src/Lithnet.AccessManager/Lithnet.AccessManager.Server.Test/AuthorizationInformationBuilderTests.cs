@@ -23,7 +23,7 @@ namespace Lithnet.AccessManager.Server.Test
 
         private IPowerShellSecurityDescriptorGenerator powershell;
 
-        private ITargetDataProvider targetDataProvider;
+        private IComputerTargetProvider targetDataProvider;
 
         private IAuthorizationContextProvider authorizationContextProvider;
 
@@ -37,7 +37,7 @@ namespace Lithnet.AccessManager.Server.Test
             cache = new AuthorizationInformationMemoryCache();
             logger = Global.LogFactory.CreateLogger<AuthorizationInformationBuilder>();
             powershell = Mock.Of<IPowerShellSecurityDescriptorGenerator>();
-            targetDataProvider = new TargetDataProvider(new TargetDataCache(), Global.LogFactory.CreateLogger<TargetDataProvider>());
+            targetDataProvider = new ComputerTargetProvider(directory,new TargetDataProvider(new TargetDataCache(), Global.LogFactory.CreateLogger<TargetDataProvider>()), Global.LogFactory.CreateLogger<ComputerTargetProvider>());
             authorizationContextProvider = new AuthorizationContextProvider(Mock.Of<IOptions<AuthorizationOptions>>(), Global.LogFactory.CreateLogger<AuthorizationContextProvider>(), discoveryServices);
         }
 
@@ -111,7 +111,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
 
-            CollectionAssert.AreEquivalent(new[] { t1, t2, t3, t5, t7 }, builder.GetMatchingTargetsForComputer(computer1));
+            CollectionAssert.AreEquivalent(new[] { t1, t2, t3, t5, t7 }, targetDataProvider.GetMatchingTargetsForComputer(computer1, options.Value.ComputerTargets));
         }
 
         [Test]
@@ -129,7 +129,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
 
-            CollectionAssert.AreEqual(new[] { t3, t1, t2 }, builder.GetMatchingTargetsForComputer(computer1));
+            CollectionAssert.AreEqual(new[] { t3, t1, t2 }, targetDataProvider.GetMatchingTargetsForComputer(computer1, options.Value.ComputerTargets));
         }
 
         [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "IDMDEV1")]

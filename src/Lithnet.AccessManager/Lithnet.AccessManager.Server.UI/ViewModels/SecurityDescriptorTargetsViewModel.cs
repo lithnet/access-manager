@@ -29,6 +29,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILogger<SecurityDescriptorTargetsViewModel> logger;
         private readonly IEffectiveAccessViewModelFactory effectiveAccessFactory;
         private readonly INotifyModelChangedEventPublisher eventPublisher;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
         private bool firstSearch;
         private ListSortDirection currentSortDirection = ListSortDirection.Ascending;
@@ -38,7 +39,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public Task Initialization { get; private set; }
         
-        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, ISecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IComputerTargetProvider computerTargetProvider, IEffectiveAccessViewModelFactory effectiveAccessFactory)
+        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, ISecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IComputerTargetProvider computerTargetProvider, IEffectiveAccessViewModelFactory effectiveAccessFactory, IShellExecuteProvider shellExecuteProvider)
         {
             this.factory = factory;
             this.Model = model;
@@ -47,6 +48,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.directory = directory;
             this.computerTargetProvider = computerTargetProvider;
             this.effectiveAccessFactory = effectiveAccessFactory;
+            this.shellExecuteProvider = shellExecuteProvider;
             this.customComparer = new SecurityDescriptorTargetViewModelComparer();
             this.ChildDisplaySettings = new SecurityDescriptorTargetViewModelDisplaySettings();
             this.eventPublisher = eventPublisher;
@@ -177,7 +179,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             var vm = this.effectiveAccessFactory.CreateViewModel(this);
 
-            ExternalDialogWindow window = new ExternalDialogWindow
+            ExternalDialogWindow window = new ExternalDialogWindow(shellExecuteProvider)
             {
                 Title = "Effective Access",
                 DataContext = vm,
