@@ -15,10 +15,10 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 dotnet publish "%agentProject%" --runtime win-x64 --output "%outputdirx64%" --framework net472 --self-contained false /property:Version=%version% /property:FileVersion=%version%
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-"%SIGNTOOLPATH%\signtool.exe" sign /sha1 %CSCERTTHUMBPRINT% /t http://timestamp.digicert.com /fd sha256 /v "%outputdirx64%\Lithnet*.exe"
+"%SIGNTOOLPATH%\signtool.exe" sign /sha1 %CSCERTTHUMBPRINT% /d "Lithnet Access Manager" /t http://timestamp.digicert.com /fd sha256 /v "%outputdirx64%\Lithnet*.exe"
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-"%SIGNTOOLPATH%\signtool.exe" sign /sha1 %CSCERTTHUMBPRINT% /t http://timestamp.digicert.com /fd sha256 /v "%outputdirx64%\Lithnet*.dll"
+"%SIGNTOOLPATH%\signtool.exe" sign /sha1 %CSCERTTHUMBPRINT% /d "Lithnet Access Manager" /t http://timestamp.digicert.com /fd sha256 /v "%outputdirx64%\Lithnet*.dll"
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 "%AIPATH%\AdvancedInstaller.com" /build "%setupProjectx64%"
@@ -30,10 +30,10 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 dotnet publish "%agentProject%" --runtime win-x86 --output "%outputdirx86%" --framework net472 --self-contained false  /property:Version=%version% /property:FileVersion=%version%
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-"%SIGNTOOLPATH%\signtool.exe" sign /sha1 %CSCERTTHUMBPRINT% /t http://timestamp.digicert.com /fd sha256 /v "%outputdirx86%\Lithnet*.exe"
+"%SIGNTOOLPATH%\signtool.exe" sign /sha1 %CSCERTTHUMBPRINT% /d "Lithnet Access Manager" /t http://timestamp.digicert.com /fd sha256 /v "%outputdirx86%\Lithnet*.exe"
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-"%SIGNTOOLPATH%\signtool.exe" sign /sha1 %CSCERTTHUMBPRINT% /t http://timestamp.digicert.com /fd sha256 /v "%outputdirx86%\Lithnet*.dll"
+"%SIGNTOOLPATH%\signtool.exe" sign /sha1 %CSCERTTHUMBPRINT% /d "Lithnet Access Manager" /t http://timestamp.digicert.com /fd sha256 /v "%outputdirx86%\Lithnet*.dll"
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 "%AIPATH%\AdvancedInstaller.com" /build "%setupProjectx86%"
