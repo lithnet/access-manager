@@ -18,6 +18,6 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public bool IdpLogout { get; set; }
 
-        public IList<string> Scopes { get; set; }
+        public IList<string> Scopes { get; set; } = new List<string>();
     }
 }

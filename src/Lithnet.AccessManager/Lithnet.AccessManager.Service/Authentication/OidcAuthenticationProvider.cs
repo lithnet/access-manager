@@ -58,7 +58,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
                  };
 
                  openIdConnectOptions.Scope.Clear();
-                 if (this.options?.Scopes.Count == 0)
+                 if (this.options.Scopes == null || this.options.Scopes.Count == 0)
                  {
                      openIdConnectOptions.Scope.Add("openid");
                      openIdConnectOptions.Scope.Add("profile");
