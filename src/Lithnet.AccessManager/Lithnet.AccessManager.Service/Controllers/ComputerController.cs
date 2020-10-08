@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Threading;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
@@ -34,9 +35,10 @@ namespace Lithnet.AccessManager.Service.Controllers
         private readonly IAuditEventProcessor reporting;
         private readonly UserInterfaceOptions userInterfaceSettings;
         private readonly IBitLockerRecoveryPasswordProvider bitLockerProvider;
+        private readonly ILicenseManager licenseManager;
 
         public ComputerController(IAuthorizationService authorizationService, ILogger<ComputerController> logger, IDirectory directory,
-            IAuditEventProcessor reporting, IRateLimiter rateLimiter, IOptionsSnapshot<UserInterfaceOptions> userInterfaceSettings, IAuthenticationProvider authenticationProvider, IPasswordProvider passwordProvider, IJitAccessProvider jitAccessProvider, IBitLockerRecoveryPasswordProvider bitLockerProvider)
+            IAuditEventProcessor reporting, IRateLimiter rateLimiter, IOptionsSnapshot<UserInterfaceOptions> userInterfaceSettings, IAuthenticationProvider authenticationProvider, IPasswordProvider passwordProvider, IJitAccessProvider jitAccessProvider, IBitLockerRecoveryPasswordProvider bitLockerProvider, ILicenseManager licenseManager)
         {
             this.authorizationService = authorizationService;
             this.logger = logger;
@@ -48,6 +50,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             this.passwordProvider = passwordProvider;
             this.jitAccessProvider = jitAccessProvider;
             this.bitLockerProvider = bitLockerProvider;
+            this.licenseManager = licenseManager;
         }
 
         public IActionResult AccessRequest()
@@ -224,7 +227,7 @@ namespace Lithnet.AccessManager.Service.Controllers
                 }
                 else if (authResponse.EvaluatedAccess == AccessMask.BitLocker)
                 {
-                    return this.GetBitLockerRecoveryPasswords(model, user, computer, (BitLockerAuthorizationResponse) authResponse);
+                    return this.GetBitLockerRecoveryPasswords(model, user, computer, (BitLockerAuthorizationResponse)authResponse);
                 }
                 else
                 {
@@ -370,6 +373,7 @@ namespace Lithnet.AccessManager.Service.Controllers
 
                 try
                 {
+                    this.licenseManager.ThrowOnMissingFeature(LicensedFeatures.LapsHistory);
                     history = this.passwordProvider.GetPasswordHistory(computer);
 
                     if (history == null)
@@ -436,6 +440,14 @@ namespace Lithnet.AccessManager.Service.Controllers
                 }
 
                 model.AllowedRequestTypes = authResponse.EvaluatedAccess;
+
+                if (model.AllowedRequestTypes.HasFlag(AccessMask.LocalAdminPasswordHistory))
+                {
+                    if (!this.licenseManager.IsFeatureEnabled(LicensedFeatures.LapsHistory))
+                    {
+                        model.AllowedRequestTypes = model.AllowedRequestTypes & ~AccessMask.LocalAdminPasswordHistory;
+                    }
+                }
 
                 if (model.AllowedRequestTypes.HasFlag(AccessMask.LocalAdminPassword))
                 {

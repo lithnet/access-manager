@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Threading.Channels;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Authorization;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Service
@@ -69,6 +71,7 @@ namespace Lithnet.AccessManager.Service
             services.TryAddSingleton<IAuthorizationInformationMemoryCache, AuthorizationInformationMemoryCache>();
             services.TryAddSingleton<ITargetDataCache, TargetDataCache>();
             services.TryAddSingleton<IAuthorizationContextProvider, AuthorizationContextProvider>();
+            services.TryAddSingleton<ILicenseManager, LicenseManager>();
 
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();
@@ -100,7 +103,7 @@ namespace Lithnet.AccessManager.Service
             this.ConfigureAuthorization(services);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider provider, IOptions<ConfigurationMetadata> metadata)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider provider, IOptions<ConfigurationMetadata> metadata, ILicenseManager licenseManager, ILogger<Startup> logger)
         {
             metadata.Value.ValidateMetadata();
 
@@ -136,6 +139,16 @@ namespace Lithnet.AccessManager.Service
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            try
+            {
+                licenseManager.LoadAndValidateLicense();
+                logger.LogInformation("Lithnet Access Manager Enterprise Edition");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Lithnet Access Manager Standard Edition");
+            }
         }
 
         private void ConfigureAuthentication(IServiceCollection services)
