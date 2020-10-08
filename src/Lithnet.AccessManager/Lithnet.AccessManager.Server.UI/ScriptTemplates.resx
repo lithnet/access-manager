@@ -437,15 +437,13 @@ $fveRecoveryPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaN
 $serviceAccountSid = new-object System.Security.Principal.SecurityIdentifier "{serviceAccount}"
 
 $propertyAccessRule1 = new-object "System.DirectoryServices.ActiveDirectoryAccessRule" $serviceAccountSid, "ReadProperty", "Allow", "Descendents", $fveRecoveryObjectGuid
-$propertyAccessRule4 = new-object "System.DirectoryServices.ActiveDirectoryAccessRule" $serviceAccountSid, "ExtendedRight", "Allow", $fveRecoveryPasswordGuid, "Descendents", $fveRecoveryObjectGuid
+$propertyAccessRule2 = new-object "System.DirectoryServices.ActiveDirectoryAccessRule" $serviceAccountSid, "ExtendedRight", "Allow", $fveRecoveryPasswordGuid, "Descendents", $fveRecoveryObjectGuid
 
 $path = "AD:\$OU"
 
 $acl = get-acl -Path $path
 $acl.AddAccessRule($propertyAccessRule1)
 $acl.AddAccessRule($propertyAccessRule2)
-$acl.AddAccessRule($propertyAccessRule3)
-$acl.AddAccessRule($propertyAccessRule4)
 
 set-acl -AclObject $acl -Path $path</value>
   </data>
