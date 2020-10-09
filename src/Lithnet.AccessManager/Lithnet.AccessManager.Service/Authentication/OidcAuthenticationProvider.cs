@@ -51,7 +51,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
                  openIdConnectOptions.SignedOutCallbackPath = "/auth/logout";
                  openIdConnectOptions.SignedOutRedirectUri = "/Home/LoggedOut";
                  openIdConnectOptions.ResponseType = this.options.ResponseType ?? OpenIdConnectResponseType.Code;
-                 openIdConnectOptions.SaveTokens = true;
+                 openIdConnectOptions.SaveTokens = false;
                  openIdConnectOptions.GetClaimsFromUserInfoEndpoint = this.options.GetUserInfoEndpointClaims ?? openIdConnectOptions.ResponseType.Contains(OpenIdConnectResponseType.Code);
                  openIdConnectOptions.UseTokenLifetime = true;
                  openIdConnectOptions.Events = new OpenIdConnectEvents()
@@ -61,8 +61,17 @@ namespace Lithnet.AccessManager.Service.AppSettings
                      OnTicketReceived = this.FindClaimIdentityInDirectoryOrFail,
                  };
 
-                 openIdConnectOptions.ClaimActions.MapAll();
-                 openIdConnectOptions.ClaimActions.MapJsonKey(ClaimTypes.Upn, "upn");
+                 if (this.options.ClaimMapping == null || this.options.ClaimMapping.Count > 0)
+                 {
+                     openIdConnectOptions.ClaimActions.MapJsonKey(ClaimTypes.Upn, "upn");
+                 }
+                 else
+                 {
+                     foreach (var kvp in this.options.ClaimMapping)
+                     {
+                         openIdConnectOptions.ClaimActions.MapJsonKey(kvp.Value, kvp.Key);
+                     }
+                 }
 
                  openIdConnectOptions.Scope.Clear();
                  if (this.options.Scopes == null || this.options.Scopes.Count == 0)

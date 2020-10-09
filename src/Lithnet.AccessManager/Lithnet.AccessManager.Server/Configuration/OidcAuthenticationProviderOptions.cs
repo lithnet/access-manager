@@ -19,5 +19,7 @@ namespace Lithnet.AccessManager.Server.Configuration
         public bool? GetUserInfoEndpointClaims { get; set; }
         
         public IList<string> Scopes { get; set; } 
+
+        public Dictionary<string, string > ClaimMapping { get; set; }
     }
 }
