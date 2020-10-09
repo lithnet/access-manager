@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using System.Security.Principal;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;

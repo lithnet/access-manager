@@ -27,6 +27,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILocalSam localSam;
         private readonly SecurityDescriptorTargetViewModelDisplaySettings displaySettings;
         private readonly IObjectSelectionProvider objectSelectionProvider;
+        private readonly ScriptTemplateProvider scriptTemplateProvider;
 
         private string jitGroupDisplayName;
 
@@ -34,7 +35,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider)
         {
             this.directory = directory;
             this.Model = model;
@@ -47,11 +48,12 @@ namespace Lithnet.AccessManager.Server.UI
             this.localSam = localSam;
             this.displaySettings = displaySettings ?? new SecurityDescriptorTargetViewModelDisplaySettings();
             this.objectSelectionProvider = objectSelectionProvider;
+            this.scriptTemplateProvider = scriptTemplateProvider;
 
             this.Script = fileSelectionViewModelFactory.CreateViewModel(model, () => model.Script, appPathProvider.ScriptsPath);
             this.Script.DefaultFileExtension = "ps1";
             this.Script.Filter = "PowerShell script|*.ps1";
-            this.Script.NewFileContent = ScriptTemplates.AuthorizationScriptTemplate;
+            this.Script.NewFileContent = this.scriptTemplateProvider.GetAuthorizationResponse;
             this.Script.ShouldValidate = false;
             this.Script.PropertyChanged += Script_PropertyChanged;
             this.Initialization = this.Initialize();

@@ -1,4 +1,5 @@
-﻿using Lithnet.AccessManager.Server.Authorization;
+﻿using System.Security.Claims;
+using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.WsFederation;
@@ -14,16 +15,16 @@ namespace Lithnet.AccessManager.Service.AppSettings
         private readonly WsFedAuthenticationProviderOptions options;
 
         public WsFedAuthenticationProvider(IOptions<WsFedAuthenticationProviderOptions> options, ILogger<WsFedAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider)
-            :base (logger, directory, httpContextAccessor, authzContextProvider)
+            : base(logger, directory, httpContextAccessor, authzContextProvider)
         {
             this.options = options.Value;
         }
-        
+
         public override bool CanLogout => true;
 
         public override bool IdpLogout => this.options.IdpLogout;
 
-        protected override string ClaimName => this.options.ClaimName;
+        protected override string ClaimName => this.options.ClaimName ?? ClaimTypes.Upn;
 
         public override void Configure(IServiceCollection services)
         {
@@ -40,9 +41,9 @@ namespace Lithnet.AccessManager.Service.AppSettings
                 options.Wtrealm = this.options.Realm;
                 options.Events = new WsFederationEvents()
                 {
-                    OnSecurityTokenValidated = this.FindClaimIdentityInDirectoryOrFail,
                     OnAccessDenied = this.HandleAuthNFailed,
-                    OnRemoteFailure = this.HandleRemoteFailure
+                    OnRemoteFailure = this.HandleRemoteFailure,
+                    OnTicketReceived = this.FindClaimIdentityInDirectoryOrFail
                 };
             })
             .AddCookie(options =>

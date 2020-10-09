@@ -21,10 +21,11 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IServiceSettingsProvider serviceSettings;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IDomainTrustProvider domainTrustProvider;
+        private readonly IScriptTemplateProvider scriptTemplateProvider;
 
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.SitemapSolid;
 
-        public ActiveDirectoryConfigurationViewModel(IActiveDirectoryForestSchemaViewModelFactory forestFactory, IActiveDirectoryDomainPermissionViewModelFactory domainFactory, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<ActiveDirectoryConfigurationView> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider)
+        public ActiveDirectoryConfigurationViewModel(IActiveDirectoryForestSchemaViewModelFactory forestFactory, IActiveDirectoryDomainPermissionViewModelFactory domainFactory, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<ActiveDirectoryConfigurationView> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IScriptTemplateProvider scriptTemplateProvider)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.domainFactory = domainFactory;
@@ -32,6 +33,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.serviceSettings = serviceSettings;
             this.shellExecuteProvider = shellExecuteProvider;
             this.domainTrustProvider = domainTrustProvider;
+            this.scriptTemplateProvider = scriptTemplateProvider;
             this.DisplayName = "Active Directory";
 
             this.Forests = new BindableCollection<ActiveDirectoryForestSchemaViewModel>();
@@ -90,7 +92,7 @@ namespace Lithnet.AccessManager.Server.UI
             var vm = new ScriptContentViewModel(this.dialogCoordinator)
             {
                 HelpText = "Run the following script as an account that is a member of the 'Schema Admins' group",
-                ScriptText = ScriptTemplates.UpdateAdSchemaTemplate
+                ScriptText = this.scriptTemplateProvider.UpdateAdSchema
                     .Replace("{forest}", current.Name)
             };
 
@@ -137,7 +139,7 @@ namespace Lithnet.AccessManager.Server.UI
             var vm = new ScriptContentViewModel(this.dialogCoordinator)
             {
                 HelpText = "Run the following script with Domain Admins rights to add the service account to the correct groups",
-                ScriptText = ScriptTemplates.AddDomainGroupMembershipPermissions
+                ScriptText = this.scriptTemplateProvider.AddDomainMembershipPermissions
                     .Replace("{domainDNS}", current.Name, StringComparison.OrdinalIgnoreCase)
                     .Replace("{serviceAccountSid}", this.serviceSettings.GetServiceAccount().Value, StringComparison.OrdinalIgnoreCase)
             };

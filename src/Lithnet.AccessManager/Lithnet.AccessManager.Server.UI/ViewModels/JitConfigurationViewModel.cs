@@ -25,10 +25,11 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IDiscoveryServices discoveryServices;
         private readonly IObjectSelectionProvider objectSelectionProvider;
+        private readonly IScriptTemplateProvider scriptTemplateProvider;
 
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.UserClockSolid;
 
-        public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IJitGroupMappingViewModelFactory groupMappingFactory, INotifyModelChangedEventPublisher eventPublisher, IJitDomainStatusViewModelFactory jitDomainStatusFactory, IServiceSettingsProvider serviceSettings, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IObjectSelectionProvider objectSelectionProvider)
+        public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IJitGroupMappingViewModelFactory groupMappingFactory, INotifyModelChangedEventPublisher eventPublisher, IJitDomainStatusViewModelFactory jitDomainStatusFactory, IServiceSettingsProvider serviceSettings, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IObjectSelectionProvider objectSelectionProvider, IScriptTemplateProvider scriptTemplateProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.dialogCoordinator = dialogCoordinator;
@@ -40,6 +41,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.domainTrustProvider = domainTrustProvider;
             this.discoveryServices = discoveryServices;
             this.objectSelectionProvider = objectSelectionProvider;
+            this.scriptTemplateProvider = scriptTemplateProvider;
 
             this.DisplayName = "Just-in-time access";
             this.GroupMappings = new BindableCollection<JitGroupMappingViewModel>();
@@ -219,7 +221,7 @@ namespace Lithnet.AccessManager.Server.UI
             var vm = new ScriptContentViewModel(this.dialogCoordinator)
             {
                 HelpText = "Run this script to grant access for the AMS service account to manage groups in this OU",
-                ScriptText = ScriptTemplates.GrantGroupPermissions
+                ScriptText = this.scriptTemplateProvider.GrantGroupPermissions
                     .Replace("{serviceAccount}", this.serviceSettings.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
                     .Replace("{ou}", current.GroupOU)
                     .Replace("{domain}", discoveryServices.GetDomainNameDns(current.GroupOU))
@@ -246,7 +248,7 @@ namespace Lithnet.AccessManager.Server.UI
             var vm = new ScriptContentViewModel(this.dialogCoordinator)
             {
                 HelpText = "Run this script to grant access for the AMS service account to manage groups in this OU",
-                ScriptText = ScriptTemplates.GrantGroupPermissions
+                ScriptText = this.scriptTemplateProvider.GrantGroupPermissions
                     .Replace("{serviceAccount}", this.serviceSettings.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
                     .Replace("{ou}", current.Mapping.GroupOU)
                     .Replace("{domain}", current.Domain.Name)
@@ -272,7 +274,7 @@ namespace Lithnet.AccessManager.Server.UI
             var vm = new ScriptContentViewModel(this.dialogCoordinator)
             {
                 HelpText = "Run this script to enable the PAM feature in your forest",
-                ScriptText = ScriptTemplates.EnablePamFeature
+                ScriptText = this.scriptTemplateProvider.EnablePamFeature
                     .Replace("{domain}", current.Domain.Forest.Name)
             };
 

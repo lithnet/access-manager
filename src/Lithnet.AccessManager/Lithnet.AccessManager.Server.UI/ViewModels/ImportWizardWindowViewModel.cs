@@ -358,6 +358,7 @@ namespace Lithnet.AccessManager.Server.UI
             if (importSettings is ImportSettingsComputerDiscovery cd)
             {
                 cd.ImportOU = this.containerVm.Target;
+                cd.FilterDisabledComputers = this.containerVm.IgnoreDisabledComputerObjects;
                 cd.DoNotConsolidate = this.containerVm.DoNotConsolidate;
                 cd.DoNotConsolidateOnError = this.containerVm.DoNotConsolidateOnError;
 

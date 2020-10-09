@@ -181,6 +181,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IPowerShellSecurityDescriptorGenerator>().To<PowerShellSecurityDescriptorGenerator>();
                 builder.Bind<IAuthorizationInformationMemoryCache>().To<AuthorizationInformationMemoryCache>();
                 builder.Bind<IPowerShellSessionProvider>().To<CachedPowerShellSessionProvider>();
+                builder.Bind<IScriptTemplateProvider>().To<ScriptTemplateProvider>();
 
                 builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentModelValidator<>));
                 builder.Bind(typeof(IValidator<>)).ToAllImplementations();

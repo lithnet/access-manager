@@ -14,6 +14,10 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 
         public bool FilterNonAccountSids { get; set; } = true;
 
+        public bool FilterDisabledComputers { get; set; }
+
+        public bool ExcludeConflictObjects { get; set; } = true;
+
         public string ImportOU { get; set; }
 
         public HashSet<SecurityIdentifier> ComputerFilter { get; } = new HashSet<SecurityIdentifier>();

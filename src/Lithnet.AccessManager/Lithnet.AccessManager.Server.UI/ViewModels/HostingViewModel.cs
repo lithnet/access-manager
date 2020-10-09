@@ -40,8 +40,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IEventAggregator eventAggregator;
         private readonly IDirectory directory;
-
-        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory)
+        private readonly IScriptTemplateProvider scriptTemplateProvider;
+        
+        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider)
         {
             this.logger = logger;
             this.pathProvider = pathProvider;
@@ -53,6 +54,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.eventAggregator = eventAggregator;
             this.Validator = validator;
             this.directory = directory;
+            this.scriptTemplateProvider = scriptTemplateProvider;
 
             this.WorkingModel = this.CloneModel(model);
             this.Certificate = this.GetCertificate();
@@ -225,7 +227,7 @@ namespace Lithnet.AccessManager.Server.UI
             ScriptContentViewModel vm = new ScriptContentViewModel(this.dialogCoordinator)
             {
                 HelpText = "Run the following script as an account that is a member of the 'Domain admins' group",
-                ScriptText = ScriptTemplates.PreventDelegation
+                ScriptText = this.scriptTemplateProvider.PreventDelegation
                     .Replace("{sid}", this.ServiceAccount.ToString(), StringComparison.OrdinalIgnoreCase)
             };
 
@@ -247,7 +249,7 @@ namespace Lithnet.AccessManager.Server.UI
             ScriptContentViewModel vm = new ScriptContentViewModel(this.dialogCoordinator)
             {
                 HelpText = "Run the following script as an account that is a member of the 'Domain admins' group",
-                ScriptText = ScriptTemplates.CreateGmsa
+                ScriptText = this.scriptTemplateProvider.CreateGmsa
                     .Replace("{serverName}", Environment.MachineName, StringComparison.OrdinalIgnoreCase)
             };
 
