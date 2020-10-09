@@ -26,8 +26,8 @@ $InformationPreference = "Continue"
 $rootDSE = Get-ADRootDSE
 $schemaNC = $rootDSE.schemaNamingContext
 $computerObjectGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&(ldapDisplayName=computer)(objectclass=classSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$msLapsPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&(ldapDisplayName=ms-Mcs-AdmPwd)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$msLapsPasswordExpiryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&(ldapDisplayName=ms-Mcs-AdmPwdExpirationTime)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$msLapsPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&(ldapDisplayName=ms-Mcs-AdmPwd)(objectclass=attributeSchema)(!(isDefunct=TRUE)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$msLapsPasswordExpiryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&(ldapDisplayName=ms-Mcs-AdmPwdExpirationTime)(objectclass=attributeSchema)(!(isDefunct=TRUE)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
 
 
 $selfSid = new-object System.Security.Principal.SecurityIdentifier "S-1-5-10"
