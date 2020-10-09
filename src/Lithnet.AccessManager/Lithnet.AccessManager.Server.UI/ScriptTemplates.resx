@@ -354,9 +354,9 @@ if ([string]::IsNullOrEmpty($ou))
 
 $schemaNC = $rootDSE.schemaNamingContext
 $computerObjectGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=computer)(objectclass=classSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$lithnetAdminPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPassword)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$lithnetAdminPasswordExpiryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordExpiry)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$lithnetAdminPasswordHistoryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordHistory)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$lithnetAdminPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPassword)(objectclass=attributeSchema)(!(isDefunct=TRUE)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$lithnetAdminPasswordExpiryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordExpiry)(objectclass=attributeSchema)(!(isDefunct=TRUE)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$lithnetAdminPasswordHistoryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordHistory)(objectclass=attributeSchema)(!(isDefunct=TRUE)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
 
 $selfSid = new-object System.Security.Principal.SecurityIdentifier "S-1-5-10"
 $serviceAccountSid = new-object System.Security.Principal.SecurityIdentifier "{serviceAccount}"
@@ -432,7 +432,7 @@ if ([string]::IsNullOrEmpty($ou))
 
 $schemaNC = $rootDSE.schemaNamingContext
 $fveRecoveryObjectGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=msFVE-RecoveryInformation)(objectclass=classSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$fveRecoveryPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=msFVE-RecoveryPassword)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$fveRecoveryPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=msFVE-RecoveryPassword)(objectclass=attributeSchema)(!(isDefunct=TRUE)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
 
 $serviceAccountSid = new-object System.Security.Principal.SecurityIdentifier "{serviceAccount}"
 
@@ -529,8 +529,8 @@ if ([string]::IsNullOrEmpty($ou))
 
 $schemaNC = $rootDSE.schemaNamingContext
 $computerObjectGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=computer)(objectclass=classSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$msLapsPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=ms-Mcs-AdmPwd)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$msLapsPasswordExpiryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=ms-Mcs-AdmPwdExpirationTime)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$msLapsPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=ms-Mcs-AdmPwd)(objectclass=attributeSchema)(!(isDefunct=TRUE)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$msLapsPasswordExpiryGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&amp;(ldapDisplayName=ms-Mcs-AdmPwdExpirationTime)(objectclass=attributeSchema)(!(isDefunct=TRUE)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
 
 $serviceAccountSid = new-object System.Security.Principal.SecurityIdentifier "{serviceAccount}"
 
@@ -666,7 +666,7 @@ $schemaNC = $rootDSE.schemaNamingContext
 $schemaMaster = Get-ADObject $schemaNC -Properties fSMORoleOwner -server $server | Get-ADDomainController -Identity { $_.fSMORoleOwner } -Server $server
 $schemaMasterRootDse = [ADSI]::new("LDAP://$($schemaMaster.HostName)/RootDSE")
 
-if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPassword)(objectclass=attributeSchema)(!(isDefunct=true)))"))
+if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPassword)(objectclass=attributeSchema)(!(isDefunct=TRUE)))"))
 {
     New-ADObject -Name "Lithnet-Admin-Password" -Type "attributeSchema" -Path $schemaNC -Server $schemaMaster.HostName -OtherAttributes @{
         schemaIDGUID                  = [Guid]::new("f440de15-5e53-4522-a221-0000b9d757dd").ToByteArray()
@@ -689,7 +689,7 @@ else
     Write-Host "The attribute lithnetAdminPassword already exists"
 }
 
-if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordHistory)(objectclass=attributeSchema)(!(isDefunct=true)))"))
+if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordHistory)(objectclass=attributeSchema)(!(isDefunct=TRUE)))"))
 {
     New-ADObject -Name "Lithnet-Admin-Password-History" -Type "attributeSchema" -Path $schemaNC -Server $schemaMaster.HostName -OtherAttributes @{
         schemaIDGUID                  = [Guid]::new("5e7f84e2-9561-4ac3-b3b4-0000121aa663").ToByteArray()
@@ -712,7 +712,7 @@ else
     Write-Host "The attribute lithnetAdminPasswordHistory already exists"
 }
 
-if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordExpiry)(objectclass=attributeSchema)(!(isDefunct=true)))"))
+if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&amp;(ldapDisplayName=lithnetAdminPasswordExpiry)(objectclass=attributeSchema)(!(isDefunct=TRUE)))"))
 {
     New-ADObject -Name "Lithnet-Admin-Password-Expiry" -Type "attributeSchema" -Path $schemaNC -Server $schemaMaster.HostName -OtherAttributes @{
         schemaIDGUID                  = [Guid]::new("0f65f007-22e9-4a4f-9fba-000025aa156d").ToByteArray()
