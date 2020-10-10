@@ -9,7 +9,7 @@
              mc:Ignorable="d" 
              d:DesignWidth="800" Margin="5">
     <StackPanel>
-      <DockPanel>
+        <DockPanel>
             <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
                 <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
             </Button>
@@ -91,18 +91,10 @@
             <Label Grid.Row="2" Grid.Column="0" 
                            Content="Secret"
                            Margin="5"/>
-            <TextBox Grid.Row="2" Grid.Column="1" 
-                             Text="{Binding OidcSecret, UpdateSourceTrigger=PropertyChanged}" 
-                             Margin="5"/>
-
-            <Label Grid.Row="2" Grid.Column="0" 
-                           Content="Secret"
-                           Margin="5"/>
             <PasswordBox Grid.Row="2" Grid.Column="1" 
-                         GotFocus="{s:Action OidcSecretFocus}"
-                                 local:PasswordBoxBindingHelper.BindPassword="True"
-                                 local:PasswordBoxBindingHelper.BoundPassword="{Binding Path=OidcSecret, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 Margin="5"/>
+                         local:PasswordBoxBindingHelper.BindPassword="True"
+                         local:PasswordBoxBindingHelper.BoundPassword="{Binding Path=OidcSecret, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="5"/>
 
             <TextBlock Grid.Row="3" Grid.Column="1"
                        Margin="5">View the setup guides for <Hyperlink Click="{s:Action AadHelp}">Azure AD</Hyperlink> and <Hyperlink Click="{s:Action OktaHelp}">Okta</Hyperlink></TextBlock>

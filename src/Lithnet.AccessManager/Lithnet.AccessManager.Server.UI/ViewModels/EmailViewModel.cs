@@ -71,11 +71,6 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public void PasswordFocus()
-        {
-            this.Password = null;
-        }
-
         public PackIconUniconsKind Icon => PackIconUniconsKind.At;
 
         public async Task Help()

@@ -216,11 +216,6 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public void OidcSecretFocus()
-        {
-            this.OidcSecret = null;
-        }
-
         [NotifyModelChangedProperty(RequiresServiceRestart = true)]
         public string WsFedRealm { get => this.model.WsFed.Realm; set => this.model.WsFed.Realm = value; }
 

@@ -84,11 +84,10 @@
                        Content="Password"
                        Margin="5"/>
             <PasswordBox Grid.Row="6" Grid.Column="1" 
-                         GotFocus="{s:Action PasswordFocus}"
-                             local:PasswordBoxBindingHelper.BindPassword="True" 
-                             local:PasswordBoxBindingHelper.BoundPassword="{Binding Path=Password, Mode=TwoWay}"
-                             IsEnabled="{Binding UseSpecifiedCredentials, UpdateSourceTrigger=PropertyChanged}" 
-                             Margin="5"/>
+                         local:PasswordBoxBindingHelper.BindPassword="True" 
+                         local:PasswordBoxBindingHelper.BoundPassword="{Binding Path=Password, Mode=TwoWay}"
+                         IsEnabled="{Binding UseSpecifiedCredentials, UpdateSourceTrigger=PropertyChanged}" 
+                         Margin="5"/>
 
         </Grid>
     </StackPanel>
