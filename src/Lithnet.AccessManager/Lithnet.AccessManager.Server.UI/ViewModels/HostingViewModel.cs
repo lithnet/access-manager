@@ -203,23 +203,14 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
+        public async Task OpenDelegationWarningHelpLink()
+        {
+            await shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkPageHostingDelegationWarning);
+        }
+
         public async Task OpenGmsaInfo()
         {
-            try
-            {
-                ProcessStartInfo psi = new ProcessStartInfo
-                {
-                    FileName = Constants.LinkGmsaInfo,
-                    UseShellExecute = true
-                };
-
-                Process.Start(psi);
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not open link");
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not open the default link handler\r\n{ex.Message}");
-            }
+            await shellExecuteProvider.OpenWithShellExecute(Constants.LinkGmsaInfo);
         }
 
         public void PreventDelegation()

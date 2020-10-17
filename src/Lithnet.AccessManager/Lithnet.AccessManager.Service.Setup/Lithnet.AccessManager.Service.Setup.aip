@@ -17,10 +17,10 @@
     <ROW Property="CTRLS" Value="2"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{4F9ACEF2-2692-4B77-90F4-186ECC0B204C} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{A7FD299E-D64C-4954-88B6-2C9E6678B69B} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7630.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7636.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="RUNAPPLICATION" Value="1" Type="4"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
@@ -95,7 +95,7 @@
     <ROW Component="ControlzEx.dll" ComponentId="{42DB7DB5-D3DE-4B89-ABC2-9D5291EB4B82}" Directory_="APPDIR" Attributes="0" KeyPath="ControlzEx.dll"/>
     <ROW Component="CsvHelper.dll" ComponentId="{CD84DF5B-B067-4AAC-B06F-09695964D674}" Directory_="APPDIR" Attributes="0" KeyPath="CsvHelper.dll"/>
     <ROW Component="Diagnostics.format.ps1xml" ComponentId="{BB25EE07-1937-49B5-A660-D7C1A6FA7152}" Directory_="Microsoft.PowerShell.Diagnostic_Dir" Attributes="0" KeyPath="Diagnostics.format.ps1xml" Type="0"/>
-    <ROW Component="EventLogMessages.dll" ComponentId="{CC7CC44A-3874-498B-9545-DEB5C8710543}" Directory_="APPDIR" Attributes="256" KeyPath="EventLogMessages.dll"/>
+    <ROW Component="EventLogMessages.dll" ComponentId="{183E464A-8D52-47F0-A02D-DAAE2CC2DC1F}" Directory_="APPDIR" Attributes="256" KeyPath="EventLogMessages.dll"/>
     <ROW Component="FluentValidation.dll" ComponentId="{7EFC4B04-1F5D-429C-9C28-85831DC3B344}" Directory_="APPDIR" Attributes="0" KeyPath="FluentValidation.dll"/>
     <ROW Component="HtmlAgilityPack.dll" ComponentId="{8505AA5C-23A4-4869-9C25-E396707B78B8}" Directory_="APPDIR" Attributes="0" KeyPath="HtmlAgilityPack.dll"/>
     <ROW Component="InconsolataRegular.ttf" ComponentId="{599B69B5-3EBB-4383-A188-CF1595F67276}" Directory_="fonts_Dir" Attributes="0" Type="0"/>
@@ -687,7 +687,6 @@
     <ROW File="PSDiagnostics.psd1" Component_="PSDiagnostics.psd1" FileName="PSDIAG~1.PSD|PSDiagnostics.psd1" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp3.1\Modules\PSDiagnostics\PSDiagnostics.psd1" SelfReg="false"/>
     <ROW File="PSDiagnostics.psm1" Component_="PSDiagnostics.psd1" FileName="PSDIAG~1.PSM|PSDiagnostics.psm1" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp3.1\Modules\PSDiagnostics\PSDiagnostics.psm1" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Server.UI.exe" Component_="Lithnet.AccessManager.Server.UI.exe" FileName="LITHNE~2.EXE|Lithnet.AccessManager.Server.UI.exe" Attributes="0" SourcePath="output\Lithnet.AccessManager.Server.UI.exe" SelfReg="false"/>
-    <ROW File="EventLogMessages.dll" Component_="EventLogMessages.dll" FileName="EVENTL~1.DLL|EventLogMessages.dll" Attributes="0" SourcePath="C:\Windows\Microsoft.NET\Framework64\v4.0.30319\EventLogMessages.dll" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Service.deps.json" Component_="apphost.json" FileName="LITHNE~1.JSO|Lithnet.AccessManager.Service.deps.json" Attributes="0" SourcePath="output\Lithnet.AccessManager.Service.deps.json" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Service.dll" Component_="Lithnet.AccessManager.Service.dll" FileName="LITHNE~3.DLL|Lithnet.AccessManager.Service.dll" Attributes="0" SourcePath="output\Lithnet.AccessManager.Service.dll" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Service.pdb" Component_="Lithnet.AccessManager.Service.exe" FileName="LITHNE~3.PDB|Lithnet.AccessManager.Service.pdb" Attributes="0" SourcePath="output\Lithnet.AccessManager.Service.pdb" SelfReg="false"/>
@@ -887,6 +886,7 @@
     <ROW File="Stylet.dll" Component_="Stylet.dll" FileName="Stylet.dll" Attributes="0" SourcePath="output\Stylet.dll" SelfReg="false"/>
     <ROW File="System.Text.Json.dll_1" Component_="System.Text.Json.dll_1" FileName="SYSTE~34.DLL|System.Text.Json.dll" Attributes="0" SourcePath="output\System.Text.Json.dll" SelfReg="false"/>
     <ROW File="WindowsFirewallHelper.dll" Component_="WindowsFirewallHelper.dll" FileName="WINDOW~1.DLL|WindowsFirewallHelper.dll" Attributes="0" SourcePath="output\WindowsFirewallHelper.dll" SelfReg="false"/>
+    <ROW File="EventLogMessages.dll" Component_="EventLogMessages.dll" FileName="EVENTL~1.DLL|EventLogMessages.dll" Attributes="0" SourcePath="output\EventLogMessages.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.AiPersistentDataComponent">
     <ROW PersistentRow="config_Dir" Type="1" Condition="1"/>
@@ -1351,7 +1351,6 @@
     <ROW Feature_="MainFeature" Component_="PSDiagnostics.psd1"/>
     <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Server.UI.exe"/>
     <ROW Feature_="MainFeature" Component_="Lithnet"/>
-    <ROW Feature_="MainFeature" Component_="EventLogMessages.dll"/>
     <ROW Feature_="MainFeature" Component_="sni.dll"/>
     <ROW Feature_="MainFeature" Component_="System.CodeDom.dll"/>
     <ROW Feature_="MainFeature" Component_="System.Configuration.ConfigurationManager.dll"/>
@@ -1490,6 +1489,7 @@
     <ROW Feature_="MainFeature" Component_="Stylet.dll"/>
     <ROW Feature_="MainFeature" Component_="System.Text.Json.dll_1"/>
     <ROW Feature_="MainFeature" Component_="WindowsFirewallHelper.dll"/>
+    <ROW Feature_="MainFeature" Component_="EventLogMessages.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>
