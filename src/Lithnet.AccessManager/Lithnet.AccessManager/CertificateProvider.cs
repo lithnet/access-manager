@@ -19,8 +19,6 @@ namespace Lithnet.AccessManager
     {
         private static readonly bool isService = GetServiceStatus();
 
-        private readonly IDirectory directory;
-
         private readonly ILogger logger;
 
         private readonly IAppPathProvider appPathProvider;
@@ -83,9 +81,8 @@ namespace Lithnet.AccessManager
             return f;
         }
 
-        public CertificateProvider(ILogger<CertificateProvider> logger, IDirectory directory, IAppPathProvider appPathProvider, IDiscoveryServices discoveryServices)
+        public CertificateProvider(ILogger<CertificateProvider> logger, IAppPathProvider appPathProvider, IDiscoveryServices discoveryServices)
         {
-            this.directory = directory;
             this.logger = logger;
             this.appPathProvider = appPathProvider;
             this.discoveryServices = discoveryServices;

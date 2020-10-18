@@ -77,6 +77,8 @@
         public const int CertificateAuthNError = 5034;
         public const int BitLockerKeyAccessError = 5035;
 
+        // 6000 range - Reserved 
+
         // 8000 range - UI errors
         public const int UIGroupMembershipLookupError = 8000;
         public const int UISchemaLookupError = 8001;

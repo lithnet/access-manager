@@ -142,12 +142,20 @@ namespace Lithnet.AccessManager.Service
 
             try
             {
-                licenseManager.LoadAndValidateLicense();
-                logger.LogInformation("Lithnet Access Manager Enterprise Edition");
+                licenseManager.Initialize();
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Lithnet Access Manager Standard Edition");
+                logger.LogError(ex, "An error occurred performing the license check. Enterprise edition features will not be available");
+            }
+
+            if (licenseManager.IsEnterpriseEdition())
+            {
+                logger.LogInformation("Starting Lithnet Access Manager Enterprise Edition");
+            }
+            else
+            {
+                logger.LogInformation("Starting Lithnet Access Manager Standard Edition");
             }
         }
 
