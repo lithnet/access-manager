@@ -24,7 +24,7 @@ $schemaNC = $rootDSE.schemaNamingContext
 $schemaMaster = Get-ADObject $schemaNC -Properties fSMORoleOwner -server $server | Get-ADDomainController -Identity { $_.fSMORoleOwner } -Server $server
 $schemaMasterRootDse = [ADSI]::new("LDAP://$($schemaMaster.HostName)/RootDSE")
 
-if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&(ldapDisplayName=lithnetAdminPassword)(objectclass=attributeSchema)(!(isDefunct=true)))"))
+if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&(ldapDisplayName=lithnetAdminPassword)(objectclass=attributeSchema)(!(isDefunct=TRUE)))"))
 {
     New-ADObject -Name "Lithnet-Admin-Password" -Type "attributeSchema" -Path $schemaNC -Server $schemaMaster.HostName -OtherAttributes @{
         schemaIDGUID                  = [Guid]::new("f440de15-5e53-4522-a221-0000b9d757dd").ToByteArray()
@@ -47,7 +47,7 @@ else
     Write-Host "The attribute lithnetAdminPassword already exists"
 }
 
-if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&(ldapDisplayName=lithnetAdminPasswordHistory)(objectclass=attributeSchema)(!(isDefunct=true)))"))
+if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&(ldapDisplayName=lithnetAdminPasswordHistory)(objectclass=attributeSchema)(!(isDefunct=TRUE)))"))
 {
     New-ADObject -Name "Lithnet-Admin-Password-History" -Type "attributeSchema" -Path $schemaNC -Server $schemaMaster.HostName -OtherAttributes @{
         schemaIDGUID                  = [Guid]::new("5e7f84e2-9561-4ac3-b3b4-0000121aa663").ToByteArray()
@@ -70,7 +70,7 @@ else
     Write-Host "The attribute lithnetAdminPasswordHistory already exists"
 }
 
-if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&(ldapDisplayName=lithnetAdminPasswordExpiry)(objectclass=attributeSchema)(!(isDefunct=true)))"))
+if (-not (Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&(ldapDisplayName=lithnetAdminPasswordExpiry)(objectclass=attributeSchema)(!(isDefunct=TRUE)))"))
 {
     New-ADObject -Name "Lithnet-Admin-Password-Expiry" -Type "attributeSchema" -Path $schemaNC -Server $schemaMaster.HostName -OtherAttributes @{
         schemaIDGUID                  = [Guid]::new("0f65f007-22e9-4a4f-9fba-000025aa156d").ToByteArray()

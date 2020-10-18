@@ -15,7 +15,7 @@
 
     <AdornerDecorator>
         <StackPanel>
-  
+
             <DockPanel>
                 <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
                     <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
@@ -95,6 +95,7 @@
                     <RowDefinition />
                     <RowDefinition />
                     <RowDefinition />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
 
                 <TextBlock Grid.Row="0" Grid.Column="0" 
@@ -154,6 +155,11 @@
                             HorizontalAlignment="Left"
                             Margin="5"/>
                 </StackPanel>
+
+                <CheckBox Grid.Row="4" Grid.Column="1"
+                          Content="Exclude disabled computer objects from discovery"
+                          IsChecked="{Binding IgnoreDisabledComputerObjects}"
+                          Margin="5"/>
             </Grid>
         </StackPanel>
     </AdornerDecorator>

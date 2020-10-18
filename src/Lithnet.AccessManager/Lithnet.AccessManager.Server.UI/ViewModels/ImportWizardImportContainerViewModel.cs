@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
-using System.Management.Automation.Language;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.UI.AuthorizationRuleImport;
@@ -60,6 +59,8 @@ namespace Lithnet.AccessManager.Server.UI
         public string DoNotConsolidateOnErrorText { get; set; }
 
         public string ContainerHelperText { get; set; }
+
+        public bool IgnoreDisabledComputerObjects { get; set; } = true;
 
         public SecurityIdentifierViewModel SelectedFilteredSid { get; set; }
 

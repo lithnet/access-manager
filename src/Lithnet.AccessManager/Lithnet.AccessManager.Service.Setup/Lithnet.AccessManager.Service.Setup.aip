@@ -7,6 +7,7 @@
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
     <ROW Property="AI_FINDEXE_TITLE" Value="Select the installation package for [|ProductName]" ValueLocId="AI.Property.FindExeTitle"/>
     <ROW Property="AI_LOGON_AS_SERVICE_ACCOUNTS" Value="[USER_NAME]"/>
+    <ROW Property="AI_PREREQ_REPAIR_ENABLED" MultiBuildValue="DefaultBuild:1"/>
     <ROW Property="AI_RUN_AS_ADMIN" Value="1"/>
     <ROW Property="AI_ThemeStyle" Value="aero" MsiKey="AI_ThemeStyle"/>
     <ROW Property="AI_USER_IGNORE_FULLNAME" Value="1"/>
@@ -17,10 +18,10 @@
     <ROW Property="CTRLS" Value="2"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{F518B241-48F2-4DD1-B8B0-BD4A8B77CA3B} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{74BCBD9B-EC6D-45D3-B485-DE311F9627E0} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7624.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7644.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="RUNAPPLICATION" Value="1" Type="4"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
@@ -92,15 +93,15 @@
     <ROW Component="APPDIR" ComponentId="{F9AEC186-4F5E-404F-991C-59F9414E9848}" Directory_="APPDIR" Attributes="0"/>
     <ROW Component="AccessManagerService" ComponentId="{7A348F02-D471-4E9B-AE59-21D38089B507}" Directory_="APPDIR" Attributes="260" KeyPath="AccessManagerService"/>
     <ROW Component="CimCmdlets.psd1" ComponentId="{19FC76BC-BDB2-4D1B-A139-14DCF06BCB86}" Directory_="CimCmdlets_Dir" Attributes="0" KeyPath="CimCmdlets.psd1" Type="0"/>
-    <ROW Component="ControlzEx.dll" ComponentId="{5AA8ACA1-3B5E-4E83-B240-2B29E1469B74}" Directory_="APPDIR" Attributes="0" KeyPath="ControlzEx.dll"/>
+    <ROW Component="ControlzEx.dll" ComponentId="{42DB7DB5-D3DE-4B89-ABC2-9D5291EB4B82}" Directory_="APPDIR" Attributes="0" KeyPath="ControlzEx.dll"/>
     <ROW Component="CsvHelper.dll" ComponentId="{CD84DF5B-B067-4AAC-B06F-09695964D674}" Directory_="APPDIR" Attributes="0" KeyPath="CsvHelper.dll"/>
     <ROW Component="Diagnostics.format.ps1xml" ComponentId="{BB25EE07-1937-49B5-A660-D7C1A6FA7152}" Directory_="Microsoft.PowerShell.Diagnostic_Dir" Attributes="0" KeyPath="Diagnostics.format.ps1xml" Type="0"/>
-    <ROW Component="EventLogMessages.dll" ComponentId="{CC7CC44A-3874-498B-9545-DEB5C8710543}" Directory_="APPDIR" Attributes="256" KeyPath="EventLogMessages.dll"/>
-    <ROW Component="FluentValidation.dll" ComponentId="{8BFEC7C5-222F-4A6B-8D54-FCB9CFEA515D}" Directory_="APPDIR" Attributes="0" KeyPath="FluentValidation.dll"/>
+    <ROW Component="EventLogMessages.dll" ComponentId="{183E464A-8D52-47F0-A02D-DAAE2CC2DC1F}" Directory_="APPDIR" Attributes="256" KeyPath="EventLogMessages.dll"/>
+    <ROW Component="FluentValidation.dll" ComponentId="{7EFC4B04-1F5D-429C-9C28-85831DC3B344}" Directory_="APPDIR" Attributes="0" KeyPath="FluentValidation.dll"/>
     <ROW Component="HtmlAgilityPack.dll" ComponentId="{8505AA5C-23A4-4869-9C25-E396707B78B8}" Directory_="APPDIR" Attributes="0" KeyPath="HtmlAgilityPack.dll"/>
     <ROW Component="InconsolataRegular.ttf" ComponentId="{599B69B5-3EBB-4383-A188-CF1595F67276}" Directory_="fonts_Dir" Attributes="0" Type="0"/>
     <ROW Component="Lithnet" ComponentId="{87EF8BF8-4942-4907-826F-8DC42D990F22}" Directory_="Lithnet_Dir" Attributes="0"/>
-    <ROW Component="Lithnet.AccessManager.Server.UI.dll" ComponentId="{3F7461B5-EFB6-48F1-8CBA-9CB1F97BC88A}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.Server.UI.dll"/>
+    <ROW Component="Lithnet.AccessManager.Server.UI.dll" ComponentId="{B8CE773B-3F5A-4DFE-B936-C1EE9C5C053D}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.Server.UI.dll"/>
     <ROW Component="Lithnet.AccessManager.Server.UI.exe" ComponentId="{12E3D520-C42D-4704-B2A5-EAC20746AEF3}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.Server.UI.exe"/>
     <ROW Component="Lithnet.AccessManager.Server.dll" ComponentId="{C36055FC-20C8-47CA-B618-F40CD40A68FE}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Server.dll"/>
     <ROW Component="Lithnet.AccessManager.Service.Views.dll" ComponentId="{062BFBE6-BD2F-4C8C-9298-288080A0BE0B}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.Service.Views.dll"/>
@@ -109,39 +110,39 @@
     <ROW Component="Lithnet.AccessManager.dll" ComponentId="{B91416EA-CBCE-4214-AB9E-F8923BDB686F}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.dll"/>
     <ROW Component="Lithnet.Security.Authorization.dll" ComponentId="{C520F985-3F93-4741-9B5B-679D61217543}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.Security.Authorization.dll"/>
     <ROW Component="Logs" ComponentId="{08C528FB-E4C4-4788-8599-0B707DA73F5F}" Directory_="Logs_Dir" Attributes="0"/>
-    <ROW Component="MahApps.Metro.IconPacks.BoxIcons.dll" ComponentId="{0C6CEFAC-B384-4BC2-B08D-A68BC0F6B62A}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.BoxIcons.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.Core.dll" ComponentId="{DBE99A28-BB9C-4D07-AC69-9C7FB92BFF3F}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Core.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.Entypo.dll" ComponentId="{55CE19D8-9DDF-49D0-9223-8FCBBACD023A}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Entypo.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.EvaIcons.dll" ComponentId="{058B5229-4393-43E8-B5CF-495863D7C107}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.EvaIcons.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.FeatherIcons.dll" ComponentId="{8C036996-1430-4F5B-9884-AB90538BE470}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.FeatherIcons.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.FontAwesome.dll" ComponentId="{C9E7CE3B-C0D0-457E-B4A9-E2A5ACF24DCB}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.FontAwesome.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.Ionicons.dll" ComponentId="{185E8A42-35A9-404E-BC40-E19C2E4C9519}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Ionicons.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.JamIcons.dll" ComponentId="{86DE29CE-5145-4BCF-9E09-F44B2182A3F5}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.JamIcons.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.Material.dll" ComponentId="{4B34EFCE-209B-4A20-A415-2CDF6A9178B5}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Material.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.MaterialDesign.dll" ComponentId="{EEDE381C-C885-474D-A537-4F57B1FCDC07}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.MaterialDesign.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.MaterialLight.dll" ComponentId="{CB270B0C-1EC0-4B54-9C3D-C3186814841C}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.MaterialLight.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.Microns.dll" ComponentId="{BAA2F79D-2272-42DF-9791-C9CEEF97553C}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Microns.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.Modern.dll" ComponentId="{E2CE008F-93FE-4EF6-A850-E795B890B0B0}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Modern.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.Octicons.dll" ComponentId="{063904D2-CDA2-426A-B9C6-CD73FB05AE2E}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Octicons.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.PicolIcons.dll" ComponentId="{74333ECF-347C-40D7-9D08-31E5447FA0FB}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.PicolIcons.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.RPGAwesome.dll" ComponentId="{4A10B8EA-7B43-477C-9B39-4CAA01DFCD53}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.RPGAwesome.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.SimpleIcons.dll" ComponentId="{5B60214B-C93D-4EBC-A539-CC5CC6F15976}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.SimpleIcons.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.Typicons.dll" ComponentId="{E68A4710-E1BD-4F15-A70F-C0B2A85D9069}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Typicons.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.Unicons.dll" ComponentId="{6FE29B43-4617-4EC5-B425-1EBA1E0DB6D3}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Unicons.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.WeatherIcons.dll" ComponentId="{41CEBF7A-F979-4FDA-B704-8C14C32317D4}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.WeatherIcons.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.Zondicons.dll" ComponentId="{D20A21DA-ECD6-439D-B6BD-E77CDF898EB7}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Zondicons.dll"/>
-    <ROW Component="MahApps.Metro.IconPacks.dll" ComponentId="{99CC9F46-1CF8-459C-AE90-4E46B1D3B667}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.dll"/>
-    <ROW Component="MahApps.Metro.SimpleChildWindow.dll" ComponentId="{1BE5C6B8-6315-4443-B71E-64728D758FDE}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.SimpleChildWindow.dll"/>
-    <ROW Component="MahApps.Metro.dll" ComponentId="{2563A707-4A58-4EE1-9373-6C365A53FD70}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.BoxIcons.dll" ComponentId="{40360112-AA7B-4AD8-B983-7CF3A7EA12B9}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.BoxIcons.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.Core.dll" ComponentId="{1C108A0F-9FA2-41B1-BECA-980DA861497D}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Core.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.Entypo.dll" ComponentId="{47863004-E345-4386-AF24-F58109A67901}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Entypo.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.EvaIcons.dll" ComponentId="{D403DC1E-F638-450B-A516-E53AF2BD4B30}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.EvaIcons.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.FeatherIcons.dll" ComponentId="{BA177887-3950-40D2-B7D4-6C02BBAC4AD4}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.FeatherIcons.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.FontAwesome.dll" ComponentId="{241A4475-B5E4-4B98-9D13-B02BC9828DF8}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.FontAwesome.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.Ionicons.dll" ComponentId="{0D6E53F4-1BE5-4F38-B18D-83F0F54884B9}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Ionicons.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.JamIcons.dll" ComponentId="{998A2648-EBF5-43E6-B5AD-E540C37867FB}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.JamIcons.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.Material.dll" ComponentId="{8EBFDB99-3B33-41B1-8F69-19FD967445B6}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Material.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.MaterialDesign.dll" ComponentId="{66A9A6CE-2604-4DCE-97DF-AE218B81122B}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.MaterialDesign.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.MaterialLight.dll" ComponentId="{B3659F0A-2203-4B37-A8E7-1B8D2D396647}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.MaterialLight.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.Microns.dll" ComponentId="{3C7C4B06-1CBF-4EB1-BB1F-8CF019A40D30}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Microns.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.Modern.dll" ComponentId="{42F847F9-FF3A-40A6-BB61-F75EAF1DF55A}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Modern.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.Octicons.dll" ComponentId="{52036B10-785A-4B35-9EEA-C40D0B7DED3B}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Octicons.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.PicolIcons.dll" ComponentId="{A3ABCFE1-95F5-4699-97F4-BE8FBB2DE484}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.PicolIcons.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.RPGAwesome.dll" ComponentId="{BE857CB5-8298-4244-8AA2-CDECC27BAB8E}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.RPGAwesome.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.SimpleIcons.dll" ComponentId="{C48655AC-65F8-4E22-AFFC-C4735E058042}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.SimpleIcons.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.Typicons.dll" ComponentId="{16956DCA-B15B-4D92-B937-171255AF18C3}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Typicons.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.Unicons.dll" ComponentId="{1C6CC352-FC67-483C-AB48-074EE8344B1B}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Unicons.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.WeatherIcons.dll" ComponentId="{2C1247FC-265C-4B14-A230-F10D2D13CCD3}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.WeatherIcons.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.Zondicons.dll" ComponentId="{4A1B5AA7-9D4B-4AE8-9782-79D2A049B348}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.Zondicons.dll"/>
+    <ROW Component="MahApps.Metro.IconPacks.dll" ComponentId="{A578B158-26DD-4413-8859-B498001F078C}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.dll"/>
+    <ROW Component="MahApps.Metro.SimpleChildWindow.dll" ComponentId="{7D82607D-94F7-442B-8EBC-EBA405F562E8}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.SimpleChildWindow.dll"/>
+    <ROW Component="MahApps.Metro.dll" ComponentId="{F8EDDAC2-FB2C-4D65-B906-35493EDF06C2}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.dll"/>
     <ROW Component="Markdig.Signed.dll" ComponentId="{8BE41F83-8EA4-41AE-84FD-24104E136B56}" Directory_="APPDIR" Attributes="0" KeyPath="Markdig.Signed.dll"/>
     <ROW Component="Microsoft.ApplicationInsights.dll" ComponentId="{0E967D98-6AA8-4AE3-BD7A-4A674C74AA4B}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.ApplicationInsights.dll"/>
     <ROW Component="Microsoft.AspNetCore.Authentication.JwtBearer.dll" ComponentId="{AD729529-919D-44B2-8A6B-43C7FC145F05}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Authentication.JwtBearer.dll"/>
     <ROW Component="Microsoft.AspNetCore.Authentication.OpenIdConnect.dll" ComponentId="{9B63B1D6-F7CF-4912-AC89-2A4DF1B15B0D}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Authentication.OpenIdConnect.dll"/>
     <ROW Component="Microsoft.AspNetCore.Authentication.WsFederation.dll" ComponentId="{9AD44D01-F1C6-4CD7-BBFD-88B5BFA3486D}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Authentication.WsFederation.dll"/>
-    <ROW Component="Microsoft.AspNetCore.Http.Abstractions.dll" ComponentId="{65A4410D-17C1-4ABE-9788-B7F0343D7FC0}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Http.Abstractions.dll"/>
-    <ROW Component="Microsoft.AspNetCore.Http.Extensions.dll" ComponentId="{E43D9906-0B86-4EFD-8908-F90A255D9A1A}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Http.Extensions.dll"/>
-    <ROW Component="Microsoft.AspNetCore.Http.Features.dll" ComponentId="{7523B52C-8A58-4766-A0B9-DC467FA55763}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Http.Features.dll"/>
-    <ROW Component="Microsoft.AspNetCore.HttpOverrides.dll" ComponentId="{7D5CC644-49FA-4665-8735-2E21C0AC2C87}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.HttpOverrides.dll"/>
+    <ROW Component="Microsoft.AspNetCore.Http.Abstractions.dll" ComponentId="{D08873BD-7F5F-4160-9D99-31214A44DDCD}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Http.Abstractions.dll"/>
+    <ROW Component="Microsoft.AspNetCore.Http.Extensions.dll" ComponentId="{426D3425-0C82-409E-A104-47BF2A693046}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Http.Extensions.dll"/>
+    <ROW Component="Microsoft.AspNetCore.Http.Features.dll" ComponentId="{88427C4A-F67E-411D-B73C-ACF9D65345C3}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Http.Features.dll"/>
+    <ROW Component="Microsoft.AspNetCore.HttpOverrides.dll" ComponentId="{48148CA2-8229-43D5-A600-F0E551330329}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.HttpOverrides.dll"/>
     <ROW Component="Microsoft.CSharp.dll" ComponentId="{D0549982-338F-4F85-B27B-546E82DE1C91}" Directory_="ref_Dir" Attributes="0" KeyPath="Microsoft.CSharp.dll"/>
     <ROW Component="Microsoft.CodeAnalysis.CSharp.dll" ComponentId="{FE9109AF-EEF0-44AC-894E-0459939EB8ED}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.CodeAnalysis.CSharp.dll"/>
     <ROW Component="Microsoft.CodeAnalysis.dll" ComponentId="{6A2938B3-D251-43B0-BA7B-46E1A4F62B48}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.CodeAnalysis.dll"/>
@@ -158,6 +159,7 @@
     <ROW Component="Microsoft.Extensions.DependencyInjection.Abstractions.dll" ComponentId="{5CF99C12-8792-4120-A4E4-6C51D659B022}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.DependencyInjection.Abstractions.dll"/>
     <ROW Component="Microsoft.Extensions.DependencyInjection.dll" ComponentId="{A18F63B0-2771-4C55-897B-8E890D35DAA8}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.DependencyInjection.dll"/>
     <ROW Component="Microsoft.Extensions.FileProviders.Abstractions.dll" ComponentId="{9FE9437C-5D08-41DC-A2B1-0761CBAEBD0A}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.FileProviders.Abstractions.dll"/>
+    <ROW Component="Microsoft.Extensions.FileProviders.Embedded.dll" ComponentId="{6D9EC9C3-8297-486B-9A4F-47B18F4EA021}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.FileProviders.Embedded.dll"/>
     <ROW Component="Microsoft.Extensions.FileProviders.Physical.dll" ComponentId="{45CE122C-9876-41BE-8831-A7C6B7BDC972}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.FileProviders.Physical.dll"/>
     <ROW Component="Microsoft.Extensions.FileSystemGlobbing.dll" ComponentId="{D1D0CA68-5379-4ADA-8A0D-970898EB3C85}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.FileSystemGlobbing.dll"/>
     <ROW Component="Microsoft.Extensions.Hosting.Abstractions.dll" ComponentId="{D857E15A-49AB-42B3-9AA4-9B4234FF0B66}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Hosting.Abstractions.dll"/>
@@ -184,7 +186,7 @@
     <ROW Component="Microsoft.Management.Infrastructure.CimCmdlets.dll" ComponentId="{29348E99-D1E9-4466-9789-DF9E6E2F7BF0}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.CimCmdlets.dll"/>
     <ROW Component="Microsoft.Management.Infrastructure.Native.dll" ComponentId="{77A30568-DDC8-4A42-A490-177702A46945}" Directory_="APPDIR" Attributes="256" KeyPath="Microsoft.Management.Infrastructure.Native.dll"/>
     <ROW Component="Microsoft.Management.Infrastructure.dll" ComponentId="{53070632-0ADE-4266-A2E2-6100C6B7063C}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.dll"/>
-    <ROW Component="Microsoft.Net.Http.Headers.dll" ComponentId="{DD8F5234-B49E-4D23-AEC6-027F6FDC6E06}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Net.Http.Headers.dll"/>
+    <ROW Component="Microsoft.Net.Http.Headers.dll" ComponentId="{19B425A2-9564-4CD2-AD1B-77160883A35A}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Net.Http.Headers.dll"/>
     <ROW Component="Microsoft.PowerShell.Commands.Diagnostics.dll" ComponentId="{F7D64C85-F617-4D87-A315-B2BDF776FDC2}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.Commands.Diagnostics.dll"/>
     <ROW Component="Microsoft.PowerShell.Commands.Management.dll" ComponentId="{C1B50920-7F6E-46E0-B792-4DD9E3003910}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.Commands.Management.dll"/>
     <ROW Component="Microsoft.PowerShell.Commands.Utility.dll" ComponentId="{F2464B58-8533-45D2-BED8-B5D916F00AEB}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.Commands.Utility.dll"/>
@@ -208,7 +210,8 @@
     <ROW Component="Microsoft.WSMan.Runtime.dll" ComponentId="{E37837F5-3BA8-4119-B266-076A52FB3435}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.WSMan.Runtime.dll"/>
     <ROW Component="Microsoft.Win32.Primitives.dll" ComponentId="{1D59DF23-C691-4C38-84B8-288329CD2F91}" Directory_="ref_Dir" Attributes="0" KeyPath="Microsoft.Win32.Primitives.dll"/>
     <ROW Component="Microsoft.Win32.Registry.AccessControl.dll" ComponentId="{77F34DA3-8885-4F68-831E-63CFDE11899B}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Win32.Registry.AccessControl.dll"/>
-    <ROW Component="Microsoft.Xaml.Behaviors.dll" ComponentId="{CD2FA4AE-0E19-43F0-A2EC-5F31AFDC4C15}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Xaml.Behaviors.dll"/>
+    <ROW Component="Microsoft.Xaml.Behaviors.dll" ComponentId="{3E64F50A-5AB2-44CD-8F94-EFBC05752301}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Xaml.Behaviors.dll"/>
+    <ROW Component="MicrosoftSQLServer" ComponentId="{0BE4E73A-67E5-4544-B360-C66FBD696920}" Directory_="APPDIR" Attributes="260" KeyPath="MicrosoftSQLServer" Options="2"/>
     <ROW Component="NJsonSchema.dll" ComponentId="{F8CC9122-BFBB-4FFB-AE60-6E3CDC30913D}" Directory_="APPDIR" Attributes="0" KeyPath="NJsonSchema.dll"/>
     <ROW Component="NLog.Extensions.Logging.dll" ComponentId="{7DE11411-9180-4788-ADB0-ED0D3352587B}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.Extensions.Logging.dll"/>
     <ROW Component="NLog.Web.AspNetCore.dll" ComponentId="{E6FE2BF1-AAD2-4D55-893D-A0056725F854}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.Web.AspNetCore.dll"/>
@@ -218,9 +221,9 @@
     <ROW Component="PSDiagnostics.psd1" ComponentId="{21CD8837-1EB6-4D6E-A9FD-C0AF347CF1AC}" Directory_="PSDiagnostics_Dir" Attributes="0" KeyPath="PSDiagnostics.psd1" Type="0"/>
     <ROW Component="PowerShell.Core.Instrumentation.dll" ComponentId="{C93C7DED-B22F-4C2A-99CB-E766FFF33310}" Directory_="APPDIR" Attributes="256" KeyPath="PowerShell.Core.Instrumentation.dll"/>
     <ROW Component="ProductInformation" ComponentId="{EF48E22B-B87F-4609-BCA9-10F3D3A555BF}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
-    <ROW Component="PropertyChanged.dll" ComponentId="{B53211A2-769C-4989-955F-BE5FF81F4B34}" Directory_="APPDIR" Attributes="0" KeyPath="PropertyChanged.dll"/>
-    <ROW Component="SslCertBinding.Net.dll" ComponentId="{4ED96CB7-EECE-4BAC-9DB2-6BF79C5652B8}" Directory_="APPDIR" Attributes="0" KeyPath="SslCertBinding.Net.dll"/>
-    <ROW Component="Stylet.dll" ComponentId="{2D1874CF-81D8-453A-8F20-EEA3E6FA65CB}" Directory_="APPDIR" Attributes="0" KeyPath="Stylet.dll"/>
+    <ROW Component="PropertyChanged.dll" ComponentId="{29A57540-8DD1-47A8-ABDE-E4A76B306262}" Directory_="APPDIR" Attributes="0" KeyPath="PropertyChanged.dll"/>
+    <ROW Component="SslCertBinding.Net.dll" ComponentId="{8E16E68A-A2C0-4A97-8799-100A2FD01191}" Directory_="APPDIR" Attributes="0" KeyPath="SslCertBinding.Net.dll"/>
+    <ROW Component="Stylet.dll" ComponentId="{F95F7D4F-064E-44E3-AA02-3980AD4627B1}" Directory_="APPDIR" Attributes="0" KeyPath="Stylet.dll"/>
     <ROW Component="System.AppContext.dll" ComponentId="{1B762BFF-41E7-42C3-9A1B-202A716CF768}" Directory_="ref_Dir" Attributes="0" KeyPath="System.AppContext.dll"/>
     <ROW Component="System.Buffers.dll" ComponentId="{0130FA7C-409A-4431-A7F5-66DBDEE2C1CB}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Buffers.dll"/>
     <ROW Component="System.CodeDom.dll" ComponentId="{BA178201-EC2B-4BC8-AD0D-B2AFEEBE68A6}" Directory_="APPDIR" Attributes="0" KeyPath="System.CodeDom.dll"/>
@@ -367,7 +370,7 @@
     <ROW Component="System.Text.Encoding.dll" ComponentId="{DC690EFC-BC23-41E5-9B17-2553766A43F5}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Text.Encoding.dll"/>
     <ROW Component="System.Text.Encodings.Web.dll" ComponentId="{04BBD469-845C-4AAB-8D93-A297408E1253}" Directory_="APPDIR" Attributes="0" KeyPath="System.Text.Encodings.Web.dll"/>
     <ROW Component="System.Text.Json.dll" ComponentId="{9EEB30B1-56D7-4B5E-A72E-929CA0B82C20}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Text.Json.dll"/>
-    <ROW Component="System.Text.Json.dll_1" ComponentId="{AE6F7D85-A833-4BCF-9992-A33AF41D8753}" Directory_="APPDIR" Attributes="0" KeyPath="System.Text.Json.dll_1"/>
+    <ROW Component="System.Text.Json.dll_1" ComponentId="{B71BF89F-6A21-4592-B4C8-BE0DDA86D412}" Directory_="APPDIR" Attributes="0" KeyPath="System.Text.Json.dll_1"/>
     <ROW Component="System.Text.RegularExpressions.dll" ComponentId="{EE4132A8-B791-450A-A183-B10AE8670CBE}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Text.RegularExpressions.dll"/>
     <ROW Component="System.Threading.AccessControl.dll" ComponentId="{6C07095E-D48B-45FC-985E-917116077EDE}" Directory_="APPDIR" Attributes="0" KeyPath="System.Threading.AccessControl.dll"/>
     <ROW Component="System.Threading.Channels.dll" ComponentId="{E7140A33-43B1-43B4-81EC-351A2D6B485E}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Threading.Channels.dll"/>
@@ -404,7 +407,7 @@
     <ROW Component="Vanara.PInvoke.Shared.dll" ComponentId="{E7A3EFE6-B53C-4E22-981D-BB99B883514C}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Shared.dll"/>
     <ROW Component="Vanara.PInvoke.Ws2_32.dll" ComponentId="{C1ADD727-83D1-474F-A7AF-F30C3DD13600}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Ws2_32.dll"/>
     <ROW Component="WindowsBase.dll" ComponentId="{5FEB7CF7-9184-4567-B6EE-BA06B26334CC}" Directory_="ref_Dir" Attributes="0" KeyPath="WindowsBase.dll"/>
-    <ROW Component="WindowsFirewallHelper.dll" ComponentId="{D7719CCD-5293-4ABF-AD98-0F9FBC2D803B}" Directory_="APPDIR" Attributes="0" KeyPath="WindowsFirewallHelper.dll"/>
+    <ROW Component="WindowsFirewallHelper.dll" ComponentId="{B637DAF6-EB72-4EDE-BC69-F516E9C7F570}" Directory_="APPDIR" Attributes="0" KeyPath="WindowsFirewallHelper.dll"/>
     <ROW Component="all.css" ComponentId="{B40E0286-ED2B-4ADC-921D-7D72ACCB4816}" Directory_="css_2_Dir" Attributes="0" KeyPath="all.css" Type="0"/>
     <ROW Component="all.js" ComponentId="{2CFA21C0-433E-414B-A7D8-2D68B32E35E7}" Directory_="js_2_Dir" Attributes="0" KeyPath="all.js" Type="0"/>
     <ROW Component="apimswincorefilel121.dll" ComponentId="{7D9364E0-D30F-4848-A8A9-58EAFB2DA475}" Directory_="APPDIR" Attributes="256" KeyPath="apimswincorefilel121.dll"/>
@@ -453,6 +456,7 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
     <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="0"/>
+    <ROW Feature="MicrosoftSQLServer" Title="Microsoft SQL Server 2019 LocalDB" Description="Microsoft SQL Server 2019 LocalDB" Display="5" Level="1" Attributes="16"/>
     <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
@@ -686,7 +690,6 @@
     <ROW File="PSDiagnostics.psd1" Component_="PSDiagnostics.psd1" FileName="PSDIAG~1.PSD|PSDiagnostics.psd1" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp3.1\Modules\PSDiagnostics\PSDiagnostics.psd1" SelfReg="false"/>
     <ROW File="PSDiagnostics.psm1" Component_="PSDiagnostics.psd1" FileName="PSDIAG~1.PSM|PSDiagnostics.psm1" Attributes="0" SourcePath="output\runtimes\win\lib\netcoreapp3.1\Modules\PSDiagnostics\PSDiagnostics.psm1" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Server.UI.exe" Component_="Lithnet.AccessManager.Server.UI.exe" FileName="LITHNE~2.EXE|Lithnet.AccessManager.Server.UI.exe" Attributes="0" SourcePath="output\Lithnet.AccessManager.Server.UI.exe" SelfReg="false"/>
-    <ROW File="EventLogMessages.dll" Component_="EventLogMessages.dll" FileName="EVENTL~1.DLL|EventLogMessages.dll" Attributes="0" SourcePath="C:\Windows\Microsoft.NET\Framework64\v4.0.30319\EventLogMessages.dll" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Service.deps.json" Component_="apphost.json" FileName="LITHNE~1.JSO|Lithnet.AccessManager.Service.deps.json" Attributes="0" SourcePath="output\Lithnet.AccessManager.Service.deps.json" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Service.dll" Component_="Lithnet.AccessManager.Service.dll" FileName="LITHNE~3.DLL|Lithnet.AccessManager.Service.dll" Attributes="0" SourcePath="output\Lithnet.AccessManager.Service.dll" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Service.pdb" Component_="Lithnet.AccessManager.Service.exe" FileName="LITHNE~3.PDB|Lithnet.AccessManager.Service.pdb" Attributes="0" SourcePath="output\Lithnet.AccessManager.Service.pdb" SelfReg="false"/>
@@ -795,45 +798,6 @@
     <ROW File="fasolid900.woff2" Component_="fabrands400.eot" FileName="FA-SOL~2.WOF|fa-solid-900.woff2" Attributes="0" SourcePath="output\wwwroot\lib\font-awesome\webfonts\fa-solid-900.woff2" SelfReg="false"/>
     <ROW File="jquery.min.js" Component_="jquery.min.js" FileName="JQUERY~1.JS|jquery.min.js" Attributes="0" SourcePath="output\wwwroot\lib\jquery\jquery.min.js" SelfReg="false"/>
     <ROW File="jquery.min.map" Component_="jquery.min.js" FileName="JQUERY~1.MAP|jquery.min.map" Attributes="0" SourcePath="output\wwwroot\lib\jquery\jquery.min.map" SelfReg="false"/>
-    <ROW File="ControlzEx.dll" Component_="ControlzEx.dll" FileName="CONTRO~1.DLL|ControlzEx.dll" Attributes="0" SourcePath="output\ControlzEx.dll" SelfReg="false"/>
-    <ROW File="FluentValidation.dll" Component_="FluentValidation.dll" FileName="FLUENT~1.DLL|FluentValidation.dll" Attributes="0" SourcePath="output\FluentValidation.dll" SelfReg="false"/>
-    <ROW File="Lithnet.AccessManager.Server.UI.deps.json" Component_="apphost.json" FileName="LITHNE~3.JSO|Lithnet.AccessManager.Server.UI.deps.json" Attributes="0" SourcePath="output\Lithnet.AccessManager.Server.UI.deps.json" SelfReg="false"/>
-    <ROW File="Lithnet.AccessManager.Server.UI.dll" Component_="Lithnet.AccessManager.Server.UI.dll" FileName="LITHNE~6.DLL|Lithnet.AccessManager.Server.UI.dll" Attributes="0" SourcePath="output\Lithnet.AccessManager.Server.UI.dll" SelfReg="false"/>
-    <ROW File="Lithnet.AccessManager.Server.UI.pdb" Component_="Lithnet.AccessManager.Server.UI.exe" FileName="LITHNE~5.PDB|Lithnet.AccessManager.Server.UI.pdb" Attributes="0" SourcePath="output\Lithnet.AccessManager.Server.UI.pdb" SelfReg="false"/>
-    <ROW File="Lithnet.AccessManager.Server.UI.runtimeconfig.json" Component_="apphost.json" FileName="LITHNE~4.JSO|Lithnet.AccessManager.Server.UI.runtimeconfig.json" Attributes="0" SourcePath="output\Lithnet.AccessManager.Server.UI.runtimeconfig.json" SelfReg="false"/>
-    <ROW File="MahApps.Metro.dll" Component_="MahApps.Metro.dll" FileName="MAHAPP~1.DLL|MahApps.Metro.dll" Attributes="0" SourcePath="output\MahApps.Metro.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.BoxIcons.dll" Component_="MahApps.Metro.IconPacks.BoxIcons.dll" FileName="MAHAPP~2.DLL|MahApps.Metro.IconPacks.BoxIcons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.BoxIcons.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.Core.dll" Component_="MahApps.Metro.IconPacks.Core.dll" FileName="MAHAPP~3.DLL|MahApps.Metro.IconPacks.Core.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Core.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.dll" Component_="MahApps.Metro.IconPacks.dll" FileName="MAHAPP~4.DLL|MahApps.Metro.IconPacks.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.Entypo.dll" Component_="MahApps.Metro.IconPacks.Entypo.dll" FileName="MAHAPP~5.DLL|MahApps.Metro.IconPacks.Entypo.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Entypo.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.EvaIcons.dll" Component_="MahApps.Metro.IconPacks.EvaIcons.dll" FileName="MAHAPP~6.DLL|MahApps.Metro.IconPacks.EvaIcons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.EvaIcons.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.FeatherIcons.dll" Component_="MahApps.Metro.IconPacks.FeatherIcons.dll" FileName="MAHAPP~7.DLL|MahApps.Metro.IconPacks.FeatherIcons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.FeatherIcons.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.FontAwesome.dll" Component_="MahApps.Metro.IconPacks.FontAwesome.dll" FileName="MAHAPP~8.DLL|MahApps.Metro.IconPacks.FontAwesome.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.FontAwesome.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.Ionicons.dll" Component_="MahApps.Metro.IconPacks.Ionicons.dll" FileName="MAHAPP~9.DLL|MahApps.Metro.IconPacks.Ionicons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Ionicons.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.JamIcons.dll" Component_="MahApps.Metro.IconPacks.JamIcons.dll" FileName="MAHAP~10.DLL|MahApps.Metro.IconPacks.JamIcons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.JamIcons.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.Material.dll" Component_="MahApps.Metro.IconPacks.Material.dll" FileName="MAHAP~11.DLL|MahApps.Metro.IconPacks.Material.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Material.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.MaterialDesign.dll" Component_="MahApps.Metro.IconPacks.MaterialDesign.dll" FileName="MAHAP~12.DLL|MahApps.Metro.IconPacks.MaterialDesign.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.MaterialDesign.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.MaterialLight.dll" Component_="MahApps.Metro.IconPacks.MaterialLight.dll" FileName="MAHAP~13.DLL|MahApps.Metro.IconPacks.MaterialLight.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.MaterialLight.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.Microns.dll" Component_="MahApps.Metro.IconPacks.Microns.dll" FileName="MAHAP~14.DLL|MahApps.Metro.IconPacks.Microns.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Microns.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.Modern.dll" Component_="MahApps.Metro.IconPacks.Modern.dll" FileName="MAHAP~15.DLL|MahApps.Metro.IconPacks.Modern.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Modern.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.Octicons.dll" Component_="MahApps.Metro.IconPacks.Octicons.dll" FileName="MAHAP~16.DLL|MahApps.Metro.IconPacks.Octicons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Octicons.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.PicolIcons.dll" Component_="MahApps.Metro.IconPacks.PicolIcons.dll" FileName="MAHAP~17.DLL|MahApps.Metro.IconPacks.PicolIcons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.PicolIcons.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.RPGAwesome.dll" Component_="MahApps.Metro.IconPacks.RPGAwesome.dll" FileName="MAHAP~18.DLL|MahApps.Metro.IconPacks.RPGAwesome.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.RPGAwesome.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.SimpleIcons.dll" Component_="MahApps.Metro.IconPacks.SimpleIcons.dll" FileName="MAHAP~19.DLL|MahApps.Metro.IconPacks.SimpleIcons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.SimpleIcons.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.Typicons.dll" Component_="MahApps.Metro.IconPacks.Typicons.dll" FileName="MAHAP~20.DLL|MahApps.Metro.IconPacks.Typicons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Typicons.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.Unicons.dll" Component_="MahApps.Metro.IconPacks.Unicons.dll" FileName="MAHAP~21.DLL|MahApps.Metro.IconPacks.Unicons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Unicons.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.WeatherIcons.dll" Component_="MahApps.Metro.IconPacks.WeatherIcons.dll" FileName="MAHAP~22.DLL|MahApps.Metro.IconPacks.WeatherIcons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.WeatherIcons.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.IconPacks.Zondicons.dll" Component_="MahApps.Metro.IconPacks.Zondicons.dll" FileName="MAHAP~23.DLL|MahApps.Metro.IconPacks.Zondicons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Zondicons.dll" SelfReg="false"/>
-    <ROW File="MahApps.Metro.SimpleChildWindow.dll" Component_="MahApps.Metro.SimpleChildWindow.dll" FileName="MAHAP~24.DLL|MahApps.Metro.SimpleChildWindow.dll" Attributes="0" SourcePath="output\MahApps.Metro.SimpleChildWindow.dll" SelfReg="false"/>
-    <ROW File="Microsoft.AspNetCore.Http.Abstractions.dll" Component_="Microsoft.AspNetCore.Http.Abstractions.dll" FileName="MICRO~44.DLL|Microsoft.AspNetCore.Http.Abstractions.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.Http.Abstractions.dll" SelfReg="false"/>
-    <ROW File="Microsoft.AspNetCore.Http.Extensions.dll" Component_="Microsoft.AspNetCore.Http.Extensions.dll" FileName="MICRO~45.DLL|Microsoft.AspNetCore.Http.Extensions.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.Http.Extensions.dll" SelfReg="false"/>
-    <ROW File="Microsoft.AspNetCore.Http.Features.dll" Component_="Microsoft.AspNetCore.Http.Features.dll" FileName="MICRO~57.DLL|Microsoft.AspNetCore.Http.Features.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.Http.Features.dll" SelfReg="false"/>
-    <ROW File="Microsoft.AspNetCore.HttpOverrides.dll" Component_="Microsoft.AspNetCore.HttpOverrides.dll" FileName="MICRO~58.DLL|Microsoft.AspNetCore.HttpOverrides.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.HttpOverrides.dll" SelfReg="false"/>
-    <ROW File="Microsoft.Net.Http.Headers.dll" Component_="Microsoft.Net.Http.Headers.dll" FileName="MICRO~59.DLL|Microsoft.Net.Http.Headers.dll" Attributes="0" SourcePath="output\Microsoft.Net.Http.Headers.dll" SelfReg="false"/>
-    <ROW File="Microsoft.Xaml.Behaviors.dll" Component_="Microsoft.Xaml.Behaviors.dll" FileName="MICRO~60.DLL|Microsoft.Xaml.Behaviors.dll" Attributes="0" SourcePath="output\Microsoft.Xaml.Behaviors.dll" SelfReg="false"/>
-    <ROW File="SslCertBinding.Net.dll" Component_="SslCertBinding.Net.dll" FileName="SSLCER~1.DLL|SslCertBinding.Net.dll" Attributes="0" SourcePath="output\SslCertBinding.Net.dll" SelfReg="false"/>
-    <ROW File="Stylet.dll" Component_="Stylet.dll" FileName="Stylet.dll" Attributes="0" SourcePath="output\Stylet.dll" SelfReg="false"/>
-    <ROW File="System.Text.Json.dll_1" Component_="System.Text.Json.dll_1" FileName="SYSTE~34.DLL|System.Text.Json.dll" Attributes="0" SourcePath="output\System.Text.Json.dll" SelfReg="false"/>
     <ROW File="apphost.json_1" Component_="apphost.json_1" FileName="APPHOS~1.JSO|apphost.json" Attributes="0" SourcePath="output\config\apphost.json" SelfReg="false"/>
     <ROW File="appsettings.json_1" Component_="apphost.json_1" FileName="APPSET~1.JSO|appsettings.json" Attributes="0" SourcePath="output\config\appsettings.json" SelfReg="false"/>
     <ROW File="emailfailure.html" Component_="emailfailure.html" FileName="EMAIL-~1.HTM|email-failure.html" Attributes="0" SourcePath="output\config\audit-templates\email-failure.html" SelfReg="false"/>
@@ -878,13 +842,54 @@
     <ROW File="Microsoft.Management.Infrastructure.dll" Component_="Microsoft.Management.Infrastructure.dll" FileName="MICRO~61.DLL|Microsoft.Management.Infrastructure.dll" Attributes="0" SourcePath="output\Microsoft.Management.Infrastructure.dll" SelfReg="false"/>
     <ROW File="Microsoft.Management.Infrastructure.Native.dll" Component_="Microsoft.Management.Infrastructure.Native.dll" FileName="MICRO~62.DLL|Microsoft.Management.Infrastructure.Native.dll" Attributes="0" SourcePath="output\Microsoft.Management.Infrastructure.Native.dll" SelfReg="false"/>
     <ROW File="miutils.dll" Component_="miutils.dll" FileName="miutils.dll" Attributes="0" SourcePath="output\miutils.dll" SelfReg="false"/>
-    <ROW File="WindowsFirewallHelper.dll" Component_="WindowsFirewallHelper.dll" FileName="WINDOW~1.DLL|WindowsFirewallHelper.dll" Attributes="0" SourcePath="output\WindowsFirewallHelper.dll" SelfReg="false"/>
-    <ROW File="PropertyChanged.dll" Component_="PropertyChanged.dll" FileName="PROPER~1.DLL|PropertyChanged.dll" Attributes="0" SourcePath="output\PropertyChanged.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.Kernel32.dll" Component_="Vanara.PInvoke.Kernel32.dll" FileName="VANARA~4.DLL|Vanara.PInvoke.Kernel32.dll" Attributes="0" SourcePath="output\Vanara.PInvoke.Kernel32.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.NetApi32.dll" Component_="Vanara.PInvoke.NetApi32.dll" FileName="VANARA~5.DLL|Vanara.PInvoke.NetApi32.dll" Attributes="0" SourcePath="output\Vanara.PInvoke.NetApi32.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.Security.dll" Component_="Vanara.PInvoke.Security.dll" FileName="VANARA~6.DLL|Vanara.PInvoke.Security.dll" Attributes="0" SourcePath="output\Vanara.PInvoke.Security.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.Ws2_32.dll" Component_="Vanara.PInvoke.Ws2_32.dll" FileName="VANARA~7.DLL|Vanara.PInvoke.Ws2_32.dll" Attributes="0" SourcePath="output\Vanara.PInvoke.Ws2_32.dll" SelfReg="false"/>
     <ROW File="CsvHelper.dll" Component_="CsvHelper.dll" FileName="CSVHEL~1.DLL|CsvHelper.dll" Attributes="0" SourcePath="output\CsvHelper.dll" SelfReg="false"/>
+    <ROW File="ControlzEx.dll" Component_="ControlzEx.dll" FileName="CONTRO~1.DLL|ControlzEx.dll" Attributes="0" SourcePath="output\ControlzEx.dll" SelfReg="false"/>
+    <ROW File="FluentValidation.dll" Component_="FluentValidation.dll" FileName="FLUENT~1.DLL|FluentValidation.dll" Attributes="0" SourcePath="output\FluentValidation.dll" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Server.UI.deps.json" Component_="apphost.json" FileName="LITHNE~3.JSO|Lithnet.AccessManager.Server.UI.deps.json" Attributes="0" SourcePath="output\Lithnet.AccessManager.Server.UI.deps.json" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Server.UI.dll" Component_="Lithnet.AccessManager.Server.UI.dll" FileName="LITHNE~6.DLL|Lithnet.AccessManager.Server.UI.dll" Attributes="0" SourcePath="output\Lithnet.AccessManager.Server.UI.dll" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Server.UI.pdb" Component_="Lithnet.AccessManager.Server.UI.exe" FileName="LITHNE~5.PDB|Lithnet.AccessManager.Server.UI.pdb" Attributes="0" SourcePath="output\Lithnet.AccessManager.Server.UI.pdb" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Server.UI.runtimeconfig.json" Component_="apphost.json" FileName="LITHNE~4.JSO|Lithnet.AccessManager.Server.UI.runtimeconfig.json" Attributes="0" SourcePath="output\Lithnet.AccessManager.Server.UI.runtimeconfig.json" SelfReg="false"/>
+    <ROW File="MahApps.Metro.dll" Component_="MahApps.Metro.dll" FileName="MAHAPP~1.DLL|MahApps.Metro.dll" Attributes="0" SourcePath="output\MahApps.Metro.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.BoxIcons.dll" Component_="MahApps.Metro.IconPacks.BoxIcons.dll" FileName="MAHAPP~2.DLL|MahApps.Metro.IconPacks.BoxIcons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.BoxIcons.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.Core.dll" Component_="MahApps.Metro.IconPacks.Core.dll" FileName="MAHAPP~3.DLL|MahApps.Metro.IconPacks.Core.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Core.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.dll" Component_="MahApps.Metro.IconPacks.dll" FileName="MAHAPP~4.DLL|MahApps.Metro.IconPacks.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.Entypo.dll" Component_="MahApps.Metro.IconPacks.Entypo.dll" FileName="MAHAPP~5.DLL|MahApps.Metro.IconPacks.Entypo.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Entypo.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.EvaIcons.dll" Component_="MahApps.Metro.IconPacks.EvaIcons.dll" FileName="MAHAPP~6.DLL|MahApps.Metro.IconPacks.EvaIcons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.EvaIcons.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.FeatherIcons.dll" Component_="MahApps.Metro.IconPacks.FeatherIcons.dll" FileName="MAHAPP~7.DLL|MahApps.Metro.IconPacks.FeatherIcons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.FeatherIcons.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.FontAwesome.dll" Component_="MahApps.Metro.IconPacks.FontAwesome.dll" FileName="MAHAPP~8.DLL|MahApps.Metro.IconPacks.FontAwesome.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.FontAwesome.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.Ionicons.dll" Component_="MahApps.Metro.IconPacks.Ionicons.dll" FileName="MAHAPP~9.DLL|MahApps.Metro.IconPacks.Ionicons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Ionicons.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.JamIcons.dll" Component_="MahApps.Metro.IconPacks.JamIcons.dll" FileName="MAHAP~10.DLL|MahApps.Metro.IconPacks.JamIcons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.JamIcons.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.Material.dll" Component_="MahApps.Metro.IconPacks.Material.dll" FileName="MAHAP~11.DLL|MahApps.Metro.IconPacks.Material.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Material.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.MaterialDesign.dll" Component_="MahApps.Metro.IconPacks.MaterialDesign.dll" FileName="MAHAP~12.DLL|MahApps.Metro.IconPacks.MaterialDesign.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.MaterialDesign.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.MaterialLight.dll" Component_="MahApps.Metro.IconPacks.MaterialLight.dll" FileName="MAHAP~13.DLL|MahApps.Metro.IconPacks.MaterialLight.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.MaterialLight.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.Microns.dll" Component_="MahApps.Metro.IconPacks.Microns.dll" FileName="MAHAP~14.DLL|MahApps.Metro.IconPacks.Microns.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Microns.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.Modern.dll" Component_="MahApps.Metro.IconPacks.Modern.dll" FileName="MAHAP~15.DLL|MahApps.Metro.IconPacks.Modern.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Modern.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.Octicons.dll" Component_="MahApps.Metro.IconPacks.Octicons.dll" FileName="MAHAP~16.DLL|MahApps.Metro.IconPacks.Octicons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Octicons.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.PicolIcons.dll" Component_="MahApps.Metro.IconPacks.PicolIcons.dll" FileName="MAHAP~17.DLL|MahApps.Metro.IconPacks.PicolIcons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.PicolIcons.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.RPGAwesome.dll" Component_="MahApps.Metro.IconPacks.RPGAwesome.dll" FileName="MAHAP~18.DLL|MahApps.Metro.IconPacks.RPGAwesome.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.RPGAwesome.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.SimpleIcons.dll" Component_="MahApps.Metro.IconPacks.SimpleIcons.dll" FileName="MAHAP~19.DLL|MahApps.Metro.IconPacks.SimpleIcons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.SimpleIcons.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.Typicons.dll" Component_="MahApps.Metro.IconPacks.Typicons.dll" FileName="MAHAP~20.DLL|MahApps.Metro.IconPacks.Typicons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Typicons.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.Unicons.dll" Component_="MahApps.Metro.IconPacks.Unicons.dll" FileName="MAHAP~21.DLL|MahApps.Metro.IconPacks.Unicons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Unicons.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.WeatherIcons.dll" Component_="MahApps.Metro.IconPacks.WeatherIcons.dll" FileName="MAHAP~22.DLL|MahApps.Metro.IconPacks.WeatherIcons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.WeatherIcons.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.IconPacks.Zondicons.dll" Component_="MahApps.Metro.IconPacks.Zondicons.dll" FileName="MAHAP~23.DLL|MahApps.Metro.IconPacks.Zondicons.dll" Attributes="0" SourcePath="output\MahApps.Metro.IconPacks.Zondicons.dll" SelfReg="false"/>
+    <ROW File="MahApps.Metro.SimpleChildWindow.dll" Component_="MahApps.Metro.SimpleChildWindow.dll" FileName="MAHAP~24.DLL|MahApps.Metro.SimpleChildWindow.dll" Attributes="0" SourcePath="output\MahApps.Metro.SimpleChildWindow.dll" SelfReg="false"/>
+    <ROW File="Microsoft.AspNetCore.Http.Abstractions.dll" Component_="Microsoft.AspNetCore.Http.Abstractions.dll" FileName="MICRO~44.DLL|Microsoft.AspNetCore.Http.Abstractions.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.Http.Abstractions.dll" SelfReg="false"/>
+    <ROW File="Microsoft.AspNetCore.Http.Extensions.dll" Component_="Microsoft.AspNetCore.Http.Extensions.dll" FileName="MICRO~45.DLL|Microsoft.AspNetCore.Http.Extensions.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.Http.Extensions.dll" SelfReg="false"/>
+    <ROW File="Microsoft.AspNetCore.Http.Features.dll" Component_="Microsoft.AspNetCore.Http.Features.dll" FileName="MICRO~57.DLL|Microsoft.AspNetCore.Http.Features.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.Http.Features.dll" SelfReg="false"/>
+    <ROW File="Microsoft.AspNetCore.HttpOverrides.dll" Component_="Microsoft.AspNetCore.HttpOverrides.dll" FileName="MICRO~58.DLL|Microsoft.AspNetCore.HttpOverrides.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.HttpOverrides.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.FileProviders.Embedded.dll" Component_="Microsoft.Extensions.FileProviders.Embedded.dll" FileName="MICRO~59.DLL|Microsoft.Extensions.FileProviders.Embedded.dll" Attributes="0" SourcePath="output\Microsoft.Extensions.FileProviders.Embedded.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Net.Http.Headers.dll" Component_="Microsoft.Net.Http.Headers.dll" FileName="MICRO~60.DLL|Microsoft.Net.Http.Headers.dll" Attributes="0" SourcePath="output\Microsoft.Net.Http.Headers.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Xaml.Behaviors.dll" Component_="Microsoft.Xaml.Behaviors.dll" FileName="MICRO~63.DLL|Microsoft.Xaml.Behaviors.dll" Attributes="0" SourcePath="output\Microsoft.Xaml.Behaviors.dll" SelfReg="false"/>
+    <ROW File="PropertyChanged.dll" Component_="PropertyChanged.dll" FileName="PROPER~1.DLL|PropertyChanged.dll" Attributes="0" SourcePath="output\PropertyChanged.dll" SelfReg="false"/>
+    <ROW File="SslCertBinding.Net.dll" Component_="SslCertBinding.Net.dll" FileName="SSLCER~1.DLL|SslCertBinding.Net.dll" Attributes="0" SourcePath="output\SslCertBinding.Net.dll" SelfReg="false"/>
+    <ROW File="Stylet.dll" Component_="Stylet.dll" FileName="Stylet.dll" Attributes="0" SourcePath="output\Stylet.dll" SelfReg="false"/>
+    <ROW File="System.Text.Json.dll_1" Component_="System.Text.Json.dll_1" FileName="SYSTE~34.DLL|System.Text.Json.dll" Attributes="0" SourcePath="output\System.Text.Json.dll" SelfReg="false"/>
+    <ROW File="WindowsFirewallHelper.dll" Component_="WindowsFirewallHelper.dll" FileName="WINDOW~1.DLL|WindowsFirewallHelper.dll" Attributes="0" SourcePath="output\WindowsFirewallHelper.dll" SelfReg="false"/>
+    <ROW File="EventLogMessages.dll" Component_="EventLogMessages.dll" FileName="EVENTL~1.DLL|EventLogMessages.dll" Attributes="0" SourcePath="output\EventLogMessages.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.AiPersistentDataComponent">
     <ROW PersistentRow="config_Dir" Type="1" Condition="1"/>
@@ -900,7 +905,7 @@
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="1" PackageFolder="packages" Languages="en" InstallationType="4" CabsLocation="1" PackageType="1" FilesInsideExe="true" ExtractionFolder="[AppDataFolder][|Manufacturer]\[|ProductName] [|ProductVersion]\install" ExtUI="true" UseLargeSchema="true" MsiPackageType="x64" UACExecutionLevel="2"/>
+    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="1" PackageFolder="..\..\..\setup-packages" Languages="en" InstallationType="4" CabsLocation="1" PackageType="1" FilesInsideExe="true" ExtractionFolder="[AppDataFolder][|Manufacturer]\[|ProductName] [|ProductVersion]\install" ExtUI="true" UseLargeSchema="true" MsiPackageType="x64" UACExecutionLevel="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildEventsComponent">
     <ROW EventId="0" EventRun="dotnet" EventCmdLine="publish --runtime win-x64 --output &quot;D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager\Lithnet.AccessManager.Service.Setup\output&quot; --framework netcoreapp3.1 --self-contained false" EventWkDir="D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager\Lithnet.AccessManager.Service" EventDescription="Building service project" EventOrder="2" EventType="1" EventInterupt="true" EventEnabled="false" EventPrecompression="false" RollbackEvent="false" EventBuild="DefaultBuild"/>
@@ -945,10 +950,16 @@
     <ROW Action="AI_AiRestoreDeferred" Description="Executing restore operation" DescriptionLocId="ActionText.Description.AI_AiRestoreDeferred" Template="Path: [1]" TemplateLocId="ActionText.Template.AI_AiRestoreDeferred"/>
     <ROW Action="AI_AiRestoreDeferredImpersonate" Description="Executing restore operation" DescriptionLocId="ActionText.Description.AI_AiRestoreDeferred" Template="Path: [1]" TemplateLocId="ActionText.Template.AI_AiRestoreDeferred"/>
     <ROW Action="AI_AiRestoreRollback" Description="Rollback restore" DescriptionLocId="ActionText.Description.AI_AiRestoreRollback" Template="Path: [1]" TemplateLocId="ActionText.Template.AI_AiRestoreRollback"/>
+    <ROW Action="AI_ConfigureChainer" Description="Configuring prerequisites launcher" DescriptionLocId="ActionText.Description.AI_ConfigureChainer" Template="Configure Launcher" TemplateLocId="ActionText.Template.AI_ConfigureChainer"/>
     <ROW Action="AI_DeleteLzma" Description="Deleting files extracted from archive" DescriptionLocId="ActionText.Description.AI_DeleteLzma" TemplateLocId="-"/>
     <ROW Action="AI_DeleteRLzma" Description="Deleting files extracted from archive" DescriptionLocId="ActionText.Description.AI_DeleteLzma" TemplateLocId="-"/>
+    <ROW Action="AI_DownloadPrereq" Description="Downloading prerequisite software" DescriptionLocId="ActionText.Description.AI_DownloadPrereq" Template="Downloading [1]{[2] completed}" TemplateLocId="ActionText.Template.AI_DownloadPrereq"/>
     <ROW Action="AI_ExtractFiles" Description="Extracting files from archive" DescriptionLocId="ActionText.Description.AI_ExtractLzma" TemplateLocId="-"/>
     <ROW Action="AI_ExtractLzma" Description="Extracting files from archive" DescriptionLocId="ActionText.Description.AI_ExtractLzma" TemplateLocId="-"/>
+    <ROW Action="AI_ExtractPrereq" Description="Extracting prerequisite software" DescriptionLocId="ActionText.Description.AI_ExtractPrereq" Template="Extracting [1]{[2] completed}" TemplateLocId="ActionText.Template.AI_ExtractPrereq"/>
+    <ROW Action="AI_InstallPostPrerequisite" Description="Installing prerequisite software" DescriptionLocId="ActionText.Description.AI_InstallPrerequisite" Template="Installing [1]{[2] completed}" TemplateLocId="ActionText.Template.AI_InstallPrerequisite"/>
+    <ROW Action="AI_InstallPrerequisite" Description="Installing prerequisite software" DescriptionLocId="ActionText.Description.AI_InstallPrerequisite" Template="Installing [1]{[2] completed}" TemplateLocId="ActionText.Template.AI_InstallPrerequisite"/>
+    <ROW Action="AI_VerifyPrereq" Description="Verifying prerequisites" DescriptionLocId="ActionText.Description.AI_VerifyPrereq" Template="[1] was not installed correctly." TemplateLocId="ActionText.Template.AI_VerifyPrereq"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiAppSearchComponent">
     <ROW Property="USER_NAME" Signature_="AppSearchSign"/>
@@ -963,6 +974,7 @@
     <ROW Name="Prereq.dll" SourcePath="&lt;AI_CUSTACTS&gt;Prereq.dll"/>
     <ROW Name="ResourceCleaner.dll" SourcePath="&lt;AI_CUSTACTS&gt;ResourceCleaner.dll"/>
     <ROW Name="aicustact.dll" SourcePath="&lt;AI_CUSTACTS&gt;aicustact.dll"/>
+    <ROW Name="aipackagechainer.exe" SourcePath="&lt;AI_CUSTACTS&gt;aipackagechainer.exe"/>
     <ROW Name="lzmaextractor.dll" SourcePath="&lt;AI_CUSTACTS&gt;lzmaextractor.dll"/>
     <ROW Name="userAccounts.dll" SourcePath="&lt;AI_CUSTACTS&gt;userAccounts.dll"/>
     <ROW Name="viewer.exe" SourcePath="&lt;AI_CUSTACTS&gt;viewer.exe"/>
@@ -1047,6 +1059,9 @@
     <ROW Dialog_="UserExit" Control_="Finish" Event="DoAction" Argument="AI_AiBackupCleanup" Condition="1" Ordering="101"/>
     <ROW Dialog_="LogonInformationDlg" Control_="Next" Event="DoAction" Argument="UsernameTestFailure" Condition="AI_INSTALL AND ( (USER_PASSWORD = USER_PASSWORD_CONFIRM) AND ACCOUNT_TEST_RESULT )" Ordering="9"/>
     <ROW Dialog_="LogonInformationDlg" Control_="Next" Event="DoAction" Argument="AI_DATA_SETTER_9" Condition="AI_INSTALL AND ( (USER_PASSWORD = USER_PASSWORD_CONFIRM) AND ACCOUNT_TEST_RESULT )" Ordering="8"/>
+    <ROW Dialog_="ExitDialog" Control_="Finish" Event="DoAction" Argument="AI_CleanPrereq" Condition="1" Ordering="301"/>
+    <ROW Dialog_="FatalError" Control_="Finish" Event="DoAction" Argument="AI_CleanPrereq" Condition="1" Ordering="103"/>
+    <ROW Dialog_="UserExit" Control_="Finish" Event="DoAction" Argument="AI_CleanPrereq" Condition="1" Ordering="102"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
     <ROW Directory_="APPDIR" Component_="APPDIR" ManualDelete="true"/>
@@ -1067,7 +1082,9 @@
     <ROW Action="AI_AiRestoreRollback" Type="11521" Source="ResourceCleaner.dll" Target="OnAiRestoreRollback" WithoutSeq="true"/>
     <ROW Action="AI_AppSearchEx" Type="1" Source="Prereq.dll" Target="DoAppSearchEx"/>
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Type="51" Source="AI_SETUPEXEPATH_ORIGINAL" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_CleanPrereq" Type="65" Source="Prereq.dll" Target="CleanPrereq" WithoutSeq="true"/>
     <ROW Action="AI_ConfigPermissions" Type="1" Source="userAccounts.dll" Target="OnConfigPermissions" AdditionalSeq="AI_DATA_SETTER_2"/>
+    <ROW Action="AI_ConfigureChainer" Type="1" Source="Prereq.dll" Target="ConfigurePrereqLauncher"/>
     <ROW Action="AI_DATA_SETTER" Type="51" Source="AI_ExtractFiles" Target="[AI_SETUPEXEPATH]"/>
     <ROW Action="AI_DATA_SETTER_1" Type="51" Source="AI_SetLogOnAsService" Target="[AI_LOGON_AS_SERVICE_ACCOUNTS]"/>
     <ROW Action="AI_DATA_SETTER_10" Type="51" Source="CustomActionData" Target="AEQAaQBnAGkAdABhAGwAbAB5AFMAaQBnAG4AUwBjAHIAaQBwAHQAAgAxAAEARgBsAGEAZwBzAAIANgABAFAAYQByAGEAbQBzAAIAAQBTAGMAcgBpAHAAdAACACMAIABCAGwAbwBjAGsAIABmAG8AcgAgAGQAZQBjAGwAYQByAGkAbgBnACAAdABoAGUAIABzAGMAcgBpAHAAdAAgAHAAYQByAGEAbQBlAHQAZQByAHMALgANAAoAUABhAHIAYQBtACgAKQANAAoADQAKACQASQBuAGYAbwByAG0AYQB0AGkAbwBuAFAAcgBlAGYAZQByAGUAbgBjAGUAIAA9ACAAIgBDAG8AbgB0AGkAbgB1AGUAIgANAAoADQAKAHQAcgB5AA0ACgBbAFwAewBdAA0ACgAgAAkAQQBJAF8AUwBlAHQATQBzAGkAUAByAG8AcABlAHIAdAB5ACAAQQBDAEMATwBVAE4AVABfAFQARQBTAFQAXwBSAEUAUwBVAEwAVAAgACIAIgANAAoADQAKAAkAJAB1AHMAZQByAG4AYQBtAGUAIAA9ACAAQQBJAF8ARwBlAHQATQBzAGkAUAByAG8AcABlAHIAdAB5ACAAVQBTAEUAUgBfAE4AQQBNAEUAIAAtAHQAZQBzAHQAdgBhAGwAdQBlACAAIgBJAEQATQBEAEUAVgAxAFwAegBiAC0AcwB2AGMALQBsAGEAYQBtACQAIgANAAoACQANAAoAIAAgACAAIABXAHIAaQB0AGUALQBJAG4AZgBvAHIAbQBhAHQAaQBvAG4AIAAiAFYAYQBsAGkAZABhAHQAaQBuAGcAIAB1AHMAZQByAG4AYQBtAGUAIAAkAHUAcwBlAHIAbgBhAG0AZQAiAA0ACgANAAoACQBpAGYAIAAoACgAJAB1AHMAZQByAG4AYQBtAGUAIAAtAG4AbwB0AGwAaQBrAGUAIAAiACoAXAAqACIAKQAgAC0AYQBuAGQAIAAoACQAdQBzAGUAcgBuAGEAbQBlACAALQBuAG8AdABsAGkAawBlACAAIgAqAEAAKgAiACkAKQANAAoACQBbAFwAewBdAA0ACgAJAAkAQQBJAF8AUwBlAHQATQBzAGkAUAByAG8AcABlAHIAdAB5ACAAQQBDAEMATwBVAE4AVABfAFQARQBTAFQAXwBSAEUAUwBVAEwAVAAgACIAUABsAGUAYQBzAGUAIABlAG4AdABlAHIAIAB0AGgAZQAgAHUAcwBlAHIAbgBhAG0AZQAgAGkAbgAgAHQAaABlACAAZgBvAHIAbQBhAHQAIABEAE8ATQBBAEkATgBcAHUAcwBlAHIAbgBhAG0AZQAiAA0ACgAgACAAIAAgACAAIAAgACAAVwByAGkAdABlAC0AVwBhAHIAbgBpAG4AZwAgACIAVQBzAGUAcgBuAGEAbQBlACAAdwBhAHMAIABuAG8AdAAgAGkAbgAgAHQAaABlACAAYwBvAHIAcgBlAGMAdAAgAGYAbwByAG0AYQB0ACIADQAKAAkACQByAGUAdAB1AHIAbgA7AA0ACgAJAFsAXAB9AF0ADQAKAA0ACgAgACAAIAAgAHQAcgB5AA0ACgAgACAAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAACQAkAGEAYwBjAG8AdQBuAHQAIAA9ACAATgBlAHcALQBPAGIAagBlAGMAdAAgACIAUwB5AHMAdABlAG0ALgBTAGUAYwB1AHIAaQB0AHkALgBQAHIAaQBuAGMAaQBwAGEAbAAuAE4AVABBAGMAYwBvAHUAbgB0ACIAIAAkAHUAcwBlAHIAbgBhAG0AZQANAAoAIAAgACAAIAAgACAAIAAgAFcAcgBpAHQAZQAtAEkAbgBmAG8AcgBtAGEAdABpAG8AbgAgACIARgBvAHUAbgBkACAAYQBjAGMAbwB1AG4AdAAgACQAYQBjAGMAbwB1AG4AdAAiAA0ACgANAAoACQAgACAAIAAgACQAcwBpAGQAIAA9ACAAJABhAGMAYwBvAHUAbgB0AC4AVAByAGEAbgBzAGwAYQB0AGUAKABbAFwAWwBdAFMAeQBzAHQAZQBtAC4AUwBlAGMAdQByAGkAdAB5AC4AUAByAGkAbgBjAGkAcABhAGwALgBTAGUAYwB1AHIAaQB0AHkASQBkAGUAbgB0AGkAZgBpAGUAcgBbAFwAXQBdACkADQAKAA0ACgAJACAAIAAgACAAaQBmACAAKAAkAHMAaQBkACAALQBuAGUAIAAkAG4AdQBsAGwAKQANAAoACQAgACAAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgAEEASQBfAFMAZQB0AE0AcwBpAFAAcgBvAHAAZQByAHQAeQAgAFUAUwBFAFIAXwBTAEkARAAgACQAcwBpAGQALgBUAG8AUwB0AHIAaQBuAGcAKAApAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIABXAHIAaQB0AGUALQBJAG4AZgBvAHIAbQBhAHQAaQBvAG4AIAAiAEYAbwB1AG4AZAAgAHMAaQBkACAAJABzAGkAZAAiAA0ACgAJACAAIAAgACAAWwBcAH0AXQANAAoAIAAgACAAIABbAFwAfQBdAA0ACgAgACAAIAAgAGMAYQB0AGMAaAAgAFsAXABbAF0ARQB4AGMAZQBwAHQAaQBvAG4AWwBcAF0AXQANAAoAIAAgACAAIABbAFwAewBdAA0ACgAgACAAIAAgACAAIAAgACAAVwByAGkAdABlAC0AVwBhAHIAbgBpAG4AZwAgACIAQwBvAHUAbABkACAAbgBvAHQAIABmAGkAbgBkACAAYQBjAGMAbwB1AG4AdAAgAG4AYQBtAGUAIgANAAoAIAAgACAAIAAgACAAIAAgAFcAcgBpAHQAZQAtAFcAYQByAG4AaQBuAGcAIAAkAF8ALgBFAHgAYwBlAHAAdABpAG8AbgAuAFQAbwBTAHQAcgBpAG4AZwAoACkADQAKACAAIAAgACAAWwBcAH0AXQANAAoADQAKACAAIAAgACAAaQBmACAAKAAkAHMAaQBkACAALQBlAHEAIAAkAG4AdQBsAGwAKQANAAoAIAAgACAAIABbAFwAewBdAA0ACgAgACAAIAAgAAkAQQBJAF8AUwBlAHQATQBzAGkAUAByAG8AcABlAHIAdAB5ACAAQQBDAEMATwBVAE4AVABfAFQARQBTAFQAXwBSAEUAUwBVAEwAVAAgACIAVABoAGUAIABzAHAAZQBjAGkAZgBpAGUAZAAgAHUAcwBlAHIAIABjAG8AdQBsAGQAIABuAG8AdAAgAGIAZQAgAGYAbwB1AG4AZAAgAGkAbgAgAHQAaABlACAAZABpAHIAZQBjAHQAbwByAHkAIgANAAoAIAAgACAAIAAgACAAIAAgAFcAcgBpAHQAZQAtAFcAYQByAG4AaQBuAGcAIAAiAFUAcwBlAHIAbgBhAG0AZQAgAHcAYQBzACAAbgBvAHQAIABmAG8AdQBuAGQAIgANAAoACQAJAHIAZQB0AHUAcgBuADsADQAKACAAIAAgACAAWwBcAH0AXQANAAoADQAKACAAIAAgACAAdAByAHkADQAKACAAIAAgACAAWwBcAHsAXQANAAoAIAAgACAAIAAgACAAIAAgACQAZABvAG0AYQBpAG4APQAgAEcAZQB0AC0AQQBEAEQAbwBtAGEAaQBuACAALQBJAGQAZQBuAHQAaQB0AHkAIAAkAGEAYwBjAG8AdQBuAHQALgBWAGEAbAB1AGUALgBTAHAAbABpAHQAKAAiAFwAIgApAFsAXABbAF0AMABbAFwAXQBdAA0ACgAgACAAIAAgACAAIAAgACAAVwByAGkAdABlAC0ASQBuAGYAbwByAG0AYQB0AGkAbwBuACAAIgBGAG8AdQBuAGQAIABkAG8AbQBhAGkAbgAgACQAZABvAG0AYQBpAG4ALgBEAE4AUwBSAG8AbwB0ACIADQAKAA0ACgAgACAAIAAgACAAIAAgACAAJABzAGUAcgB2AGkAYwBlAEEAYwBjAG8AdQBuAHQAIAA9ACAARwBlAHQALQBBAEQAUwBlAHIAdgBpAGMAZQBBAGMAYwBvAHUAbgB0ACAAJABzAGkAZAAgAC0AUwBlAHIAdgBlAHIAIAAkAGQAbwBtAGEAaQBuAC4ARABOAFMAUgBvAG8AdAANAAoADQAKACAAIAAgACAAIAAgACAAIABpAGYAIAAoACQAcwBlAHIAdgBpAGMAZQBBAGMAYwBvAHUAbgB0ACAALQBuAGUAIAAkAG4AdQBsAGwAKQANAAoAIAAgACAAIAAgACAAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgAFcAcgBpAHQAZQAtAEkAbgBmAG8AcgBtAGEAdABpAG8AbgAgACIAQQBjAGMAbwB1AG4AdAAgAGkAcwAgAGEAIABzAGUAcgB2AGkAYwBlACAAYQBjAGMAbwB1AG4AdAAiAA0ACgANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAaQBmACAAKABUAGUAcwB0AC0AQQBEAFMAZQByAHYAaQBjAGUAQQBjAGMAbwB1AG4AdAAgAC0ASQBkAGUAbgB0AGkAdAB5ACAAJABzAGkAZAApAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIABbAFwAewBdAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgAFcAcgBpAHQAZQAtAEkAbgBmAG8AcgBtAGEAdABpAG8AbgAgACIAVABoAGkAcwAgAGMAbwBtAHAAdQB0AGUAcgAgAGMAYQBuACAAYQBjAGMAZQBzAHMAIAB0AGgAZQAgAHMAZQByAHYAaQBjAGUAIABhAGMAYwBvAHUAbgB0ACIADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgAFsAXAB9AF0ADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgAGUAbABzAGUADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAVwByAGkAdABlAC0AVwBhAHIAbgBpAG4AZwAgACIAVABoAGkAcwAgAGMAbwBtAHAAdQB0AGUAcgAgAGMAYQBuAG4AbwB0ACAAYQBjAGMAZQBzAHMAIAB0AGgAZQAgAHMAZQByAHYAaQBjAGUAIABhAGMAYwBvAHUAbgB0ACIADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAQQBJAF8AUwBlAHQATQBzAGkAUAByAG8AcABlAHIAdAB5ACAAQQBDAEMATwBVAE4AVABfAFQARQBTAFQAXwBSAEUAUwBVAEwAVAAgACIAVABoAGUAIABjAG8AbQBwAHUAdABlAHIAIABkAG8AZQBzACAAbgBvAHQAIABoAGEAdgBlACAAcABlAHIAbQBpAHMAcwBpAG8AbgAgAHQAbwAgAGEAYwBjAGUAcwBzACAAdABoAGUAIABzAGUAcgB2AGkAYwBlACAAYQBjAGMAbwB1AG4AdAAgAHAAYQBzAHMAdwBvAHIAZAAuACAAVQBzAGUAIAB0AGgAZQAgACcAUwBlAHQALQBBAEQAUwBlAHIAdgBpAGMAZQBBAGMAYwBvAHUAbgB0ACcAIABQAG8AdwBlAHIAUwBoAGUAbABsACAAYwBtAGQAbABlAHQAIAB3AGkAdABoACAAdABoAGUAIAAnAC0AUAByAGkAbgBjAGkAcABhAGwAcwBBAGwAbABvAHcAZQBkAFQAbwBSAGUAdAByAGkAZQB2AGUATQBhAG4AYQBnAGUAZABQAGEAcwBzAHcAbwByAGQAJwAgAHAAYQByAGEAbQBlAHQAZQByACAAdABvACAAZwByAGEAbgB0ACAAdABoAGkAcwAgAGMAbwBtAHAAdQB0AGUAcgAgAHAAZQByAG0AaQBzAHMAaQBvAG4AIAB0AG8AIAByAGUAYQBkACAAdABoAGUAIABwAGEAcwBzAHcAbwByAGQAIABhAG4AZAAgAHQAcgB5ACAAYQBnAGEAaQBuACIADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgAFsAXAB9AF0ADQAKACAAIAAgACAAIAAgACAAIABbAFwAfQBdAA0ACgAgACAAIAAgACAAIAAgACAAZQBsAHMAZQANAAoAIAAgACAAIAAgACAAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgAFcAcgBpAHQAZQAtAEkAbgBmAG8AcgBtAGEAdABpAG8AbgAgACIAQQBjAGMAbwB1AG4AdAAgAGkAcwAgAG4AbwB0ACAAYQAgAHMAZQByAHYAaQBjAGUAIABhAGMAYwBvAHUAbgB0ACIADQAKACAAIAAgACAAIAAgACAAIABbAFwAfQBdAA0ACgAgACAAIAAgAFsAXAB9AF0ADQAKACAAIAAgACAAYwBhAHQAYwBoACAAWwBcAFsAXQBFAHgAYwBlAHAAdABpAG8AbgBbAFwAXQBdAA0ACgAgACAAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAIAAgACAAIABXAHIAaQB0AGUALQBXAGEAcgBuAGkAbgBnACAAIgBDAG8AdQBsAGQAIABuAG8AdAAgAGQAZQB0AGUAcgBtAGkAbgBlACAAaQBmACAAdABoAGkAcwAgAGEAYwBjAG8AdQBuAHQAIAB3AGEAcwAgAGEAIABzAGUAcgB2AGkAYwBlACAAYQBjAGMAbwB1AG4AdAAiAA0ACgAgACAAIAAgACAAIAAgACAAVwByAGkAdABlAC0AVwBhAHIAbgBpAG4AZwAgACQAXwAuAEUAeABjAGUAcAB0AGkAbwBuAC4AVABvAFMAdAByAGkAbgBnACgAKQANAAoAIAAgACAAIABbAFwAfQBdAA0ACgBbAFwAfQBdAA0ACgBjAGEAdABjAGgAIABbAFwAWwBdAEUAeABjAGUAcAB0AGkAbwBuAFsAXABdAF0ADQAKAFsAXAB7AF0ADQAKACAAIAAgACAAVwByAGkAdABlAC0AVwBhAHIAbgBpAG4AZwAgACQAXwAuAEUAeABjAGUAcAB0AGkAbwBuAC4AVABvAFMAdAByAGkAbgBnACgAKQANAAoAWwBcAH0AXQABAFMAYwByAGkAcAB0AFAAcgBlAGEAbQBiAGwAZQACAHAAYQByAGEAbQAoAA0ACgAgACAAWwBcAFsAXQBhAGwAaQBhAHMAKAAiAHAAcgBvAHAARgBpAGwAZQAiACkAWwBcAF0AXQAgACAAIAAgACAAIABbAFwAWwBdAFAAYQByAGEAbQBlAHQAZQByACgATQBhAG4AZABhAHQAbwByAHkAPQAkAHQAcgB1AGUAKQBbAFwAXQBdACAAWwBcAFsAXQBzAHQAcgBpAG4AZwBbAFwAXQBdACAAJABtAHMAaQBQAHIAbwBwAE8AdQB0AEYAaQBsAGUAUABhAHQAaAANAAoAIAAsAFsAXABbAF0AYQBsAGkAYQBzACgAIgBwAHIAbwBwAFMAZQBwACIAKQBbAFwAXQBdACAAIAAgACAAIAAgACAAWwBcAFsAXQBQAGEAcgBhAG0AZQB0AGUAcgAoAE0AYQBuAGQAYQB0AG8AcgB5AD0AJAB0AHIAdQBlACkAWwBcAF0AXQAgAFsAXABbAF0AcwB0AHIAaQBuAGcAWwBcAF0AXQAgACQAbQBzAGkAUAByAG8AcABLAFYAUwBlAHAAYQByAGEAdABvAHIADQAKACAALABbAFwAWwBdAGEAbABpAGEAcwAoACIAcwBjAHIAaQBwAHQARgBpAGwAZQAiACkAWwBcAF0AXQAgACAAIAAgAFsAXABbAF0AUABhAHIAYQBtAGUAdABlAHIAKABNAGEAbgBkAGEAdABvAHIAeQA9ACQAdAByAHUAZQApAFsAXABdAF0AIABbAFwAWwBdAHMAdAByAGkAbgBnAFsAXABdAF0AIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoAA0ACgAgACwAWwBcAFsAXQBhAGwAaQBhAHMAKAAiAHMAYwByAGkAcAB0AEEAcgBnAHMARgBpAGwAZQAiACkAWwBcAF0AXQBbAFwAWwBdAFAAYQByAGEAbQBlAHQAZQByACgATQBhAG4AZABhAHQAbwByAHkAPQAkAGYAYQBsAHMAZQApAFsAXABdAF0AWwBcAFsAXQBzAHQAcgBpAG4AZwBbAFwAXQBdACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEEAcgBnAHMARgBpAGwAZQBQAGEAdABoAA0ACgAgACwAWwBcAFsAXQBQAGEAcgBhAG0AZQB0AGUAcgAoAE0AYQBuAGQAYQB0AG8AcgB5AD0AJAB0AHIAdQBlACkAWwBcAF0AXQAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAWwBcAFsAXQBzAHQAcgBpAG4AZwBbAFwAXQBdACAAJAB0AGUAcwB0AFAAcgBlAGYAaQB4AA0ACgAgACwAWwBcAFsAXQBzAHcAaQB0AGMAaABbAFwAXQBdACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJABpAHMAVABlAHMAdAANAAoAIAApAA0ACgANAAoARgB1AG4AYwB0AGkAbwBuACAAQQBJAF8ARwBlAHQATQBzAGkAUAByAG8AcABlAHIAdAB5ACgAIABbAFwAWwBdAFAAYQByAGEAbQBlAHQAZQByACgATQBhAG4AZABhAHQAbwByAHkAPQAkAHQAcgB1AGUAKQBbAFwAXQBdACAAIABbAFwAWwBdAHMAdAByAGkAbgBnAFsAXABdAF0AIAAkAG4AYQBtAGUADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAsACAAWwBcAFsAXQBQAGEAcgBhAG0AZQB0AGUAcgAoAE0AYQBuAGQAYQB0AG8AcgB5AD0AJABmAGEAbABzAGUAKQBbAFwAXQBdACAAJAB0AGUAcwB0AFYAYQBsAHUAZQAgAD0AIAAkAG4AdQBsAGwADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAApAA0ACgBbAFwAewBdAA0ACgAgACAAaQBmACAAKAAkAGkAcwBUAGUAcwB0ACAALQBhAG4AZAAgACgAJAB0AGUAcwB0AFYAYQBsAHUAZQAgAC0AbgBlACAAJABuAHUAbABsACkAKQANAAoAIAAgAFsAXAB7AF0ADQAKACAAIAAgACIAIAAkAHQAZQBzAHQAUAByAGUAZgBpAHgAJABuAGEAbQBlACAAJABtAHMAaQBQAHIAbwBwAEsAVgBTAGUAcABhAHIAYQB0AG8AcgAgACQAdABlAHMAdABWAGEAbAB1AGUAIgAgAD4APgAgACQAbQBzAGkAUAByAG8AcABPAHUAdABGAGkAbABlAFAAYQB0AGgAOwANAAoAIAAgACAAcgBlAHQAdQByAG4AIAAkAHQAZQBzAHQAVgBhAGwAdQBlAA0ACgAgACAAWwBcAH0AXQANAAoAIAAgAFsAXABbAF0AYQByAHIAYQB5AFsAXABdAF0AIAAkAGMAbwBuAHQAZQBuAHQAIAA9ACAARwBlAHQALQBDAG8AbgB0AGUAbgB0ACAAJABtAHMAaQBQAHIAbwBwAE8AdQB0AEYAaQBsAGUAUABhAHQAaAANAAoAIAAgAFsAXABbAF0AYQByAHIAYQB5AFsAXABdAF0AOgA6AFIAZQB2AGUAcgBzAGUAKAAkAGMAbwBuAHQAZQBuAHQAKQANAAoAIAAgAEYAbwByAEUAYQBjAGgAIAAoACQAbABpAG4AZQAgAGkAbgAgACQAYwBvAG4AdABlAG4AdAApAA0ACgAgACAAWwBcAHsAXQANAAoAIAAgACAAIAAkAGwAaQBuAGUAVABvAGsAZQBuAHMAIAA9ACAAJABsAGkAbgBlACAALQBzAHAAbABpAHQAIAAkAG0AcwBpAFAAcgBvAHAASwBWAFMAZQBwAGEAcgBhAHQAbwByAA0ACgAgACAAIAAgAGkAZgAgACgAJABsAGkAbgBlAFQAbwBrAGUAbgBzAC4AQwBvAHUAbgB0ACAALQBnAHQAIAAxACAALQBhAG4AZAAgACQAbABpAG4AZQBUAG8AawBlAG4AcwBbAFwAWwBdADAAWwBcAF0AXQAgAC0AZQBxACAAJABuAGEAbQBlACkADQAKACAAIAAgACAAWwBcAHsAXQANAAoAIAAgACAAIAAgACAAcgBlAHQAdQByAG4AIAAkAGwAaQBuAGUAVABvAGsAZQBuAHMAWwBcAFsAXQAxAFsAXABdAF0ADQAKACAAIAAgACAAWwBcAH0AXQANAAoAIAAgAFsAXAB9AF0ADQAKACAAIAByAGUAdAB1AHIAbgAgACcAJwANAAoAWwBcAH0AXQANAAoADQAKAEYAdQBuAGMAdABpAG8AbgAgAEEASQBfAFMAZQB0AE0AcwBpAFAAcgBvAHAAZQByAHQAeQAoACAAWwBcAFsAXQBQAGEAcgBhAG0AZQB0AGUAcgAoAE0AYQBuAGQAYQB0AG8AcgB5AD0AJAB0AHIAdQBlACkAWwBcAF0AXQAgACQAbgBhAG0AZQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACwAIABbAFwAWwBdAFAAYQByAGEAbQBlAHQAZQByACgATQBhAG4AZABhAHQAbwByAHkAPQAkAGYAYQBsAHMAZQApAFsAXABdAF0AIAAkAHYAYQBsAHUAZQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACkADQAKAFsAXAB7AF0ADQAKACAAIABpAGYAIAAoACQAdgBhAGwAdQBlACAALQBlAHEAIAAkAG4AdQBsAGwAKQANAAoAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAVwByAGkAdABlAC0ATwB1AHQAcAB1AHQAIAAiAFAATwBUAEUATgBUAEkAQQBMAF8AQgBVAEcAOgAgAE0AUwBJACAAcAByAG8AcABlAHIAdAB5ACAAJABuAGEAbQBlACAAcwBlAHQAIAB0AG8AIABhAG4AIAB1AG4AaQBuAGkAdABpAGEAbABpAHoAZQBkAC8AbgB1AGwAbAAgAHYAYQByAGkAYQBiAGwAZQAuACAASQBuAGkAdABpAGEAbABpAHoAZQAgAGUAbQBwAHQAeQAgAHYAYQByAGkAYQBiAGwAZQBzACAAdQBzAGkAbgBnACAAZQBtAHAAdAB5ACAAcQB1AG8AdABlAHMALgAiAA0ACgAgACAAWwBcAH0AXQANAAoAIAAgACIAJABuAGEAbQBlACQAbQBzAGkAUAByAG8AcABLAFYAUwBlAHAAYQByAGEAdABvAHIAJAB2AGEAbAB1AGUAIgAgAD4APgAgACQAbQBzAGkAUAByAG8AcABPAHUAdABGAGkAbABlAFAAYQB0AGgAOwANAAoAWwBcAH0AXQANAAoADQAKAHQAcgB5AA0ACgBbAFwAewBdAA0ACgAgACAAWwBcAFsAXQBzAHQAcgBpAG4AZwBbAFwAXQBdACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEEAcgBnAHMAIAA9ACAARwBlAHQALQBDAG8AbgB0AGUAbgB0ACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEEAcgBnAHMARgBpAGwAZQBQAGEAdABoAA0ACgAgACAADQAKACAAIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoACAAPQAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgALgBSAGUAcABsAGEAYwBlACgAJwAgACcALAAgACcAYAAgACcAKQANAAoAIAAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgAIAA9ACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAuAFIAZQBwAGwAYQBjAGUAKAAnACQAJwAsACAAJwBgACQAJwApAA0ACgAgACAAIwAgAFMAaQBtAHAAbABlACAAcQB1AG8AdABlAHMAIABhAHIAZQAgAHAAcgBvAGIAbABlAG0AYQB0AGkAYwAsACAAZQBzAHAAZQBjAGkAYQBsAGwAeQAgAHcAaABlAG4AIABtAG8AcgBlACAAaQBuACAAYQAgAHMAdQBjAGMAZQBzAHMAaQBvAG4ADQAKACAAIAAjACAAZQAuAGcALgAgAGkAbgAgAGEAIAB1AHMAZQByAG4AYQBtAGUALgAgAFcAZQAgAG4AZQBlAGQAIAB0AG8AIABlAG4AYwBsAG8AcwBlACAAZQBhAGMAaAAgAGIAdQBuAGQAbABlACAAbwBmACAAdABoAGUAbQAgAGkAbgAgAGEAIABzAGkAbQBwAGwAZQAgAHEAdQBvAHQAZQBkACAAcwB0AHIAaQBuAGcADQAKACAAIAAjACAAdwBpAHQAaAAgAGUAYQBjAGgAIABjAG8AbgB0AGEAaQBuAGUAZAAgAHMAaQBtAHAAbABlACAAcQB1AG8AdABlACAAYgBlAGkAbgBnACAAZQBzAGMAYQBwAGUAZAAgAGIAeQAgAGQAbwB1AGIAbABpAG4AZwAuACAATgAgAGkAbgBpAHQAaQBhAGwAIABxAHUAbwB0AGUAcwAgAD0APgAgACgATgArADEAKQAqADIAIABmAGkAbgBhAGwAIABxAHUAbwB0AGUAcwANAAoAIAAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgAIAA9ACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAuAFIAZQBwAGwAYQBjAGUAKAAiACcAJwAnACcAIgAsACAAIgA/AD8APwA/AD8APwA/AD8APwA/ACIAKQANAAoAIAAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgAIAA9ACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAuAFIAZQBwAGwAYQBjAGUAKAAiACcAJwAnACIALAAgACAAIgA/AD8APwA/AD8APwA/AD8AIgApAA0ACgAgACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAgAD0AIAAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoAC4AUgBlAHAAbABhAGMAZQAoACIAJwAnACIALAAgACAAIAAiAD8APwA/AD8APwA/ACIAKQANAAoAIAAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgAIAA9ACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAuAFIAZQBwAGwAYQBjAGUAKAAiACcAIgAsACAAIAAgACAAIgA/AD8APwA/ACIAKQANAAoAIAAgACQAdQBzAGUAcgBTAGMAcgBpAHAAdABGAGkAbABlAFAAYQB0AGgAIAA9ACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEYAaQBsAGUAUABhAHQAaAAuAFIAZQBwAGwAYQBjAGUAKAAnAD8AJwAsACAAIAAgACAAIgAnACIAKQANAAoAIAAgAA0ACgAgACAASQBuAHYAbwBrAGUALQBFAHgAcAByAGUAcwBzAGkAbwBuACAAIgAkAHUAcwBlAHIAUwBjAHIAaQBwAHQARgBpAGwAZQBQAGEAdABoACAAJAB1AHMAZQByAFMAYwByAGkAcAB0AEEAcgBnAHMAIgANAAoADQAKACAAIABpAGYAIAAoACQATABhAHMAdABFAHgAaQB0AEMAbwBkAGUAIAAtAG4AZQAgACQAbgB1AGwAbAApAA0ACgAgACAAWwBcAHsAXQANAAoAIAAgACAAIABlAHgAaQB0ACAAJABMAGEAcwB0AEUAeABpAHQAQwBvAGQAZQA7AA0ACgAgACAAWwBcAH0AXQANAAoAWwBcAH0AXQANAAoAYwBhAHQAYwBoAA0ACgBbAFwAewBdAA0ACgAgACAAIABXAHIAaQB0AGUALQBPAHUAdABwAHUAdAAgACIARQBSAFIATwBSADoAIAAkACgAJABfAC4ARQB4AGMAZQBwAHQAaQBvAG4ALgBNAGUAcwBzAGEAZwBlACkAIgANAAoAIAAgACAARQB4AGkAdAAgADAAeAAyADMARQAgACMARQBSAFIATwBSAF8AVQBOAEgAQQBOAEQATABFAEQAXwBFAFgAQwBFAFAAVABJAE8ATgANAAoAWwBcAH0AXQANAAo="/>
@@ -1083,15 +1100,20 @@
     <ROW Action="AI_DeleteLzma" Type="1025" Source="lzmaextractor.dll" Target="DeleteLZMAFiles"/>
     <ROW Action="AI_DeleteRCadLzma" Type="51" Source="AI_DeleteRLzma" Target="[AI_SETUPEXEPATH]"/>
     <ROW Action="AI_DeleteRLzma" Type="1281" Source="lzmaextractor.dll" Target="DeleteLZMAFiles"/>
+    <ROW Action="AI_DownloadPrereq" Type="1" Source="Prereq.dll" Target="DownloadPrereq"/>
     <ROW Action="AI_DpiContentScale" Type="1" Source="aicustact.dll" Target="DpiContentScale"/>
     <ROW Action="AI_EnableDebugLog" Type="321" Source="aicustact.dll" Target="EnableDebugLog"/>
     <ROW Action="AI_EstimateExtractFiles" Type="1" Source="Prereq.dll" Target="EstimateExtractFiles"/>
     <ROW Action="AI_ExtractCadLzma" Type="51" Source="AI_ExtractLzma" Target="[AI_SETUPEXEPATH]"/>
     <ROW Action="AI_ExtractFiles" Type="1025" Source="Prereq.dll" Target="ExtractSourceFiles" AdditionalSeq="AI_DATA_SETTER"/>
     <ROW Action="AI_ExtractLzma" Type="1025" Source="lzmaextractor.dll" Target="ExtractLZMAFiles"/>
+    <ROW Action="AI_ExtractPrereq" Type="65" Source="Prereq.dll" Target="ExtractPrereq"/>
     <ROW Action="AI_FindExeLzma" Type="1" Source="lzmaextractor.dll" Target="FindEXE"/>
     <ROW Action="AI_InstallModeCheck" Type="1" Source="aicustact.dll" Target="UpdateInstallMode" WithoutSeq="true"/>
+    <ROW Action="AI_InstallPostPrerequisite" Type="1" Source="Prereq.dll" Target="InstallPostPrereq"/>
+    <ROW Action="AI_InstallPrerequisite" Type="1" Source="Prereq.dll" Target="InstallPrereq"/>
     <ROW Action="AI_LaunchApp" Type="1" Source="aicustact.dll" Target="[#Lithnet.AccessManager.Server.UI.exe]"/>
+    <ROW Action="AI_LaunchChainer" Type="3314" Source="AI_PREREQ_CHAINER"/>
     <ROW Action="AI_PREPARE_UPGRADE" Type="65" Source="aicustact.dll" Target="PrepareUpgrade"/>
     <ROW Action="AI_PrepareRevokePermissions" Type="1" Source="userAccounts.dll" Target="OnPrepareRevokePermissions"/>
     <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Type="51" Source="AI_SETUPEXEPATH" Target="[AI_SETUPEXEPATH_ORIGINAL]"/>
@@ -1103,6 +1125,7 @@
     <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
     <ROW Action="AI_SetLogOnAsService" Type="3073" Source="aicustact.dll" Target="LogOnAsAService" AdditionalSeq="AI_DATA_SETTER_1"/>
     <ROW Action="AI_SetPermissions" Type="11265" Source="userAccounts.dll" Target="OnSetPermissions" WithoutSeq="true"/>
+    <ROW Action="AI_VerifyPrereq" Type="1" Source="Prereq.dll" Target="VerifyPrereq"/>
     <ROW Action="CreateEventSource" Type="1" Source="PowerShellScriptLauncher.dll" Target="RunPowerShellScript" Options="1" AdditionalSeq="AI_DATA_SETTER_6"/>
     <ROW Action="PasswordsDontMatchMessage" Type="65" Source="aicustact.dll" Target="MsgBox" WithoutSeq="true" Options="1" AdditionalSeq="AI_DATA_SETTER_5"/>
     <ROW Action="RemoveCertBinding" Type="1090" Source="viewer.exe" Target="/EnforcedRunAsAdmin /RunAsAdmin /HideWindow netsh http delete sslcert [CERT_BINDING]" Options="1"/>
@@ -1349,7 +1372,6 @@
     <ROW Feature_="MainFeature" Component_="PSDiagnostics.psd1"/>
     <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Server.UI.exe"/>
     <ROW Feature_="MainFeature" Component_="Lithnet"/>
-    <ROW Feature_="MainFeature" Component_="EventLogMessages.dll"/>
     <ROW Feature_="MainFeature" Component_="sni.dll"/>
     <ROW Feature_="MainFeature" Component_="System.CodeDom.dll"/>
     <ROW Feature_="MainFeature" Component_="System.Configuration.ConfigurationManager.dll"/>
@@ -1371,34 +1393,8 @@
     <ROW Feature_="MainFeature" Component_="brands.svg"/>
     <ROW Feature_="MainFeature" Component_="fabrands400.eot"/>
     <ROW Feature_="MainFeature" Component_="jquery.min.js"/>
-    <ROW Feature_="MainFeature" Component_="ControlzEx.dll"/>
-    <ROW Feature_="MainFeature" Component_="FluentValidation.dll"/>
-    <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Server.UI.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.BoxIcons.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Core.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Entypo.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.EvaIcons.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.FeatherIcons.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.FontAwesome.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Ionicons.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.JamIcons.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Material.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.MaterialDesign.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.MaterialLight.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Microns.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Modern.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Octicons.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.PicolIcons.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.RPGAwesome.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.SimpleIcons.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Typicons.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Unicons.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.WeatherIcons.dll"/>
     <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Service.dll"/>
     <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Service.Views.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Zondicons.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Authentication.JwtBearer.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Authentication.OpenIdConnect.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Authentication.WsFederation.dll"/>
@@ -1419,8 +1415,6 @@
     <ROW Feature_="MainFeature" Component_="Microsoft.IdentityModel.Tokens.Saml.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.IdentityModel.Xml.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.CimCmdlets.dll"/>
-    <ROW Feature_="MainFeature" Component_="MahApps.Metro.SimpleChildWindow.dll"/>
-    <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Http.Abstractions.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.Commands.Diagnostics.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.Commands.Management.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.Commands.Utility.dll"/>
@@ -1432,17 +1426,9 @@
     <ROW Feature_="MainFeature" Component_="Microsoft.Win32.Registry.AccessControl.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.WSMan.Management.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.WSMan.Runtime.dll"/>
-    <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Http.Extensions.dll"/>
     <ROW Feature_="MainFeature" Component_="NLog.Web.AspNetCore.dll"/>
     <ROW Feature_="MainFeature" Component_="PowerShell.Core.Instrumentation.dll"/>
     <ROW Feature_="MainFeature" Component_="pwrshplugin.dll"/>
-    <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Http.Features.dll"/>
-    <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.HttpOverrides.dll"/>
-    <ROW Feature_="MainFeature" Component_="Microsoft.Net.Http.Headers.dll"/>
-    <ROW Feature_="MainFeature" Component_="Microsoft.Xaml.Behaviors.dll"/>
-    <ROW Feature_="MainFeature" Component_="SslCertBinding.Net.dll"/>
-    <ROW Feature_="MainFeature" Component_="Stylet.dll"/>
-    <ROW Feature_="MainFeature" Component_="System.Text.Json.dll_1"/>
     <ROW Feature_="MainFeature" Component_="apphost.json_1"/>
     <ROW Feature_="MainFeature" Component_="emailfailure.html"/>
     <ROW Feature_="MainFeature" Component_="exampleaudit.ps1"/>
@@ -1478,8 +1464,6 @@
     <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.dll"/>
     <ROW Feature_="MainFeature" Component_="miutils.dll"/>
-    <ROW Feature_="MainFeature" Component_="WindowsFirewallHelper.dll"/>
-    <ROW Feature_="MainFeature" Component_="PropertyChanged.dll"/>
     <ROW Feature_="MainFeature" Component_="AI_ExePath"/>
     <ROW Feature_="MainFeature" Component_="AccessManagerService"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Kernel32.dll"/>
@@ -1487,6 +1471,47 @@
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Security.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Ws2_32.dll"/>
     <ROW Feature_="MainFeature" Component_="CsvHelper.dll"/>
+    <ROW Feature_="MainFeature" Component_="ControlzEx.dll"/>
+    <ROW Feature_="MainFeature" Component_="FluentValidation.dll"/>
+    <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Server.UI.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.BoxIcons.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Core.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Entypo.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.EvaIcons.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.FeatherIcons.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.FontAwesome.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Ionicons.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.JamIcons.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Material.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.MaterialDesign.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.MaterialLight.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Microns.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Modern.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Octicons.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.PicolIcons.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.RPGAwesome.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.SimpleIcons.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Typicons.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Unicons.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.WeatherIcons.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.IconPacks.Zondicons.dll"/>
+    <ROW Feature_="MainFeature" Component_="MahApps.Metro.SimpleChildWindow.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Http.Abstractions.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Http.Extensions.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Http.Features.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.HttpOverrides.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.FileProviders.Embedded.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Net.Http.Headers.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Xaml.Behaviors.dll"/>
+    <ROW Feature_="MainFeature" Component_="PropertyChanged.dll"/>
+    <ROW Feature_="MainFeature" Component_="SslCertBinding.Net.dll"/>
+    <ROW Feature_="MainFeature" Component_="Stylet.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Text.Json.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="WindowsFirewallHelper.dll"/>
+    <ROW Feature_="MainFeature" Component_="EventLogMessages.dll"/>
+    <ROW Feature_="MicrosoftSQLServer" Component_="MicrosoftSQLServer"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>
@@ -1521,8 +1546,8 @@
     <ROW Action="AI_AiRemoveRegsImmediate" Sequence="2599"/>
     <ROW Action="AI_AiBackupImmediate" Sequence="1401"/>
     <ROW Action="AI_AiBackupRollback" Sequence="1501"/>
-    <ROW Action="AI_AiRestoreDeferredImpersonate" Sequence="6597"/>
-    <ROW Action="AI_AiRestoreDeferred" Sequence="6598"/>
+    <ROW Action="AI_AiRestoreDeferredImpersonate" Sequence="6595"/>
+    <ROW Action="AI_AiRestoreDeferred" Sequence="6596"/>
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="99" Builds="DefaultBuild"/>
     <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="101" Builds="DefaultBuild"/>
     <ROW Action="AI_DeleteCadLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="199" Builds="DefaultBuild"/>
@@ -1531,13 +1556,16 @@
     <ROW Action="AI_FindExeLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="196" Builds="DefaultBuild"/>
     <ROW Action="AI_ExtractLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="1549" Builds="DefaultBuild"/>
     <ROW Action="AI_DeleteRLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="1548" Builds="DefaultBuild"/>
-    <ROW Action="AI_DeleteLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="6599" Builds="DefaultBuild"/>
+    <ROW Action="AI_DeleteLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="6597" Builds="DefaultBuild"/>
     <ROW Action="AI_ExtractFiles" Sequence="3998" Builds="DefaultBuild"/>
     <ROW Action="AI_DATA_SETTER" Sequence="3997"/>
     <ROW Action="AI_EstimateExtractFiles" Sequence="3999" Builds="DefaultBuild"/>
     <ROW Action="RemoveHttpUrlAcl" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) AND NOT UPGRADINGPRODUCTCODE ) AND ( HTTP_ACL )" Sequence="6401"/>
     <ROW Action="RemoveHttpsUrlAcl" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) AND NOT UPGRADINGPRODUCTCODE ) AND ( HTTPS_ACL )" Sequence="6402"/>
     <ROW Action="RemoveCertBinding" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) AND NOT UPGRADINGPRODUCTCODE ) AND ( CERT_BINDING )" Sequence="6403"/>
+    <ROW Action="AI_ConfigureChainer" Condition="((UILevel = 2) OR (UILevel = 3)) AND (NOT UPGRADINGPRODUCTCODE)" Sequence="6598"/>
+    <ROW Action="AI_LaunchChainer" Condition="AI_PREREQ_CHAINER AND (NOT UPGRADINGPRODUCTCODE)" Sequence="6599"/>
+    <ROW Action="AI_VerifyPrereq" Sequence="1101"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstallUISequenceComponent">
     <ROW Action="AI_RESTORE_LOCATION" Condition="APPDIR=&quot;&quot;" Sequence="749"/>
@@ -1547,6 +1575,11 @@
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="99"/>
     <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="102"/>
     <ROW Action="AI_AppSearchEx" Sequence="101"/>
+    <ROW Action="AI_DownloadPrereq" Sequence="1297"/>
+    <ROW Action="AI_ExtractPrereq" Sequence="1298"/>
+    <ROW Action="AI_InstallPrerequisite" Sequence="1299"/>
+    <ROW Action="AI_InstallPostPrerequisite" Sequence="1301"/>
+    <ROW Action="AI_CleanPrereq" Sequence="1302"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiLaunchConditionsComponent">
     <ROW Condition="( Version9X OR ( NOT VersionNT64 ) OR ( VersionNT64 AND ((VersionNT64 &lt;&gt; 600) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 600) OR (MsiNTProductType = 1)) AND ((VersionNT64 &lt;&gt; 601) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 601) OR (MsiNTProductType = 1)) AND ((VersionNT64 &lt;&gt; 602) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 602) OR (MsiNTProductType = 1)) AND ((VersionNT64 &lt;&gt; 603) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 1000) OR (MsiNTProductType &lt;&gt; 1)) ) )" Description="[ProductName] cannot be installed on the following Windows versions: [WindowsTypeNT64Display]." DescriptionLocId="AI.LaunchCondition.NoSpecificNT64" IsPredefined="true" Builds="DefaultBuild"/>
@@ -1570,6 +1603,7 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
     <ROW Registry="AI_ExePath" Root="-1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Value="[AI_SETUPEXEPATH]" Component_="AI_ExePath"/>
     <ROW Registry="AccessManagerService" Root="-1" Key="Software\Lithnet\Access Manager Service" Name="+" Component_="AccessManagerService"/>
+    <ROW Registry="MicrosoftSQLServer" Root="-1" Key="Software\Caphyon\Advanced Installer\Prereqs\[ProductCode]\[ProductVersion]" Name="MicrosoftSQLServer" Value="1" Component_="MicrosoftSQLServer"/>
     <ROW Registry="Path" Root="-1" Key="Software\Lithnet\Access Manager Service" Name="Path" Value="[APPDIR]" Component_="ProductInformation"/>
     <ROW Registry="Version" Root="-1" Key="Software\Lithnet\Access Manager Service" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
   </COMPONENT>
@@ -1598,11 +1632,14 @@
   <COMPONENT cid="caphyon.advinst.msicomp.PreReqComponent">
     <ROW PrereqKey="C6FE8A2F0943D2B7A0CB204E12F1F4" DisplayName="ASP.NET Core Runtime 3.1.4 x64" VersionMin="3.1" SetupFileUrl="https://download.visualstudio.microsoft.com/download/pr/f9598bd0-060a-46c1-b5ce-65f1663f6204/afb4dd9e1377f63a5c124d60fb119764/aspnetcore-runtime-3.1.4-win-x64.exe" Location="1" ExactSize="7829704" WinNTVersions="Windows 9x/ME/NT/2000/XP/Vista/Windows 7/Windows 8 x86/Windows 8.1 x86/Windows 10 x86" WinNT64Versions="Windows Vista x64, Windows Server 2008 x64, Windows 7 RTM x64, Windows Server 2008 R2 x64, Windows 8 x64, Windows Server 2012 x64, Windows 10 version 1507 x64, Windows 10 version 1511 x64" Operator="1" NoUiComLine="/q /norestart" Options="xym" MD5="b1f068dcfcea78ec654cd3d120e1ebb7" TargetName="ASP.NET Core 3.1"/>
     <ROW PrereqKey="D0156DFD814047AB868D49D0D15F8245" DisplayName=".NET Core Desktop Runtime 3.1.4 x64" VersionMin="3.1" SetupFileUrl="https://download.visualstudio.microsoft.com/download/pr/d8cf1fe3-21c2-4baf-988f-f0152996135e/0c00b94713ee93e7ad5b4f82e2b86607/windowsdesktop-runtime-3.1.4-win-x64.exe" Location="1" ExactSize="54480864" WinNTVersions="Windows 9x/ME/NT/2000/XP/Vista/Windows 7/Windows 8 x86/Windows 8.1 x86/Windows 10 x86" WinNT64Versions="Windows Vista x64, Windows Server 2008 x64, Windows 7 RTM x64, Windows Server 2008 R2 x64, Windows 8 x64, Windows Server 2012 x64, Windows 10 version 1507 x64, Windows 10 version 1511 x64" Operator="1" NoUiComLine="/q /norestart" Options="xym" MD5="7f402d44cf352d91fd29ac45e174b546" TargetName=".NET Core 3.1"/>
-    <ATTRIBUTE name="PrereqsOrder" value="C6FE8A2F0943D2B7A0CB204E12F1F4 D0156DFD814047AB868D49D0D15F8245"/>
+    <ROW PrereqKey="MicrosoftSQLServer" DisplayName="Microsoft SQL Server 2019 LocalDB" VersionMin="15.0" SetupFileUrl="C:\Users\zb-mgr-rnewing\Downloads\SqlLocalDB.msi" Location="0" ExactSize="0" WinNTVersions="Windows 9x/ME/NT/2000/XP/Vista/Windows 7/Windows 8 x86/Windows 8.1 x86/Windows 10 x86" WinNT64Versions="Windows Vista x64, Windows Server 2008 x64, Windows 7 x64, Windows Server 2008 R2 x64" Operator="1" BasicUiComLine="/qb IACCEPTSQLLOCALDBLICENSETERMS=YES" NoUiComLine="/qn IACCEPTSQLLOCALDBLICENSETERMS=YES" Options="fmz" TargetName="Microsoft SQL Server 2019 LocalDB\SqlLocalDB.msi" Feature="MicrosoftSQLServer"/>
+    <ATTRIBUTE name="PrereqsOrder" value="C6FE8A2F0943D2B7A0CB204E12F1F4 D0156DFD814047AB868D49D0D15F8245 MicrosoftSQLServer"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.PreReqSearchComponent">
     <ROW SearchKey="C6FE8A2F0943D2B7A0CB204E12F1F4ASP.N" Prereq="C6FE8A2F0943D2B7A0CB204E12F1F4" SearchType="1" SearchString="HKLM\SOFTWARE\Microsoft\ASP.NET Core\Shared Framework\v3.1" VerMin="3.1.4" Order="1" Property="PreReqSearch_C6FE8A2F0943D2B7A0CB20"/>
     <ROW SearchKey="D0156DFD814047AB868D49D0D15F8245Mic" Prereq="D0156DFD814047AB868D49D0D15F8245" SearchType="0" SearchString="[ProgramFiles64Folder]dotnet\shared\Microsoft.WindowsDesktop.App\PresentationCore.dll?2" VerMin="4.800.120.21303" Order="1" Property="PreReqSearch_D0156DFD814047AB868D49"/>
+    <ROW SearchKey="UpgradeCode" Prereq="MicrosoftSQLServer" SearchType="4" SearchString="{F0176A51-908A-4240-8853-E229D0AE3F39}" VerMin="15.0.2000.5" Order="1" Property="PreReqSearch"/>
+    <ROW SearchKey="Version" Prereq="MicrosoftSQLServer" SearchType="2" SearchString="HKLM\SOFTWARE\Microsoft\Microsoft SQL Server 2017 Redist\SqlLocalDB\CurrentVersion\Version" VerMin="15.0.2000.5" Order="2" Property="PreReqSearch_1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.SynchronizedFolderComponent">
     <ROW Directory_="APPDIR" SourcePath="output" Feature="MainFeature" ExcludePattern="*~|#*#|%*%|._|CVS|.cvsignore|SCCS|vssver.scc|mssccprj.scc|vssver2.scc|.svn|.DS_Store" ExcludeFlags="6"/>

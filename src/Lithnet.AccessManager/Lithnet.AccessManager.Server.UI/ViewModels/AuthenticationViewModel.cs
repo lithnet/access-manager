@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.UI.Interop;
-using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Microsoft.Extensions.Logging;
@@ -30,11 +26,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly RandomNumberGenerator rng;
         private readonly INotifyModelChangedEventPublisher eventPublisher;
         private readonly IShellExecuteProvider shellExecuteProvider;
-        private readonly IDomainTrustProvider domainTrustProvider;
-        private readonly IDiscoveryServices discoveryServices;
         private readonly IObjectSelectionProvider objectSelectionProvider;
 
-        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, RandomNumberGenerator rng, IDirectory directory, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IObjectSelectionProvider objectSelectionProvider)
+        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, RandomNumberGenerator rng, IDirectory directory, IShellExecuteProvider shellExecuteProvider, IObjectSelectionProvider objectSelectionProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.model = model;
@@ -44,8 +38,6 @@ namespace Lithnet.AccessManager.Server.UI
             this.rng = rng;
             this.directory = directory;
             this.eventPublisher = eventPublisher;
-            this.domainTrustProvider = domainTrustProvider;
-            this.discoveryServices = discoveryServices;
             this.objectSelectionProvider = objectSelectionProvider;
 
             this.DisplayName = "Authentication";
@@ -214,11 +206,6 @@ namespace Lithnet.AccessManager.Server.UI
                     this.model.Oidc.Secret.Data = Convert.ToBase64String(ProtectedData.Protect(Encoding.UTF8.GetBytes(value), salt, DataProtectionScope.LocalMachine));
                 }
             }
-        }
-
-        public void OidcSecretFocus()
-        {
-            this.OidcSecret = null;
         }
 
         [NotifyModelChangedProperty(RequiresServiceRestart = true)]

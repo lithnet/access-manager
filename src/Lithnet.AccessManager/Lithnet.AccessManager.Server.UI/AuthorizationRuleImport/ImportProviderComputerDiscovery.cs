@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using Lithnet.AccessManager.Server.Configuration;
+using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
@@ -190,11 +191,18 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 
         private IEnumerable<SearchResult> GetComputersFromOU(string adsPath, bool includeSubTree, IComputerPrincipalProvider provider)
         {
+            string additionaFilter = string.Empty;
+
+            if (this.settings.FilterDisabledComputers)
+            {
+                additionaFilter += "(!(userAccountControl:1.2.840.113556.1.4.803:=2))";
+            }
+
             DirectorySearcher d = new DirectorySearcher
             {
                 SearchRoot = new DirectoryEntry(adsPath),
                 SearchScope = includeSubTree ? SearchScope.Subtree : SearchScope.OneLevel,
-                Filter = "(&(objectCategory=computer))",
+                Filter = $"(&(objectCategory=computer){additionaFilter})",
                 PageSize = 1000,
                 SecurityMasks = SecurityMasks.Dacl | SecurityMasks.Group | SecurityMasks.Owner
             };
@@ -207,6 +215,11 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
                 "msDS-PrincipalName",
                 "objectSid"
             };
+
+            if (this.settings.ExcludeConflictObjects)
+            {
+                properties.Add("CNF");
+            }
 
             d.PropertiesToLoad.AddRange(properties.ToArray());
 
@@ -249,7 +262,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
                 {
                     this.OnItemProcessStart?.Invoke(this, new ImportProcessingEventArgs(computerName));
 
-                    if (settings.ComputerFilter.Contains(computer.GetPropertySid("objectSid")))
+                    if (this.ShouldFilterComputer(computer))
                     {
                         this.logger.LogTrace("Filtering computer {computer}", computerName);
                         continue;
@@ -321,6 +334,21 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
                 ou.DescendantOUs.Add(childou);
                 this.PerformComputerDiscovery(childou, principalProvider, discoveryErrors);
             }
+        }
+
+        private bool ShouldFilterComputer(SearchResult computer)
+        {
+            if (settings.ComputerFilter.Contains(computer.GetPropertySid("objectSid")))
+            {
+                return true;
+            }
+
+            if (settings.ExcludeConflictObjects && computer.GetPropertyGuid("CNF").HasValue)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private bool ShouldFilter(SecurityIdentifier sid, out DiscoveryError filteredReason)

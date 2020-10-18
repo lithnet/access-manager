@@ -33,7 +33,7 @@ if ([string]::IsNullOrEmpty($ou))
 
 $schemaNC = $rootDSE.schemaNamingContext
 $fveRecoveryObjectGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&(ldapDisplayName=msFVE-RecoveryInformation)(objectclass=classSchema))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
-$fveRecoveryPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&(ldapDisplayName=msFVE-RecoveryPassword)(objectclass=attributeSchema)(!(isDefunct=true)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
+$fveRecoveryPasswordGuid = New-Object Guid @(,(Get-ADObject -SearchBase $schemaNC -LdapFilter "(&(ldapDisplayName=msFVE-RecoveryPassword)(objectclass=attributeSchema)(!(isDefunct=TRUE)))"-Properties "SchemaIDGuid" ).SchemaIDGuid)
 
 $serviceAccountSid = new-object System.Security.Principal.SecurityIdentifier "{serviceAccount}"
 

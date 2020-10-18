@@ -9,12 +9,14 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IAppPathProvider appPathProvider;
         private readonly IFileSelectionViewModelFactory fileSelectionViewModelFactory;
         private readonly Func<IModelValidator<PowershellNotificationChannelDefinitionViewModel>> validator;
+        private readonly ScriptTemplateProvider scriptTemplateProvider;
 
-        public PowershellNotificationChannelDefinitionViewModelFactory(IAppPathProvider appPathProvider, IFileSelectionViewModelFactory fileSelectionViewModelFactory, Func<IModelValidator<PowershellNotificationChannelDefinitionViewModel>> validator)
+        public PowershellNotificationChannelDefinitionViewModelFactory(IAppPathProvider appPathProvider, IFileSelectionViewModelFactory fileSelectionViewModelFactory, Func<IModelValidator<PowershellNotificationChannelDefinitionViewModel>> validator, ScriptTemplateProvider scriptTemplateProvider)
         {
             this.appPathProvider = appPathProvider;
             this.fileSelectionViewModelFactory = fileSelectionViewModelFactory;
             this.validator = validator;
+            this.scriptTemplateProvider = scriptTemplateProvider;
         }
 
         public override PowershellNotificationChannelDefinition CreateModel()
@@ -24,7 +26,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public override PowershellNotificationChannelDefinitionViewModel CreateViewModel(PowershellNotificationChannelDefinition model)
         {
-            return new PowershellNotificationChannelDefinitionViewModel(model, validator.Invoke(), fileSelectionViewModelFactory, appPathProvider);
+            return new PowershellNotificationChannelDefinitionViewModel(model, validator.Invoke(), fileSelectionViewModelFactory, appPathProvider, scriptTemplateProvider);
         }
     }
 }

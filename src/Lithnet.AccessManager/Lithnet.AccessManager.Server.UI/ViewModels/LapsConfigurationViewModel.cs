@@ -16,7 +16,6 @@ namespace Lithnet.AccessManager.Server.UI
     public class LapsConfigurationViewModel : Screen, IHelpLink
     {
         private readonly ICertificateProvider certificateProvider;
-        private readonly IDirectory directory;
         private readonly IX509Certificate2ViewModelFactory certificate2ViewModelFactory;
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IServiceSettingsProvider serviceSettings;
@@ -24,11 +23,11 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IDiscoveryServices discoveryServices;
+        private readonly IScriptTemplateProvider scriptTemplateProvider;
 
-        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IDirectory directory, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IServiceSettingsProvider serviceSettings, ILogger<LapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices)
+        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IServiceSettingsProvider serviceSettings, ILogger<LapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IScriptTemplateProvider scriptTemplateProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
-            this.directory = directory;
             this.certificateProvider = certificateProvider;
             this.certificate2ViewModelFactory = certificate2ViewModelFactory;
             this.dialogCoordinator = dialogCoordinator;
@@ -36,6 +35,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.logger = logger;
             this.domainTrustProvider = domainTrustProvider;
             this.discoveryServices = discoveryServices;
+            this.scriptTemplateProvider = scriptTemplateProvider;
 
             this.Forests = new List<Forest>();
             this.AvailableCertificates = new BindableCollection<X509Certificate2ViewModel>();
@@ -94,7 +94,7 @@ namespace Lithnet.AccessManager.Server.UI
             var vm = new ScriptContentViewModel(this.dialogCoordinator)
             {
                 HelpText = "Run the following script to publish the encryption certificate",
-                ScriptText = ScriptTemplates.PublishCertificateTemplate
+                ScriptText = this.scriptTemplateProvider.PublishLithnetAccessManagerCertificate
                     .Replace("{configurationNamingContext}", de.GetPropertyString("distinguishedName"))
                     .Replace("{certificateData}", certData)
                     .Replace("{forest}", this.SelectedForest.Name)
@@ -192,7 +192,7 @@ namespace Lithnet.AccessManager.Server.UI
             var vm = new ScriptContentViewModel(this.dialogCoordinator)
             {
                 HelpText = "Modify the OU variable in this script, and run it with domain admin rights to assign permissions for the service account to be able to read the encrypted local admin passwords and history from the directory",
-                ScriptText = ScriptTemplates.GrantAccessManagerPermissions.Replace("{serviceAccount}", this.serviceSettings.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
+                ScriptText = this.scriptTemplateProvider.GrantAccessManagerPermissions.Replace("{serviceAccount}", this.serviceSettings.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
             };
 
             ExternalDialogWindow w = new ExternalDialogWindow
@@ -249,7 +249,7 @@ namespace Lithnet.AccessManager.Server.UI
             var vm = new ScriptContentViewModel(this.dialogCoordinator)
             {
                 HelpText = "Modify the OU variable in this script, and run it with domain admin rights to assign permissions for the service account to be able to read Microsoft LAPS passwords from the directory",
-                ScriptText = ScriptTemplates.GrantMsLapsPermissions.Replace("{serviceAccount}", this.serviceSettings.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
+                ScriptText = this.scriptTemplateProvider.GrantMsLapsPermissions.Replace("{serviceAccount}", this.serviceSettings.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
             };
 
             ExternalDialogWindow w = new ExternalDialogWindow

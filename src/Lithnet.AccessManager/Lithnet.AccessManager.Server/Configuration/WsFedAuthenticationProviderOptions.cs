@@ -8,7 +8,7 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public string Realm { get; set; }
 
-        public string ClaimName { get; set; } = ClaimTypes.Upn;
+        public string ClaimName { get; set; }
 
         public bool IdpLogout { get; set; }
     }

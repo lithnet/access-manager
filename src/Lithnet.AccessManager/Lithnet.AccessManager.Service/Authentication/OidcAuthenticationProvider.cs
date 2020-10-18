@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Net;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Extensions;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace Lithnet.AccessManager.Service.AppSettings
 {
@@ -23,12 +27,12 @@ namespace Lithnet.AccessManager.Service.AppSettings
         {
             this.options = options.Value;
         }
-    
+
         public override bool CanLogout => true;
 
         public override bool IdpLogout => this.options.IdpLogout;
 
-        protected override string ClaimName => this.options.ClaimName;
+        protected override string ClaimName => this.options.ClaimName ?? ClaimTypes.Upn;
 
         public override void Configure(IServiceCollection services)
         {
@@ -46,16 +50,28 @@ namespace Lithnet.AccessManager.Service.AppSettings
                  openIdConnectOptions.CallbackPath = "/auth";
                  openIdConnectOptions.SignedOutCallbackPath = "/auth/logout";
                  openIdConnectOptions.SignedOutRedirectUri = "/Home/LoggedOut";
-                 openIdConnectOptions.ResponseType = this.options.ResponseType;
-                 openIdConnectOptions.SaveTokens = true;
-                 openIdConnectOptions.GetClaimsFromUserInfoEndpoint = true;
+                 openIdConnectOptions.ResponseType = this.options.ResponseType ?? OpenIdConnectResponseType.Code;
+                 openIdConnectOptions.SaveTokens = false;
+                 openIdConnectOptions.GetClaimsFromUserInfoEndpoint = this.options.GetUserInfoEndpointClaims ?? openIdConnectOptions.ResponseType.Contains(OpenIdConnectResponseType.Code);
                  openIdConnectOptions.UseTokenLifetime = true;
                  openIdConnectOptions.Events = new OpenIdConnectEvents()
                  {
-                     OnTokenValidated = this.FindClaimIdentityInDirectoryOrFail,
                      OnRemoteFailure = this.HandleRemoteFailure,
                      OnAccessDenied = this.HandleAuthNFailed,
+                     OnTicketReceived = this.FindClaimIdentityInDirectoryOrFail,
                  };
+
+                 if (this.options.ClaimMapping == null || this.options.ClaimMapping.Count > 0)
+                 {
+                     openIdConnectOptions.ClaimActions.MapJsonKey(ClaimTypes.Upn, "upn");
+                 }
+                 else
+                 {
+                     foreach (var kvp in this.options.ClaimMapping)
+                     {
+                         openIdConnectOptions.ClaimActions.MapJsonKey(kvp.Value, kvp.Key);
+                     }
+                 }
 
                  openIdConnectOptions.Scope.Clear();
                  if (this.options.Scopes == null || this.options.Scopes.Count == 0)

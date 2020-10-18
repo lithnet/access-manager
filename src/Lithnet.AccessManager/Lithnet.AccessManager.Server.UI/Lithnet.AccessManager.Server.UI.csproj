@@ -21,6 +21,20 @@
   <ItemGroup>
     <None Remove="access-manager.png" />
     <None Remove="NLog.config" />
+    <None Remove="ScriptTemplates\AddDomainGroupMembershipPermissions.ps1" />
+    <None Remove="ScriptTemplates\CreateGmsa.ps1" />
+    <None Remove="ScriptTemplates\EnablePamFeature.ps1" />
+    <None Remove="ScriptTemplates\Get-LocalAdministrators.ps1" />
+    <None Remove="ScriptTemplates\GetAuthorizationResponse.ps1" />
+    <None Remove="ScriptTemplates\GrantAccessManagerPermissions.ps1" />
+    <None Remove="ScriptTemplates\GrantBitLockerRecoveryPasswordPermissions.ps1" />
+    <None Remove="ScriptTemplates\GrantGroupPermissions.ps1" />
+    <None Remove="ScriptTemplates\GrantMsLapsComputerSelfPermission.ps1" />
+    <None Remove="ScriptTemplates\GrantMsLapsPermissions.ps1" />
+    <None Remove="ScriptTemplates\PreventDelegation.ps1" />
+    <None Remove="ScriptTemplates\PublishLithnetAccessManagerCertificate.ps1" />
+    <None Remove="ScriptTemplates\UpdateAdSchema.ps1" />
+    <None Remove="ScriptTemplates\WriteAuditLog.ps1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,11 +46,29 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="ScriptTemplates\AddDomainGroupMembershipPermissions.ps1" />
+    <EmbeddedResource Include="ScriptTemplates\CreateGmsa.ps1" />
+    <EmbeddedResource Include="ScriptTemplates\EnablePamFeature.ps1" />
+    <EmbeddedResource Include="ScriptTemplates\Get-LocalAdministrators.ps1" />
+    <EmbeddedResource Include="ScriptTemplates\GetAuthorizationResponse.ps1" />
+    <EmbeddedResource Include="ScriptTemplates\GrantAccessManagerPermissions.ps1" />
+    <EmbeddedResource Include="ScriptTemplates\GrantBitLockerRecoveryPasswordPermissions.ps1" />
+    <EmbeddedResource Include="ScriptTemplates\GrantGroupPermissions.ps1" />
+    <EmbeddedResource Include="ScriptTemplates\GrantMsLapsComputerSelfPermission.ps1" />
+    <EmbeddedResource Include="ScriptTemplates\GrantMsLapsPermissions.ps1" />
+    <EmbeddedResource Include="ScriptTemplates\PreventDelegation.ps1" />
+    <EmbeddedResource Include="ScriptTemplates\PublishLithnetAccessManagerCertificate.ps1" />
+    <EmbeddedResource Include="ScriptTemplates\UpdateAdSchema.ps1" />
+    <EmbeddedResource Include="ScriptTemplates\WriteAuditLog.ps1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentValidation" Version="9.0.1" />
     <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7586" />
     <PackageReference Include="mahapps.metro" Version="2.1.1" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="4.4.0" />
     <PackageReference Include="MahApps.Metro.SimpleChildWindow" Version="2.0.0-alpha0043" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.8" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Logging.EventLog" Version="3.1.6" />
     <PackageReference Include="newtonsoft.json" Version="12.0.3" />
@@ -60,11 +92,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="ScriptTemplates.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ScriptTemplates.resx</DependentUpon>
-    </Compile>
     <Compile Update="Views\JitConfigurationView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -95,13 +122,6 @@
     <Compile Update="Windows\ExternalDialogWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="ScriptTemplates.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ScriptTemplates.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

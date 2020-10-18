@@ -473,7 +473,7 @@ namespace Lithnet.AccessManager
                 {
                     SearchRoot = this.GetSchemaNamingContext(dnsDomain),
                     SearchScope = SearchScope.Subtree,
-                    Filter = $"(&(objectClass=attributeSchema)(lDAPDisplayName={attributeName})(!(isDefunct=true)))"
+                    Filter = $"(&(objectClass=attributeSchema)(lDAPDisplayName={attributeName})(!(isDefunct=TRUE)))"
                 };
 
                 d.PropertiesToLoad.Add("schemaIDGUID");
@@ -504,7 +504,7 @@ namespace Lithnet.AccessManager
                 {
                     SearchRoot = this.GetSchemaNamingContext(dnsDomain),
                     SearchScope = SearchScope.Subtree,
-                    Filter = $"(&(objectClass=classSchema)(lDAPDisplayName={objectName})(!(isDefunct=true)))"
+                    Filter = $"(&(objectClass=classSchema)(lDAPDisplayName={objectName})(!(isDefunct=TRUE)))"
                 };
 
                 d.PropertiesToLoad.Add("schemaIDGUID");

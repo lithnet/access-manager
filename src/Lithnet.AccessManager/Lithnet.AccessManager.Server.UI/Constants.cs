@@ -8,7 +8,8 @@
 
         public const string LinkDownloadAccessManagerAgent = "https://go.lithnet.io/fwlink/plrejfry";
         public const string LinkGmsaInfo = "https://go.lithnet.io/fwlink/fmuvtbkw";
-        
+        public const string HelpLinkPageHostingDelegationWarning = "https://go.lithnet.io/fwlink/waprxwbx";
+
         public const string HelpLinkPageActiveDirectory = "https://go.lithnet.io/fwlink/jzbnxnbz";
         public const string HelpLinkPageAuditing = "https://go.lithnet.io/fwlink/hvsjlbde";
         public const string HelpLinkPageAuthentication = "https://go.lithnet.io/fwlink/fhqobzto";
