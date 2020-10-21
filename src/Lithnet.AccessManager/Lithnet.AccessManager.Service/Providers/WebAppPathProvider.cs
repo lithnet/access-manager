@@ -9,7 +9,7 @@ namespace Lithnet.AccessManager.Service
     {
         public WebAppPathProvider(IHostEnvironment env)
         {
-            RegistryKey key = Registry.LocalMachine.OpenSubKey(Constants.BaseKey, false);
+            RegistryKey key = Registry.LocalMachine.OpenSubKey(Constants.ParametersKey, false);
             string appPath = key?.GetValue("BasePath", null) as string ?? env.ContentRootPath;
             string configPath = key?.GetValue("ConfigPath", null) as string ?? Path.Combine(appPath, "config");
             string wwwRootPath = key?.GetValue("WwwRootPath", null) as string ?? Path.Combine(appPath, "wwwroot");
@@ -21,6 +21,7 @@ namespace Lithnet.AccessManager.Service
             this.ScriptsPath = $"{configPath}\\scripts";
             this.WwwRootPath = wwwRootPath;
             this.ImagesPath = $"{wwwRootPath}\\images";
+            this.LogoPath = $"{configPath}\\logo.png";
         }
 
         public string AppPath { get; }
@@ -32,6 +33,7 @@ namespace Lithnet.AccessManager.Service
         public string WwwRootPath { get; }
 
         public string ImagesPath { get; }
+        public string LogoPath { get; }
 
         public string ConfigFile { get; }
         

@@ -12,6 +12,8 @@
 
         string ImagesPath { get; } 
 
+        string LogoPath { get; }
+
         string ConfigFile { get; }
 
         string HostingConfigFile { get; }

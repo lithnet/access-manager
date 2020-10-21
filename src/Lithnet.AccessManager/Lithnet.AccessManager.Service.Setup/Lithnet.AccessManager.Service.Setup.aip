@@ -18,10 +18,10 @@
     <ROW Property="CTRLS" Value="2"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{74BCBD9B-EC6D-45D3-B485-DE311F9627E0} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{15AEE0E6-8FA2-4E19-B379-98C219716769} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7644.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7660.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="RUNAPPLICATION" Value="1" Type="4"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
@@ -101,6 +101,7 @@
     <ROW Component="HtmlAgilityPack.dll" ComponentId="{8505AA5C-23A4-4869-9C25-E396707B78B8}" Directory_="APPDIR" Attributes="0" KeyPath="HtmlAgilityPack.dll"/>
     <ROW Component="InconsolataRegular.ttf" ComponentId="{599B69B5-3EBB-4383-A188-CF1595F67276}" Directory_="fonts_Dir" Attributes="0" Type="0"/>
     <ROW Component="Lithnet" ComponentId="{87EF8BF8-4942-4907-826F-8DC42D990F22}" Directory_="Lithnet_Dir" Attributes="0"/>
+    <ROW Component="Lithnet.AccessManager.Enterprise.dll" ComponentId="{F331ECC3-B27C-471C-93CD-37A20F36CFAD}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Enterprise.dll"/>
     <ROW Component="Lithnet.AccessManager.Server.UI.dll" ComponentId="{B8CE773B-3F5A-4DFE-B936-C1EE9C5C053D}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.Server.UI.dll"/>
     <ROW Component="Lithnet.AccessManager.Server.UI.exe" ComponentId="{12E3D520-C42D-4704-B2A5-EAC20746AEF3}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.Server.UI.exe"/>
     <ROW Component="Lithnet.AccessManager.Server.dll" ComponentId="{C36055FC-20C8-47CA-B618-F40CD40A68FE}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Server.dll"/>
@@ -890,6 +891,7 @@
     <ROW File="System.Text.Json.dll_1" Component_="System.Text.Json.dll_1" FileName="SYSTE~34.DLL|System.Text.Json.dll" Attributes="0" SourcePath="output\System.Text.Json.dll" SelfReg="false"/>
     <ROW File="WindowsFirewallHelper.dll" Component_="WindowsFirewallHelper.dll" FileName="WINDOW~1.DLL|WindowsFirewallHelper.dll" Attributes="0" SourcePath="output\WindowsFirewallHelper.dll" SelfReg="false"/>
     <ROW File="EventLogMessages.dll" Component_="EventLogMessages.dll" FileName="EVENTL~1.DLL|EventLogMessages.dll" Attributes="0" SourcePath="output\EventLogMessages.dll" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Enterprise.dll" Component_="Lithnet.AccessManager.Enterprise.dll" FileName="LITHNE~7.DLL|Lithnet.AccessManager.Enterprise.dll" Attributes="0" SourcePath="output\Lithnet.AccessManager.Enterprise.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.AiPersistentDataComponent">
     <ROW PersistentRow="config_Dir" Type="1" Condition="1"/>
@@ -1512,6 +1514,7 @@
     <ROW Feature_="MainFeature" Component_="WindowsFirewallHelper.dll"/>
     <ROW Feature_="MainFeature" Component_="EventLogMessages.dll"/>
     <ROW Feature_="MicrosoftSQLServer" Component_="MicrosoftSQLServer"/>
+    <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Enterprise.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>

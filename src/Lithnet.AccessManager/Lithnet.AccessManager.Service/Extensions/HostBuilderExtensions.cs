@@ -16,7 +16,7 @@ namespace Lithnet.AccessManager.Service.Internal
     {
         public static IConfigurationBuilder ConfigureAppSettings(this IConfigurationBuilder config)
         {
-            RegistryKey key = Registry.LocalMachine.OpenSubKey(Constants.BaseKey, false);
+            RegistryKey key = Registry.LocalMachine.OpenSubKey(Constants.ParametersKey, false);
             string basePath = key?.GetValue("BasePath") as string;
             string configPath = key?.GetValue("ConfigPath") as string;
 

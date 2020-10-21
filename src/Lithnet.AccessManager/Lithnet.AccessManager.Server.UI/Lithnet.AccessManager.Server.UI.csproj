@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <None Remove="access-manager.png" />
-    <None Remove="NLog.config" />
     <None Remove="ScriptTemplates\AddDomainGroupMembershipPermissions.ps1" />
     <None Remove="ScriptTemplates\CreateGmsa.ps1" />
     <None Remove="ScriptTemplates\EnablePamFeature.ps1" />
@@ -35,14 +34,6 @@
     <None Remove="ScriptTemplates\PublishLithnetAccessManagerCertificate.ps1" />
     <None Remove="ScriptTemplates\UpdateAdSchema.ps1" />
     <None Remove="ScriptTemplates\WriteAuditLog.ps1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="NLog.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -64,7 +55,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="9.0.1" />
-    <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7596.16890" />
+    <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7599.3654" />
     <PackageReference Include="mahapps.metro" Version="2.1.1" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="4.4.0" />
     <PackageReference Include="MahApps.Metro.SimpleChildWindow" Version="2.0.0-alpha0043" />

@@ -13,6 +13,7 @@ using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
 using Microsoft.Extensions.Options;
+using Microsoft.Win32;
 using NLog.Extensions.Logging;
 using Stylet;
 using StyletIoC;
@@ -27,8 +28,33 @@ namespace Lithnet.AccessManager.Server.UI
 
         private IApplicationConfig appconfig;
 
+
+        private static void SetupNLog()
+        {
+            RegistryKey paramsKey = Registry.LocalMachine.OpenSubKey(AccessManager.Constants.ParametersKey, false);
+            string logPath = paramsKey?.GetValue("LogPath") as string ?? Path.Combine(Directory.GetCurrentDirectory(), "logs");
+            int retentionDays = Math.Max(paramsKey?.GetValue("LogRetentionDays") as int? ?? 7, 1);
+
+            var configuration = new NLog.Config.LoggingConfiguration();
+
+            var uiLog = new NLog.Targets.FileTarget("access-manager-ui")
+            {
+                FileName = Path.Combine(logPath, "access-manager-ui.log"),
+                ArchiveEvery = NLog.Targets.FileArchivePeriod.Day,
+                ArchiveNumbering = NLog.Targets.ArchiveNumberingMode.Date,
+                MaxArchiveFiles = retentionDays,
+                Layout = "${longdate}|${level:uppercase=true:padding=5}|${logger}|${message}${onexception:inner=${newline}${exception:format=ToString}}"
+            };
+
+            configuration.AddRule(NLog.LogLevel.Trace, NLog.LogLevel.Fatal, uiLog);
+
+            NLog.LogManager.Configuration = configuration;
+        }
+
         public Bootstrapper()
         {
+            SetupNLog();
+                
             loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder.AddNLog();

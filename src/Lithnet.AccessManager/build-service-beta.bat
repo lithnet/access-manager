@@ -1,5 +1,5 @@
 @echo off
-SET /A buildingbeta=0
+SET /A buildingbeta=1
 
 call pre-build.bat
 if %errorlevel% neq 0 exit /b %errorlevel%

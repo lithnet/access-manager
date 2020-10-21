@@ -9,6 +9,13 @@ SET setupProject=%solutiondir%\Lithnet.AccessManager.Service.Setup\Lithnet.Acces
 rd /s /q "%outputdir%"
 if %errorlevel% neq 0 exit /b %errorlevel%
 
+md %outputdir%
+
+if "%buildingbeta%" EQU "1" (
+ECHO Writing lciense file
+"D:\dev\git\lithnet\access-manager-enterprise\src\Lithnet.AccessManager.Enterprise.LicenseManager.Cli\bin\Debug\netcoreapp3.1\amsliccli" --audiences * --units -1 --min-version %version% --max-version %version% --expire-in-days 90 --out-file "%outputdir%\license.dat"
+)
+
 dotnet publish "%serviceProject%" --runtime win8-x64 --output "%outputdir%" --framework netcoreapp3.1 --self-contained false
 if %errorlevel% neq 0 exit /b %errorlevel%
 

@@ -76,6 +76,7 @@
         public const int CertificateAuthNAccessDenied = 5033;
         public const int CertificateAuthNError = 5034;
         public const int BitLockerKeyAccessError = 5035;
+        public const int ResourceReadError = 5036;
 
         // 6000 range - Reserved 
 
