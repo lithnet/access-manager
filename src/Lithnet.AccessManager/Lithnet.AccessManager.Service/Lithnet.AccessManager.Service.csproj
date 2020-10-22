@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Content Remove="dev-config\apphost.json" />
+    <Content Remove="dev-config\logo.png" />
     <Content Remove="dev-config\appsecrets.json" />
     <Content Remove="dev-config\appsettings.json" />
     <Content Remove="dev-config\audit-templates\webhook-slack-failure.json" />
@@ -36,7 +37,6 @@
     <None Remove="config\logo.png" />
     <None Remove="config\scripts\example-audit.ps1" />
     <None Remove="config\scripts\example-authorization.ps1" />
-    <None Remove="dev-config\logo.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -62,10 +62,6 @@
     <Content Include="config\scripts\example-authorization.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 
-    </Content>
-    <Content Include="dev-config\logo.png">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
 
@@ -145,6 +141,9 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="dev-config\audit-templates\eventlog-success.txt">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="dev-config\logo.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="dev-config\scripts\example-audit.ps1">
