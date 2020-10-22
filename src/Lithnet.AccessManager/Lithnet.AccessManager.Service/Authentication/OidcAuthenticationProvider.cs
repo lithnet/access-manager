@@ -90,7 +90,10 @@ namespace Lithnet.AccessManager.Service.AppSettings
              .AddCookie(cookieAuthenticationOptions =>
              {
                  cookieAuthenticationOptions.LoginPath = "/Home/Login";
-                 cookieAuthenticationOptions.LogoutPath = "/Home/Logout";
+                 cookieAuthenticationOptions.LogoutPath = "/Home/SignOut";
+                 cookieAuthenticationOptions.Cookie.SameSite = SameSiteMode.None;
+                 cookieAuthenticationOptions.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                 cookieAuthenticationOptions.SessionStore = new AuthenticationTicketCache();
              });
         }
     }

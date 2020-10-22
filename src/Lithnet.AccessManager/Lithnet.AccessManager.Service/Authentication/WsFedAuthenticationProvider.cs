@@ -28,30 +28,31 @@ namespace Lithnet.AccessManager.Service.AppSettings
 
         public override void Configure(IServiceCollection services)
         {
-            services.AddAuthentication(options =>
+            services.AddAuthentication(authenticationOptions =>
             {
-                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                authenticationOptions.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                authenticationOptions.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                authenticationOptions.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
-            .AddWsFederation("laps", options =>
+            .AddWsFederation("laps", wsFederationOptions =>
             {
-                options.CallbackPath = "/auth";
-                options.MetadataAddress = this.options.Metadata;
-                options.Wtrealm = this.options.Realm;
-                options.Events = new WsFederationEvents()
+                wsFederationOptions.CallbackPath = "/auth";
+                wsFederationOptions.MetadataAddress = this.options.Metadata;
+                wsFederationOptions.Wtrealm = this.options.Realm;
+                wsFederationOptions.Events = new WsFederationEvents()
                 {
                     OnAccessDenied = this.HandleAuthNFailed,
                     OnRemoteFailure = this.HandleRemoteFailure,
                     OnTicketReceived = this.FindClaimIdentityInDirectoryOrFail
                 };
             })
-            .AddCookie(options =>
+            .AddCookie(cookieAuthenticationOptions =>
             {
-                options.LoginPath = "/Home/Login";
-                options.LogoutPath = "/Home/SignOut";
-                options.Cookie.SameSite = SameSiteMode.None;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                cookieAuthenticationOptions.LoginPath = "/Home/Login";
+                cookieAuthenticationOptions.LogoutPath = "/Home/SignOut";
+                cookieAuthenticationOptions.Cookie.SameSite = SameSiteMode.None;
+                cookieAuthenticationOptions.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                cookieAuthenticationOptions.SessionStore = new AuthenticationTicketCache();
             });
         }
     }
