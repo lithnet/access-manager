@@ -1,17 +1,12 @@
 ﻿using System;
-using System.ComponentModel;
 using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
-using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using Lithnet.Security.Authorization;
 using Microsoft.Extensions.Logging;
-using Vanara.PInvoke;
 
 namespace Lithnet.AccessManager
 {
@@ -21,45 +16,9 @@ namespace Lithnet.AccessManager
 
         private readonly ILogger logger;
 
-        private readonly IAppPathProvider appPathProvider;
-
         private readonly IDiscoveryServices discoveryServices;
 
         public const string LithnetAccessManagerEku = "1.3.6.1.4.1.55989.2.1.1";
-
-        public X509Store OpenServiceStore(string serviceName, OpenFlags openFlags)
-        {
-            Crypt32.CertStoreFlags storeFlags = Crypt32.CertStoreFlags.CERT_SYSTEM_STORE_SERVICES;
-
-            return this.OpenServiceStore(storeFlags, openFlags, $"{serviceName}\\MY");
-        }
-
-        public X509Store OpenServiceStore(OpenFlags flags)
-        {
-            Crypt32.CertStoreFlags storeFlags = Crypt32.CertStoreFlags.CERT_SYSTEM_STORE_CURRENT_SERVICE;
-
-            return this.OpenServiceStore(storeFlags, flags, "MY");
-        }
-
-        private X509Store OpenServiceStore(Crypt32.CertStoreFlags storeFlags, OpenFlags openFlags, string storeName)
-        {
-            storeFlags |= openFlags.HasFlag(OpenFlags.MaxAllowed) ? Crypt32.CertStoreFlags.CERT_STORE_MAXIMUM_ALLOWED_FLAG : 0;
-            storeFlags |= openFlags.HasFlag(OpenFlags.IncludeArchived) ? Crypt32.CertStoreFlags.CERT_STORE_ENUM_ARCHIVED_FLAG : 0;
-            storeFlags |= openFlags.HasFlag(OpenFlags.OpenExistingOnly) ? Crypt32.CertStoreFlags.CERT_STORE_OPEN_EXISTING_FLAG : 0;
-            storeFlags |= !openFlags.HasFlag(OpenFlags.ReadWrite) ? Crypt32.CertStoreFlags.CERT_STORE_READONLY_FLAG : 0;
-
-            Crypt32.SafeHCERTSTORE pHandle = Crypt32.CertOpenStore(new Crypt32.SafeOID(10), Crypt32.CertEncodingType.X509_ASN_ENCODING, IntPtr.Zero, storeFlags, storeName);
-
-            if (pHandle.IsInvalid)
-            {
-                throw new Win32Exception(Marshal.GetLastWin32Error());
-            }
-
-            var store = new X509Store(pHandle.DangerousGetHandle());
-            pHandle.SetHandleAsInvalid(); // The X509Store object will take care of closing the handle
-            return store;
-        }
-
 
         public X509Certificate2 CreateSelfSignedCert(string subject)
         {
@@ -81,21 +40,15 @@ namespace Lithnet.AccessManager
             return f;
         }
 
-        public CertificateProvider(ILogger<CertificateProvider> logger, IAppPathProvider appPathProvider, IDiscoveryServices discoveryServices)
+        public CertificateProvider(ILogger<CertificateProvider> logger, IDiscoveryServices discoveryServices)
         {
             this.logger = logger;
-            this.appPathProvider = appPathProvider;
             this.discoveryServices = discoveryServices;
         }
 
         public X509Certificate2 FindDecryptionCertificate(string thumbprint)
         {
-            return FindDecryptionCertificate(thumbprint, null);
-        }
-
-        public X509Certificate2 FindDecryptionCertificate(string thumbprint, string serviceName)
-        {
-            var cert = this.ResolveCertificateFromLocalStore(thumbprint, serviceName);
+            var cert = this.ResolveCertificateFromLocalStore(thumbprint);
 
             if (cert == null)
             {
@@ -110,20 +63,19 @@ namespace Lithnet.AccessManager
             return cert;
         }
 
-        public X509Certificate2 FindEncryptionCertificate(string thumbprint = null, string pathHint = null)
+
+        public X509Certificate2 FindEncryptionCertificate()
+        {
+            return this.FindEncryptionCertificate(null);
+        }
+
+        public X509Certificate2 FindEncryptionCertificate(string thumbprint)
         {
             X509Certificate2 cert = null;
 
             if (!string.IsNullOrWhiteSpace(thumbprint))
             {
                 cert = this.ResolveCertificateFromLocalStore(thumbprint);
-            }
-            else
-            {
-                if (!string.IsNullOrWhiteSpace(pathHint))
-                {
-                    this.TryGetCertificateFromPath(pathHint, out cert);
-                }
             }
 
             if (cert == null)
@@ -133,7 +85,7 @@ namespace Lithnet.AccessManager
 
             if (cert == null)
             {
-                throw new CertificateNotFoundException($"A certificate could not be found. Requested thumbprint {thumbprint}. Path hint: {pathHint}");
+                throw new CertificateNotFoundException($"A certificate could not be found. Requested thumbprint {thumbprint}");
             }
 
             return cert;
@@ -143,7 +95,7 @@ namespace Lithnet.AccessManager
         {
             X509Certificate2Collection certs = new X509Certificate2Collection();
 
-            X509Store store = this.OpenServiceStore(Constants.ServiceName, OpenFlags.ReadOnly);
+            X509Store store = X509ServiceStoreHelper.Open(Constants.ServiceName, OpenFlags.ReadOnly);
             GetEligibleCertificates(needPrivateKey, store, certs);
 
             return certs;
@@ -203,88 +155,17 @@ namespace Lithnet.AccessManager
             return false;
         }
 
-        internal bool TryGetCertificateFromPath(string path, out X509Certificate2 cert)
-        {
-            cert = null;
-
-            if (Uri.TryCreate(path, UriKind.Absolute, out Uri u))
-            {
-                if (u.IsFile || u.IsUnc)
-                {
-                    return this.TryGetCertificateFromFile(path, out cert);
-                }
-                else
-                {
-                    return this.TryGetCertificateFromUrl(u, out cert);
-                }
-            }
-            else if (Uri.TryCreate(path, UriKind.Relative, out _))
-            {
-                var testPath = Path.Combine(this.appPathProvider.AppPath, path);
-                return this.TryGetCertificateFromFile(testPath, out cert);
-            }
-
-            return false;
-        }
-
-        internal bool TryGetCertificateFromUrl(Uri path, out X509Certificate2 cert)
-        {
-            cert = null;
-
-            try
-            {
-                if (path.Scheme != "https")
-                {
-                    logger.LogError(EventIDs.CertProviderInvalidUnsupportedUriScheme, "Can not obtain certificate from URL, as only https URLs are supported: {path}", path);
-                    return false;
-                }
-
-                HttpClient client = new HttpClient();
-                var result = client.GetAsync(path).ConfigureAwait(false).GetAwaiter().GetResult();
-
-                result.EnsureSuccessStatusCode();
-
-                byte[] data = result.Content.ReadAsByteArrayAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-
-                cert = new X509Certificate2(data);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                logger.LogTrace(ex, "TryGetCertificateFromUrl failed");
-            }
-
-            return false;
-        }
-
-        internal bool TryGetCertificateFromFile(string path, out X509Certificate2 cert)
-        {
-            cert = null;
-
-            try
-            {
-                cert = new X509Certificate2(path);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                logger.LogTrace(ex, "TryGetCertificateFromFile failed");
-            }
-
-            return false;
-        }
+        //private X509Certificate2 ResolveCertificateFromLocalStore(string thumbprint)
+        //{
+        //    return GetCertificateFromServiceStore(thumbprint, null) ??
+        //           GetCertificateFromStore(thumbprint, StoreLocation.CurrentUser) ??
+        //            GetCertificateFromStore(thumbprint, StoreLocation.LocalMachine) ??
+        //            throw new CertificateNotFoundException($"A certificate with the thumbprint {thumbprint} could not be found");
+        //}
 
         private X509Certificate2 ResolveCertificateFromLocalStore(string thumbprint)
         {
-            return GetCertificateFromServiceStore(thumbprint, null) ??
-                   GetCertificateFromStore(thumbprint, StoreLocation.CurrentUser) ??
-                    GetCertificateFromStore(thumbprint, StoreLocation.LocalMachine) ??
-                    throw new CertificateNotFoundException($"A certificate with the thumbprint {thumbprint} could not be found");
-        }
-
-        private X509Certificate2 ResolveCertificateFromLocalStore(string thumbprint, string serviceName)
-        {
-            return GetCertificateFromServiceStore(thumbprint, serviceName) ??
+            return GetCertificateFromServiceStore(thumbprint, Constants.ServiceName) ??
                    GetCertificateFromStore(thumbprint, StoreLocation.CurrentUser) ??
                    GetCertificateFromStore(thumbprint, StoreLocation.LocalMachine) ??
                    throw new CertificateNotFoundException($"A certificate with the thumbprint {thumbprint} could not be found");
@@ -325,11 +206,11 @@ namespace Lithnet.AccessManager
                 X509Store store;
                 if (serviceName == null)
                 {
-                    store = this.OpenServiceStore(OpenFlags.ReadOnly);
+                    store = X509ServiceStoreHelper.Open(OpenFlags.ReadOnly);
                 }
                 else
                 {
-                    store = this.OpenServiceStore(serviceName, OpenFlags.ReadOnly);
+                    store = X509ServiceStoreHelper.Open(serviceName, OpenFlags.ReadOnly);
                 }
 
                 using (store)

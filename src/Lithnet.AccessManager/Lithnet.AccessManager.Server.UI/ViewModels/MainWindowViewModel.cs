@@ -3,6 +3,7 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
@@ -14,25 +15,24 @@ namespace Lithnet.AccessManager.Server.UI
     public class MainWindowViewModel : Conductor<PropertyChangedBase>.Collection.OneActive, IHandle<ModelChangedEvent>
     {
         private readonly IApplicationConfig model;
-
         private readonly IEventAggregator eventAggregator;
-
         private readonly IDialogCoordinator dialogCoordinator;
-
         private readonly ILogger<MainWindowViewModel> logger;
-
         private readonly IShellExecuteProvider shellExecuteProvider;
-
         private readonly IServiceSettingsProvider serviceSettingsProvider;
+        private readonly ILicenseManager licenseManager;
+        private readonly IRegistryProvider registryProvider;
 
         public MainWindowViewModel(IApplicationConfig model, AuthenticationViewModel authentication, AuthorizationViewModel authorization, UserInterfaceViewModel ui, RateLimitsViewModel rate, IpDetectionViewModel ip,
             AuditingViewModel audit, EmailViewModel mail, HostingViewModel hosting, ActiveDirectoryConfigurationViewModel ad,
-            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IServiceSettingsProvider serviceSettingsProvider)
+            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IServiceSettingsProvider serviceSettingsProvider, ILicenseManager licenseManager, IRegistryProvider registryProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
             this.serviceSettingsProvider = serviceSettingsProvider;
+            this.licenseManager = licenseManager;
+            this.registryProvider = registryProvider;
             this.eventAggregator = eventAggregator;
             this.eventAggregator.Subscribe(this);
             this.DisplayName = Constants.AppName;
@@ -60,6 +60,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.ActiveItem = this.Items.First();
 
             this.UpdateIsConfigured();
+
+            this.licenseManager.Initialize();
         }
 
         public BindableCollection<PropertyChangedBase> OptionItems { get; }
@@ -206,16 +208,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         private void UpdateIsConfigured()
         {
-            int? value = Registry.GetValue(AccessManager.Constants.RootedBaseKey, "Configured", 0) as int?;
-
-            if (value == null)
-            {
-                this.IsConfigured = false;
-            }
-            else
-            {
-                this.IsConfigured = value == 1;
-            }
+            this.IsConfigured = this.registryProvider.IsConfigured;
         }
 
         public void Handle(ModelChangedEvent message)

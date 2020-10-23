@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Lithnet.AccessManager
+namespace Lithnet.AccessManager.Server
 {
     public class PasswordEntry
     {

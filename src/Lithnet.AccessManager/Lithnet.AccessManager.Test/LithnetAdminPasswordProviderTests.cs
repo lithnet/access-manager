@@ -25,7 +25,7 @@ namespace Lithnet.AccessManager.Test
             encryptionProvider = new EncryptionProvider();
             this.discoveryServices = new DiscoveryServices(Mock.Of<ILogger<DiscoveryServices>>());
             directory = new ActiveDirectory(discoveryServices);
-            certificateProvider = new CertificateProvider(Mock.Of<ILogger<CertificateProvider>>(), directory, Mock.Of<IAppPathProvider>(), discoveryServices);
+            certificateProvider = new CertificateProvider(Mock.Of<ILogger<CertificateProvider>>(), discoveryServices);
             provider = new LithnetAdminPasswordProvider(Mock.Of<ILogger<LithnetAdminPasswordProvider>>(), encryptionProvider, certificateProvider);
         }
 

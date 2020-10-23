@@ -4,11 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Management.Automation;
 using System.Text;
-using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.Extensions.Logging;
 using Vanara.InteropServices;
 
-namespace Lithnet.AccessManager.Server.Authorization
+namespace Lithnet.AccessManager.Server
 {
     public class CachedPowerShellSessionProvider : IPowerShellSessionProvider
     {

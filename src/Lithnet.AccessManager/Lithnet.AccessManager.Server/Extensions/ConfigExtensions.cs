@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 
-namespace Lithnet.AccessManager.Server.Extensions
+namespace Lithnet.AccessManager.Server
 {
     public static class ConfigExtensions
     {

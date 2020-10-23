@@ -8,10 +8,6 @@
 
         string ScriptsPath { get; } 
 
-        string WwwRootPath { get; } 
-
-        string ImagesPath { get; } 
-
         string LogoPath { get; }
 
         string ConfigFile { get; }

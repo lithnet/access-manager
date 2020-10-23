@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.DirectoryServices.AccountManagement;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -18,7 +20,6 @@ using Lithnet.AccessManager.Server.UI.Interop;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
 using Newtonsoft.Json;
 using SslCertBinding.Net;
 using Stylet;
@@ -41,8 +42,10 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IEventAggregator eventAggregator;
         private readonly IDirectory directory;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
-        
-        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider)
+        private readonly ICertificatePermissionProvider certPermissionProvider;
+        private readonly IRegistryProvider registryProvider;
+
+        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider)
         {
             this.logger = logger;
             this.pathProvider = pathProvider;
@@ -55,6 +58,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.Validator = validator;
             this.directory = directory;
             this.scriptTemplateProvider = scriptTemplateProvider;
+            this.certPermissionProvider = certPermissionProvider;
+            this.registryProvider = registryProvider;
 
             this.WorkingModel = this.CloneModel(model);
             this.Certificate = this.GetCertificate();
@@ -275,18 +280,10 @@ namespace Lithnet.AccessManager.Server.UI
 
         private void UpdateIsConfigured()
         {
-            int? value = Registry.GetValue(AccessManager.Constants.RootedBaseKey, "Configured", 0) as int?;
-
-            if (value == null)
-            {
-                this.IsConfigured = false;
-            }
-            else
-            {
-                this.IsConfigured = value == 1;
-            }
+            this.IsConfigured = registryProvider.IsConfigured;
         }
 
+        [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
         public async Task<bool> CommitSettings()
         {
             if (this.Certificate == null)
@@ -321,6 +318,8 @@ namespace Lithnet.AccessManager.Server.UI
                 currentlyUnconfigured;
 
             bool updateServiceAccount = this.workingServiceAccountUserName != null;
+
+            bool updateFileSystemPermissions = updateServiceAccount || currentlyUnconfigured;
 
             HostingSettingsRollbackContext rollbackContext = new HostingSettingsRollbackContext();
             rollbackContext.StartingUnconfigured = currentlyUnconfigured;
@@ -449,6 +448,21 @@ namespace Lithnet.AccessManager.Server.UI
 
             try
             {
+                if (updateFileSystemPermissions)
+                {
+                    this.UpdateFileSystemPermissions(rollbackContext);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Error updating file system permissions");
+                rollbackContext.Rollback(this.logger);
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not update file system permissions\r\n{ex.Message}");
+                return false;
+            }
+
+            try
+            {
                 if (updateServiceAccount)
                 {
                     this.UpdateServiceAccount();
@@ -466,13 +480,12 @@ namespace Lithnet.AccessManager.Server.UI
 
             if (currentlyUnconfigured)
             {
-                Registry.SetValue(AccessManager.Constants.RootedBaseKey, "Configured", 1);
+                this.registryProvider.IsConfigured = true;
                 this.UpdateIsConfigured();
             }
 
             if (updateCertificateBinding || updateHttpReservations || updatePrivateKeyPermissions ||
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                updateServiceAccount || updateConfigFile || updateFirewallRules)
+                updateServiceAccount || updateConfigFile || updateFirewallRules || updateFileSystemPermissions)
             {
                 this.OriginalModel = this.CloneModel(this.WorkingModel);
                 this.OriginalCertificate = this.Certificate;
@@ -503,11 +516,13 @@ namespace Lithnet.AccessManager.Server.UI
                 return;
             }
 
-            FileSecurity originalCertificateSecurity = this.Certificate.GetPrivateKeySecurity();
-            X509Certificate2 certificate = this.Certificate;
+            this.certPermissionProvider.AddReadPermission(this.Certificate, this.ServiceAccount, out Action rollbackAction);
+            if (rollbackAction != null)
+            {
+                rollback.RollbackActions.Add(rollbackAction);
+            }
 
-            certificate.AddPrivateKeyReadPermission(this.ServiceAccount);
-            rollback.RollbackActions.Add(() => certificate.SetPrivateKeySecurity(originalCertificateSecurity));
+            this.certPermissionProvider.AddReadPermissionToServiceStore(this.ServiceAccount, rollback.RollbackActions);
         }
 
         public async Task DownloadUpdate()
@@ -569,7 +584,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task SelectServiceAccountUser()
         {
-            LoginDialogData r = await this.dialogCoordinator.ShowLoginAsync(this, "Service account", "Enter the credentials for the service account. If you are using a group-managed service account, leave the password field blank, and don't forget to include the '$' sign at the end of the account name", new LoginDialogSettings
+            LoginDialogData r = await this.dialogCoordinator.ShowLoginAsync(this, "Service account", "Enter the credentials for the service account. If you are using a group-managed service account, leave the password field blank", new LoginDialogSettings
             {
                 EnablePasswordPreview = true,
                 AffirmativeButtonText = "OK"
@@ -582,7 +597,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             try
             {
-                if (directory.TryGetPrincipal(r.Username, out ISecurityPrincipal o))
+                if (directory.TryGetPrincipal(r.Username, out ISecurityPrincipal o) || directory.TryGetPrincipal(r.Username + "$", out o))
                 {
                     if (o is IGroup)
                     {
@@ -604,7 +619,7 @@ namespace Lithnet.AccessManager.Server.UI
                     this.ServiceAccount = up.Sid;
                 }
 
-                this.workingServiceAccountUserName = r.Username;
+                this.workingServiceAccountUserName = o.MsDsPrincipalName;
                 this.workingServiceAccountPassword = r.Password;
 
                 this.PopulateIsNotGmsa();
@@ -735,7 +750,7 @@ namespace Lithnet.AccessManager.Server.UI
         private static async Task<string> DownloadFile(string url)
         {
             using HttpClientHandler handler = new HttpClientHandler
-            { 
+            {
                 DefaultProxyCredentials = CredentialCache.DefaultCredentials
             };
 
@@ -845,27 +860,14 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.CreateUrlReservation(httpNew, this.ServiceAccount);
             rollback.RollbackActions.Add(() => UrlAcl.Delete(httpNew));
-            Registry.SetValue(AccessManager.Constants.RootedBaseKey, "HttpAcl", httpNew);
-            if (httpOld != null)
-            {
-                rollback.RollbackActions.Add(() => Registry.SetValue(AccessManager.Constants.RootedBaseKey, "HttpAcl", httpOld));
-            }
-            else
-            {
-                rollback.RollbackActions.Add(() => Registry.LocalMachine.OpenSubKey(AccessManager.Constants.BaseKey)?.DeleteValue("HttpAcl"));
-            }
+            this.registryProvider.HttpAcl = httpNew;
+
+            rollback.RollbackActions.Add(() => this.registryProvider.HttpAcl = httpOld);
 
             this.CreateUrlReservation(httpsNew, this.ServiceAccount);
             rollback.RollbackActions.Add(() => UrlAcl.Delete(httpsNew));
-            Registry.SetValue(AccessManager.Constants.RootedBaseKey, "HttpsAcl", httpsNew);
-            if (httpsOld != null)
-            {
-                rollback.RollbackActions.Add(() => Registry.SetValue(AccessManager.Constants.RootedBaseKey, "HttpsAcl", httpsOld));
-            }
-            else
-            {
-                rollback.RollbackActions.Add(() => Registry.LocalMachine.OpenSubKey(AccessManager.Constants.BaseKey)?.DeleteValue("HttpsAcl"));
-            }
+            this.registryProvider.HttpsAcl = httpsNew;
+            rollback.RollbackActions.Add(() => this.registryProvider.HttpsAcl = httpsOld);
         }
 
         private void CreateUrlReservation(string url, SecurityIdentifier sid)
@@ -1068,15 +1070,16 @@ namespace Lithnet.AccessManager.Server.UI
             bindingConfiguration.Bind(binding);
             rollback.RollbackActions.Add(() => bindingConfiguration.Delete(binding.IpPort));
 
-            Registry.SetValue(AccessManager.Constants.RootedBaseKey, "CertBinding", binding.IpPort.ToString());
-            if (originalBinding != null)
-            {
-                rollback.RollbackActions.Add(() => Registry.SetValue(AccessManager.Constants.RootedBaseKey, "CertBinding", originalBinding.IpPort.ToString()));
-            }
-            else
-            {
-                rollback.RollbackActions.Add(() => Registry.LocalMachine.OpenSubKey(AccessManager.Constants.BaseKey)?.DeleteValue("CertBinding"));
-            }
+            this.registryProvider.CertBinding = binding.IpPort.ToString();
+            rollback.RollbackActions.Add(() => this.registryProvider.CertBinding = originalBinding?.IpPort?.ToString());
+        }
+
+        private void UpdateFileSystemPermissions(HostingSettingsRollbackContext rollback)
+        {
+            DirectoryInfo di = new DirectoryInfo(this.registryProvider.LogPath);
+            DirectorySecurity originalSecurity = di.GetAccessControl();
+            di.AddDirectorySecurity(this.ServiceAccount, FileSystemRights.Modify, AccessControlType.Allow);
+            rollback.RollbackActions.Add(() => di.SetAccessControl(originalSecurity));
         }
 
         private CertificateBinding GetCertificateBinding(CertificateBindingConfiguration config)

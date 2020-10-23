@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.Auditing
@@ -34,7 +33,7 @@ namespace Lithnet.AccessManager.Server.Auditing
             }
             catch (Exception ex)
             {
-                this.logger.LogEventError(EventIDs.ErrorLoadingTemplateResource, "Could not load template file", ex);
+                this.logger.LogError(EventIDs.ErrorLoadingTemplateResource, ex, "Could not load template file");
                 throw;
             }
         }

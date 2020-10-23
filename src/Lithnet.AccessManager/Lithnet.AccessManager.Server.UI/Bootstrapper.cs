@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using FluentValidation;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.AuthorizationRuleImport;
@@ -28,21 +29,18 @@ namespace Lithnet.AccessManager.Server.UI
 
         private IApplicationConfig appconfig;
 
-
         private static void SetupNLog()
         {
-            RegistryKey paramsKey = Registry.LocalMachine.OpenSubKey(AccessManager.Constants.ParametersKey, false);
-            string logPath = paramsKey?.GetValue("LogPath") as string ?? Path.Combine(Directory.GetCurrentDirectory(), "logs");
-            int retentionDays = Math.Max(paramsKey?.GetValue("LogRetentionDays") as int? ?? 7, 1);
+            RegistryProvider provider = new RegistryProvider(false);
 
             var configuration = new NLog.Config.LoggingConfiguration();
 
             var uiLog = new NLog.Targets.FileTarget("access-manager-ui")
             {
-                FileName = Path.Combine(logPath, "access-manager-ui.log"),
+                FileName = Path.Combine(provider.LogPath, "access-manager-ui.log"),
                 ArchiveEvery = NLog.Targets.FileArchivePeriod.Day,
                 ArchiveNumbering = NLog.Targets.ArchiveNumberingMode.Date,
-                MaxArchiveFiles = retentionDays,
+                MaxArchiveFiles = provider.RetentionDays,
                 Layout = "${longdate}|${level:uppercase=true:padding=5}|${logger}|${message}${onexception:inner=${newline}${exception:format=ToString}}"
             };
 
@@ -54,7 +52,7 @@ namespace Lithnet.AccessManager.Server.UI
         public Bootstrapper()
         {
             SetupNLog();
-                
+
             loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder.AddNLog();
@@ -118,7 +116,8 @@ namespace Lithnet.AccessManager.Server.UI
 
         protected override void ConfigureIoC(IStyletIoCBuilder builder)
         {
-            IAppPathProvider pathProvider = new AppPathProvider();
+            RegistryProvider registryProvider = new RegistryProvider(true);
+            IAppPathProvider pathProvider = new AppPathProvider(registryProvider);
 
             try
             {
@@ -137,31 +136,6 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<UserInterfaceOptions>().ToInstance(appconfig.UserInterface);
                 builder.Bind<JitConfigurationOptions>().ToInstance(appconfig.JitConfiguration);
 
-                //// ViewModels
-                //builder.Bind<AuthenticationViewModel>().ToSelf();
-                //builder.Bind<EmailViewModel>().ToSelf();
-                //builder.Bind<HostingViewModel>().ToSelf();
-                //builder.Bind<AuditingViewModel>().ToSelf();
-                //builder.Bind<AuthorizationViewModel>().ToSelf();
-                //builder.Bind<ActiveDirectoryConfigurationViewModel>().ToSelf();
-                //builder.Bind<IpDetectionViewModel>().ToSelf();
-                //builder.Bind<PowershellNotificationChannelDefinitionsViewModel>().ToSelf();
-                //builder.Bind<PowershellNotificationChannelDefinitionViewModel>().ToSelf();
-                //builder.Bind<RateLimitsViewModel>().ToSelf();
-               // builder.Bind<SmtpNotificationChannelDefinitionsViewModel>().ToSelf();
-                //builder.Bind<SmtpNotificationChannelDefinitionViewModel>().ToSelf();
-                //builder.Bind<UserInterfaceViewModel>().ToSelf();
-                //builder.Bind<WebhookNotificationChannelDefinitionsViewModel>().ToSelf();
-                //builder.Bind<WebhookNotificationChannelDefinitionViewModel>().ToSelf();
-                //builder.Bind<HelpViewModel>().ToSelf();
-                //builder.Bind<LapsConfigurationViewModel>().ToSelf();
-                //builder.Bind<JitConfigurationViewModel>().ToSelf();
-                //builder.Bind<BitLockerViewModel>().ToSelf();
-                //builder.Bind<ImportWizardImportTypeViewModel>().ToSelf();
-                //builder.Bind<ImportWizardWindowViewModel>().ToSelf();
-                //builder.Bind<ImportWizardCsvSettingsViewModel>().ToSelf();
-                //builder.Bind<ImportWizardImportContainerViewModel>().ToSelf();
-                //builder.Bind<ImportWizardRuleSettingsViewModel>().ToSelf();
 
                 // ViewModel factories
                 builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
@@ -208,6 +182,12 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IAuthorizationInformationMemoryCache>().To<AuthorizationInformationMemoryCache>();
                 builder.Bind<IPowerShellSessionProvider>().To<CachedPowerShellSessionProvider>();
                 builder.Bind<IScriptTemplateProvider>().To<ScriptTemplateProvider>();
+                builder.Bind<IRegistryProvider>().ToInstance(registryProvider);
+                builder.Bind<ICertificatePermissionProvider>().To<CertificatePermissionProvider>();
+
+                builder.Bind<IProtectedSecretProvider>().To<ProtectedSecretProvider>();
+                builder.Bind<IClusterProvider>().To<ClusterProvider>();
+                builder.Bind<ILicenseManager>().To<LicenseManager>().InSingletonScope();
 
                 builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentModelValidator<>));
                 builder.Bind(typeof(IValidator<>)).ToAllImplementations();

@@ -1,6 +1,4 @@
-﻿using System;
-using System.DirectoryServices.ActiveDirectory;
-using System.IO;
+﻿using System.DirectoryServices.ActiveDirectory;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -10,22 +8,15 @@ namespace Lithnet.AccessManager.Test
 {
     public class CertificateProviderTests
     {
-        private Mock<IAppPathProvider> env;
-
         private CertificateProvider provider;
-
-        private IDirectory directory;
 
         private IDiscoveryServices discoveryServices;
 
         [SetUp()]
         public void TestInitialize()
         {
-            this.env = new Mock<IAppPathProvider>();
-            this.env.SetupGet(t => t.AppPath).Returns(Environment.CurrentDirectory);
             this.discoveryServices = new DiscoveryServices(Mock.Of<ILogger<DiscoveryServices>>());
-            this.directory = new ActiveDirectory(this.discoveryServices);
-            provider = new CertificateProvider(Mock.Of<ILogger<CertificateProvider>>(), directory, env.Object, discoveryServices);
+            provider = new CertificateProvider(Mock.Of<ILogger<CertificateProvider>>(), discoveryServices);
         }
 
         [TestCase(StoreLocation.CurrentUser)]
@@ -66,13 +57,13 @@ namespace Lithnet.AccessManager.Test
         [Test]
         public void GetDecryptionCertificateFromServiceStore()
         {
-            var store = this.provider.OpenServiceStore(Constants.ServiceName, OpenFlags.ReadWrite);
+            var store = X509ServiceStoreHelper.Open(Constants.ServiceName, OpenFlags.ReadWrite);
 
             foreach (var cert in store.Certificates)
             {
                 if (cert.HasPrivateKey)
                 {
-                    Assert.AreEqual(cert, provider.FindDecryptionCertificate(cert.Thumbprint, Constants.ServiceName));
+                    Assert.AreEqual(cert, provider.FindDecryptionCertificate(cert.Thumbprint));
                 }
                 else
                 {
@@ -90,53 +81,23 @@ namespace Lithnet.AccessManager.Test
             X509Certificate2 cert = null;
             try
             {
-                var store = this.provider.OpenServiceStore(Constants.ServiceName, OpenFlags.ReadWrite);
+                var store = X509ServiceStoreHelper.Open(Constants.ServiceName, OpenFlags.ReadWrite);
                 cert = this.provider.CreateSelfSignedCert(TestContext.CurrentContext.Random.GetString(10));
                 store.Add(cert);
                 store.Close();
 
-                Assert.AreEqual(cert, provider.FindDecryptionCertificate(cert.Thumbprint, Constants.ServiceName));
+                Assert.AreEqual(cert, provider.FindDecryptionCertificate(cert.Thumbprint));
             }
             finally
             {
                 if (cert != null)
                 {
-                    var store = this.provider.OpenServiceStore(Constants.ServiceName, OpenFlags.ReadWrite);
+                    var store = X509ServiceStoreHelper.Open(Constants.ServiceName, OpenFlags.ReadWrite);
                     store.Remove(cert);
                     store.Close();
                 }
             }
 
-        }
-
-        [TestCase("TestFiles\\DigiCertGlobalRootG3.crt")]
-        public void GetCertificateFromPartialPath(string path)
-        {
-            Assert.IsTrue(provider.TryGetCertificateFromPath(path, out X509Certificate2 cert));
-            Assert.IsNotNull(cert);
-        }
-
-        [TestCase("TestFiles\\DigiCertGlobalRootG3.crt")]
-        public void GetCertificateFromFullPath(string path)
-        {
-            path = Path.Combine(Environment.CurrentDirectory, path);
-            Assert.IsTrue(provider.TryGetCertificateFromPath(path, out X509Certificate2 cert));
-            Assert.IsNotNull(cert);
-        }
-
-        [TestCase("https://cacerts.digicert.com/DigiCertGlobalRootG3.crt")]
-        public void GetCertificateFromUrl(string url)
-        {
-            Uri uri = new Uri(url);
-            Assert.IsTrue(provider.TryGetCertificateFromUrl(uri, out X509Certificate2 cert));
-            Assert.IsNotNull(cert);
-        }
-
-        [TestCase("https://cacerts.digicert.com/DigiCertGlobalRootG3.crt")]
-        public void GetCertificateFromPathUrl(string url)
-        {
-            Assert.IsTrue(provider.TryGetCertificateFromPath(url, out X509Certificate2 cert));
-            Assert.IsNotNull(cert);
         }
 
         [Test]

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Runtime.InteropServices;
+using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -16,9 +16,10 @@ namespace Lithnet.AccessManager.Service.Internal
     {
         public static IConfigurationBuilder ConfigureAppSettings(this IConfigurationBuilder config)
         {
-            RegistryKey key = Registry.LocalMachine.OpenSubKey(Constants.ParametersKey, false);
-            string basePath = key?.GetValue("BasePath") as string;
-            string configPath = key?.GetValue("ConfigPath") as string;
+            RegistryProvider registryProvider = new RegistryProvider(false);
+
+            string basePath = registryProvider.BasePath;
+            string configPath = registryProvider.ConfigPath;
 
             if (!string.IsNullOrWhiteSpace(configPath))
             {

@@ -17,6 +17,7 @@
  
   <ItemGroup>
     <PackageReference Include="htmlagilitypack" Version="1.11.24" />
+    <PackageReference Include="lithnet.accessmanager.enterprise" Version="1.0.7600.63629" />
     <PackageReference Include="lithnet.security.authorization" Version="1.0.7518.2238" />
     <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.1.6" />

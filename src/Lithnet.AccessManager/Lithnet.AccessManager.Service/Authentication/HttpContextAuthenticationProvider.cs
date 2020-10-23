@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Security.Claims;
 using Lithnet.AccessManager.Server.Authorization;
-using Lithnet.AccessManager.Server.Extensions;
 using Lithnet.AccessManager.Service.App_LocalResources;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;

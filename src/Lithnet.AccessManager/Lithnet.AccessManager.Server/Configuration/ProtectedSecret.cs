@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Security.Policy;
 using System.Text;
 
 namespace Lithnet.AccessManager.Server.Configuration
 {
-    public class EncryptedData
+    public class ProtectedSecret 
     {
         public string Data { get; set; }
 

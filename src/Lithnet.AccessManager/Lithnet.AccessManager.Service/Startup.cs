@@ -57,8 +57,8 @@ namespace Lithnet.AccessManager.Service
             services.TryAddScoped<ILithnetAdminPasswordProvider, LithnetAdminPasswordProvider>();
             services.TryAddScoped<IPasswordProvider, PasswordProvider>();
             services.TryAddScoped<IMsMcsAdmPwdProvider, MsMcsAdmPwdProvider>();
-            services.TryAddScoped<IEncryptionProvider, EncryptionProvider>();
-            services.TryAddScoped<ICertificateProvider, CertificateProvider>();
+            services.TryAddSingleton<IEncryptionProvider, EncryptionProvider>();
+            services.TryAddSingleton<ICertificateProvider, CertificateProvider>();
             services.TryAddScoped<IAuthorizationInformationBuilder, AuthorizationInformationBuilder>();
             services.TryAddScoped<ITargetDataProvider, TargetDataProvider>();
             services.TryAddScoped<IBitLockerRecoveryPasswordProvider, BitLockerRecoveryPasswordProvider>();
@@ -72,6 +72,9 @@ namespace Lithnet.AccessManager.Service
             services.TryAddSingleton<ITargetDataCache, TargetDataCache>();
             services.TryAddSingleton<IAuthorizationContextProvider, AuthorizationContextProvider>();
             services.TryAddSingleton<ILicenseManager, LicenseManager>();
+            services.TryAddSingleton<IClusterProvider, ClusterProvider>();
+            services.TryAddSingleton<IProtectedSecretProvider, ProtectedSecretProvider>();
+            services.TryAddSingleton<IRegistryProvider>(new RegistryProvider(false));
 
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();

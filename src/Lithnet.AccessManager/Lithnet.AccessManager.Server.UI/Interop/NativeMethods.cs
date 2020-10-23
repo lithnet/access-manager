@@ -177,40 +177,10 @@ namespace Lithnet.AccessManager.Server.UI.Interop
             ServiceController controller = new ServiceController(serviceName);
 
             if (!ChangeServiceConfig(controller.ServiceHandle.DangerousGetHandle(), SERVICE_NO_CHANGE,
-                SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, null, null, IntPtr.Zero, null, username, password, null))
+                                     SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, null, null, IntPtr.Zero, null, username, password, null))
             {
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             }
-        }
-
-        public static string GetKeyLocation(X509Certificate2 cert)
-        {
-            var cng = cert.PrivateKey as RSACng;
-            var crypto = cert.PrivateKey as RSACryptoServiceProvider;
-
-            string name = cng.Key.UniqueName ?? crypto.CspKeyContainerInfo.UniqueKeyContainerName;
-
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                return null;
-            }
-
-            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Application Data\Microsoft\Crypto\RSA\MachineKeys", name);
-
-            if (File.Exists(path))
-            {
-                return path;
-            }
-
-            path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Application Data\Microsoft\Crypto\Keys", name);
-
-
-            if (File.Exists(path))
-            {
-                return path;
-            }
-
-            return null;
         }
 
         public static X509Certificate2 ShowCertificateImportDialog(IntPtr hwnd, string title, StoreLocation location, StoreName name)

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Net;
+using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.App_LocalResources;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Exceptions;
-using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Lithnet.AccessManager.Server.Authorization;
@@ -50,7 +50,7 @@ namespace Lithnet.AccessManager.Service.Internal
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogEventError(EventIDs.NotificationChannelError, string.Format(LogMessages.NotificationChannelError, channel.Name), ex);
+                    this.logger.LogError(EventIDs.NotificationChannelError, ex, string.Format(LogMessages.NotificationChannelError, channel.Name));
                     exceptions.Add(ex);
                 }
             }
@@ -65,7 +65,7 @@ namespace Lithnet.AccessManager.Service.Internal
                 }
                 else
                 {
-                    this.logger.LogEventError(EventIDs.NotificationChannelError, ex.Message, ex);
+                    this.logger.LogError(EventIDs.NotificationChannelError, ex, ex.Message);
                 }
             }
 
@@ -87,15 +87,15 @@ namespace Lithnet.AccessManager.Service.Internal
 
             message = this.ReplaceTokens(tokens, message, false);
 
-            this.logger.LogEvent(action.EventID, action.IsSuccess ? LogLevel.Information : LogLevel.Error, message, null);
+            this.logger.Log(action.IsSuccess ? LogLevel.Information : LogLevel.Error, action.EventID, message);
         }
 
         private Dictionary<string, string> BuildTokenDictionary(AuditableAction action)
         {
             LapsAuthorizationResponse lapsAuthZResponse = action.AuthzResponse as LapsAuthorizationResponse;
             JitAuthorizationResponse jitAuthZResponse = action.AuthzResponse as JitAuthorizationResponse;
-            
-            Dictionary<string, string> pairs = new Dictionary<string, string> (StringComparer.OrdinalIgnoreCase) {
+
+            Dictionary<string, string> pairs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
                 { "{user.SamAccountName}", action.User?.SamAccountName},
                 { "{user.MsDsPrincipalName}", action.User?.MsDsPrincipalName},
                 { "{user.DisplayName}", action.User?.DisplayName},

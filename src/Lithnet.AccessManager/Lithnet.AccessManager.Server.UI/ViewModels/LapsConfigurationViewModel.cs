@@ -41,7 +41,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.AvailableCertificates = new BindableCollection<X509Certificate2ViewModel>();
             this.DisplayName = "Local admin passwords";
         }
-        
+
         public string HelpLink => Constants.HelpLinkPageLocalAdminPasswords;
 
         protected override void OnInitialActivate()
@@ -148,9 +148,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert(this.SelectedForest.Name);
 
-                using X509Store store =
-                    this.certificateProvider.OpenServiceStore(AccessManager.Constants.ServiceName,
-                        OpenFlags.ReadWrite);
+                using X509Store store = X509ServiceStoreHelper.Open(AccessManager.Constants.ServiceName, OpenFlags.ReadWrite);
                 store.Add(cert);
                 cert.AddPrivateKeyReadPermission(this.serviceSettings.GetServiceAccount());
 
