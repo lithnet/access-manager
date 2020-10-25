@@ -19,10 +19,10 @@
     <ROW Property="IAgree" Value="Yes" Type="4" MsiKey="IAgree"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{A96D20F8-AF0C-4A3E-BADE-17F62F85923D} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{212335BA-7D42-4022-BF0D-D5D430F58C8A} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7720.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7732.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
@@ -922,7 +922,7 @@
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="1" PackageFolder="..\..\..\setup-packages" Languages="en" InstallationType="4" CabsLocation="1" PackageType="1" FilesInsideExe="true" ExtractionFolder="[AppDataFolder][|Manufacturer]\[|ProductName] [|ProductVersion]\install" ExtUI="true" UseLargeSchema="true" MsiPackageType="x64" UACExecutionLevel="2"/>
+    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="1" PackageFolder="..\..\..\..\..\..\installers\ams" Languages="en" InstallationType="4" CabsLocation="1" PackageType="1" FilesInsideExe="true" ExtractionFolder="[AppDataFolder][|Manufacturer]\[|ProductName] [|ProductVersion]\install" ExtUI="true" UseLargeSchema="true" MsiPackageType="x64" UACExecutionLevel="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildEventsComponent">
     <ROW EventId="0" EventRun="dotnet" EventCmdLine="publish --runtime win-x64 --output &quot;D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager\Lithnet.AccessManager.Service.Setup\output&quot; --framework netcoreapp3.1 --self-contained false" EventWkDir="D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager\Lithnet.AccessManager.Service" EventDescription="Building service project" EventOrder="2" EventType="1" EventInterupt="true" EventEnabled="false" EventPrecompression="false" RollbackEvent="false" EventBuild="DefaultBuild"/>

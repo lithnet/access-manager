@@ -8,14 +8,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5436F418-3FBB-4453-84C6-1CF0B98B8AA5}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		build-agent-core.bat = build-agent-core.bat
+		action-core-build-agent.bat = action-core-build-agent.bat
+		action-core-build-service.bat = action-core-build-service.bat
+		action-do-pre-build.bat = action-do-pre-build.bat
+		action-new-version.bat = action-new-version.bat
 		build-agent.bat = build-agent.bat
 		build-all.bat = build-all.bat
 		build-service-beta.bat = build-service-beta.bat
-		build-service-core.bat = build-service-core.bat
 		build-service.bat = build-service.bat
-		new-version.bat = new-version.bat
-		pre-build.bat = pre-build.bat
 		version.txt = version.txt
 	EndProjectSection
 EndProject

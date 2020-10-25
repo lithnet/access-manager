@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="17.3" version="17.4.1" Modules="professional" RootPath="." Language="en" Id="{6231D1B4-23AF-4C6E-998C-070D74534FAD}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="17.3" version="17.6" Modules="professional" RootPath="." Language="en" Id="{6231D1B4-23AF-4C6E-998C-070D74534FAD}">
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
     <ROW Property="AI_PREDEF_LCONDS_PROPS" Value="AI_DETECTED_DOTNET_VERSION"/>
@@ -9,10 +9,10 @@
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="ARPPRODUCTICON" Value="accessmanager.exe" Type="8"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
-    <ROW Property="ProductCode" Value="1033:{DC26BCB5-283A-4C01-A9D1-25569A3C6163} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{8664C883-6F30-4F52-8FC1-11DF6AAA1DD6} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Agent"/>
-    <ROW Property="ProductVersion" Value="1.0.7630.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7728.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
     <ROW Property="SETUPEXEDIR" Value="1"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{EEDECF4C-BABB-4AE0-9CB9-DC051FF1AE75}"/>
@@ -81,6 +81,7 @@
     <ROW Component="System.Runtime.CompilerServices.Unsafe.dll" ComponentId="{5C9842A0-3EE1-4EDB-A428-7B3D43169532}" Directory_="APPDIR" Attributes="0" KeyPath="System.Runtime.CompilerServices.Unsafe.dll"/>
     <ROW Component="System.Security.AccessControl.dll" ComponentId="{CC73C49C-C728-4BFE-993E-1EA30AB02BD5}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.AccessControl.dll"/>
     <ROW Component="System.Security.Cryptography.Cng.dll" ComponentId="{237F76C5-1EA0-4096-B37D-0DE3236428D2}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Cryptography.Cng.dll"/>
+    <ROW Component="System.Security.Cryptography.ProtectedData.dll" ComponentId="{D20EDFDB-6D43-4ADC-A925-435219332333}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Cryptography.ProtectedData.dll"/>
     <ROW Component="System.Security.Principal.Windows.dll" ComponentId="{961270E7-A746-46F9-877E-4BE66CAC9EDA}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Principal.Windows.dll"/>
     <ROW Component="System.ServiceProcess.ServiceController.dll" ComponentId="{B6FAB8BE-D34A-47CB-B3C7-569C0CFCB3FC}" Directory_="APPDIR" Attributes="0" KeyPath="System.ServiceProcess.ServiceController.dll"/>
     <ROW Component="System.Text.Encodings.Web.dll" ComponentId="{C12FA5FE-7C79-4D62-B422-A873354FF938}" Directory_="APPDIR" Attributes="0" KeyPath="System.Text.Encodings.Web.dll"/>
@@ -173,6 +174,7 @@
     <ROW File="Vanara.PInvoke.Security.dll" Component_="Vanara.PInvoke.Security.dll" FileName="VANARA~6.DLL|Vanara.PInvoke.Security.dll" Attributes="0" SourcePath="output-x86\Vanara.PInvoke.Security.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.Ws2_32.dll" Component_="Vanara.PInvoke.Ws2_32.dll" FileName="VANARA~7.DLL|Vanara.PInvoke.Ws2_32.dll" Attributes="0" SourcePath="output-x86\Vanara.PInvoke.Ws2_32.dll" SelfReg="false"/>
     <ROW File="CsvHelper.dll" Component_="CsvHelper.dll" FileName="CSVHEL~1.DLL|CsvHelper.dll" Attributes="0" SourcePath="output-x86\CsvHelper.dll" SelfReg="false"/>
+    <ROW File="System.Security.Cryptography.ProtectedData.dll" Component_="System.Security.Cryptography.ProtectedData.dll" FileName="SYSTE~15.DLL|System.Security.Cryptography.ProtectedData.dll" Attributes="0" SourcePath="output-x86\System.Security.Cryptography.ProtectedData.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" GeneralOptions="o" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites"/>
@@ -181,7 +183,7 @@
     <ROW Action="AI_DetectSoftware" Sequence="151"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildKey="MSIOnlyBuild_1_2" BuildName="Net472Msi" BuildOrder="1" BuildType="1" PackageFolder="..\..\..\setup-packages" PackageFileName="Lithnet Access Manager Agent Setup-x86" Languages="en" InstallationType="4" UseLargeSchema="true"/>
+    <ROW BuildKey="MSIOnlyBuild_1_2" BuildName="Net472Msi" BuildOrder="1" BuildType="1" PackageFolder="..\..\..\..\..\..\installers\ams" PackageFileName="Lithnet Access Manager Agent Setup-x86" Languages="en" InstallationType="4" UseLargeSchema="true"/>
     <ATTRIBUTE name="CompConditionPolicy" value="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
@@ -322,6 +324,7 @@
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Security.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Ws2_32.dll"/>
     <ROW Feature_="MainFeature" Component_="CsvHelper.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Security.Cryptography.ProtectedData.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>

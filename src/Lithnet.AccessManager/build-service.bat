@@ -1,11 +1,14 @@
 @echo off
 SET /A buildingbeta=0
 
-call pre-build.bat
+call action-do-pre-build.bat
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-call new-version.bat
+call action-new-version.bat
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-call build-service-core.bat
+call action-core-build-service.bat
 if %errorlevel% neq 0 exit /b %errorlevel%
+
+ECHO %version%| clip
+explorer %amsBuildFolder%
