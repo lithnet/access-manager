@@ -18,19 +18,19 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IActiveDirectoryDomainPermissionViewModelFactory domainFactory;
         private readonly IActiveDirectoryForestSchemaViewModelFactory forestFactory;
-        private readonly IServiceSettingsProvider serviceSettings;
+        private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
 
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.SitemapSolid;
 
-        public ActiveDirectoryConfigurationViewModel(IActiveDirectoryForestSchemaViewModelFactory forestFactory, IActiveDirectoryDomainPermissionViewModelFactory domainFactory, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<ActiveDirectoryConfigurationView> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IScriptTemplateProvider scriptTemplateProvider)
+        public ActiveDirectoryConfigurationViewModel(IActiveDirectoryForestSchemaViewModelFactory forestFactory, IActiveDirectoryDomainPermissionViewModelFactory domainFactory, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<ActiveDirectoryConfigurationView> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IScriptTemplateProvider scriptTemplateProvider)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.domainFactory = domainFactory;
             this.forestFactory = forestFactory;
-            this.serviceSettings = serviceSettings;
+            this.windowsServiceProvider = windowsServiceProvider;
             this.shellExecuteProvider = shellExecuteProvider;
             this.domainTrustProvider = domainTrustProvider;
             this.scriptTemplateProvider = scriptTemplateProvider;
@@ -141,7 +141,7 @@ namespace Lithnet.AccessManager.Server.UI
                 HelpText = "Run the following script with Domain Admins rights to add the service account to the correct groups",
                 ScriptText = this.scriptTemplateProvider.AddDomainMembershipPermissions
                     .Replace("{domainDNS}", current.Name, StringComparison.OrdinalIgnoreCase)
-                    .Replace("{serviceAccountSid}", this.serviceSettings.GetServiceAccount().Value, StringComparison.OrdinalIgnoreCase)
+                    .Replace("{serviceAccountSid}", this.windowsServiceProvider.GetServiceAccount().Value, StringComparison.OrdinalIgnoreCase)
             };
 
             ExternalDialogWindow w = new ExternalDialogWindow

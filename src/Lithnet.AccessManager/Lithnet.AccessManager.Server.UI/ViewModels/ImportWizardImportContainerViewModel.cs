@@ -18,11 +18,11 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDiscoveryServices discoveryServices;
         private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly IDirectory directory;
-        private readonly IServiceSettingsProvider serviceSettings;
+        private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly IShellExecuteProvider shellExecuteProvider;
         public Task Initialization { get; private set; }
 
-        public ImportWizardImportContainerViewModel(ILogger<ImportWizardImportContainerViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardImportContainerViewModel> validator, IObjectSelectionProvider objectSelectionProvider, IDiscoveryServices discoveryServices, IDirectory directory, IServiceSettingsProvider serviceSettings, IShellExecuteProvider shellExecuteProvider)
+        public ImportWizardImportContainerViewModel(ILogger<ImportWizardImportContainerViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardImportContainerViewModel> validator, IObjectSelectionProvider objectSelectionProvider, IDiscoveryServices discoveryServices, IDirectory directory, IWindowsServiceProvider windowsServiceProvider, IShellExecuteProvider shellExecuteProvider)
         {
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
@@ -30,14 +30,14 @@ namespace Lithnet.AccessManager.Server.UI
             this.objectSelectionProvider = objectSelectionProvider;
             this.directory = directory;
             this.Validator = validator;
-            this.serviceSettings = serviceSettings;
+            this.windowsServiceProvider = windowsServiceProvider;
             this.shellExecuteProvider = shellExecuteProvider;
             this.Initialization = this.Initialize();
         }
 
         public async Task Initialize()
         {
-            var serviceAccount = this.serviceSettings.GetServiceAccount();
+            var serviceAccount = this.windowsServiceProvider.GetServiceAccount();
             if (serviceAccount != null)
             {
                 this.FilteredSids.Add(new SecurityIdentifierViewModel(serviceAccount, directory));

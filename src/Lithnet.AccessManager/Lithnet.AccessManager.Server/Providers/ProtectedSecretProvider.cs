@@ -11,14 +11,14 @@ namespace Lithnet.AccessManager.Server
         private readonly IEncryptionProvider encryptionProvider;
         private readonly ICertificateProvider certificateProvider;
         private readonly RandomNumberGenerator rng;
-        private readonly IClusterProvider clusterProvider;
+        private readonly IProductSettingsProvider productSettings;
 
-        public ProtectedSecretProvider(IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider, RandomNumberGenerator rng, IClusterProvider clusterProvider)
+        public ProtectedSecretProvider(IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider, RandomNumberGenerator rng, IClusterProvider clusterProvider, IProductSettingsProvider productSettings)
         {
             this.encryptionProvider = encryptionProvider;
             this.certificateProvider = certificateProvider;
             this.rng = rng;
-            this.clusterProvider = clusterProvider;
+            this.productSettings = productSettings;
         }
 
         public string UnprotectSecret(ProtectedSecret data)
@@ -69,7 +69,7 @@ namespace Lithnet.AccessManager.Server
 
         public ProtectedSecret ProtectSecret(string secret)
         {
-            var thumbprint = this.clusterProvider.GetEncryptionCertificateThumbprint();
+            var thumbprint = this.productSettings.GetEncryptionCertificateThumbprint();
 
             if (thumbprint == null)
             {

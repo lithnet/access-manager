@@ -19,18 +19,18 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly ILogger<MainWindowViewModel> logger;
         private readonly IShellExecuteProvider shellExecuteProvider;
-        private readonly IServiceSettingsProvider serviceSettingsProvider;
+        private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly ILicenseManager licenseManager;
         private readonly IRegistryProvider registryProvider;
-
+        
         public MainWindowViewModel(IApplicationConfig model, AuthenticationViewModel authentication, AuthorizationViewModel authorization, UserInterfaceViewModel ui, RateLimitsViewModel rate, IpDetectionViewModel ip,
             AuditingViewModel audit, EmailViewModel mail, HostingViewModel hosting, ActiveDirectoryConfigurationViewModel ad,
-            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IServiceSettingsProvider serviceSettingsProvider, ILicenseManager licenseManager, IRegistryProvider registryProvider)
+            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, ILicenseManager licenseManager, IRegistryProvider registryProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
-            this.serviceSettingsProvider = serviceSettingsProvider;
+            this.windowsServiceProvider = windowsServiceProvider;
             this.licenseManager = licenseManager;
             this.registryProvider = registryProvider;
             this.eventAggregator = eventAggregator;
@@ -77,7 +77,6 @@ namespace Lithnet.AccessManager.Server.UI
             try
             {
                 this.model.Save(this.model.Path);
-                this.IsDirty = false;
             }
             catch (Exception ex)
             {
@@ -98,6 +97,7 @@ namespace Lithnet.AccessManager.Server.UI
                 return false;
             }
 
+            this.IsDirty = false;
             this.UpdateIsConfigured();
 
             if (this.IsRestartRequiredOnSave)
@@ -119,8 +119,8 @@ namespace Lithnet.AccessManager.Server.UI
                       {
                           try
                           {
-                              this.serviceSettingsProvider.ServiceController.WaitForStatus(ServiceControllerStatus.Stopped);
-                              this.serviceSettingsProvider.ServiceController.WaitForStatus(ServiceControllerStatus.Running);
+                              this.windowsServiceProvider.WaitForStatus(ServiceControllerStatus.Stopped);
+                              this.windowsServiceProvider.WaitForStatus(ServiceControllerStatus.Running);
                               this.IsPendingServiceRestart = false;
                           }
                           catch (Exception ex)
@@ -225,16 +225,8 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                var controller = this.serviceSettingsProvider.ServiceController;
-                controller.Refresh();
-
-                if (controller.Status == ServiceControllerStatus.Running)
-                {
-                    controller.Stop();
-                    await controller.WaitForStatusAsync(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30), CancellationToken.None);
-                }
-
-                controller.Start();
+                await this.windowsServiceProvider.StopServiceAsync();
+                await this.windowsServiceProvider.StartServiceAsync();
             }
             catch (Exception ex)
             {

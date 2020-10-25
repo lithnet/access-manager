@@ -15,6 +15,7 @@ using System.Security.Principal;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using MahApps.Metro.Controls.Dialogs;
@@ -36,7 +37,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly ILogger<HostingViewModel> logger;
         private readonly IAppPathProvider pathProvider;
-        private readonly IServiceSettingsProvider serviceSettings;
+        private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly ICertificateProvider certProvider;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IEventAggregator eventAggregator;
@@ -44,15 +45,16 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IScriptTemplateProvider scriptTemplateProvider;
         private readonly ICertificatePermissionProvider certPermissionProvider;
         private readonly IRegistryProvider registryProvider;
+        private readonly IClusterProvider clusterProvider;
 
-        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider)
+        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, IClusterProvider clusterProvider)
         {
             this.logger = logger;
             this.pathProvider = pathProvider;
             this.OriginalModel = model;
             this.certProvider = certProvider;
             this.dialogCoordinator = dialogCoordinator;
-            this.serviceSettings = serviceSettings;
+            this.windowsServiceProvider = windowsServiceProvider;
             this.shellExecuteProvider = shellExecuteProvider;
             this.eventAggregator = eventAggregator;
             this.Validator = validator;
@@ -60,13 +62,14 @@ namespace Lithnet.AccessManager.Server.UI
             this.scriptTemplateProvider = scriptTemplateProvider;
             this.certPermissionProvider = certPermissionProvider;
             this.registryProvider = registryProvider;
+            this.clusterProvider = clusterProvider;
 
             this.WorkingModel = this.CloneModel(model);
             this.Certificate = this.GetCertificate();
             this.OriginalCertificate = this.Certificate;
-            this.ServiceAccount = this.serviceSettings.GetServiceAccount();
+            this.ServiceAccount = this.windowsServiceProvider.GetServiceAccount();
             this.OriginalServiceAccount = this.ServiceAccount;
-            this.ServiceStatus = this.serviceSettings.ServiceController.Status.ToString();
+            this.ServiceStatus = this.windowsServiceProvider.Status.ToString();
             this.DisplayName = "Web hosting";
 
             eventPublisher.Register(this);
@@ -498,7 +501,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         private void UpdateServiceAccount()
         {
-            this.serviceSettings.SetServiceAccount(this.workingServiceAccountUserName, this.workingServiceAccountPassword);
+            this.windowsServiceProvider.SetServiceAccount(this.workingServiceAccountUserName, this.workingServiceAccountPassword);
         }
 
         private void SaveHostingConfigFile(HostingSettingsRollbackContext rollback)
@@ -661,22 +664,17 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 if (this.CanStartService)
                 {
-                    this.serviceSettings.ServiceController.Start();
+                    await this.windowsServiceProvider.StartServiceAsync();
                 }
-            }
-            catch (Exception ex)
-            {
-                await dialogCoordinator.ShowMessageAsync(this, "Service control", $"Could not start service\r\n{ex.Message}");
-                return;
-            }
-
-            try
-            {
-                await this.serviceSettings.ServiceController.WaitForStatusAsync(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30), CancellationToken.None);
             }
             catch (System.ServiceProcess.TimeoutException)
             {
                 await dialogCoordinator.ShowMessageAsync(this, "Service control", "The service did not start in the requested time");
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not start service");
+                await dialogCoordinator.ShowMessageAsync(this, "Service control", $"Could not start service\r\n{ex.Message}");
             }
         }
 
@@ -686,21 +684,18 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 if (this.CanStopService)
                 {
-                    this.serviceSettings.ServiceController.Stop();
+                    await this.windowsServiceProvider.StopServiceAsync();
+
                 }
-            }
-            catch (Exception ex)
-            {
-                await dialogCoordinator.ShowMessageAsync(this, "Service control", $"Could not stop service\r\n{ex.Message}");
-                return;
-            }
-            try
-            {
-                await this.serviceSettings.ServiceController.WaitForStatusAsync(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30), CancellationToken.None);
             }
             catch (System.ServiceProcess.TimeoutException)
             {
                 await dialogCoordinator.ShowMessageAsync(this, "Service control", "The service did not stop in the requested time");
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not stop service");
+                await dialogCoordinator.ShowMessageAsync(this, "Service control", $"Could not stop service\r\n{ex.Message}");
             }
         }
 
@@ -1004,14 +999,13 @@ namespace Lithnet.AccessManager.Server.UI
                 while (!token.IsCancellationRequested)
                 {
                     await Task.Delay(500, CancellationToken.None).ConfigureAwait(false);
-                    this.serviceSettings.ServiceController.Refresh();
 
-                    if (lastStatus == this.serviceSettings.ServiceController.Status)
+                    if (lastStatus == this.windowsServiceProvider.Status)
                     {
                         continue;
                     }
 
-                    ServiceControllerStatus currentStatus = this.serviceSettings.ServiceController.Status;
+                    ServiceControllerStatus currentStatus = this.windowsServiceProvider.Status;
 
                     switch (currentStatus)
                     {

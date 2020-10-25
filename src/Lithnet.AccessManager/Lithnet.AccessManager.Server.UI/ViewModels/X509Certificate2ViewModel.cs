@@ -14,16 +14,16 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class X509Certificate2ViewModel : PropertyChangedBase
     {
-        private readonly IServiceSettingsProvider serviceSettings;
+        private readonly IWindowsServiceProvider windowsServiceProvider;
 
         private readonly ILogger<X509Certificate2ViewModel> logger;
 
         private readonly IDialogCoordinator dialogCoordinator;
 
-        public X509Certificate2ViewModel(X509Certificate2 model, IServiceSettingsProvider serviceSettings, ILogger<X509Certificate2ViewModel> logger, IDialogCoordinator dialogCoordinator)
+        public X509Certificate2ViewModel(X509Certificate2 model, IWindowsServiceProvider windowsServiceProvider, ILogger<X509Certificate2ViewModel> logger, IDialogCoordinator dialogCoordinator)
         {
             this.Model = model;
-            this.serviceSettings = serviceSettings;
+            this.windowsServiceProvider = windowsServiceProvider;
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
             this.CheckCertificatePermissions();
@@ -59,7 +59,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                this.Model.AddPrivateKeyReadPermission(this.serviceSettings.GetServiceAccount());
+                this.Model.AddPrivateKeyReadPermission(this.windowsServiceProvider.GetServiceAccount());
             }
             catch(Exception ex)
             {
@@ -85,7 +85,7 @@ namespace Lithnet.AccessManager.Server.UI
             try
             {
                 var security = this.Model.GetPrivateKeySecurity();
-                using AuthorizationContext c = new AuthorizationContext(this.serviceSettings.GetServiceAccount());
+                using AuthorizationContext c = new AuthorizationContext(this.windowsServiceProvider.GetServiceAccount());
                 GenericSecurityDescriptor sd = new RawSecurityDescriptor(security.GetSecurityDescriptorSddlForm(AccessControlSections.All));
                 this.HasPermission = c.AccessCheck(sd, (int)FileSystemRights.Read);
                 this.HasNoPermission = !this.HasPermission;

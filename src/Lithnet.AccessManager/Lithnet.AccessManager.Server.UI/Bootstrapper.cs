@@ -14,7 +14,6 @@ using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
 using Microsoft.Extensions.Options;
-using Microsoft.Win32;
 using NLog.Extensions.Logging;
 using Stylet;
 using StyletIoC;
@@ -67,6 +66,21 @@ namespace Lithnet.AccessManager.Server.UI
             });
 
             logger = loggerFactory.CreateLogger<Bootstrapper>();
+
+            try
+            {
+                ClusterProvider provider = new ClusterProvider();
+
+                if (provider.IsClustered && !provider.IsOnActiveNode())
+                {
+                    MessageBox.Show($"The AMS service is not active on this cluster node. Please edit the configuration on the currently active node", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                    Environment.Exit(2);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(EventIDs.UIGenericError, ex, "Unable to determine cluster node status");
+            }
         }
 
         protected override void OnStart()
@@ -121,6 +135,20 @@ namespace Lithnet.AccessManager.Server.UI
 
             try
             {
+                if (!File.Exists(pathProvider.ConfigFile))
+                {
+                    this.logger.LogError(EventIDs.UIGenericError, "Config file was not found at path {path}", pathProvider.ConfigFile);
+                    MessageBox.Show($"The appsettings.config file could not be found at path {pathProvider.ConfigFile}. Please resolve the issue and restart the application", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Environment.Exit(2);
+                }
+
+                if (!File.Exists(pathProvider.HostingConfigFile))
+                {
+                    this.logger.LogError(EventIDs.UIGenericError, "Apphost file was not found at path {path}", pathProvider.HostingConfigFile);
+                    MessageBox.Show($"The apphost.config file could not be found at path {pathProvider.HostingConfigFile}. Please resolve the issue and restart the application", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Environment.Exit(2);
+                }
+
                 appconfig = ApplicationConfig.Load(pathProvider.ConfigFile);
                 var hosting = HostingOptions.Load(pathProvider.HostingConfigFile);
 
@@ -164,7 +192,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IComputerPrincipalProviderLaps>().To<ComputerPrincipalProviderLaps>();
                 builder.Bind<IComputerPrincipalProviderBitLocker>().To<ComputerPrincipalProviderBitLocker>();
                 builder.Bind<IDiscoveryServices>().To<DiscoveryServices>();
-                builder.Bind<IServiceSettingsProvider>().To<ServiceSettingsProvider>();
+                builder.Bind<IWindowsServiceProvider>().To<WindowsServiceProvider>();
                 builder.Bind<INotificationSubscriptionProvider>().To<NotificationSubscriptionProvider>();
                 builder.Bind<IEncryptionProvider>().To<EncryptionProvider>();
                 builder.Bind<ICertificateProvider>().To<CertificateProvider>();
@@ -185,8 +213,9 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IRegistryProvider>().ToInstance(registryProvider);
                 builder.Bind<ICertificatePermissionProvider>().To<CertificatePermissionProvider>();
 
-                builder.Bind<IProtectedSecretProvider>().To<ProtectedSecretProvider>();
-                builder.Bind<IClusterProvider>().To<ClusterProvider>();
+                builder.Bind<IProtectedSecretProvider>().To<ProtectedSecretProvider>().InSingletonScope();
+                builder.Bind<IClusterProvider>().To<ClusterProvider>().InSingletonScope();
+                builder.Bind<IProductSettingsProvider>().To<ProductSettingsProvider>().InSingletonScope();
                 builder.Bind<ILicenseManager>().To<LicenseManager>().InSingletonScope();
 
                 builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentModelValidator<>));

@@ -18,20 +18,20 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ICertificateProvider certificateProvider;
         private readonly IX509Certificate2ViewModelFactory certificate2ViewModelFactory;
         private readonly IDialogCoordinator dialogCoordinator;
-        private readonly IServiceSettingsProvider serviceSettings;
+        private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly ILogger<LapsConfigurationViewModel> logger;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IDiscoveryServices discoveryServices;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
 
-        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IServiceSettingsProvider serviceSettings, ILogger<LapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IScriptTemplateProvider scriptTemplateProvider)
+        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IWindowsServiceProvider windowsServiceProvider, ILogger<LapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IScriptTemplateProvider scriptTemplateProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.certificateProvider = certificateProvider;
             this.certificate2ViewModelFactory = certificate2ViewModelFactory;
             this.dialogCoordinator = dialogCoordinator;
-            this.serviceSettings = serviceSettings;
+            this.windowsServiceProvider = windowsServiceProvider;
             this.logger = logger;
             this.domainTrustProvider = domainTrustProvider;
             this.discoveryServices = discoveryServices;
@@ -150,7 +150,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                 using X509Store store = X509ServiceStoreHelper.Open(AccessManager.Constants.ServiceName, OpenFlags.ReadWrite);
                 store.Add(cert);
-                cert.AddPrivateKeyReadPermission(this.serviceSettings.GetServiceAccount());
+                cert.AddPrivateKeyReadPermission(this.windowsServiceProvider.GetServiceAccount());
 
                 var vm = this.certificate2ViewModelFactory.CreateViewModel(cert);
 
@@ -190,7 +190,7 @@ namespace Lithnet.AccessManager.Server.UI
             var vm = new ScriptContentViewModel(this.dialogCoordinator)
             {
                 HelpText = "Modify the OU variable in this script, and run it with domain admin rights to assign permissions for the service account to be able to read the encrypted local admin passwords and history from the directory",
-                ScriptText = this.scriptTemplateProvider.GrantAccessManagerPermissions.Replace("{serviceAccount}", this.serviceSettings.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
+                ScriptText = this.scriptTemplateProvider.GrantAccessManagerPermissions.Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
             };
 
             ExternalDialogWindow w = new ExternalDialogWindow
@@ -247,7 +247,7 @@ namespace Lithnet.AccessManager.Server.UI
             var vm = new ScriptContentViewModel(this.dialogCoordinator)
             {
                 HelpText = "Modify the OU variable in this script, and run it with domain admin rights to assign permissions for the service account to be able to read Microsoft LAPS passwords from the directory",
-                ScriptText = this.scriptTemplateProvider.GrantMsLapsPermissions.Replace("{serviceAccount}", this.serviceSettings.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
+                ScriptText = this.scriptTemplateProvider.GrantMsLapsPermissions.Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
             };
 
             ExternalDialogWindow w = new ExternalDialogWindow

@@ -73,6 +73,7 @@ namespace Lithnet.AccessManager.Service
             services.TryAddSingleton<IAuthorizationContextProvider, AuthorizationContextProvider>();
             services.TryAddSingleton<ILicenseManager, LicenseManager>();
             services.TryAddSingleton<IClusterProvider, ClusterProvider>();
+            services.TryAddSingleton<IProductSettingsProvider, ProductSettingsProvider>();
             services.TryAddSingleton<IProtectedSecretProvider, ProtectedSecretProvider>();
             services.TryAddSingleton<IRegistryProvider>(new RegistryProvider(false));
 
