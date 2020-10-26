@@ -66,7 +66,7 @@ namespace Lithnet.AccessManager.Service
             services.TryAddScoped<IComputerTargetProvider, ComputerTargetProvider>();
 
             services.TryAddSingleton<IAppPathProvider, WebAppPathProvider>();
-            services.TryAddSingleton<RandomNumberGenerator>(RandomNumberGenerator.Create());
+            services.TryAddSingleton(RandomNumberGenerator.Create());
             services.TryAddSingleton<IJitAccessGroupResolver, JitAccessGroupResolver>();
             services.TryAddSingleton<IPowerShellSessionProvider, CachedPowerShellSessionProvider>();
             services.TryAddSingleton<IAuthorizationInformationMemoryCache, AuthorizationInformationMemoryCache>();
@@ -77,6 +77,7 @@ namespace Lithnet.AccessManager.Service
             services.TryAddSingleton<IProductSettingsProvider, ProductSettingsProvider>();
             services.TryAddSingleton<IProtectedSecretProvider, ProtectedSecretProvider>();
             services.TryAddSingleton<IRegistryProvider>(new RegistryProvider(false));
+            services.TryAddSingleton<ILicenseDataProvider, LicenseDataProvider>();
 
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();
@@ -183,7 +184,7 @@ namespace Lithnet.AccessManager.Service
             };
 
             authProvider.Configure(services);
-            services.TryAddSingleton<IAuthenticationProvider>(authProvider);
+            services.TryAddSingleton(authProvider);
         }
 
         private void ConfigureAuthorization(IServiceCollection services)

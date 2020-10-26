@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-Move using Lithnet.AccessManager.Enterprise;
 using Newtonsoft.Json;
 
 namespace Lithnet.AccessManager.Server.Configuration

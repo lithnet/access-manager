@@ -49,7 +49,7 @@
                            TextWrapping="Wrap"
                            Text="{Binding EffectiveProductEdition, FallbackValue='Standard'}"/>
             </StackPanel>
-            
+
 
             <TextBlock Grid.Row="1" Grid.Column="1" 
                        Margin="5"
@@ -76,6 +76,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -134,72 +135,82 @@
                        TextWrapping="Wrap"
                        Text="{Binding ProductEdition}"/>
 
-            <TextBlock Grid.Row="4" Grid.Column="0"
-                       Margin="5"
-                       TextWrapping="Wrap"
-                       Text="Valid from"/>
-
-            <TextBlock Grid.Row="4" Grid.Column="1"
-                       Margin="5"
-                       TextWrapping="Wrap"
-                       Text="{Binding Issued}"/>
-
-            <TextBlock Grid.Row="5" Grid.Column="0"
-                       Margin="5"
-                       TextWrapping="Wrap"
-                       Text="Valid to"/>
-
-            <TextBlock Grid.Row="5" Grid.Column="1"
-                       Margin="5"
-                       TextWrapping="Wrap"
-                       Text="{Binding ValidTo}"/>
-
             <TextBlock Grid.Row="3" Grid.Column="0"
                        Margin="5"
                        TextWrapping="Wrap"
-                       Text="Issued to"/>
+                       Text="License type"/>
 
             <TextBlock Grid.Row="3" Grid.Column="1"
                        Margin="5"
                        TextWrapping="Wrap"
-                       Text="{Binding LicensedTo}"/>
+                       Text="{Binding Type}"/>
+
+            <TextBlock Grid.Row="5" Grid.Column="0"
+                       Margin="5"
+                       TextWrapping="Wrap"
+                       Text="Valid from"/>
+
+            <TextBlock Grid.Row="5" Grid.Column="1"
+                       Margin="5"
+                       TextWrapping="Wrap"
+                       Text="{Binding Issued}"/>
 
             <TextBlock Grid.Row="6" Grid.Column="0"
                        Margin="5"
                        TextWrapping="Wrap"
-                       Text="Licensed versions"/>
+                       Text="Valid to"/>
 
             <TextBlock Grid.Row="6" Grid.Column="1"
                        Margin="5"
                        TextWrapping="Wrap"
-                       Text="{Binding Versions}"/>
+                       Text="{Binding ValidTo}"/>
+
+            <TextBlock Grid.Row="4" Grid.Column="0"
+                       Margin="5"
+                       TextWrapping="Wrap"
+                       Text="Issued to"/>
+
+            <TextBlock Grid.Row="4" Grid.Column="1"
+                       Margin="5"
+                       TextWrapping="Wrap"
+                       Text="{Binding LicensedTo}"/>
 
             <TextBlock Grid.Row="7" Grid.Column="0"
                        Margin="5"
                        TextWrapping="Wrap"
-                       Text="Licensed forests"/>
+                       Text="Licensed versions"/>
 
             <TextBlock Grid.Row="7" Grid.Column="1"
                        Margin="5"
                        TextWrapping="Wrap"
-                       Text="{Binding LicensedForests}"/>
+                       Text="{Binding Versions}"/>
 
             <TextBlock Grid.Row="8" Grid.Column="0"
                        Margin="5"
                        TextWrapping="Wrap"
-                       Text="Licensed users"/>
+                       Text="Licensed forests"/>
 
             <TextBlock Grid.Row="8" Grid.Column="1"
                        Margin="5"
                        TextWrapping="Wrap"
-                       Text="{Binding LicensedUsers}"/>
+                       Text="{Binding LicensedForests}"/>
 
             <TextBlock Grid.Row="9" Grid.Column="0"
                        Margin="5"
                        TextWrapping="Wrap"
-                       Text="License ID"/>
+                       Text="Licensed users"/>
 
             <TextBlock Grid.Row="9" Grid.Column="1"
+                       Margin="5"
+                       TextWrapping="Wrap"
+                       Text="{Binding LicensedUsers}"/>
+
+            <TextBlock Grid.Row="10" Grid.Column="0"
+                       Margin="5"
+                       TextWrapping="Wrap"
+                       Text="License ID"/>
+
+            <TextBlock Grid.Row="10" Grid.Column="1"
                        Margin="5"
                        TextWrapping="Wrap"
                        Text="{Binding KeyId}"/>

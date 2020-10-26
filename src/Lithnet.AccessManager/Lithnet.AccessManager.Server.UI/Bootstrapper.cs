@@ -217,6 +217,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IClusterProvider>().To<ClusterProvider>().InSingletonScope();
                 builder.Bind<IProductSettingsProvider>().To<ProductSettingsProvider>().InSingletonScope();
                 builder.Bind<ILicenseManager>().To<LicenseManager>().InSingletonScope();
+                builder.Bind<ILicenseDataProvider>().To<LicenseDataProvider>().InSingletonScope();
 
                 builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentModelValidator<>));
                 builder.Bind(typeof(IValidator<>)).ToAllImplementations();

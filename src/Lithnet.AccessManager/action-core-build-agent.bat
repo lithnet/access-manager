@@ -10,7 +10,7 @@ SET setupProjectx64=%solutiondir%\Lithnet.AccessManager.Agent.Setup\Lithnet.Acce
 SET setupProjectx86=%solutiondir%\Lithnet.AccessManager.Agent.Setup\Lithnet.AccessManager.Agent.Setup-x86.aip
 
 ECHO [92mClearing 64-bit output directory[0m
-rd /s /q "%outputdirx64%"
+rd /s /q "%outputdirx64%" || exit /b %errorlevel%
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
 ECHO [92mBuilding 64-bit agent project[0m
@@ -30,7 +30,7 @@ ECHO [92mBuilding 64-bit installer[0m
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
 ECHO [92mClearing 32-bit output directory[0m
-rd /s /q "%outputdirx86%"
+rd /s /q "%outputdirx86%" || exit /b %errorlevel%
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
 ECHO [92mBuilding 32-bit agent project[0m

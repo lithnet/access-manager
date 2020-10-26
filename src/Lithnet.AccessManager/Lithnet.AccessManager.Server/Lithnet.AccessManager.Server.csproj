@@ -14,10 +14,14 @@
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <RuntimeIdentifier>win8-x64</RuntimeIdentifier>
   </PropertyGroup>
- 
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\Lithnet.AccessManager.Service.Setup\output\license*.dat" LinkBase="EmbeddedResources" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="htmlagilitypack" Version="1.11.24" />
-    <PackageReference Include="lithnet.accessmanager.enterprise" Version="1.0.7604.26991" />
+    <PackageReference Include="lithnet.accessmanager.enterprise" Version="1.0.7604.30981" />
     <PackageReference Include="lithnet.security.authorization" Version="1.0.7518.2238" />
     <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.1.9" />
@@ -47,6 +51,10 @@
       <LastGenOutput>LogMessages.Designer.cs</LastGenOutput>
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="EmbeddedResources\" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

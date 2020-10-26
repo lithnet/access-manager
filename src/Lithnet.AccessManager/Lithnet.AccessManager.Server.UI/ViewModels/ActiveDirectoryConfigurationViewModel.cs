@@ -42,9 +42,11 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string HelpLink => Constants.HelpLinkPageActiveDirectory;
 
+        private Task initialize;
+
         protected override void OnInitialActivate()
         {
-            Task.Run(async () => await this.PopulateForestsAndDomains());
+            this.initialize = Task.Run(async () => await this.PopulateForestsAndDomains());
         }
 
         private async Task PopulateForestsAndDomains()

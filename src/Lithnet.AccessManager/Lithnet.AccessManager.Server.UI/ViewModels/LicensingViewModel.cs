@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Enterprise;
+using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Microsoft.Extensions.Logging;
@@ -18,16 +19,18 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILicenseManager licenseManager;
         private readonly ILogger<LicensingViewModel> logger;
         private readonly LicensingOptions licensingOptions;
+        private readonly ILicenseDataProvider licenseDataProvider;
 
-        public LicensingViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, ILicenseManager licenseManager, ILogger<LicensingViewModel> logger, LicensingOptions licensingOptions, INotifyModelChangedEventPublisher eventPublisher)
+        public LicensingViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, ILicenseManager licenseManager, ILogger<LicensingViewModel> logger, LicensingOptions licensingOptions, INotifyModelChangedEventPublisher eventPublisher, ILicenseDataProvider licenseDataProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.licenseManager = licenseManager;
             this.logger = logger;
             this.licensingOptions = licensingOptions;
+            this.licenseDataProvider = licenseDataProvider;
             this.dialogCoordinator = dialogCoordinator;
             this.DisplayName = "License";
-            this.ValidationResult = licenseManager.ValidateLicense(licensingOptions.Data);
+            this.ValidationResult = licenseManager.ValidateLicense(licenseDataProvider.GetRawLicenseData());
             eventPublisher.Register(this);
         }
 
@@ -123,6 +126,8 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool HasExpired => this.License?.ValidTo > DateTime.UtcNow;
 
+        public string Type => this.License?.Type.ToString();
+
         public string ExpiryDaysRemaining => this.License == null ? null : ToRelativeDate(this.License.ValidTo);
 
         public string LicensedUsers => this.License?.Units == null ? null : this.License.Units < 0 ? "Unlimited" : this.License.Units.ToString();
@@ -197,7 +202,6 @@ namespace Lithnet.AccessManager.Server.UI
                 if (validationResult.State == LicenseState.Licensed)
                 {
                     this.LicenseData = data;
-                    this.licensingOptions.Type = validationResult.License.Type;
                     this.ValidationResult = validationResult;
                 }
                 else
@@ -226,6 +230,8 @@ namespace Lithnet.AccessManager.Server.UI
         {
 
         }
+
+        public bool CanRemoveLicense => this.License?.Type != LicenseType.BuiltIn;
 
         public async Task RemoveLicense()
         {

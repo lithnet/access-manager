@@ -19,10 +19,10 @@
     <ROW Property="IAgree" Value="Yes" Type="4" MsiKey="IAgree"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{212335BA-7D42-4022-BF0D-D5D430F58C8A} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{3BE27FA5-BDF0-4A46-B6F1-018A1B0FCE8D} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7732.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7735.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
@@ -142,6 +142,8 @@
     <ROW Component="MahApps.Metro.SimpleChildWindow.dll" ComponentId="{C63E3974-A89C-4C74-9902-C8B01D8CADC6}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.SimpleChildWindow.dll"/>
     <ROW Component="MahApps.Metro.dll" ComponentId="{E7626086-C268-4B41-B966-79B902FEFCA9}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.dll"/>
     <ROW Component="Markdig.Signed.dll" ComponentId="{A1878A93-760B-43FE-A159-AEE8151E7F48}" Directory_="APPDIR" Attributes="0" KeyPath="Markdig.Signed.dll"/>
+    <ROW Component="MessagePack.Annotations.dll" ComponentId="{7FE883E2-6A8C-4A78-A07C-633B38E93C68}" Directory_="APPDIR" Attributes="0" KeyPath="MessagePack.Annotations.dll"/>
+    <ROW Component="MessagePack.dll" ComponentId="{F28A793C-1D6C-423D-8E35-78F3BE267795}" Directory_="APPDIR" Attributes="0" KeyPath="MessagePack.dll"/>
     <ROW Component="Microsoft.ApplicationInsights.dll" ComponentId="{E18383E2-F526-4947-AF24-928D926ABDFA}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.ApplicationInsights.dll"/>
     <ROW Component="Microsoft.AspNetCore.Authentication.JwtBearer.dll" ComponentId="{4FD6EB23-B4E0-468F-B473-1A7ECA46D615}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Authentication.JwtBearer.dll"/>
     <ROW Component="Microsoft.AspNetCore.Authentication.OpenIdConnect.dll" ComponentId="{7F70E1D2-96B9-45F4-AD57-08DECBDC1612}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Authentication.OpenIdConnect.dll"/>
@@ -150,6 +152,7 @@
     <ROW Component="Microsoft.AspNetCore.Http.Extensions.dll" ComponentId="{EBC0F8D4-052C-417B-976F-B20D8B18A6E9}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Http.Extensions.dll"/>
     <ROW Component="Microsoft.AspNetCore.Http.Features.dll" ComponentId="{D0EA37FD-09D8-4E34-A4EE-521869F398DF}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Http.Features.dll"/>
     <ROW Component="Microsoft.AspNetCore.HttpOverrides.dll" ComponentId="{CE111FED-D5DA-482B-989E-3A4AE4E58796}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.HttpOverrides.dll"/>
+    <ROW Component="Microsoft.Bcl.AsyncInterfaces.dll" ComponentId="{A77BDECC-4486-4D39-8A14-A617B82A13C4}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Bcl.AsyncInterfaces.dll"/>
     <ROW Component="Microsoft.CSharp.dll" ComponentId="{4C8A1964-3DE2-420E-9708-21727087580E}" Directory_="ref_Dir" Attributes="0" KeyPath="Microsoft.CSharp.dll"/>
     <ROW Component="Microsoft.CodeAnalysis.CSharp.dll" ComponentId="{37BAE656-E2DD-4FA9-BF42-72D9E8A4A64E}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.CodeAnalysis.CSharp.dll"/>
     <ROW Component="Microsoft.CodeAnalysis.dll" ComponentId="{B3251CC0-15A1-4EB7-BDA6-B9ADA0A67015}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.CodeAnalysis.dll"/>
@@ -208,6 +211,8 @@
     <ROW Component="Microsoft.PowerShell.Utility.psd1" ComponentId="{47880E63-78E0-4A01-A7F0-B9A5634776AA}" Directory_="Microsoft.PowerShell.Utility_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.Utility.psd1" Type="0"/>
     <ROW Component="Microsoft.VisualBasic.Core.dll" ComponentId="{37BE1D7A-3840-42A3-BEF0-2C7DC038849B}" Directory_="ref_Dir" Attributes="0" KeyPath="Microsoft.VisualBasic.Core.dll"/>
     <ROW Component="Microsoft.VisualBasic.dll" ComponentId="{3521B4A0-A992-4190-9E14-655AA372EF3D}" Directory_="ref_Dir" Attributes="0" KeyPath="Microsoft.VisualBasic.dll"/>
+    <ROW Component="Microsoft.VisualStudio.Threading.dll" ComponentId="{37CCA950-AF00-48A5-8520-48720F290E79}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.VisualStudio.Threading.dll"/>
+    <ROW Component="Microsoft.VisualStudio.Validation.dll" ComponentId="{2F4F74E0-D073-410F-82C5-DE76870FF395}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.VisualStudio.Validation.dll"/>
     <ROW Component="Microsoft.WSMan.Management.dll" ComponentId="{2A15E68A-ECDE-412A-B89D-2DD3E18CAFA3}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.WSMan.Management.dll"/>
     <ROW Component="Microsoft.WSMan.Management.psd1" ComponentId="{0B1E3179-46A9-4001-B096-2F9BFA936468}" Directory_="Microsoft.WSMan.Management_Dir" Attributes="0" KeyPath="Microsoft.WSMan.Management.psd1" Type="0"/>
     <ROW Component="Microsoft.WSMan.Runtime.dll" ComponentId="{2267E1AF-1300-46CE-92CC-76773FC782F0}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.WSMan.Runtime.dll"/>
@@ -218,13 +223,16 @@
     <ROW Component="NLog.Extensions.Logging.dll" ComponentId="{EBFD3BDF-498C-40E4-A3F8-9EACA8D85A24}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.Extensions.Logging.dll"/>
     <ROW Component="NLog.Web.AspNetCore.dll" ComponentId="{73F69022-9231-402D-920C-6F0AC94DC74E}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.Web.AspNetCore.dll"/>
     <ROW Component="NLog.dll" ComponentId="{15E312A9-DD08-42F7-9CBD-4A8535A00C74}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.dll"/>
+    <ROW Component="NamedPipeServerStream.NetFrameworkVersion.dll" ComponentId="{E4F606B3-AA38-4112-8E14-27706ABFDA4C}" Directory_="APPDIR" Attributes="0" KeyPath="NamedPipeServerStream.NetFrameworkVersion.dll"/>
     <ROW Component="Namotion.Reflection.dll" ComponentId="{9389DC0C-381C-4B7E-B8FF-77E23D9E02DF}" Directory_="APPDIR" Attributes="0" KeyPath="Namotion.Reflection.dll"/>
+    <ROW Component="Nerdbank.Streams.dll" ComponentId="{24AE6EE6-D142-418B-82F9-3DD843D39A3C}" Directory_="APPDIR" Attributes="0" KeyPath="Nerdbank.Streams.dll"/>
     <ROW Component="Newtonsoft.Json.dll" ComponentId="{AD28598B-7779-423E-B6FC-F54E61CAAA11}" Directory_="APPDIR" Attributes="0" KeyPath="Newtonsoft.Json.dll"/>
     <ROW Component="PSDiagnostics.psd1" ComponentId="{CA7AFEFD-15A3-422C-A604-B219B3C0AB14}" Directory_="PSDiagnostics_Dir" Attributes="0" KeyPath="PSDiagnostics.psd1" Type="0"/>
     <ROW Component="PowerShell.Core.Instrumentation.dll" ComponentId="{BF9FC8CA-DB7B-4B90-9A19-58322CFB8734}" Directory_="APPDIR" Attributes="256" KeyPath="PowerShell.Core.Instrumentation.dll"/>
     <ROW Component="ProductInformation" ComponentId="{EF48E22B-B87F-4609-BCA9-10F3D3A555BF}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
     <ROW Component="PropertyChanged.dll" ComponentId="{471EB34E-92D2-401F-9D65-40D178F0D228}" Directory_="APPDIR" Attributes="0" KeyPath="PropertyChanged.dll"/>
     <ROW Component="SslCertBinding.Net.dll" ComponentId="{8CACD9B3-59BB-4C59-815A-416CAC7EF31E}" Directory_="APPDIR" Attributes="0" KeyPath="SslCertBinding.Net.dll"/>
+    <ROW Component="StreamJsonRpc.dll" ComponentId="{174C7F0D-943E-45CC-9718-2463F41C492A}" Directory_="APPDIR" Attributes="0" KeyPath="StreamJsonRpc.dll"/>
     <ROW Component="Stylet.dll" ComponentId="{EE30EF72-9081-48E1-9ECB-28F49CD10A7F}" Directory_="APPDIR" Attributes="0" KeyPath="Stylet.dll"/>
     <ROW Component="System.AppContext.dll" ComponentId="{17D74163-9937-413C-AC4A-EEB2E204ECF6}" Directory_="ref_Dir" Attributes="0" KeyPath="System.AppContext.dll"/>
     <ROW Component="System.Buffers.dll" ComponentId="{B88998A9-D018-4DB6-8F67-EA78B72D8566}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Buffers.dll"/>
@@ -283,6 +291,7 @@
     <ROW Component="System.IO.IsolatedStorage.dll" ComponentId="{632DCC48-0A0A-4E77-9711-1EDAA25374A6}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.IsolatedStorage.dll"/>
     <ROW Component="System.IO.MemoryMappedFiles.dll" ComponentId="{EA0255C6-9893-4577-B975-F2DB8BD7735C}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.MemoryMappedFiles.dll"/>
     <ROW Component="System.IO.Packaging.dll" ComponentId="{67B6AB12-8B12-4339-941B-CD4404D11FFE}" Directory_="APPDIR" Attributes="0" KeyPath="System.IO.Packaging.dll"/>
+    <ROW Component="System.IO.Pipelines.dll" ComponentId="{00DF98B6-7260-44FD-899C-F58D608F0A27}" Directory_="APPDIR" Attributes="0" KeyPath="System.IO.Pipelines.dll"/>
     <ROW Component="System.IO.Pipes.dll" ComponentId="{F00C250E-AB82-46E7-A052-68C1C70B8CAE}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.Pipes.dll"/>
     <ROW Component="System.IO.Ports.dll" ComponentId="{67F9C1B1-9B5F-4A1B-B6C8-8D24F77558AC}" Directory_="APPDIR" Attributes="0" KeyPath="System.IO.Ports.dll"/>
     <ROW Component="System.IO.UnmanagedMemoryStream.dll" ComponentId="{815C6477-D414-4CE9-9073-00D1D9A84C0E}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.UnmanagedMemoryStream.dll"/>
@@ -899,6 +908,16 @@
     <ROW File="fasolid900.woff2" Component_="fabrands400.eot" FileName="FA-SOL~2.WOF|fa-solid-900.woff2" Attributes="0" SourcePath="output\wwwroot\lib\font-awesome\webfonts\fa-solid-900.woff2" SelfReg="false"/>
     <ROW File="jquery.min.js" Component_="jquery.min.js" FileName="JQUERY~1.JS|jquery.min.js" Attributes="0" SourcePath="output\wwwroot\lib\jquery\jquery.min.js" SelfReg="false"/>
     <ROW File="jquery.min.map" Component_="jquery.min.js" FileName="JQUERY~1.MAP|jquery.min.map" Attributes="0" SourcePath="output\wwwroot\lib\jquery\jquery.min.map" SelfReg="false"/>
+    <ROW File="license.dat" Component_="Lithnet.AccessManager.Server.UI.deps.json" FileName="license.dat" Attributes="0" SourcePath="output\license.dat" SelfReg="false"/>
+    <ROW File="MessagePack.Annotations.dll" Component_="MessagePack.Annotations.dll" FileName="MESSAG~1.DLL|MessagePack.Annotations.dll" Attributes="0" SourcePath="output\MessagePack.Annotations.dll" SelfReg="false"/>
+    <ROW File="MessagePack.dll" Component_="MessagePack.dll" FileName="MESSAG~2.DLL|MessagePack.dll" Attributes="0" SourcePath="output\MessagePack.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Bcl.AsyncInterfaces.dll" Component_="Microsoft.Bcl.AsyncInterfaces.dll" FileName="MICRO~64.DLL|Microsoft.Bcl.AsyncInterfaces.dll" Attributes="0" SourcePath="output\Microsoft.Bcl.AsyncInterfaces.dll" SelfReg="false"/>
+    <ROW File="Microsoft.VisualStudio.Threading.dll" Component_="Microsoft.VisualStudio.Threading.dll" FileName="MICRO~65.DLL|Microsoft.VisualStudio.Threading.dll" Attributes="0" SourcePath="output\Microsoft.VisualStudio.Threading.dll" SelfReg="false"/>
+    <ROW File="Microsoft.VisualStudio.Validation.dll" Component_="Microsoft.VisualStudio.Validation.dll" FileName="MICRO~66.DLL|Microsoft.VisualStudio.Validation.dll" Attributes="0" SourcePath="output\Microsoft.VisualStudio.Validation.dll" SelfReg="false"/>
+    <ROW File="NamedPipeServerStream.NetFrameworkVersion.dll" Component_="NamedPipeServerStream.NetFrameworkVersion.dll" FileName="NAMEDP~1.DLL|NamedPipeServerStream.NetFrameworkVersion.dll" Attributes="0" SourcePath="output\NamedPipeServerStream.NetFrameworkVersion.dll" SelfReg="false"/>
+    <ROW File="Nerdbank.Streams.dll" Component_="Nerdbank.Streams.dll" FileName="NERDBA~1.DLL|Nerdbank.Streams.dll" Attributes="0" SourcePath="output\Nerdbank.Streams.dll" SelfReg="false"/>
+    <ROW File="StreamJsonRpc.dll" Component_="StreamJsonRpc.dll" FileName="STREAM~1.DLL|StreamJsonRpc.dll" Attributes="0" SourcePath="output\StreamJsonRpc.dll" SelfReg="false"/>
+    <ROW File="System.IO.Pipelines.dll" Component_="System.IO.Pipelines.dll" FileName="SYSTE~35.DLL|System.IO.Pipelines.dll" Attributes="0" SourcePath="output\System.IO.Pipelines.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.custcomp.AiControlConditionAliasComponent">
     <ROW AliasRowId="ExitDialog#LaunchProdCheckBox#Hide#((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))" AliasRowOperation="2" Condition="(((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))) OR NOT IS_STANDALONE_OR_NOT_CLUSTERED_OR_ON_ACTIVE_NODE"/>
@@ -1572,6 +1591,15 @@
     <ROW Feature_="MainFeature" Component_="brands.svg"/>
     <ROW Feature_="MainFeature" Component_="fabrands400.eot"/>
     <ROW Feature_="MainFeature" Component_="jquery.min.js"/>
+    <ROW Feature_="MainFeature" Component_="MessagePack.Annotations.dll"/>
+    <ROW Feature_="MainFeature" Component_="MessagePack.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Bcl.AsyncInterfaces.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.VisualStudio.Threading.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.VisualStudio.Validation.dll"/>
+    <ROW Feature_="MainFeature" Component_="NamedPipeServerStream.NetFrameworkVersion.dll"/>
+    <ROW Feature_="MainFeature" Component_="Nerdbank.Streams.dll"/>
+    <ROW Feature_="MainFeature" Component_="StreamJsonRpc.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.IO.Pipelines.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>

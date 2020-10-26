@@ -6,12 +6,12 @@ SET serviceProject=%solutiondir%\Lithnet.AccessManager.Service\Lithnet.AccessMan
 SET uiProject=%solutiondir%\Lithnet.AccessManager.Server.UI\Lithnet.AccessManager.Server.UI.csproj
 SET setupProject=%solutiondir%\Lithnet.AccessManager.Service.Setup\Lithnet.AccessManager.Service.Setup.aip
 
-ECHO [92mClearing output directory[0m
-rd /s /q "%outputdir%"
+ECHO [92mClearing output directory "%outputdir%"[0m
+rd /s /q "%outputdir%" || exit /b %errorlevel%
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-ECHO [92mCreating output directory[0m
-md %outputdir%
+ECHO [92mCreating output directory "%outputdir%"[0m
+md %outputdir% || exit /b %errorlevel%
 
 if "%buildingbeta%" EQU "1" (
 ECHO [94mWriting license file[0m
