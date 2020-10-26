@@ -8,3 +8,6 @@ dotnet_diagnostic.VSTHRD200.severity = suggestion
 
 # VSTHRD002: Avoid problematic synchronous waits
 dotnet_diagnostic.VSTHRD002.severity = suggestion
+
+# VSTHRD110: Observe result of async calls
+dotnet_diagnostic.VSTHRD110.severity = suggestion

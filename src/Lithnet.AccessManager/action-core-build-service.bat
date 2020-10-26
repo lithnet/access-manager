@@ -7,7 +7,7 @@ SET uiProject=%solutiondir%\Lithnet.AccessManager.Server.UI\Lithnet.AccessManage
 SET setupProject=%solutiondir%\Lithnet.AccessManager.Service.Setup\Lithnet.AccessManager.Service.Setup.aip
 
 ECHO [92mClearing output directory "%outputdir%"[0m
-rd /s /q "%outputdir%" || exit /b %errorlevel%
+IF EXIST "%outputdir%" rd /s /q "%outputdir%" || exit /b %errorlevel%
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 ECHO [92mCreating output directory "%outputdir%"[0m
