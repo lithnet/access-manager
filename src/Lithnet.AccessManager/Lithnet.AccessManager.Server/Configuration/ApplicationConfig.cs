@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+Move using Lithnet.AccessManager.Enterprise;
 using Newtonsoft.Json;
 
 namespace Lithnet.AccessManager.Server.Configuration
@@ -10,6 +11,8 @@ namespace Lithnet.AccessManager.Server.Configuration
         public string Path { get; set; }
 
         public ConfigurationMetadata Metadata { get; set; } = new ConfigurationMetadata();
+
+        public LicensingOptions Licensing { get; set; } = new LicensingOptions();
 
         public AuthenticationOptions Authentication { get; set; } = new AuthenticationOptions();
 

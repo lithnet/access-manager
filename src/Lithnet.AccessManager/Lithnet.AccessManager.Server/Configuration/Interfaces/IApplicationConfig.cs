@@ -1,8 +1,12 @@
-﻿namespace Lithnet.AccessManager.Server.Configuration
+﻿using Lithnet.AccessManager.Enterprise;
+
+namespace Lithnet.AccessManager.Server.Configuration
 {
     public interface IApplicationConfig
     {
         string Path { get; set; }
+
+        LicensingOptions Licensing { get; set; }
 
         AuditOptions Auditing { get; set; }
 

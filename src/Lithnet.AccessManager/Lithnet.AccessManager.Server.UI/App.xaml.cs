@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -19,7 +20,16 @@ namespace Lithnet.AccessManager.Server.UI
             EventManager.RegisterClassHandler(typeof(PasswordBox), UIElement.PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(SelectivelyIgnoreMouseButton));
             EventManager.RegisterClassHandler(typeof(PasswordBox), UIElement.GotKeyboardFocusEvent, new RoutedEventHandler(SelectAllText));
             EventManager.RegisterClassHandler(typeof(PasswordBox), Control.MouseDoubleClickEvent, new RoutedEventHandler(SelectAllText));
-            base.OnStartup(e);
+
+            try
+            {
+                base.OnStartup(e);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"There was a problem loading the application, and the application will now terminate\r\n\r\nError message: {ex}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Environment.Exit(1);
+            }
         }
 
         void SelectivelyIgnoreMouseButton(object sender, MouseButtonEventArgs e)
@@ -32,7 +42,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
 
             if (parent is Control textBox)
-            { 
+            {
                 if (!textBox.IsKeyboardFocusWithin)
                 {
                     textBox.Focus();

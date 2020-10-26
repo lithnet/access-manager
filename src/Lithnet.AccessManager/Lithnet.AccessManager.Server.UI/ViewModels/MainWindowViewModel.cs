@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.ServiceProcess;
-using System.Threading;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -20,27 +17,25 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILogger<MainWindowViewModel> logger;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IWindowsServiceProvider windowsServiceProvider;
-        private readonly ILicenseManager licenseManager;
         private readonly IRegistryProvider registryProvider;
-        
+
         public MainWindowViewModel(IApplicationConfig model, AuthenticationViewModel authentication, AuthorizationViewModel authorization, UserInterfaceViewModel ui, RateLimitsViewModel rate, IpDetectionViewModel ip,
             AuditingViewModel audit, EmailViewModel mail, HostingViewModel hosting, ActiveDirectoryConfigurationViewModel ad,
-            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, ILicenseManager licenseManager, IRegistryProvider registryProvider)
+            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, LicensingViewModel lic, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider)
         {
+            this.model = model;
             this.shellExecuteProvider = shellExecuteProvider;
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
             this.windowsServiceProvider = windowsServiceProvider;
-            this.licenseManager = licenseManager;
+            this.hosting = hosting;
             this.registryProvider = registryProvider;
             this.eventAggregator = eventAggregator;
+            this.dialogCoordinator = dialogCoordinator;
+
             this.eventAggregator.Subscribe(this);
             this.DisplayName = Constants.AppName;
 
-            this.model = model;
-            this.dialogCoordinator = dialogCoordinator;
-
-            this.hosting = hosting;
             this.Items.Add(hosting);
             this.Items.Add(authentication);
             this.Items.Add(ui);
@@ -53,15 +48,13 @@ namespace Lithnet.AccessManager.Server.UI
             this.Items.Add(jit);
             this.Items.Add(bitLocker);
             this.Items.Add(authorization);
+            this.Items.Add(lic);
 
-            this.OptionItems = new BindableCollection<PropertyChangedBase>();
-            this.OptionItems.Add(help);
+            this.OptionItems = new BindableCollection<PropertyChangedBase> { help };
 
             this.ActiveItem = this.Items.First();
 
             this.UpdateIsConfigured();
-
-            this.licenseManager.Initialize();
         }
 
         public BindableCollection<PropertyChangedBase> OptionItems { get; }
@@ -115,19 +108,17 @@ namespace Lithnet.AccessManager.Server.UI
                 else
                 {
                     this.IsPendingServiceRestart = true;
-                    await Task.Run(() =>
-                      {
-                          try
-                          {
-                              this.windowsServiceProvider.WaitForStatus(ServiceControllerStatus.Stopped);
-                              this.windowsServiceProvider.WaitForStatus(ServiceControllerStatus.Running);
-                              this.IsPendingServiceRestart = false;
-                          }
-                          catch (Exception ex)
-                          {
-                              this.logger.LogError(EventIDs.UIGenericError, ex, "Service status polling error");
-                          }
-                      });
+
+                    try
+                    {
+                        await this.windowsServiceProvider.WaitForStatus(ServiceControllerStatus.Stopped);
+                        await this.windowsServiceProvider.WaitForStatus(ServiceControllerStatus.Running);
+                        this.IsPendingServiceRestart = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        this.logger.LogError(EventIDs.UIGenericError, ex, "Service status polling error");
+                    }
                 }
             }
 

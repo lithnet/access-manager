@@ -15,7 +15,7 @@ md %outputdir%
 
 if "%buildingbeta%" EQU "1" (
 ECHO [94mWriting license file[0m
-"D:\dev\git\lithnet\access-manager-enterprise\src\Lithnet.AccessManager.Enterprise.LicenseManager.Cli\bin\Debug\netcoreapp3.1\amsliccli" --audiences * --units -1 --min-version %version% --max-version %version% --expire-in-days 90 --out-file "%outputdir%\license.dat"
+"D:\dev\git\lithnet\access-manager-enterprise\src\Lithnet.AccessManager.Enterprise.LicenseManager.Cli\bin\Debug\netcoreapp3.1\amsliccli" --subject "Beta program participant" --type BuiltIn --audiences * --units -1 --min-version %version% --max-version %version% --expire-in-days 90 --out-file "%outputdir%\license.dat"
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 )
 

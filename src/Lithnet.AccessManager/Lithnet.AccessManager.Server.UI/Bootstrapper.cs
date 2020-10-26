@@ -163,7 +163,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<RateLimitOptions>().ToInstance(appconfig.RateLimits);
                 builder.Bind<UserInterfaceOptions>().ToInstance(appconfig.UserInterface);
                 builder.Bind<JitConfigurationOptions>().ToInstance(appconfig.JitConfiguration);
-
+                builder.Bind<LicensingOptions>().ToInstance(appconfig.Licensing);
 
                 // ViewModel factories
                 builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
@@ -224,7 +224,10 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind(typeof(ILogger<>)).To(typeof(Logger<>));
                 builder.Bind(typeof(IOptions<>)).To(typeof(OptionsWrapper<>));
                 builder.Bind(typeof(IOptionsSnapshot<>)).To(typeof(UiOptionsSnapshotProvider<>));
-
+                builder.Bind(typeof(IOptionsMonitor<>)).To(typeof(OptionsMonitor<>));
+                builder.Bind(typeof(IOptionsFactory<>)).To(typeof(OptionsFactory<>));
+                builder.Bind(typeof(IOptionsMonitorCache<>)).To(typeof(UIiOptionsMonitorCache<>));
+                
                 base.ConfigureIoC(builder);
             }
             catch (ConfigurationException ex)

@@ -38,6 +38,7 @@ namespace Lithnet.AccessManager.Service
             services.AddControllersWithViews();
             services.AddHttpContextAccessor();
             services.AddResponseCaching();
+
             services.TryAddScoped<IIwaAuthenticationProvider, IwaAuthenticationProvider>();
             services.TryAddScoped<IOidcAuthenticationProvider, OidcAuthenticationProvider>();
             services.TryAddScoped<IWsFedAuthenticationProvider, WsFedAuthenticationProvider>();
@@ -102,17 +103,17 @@ namespace Lithnet.AccessManager.Service
             services.Configure<AuthorizationOptions>(Configuration.GetSection("Authorization"));
             services.Configure<ForwardedHeadersAppOptions>(Configuration.GetSection("ForwardedHeaders"));
             services.Configure<JitConfigurationOptions>(Configuration.GetSection("JitConfiguration"));
+            services.Configure<LicensingOptions>(Configuration.GetSection("Licensing"));
 
             this.ConfigureAuthentication(services);
             this.ConfigureAuthorization(services);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider provider, IOptions<ConfigurationMetadata> metadata, ILicenseManager licenseManager, ILogger<Startup> logger)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<ForwardedHeadersAppOptions> fwdOptions, IOptions<ConfigurationMetadata> metadata, ILicenseManager licenseManager, ILogger<Startup> logger)
         {
             metadata.Value.ValidateMetadata();
 
-            var fwdOptions = provider.GetRequiredService<IOptions<ForwardedHeadersAppOptions>>().Value;
-            app.UseForwardedHeaders(fwdOptions.ToNativeOptions());
+            app.UseForwardedHeaders(fwdOptions.Value.ToNativeOptions());
             app.UseStatusCodePagesWithReExecute("/StatusCode", "?code={0}");
 
             if (env.IsDevelopment())
@@ -146,7 +147,11 @@ namespace Lithnet.AccessManager.Service
 
             try
             {
-                licenseManager.Initialize();
+                var license = licenseManager.GetLicense();
+                if (license != null)
+                {
+                    logger.LogTrace("License information\r\n{licenseData}", license.ToString());
+                }
             }
             catch (Exception ex)
             {

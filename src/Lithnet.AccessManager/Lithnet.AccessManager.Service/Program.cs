@@ -23,7 +23,6 @@ namespace Lithnet.AccessManager.Service
 
         public static IHostBuilder CreateHostBuilder(string[] args, RegistryProvider registryProvider)
         {
-
             bool safeStart = args.Any(t => string.Equals(t, "/safeStart", System.StringComparison.OrdinalIgnoreCase));
 
             if (safeStart || !registryProvider.IsConfigured)

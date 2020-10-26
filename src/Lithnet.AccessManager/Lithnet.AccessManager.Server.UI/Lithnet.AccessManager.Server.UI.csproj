@@ -55,7 +55,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="9.0.1" />
-    <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7603.5465" />
+    <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7604.26991" />
     <PackageReference Include="mahapps.metro" Version="2.1.1" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="4.6.0" />
     <PackageReference Include="MahApps.Metro.SimpleChildWindow" Version="2.0.0-alpha0043" />
@@ -116,6 +116,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="Views\LicensingView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\EffectiveAccessView.xaml">
       <SubType>Designer</SubType>
     </Page>
