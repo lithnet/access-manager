@@ -29,6 +29,10 @@
     color: rgb(29,168,224);
 }
 
+.logout-link {
+    color: #777;
+}
+
 .button-loading-overlay {
 
 }

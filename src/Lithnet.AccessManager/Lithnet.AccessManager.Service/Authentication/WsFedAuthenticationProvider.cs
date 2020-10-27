@@ -39,6 +39,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
                 wsFederationOptions.CallbackPath = "/auth";
                 wsFederationOptions.MetadataAddress = this.options.Metadata;
                 wsFederationOptions.Wtrealm = this.options.Realm;
+                wsFederationOptions.SignOutWreply = "/Home/LoggedOut";
                 wsFederationOptions.Events = new WsFederationEvents()
                 {
                     OnAccessDenied = this.HandleAuthNFailed,
