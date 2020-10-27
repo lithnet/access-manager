@@ -217,18 +217,19 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IClusterProvider>().To<ClusterProvider>().InSingletonScope();
                 builder.Bind<IProductSettingsProvider>().To<ProductSettingsProvider>().InSingletonScope();
                 builder.Bind<ILicenseManager>().To<LicenseManager>().InSingletonScope();
-                builder.Bind<ILicenseDataProvider>().To<LicenseDataProvider>().InSingletonScope();
+                builder.Bind<ILicenseDataProvider>().To<OptionsLicenseDataProvider>().InSingletonScope();
 
                 builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentModelValidator<>));
                 builder.Bind(typeof(IValidator<>)).ToAllImplementations();
                 builder.Bind<ILoggerFactory>().ToInstance(this.loggerFactory);
                 builder.Bind(typeof(ILogger<>)).To(typeof(Logger<>));
-                builder.Bind(typeof(IOptions<>)).To(typeof(OptionsWrapper<>));
-                builder.Bind(typeof(IOptionsSnapshot<>)).To(typeof(UiOptionsSnapshotProvider<>));
-                builder.Bind(typeof(IOptionsMonitor<>)).To(typeof(OptionsMonitor<>));
+                builder.Bind(typeof(IOptions<>)).To(typeof(OptionsWrapper<>)).InSingletonScope();
+                builder.Bind(typeof(IOptionsSnapshot<>)).To(typeof(OptionsManager<>));
+                builder.Bind(typeof(IOptionsMonitor<>)).To(typeof(OptionsMonitor<>)).InSingletonScope();
                 builder.Bind(typeof(IOptionsFactory<>)).To(typeof(OptionsFactory<>));
-                builder.Bind(typeof(IOptionsMonitorCache<>)).To(typeof(UIiOptionsMonitorCache<>));
-                
+                builder.Bind(typeof(IOptionsMonitorCache<>)).To(typeof(OptionsCache<>)).InSingletonScope();
+
+
                 base.ConfigureIoC(builder);
             }
             catch (ConfigurationException ex)

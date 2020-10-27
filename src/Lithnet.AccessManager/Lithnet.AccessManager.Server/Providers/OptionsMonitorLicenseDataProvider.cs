@@ -9,11 +9,11 @@ using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Server
 {
-    public class LicenseDataProvider : ILicenseDataProvider
+    public class OptionsMonitorLicenseDataProvider : IMonitoredLicenseDataProvider
     {
         private readonly IOptionsMonitor<LicensingOptions> options;
 
-        public LicenseDataProvider(IOptionsMonitor<LicensingOptions> options)
+        public OptionsMonitorLicenseDataProvider(IOptionsMonitor<LicensingOptions> options)
         {
             this.options = options;
             this.options.OnChange((x, y) => this.OnLicenseDataChanged?.Invoke(this, new EventArgs()));

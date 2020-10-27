@@ -21,7 +21,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public MainWindowViewModel(IApplicationConfig model, AuthenticationViewModel authentication, AuthorizationViewModel authorization, UserInterfaceViewModel ui, RateLimitsViewModel rate, IpDetectionViewModel ip,
             AuditingViewModel audit, EmailViewModel mail, HostingViewModel hosting, ActiveDirectoryConfigurationViewModel ad,
-            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, LicensingViewModel lic, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider)
+            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, LicensingViewModel lic, HighAvailabilityViewModel havm, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider)
         {
             this.model = model;
             this.shellExecuteProvider = shellExecuteProvider;
@@ -49,6 +49,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.Items.Add(bitLocker);
             this.Items.Add(authorization);
             this.Items.Add(lic);
+            this.Items.Add(havm);
 
             this.OptionItems = new BindableCollection<PropertyChangedBase> { help };
 

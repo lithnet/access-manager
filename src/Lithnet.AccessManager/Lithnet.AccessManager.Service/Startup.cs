@@ -77,7 +77,7 @@ namespace Lithnet.AccessManager.Service
             services.TryAddSingleton<IProductSettingsProvider, ProductSettingsProvider>();
             services.TryAddSingleton<IProtectedSecretProvider, ProtectedSecretProvider>();
             services.TryAddSingleton<IRegistryProvider>(new RegistryProvider(false));
-            services.TryAddSingleton<ILicenseDataProvider, LicenseDataProvider>();
+            services.TryAddSingleton<ILicenseDataProvider, OptionsMonitorLicenseDataProvider>();
 
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();
