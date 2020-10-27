@@ -330,7 +330,7 @@ namespace Lithnet.AccessManager.Service.Controllers
                     User = user,
                     Computer = computer,
                     EventID = EventIDs.ComputerPasswordActiveAccessGranted,
-                    AccessExpiryDate = current.ExpiryDate?.ToLocalTime().ToString(CultureInfo.CurrentUICulture)
+                    AccessExpiryDate = current.ExpiryDate?.ToLocalTime().ToString(CultureInfo.CurrentCulture)
                 });
 
                 return this.View("AccessResponseCurrentPassword", new CurrentPasswordModel()
