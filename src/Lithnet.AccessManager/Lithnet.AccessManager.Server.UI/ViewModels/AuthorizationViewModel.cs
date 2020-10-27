@@ -78,6 +78,7 @@ namespace Lithnet.AccessManager.Server.UI
                 if (existingTarget == null)
                 {
                     Execute.OnUIThread(() => this.Targets.ViewModels.Add(newTarget));
+                    this.Targets.Model.Add(newTarget.Model);
                     continue;
                 }
 
