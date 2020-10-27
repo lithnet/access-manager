@@ -31,6 +31,18 @@ namespace Lithnet.AccessManager.Service.AppSettings
 
         protected override string ClaimName => this.options.ClaimName ?? ClaimTypes.Upn;
 
+        private Task BeforeRedirectToIdentityProviderAsync(RedirectContext context)
+        {
+            Claim idTokenClaim = context.HttpContext.User.FindFirst("id_token");
+
+            if (idTokenClaim != null)
+            {
+                context.ProtocolMessage.IdTokenHint = idTokenClaim.Value;
+            }
+
+            return Task.CompletedTask;
+        }
+
         public override void Configure(IServiceCollection services)
         {
             services.AddAuthentication(authenticationOptions =>
@@ -48,7 +60,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
                  openIdConnectOptions.SignedOutCallbackPath = "/auth/logout";
                  openIdConnectOptions.SignedOutRedirectUri = "/Home/LoggedOut";
                  openIdConnectOptions.ResponseType = this.options.ResponseType ?? OpenIdConnectResponseType.Code;
-                 openIdConnectOptions.SaveTokens = false;
+                 openIdConnectOptions.SaveTokens = true;
                  openIdConnectOptions.GetClaimsFromUserInfoEndpoint = this.options.GetUserInfoEndpointClaims ?? openIdConnectOptions.ResponseType.Contains(OpenIdConnectResponseType.Code);
                  openIdConnectOptions.UseTokenLifetime = true;
                  openIdConnectOptions.Events = new OpenIdConnectEvents()
@@ -56,6 +68,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
                      OnRemoteFailure = this.HandleRemoteFailure,
                      OnAccessDenied = this.HandleAuthNFailed,
                      OnTicketReceived = this.FindClaimIdentityInDirectoryOrFail,
+                     OnRedirectToIdentityProviderForSignOut = this.BeforeRedirectToIdentityProviderAsync,
                  };
 
                  if (this.options.ClaimMapping == null || this.options.ClaimMapping.Count > 0)
