@@ -17,5 +17,7 @@
         string ConfigPath { get; }
         
         string BasePath { get; }
+
+        string ServiceKeyThumbprint { get; set; }
     }
 }

@@ -164,6 +164,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<UserInterfaceOptions>().ToInstance(appconfig.UserInterface);
                 builder.Bind<JitConfigurationOptions>().ToInstance(appconfig.JitConfiguration);
                 builder.Bind<LicensingOptions>().ToInstance(appconfig.Licensing);
+                builder.Bind<HighAvailabilityOptions>().ToInstance(appconfig.HighAvailability);
 
                 // ViewModel factories
                 builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
@@ -217,6 +218,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IClusterProvider>().To<ClusterProvider>().InSingletonScope();
                 builder.Bind<IProductSettingsProvider>().To<ProductSettingsProvider>().InSingletonScope();
                 builder.Bind<ILicenseManager>().To<LicenseManager>().InSingletonScope();
+
                 builder.Bind<ILicenseDataProvider>().To<OptionsLicenseDataProvider>().InSingletonScope();
 
                 builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentModelValidator<>));

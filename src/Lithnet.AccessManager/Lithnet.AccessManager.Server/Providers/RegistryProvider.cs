@@ -59,6 +59,23 @@ namespace Lithnet.AccessManager.Server
             }
         }
 
+        
+        public string ServiceKeyThumbprint
+        {
+            get => paramsKey?.GetValue("ServiceKeyThumbprint") as string;
+            set
+            {
+                if (value == null)
+                {
+                    paramsKey.DeleteValue("ServiceKeyThumbprint");
+                }
+                else
+                {
+                    paramsKey.SetValue("ServiceKeyThumbprint", value);
+                }
+            }
+        }
+
         public string HttpsAcl
         {
             get => baseKey?.GetValue("HttpsAcl") as string;

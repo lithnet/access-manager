@@ -41,10 +41,10 @@
 
             <StackPanel Grid.Row="0" Grid.Column="1" 
                         Orientation="Horizontal">
-                <iconPacks:PackIconModern Kind="Star"
-                                               Margin="0 0 5 0"
-                                               Visibility="{Binding HasEnterpriseLicense, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                               Foreground="BlueViolet"/>
+                <iconPacks:PackIconMaterial Kind="RocketLaunchOutline" 
+                                          Margin="0 0 0 0"
+                                          Visibility="{Binding HasEnterpriseLicense, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                          Foreground="BlueViolet"/>
                 <TextBlock Margin="5 0 0 0"
                            TextWrapping="Wrap"
                            Text="{Binding EffectiveProductEdition, FallbackValue='Standard'}"/>

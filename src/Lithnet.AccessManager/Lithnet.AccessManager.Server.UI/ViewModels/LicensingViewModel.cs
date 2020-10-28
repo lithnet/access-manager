@@ -20,14 +20,16 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILogger<LicensingViewModel> logger;
         private readonly LicensingOptions licensingOptions;
         private readonly ILicenseDataProvider licenseDataProvider;
+        private readonly IEventAggregator eventAggregator;
 
-        public LicensingViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, ILicenseManager licenseManager, ILogger<LicensingViewModel> logger, LicensingOptions licensingOptions, INotifyModelChangedEventPublisher eventPublisher, ILicenseDataProvider licenseDataProvider)
+        public LicensingViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, ILicenseManager licenseManager, ILogger<LicensingViewModel> logger, LicensingOptions licensingOptions, INotifyModelChangedEventPublisher eventPublisher, ILicenseDataProvider licenseDataProvider, IEventAggregator eventAggregator)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.licenseManager = licenseManager;
             this.logger = logger;
             this.licensingOptions = licensingOptions;
             this.licenseDataProvider = licenseDataProvider;
+            this.eventAggregator = eventAggregator;
             this.dialogCoordinator = dialogCoordinator;
             this.DisplayName = "License";
             this.ValidationResult = licenseManager.ValidateLicense(licenseDataProvider.GetRawLicenseData());
@@ -208,6 +210,8 @@ namespace Lithnet.AccessManager.Server.UI
                 {
                     await this.dialogCoordinator.ShowMessageAsync(this, "Unable to apply license", validationResult.Message);
                 }
+
+                this.licenseDataProvider.LicenseDataChanged();
             }
             catch (Exception ex)
             {
@@ -243,6 +247,7 @@ namespace Lithnet.AccessManager.Server.UI
                 {
                     this.LicenseData = null;
                     this.ValidationResult = this.licenseManager.ValidateLicense(null);
+                    this.licenseDataProvider.LicenseDataChanged();
                 }
             }
             catch (Exception ex)

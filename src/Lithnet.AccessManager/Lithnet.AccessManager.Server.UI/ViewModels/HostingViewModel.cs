@@ -885,7 +885,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         private void UpdateEncryptionCertificateAcls(HostingSettingsRollbackContext rollback)
         {
-            foreach (X509Certificate2 cert in this.certProvider.GetEligibleCertificates(true))
+            foreach (X509Certificate2 cert in this.certProvider.GetEligiblePasswordEncryptionCertificates(true))
             {
                 FileSecurity originalCertificateSecurity = cert.GetPrivateKeySecurity();
 

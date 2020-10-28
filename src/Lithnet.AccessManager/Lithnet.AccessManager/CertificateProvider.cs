@@ -18,18 +18,19 @@ namespace Lithnet.AccessManager
 
         private readonly IDiscoveryServices discoveryServices;
 
-        public const string LithnetAccessManagerEku = "1.3.6.1.4.1.55989.2.1.1";
+        public static Oid LithnetAccessManagerPasswordEncryptionEku = new Oid("1.3.6.1.4.1.55989.2.1.1", "Lithnet Access Manager password encryption");
+        public static Oid LithnetAccessManagerClusterEncryptionEku = new Oid("1.3.6.1.4.1.55989.2.1.2", "Lithnet Access Manager cluster encryption");
 
-        public X509Certificate2 CreateSelfSignedCert(string subject)
+        public X509Certificate2 CreateSelfSignedCert(string subject, Oid eku)
         {
             CertificateRequest request = new CertificateRequest($"CN={subject},OU=Access Manager,O=Lithnet", RSA.Create(4096), HashAlgorithmName.SHA384, RSASignaturePadding.Pss);
 
-            var enhancedKeyUsage = new OidCollection
+            if (eku != null)
             {
-                new Oid(LithnetAccessManagerEku, "Lithnet Access Manager Encryption")
-            };
+                var enhancedKeyUsage = new OidCollection { eku };
+                request.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(enhancedKeyUsage, critical: true));
+            }
 
-            request.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(enhancedKeyUsage, critical: true));
             request.CertificateExtensions.Add(new X509KeyUsageExtension(X509KeyUsageFlags.KeyEncipherment, true));
             request.CertificateExtensions.Add(new X509BasicConstraintsExtension(false, false, 0, true));
 
@@ -91,20 +92,28 @@ namespace Lithnet.AccessManager
             return cert;
         }
 
-        public X509Certificate2Collection GetEligibleCertificates(bool needPrivateKey)
+        public X509Certificate2Collection GetEligiblePasswordEncryptionCertificates(bool needPrivateKey)
         {
             X509Certificate2Collection certs = new X509Certificate2Collection();
 
             X509Store store = X509ServiceStoreHelper.Open(Constants.ServiceName, OpenFlags.ReadOnly);
-            GetEligibleCertificates(needPrivateKey, store, certs);
+            GetEligibleCertificates(needPrivateKey, LithnetAccessManagerPasswordEncryptionEku, store, certs);
 
             return certs;
         }
 
-        private static void GetEligibleCertificates(bool needPrivateKey, X509Store store, X509Certificate2Collection certs)
+        public X509Certificate2Collection GetEligibleClusterEncryptionCertificates(bool needPrivateKey)
         {
-            Oid accessManagerEku = new Oid(LithnetAccessManagerEku);
+            X509Certificate2Collection certs = new X509Certificate2Collection();
 
+            X509Store store = X509ServiceStoreHelper.Open(Constants.ServiceName, OpenFlags.ReadOnly);
+            GetEligibleCertificates(needPrivateKey, LithnetAccessManagerClusterEncryptionEku, store, certs);
+
+            return certs;
+        }
+
+        private static void GetEligibleCertificates(bool needPrivateKey, Oid eku, X509Store store, X509Certificate2Collection certs)
+        {
             foreach (X509Certificate2 c in store.Certificates.Find(X509FindType.FindByTimeValid, DateTime.Now, false)
                 .OfType<X509Certificate2>().Where(t => !needPrivateKey || t.HasPrivateKey))
             {
@@ -112,7 +121,7 @@ namespace Lithnet.AccessManager
                 {
                     foreach (Oid o in x.EnhancedKeyUsages)
                     {
-                        if (o.Value == accessManagerEku.Value)
+                        if (o.Value == eku.Value)
                         {
                             certs.Add(c);
                         }

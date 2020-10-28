@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
@@ -81,9 +82,8 @@ namespace Lithnet.AccessManager.Server
             }
         }
 
-        private ProtectedSecret ProtectSecretv2(string secret, string thumbprint)
+        public ProtectedSecret ProtectSecret(string secret, X509Certificate2 cert)
         {
-            var cert = certificateProvider.FindEncryptionCertificate(thumbprint);
             ProtectedSecret protectedData = new ProtectedSecret
             {
                 Mode = 2,
@@ -91,6 +91,12 @@ namespace Lithnet.AccessManager.Server
             };
 
             return protectedData;
+        }
+
+        private ProtectedSecret ProtectSecretv2(string secret, string thumbprint)
+        {
+            var cert = certificateProvider.FindEncryptionCertificate(thumbprint);
+            return this.ProtectSecret(secret, cert);
         }
 
         private ProtectedSecret ProtectSecretv1(string secret)

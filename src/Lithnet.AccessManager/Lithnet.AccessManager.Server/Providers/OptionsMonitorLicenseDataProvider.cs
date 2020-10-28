@@ -6,10 +6,11 @@ using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Options;
+using Vanara.Extensions.Reflection;
 
 namespace Lithnet.AccessManager.Server
 {
-    public class OptionsMonitorLicenseDataProvider : IMonitoredLicenseDataProvider
+    public class OptionsMonitorLicenseDataProvider : ILicenseDataProvider
     {
         private readonly IOptionsMonitor<LicensingOptions> options;
 
@@ -17,6 +18,11 @@ namespace Lithnet.AccessManager.Server
         {
             this.options = options;
             this.options.OnChange((x, y) => this.OnLicenseDataChanged?.Invoke(this, new EventArgs()));
+        }
+
+        public void LicenseDataChanged()
+        {
+            this.OnLicenseDataChanged?.Invoke(this, new EventArgs());
         }
 
         public event EventHandler OnLicenseDataChanged;

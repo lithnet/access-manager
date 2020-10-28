@@ -82,7 +82,7 @@ namespace Lithnet.AccessManager.Test
             try
             {
                 var store = X509ServiceStoreHelper.Open(Constants.ServiceName, OpenFlags.ReadWrite);
-                cert = this.provider.CreateSelfSignedCert(TestContext.CurrentContext.Random.GetString(10));
+                cert = this.provider.CreateSelfSignedCert(TestContext.CurrentContext.Random.GetString(10), CertificateProvider.LithnetAccessManagerPasswordEncryptionEku);
                 store.Add(cert);
                 store.Close();
 

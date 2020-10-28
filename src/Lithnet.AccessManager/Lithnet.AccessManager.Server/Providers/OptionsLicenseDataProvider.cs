@@ -23,6 +23,7 @@ namespace Lithnet.AccessManager.Server
             try
             {
                 string data = this.options.Data;
+
                 return string.IsNullOrWhiteSpace(data) ? EmbeddedResourceProvider.GetResourceString("license.dat") : data;
             }
             catch
@@ -30,5 +31,12 @@ namespace Lithnet.AccessManager.Server
                 return null;
             }
         }
+
+        public void LicenseDataChanged()
+        {
+            this.OnLicenseDataChanged?.Invoke(this, new EventArgs());
+        }
+
+        public event EventHandler OnLicenseDataChanged;
     }
 }

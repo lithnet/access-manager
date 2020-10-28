@@ -5,6 +5,7 @@ using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.UI.Interop;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
@@ -146,7 +147,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert(this.SelectedForest.Name);
+                X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert(this.SelectedForest.Name, CertificateProvider.LithnetAccessManagerPasswordEncryptionEku);
 
                 using X509Store store = X509ServiceStoreHelper.Open(AccessManager.Constants.ServiceName, OpenFlags.ReadWrite);
                 store.Add(cert);
@@ -183,6 +184,75 @@ namespace Lithnet.AccessManager.Server.UI
         public void ShowCertificateDialog()
         {
             X509Certificate2UI.DisplayCertificate(this.SelectedCertificate.Model, this.GetHandle());
+        }
+
+        public bool CanExportCertificate => this.SelectedCertificate != null && this.SelectedCertificate.HasPrivateKey;
+
+        public void ExportCertificate()
+        {
+            var cert = this.SelectedCertificate.Model;
+
+            if (cert != null && cert.HasPrivateKey)
+            {
+                NativeMethods.ShowCertificateExportDialog(this.GetHandle(), "Export certificate", cert);
+            }
+        }
+
+        public bool CanDeleteCertificate => this.SelectedCertificate != null;
+
+        public async Task DeleteCertificate()
+        {
+            var cert = this.SelectedCertificate.Model;
+
+            try
+            {
+                if (cert != null)
+                {
+                    if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", "If you delete this certificate, you will no longer be able to decrypt any passwords that have been encrypted with it. Are you sure you want to proceed?", MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings
+                    {
+                        AffirmativeButtonText = "Yes",
+                        NegativeButtonText = "No"
+                    }) == MessageDialogResult.Affirmative)
+                    {
+                        using (X509Store store = X509ServiceStoreHelper.Open(AccessManager.Constants.ServiceName, OpenFlags.ReadWrite))
+                        {
+                            store.Remove(cert);
+                        }
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(EventIDs.UIGenericError, ex, "Could not delete certificate");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not delete the certificate\r\n{ex.Message}");
+            }
+            finally
+            {
+                await this.RefreshAvailableCertificates();
+            }
+        }
+
+        public async Task ImportCertificate()
+        {
+            try
+            {
+                using (X509Store store = X509ServiceStoreHelper.Open(AccessManager.Constants.ServiceName, OpenFlags.ReadWrite))
+                {
+                    X509Certificate2 newCert = NativeMethods.ShowCertificateImportDialog(this.GetHandle(), "Import encryption certificate", store);
+
+                    newCert.AddPrivateKeyReadPermission(this.windowsServiceProvider.GetServiceAccount());
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(EventIDs.UIGenericError, ex, "Could not import certificate");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not import the certificate\r\n{ex.Message}");
+            }
+            finally
+            {
+                await this.RefreshAvailableCertificates();
+            }
         }
 
         public void DelegateServicePermission()
@@ -277,7 +347,7 @@ namespace Lithnet.AccessManager.Server.UI
                     return;
                 }
 
-                var allCertificates = certificateProvider.GetEligibleCertificates(false).OfType<X509Certificate2>();
+                var allCertificates = certificateProvider.GetEligiblePasswordEncryptionCertificates(false).OfType<X509Certificate2>();
                 this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert,
                     this.SelectedForest.RootDomain.Name);
 
