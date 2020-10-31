@@ -32,7 +32,7 @@
         </DockPanel>
 
 
-        <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
+        <!--<Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
                Content="Shared encryption key"/>
 
         <Grid Margin="5"
@@ -95,7 +95,7 @@
                         HorizontalAlignment="Left"
                         Command="{s:Action ClusterEncryptionKeyImport}">Import key...</Button>
             </StackPanel>
-        </Grid>
+        </Grid>-->
 
         <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
                Content="Database configuration"/>
@@ -145,6 +145,43 @@
                     HorizontalAlignment="Left"
                     Command="{s:Action TestConnectionString}"
                     >Test...</Button>
+        </Grid>
+
+        <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
+               Content="Secret synchronization"/>
+
+        <Grid Margin="5" IsEnabled="{Binding IsEnterpriseEdition}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+
+            <CheckBox Grid.Row="0" Grid.Column="1"
+                      Margin="5"
+                      Content="Enable secret synchronization between cluster nodes"/>
+
+            <TextBlock Grid.Row="1" Grid.Column="0"
+                   Margin="5"
+                   TextWrapping="Wrap"
+                   Text="Secret managers"/>
+
+            <TextBox Grid.Row="1" Grid.Column="1" 
+                 Margin="5"
+                 Text="{Binding SecretManagers}"
+                 IsReadOnly="True"/>
+
+            <Button Grid.Row="2" Grid.Column="1"
+                    Margin="5"
+                    HorizontalAlignment="Left"
+                    Command="{s:Action SynchronizeSecrets}"
+            >Synchronize secrets...</Button>
         </Grid>
     </StackPanel>
 </UserControl>

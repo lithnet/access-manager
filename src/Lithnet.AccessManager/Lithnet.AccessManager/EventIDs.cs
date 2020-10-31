@@ -77,6 +77,8 @@
         public const int CertificateAuthNError = 5034;
         public const int BitLockerKeyAccessError = 5035;
         public const int ResourceReadError = 5036;
+        public const int CertificateSynchronizationImportError = 5037;
+        public const int CertificateSynchronizationExportError = 5038;
 
         // 6000 range - Reserved 
 

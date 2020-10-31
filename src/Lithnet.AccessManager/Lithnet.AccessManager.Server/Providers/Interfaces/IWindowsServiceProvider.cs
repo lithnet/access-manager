@@ -2,10 +2,12 @@
 using System.ServiceProcess;
 using System.Threading.Tasks;
 
-namespace Lithnet.AccessManager.Server.UI
+namespace Lithnet.AccessManager.Server
 {
     public interface IWindowsServiceProvider
     {
+        SecurityIdentifier ServiceSid { get; }
+
         ServiceControllerStatus Status { get; }
 
         SecurityIdentifier GetServiceAccount();

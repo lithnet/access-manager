@@ -21,6 +21,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
 
 namespace Lithnet.AccessManager.Service
 {
@@ -43,12 +46,9 @@ namespace Lithnet.AccessManager.Service
             services.TryAddScoped<IOidcAuthenticationProvider, OidcAuthenticationProvider>();
             services.TryAddScoped<IWsFedAuthenticationProvider, WsFedAuthenticationProvider>();
             services.TryAddScoped<ICertificateAuthenticationProvider, CertificateAuthenticationProvider>();
-
             services.TryAddScoped<IAuthorizationService, SecurityDescriptorAuthorizationService>();
             services.TryAddScoped<SecurityDescriptorAuthorizationService>();
             services.TryAddScoped<IPowerShellSecurityDescriptorGenerator, PowerShellSecurityDescriptorGenerator>();
-            services.TryAddSingleton<IDirectory, ActiveDirectory>();
-            services.TryAddSingleton<IDiscoveryServices, DiscoveryServices>();
             services.TryAddScoped<IAuditEventProcessor, AuditEventProcessor>();
             services.TryAddScoped<ITemplateProvider, TemplateProvider>();
             services.TryAddScoped<IRateLimiter, RateLimiter>();
@@ -58,13 +58,15 @@ namespace Lithnet.AccessManager.Service
             services.TryAddScoped<ILithnetAdminPasswordProvider, LithnetAdminPasswordProvider>();
             services.TryAddScoped<IPasswordProvider, PasswordProvider>();
             services.TryAddScoped<IMsMcsAdmPwdProvider, MsMcsAdmPwdProvider>();
-            services.TryAddSingleton<IEncryptionProvider, EncryptionProvider>();
-            services.TryAddSingleton<ICertificateProvider, CertificateProvider>();
             services.TryAddScoped<IAuthorizationInformationBuilder, AuthorizationInformationBuilder>();
             services.TryAddScoped<ITargetDataProvider, TargetDataProvider>();
             services.TryAddScoped<IBitLockerRecoveryPasswordProvider, BitLockerRecoveryPasswordProvider>();
             services.TryAddScoped<IComputerTargetProvider, ComputerTargetProvider>();
 
+            services.TryAddSingleton<IDirectory, ActiveDirectory>();
+            services.TryAddSingleton<IDiscoveryServices, DiscoveryServices>();
+            services.TryAddSingleton<IEncryptionProvider, EncryptionProvider>();
+            services.TryAddSingleton<ICertificateProvider, CertificateProvider>();
             services.TryAddSingleton<IAppPathProvider, WebAppPathProvider>();
             services.TryAddSingleton(RandomNumberGenerator.Create());
             services.TryAddSingleton<IJitAccessGroupResolver, JitAccessGroupResolver>();
@@ -78,6 +80,10 @@ namespace Lithnet.AccessManager.Service
             services.TryAddSingleton<IProtectedSecretProvider, ProtectedSecretProvider>();
             services.TryAddSingleton<IRegistryProvider>(new RegistryProvider(false));
             services.TryAddSingleton<ILicenseDataProvider, OptionsMonitorLicenseDataProvider>();
+            services.TryAddSingleton<ICertificateSynchronizationProvider, CertificateSynchronizationProvider>();
+            services.TryAddSingleton<IWindowsServiceProvider, WindowsServiceProvider>();
+            services.TryAddSingleton<ICertificatePermissionProvider, CertificatePermissionProvider>();
+            services.TryAddSingleton<ILocalSam, LocalSam>();
 
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();
@@ -105,12 +111,13 @@ namespace Lithnet.AccessManager.Service
             services.Configure<ForwardedHeadersAppOptions>(Configuration.GetSection("ForwardedHeaders"));
             services.Configure<JitConfigurationOptions>(Configuration.GetSection("JitConfiguration"));
             services.Configure<LicensingOptions>(Configuration.GetSection("Licensing"));
+            services.Configure<DataProtectionOptions>(Configuration.GetSection("DataProtection"));
 
             this.ConfigureAuthentication(services);
             this.ConfigureAuthorization(services);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<ForwardedHeadersAppOptions> fwdOptions, IOptions<ConfigurationMetadata> metadata, ILicenseManager licenseManager, ILogger<Startup> logger)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<ForwardedHeadersAppOptions> fwdOptions, IOptions<ConfigurationMetadata> metadata, ILicenseManager licenseManager, ILogger<Startup> logger, IRegistryProvider registryProvider, ICertificateSynchronizationProvider certificateSynchronizationProvider)
         {
             metadata.Value.ValidateMetadata();
 
@@ -166,6 +173,15 @@ namespace Lithnet.AccessManager.Service
             else
             {
                 logger.LogInformation("Starting Lithnet Access Manager Standard Edition");
+            }
+
+            try
+            {
+                certificateSynchronizationProvider.ImportCertificatesFromConfig();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(EventIDs.CertificateSynchronizationImportError, ex, "Could not import from synchronization store");
             }
         }
 

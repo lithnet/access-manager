@@ -24,6 +24,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         HighAvailabilityOptions HighAvailability { get; set; }
 
+        DataProtectionOptions DataProtection { get; set; }
+
         JitConfigurationOptions JitConfiguration { get; set; }
 
         void Save(string file);

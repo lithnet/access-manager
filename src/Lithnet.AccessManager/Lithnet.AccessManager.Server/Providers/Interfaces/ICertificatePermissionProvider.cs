@@ -7,6 +7,8 @@ namespace Lithnet.AccessManager.Server
 {
     public interface ICertificatePermissionProvider
     {
+        void AddReadPermission(X509Certificate2 certificate);
+
         void AddReadPermission(X509Certificate2 certificate, IdentityReference identity);
 
         void AddReadPermission(X509Store store, IdentityReference identity);

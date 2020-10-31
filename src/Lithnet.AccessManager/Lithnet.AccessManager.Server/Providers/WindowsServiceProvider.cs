@@ -1,22 +1,29 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Enterprise;
-using Lithnet.AccessManager.Server.UI.Interop;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 
-namespace Lithnet.AccessManager.Server.UI
+namespace Lithnet.AccessManager.Server
 {
     public class WindowsServiceProvider : IWindowsServiceProvider
     {
+        private const uint SERVICE_NO_CHANGE = 0xffffffff;
+
         private readonly IClusterProvider clusterProvider;
         private readonly ILogger<WindowsServiceProvider> logger;
         private readonly ServiceController serviceController = new ServiceController(AccessManager.Constants.ServiceName);
+        private const string serviceSidString = "S-1-5-80-125788923-1836679867-2653951330-153436886-93372159";
 
-        public ServiceControllerStatus Status 
+        [DllImport("advapi32.dll", SetLastError = true)]
+        private static extern bool ChangeServiceConfig(IntPtr hService, uint nServiceType, uint nStartType, uint nErrorControl, string lpBinaryPathName, string lpLoadOrderGroup, IntPtr lpdwTagId, string pDependencies, string lpServiceStartName, string lpPassword, string lpDisplayName);
+
+        public ServiceControllerStatus Status
         {
             get
             {
@@ -30,6 +37,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.clusterProvider = clusterProvider;
             this.logger = logger;
         }
+
+        public SecurityIdentifier ServiceSid { get; } = new SecurityIdentifier(serviceSidString);
 
         public SecurityIdentifier GetServiceAccount()
         {
@@ -53,7 +62,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public void SetServiceAccount(string username, string password)
         {
-            NativeMethods.ChangeServiceCredentials(AccessManager.Constants.ServiceName, username, password);
+            ChangeServiceCredentials(Constants.ServiceName, username, password);
         }
 
         public async Task WaitForStatus(ServiceControllerStatus status)
@@ -102,6 +111,16 @@ namespace Lithnet.AccessManager.Server.UI
             }
 
             await this.serviceController.WaitForStatusAsync(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30), CancellationToken.None);
+        }
+
+        private static void ChangeServiceCredentials(string serviceName, string username, string password)
+        {
+            ServiceController controller = new ServiceController(serviceName);
+
+            if (!ChangeServiceConfig(controller.ServiceHandle.DangerousGetHandle(), SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, null, null, IntPtr.Zero, null, username, password, null))
+            {
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
         }
     }
 }

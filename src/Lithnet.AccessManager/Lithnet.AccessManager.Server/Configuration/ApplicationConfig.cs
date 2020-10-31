@@ -27,6 +27,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public HighAvailabilityOptions HighAvailability { get; set; } = new HighAvailabilityOptions();
 
+        public DataProtectionOptions DataProtection { get; set; } = new DataProtectionOptions();
+
         public JitConfigurationOptions JitConfiguration { get; set; } = new JitConfigurationOptions();
 
         [JsonExtensionData]

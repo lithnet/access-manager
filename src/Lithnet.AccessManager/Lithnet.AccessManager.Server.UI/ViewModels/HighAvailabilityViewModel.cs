@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
+using System.Text;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
@@ -11,6 +15,7 @@ using MahApps.Metro.IconPacks;
 using Microsoft.Extensions.Logging;
 using PropertyChanged;
 using Stylet;
+using Vanara.PInvoke;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -29,8 +34,10 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IProtectedSecretProvider secretProvider;
         private readonly IRegistryProvider registryProvider;
         private readonly ILicenseDataProvider licenseProvider;
+        private readonly DataProtectionOptions dataProtectionOptions;
+        private readonly ICertificateSynchronizationProvider certSyncProvider;
 
-        public HighAvailabilityViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, ILicenseManager licenseManager, ILogger<HighAvailabilityViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certificateProvider, IWindowsServiceProvider windowsServiceProvider, HighAvailabilityOptions highAvailabilityOptions, ICertificatePermissionProvider certPermissionProvider, EmailOptions emailOptions, AuthenticationOptions authnOptions, IProtectedSecretProvider secretProvider, IRegistryProvider registryProvider, ILicenseDataProvider licenseProvider)
+        public HighAvailabilityViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, ILicenseManager licenseManager, ILogger<HighAvailabilityViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certificateProvider, IWindowsServiceProvider windowsServiceProvider, HighAvailabilityOptions highAvailabilityOptions, ICertificatePermissionProvider certPermissionProvider, EmailOptions emailOptions, AuthenticationOptions authnOptions, IProtectedSecretProvider secretProvider, IRegistryProvider registryProvider, ILicenseDataProvider licenseProvider, DataProtectionOptions dataProtectionOptions, ICertificateSynchronizationProvider certSyncProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.licenseManager = licenseManager;
@@ -44,6 +51,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.secretProvider = secretProvider;
             this.registryProvider = registryProvider;
             this.licenseProvider = licenseProvider;
+            this.dataProtectionOptions = dataProtectionOptions;
+            this.certSyncProvider = certSyncProvider;
             this.dialogCoordinator = dialogCoordinator;
 
             this.licenseProvider.OnLicenseDataChanged += delegate
@@ -110,7 +119,7 @@ namespace Lithnet.AccessManager.Server.UI
         }
 
         public bool CanTestConnectionString => this.UseSqlServer && !string.IsNullOrWhiteSpace(this.ConnectionString);
-        
+
         public void TestConnectionString()
         {
 
@@ -208,6 +217,7 @@ namespace Lithnet.AccessManager.Server.UI
                 if (response == null)
                 {
                     this.emailOptions.Password = oldEmailOptionsPassword;
+
                     return false;
                 }
 
@@ -222,6 +232,7 @@ namespace Lithnet.AccessManager.Server.UI
                 {
                     this.emailOptions.Password = oldEmailOptionsPassword;
                     this.authnOptions.Oidc.Secret = oldOidcSecret;
+
                     return false;
                 }
 
@@ -237,6 +248,7 @@ namespace Lithnet.AccessManager.Server.UI
             try
             {
                 string rawEmail = this.secretProvider.UnprotectSecret(secret);
+
                 return this.secretProvider.ProtectSecret(rawEmail);
             }
             catch (Exception ex)
@@ -282,6 +294,7 @@ namespace Lithnet.AccessManager.Server.UI
                     {
                         this.IsClusterEncryptionKeyPresent = true;
                         this.Certificate = certificate;
+
                         return;
                     }
                 }
@@ -324,6 +337,7 @@ namespace Lithnet.AccessManager.Server.UI
                         if (!await this.TryChangeOverCertificate(newCert, false))
                         {
                             store.Remove(newCert);
+
                             return;
                         }
 
@@ -335,6 +349,20 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 logger.LogError(EventIDs.UIGenericError, ex, "Could not import key");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not import the key\r\n{ex.Message}");
+            }
+        }
+
+        public async Task SynchronizeSecrets()
+        {
+            try
+            {
+                this.certSyncProvider.ExportCertificatesToConfig();
+                this.certSyncProvider.ImportCertificatesFromConfig();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(EventIDs.UIGenericError, ex, "Could not synchronize secrets");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Unable to complete the synchronization process\r\n{ex.Message}");
             }
         }
     }

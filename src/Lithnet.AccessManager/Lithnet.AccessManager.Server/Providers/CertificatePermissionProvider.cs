@@ -9,6 +9,22 @@ namespace Lithnet.AccessManager.Server
 {
     public class CertificatePermissionProvider : ICertificatePermissionProvider
     {
+        private readonly IWindowsServiceProvider windowsServiceProvider;
+        private readonly ILocalSam localSam;
+
+        public CertificatePermissionProvider(IWindowsServiceProvider windowsServiceProvider, ILocalSam localSam)
+        {
+            this.windowsServiceProvider = windowsServiceProvider;
+            this.localSam = localSam;
+        }
+
+        public void AddReadPermission(X509Certificate2 certificate)
+        {
+            //this.AddReadPermission(certificate, windowsServiceProvider.GetServiceAccount());
+            this.AddReadPermission(certificate, windowsServiceProvider.ServiceSid);
+            this.AddReadPermission(certificate, new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, localSam.GetLocalMachineAuthoritySid(Environment.MachineName)));
+        }
+
         public void AddReadPermission(X509Certificate2 certificate, IdentityReference identity)
         {
             this.AddReadPermission(certificate, identity, out _);

@@ -19,10 +19,10 @@
     <ROW Property="IAgree" Value="Yes" Type="4" MsiKey="IAgree"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{3D780287-79DC-4E06-A486-6838D1B6D8B6} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{0F9EDD21-EA07-44ED-B49B-4384E6E91C18} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7741.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7761.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
@@ -148,6 +148,9 @@
     <ROW Component="Microsoft.AspNetCore.Authentication.JwtBearer.dll" ComponentId="{4FD6EB23-B4E0-468F-B473-1A7ECA46D615}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Authentication.JwtBearer.dll"/>
     <ROW Component="Microsoft.AspNetCore.Authentication.OpenIdConnect.dll" ComponentId="{7F70E1D2-96B9-45F4-AD57-08DECBDC1612}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Authentication.OpenIdConnect.dll"/>
     <ROW Component="Microsoft.AspNetCore.Authentication.WsFederation.dll" ComponentId="{DCCEEE93-DC46-4E4A-BB00-66C6F4FD09FC}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Authentication.WsFederation.dll"/>
+    <ROW Component="Microsoft.AspNetCore.Cryptography.Internal.dll" ComponentId="{C8B1590F-862C-40FD-9623-D686D2B0A7B6}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Cryptography.Internal.dll"/>
+    <ROW Component="Microsoft.AspNetCore.DataProtection.Abstractions.dll" ComponentId="{AB73D93B-C2F4-43E4-BFE5-05323D28DDAB}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.DataProtection.Abstractions.dll"/>
+    <ROW Component="Microsoft.AspNetCore.DataProtection.dll" ComponentId="{2C2115D3-F758-4B68-B312-937AFF663717}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.DataProtection.dll"/>
     <ROW Component="Microsoft.AspNetCore.Http.Abstractions.dll" ComponentId="{B4982A1D-5B70-49DF-929D-B3F098B1A79F}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Http.Abstractions.dll"/>
     <ROW Component="Microsoft.AspNetCore.Http.Extensions.dll" ComponentId="{EBC0F8D4-052C-417B-976F-B20D8B18A6E9}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Http.Extensions.dll"/>
     <ROW Component="Microsoft.AspNetCore.Http.Features.dll" ComponentId="{D0EA37FD-09D8-4E34-A4EE-521869F398DF}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Http.Features.dll"/>
@@ -908,7 +911,6 @@
     <ROW File="fasolid900.woff2" Component_="fabrands400.eot" FileName="FA-SOL~2.WOF|fa-solid-900.woff2" Attributes="0" SourcePath="output\wwwroot\lib\font-awesome\webfonts\fa-solid-900.woff2" SelfReg="false"/>
     <ROW File="jquery.min.js" Component_="jquery.min.js" FileName="JQUERY~1.JS|jquery.min.js" Attributes="0" SourcePath="output\wwwroot\lib\jquery\jquery.min.js" SelfReg="false"/>
     <ROW File="jquery.min.map" Component_="jquery.min.js" FileName="JQUERY~1.MAP|jquery.min.map" Attributes="0" SourcePath="output\wwwroot\lib\jquery\jquery.min.map" SelfReg="false"/>
-    <ROW File="license.dat" Component_="Lithnet.AccessManager.Server.UI.deps.json" FileName="license.dat" Attributes="0" SourcePath="output\license.dat" SelfReg="false"/>
     <ROW File="MessagePack.Annotations.dll" Component_="MessagePack.Annotations.dll" FileName="MESSAG~1.DLL|MessagePack.Annotations.dll" Attributes="0" SourcePath="output\MessagePack.Annotations.dll" SelfReg="false"/>
     <ROW File="MessagePack.dll" Component_="MessagePack.dll" FileName="MESSAG~2.DLL|MessagePack.dll" Attributes="0" SourcePath="output\MessagePack.dll" SelfReg="false"/>
     <ROW File="Microsoft.Bcl.AsyncInterfaces.dll" Component_="Microsoft.Bcl.AsyncInterfaces.dll" FileName="MICRO~64.DLL|Microsoft.Bcl.AsyncInterfaces.dll" Attributes="0" SourcePath="output\Microsoft.Bcl.AsyncInterfaces.dll" SelfReg="false"/>
@@ -918,6 +920,10 @@
     <ROW File="Nerdbank.Streams.dll" Component_="Nerdbank.Streams.dll" FileName="NERDBA~1.DLL|Nerdbank.Streams.dll" Attributes="0" SourcePath="output\Nerdbank.Streams.dll" SelfReg="false"/>
     <ROW File="StreamJsonRpc.dll" Component_="StreamJsonRpc.dll" FileName="STREAM~1.DLL|StreamJsonRpc.dll" Attributes="0" SourcePath="output\StreamJsonRpc.dll" SelfReg="false"/>
     <ROW File="System.IO.Pipelines.dll" Component_="System.IO.Pipelines.dll" FileName="SYSTE~35.DLL|System.IO.Pipelines.dll" Attributes="0" SourcePath="output\System.IO.Pipelines.dll" SelfReg="false"/>
+    <ROW File="Microsoft.AspNetCore.Cryptography.Internal.dll" Component_="Microsoft.AspNetCore.Cryptography.Internal.dll" FileName="MICRO~67.DLL|Microsoft.AspNetCore.Cryptography.Internal.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.Cryptography.Internal.dll" SelfReg="false"/>
+    <ROW File="Microsoft.AspNetCore.DataProtection.Abstractions.dll" Component_="Microsoft.AspNetCore.DataProtection.Abstractions.dll" FileName="MICRO~68.DLL|Microsoft.AspNetCore.DataProtection.Abstractions.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.DataProtection.Abstractions.dll" SelfReg="false"/>
+    <ROW File="Microsoft.AspNetCore.DataProtection.dll" Component_="Microsoft.AspNetCore.DataProtection.dll" FileName="MICRO~69.DLL|Microsoft.AspNetCore.DataProtection.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.DataProtection.dll" SelfReg="false"/>
+    <ROW File="license.dat" Component_="Lithnet.AccessManager.Server.UI.deps.json" FileName="license.dat" Attributes="0" SourcePath="output\license.dat" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.custcomp.AiControlConditionAliasComponent">
     <ROW AliasRowId="ExitDialog#LaunchProdCheckBox#Hide#((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))" AliasRowOperation="2" Condition="(((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))) OR NOT IS_STANDALONE_OR_NOT_CLUSTERED_OR_ON_ACTIVE_NODE"/>
@@ -1600,6 +1606,9 @@
     <ROW Feature_="MainFeature" Component_="Nerdbank.Streams.dll"/>
     <ROW Feature_="MainFeature" Component_="StreamJsonRpc.dll"/>
     <ROW Feature_="MainFeature" Component_="System.IO.Pipelines.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Cryptography.Internal.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.DataProtection.Abstractions.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.DataProtection.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>

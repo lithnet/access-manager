@@ -165,6 +165,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<JitConfigurationOptions>().ToInstance(appconfig.JitConfiguration);
                 builder.Bind<LicensingOptions>().ToInstance(appconfig.Licensing);
                 builder.Bind<HighAvailabilityOptions>().ToInstance(appconfig.HighAvailability);
+                builder.Bind<DataProtectionOptions>().ToInstance(appconfig.DataProtection);
 
                 // ViewModel factories
                 builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
@@ -213,6 +214,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IScriptTemplateProvider>().To<ScriptTemplateProvider>();
                 builder.Bind<IRegistryProvider>().ToInstance(registryProvider);
                 builder.Bind<ICertificatePermissionProvider>().To<CertificatePermissionProvider>();
+                builder.Bind<ICertificateSynchronizationProvider>().To<CertificateSynchronizationProvider>();
 
                 builder.Bind<IProtectedSecretProvider>().To<ProtectedSecretProvider>().InSingletonScope();
                 builder.Bind<IClusterProvider>().To<ClusterProvider>().InSingletonScope();
@@ -227,7 +229,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind(typeof(ILogger<>)).To(typeof(Logger<>));
                 builder.Bind(typeof(IOptions<>)).To(typeof(OptionsWrapper<>)).InSingletonScope();
                 builder.Bind(typeof(IOptionsSnapshot<>)).To(typeof(OptionsManager<>));
-                builder.Bind(typeof(IOptionsMonitor<>)).To(typeof(OptionsMonitor<>)).InSingletonScope();
+                //builder.Bind(typeof(IOptionsMonitor<>)).To(typeof(OptionsMonitor<>)).InSingletonScope();
                 builder.Bind(typeof(IOptionsFactory<>)).To(typeof(OptionsFactory<>));
                 builder.Bind(typeof(IOptionsMonitorCache<>)).To(typeof(OptionsCache<>)).InSingletonScope();
 
