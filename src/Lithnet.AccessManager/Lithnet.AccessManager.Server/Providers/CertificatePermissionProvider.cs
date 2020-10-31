@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
+using Lithnet.Security.Authorization;
 
 namespace Lithnet.AccessManager.Server
 {
@@ -66,6 +67,19 @@ namespace Lithnet.AccessManager.Server
         {
             X509Store store = X509ServiceStoreHelper.Open(Constants.ServiceName, OpenFlags.ReadOnly);
             this.AddReadPermission(store, identity, rollbackActions);
+        }
+
+        public bool ServiceAccountHasPermission(X509Certificate2 cert)
+        {
+            return this.HasPermission(cert, this.windowsServiceProvider.GetServiceAccount());
+        }
+
+        public bool HasPermission(X509Certificate2 cert, SecurityIdentifier sid)
+        {
+            var security = cert.GetPrivateKeySecurity();
+            using AuthorizationContext c = new AuthorizationContext(sid);
+            GenericSecurityDescriptor sd = new RawSecurityDescriptor(security.GetSecurityDescriptorSddlForm(AccessControlSections.All));
+            return c.AccessCheck(sd, (int)FileSystemRights.Read);
         }
     }
 }

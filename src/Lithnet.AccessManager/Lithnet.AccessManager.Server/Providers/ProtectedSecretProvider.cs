@@ -9,7 +9,6 @@ using System.Text;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using Microsoft.Extensions.Options;
-using Vanara.Extensions;
 using Vanara.InteropServices;
 using Vanara.PInvoke;
 

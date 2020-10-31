@@ -1,31 +1,24 @@
 ﻿using System;
-using System.IO;
-using System.Security.AccessControl;
 using System.Security.Cryptography.X509Certificates;
-using System.Security.Policy;
 using System.Threading.Tasks;
-using Lithnet.Security.Authorization;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Stylet;
-using Vanara.PInvoke;
 
 namespace Lithnet.AccessManager.Server.UI
 {
     public class X509Certificate2ViewModel : PropertyChangedBase
     {
-        private readonly IWindowsServiceProvider windowsServiceProvider;
-
         private readonly ILogger<X509Certificate2ViewModel> logger;
-
         private readonly IDialogCoordinator dialogCoordinator;
+        private readonly ICertificatePermissionProvider certPermissionProvider;
 
-        public X509Certificate2ViewModel(X509Certificate2 model, IWindowsServiceProvider windowsServiceProvider, ILogger<X509Certificate2ViewModel> logger, IDialogCoordinator dialogCoordinator)
+        public X509Certificate2ViewModel(X509Certificate2 model, ILogger<X509Certificate2ViewModel> logger, IDialogCoordinator dialogCoordinator, ICertificatePermissionProvider certPermissionProvider)
         {
             this.Model = model;
-            this.windowsServiceProvider = windowsServiceProvider;
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
+            this.certPermissionProvider = certPermissionProvider;
             this.CheckCertificatePermissions();
         }
 
@@ -59,9 +52,9 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                this.Model.AddPrivateKeyReadPermission(this.windowsServiceProvider.GetServiceAccount());
+                this.certPermissionProvider.AddReadPermission(this.Model);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Could not set permissions on the private key");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not set permissions on the private key\r\n{ex.Message}");
@@ -84,10 +77,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             try
             {
-                var security = this.Model.GetPrivateKeySecurity();
-                using AuthorizationContext c = new AuthorizationContext(this.windowsServiceProvider.GetServiceAccount());
-                GenericSecurityDescriptor sd = new RawSecurityDescriptor(security.GetSecurityDescriptorSddlForm(AccessControlSections.All));
-                this.HasPermission = c.AccessCheck(sd, (int)FileSystemRights.Read);
+                this.HasPermission = this.certPermissionProvider.ServiceAccountHasPermission(this.Model);
                 this.HasNoPermission = !this.HasPermission;
             }
             catch (Exception ex)

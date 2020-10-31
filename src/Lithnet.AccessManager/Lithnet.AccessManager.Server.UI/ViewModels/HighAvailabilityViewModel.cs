@@ -125,85 +125,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         }
 
-        public async Task ClusterEncryptionKeyGenerate()
-        {
-            if (this.Certificate != null)
-            {
-                if (this.dialogCoordinator.ShowModalMessageExternal(this, "Confirm", "Are you sure you want to create a new cluster encryption key?", MessageDialogStyle.AffirmativeAndNegative) != MessageDialogResult.Affirmative)
-                {
-                    return;
-                }
-            }
-
-            try
-            {
-                X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert("Lithnet Access Manager cluster encryption", CertificateProvider.LithnetAccessManagerClusterEncryptionEku);
-
-                if (!await this.TryChangeOverCertificate(cert, true))
-                {
-                    return;
-                }
-
-                this.dialogCoordinator.ShowModalMessageExternal(this, "Next steps", "The new encryption key was successfully configured. Please export this certificate and import it into all cluster nodes");
-
-                // TODO contact cluster nodes and send the key
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(EventIDs.UIGenericError, ex, "Could not generate encryption key");
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not generate the key\r\n{ex.Message}");
-            }
-        }
-
-        private async Task<bool> TryChangeOverCertificate(X509Certificate2 cert, bool addtoStore)
-        {
-            ProtectedSecret oldEmailOptionsPassword = this.emailOptions.Password;
-            ProtectedSecret oldOidcSecret = this.authnOptions.Oidc?.Secret;
-            X509Certificate2 oldCertificate = this.Certificate;
-            string oldKey = this.ClusterEncryptionKey;
-            bool hasAddedToStore = false;
-
-            try
-            {
-                if (await this.TryReKeySecretsAsync(cert))
-                {
-                    if (addtoStore)
-                    {
-                        using X509Store store = X509ServiceStoreHelper.Open(AccessManager.Constants.ServiceName, OpenFlags.ReadWrite);
-                        store.Add(cert);
-                        hasAddedToStore = true;
-                    }
-
-                    this.certPermissionProvider.AddReadPermission(cert, this.windowsServiceProvider.GetServiceAccount());
-                    this.Certificate = cert;
-                    this.ClusterEncryptionKey = cert.Thumbprint;
-
-                    return true;
-                }
-            }
-            catch
-            {
-                if (oldOidcSecret != null)
-                {
-                    this.authnOptions.Oidc.Secret = oldOidcSecret;
-                }
-
-                this.emailOptions.Password = oldEmailOptionsPassword;
-
-                this.Certificate = oldCertificate;
-                this.ClusterEncryptionKey = oldKey;
-
-                if (hasAddedToStore)
-                {
-                    using X509Store store = X509ServiceStoreHelper.Open(AccessManager.Constants.ServiceName, OpenFlags.ReadWrite);
-                    store.Remove(cert);
-                }
-
-                throw;
-            }
-
-            return false;
-        }
+        
 
         private async Task<bool> TryReKeySecretsAsync(X509Certificate2 cert)
         {
@@ -318,39 +240,6 @@ namespace Lithnet.AccessManager.Server.UI
         }
 
         public bool CanClusterEncryptionKeyExport => this.Certificate != null;
-
-        public void ClusterEncryptionKeyExport()
-        {
-            NativeMethods.ShowCertificateExportDialog(this.GetHandle(), "Export key", this.Certificate);
-        }
-
-        public async Task ClusterEncryptionKeyImport()
-        {
-            try
-            {
-                using (X509Store store = X509ServiceStoreHelper.Open(AccessManager.Constants.ServiceName, OpenFlags.ReadWrite))
-                {
-                    X509Certificate2 newCert = NativeMethods.ShowCertificateImportDialog(this.GetHandle(), "Import cluster key", store);
-
-                    if (newCert != null)
-                    {
-                        if (!await this.TryChangeOverCertificate(newCert, false))
-                        {
-                            store.Remove(newCert);
-
-                            return;
-                        }
-
-                        this.dialogCoordinator.ShowModalMessageExternal(this, "Import cluster key", "The encryption key was successfully imported. Please ensure you import this certificate on all cluster nodes");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(EventIDs.UIGenericError, ex, "Could not import key");
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not import the key\r\n{ex.Message}");
-            }
-        }
 
         public async Task SynchronizeSecrets()
         {

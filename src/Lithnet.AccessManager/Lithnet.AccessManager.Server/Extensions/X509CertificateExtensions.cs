@@ -11,7 +11,7 @@ namespace Lithnet.AccessManager.Server
     {
         public static FileSecurity GetPrivateKeySecurity(this X509Certificate2 cert)
         {
-            string location = GetKeyLocation(cert);
+            string location = GetPrivateKeyPath(cert);
 
             if (location == null)
             {
@@ -24,7 +24,7 @@ namespace Lithnet.AccessManager.Server
 
         public static void SetPrivateKeySecurity(this X509Certificate2 cert, FileSecurity security)
         {
-            string location = GetKeyLocation(cert);
+            string location = GetPrivateKeyPath(cert);
 
             if (location == null)
             {
@@ -37,7 +37,7 @@ namespace Lithnet.AccessManager.Server
 
         public static void AddPrivateKeyReadPermission(this X509Certificate2 cert, IdentityReference account)
         {
-            string location = GetKeyLocation(cert);
+            string location = GetPrivateKeyPath(cert);
 
             if (location == null)
             {
@@ -48,7 +48,7 @@ namespace Lithnet.AccessManager.Server
             info.AddFileSecurity(account, FileSystemRights.Read, AccessControlType.Allow);
         }
 
-        private static string GetKeyLocation(X509Certificate2 cert)
+        public static string GetPrivateKeyPath(X509Certificate2 cert)
         {
             RSACng cng = cert.PrivateKey as RSACng;
             RSACryptoServiceProvider crypto = cert.PrivateKey as RSACryptoServiceProvider;

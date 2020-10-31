@@ -25,8 +25,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IDiscoveryServices discoveryServices;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
+        private readonly ICertificatePermissionProvider certPermissionProvider;
 
-        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IWindowsServiceProvider windowsServiceProvider, ILogger<LapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IScriptTemplateProvider scriptTemplateProvider)
+        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IWindowsServiceProvider windowsServiceProvider, ILogger<LapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.certificateProvider = certificateProvider;
@@ -41,6 +42,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.Forests = new List<Forest>();
             this.AvailableCertificates = new BindableCollection<X509Certificate2ViewModel>();
             this.DisplayName = "Local admin passwords";
+            this.certPermissionProvider = certPermissionProvider;
         }
 
         public string HelpLink => Constants.HelpLinkPageLocalAdminPasswords;
@@ -151,7 +153,8 @@ namespace Lithnet.AccessManager.Server.UI
 
                 using X509Store store = X509ServiceStoreHelper.Open(AccessManager.Constants.ServiceName, OpenFlags.ReadWrite);
                 store.Add(cert);
-                cert.AddPrivateKeyReadPermission(this.windowsServiceProvider.GetServiceAccount());
+
+                this.certPermissionProvider.AddReadPermission(cert);
 
                 var vm = this.certificate2ViewModelFactory.CreateViewModel(cert);
 
@@ -241,7 +244,10 @@ namespace Lithnet.AccessManager.Server.UI
                 {
                     X509Certificate2 newCert = NativeMethods.ShowCertificateImportDialog(this.GetHandle(), "Import encryption certificate", store);
 
-                    newCert.AddPrivateKeyReadPermission(this.windowsServiceProvider.GetServiceAccount());
+                    if (newCert != null)
+                    {
+                        this.certPermissionProvider.AddReadPermission(newCert);
+                    }
                 }
             }
             catch (Exception ex)

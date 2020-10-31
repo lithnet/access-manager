@@ -68,7 +68,6 @@ namespace Lithnet.AccessManager.Server.UI
             this.Certificate = this.GetCertificate();
             this.OriginalCertificate = this.Certificate;
             this.ServiceAccount = this.windowsServiceProvider.GetServiceAccount();
-            this.OriginalServiceAccount = this.ServiceAccount;
             this.ServiceStatus = this.windowsServiceProvider.Status.ToString();
             this.DisplayName = "Web hosting";
 
@@ -273,9 +272,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         private HostingOptions OriginalModel { get; set; }
 
-        private SecurityIdentifier OriginalServiceAccount { get; set; }
-
-        private HostingOptions WorkingModel { get; set; }
+            private HostingOptions WorkingModel { get; set; }
 
         private string workingServiceAccountPassword { get; set; }
 
@@ -298,17 +295,11 @@ namespace Lithnet.AccessManager.Server.UI
             this.UpdateIsConfigured();
 
             bool currentlyUnconfigured = this.IsUnconfigured;
-
-            bool updatePrivateKeyPermissions =
-                this.ServiceAccount != this.OriginalServiceAccount ||
-                this.Certificate?.Thumbprint != this.OriginalCertificate?.Thumbprint ||
-                currentlyUnconfigured;
-
+         
             bool updateHttpReservations =
                 this.WorkingModel.HttpSys.Hostname != this.OriginalModel.HttpSys.Hostname ||
                 this.WorkingModel.HttpSys.HttpPort != this.OriginalModel.HttpSys.HttpPort ||
                 this.WorkingModel.HttpSys.HttpsPort != this.OriginalModel.HttpSys.HttpsPort ||
-                this.ServiceAccount != this.OriginalServiceAccount ||
                 currentlyUnconfigured;
 
             bool updateConfigFile = updateHttpReservations;
@@ -322,46 +313,8 @@ namespace Lithnet.AccessManager.Server.UI
 
             bool updateServiceAccount = this.workingServiceAccountUserName != null;
 
-            bool updateFileSystemPermissions = updateServiceAccount || currentlyUnconfigured;
-
             HostingSettingsRollbackContext rollbackContext = new HostingSettingsRollbackContext();
             rollbackContext.StartingUnconfigured = currentlyUnconfigured;
-
-            try
-            {
-                if (updatePrivateKeyPermissions)
-                {
-                    this.UpdateCertificatePermissions(rollbackContext);
-                }
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Could not add private key permissions for SSL certificate");
-                MessageDialogResult result = await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred while trying to add permissions for the service account {this.ServiceAccountDisplayName} to read the private key of the specified certificate. Try adding permissions for this manually using the Windows computer certificates MMC console. Do you want to continue with the operation?\r\n{ex.Message}", MessageDialogStyle.AffirmativeAndNegative);
-
-                if (result == MessageDialogResult.Canceled)
-                {
-                    return false;
-                }
-            }
-
-            try
-            {
-                if (updatePrivateKeyPermissions)
-                {
-                    this.UpdateEncryptionCertificateAcls(rollbackContext);
-                }
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Could not add private key permissions for encryption certificate");
-                MessageDialogResult result = await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred while trying to add permissions for the service account {this.ServiceAccountDisplayName} to read the private key of one of the existing password encryption certificates. Try adding permissions for this manually using the Windows service certificates MMC console. Do you want to continue with the operation?\r\n{ex.Message}", MessageDialogStyle.AffirmativeAndNegative);
-
-                if (result == MessageDialogResult.Canceled)
-                {
-                    return false;
-                }
-            }
 
             try
             {
@@ -451,21 +404,6 @@ namespace Lithnet.AccessManager.Server.UI
 
             try
             {
-                if (updateFileSystemPermissions)
-                {
-                    this.UpdateFileSystemPermissions(rollbackContext);
-                }
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Error updating file system permissions");
-                rollbackContext.Rollback(this.logger);
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not update file system permissions\r\n{ex.Message}");
-                return false;
-            }
-
-            try
-            {
                 if (updateServiceAccount)
                 {
                     this.UpdateServiceAccount();
@@ -487,12 +425,10 @@ namespace Lithnet.AccessManager.Server.UI
                 this.UpdateIsConfigured();
             }
 
-            if (updateCertificateBinding || updateHttpReservations || updatePrivateKeyPermissions ||
-                updateServiceAccount || updateConfigFile || updateFirewallRules || updateFileSystemPermissions)
+            if (updateCertificateBinding || updateHttpReservations || updateServiceAccount || updateConfigFile || updateFirewallRules)
             {
                 this.OriginalModel = this.CloneModel(this.WorkingModel);
                 this.OriginalCertificate = this.Certificate;
-                this.OriginalServiceAccount = this.ServiceAccount;
                 this.eventAggregator.Publish(new ModelChangedEvent(this, "Hosting", true));
             }
 
@@ -510,22 +446,6 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.WorkingModel.Save(pathProvider.HostingConfigFile);
             rollback.RollbackActions.Add(() => originalSettings.Save(pathProvider.HostingConfigFile));
-        }
-
-        private void UpdateCertificatePermissions(HostingSettingsRollbackContext rollback)
-        {
-            if (this.Certificate == null)
-            {
-                return;
-            }
-
-            this.certPermissionProvider.AddReadPermission(this.Certificate, this.ServiceAccount, out Action rollbackAction);
-            if (rollbackAction != null)
-            {
-                rollback.RollbackActions.Add(rollbackAction);
-            }
-
-            this.certPermissionProvider.AddReadPermissionToServiceStore(this.ServiceAccount, rollback.RollbackActions);
         }
 
         public async Task DownloadUpdate()
@@ -645,6 +565,7 @@ namespace Lithnet.AccessManager.Server.UI
             if (newCert != null)
             {
                 this.Certificate = newCert;
+                this.certPermissionProvider.AddReadPermission(this.Certificate);
             }
         }
 
@@ -655,6 +576,7 @@ namespace Lithnet.AccessManager.Server.UI
             if (results.Count == 1)
             {
                 this.Certificate = results[0];
+                this.certPermissionProvider.AddReadPermission(this.Certificate);
             }
         }
 
@@ -786,8 +708,7 @@ namespace Lithnet.AccessManager.Server.UI
             CommonSecurityDescriptor sd = new CommonSecurityDescriptor(false, false, acl.Sddl);
             foreach (CommonAce dacl in sd.DiscretionaryAcl.OfType<CommonAce>())
             {
-                if (dacl.SecurityIdentifier == this.ServiceAccount ||
-                    dacl.SecurityIdentifier == this.OriginalServiceAccount)
+                if (dacl.SecurityIdentifier == this.windowsServiceProvider.ServiceSid)
                 {
                     return false;
                 }
@@ -853,13 +774,13 @@ namespace Lithnet.AccessManager.Server.UI
                 rollback.RollbackActions.Add(() => UrlAcl.Create(existingHttpsNew.Prefix, existingHttpsNew.Sddl));
             }
 
-            this.CreateUrlReservation(httpNew, this.ServiceAccount);
+            this.CreateUrlReservation(httpNew, this.windowsServiceProvider.ServiceSid);
             rollback.RollbackActions.Add(() => UrlAcl.Delete(httpNew));
             this.registryProvider.HttpAcl = httpNew;
 
             rollback.RollbackActions.Add(() => this.registryProvider.HttpAcl = httpOld);
 
-            this.CreateUrlReservation(httpsNew, this.ServiceAccount);
+            this.CreateUrlReservation(httpsNew, this.windowsServiceProvider.ServiceSid);
             rollback.RollbackActions.Add(() => UrlAcl.Delete(httpsNew));
             this.registryProvider.HttpsAcl = httpsNew;
             rollback.RollbackActions.Add(() => this.registryProvider.HttpsAcl = httpsOld);
@@ -881,17 +802,6 @@ namespace Lithnet.AccessManager.Server.UI
             }
 
             return null;
-        }
-
-        private void UpdateEncryptionCertificateAcls(HostingSettingsRollbackContext rollback)
-        {
-            foreach (X509Certificate2 cert in this.certProvider.GetEligiblePasswordEncryptionCertificates(true))
-            {
-                FileSecurity originalCertificateSecurity = cert.GetPrivateKeySecurity();
-
-                cert.AddPrivateKeyReadPermission(this.ServiceAccount);
-                rollback.RollbackActions.Add(() => cert.SetPrivateKeySecurity(originalCertificateSecurity));
-            }
         }
 
         private X509Certificate2Collection GetAvailableCertificateCollection()
@@ -1067,15 +977,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.registryProvider.CertBinding = binding.IpPort.ToString();
             rollback.RollbackActions.Add(() => this.registryProvider.CertBinding = originalBinding?.IpPort?.ToString());
         }
-
-        private void UpdateFileSystemPermissions(HostingSettingsRollbackContext rollback)
-        {
-            DirectoryInfo di = new DirectoryInfo(this.registryProvider.LogPath);
-            DirectorySecurity originalSecurity = di.GetAccessControl();
-            di.AddDirectorySecurity(this.ServiceAccount, FileSystemRights.Modify, AccessControlType.Allow);
-            rollback.RollbackActions.Add(() => di.SetAccessControl(originalSecurity));
-        }
-
+     
         private CertificateBinding GetCertificateBinding(CertificateBindingConfiguration config)
         {
             foreach (CertificateBinding binding in config.Query())

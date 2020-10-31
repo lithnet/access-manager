@@ -20,5 +20,7 @@ namespace Lithnet.AccessManager.Server
         void AddReadPermission(X509Store store, IdentityReference identity, List<Action> rollbackActions);
 
         void AddReadPermissionToServiceStore(IdentityReference identity, List<Action> rollbackActions);
+        bool ServiceAccountHasPermission(X509Certificate2 cert);
+        bool HasPermission(X509Certificate2 cert, SecurityIdentifier sid);
     }
 }
