@@ -68,6 +68,30 @@ namespace Lithnet.AccessManager.Server.UI
 
             return this.ShowDialog(owner, scope, targetServer, out sid);
         }
+        
+        public bool GetUserOrServiceAccount (IViewAware owner, out SecurityIdentifier sid)
+        {
+            return this.GetUserOrServiceAccount(owner, null, out sid);
+        }
+
+        public bool GetUserOrServiceAccount(IViewAware owner, string targetServer, out SecurityIdentifier sid)
+        {
+            DsopScopeInitInfo scope = new DsopScopeInitInfo
+            {
+                Filter = new DsFilterFlags
+                {
+                    UpLevel =
+                    {
+                        BothModeFilter = DsopObjectFilterFlags.DSOP_FILTER_USERS | DsopObjectFilterFlags.DSOP_FILTER_SERVICE_ACCOUNTS
+                    }
+                },
+                ScopeType = DsopScopeTypeFlags.DSOP_SCOPE_TYPE_ENTERPRISE_DOMAIN | DsopScopeTypeFlags.DSOP_SCOPE_TYPE_USER_ENTERED_UPLEVEL_SCOPE | DsopScopeTypeFlags.DSOP_SCOPE_TYPE_EXTERNAL_UPLEVEL_DOMAIN,
+                InitInfo = DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_USERS | DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_DEFAULT_FILTER_SERVICE_ACCOUNTS | DsopScopeInitInfoFlags.DSOP_SCOPE_FLAG_STARTING_SCOPE
+            };
+
+            return this.ShowDialog(owner, scope, targetServer, out sid);
+        }
+
 
         public bool GetUsers(IViewAware owner, string targetServer, out List<SecurityIdentifier> sid)
         {

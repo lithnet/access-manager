@@ -72,6 +72,7 @@
     <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.7.0" />
     <PackageReference Include="system.serviceprocess.servicecontroller" Version="4.7.0" />
     <PackageReference Include="vanara.pinvoke.cryptography" Version="3.2.20" />
+    <PackageReference Include="vanara.security" Version="3.2.20" />
     <PackageReference Include="WindowsFirewallHelper" Version="1.6.3.40" />
   </ItemGroup>
 

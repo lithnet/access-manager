@@ -12,5 +12,7 @@ namespace Lithnet.AccessManager.Server.Configuration
         public string Data { get; set; }
 
         public ProtectedSecret Secret { get; set; }
+
+        public CertificateOperation Operation { get; set; }
     }
 }

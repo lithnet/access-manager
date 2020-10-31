@@ -79,6 +79,7 @@
         public const int ResourceReadError = 5036;
         public const int CertificateSynchronizationImportError = 5037;
         public const int CertificateSynchronizationExportError = 5038;
+        public const int CertificateSynchronizationExportWarningNoPrivateKey = 5039;
 
         // 6000 range - Reserved 
 

@@ -10,8 +10,10 @@ using System.Threading.Tasks;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
+using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
+using Markdig.Extensions.TaskLists;
 using Microsoft.Extensions.Logging;
 using PropertyChanged;
 using Stylet;
@@ -25,35 +27,25 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly ILicenseManager licenseManager;
         private readonly ILogger<HighAvailabilityViewModel> logger;
-        private readonly ICertificateProvider certificateProvider;
-        private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly HighAvailabilityOptions highAvailabilityOptions;
-        private readonly ICertificatePermissionProvider certPermissionProvider;
-        private readonly EmailOptions emailOptions;
-        private readonly AuthenticationOptions authnOptions;
         private readonly IProtectedSecretProvider secretProvider;
-        private readonly IRegistryProvider registryProvider;
         private readonly ILicenseDataProvider licenseProvider;
         private readonly DataProtectionOptions dataProtectionOptions;
         private readonly ICertificateSynchronizationProvider certSyncProvider;
+        private readonly ISecretRekeyProvider rekeyProvider;
 
-        public HighAvailabilityViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, ILicenseManager licenseManager, ILogger<HighAvailabilityViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certificateProvider, IWindowsServiceProvider windowsServiceProvider, HighAvailabilityOptions highAvailabilityOptions, ICertificatePermissionProvider certPermissionProvider, EmailOptions emailOptions, AuthenticationOptions authnOptions, IProtectedSecretProvider secretProvider, IRegistryProvider registryProvider, ILicenseDataProvider licenseProvider, DataProtectionOptions dataProtectionOptions, ICertificateSynchronizationProvider certSyncProvider)
+        public HighAvailabilityViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, ILicenseManager licenseManager, ILogger<HighAvailabilityViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, HighAvailabilityOptions highAvailabilityOptions, IProtectedSecretProvider secretProvider, ILicenseDataProvider licenseProvider, DataProtectionOptions dataProtectionOptions, ICertificateSynchronizationProvider certSyncProvider, ISecretRekeyProvider rekeyProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.licenseManager = licenseManager;
             this.logger = logger;
-            this.certificateProvider = certificateProvider;
-            this.windowsServiceProvider = windowsServiceProvider;
             this.highAvailabilityOptions = highAvailabilityOptions;
-            this.certPermissionProvider = certPermissionProvider;
-            this.emailOptions = emailOptions;
-            this.authnOptions = authnOptions;
             this.secretProvider = secretProvider;
-            this.registryProvider = registryProvider;
             this.licenseProvider = licenseProvider;
             this.dataProtectionOptions = dataProtectionOptions;
             this.certSyncProvider = certSyncProvider;
             this.dialogCoordinator = dialogCoordinator;
+            this.rekeyProvider = rekeyProvider;
 
             this.licenseProvider.OnLicenseDataChanged += delegate
             {
@@ -63,7 +55,8 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.DisplayName = "High availability";
             eventPublisher.Register(this);
-            _ = this.RefreshAvailableCertificates();
+
+            this.isClusterCompatibleSecretEncryptionEnabled = this.dataProtectionOptions.EnableClusterCompatibleSecretEncryption;
         }
 
         public string HelpLink => Constants.HelpLinkPageBitLocker;
@@ -83,17 +76,6 @@ namespace Lithnet.AccessManager.Server.UI
         public bool IsEnterpriseEdition => this.licenseManager.IsEnterpriseEdition();
 
         public bool ShowEnterpriseEditionBanner => this.licenseManager.IsEvaulatingOrBuiltIn() || !this.licenseManager.IsEnterpriseEdition();
-
-        [NotifyModelChangedProperty]
-        public string ClusterEncryptionKey
-        {
-            get => this.registryProvider.ServiceKeyThumbprint;
-            set => this.registryProvider.ServiceKeyThumbprint = value;
-        }
-
-        public bool IsClusterEncryptionKeyPresent { get; set; }
-
-        public bool IsClusterEncryptionKeyMissing { get; set; }
 
         [NotifyModelChangedProperty]
         [AlsoNotifyFor(nameof(UseSqlServer))]
@@ -118,128 +100,55 @@ namespace Lithnet.AccessManager.Server.UI
             set => this.highAvailabilityOptions.DbConnectionString = value;
         }
 
+        [NotifyModelChangedProperty]
+        public bool IsCertificateSynchronizationEnabled
+        {
+            get => this.dataProtectionOptions.EnableCertificateSynchronization;
+            set => this.dataProtectionOptions.EnableCertificateSynchronization = value;
+        }
+
+
+        private bool isClusterCompatibleSecretEncryptionEnabled;
+
+        [NotifyModelChangedProperty]
+        public bool IsClusterCompatibleSecretEncryptionEnabled
+        {
+            get => isClusterCompatibleSecretEncryptionEnabled;
+            set => isClusterCompatibleSecretEncryptionEnabled = value;      
+        }
+
+        public void OnIsClusterCompatibleSecretEncryptionEnabledChanged()
+        {
+            _ = Task.Run(async () =>
+              {
+                  try
+                  {
+                      var previous = this.dataProtectionOptions.EnableClusterCompatibleSecretEncryption;
+                      this.dataProtectionOptions.EnableClusterCompatibleSecretEncryption = this.isClusterCompatibleSecretEncryptionEnabled;
+
+                      var result = await this.rekeyProvider.TryReKeySecretsAsync(this);
+
+                      if (!result)
+                      {
+                          this.isClusterCompatibleSecretEncryptionEnabled = previous;
+                          this.dataProtectionOptions.EnableClusterCompatibleSecretEncryption = previous;
+                          this.NotifyOfPropertyChange(nameof(IsClusterCompatibleSecretEncryptionEnabled));
+                      }
+                  }
+                  catch (Exception ex)
+                  {
+                      logger.LogError(EventIDs.UIGenericError, ex, "Could not re-key secrets");
+                      await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Unable to re-key the application secrets\r\n{ex.Message}");
+                  }
+              });
+        }
+
         public bool CanTestConnectionString => this.UseSqlServer && !string.IsNullOrWhiteSpace(this.ConnectionString);
 
         public void TestConnectionString()
         {
 
         }
-
-        
-
-        private async Task<bool> TryReKeySecretsAsync(X509Certificate2 cert)
-        {
-            ProtectedSecret oldEmailOptionsPassword = this.emailOptions.Password;
-            ProtectedSecret oldOidcSecret = this.authnOptions.Oidc?.Secret;
-
-            if (this.emailOptions.Password != null)
-            {
-                ProtectedSecret response = await this.TryReKeySecretsAsync(this.emailOptions.Password, "SMTP password", cert);
-
-                if (response == null)
-                {
-                    this.emailOptions.Password = oldEmailOptionsPassword;
-
-                    return false;
-                }
-
-                this.emailOptions.Password = response;
-            }
-
-            if (this.authnOptions.Oidc?.Secret != null)
-            {
-                ProtectedSecret response = await this.TryReKeySecretsAsync(this.authnOptions.Oidc.Secret, "OpenID Connect secret", cert);
-
-                if (response == null)
-                {
-                    this.emailOptions.Password = oldEmailOptionsPassword;
-                    this.authnOptions.Oidc.Secret = oldOidcSecret;
-
-                    return false;
-                }
-
-                this.authnOptions.Oidc.Secret = response;
-            }
-
-            return true;
-
-        }
-
-        private async Task<ProtectedSecret> TryReKeySecretsAsync(ProtectedSecret secret, string name, X509Certificate2 cert)
-        {
-            try
-            {
-                string rawEmail = this.secretProvider.UnprotectSecret(secret);
-
-                return this.secretProvider.ProtectSecret(rawEmail);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(EventIDs.UIGenericError, ex, $"Unable to re-encrypt {name}");
-
-                LoginDialogData data = await this.dialogCoordinator.ShowLoginAsync(this, "Error", $"The {name} could not be automatically re-encrypted. Please re-enter the {name}",
-                                                                                   new LoginDialogSettings
-                                                                                   {
-                                                                                       ShouldHideUsername = true,
-                                                                                       RememberCheckBoxVisibility = System.Windows.Visibility.Hidden,
-                                                                                       AffirmativeButtonText = "OK",
-                                                                                       NegativeButtonVisibility = System.Windows.Visibility.Visible,
-                                                                                       NegativeButtonText = "Cancel"
-                                                                                   });
-
-                if (data != null)
-                {
-                    return this.secretProvider.ProtectSecret(data.Password, cert);
-                }
-            }
-
-            return null;
-        }
-
-        private async Task RefreshAvailableCertificates()
-        {
-            this.IsClusterEncryptionKeyMissing = false;
-            this.IsClusterEncryptionKeyPresent = false;
-
-            if (this.ClusterEncryptionKey == null)
-            {
-                return;
-            }
-
-            try
-            {
-                IEnumerable<X509Certificate2> allCertificates = certificateProvider.GetEligibleClusterEncryptionCertificates(true).OfType<X509Certificate2>();
-
-                foreach (X509Certificate2 certificate in allCertificates)
-                {
-                    if (string.Equals(certificate.Thumbprint, this.ClusterEncryptionKey, StringComparison.OrdinalIgnoreCase))
-                    {
-                        this.IsClusterEncryptionKeyPresent = true;
-                        this.Certificate = certificate;
-
-                        return;
-                    }
-                }
-
-                this.IsClusterEncryptionKeyMissing = true;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(EventIDs.UIGenericError, ex, "Could not load certificate list");
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not refresh the certificate list\r\n{ex.Message}");
-            }
-        }
-
-        private X509Certificate2 Certificate { get; set; }
-
-        public bool CanShowCertificateDialog => this.Certificate != null;
-
-        public void ShowCertificateDialog()
-        {
-            X509Certificate2UI.DisplayCertificate(this.Certificate, this.GetHandle());
-        }
-
-        public bool CanClusterEncryptionKeyExport => this.Certificate != null;
 
         public async Task SynchronizeSecrets()
         {

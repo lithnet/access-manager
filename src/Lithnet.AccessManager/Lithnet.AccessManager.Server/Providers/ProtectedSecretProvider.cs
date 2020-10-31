@@ -18,6 +18,7 @@ namespace Lithnet.AccessManager.Server
     {
         private const int ReadPublicAndPrivateKey = 0x3;
         private const int ReadPublicKey = 0x2;
+
         private readonly ICertificateProvider certificateProvider;
         private readonly DataProtectionOptions dataProtectionOptions;
         private readonly IEncryptionProvider encryptionProvider;
@@ -42,16 +43,16 @@ namespace Lithnet.AccessManager.Server
 
             sd.DiscretionaryAcl.AddAccess(AccessControlType.Allow, this.windowsServiceProvider.GetServiceAccount(), ReadPublicAndPrivateKey, InheritanceFlags.None, PropagationFlags.None);
 
-            if (!string.IsNullOrWhiteSpace(dataProtectionOptions.SecretManager))
+            if (!string.IsNullOrWhiteSpace(dataProtectionOptions.AuthorizedSecretReaders))
             {
-                if (dataProtectionOptions.SecretManager.TryParseAsSid(out SecurityIdentifier sid))
+                if (dataProtectionOptions.AuthorizedSecretReaders.TryParseAsSid(out SecurityIdentifier sid))
                 {
                     sd.DiscretionaryAcl.AddAccess(AccessControlType.Allow, sid, ReadPublicAndPrivateKey, InheritanceFlags.None, PropagationFlags.None);
                 }
             }
 
             sd.DiscretionaryAcl.AddAccess(AccessControlType.Allow, domainAdmins, ReadPublicAndPrivateKey, InheritanceFlags.None, PropagationFlags.None);
-            sd.DiscretionaryAcl.AddAccess(AccessControlType.Allow, WindowsIdentity.GetCurrent().User , ReadPublicAndPrivateKey, InheritanceFlags.None, PropagationFlags.None);
+            sd.DiscretionaryAcl.AddAccess(AccessControlType.Allow, WindowsIdentity.GetCurrent().User, ReadPublicAndPrivateKey, InheritanceFlags.None, PropagationFlags.None);
             sd.DiscretionaryAcl.AddAccess(AccessControlType.Allow, new SecurityIdentifier(WellKnownSidType.WorldSid, null), ReadPublicKey, InheritanceFlags.None, PropagationFlags.None);
 
             return sd;
@@ -96,6 +97,8 @@ namespace Lithnet.AccessManager.Server
 
         public ProtectedSecret ProtectSecret(string secret, CommonSecurityDescriptor securityDescriptor)
         {
+            this.licenseManager.ThrowOnMissingFeature(LicensedFeatures.DpapiNgSecretEncryption);
+
             var result = NCrypt.NCryptCreateProtectionDescriptor($"SDDL={securityDescriptor.GetSddlForm(AccessControlSections.All)}", 0, out NCrypt.SafeNCRYPT_DESCRIPTOR_HANDLE handle);
             result.ThrowIfFailed();
 
@@ -118,7 +121,7 @@ namespace Lithnet.AccessManager.Server
 
         public ProtectedSecret ProtectSecret(string secret)
         {
-            if (this.licenseManager.IsFeatureEnabled(LicensedFeatures.DpapiNgSecretEncryption))
+            if (dataProtectionOptions.EnableClusterCompatibleSecretEncryption && this.licenseManager.IsFeatureEnabled(LicensedFeatures.DpapiNgSecretEncryption))
             {
                 return this.ProtectSecret(secret, this.BuildDefaultSecurityDescriptor());
             }

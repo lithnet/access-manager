@@ -220,7 +220,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IClusterProvider>().To<ClusterProvider>().InSingletonScope();
                 builder.Bind<IProductSettingsProvider>().To<ProductSettingsProvider>().InSingletonScope();
                 builder.Bind<ILicenseManager>().To<LicenseManager>().InSingletonScope();
-
+                builder.Bind<ISecretRekeyProvider>().To<SecretRekeyProvider>().InSingletonScope();
                 builder.Bind<ILicenseDataProvider>().To<OptionsLicenseDataProvider>().InSingletonScope();
 
                 builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentModelValidator<>));

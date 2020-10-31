@@ -177,7 +177,10 @@ namespace Lithnet.AccessManager.Service
 
             try
             {
-                certificateSynchronizationProvider.ImportCertificatesFromConfig();
+                if (licenseManager.IsFeatureEnabled(LicensedFeatures.CertificateSynchronization))
+                {
+                    certificateSynchronizationProvider.ImportCertificatesFromConfig();
+                }
             }
             catch (Exception ex)
             {

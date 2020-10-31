@@ -10,6 +10,10 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public List<CertificateData> Certificates { get; set; } = new List<CertificateData>();
 
-        public string SecretManager { get; set; }
+        public string AuthorizedSecretReaders { get; set; }
+
+        public bool EnableCertificateSynchronization { get; set; }
+
+        public bool EnableClusterCompatibleSecretEncryption { get; set; }
     }
 }

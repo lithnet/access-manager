@@ -2,6 +2,7 @@
 using System.Linq;
 using System.ServiceProcess;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
@@ -18,10 +19,12 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly IRegistryProvider registryProvider;
+        private readonly ICertificateSynchronizationProvider certSyncProvider;
+        private readonly ILicenseManager licenseManager;
 
         public MainWindowViewModel(IApplicationConfig model, AuthenticationViewModel authentication, AuthorizationViewModel authorization, UserInterfaceViewModel ui, RateLimitsViewModel rate, IpDetectionViewModel ip,
             AuditingViewModel audit, EmailViewModel mail, HostingViewModel hosting, ActiveDirectoryConfigurationViewModel ad,
-            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, LicensingViewModel lic, HighAvailabilityViewModel havm, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider)
+            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, LicensingViewModel lic, HighAvailabilityViewModel havm, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider, ICertificateSynchronizationProvider certSyncProvider, ILicenseManager licenseManager)
         {
             this.model = model;
             this.shellExecuteProvider = shellExecuteProvider;
@@ -31,7 +34,9 @@ namespace Lithnet.AccessManager.Server.UI
             this.hosting = hosting;
             this.registryProvider = registryProvider;
             this.eventAggregator = eventAggregator;
+            this.certSyncProvider = certSyncProvider;
             this.dialogCoordinator = dialogCoordinator;
+            this.licenseManager = licenseManager;
 
             this.eventAggregator.Subscribe(this);
             this.DisplayName = Constants.AppName;
@@ -70,6 +75,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
+                this.certSyncProvider.ExportCertificatesToConfig();
                 this.model.Save(this.model.Path);
             }
             catch (Exception ex)
@@ -109,7 +115,6 @@ namespace Lithnet.AccessManager.Server.UI
                 else
                 {
                     this.IsPendingServiceRestart = true;
-
                     try
                     {
                         await this.windowsServiceProvider.WaitForStatus(ServiceControllerStatus.Stopped);
@@ -215,14 +220,29 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task RestartService()
         {
+            ProgressDialogController progress = null;
+
             try
             {
+                progress = await this.dialogCoordinator.ShowProgressAsync(this, "Restarting service", "Waiting for the service to stop", false);
+                progress.SetIndeterminate();
+
                 await this.windowsServiceProvider.StopServiceAsync();
+
+                progress.SetMessage("Wating for the service to start");
+
                 await this.windowsServiceProvider.StartServiceAsync();
             }
             catch (Exception ex)
             {
                 logger.LogError(EventIDs.UIGenericError, ex, "Could not restart service");
+            }
+            finally
+            {
+                if (progress?.IsOpen ?? false)
+                {
+                    await progress.CloseAsync();
+                }
             }
         }
     }

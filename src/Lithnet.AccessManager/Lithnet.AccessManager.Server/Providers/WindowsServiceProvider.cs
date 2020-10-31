@@ -81,11 +81,11 @@ namespace Lithnet.AccessManager.Server
 
             if (this.clusterProvider.IsClustered)
             {
-                this.clusterProvider.StopClusteredResource();
+                await Task.Run(() => this.clusterProvider.StopClusteredResource());
             }
             else
             {
-                this.serviceController.Stop();
+                await Task.Run(() => this.serviceController.Stop());
             }
 
             await this.serviceController.WaitForStatusAsync(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30), CancellationToken.None);
@@ -103,11 +103,11 @@ namespace Lithnet.AccessManager.Server
 
             if (this.clusterProvider.IsClustered)
             {
-                this.clusterProvider.StartClusteredResource();
+                await Task.Run(() => this.clusterProvider.StartClusteredResource());
             }
             else
             {
-                this.serviceController.Start();
+                await Task.Run(() => this.serviceController.Start());
             }
 
             await this.serviceController.WaitForStatusAsync(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30), CancellationToken.None);

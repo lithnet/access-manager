@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -18,41 +19,56 @@ namespace Lithnet.AccessManager.Server
         private DataProtectionOptions dataProtectionOptions;
         private readonly IProtectedSecretProvider secretProvider;
         private readonly ICertificatePermissionProvider certPermissionProvider;
+        private readonly ILicenseManager licenseManager;
 
-        public CertificateSynchronizationProvider(RandomNumberGenerator rng, ILogger<CertificateSynchronizationProvider> logger, IOptionsMonitor<DataProtectionOptions> dataProtectionOptions, IProtectedSecretProvider secretProvider, ICertificatePermissionProvider certPermissionProvider)
+        public CertificateSynchronizationProvider(RandomNumberGenerator rng, ILogger<CertificateSynchronizationProvider> logger, IOptionsMonitor<DataProtectionOptions> dataProtectionOptions, IProtectedSecretProvider secretProvider, ICertificatePermissionProvider certPermissionProvider, ILicenseManager licenseManager)
+            : this(rng, logger, secretProvider, certPermissionProvider, licenseManager)
         {
-            this.rng = rng;
-            this.logger = logger;
             this.dataProtectionOptions = dataProtectionOptions.CurrentValue;
             dataProtectionOptions.OnChange((o, s) =>
             {
                 this.dataProtectionOptions = o;
                 this.ImportCertificatesFromConfig();
             });
-
-            this.secretProvider = secretProvider;
-            this.certPermissionProvider = certPermissionProvider;
         }
 
-        public CertificateSynchronizationProvider(RandomNumberGenerator rng, ILogger<CertificateSynchronizationProvider> logger, DataProtectionOptions dataProtectionOptions, IProtectedSecretProvider secretProvider, ICertificatePermissionProvider certPermissionProvider)
+        public CertificateSynchronizationProvider(RandomNumberGenerator rng, ILogger<CertificateSynchronizationProvider> logger, DataProtectionOptions dataProtectionOptions, IProtectedSecretProvider secretProvider, ICertificatePermissionProvider certPermissionProvider, ILicenseManager licenseManager)
+            : this(rng, logger, secretProvider, certPermissionProvider, licenseManager)
+        {
+            this.dataProtectionOptions = dataProtectionOptions;
+        }
+
+        private CertificateSynchronizationProvider(RandomNumberGenerator rng, ILogger<CertificateSynchronizationProvider> logger, IProtectedSecretProvider secretProvider, ICertificatePermissionProvider certPermissionProvider, ILicenseManager licenseManager)
         {
             this.rng = rng;
             this.logger = logger;
-            this.dataProtectionOptions = dataProtectionOptions;
             this.secretProvider = secretProvider;
             this.certPermissionProvider = certPermissionProvider;
+            this.licenseManager = licenseManager;
         }
 
         public void ExportCertificatesToConfig()
         {
+            if (!this.dataProtectionOptions.EnableCertificateSynchronization)
+            {
+                dataProtectionOptions.Certificates = null;
+                return;
+            }
+
+            if (!this.licenseManager.IsFeatureEnabled(LicensedFeatures.CertificateSynchronization))
+            {
+                return;
+            }
+
+            this.dataProtectionOptions.Certificates ??= new List<CertificateData>();
+
             using (X509Store store = X509ServiceStoreHelper.Open(Constants.ServiceName, OpenFlags.ReadOnly))
             {
                 foreach (X509Certificate2 cert in store.Certificates.OfType<X509Certificate2>())
                 {
                     if (!cert.HasPrivateKey)
                     {
-                        logger.LogTrace("Skipping synchronization of certificate {cert} as it does not have a private key", cert.Thumbprint);
-
+                        logger.LogWarning(EventIDs.CertificateSynchronizationExportWarningNoPrivateKey, "Skipping synchronization of certificate {cert} as it does not have a private key", cert.Thumbprint);
                         continue;
                     }
 
@@ -63,9 +79,16 @@ namespace Lithnet.AccessManager.Server
 
         private void ExportCertificateToConfig(X509Certificate2 cert)
         {
+            if (!this.dataProtectionOptions.EnableCertificateSynchronization)
+            {
+                return;
+            }
+
+            this.licenseManager.ThrowOnMissingFeature(LicensedFeatures.CertificateSynchronization);
+
             try
             {
-                var match = dataProtectionOptions.Certificates.FirstOrDefault(t => string.Equals(t.Thumbprint, cert.Thumbprint, StringComparison.OrdinalIgnoreCase));
+                var match = dataProtectionOptions.Certificates?.FirstOrDefault(t => string.Equals(t.Thumbprint, cert.Thumbprint, StringComparison.OrdinalIgnoreCase));
 
                 if (match == null)
                 {
@@ -120,10 +143,22 @@ namespace Lithnet.AccessManager.Server
 
         public void ImportCertificatesFromConfig()
         {
+            if (!this.dataProtectionOptions.EnableCertificateSynchronization)
+            {
+                return;
+            }
+
+            this.licenseManager.ThrowOnMissingFeature(LicensedFeatures.CertificateSynchronization);
+
             using (X509Store store = X509ServiceStoreHelper.Open(Constants.ServiceName, OpenFlags.ReadWrite))
             {
                 foreach (var certData in dataProtectionOptions.Certificates)
                 {
+                    if (certData.Operation != CertificateOperation.Add)
+                    {
+                        continue;
+                    }
+
                     try
                     {
                         X509Certificate2 cert = store.Certificates.Find(X509FindType.FindByThumbprint, certData.Thumbprint, false).OfType<X509Certificate2>().FirstOrDefault();
