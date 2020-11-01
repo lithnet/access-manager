@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
+﻿using System.Data.SqlClient;
 using System.IO;
 using System.Reflection;
-using System.Text;
 using DbUp;
 using DbUp.Engine.Output;
 using Lithnet.AccessManager.Enterprise;
@@ -110,15 +107,47 @@ namespace Lithnet.AccessManager.Server
             string createDbString = $@"CREATE DATABASE [AccessManager]
  CONTAINMENT = NONE
  ON  PRIMARY 
-( NAME = N'AccessManager', FILENAME = N'{this.localDbPath}' , SIZE = 8192KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+( NAME = N'AccessManager', FILENAME = N'{this.localDbPath}' , SIZE = 65536KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
  LOG ON 
-( NAME = N'AccessManager_log', FILENAME = N'{this.localDbLogPath}' , SIZE = 8192KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+( NAME = N'AccessManager_log', FILENAME = N'{this.localDbLogPath}' , SIZE = 65536KB, MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
  WITH CATALOG_COLLATION = DATABASE_DEFAULT";
 
             using (var con = new SqlConnection(masterDbConnectionString))
             {
                 con.Open();
                 SqlCommand command = new SqlCommand(createDbString, con);
+                command.ExecuteNonQuery();
+
+                command = new SqlCommand(@"
+USE [master]
+
+IF NOT EXISTS 
+    (SELECT name  
+     FROM master.sys.server_principals
+     WHERE name = 'NT SERVICE\lithnetams')
+BEGIN
+    CREATE LOGIN [NT SERVICE\lithnetams] FROM WINDOWS WITH DEFAULT_DATABASE=[AccessManager]
+END
+", con);
+                command.ExecuteNonQuery();
+
+                command = new SqlCommand(@"
+USE [AccessManager]
+
+IF NOT EXISTS
+    (SELECT name
+     FROM sys.database_principals
+     WHERE name = 'NT SERVICE\lithnetams')
+BEGIN
+    CREATE USER [NT SERVICE\lithnetams] FOR LOGIN [NT SERVICE\lithnetams]
+END
+", con);
+                command.ExecuteNonQuery();
+
+                command = new SqlCommand(@"
+USE [AccessManager]
+ALTER ROLE [db_owner] ADD MEMBER [NT SERVICE\lithnetams]
+", con);
                 command.ExecuteNonQuery();
             }
 

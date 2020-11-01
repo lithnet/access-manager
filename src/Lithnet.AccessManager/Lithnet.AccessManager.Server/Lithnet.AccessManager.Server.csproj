@@ -20,14 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="DBScripts\00001-CreateServiceLogin.sql" />
-    <None Remove="DBScripts\00002-CreateRateLimitCacheTable.sql" />
+    <None Remove="DBScripts\00001-CreateRateLimitCacheTable.sql" />
     <None Remove="DBScripts\00003-CreateAuditTable.sql" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="DBScripts\00002-CreateRateLimitCacheTable.sql" />
-    <EmbeddedResource Include="DBScripts\00001-CreateServiceLogin.sql" />
+    <EmbeddedResource Include="DBScripts\00001-CreateRateLimitCacheTable.sql" />
   </ItemGroup>
 
   <ItemGroup>
