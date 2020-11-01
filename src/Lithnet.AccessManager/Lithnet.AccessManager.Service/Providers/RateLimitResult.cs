@@ -1,4 +1,6 @@
-﻿namespace Lithnet.AccessManager.Service
+﻿using System;
+
+namespace Lithnet.AccessManager.Service
 {
     public class RateLimitResult
     {
@@ -10,7 +12,7 @@
 
         public string UserID { get; set; }
 
-        public int Duration { get; set; }
+        public TimeSpan Duration { get; set; }
 
         public int Threshold { get; set; }
     }

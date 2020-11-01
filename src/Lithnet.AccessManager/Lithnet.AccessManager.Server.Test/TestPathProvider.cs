@@ -16,6 +16,7 @@ namespace Lithnet.AccessManager.Service.Internal
             this.WwwRootPath = $"{AppPath}\\wwwroot";
             this.ImagesPath = $"{AppPath}\\wwwroot\\images";
             this.LogoPath = $"{AppPath}\\logo.png";
+            this.DbPath = $"{AppPath}\\db";
         }
 
         public string AppPath { get; }
@@ -33,6 +34,7 @@ namespace Lithnet.AccessManager.Service.Internal
         public string ConfigFile { get; }
 
         public string HostingConfigFile { get; }
+        public string DbPath { get; }
 
         public string GetRelativePath(string file, string basePath)
         {

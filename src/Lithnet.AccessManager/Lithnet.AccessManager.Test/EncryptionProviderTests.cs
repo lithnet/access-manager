@@ -21,7 +21,7 @@ namespace Lithnet.AccessManager.Test
         public void EncryptRoundTripv1(string data)
         {
             EncryptionProvider p = new EncryptionProvider();
-            var cert = this.certificateProvider.CreateSelfSignedCert("test");
+            var cert = this.certificateProvider.CreateSelfSignedCert("test", CertificateProvider.LithnetAccessManagerPasswordEncryptionEku);
 
             string encrypted = p.Encrypt(cert, data, 1);
             string decrypted = p.Decrypt(encrypted, _ => cert);
@@ -35,7 +35,7 @@ namespace Lithnet.AccessManager.Test
         public void EncryptRoundTripv2(string data)
         {
             EncryptionProvider p = new EncryptionProvider();
-            var cert = this.certificateProvider.CreateSelfSignedCert("test");
+            var cert = this.certificateProvider.CreateSelfSignedCert("test", CertificateProvider.LithnetAccessManagerPasswordEncryptionEku);
 
             string encrypted = p.Encrypt(cert, data, 2);
             string decrypted = p.Decrypt(encrypted, _ => cert);

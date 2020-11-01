@@ -80,6 +80,13 @@
         public const int CertificateSynchronizationImportError = 5037;
         public const int CertificateSynchronizationExportError = 5038;
         public const int CertificateSynchronizationExportWarningNoPrivateKey = 5039;
+        public const int DbUpgradeError = 5040;
+        public const int DbUpgradeWarning = 5041;
+        public const int DbUpgradeInfo = 5042;
+        public const int DbUpgradeRequired = 5043;
+        public const int DbNotFound = 5044;
+        public const int DbCreated = 5045;
+
 
         // 6000 range - Reserved 
 

@@ -5,26 +5,22 @@ using System.Globalization;
 using System.Net;
 using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.App_LocalResources;
-using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Auditing;
+using Lithnet.AccessManager.Server.Authorization;
+using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Exceptions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
-using Lithnet.AccessManager.Server.Authorization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Service.Internal
 {
     public sealed class AuditEventProcessor : IAuditEventProcessor
     {
         private readonly ILogger logger;
-
         private readonly ITemplateProvider templates;
-
         private readonly IHttpContextAccessor httpContextAccessor;
-
         private readonly IEnumerable<INotificationChannel> notificationChannels;
-
         private readonly AuditOptions auditSettings;
 
         public AuditEventProcessor(ILogger<AuditEventProcessor> logger, ITemplateProvider templates, IEnumerable<INotificationChannel> notificationChannels, IHttpContextAccessor httpContextAccessor, IOptionsSnapshot<AuditOptions> auditSettings)

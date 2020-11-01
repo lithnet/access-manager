@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Security.Principal;
+using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
@@ -6,53 +8,56 @@ using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Service
 {
-    public sealed class RateLimiter : IRateLimiter
+    public sealed class MemoryCacheRateLimiter : IRateLimiter
     {
         private readonly RateLimitOptions rateLimits;
         private readonly IMemoryCache memoryCache;
+        private readonly TimeSpan oneMinute = TimeSpan.FromMinutes(1);
+        private readonly TimeSpan oneHour = TimeSpan.FromHours(1);
+        private readonly TimeSpan oneDay = TimeSpan.FromDays(1);
 
-        public RateLimiter(IOptionsSnapshot<RateLimitOptions> rateLimits, IMemoryCache memoryCache)
+        public MemoryCacheRateLimiter(IOptionsSnapshot<RateLimitOptions> rateLimits, IMemoryCache memoryCache)
         {
             this.rateLimits = rateLimits.Value;
             this.memoryCache = memoryCache;
         }
 
-        public RateLimitResult GetRateLimitResult(string userid, HttpRequest r)
+        public Task<RateLimitResult> GetRateLimitResult(SecurityIdentifier userid, HttpRequest r)
         {
             if (this.rateLimits.PerIP.Enabled)
             {
                 RateLimitResult result =
-                    this.IsIpThresholdExceeded(r, this.rateLimits.PerIP.RequestsPerMinute, 60) ??
-                    this.IsIpThresholdExceeded(r, this.rateLimits.PerIP.RequestsPerHour, 3600) ??
-                    this.IsIpThresholdExceeded(r, this.rateLimits.PerIP.RequestsPerDay, 86400);
+                    this.IsIpThresholdExceeded(r, this.rateLimits.PerIP.RequestsPerMinute, oneMinute) ??
+                    this.IsIpThresholdExceeded(r, this.rateLimits.PerIP.RequestsPerHour, oneHour) ??
+                    this.IsIpThresholdExceeded(r, this.rateLimits.PerIP.RequestsPerDay, oneDay);
 
                 if (result != null)
                 {
-                    result.UserID = userid;
+                    result.UserID = userid.ToString();
                     result.IPAddress = r.HttpContext.Connection.RemoteIpAddress.ToString();
-                    return result;
+                    return Task.FromResult(result);
                 }
             }
 
             if (this.rateLimits.PerUser.Enabled)
             {
                 RateLimitResult result =
-                    this.IsUserThresholdExceeded(userid, this.rateLimits.PerUser.RequestsPerMinute, 60) ??
-                    this.IsUserThresholdExceeded(userid, this.rateLimits.PerUser.RequestsPerHour, 3600) ??
-                    this.IsUserThresholdExceeded(userid, this.rateLimits.PerUser.RequestsPerDay, 86400);
+                    this.IsUserThresholdExceeded(userid, this.rateLimits.PerUser.RequestsPerMinute, oneMinute) ??
+                    this.IsUserThresholdExceeded(userid, this.rateLimits.PerUser.RequestsPerHour, oneHour) ??
+                    this.IsUserThresholdExceeded(userid, this.rateLimits.PerUser.RequestsPerDay, oneDay);
 
                 if (result != null)
                 {
-                    result.UserID = userid;
+                    result.UserID = userid.ToString();
                     result.IPAddress = r.HttpContext.Connection.RemoteIpAddress.ToString();
-                    return result;
+                    return Task.FromResult(result);
                 }
             }
 
-            return new RateLimitResult() { IsRateLimitExceeded = false };
+            return Task.FromResult(new RateLimitResult() { IsRateLimitExceeded = false });
         }
 
-        private RateLimitResult IsIpThresholdExceeded(HttpRequest r, int threshold, int duration)
+        private RateLimitResult IsIpThresholdExceeded(HttpRequest r, int threshold, TimeSpan duration)
         {
             string ip = r.HttpContext.Connection.RemoteIpAddress.ToString();
 
@@ -64,9 +69,9 @@ namespace Lithnet.AccessManager.Service
             return null;
         }
 
-        private RateLimitResult IsUserThresholdExceeded(string userid, int threshold, int duration)
+        private RateLimitResult IsUserThresholdExceeded(SecurityIdentifier userid, int threshold, TimeSpan duration)
         {
-            if (this.IsThresholdExceeded(userid, threshold, duration))
+            if (this.IsThresholdExceeded(userid.ToString(), threshold, duration))
             {
                 return new RateLimitResult { Duration = duration, IsRateLimitExceeded = true, IsUserRateLimit = true, Threshold = threshold };
             }
@@ -74,13 +79,13 @@ namespace Lithnet.AccessManager.Service
             return null;
         }
 
-        private bool IsThresholdExceeded(string usernameOrIP, int threshold, int duration)
+        private bool IsThresholdExceeded(string usernameOrIP, int threshold, TimeSpan duration)
         {
             string key1 = string.Join(@"-", duration, threshold, usernameOrIP);
             return this.IsThresholdExceededForKey(key1, threshold, duration);
         }
 
-        private bool IsThresholdExceededForKey(string key, int threshold, int duration)
+        private bool IsThresholdExceededForKey(string key, int threshold, TimeSpan duration)
         {
             if (threshold <= 0)
             {
@@ -99,7 +104,7 @@ namespace Lithnet.AccessManager.Service
             this.memoryCache.Set<int>(
                 key,
                 count,
-                DateTime.UtcNow.AddSeconds(duration)
+                DateTime.UtcNow.Add(duration)
             );
 
             return count > threshold;

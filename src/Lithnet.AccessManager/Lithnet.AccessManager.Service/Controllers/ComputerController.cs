@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Threading;
+using System.Threading.Tasks;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Auditing;
@@ -79,8 +80,6 @@ namespace Lithnet.AccessManager.Service.Controllers
                 return this.View("AccessRequest", model);
             }
 
-            //Thread.Sleep(10000);
-
             IUser user = null;
             IComputer computer = null;
             model.FailureReason = null;
@@ -121,7 +120,7 @@ namespace Lithnet.AccessManager.Service.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult AccessResponse(AccessRequestModel model)
+        public async Task<IActionResult> AccessResponse(AccessRequestModel model)
         {
             model.ShowReason = this.userInterfaceSettings.UserSuppliedReason != AuditReasonFieldState.Hidden;
             model.ReasonRequired = this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required;
@@ -145,9 +144,10 @@ namespace Lithnet.AccessManager.Service.Controllers
 
                 this.logger.LogInformation(EventIDs.UserRequestedAccessToComputer, string.Format(LogMessages.UserHasRequestedAccessToComputer, user.MsDsPrincipalName, model.ComputerName));
 
-                if (!ValidateRateLimit(model, user, out actionResult))
+                RateLimitResult result = await this.GetRateLimitResult(model, user);
+                if (result.IsRateLimitExceeded)
                 {
-                    return actionResult;
+                    return this.GetRateLimitExceededResponse(result, model, user);
                 }
 
                 if (!ValidateRequestReason(model, user, out actionResult))
@@ -616,12 +616,13 @@ namespace Lithnet.AccessManager.Service.Controllers
             }
         }
 
-        private bool ValidateRateLimit(AccessRequestModel model, IUser user, out IActionResult view)
+        private async Task<RateLimitResult> GetRateLimitResult(AccessRequestModel model, IUser user)
         {
-            view = null;
+            return await this.rateLimiter.GetRateLimitResult(user.Sid, this.Request);
+        }
 
-            var rateLimitResult = this.rateLimiter.GetRateLimitResult(user.Sid.ToString(), this.Request);
-
+        private IActionResult GetRateLimitExceededResponse(RateLimitResult rateLimitResult, AccessRequestModel model, IUser user)
+        {
             if (rateLimitResult.IsRateLimitExceeded)
             {
                 this.LogRateLimitEvent(model, user, rateLimitResult);
@@ -631,11 +632,10 @@ namespace Lithnet.AccessManager.Service.Controllers
                     Heading = "Too many requests"
                 };
 
-                view = this.View("AccessRequestError", errorModel);
-                return false;
+                return this.View("AccessRequestError", errorModel);
             }
 
-            return true;
+            return null;
         }
 
         private bool ValidateRequestReason(AccessRequestModel model, IUser user, out IActionResult actionResult)

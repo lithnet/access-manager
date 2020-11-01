@@ -12,6 +12,8 @@
 
         string ConfigFile { get; }
 
+        string DbPath { get; }
+
         string HostingConfigFile { get; }
 
         string GetRelativePath(string file, string basePath);

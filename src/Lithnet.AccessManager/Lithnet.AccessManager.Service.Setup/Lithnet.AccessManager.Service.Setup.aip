@@ -19,10 +19,10 @@
     <ROW Property="IAgree" Value="Yes" Type="4" MsiKey="IAgree"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{75348472-D666-4223-8825-5618E3B258B8} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{3F99E9DC-B161-41A4-9B17-5AFDF45439A5} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7767.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7775.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
@@ -151,6 +151,7 @@
     <ROW Component="Microsoft.AspNetCore.Http.Extensions.dll" ComponentId="{EBC0F8D4-052C-417B-976F-B20D8B18A6E9}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Http.Extensions.dll"/>
     <ROW Component="Microsoft.AspNetCore.Http.Features.dll" ComponentId="{D0EA37FD-09D8-4E34-A4EE-521869F398DF}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Http.Features.dll"/>
     <ROW Component="Microsoft.AspNetCore.HttpOverrides.dll" ComponentId="{CE111FED-D5DA-482B-989E-3A4AE4E58796}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.HttpOverrides.dll"/>
+    <ROW Component="Microsoft.Azure.Services.AppAuthentication.dll" ComponentId="{3D86B3E8-33B0-4D95-B12E-790A535D2058}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Azure.Services.AppAuthentication.dll"/>
     <ROW Component="Microsoft.Bcl.AsyncInterfaces.dll" ComponentId="{A77BDECC-4486-4D39-8A14-A617B82A13C4}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Bcl.AsyncInterfaces.dll"/>
     <ROW Component="Microsoft.CSharp.dll" ComponentId="{4C8A1964-3DE2-420E-9708-21727087580E}" Directory_="ref_Dir" Attributes="0" KeyPath="Microsoft.CSharp.dll"/>
     <ROW Component="Microsoft.CodeAnalysis.CSharp.dll" ComponentId="{37BAE656-E2DD-4FA9-BF42-72D9E8A4A64E}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.CodeAnalysis.CSharp.dll"/>
@@ -184,6 +185,7 @@
     <ROW Component="Microsoft.Extensions.Options.ConfigurationExtensions.dll" ComponentId="{EC187463-59FF-4C6B-82B0-7B7E18875569}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Options.ConfigurationExtensions.dll"/>
     <ROW Component="Microsoft.Extensions.Options.dll" ComponentId="{0C64A70C-C7C6-436F-B695-420DD8B7DBBE}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Options.dll"/>
     <ROW Component="Microsoft.Extensions.Primitives.dll" ComponentId="{2127C687-CCCC-4938-B644-6A7176D709EE}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Primitives.dll"/>
+    <ROW Component="Microsoft.IdentityModel.Clients.ActiveDirectory.dll" ComponentId="{35220932-B204-4219-ABC6-9712A0B52E7A}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.Clients.ActiveDirectory.dll"/>
     <ROW Component="Microsoft.IdentityModel.JsonWebTokens.dll" ComponentId="{464C5831-7F75-4737-B76A-E8CC46B814C7}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.JsonWebTokens.dll"/>
     <ROW Component="Microsoft.IdentityModel.Logging.dll" ComponentId="{32DF9B3C-0BC5-483C-B22E-199E278586F4}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.Logging.dll"/>
     <ROW Component="Microsoft.IdentityModel.Protocols.OpenIdConnect.dll" ComponentId="{22FA00AB-25CD-4A99-8E93-9DFDCD0B5909}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.Protocols.OpenIdConnect.dll"/>
@@ -413,10 +415,12 @@
     <ROW Component="Vanara.Core.dll" ComponentId="{FA834E56-A868-47C7-94FA-FC4ADA49B252}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.Core.dll"/>
     <ROW Component="Vanara.PInvoke.Cryptography.dll" ComponentId="{8B93AF4E-4CD3-459E-B48D-212F213B9EC4}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Cryptography.dll"/>
     <ROW Component="Vanara.PInvoke.Kernel32.dll" ComponentId="{9729AEB5-3376-4308-A18D-211F560F558D}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Kernel32.dll"/>
+    <ROW Component="Vanara.PInvoke.NTDSApi.dll" ComponentId="{69984269-B313-4BEB-BE4E-8925244323BE}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.NTDSApi.dll"/>
     <ROW Component="Vanara.PInvoke.NetApi32.dll" ComponentId="{4B29DD9A-1E9D-4153-A54F-C5E8EA590C86}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.NetApi32.dll"/>
     <ROW Component="Vanara.PInvoke.Security.dll" ComponentId="{15DDDFA1-53A5-483E-9CD1-2BC28E43A52E}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Security.dll"/>
     <ROW Component="Vanara.PInvoke.Shared.dll" ComponentId="{6822FBE4-08C1-4725-96ED-CC2041C67B38}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Shared.dll"/>
     <ROW Component="Vanara.PInvoke.Ws2_32.dll" ComponentId="{B779C0BE-7CC6-40E4-A232-BBF1D7BEF116}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Ws2_32.dll"/>
+    <ROW Component="Vanara.Security.dll" ComponentId="{117AC9F3-57DB-40AD-8AE4-24597651B7C7}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.Security.dll"/>
     <ROW Component="WindowsBase.dll" ComponentId="{3A0502A2-C6C3-4A36-8BF1-5DA4206072F1}" Directory_="ref_Dir" Attributes="0" KeyPath="WindowsBase.dll"/>
     <ROW Component="WindowsFirewallHelper.dll" ComponentId="{F445CAB7-AFFA-44E8-B5E2-BFE4DEC1B2AA}" Directory_="APPDIR" Attributes="0" KeyPath="WindowsFirewallHelper.dll"/>
     <ROW Component="all.css" ComponentId="{567EE590-3832-41BD-B150-2162BEA5C1EE}" Directory_="css_2_Dir" Attributes="0" KeyPath="all.css" Type="0"/>
@@ -450,6 +454,8 @@
     <ROW Component="bootstrap.min.css" ComponentId="{AB19372E-59F1-4D79-9B51-00368E1768B5}" Directory_="css_1_Dir" Attributes="0" KeyPath="bootstrap.min.css" Type="0"/>
     <ROW Component="brands.svg" ComponentId="{1967FE82-7F79-4453-ABD1-583518A9784E}" Directory_="sprites_Dir" Attributes="0" KeyPath="brands.svg" Type="0"/>
     <ROW Component="clipboard.js" ComponentId="{1F13CA3A-7549-4FA7-B35D-793CA4761E2B}" Directory_="js_Dir" Attributes="0" KeyPath="clipboard.js" Type="0"/>
+    <ROW Component="dbupcore.dll" ComponentId="{33959FD5-8A73-41FE-9CFF-148443599BE7}" Directory_="APPDIR" Attributes="0" KeyPath="dbupcore.dll"/>
+    <ROW Component="dbupsqlserver.dll" ComponentId="{C3150EA3-A533-4920-9D69-5FA5C9301C70}" Directory_="APPDIR" Attributes="0" KeyPath="dbupsqlserver.dll"/>
     <ROW Component="emailfailure.html" Directory_="audittemplates_Dir" Attributes="256" KeyPath="emailfailure.html"/>
     <ROW Component="exampleaudit.ps1" Directory_="scripts_Dir" Attributes="256" KeyPath="exampleaudit.ps1"/>
     <ROW Component="exampleauthorization.ps1" Directory_="scripts_Dir" Attributes="256" KeyPath="exampleauthorization.ps1"/>
@@ -920,6 +926,12 @@
     <ROW File="Microsoft.AspNetCore.DataProtection.Abstractions.dll" Component_="Microsoft.AspNetCore.DataProtection.Abstractions.dll" FileName="MICRO~68.DLL|Microsoft.AspNetCore.DataProtection.Abstractions.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.DataProtection.Abstractions.dll" SelfReg="false"/>
     <ROW File="Microsoft.AspNetCore.DataProtection.dll" Component_="Microsoft.AspNetCore.DataProtection.dll" FileName="MICRO~69.DLL|Microsoft.AspNetCore.DataProtection.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.DataProtection.dll" SelfReg="false"/>
     <ROW File="license.dat" Component_="Lithnet.AccessManager.Server.UI.deps.json" FileName="license.dat" Attributes="0" SourcePath="output\license.dat" SelfReg="false"/>
+    <ROW File="dbupcore.dll" Component_="dbupcore.dll" FileName="DBUP-C~1.DLL|dbup-core.dll" Attributes="0" SourcePath="output\dbup-core.dll" SelfReg="false"/>
+    <ROW File="dbupsqlserver.dll" Component_="dbupsqlserver.dll" FileName="DBUP-S~1.DLL|dbup-sqlserver.dll" Attributes="0" SourcePath="output\dbup-sqlserver.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Azure.Services.AppAuthentication.dll" Component_="Microsoft.Azure.Services.AppAuthentication.dll" FileName="MICRO~70.DLL|Microsoft.Azure.Services.AppAuthentication.dll" Attributes="0" SourcePath="output\Microsoft.Azure.Services.AppAuthentication.dll" SelfReg="false"/>
+    <ROW File="Microsoft.IdentityModel.Clients.ActiveDirectory.dll" Component_="Microsoft.IdentityModel.Clients.ActiveDirectory.dll" FileName="MICRO~71.DLL|Microsoft.IdentityModel.Clients.ActiveDirectory.dll" Attributes="0" SourcePath="output\Microsoft.IdentityModel.Clients.ActiveDirectory.dll" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.NTDSApi.dll" Component_="Vanara.PInvoke.NTDSApi.dll" FileName="VANARA~8.DLL|Vanara.PInvoke.NTDSApi.dll" Attributes="0" SourcePath="output\Vanara.PInvoke.NTDSApi.dll" SelfReg="false"/>
+    <ROW File="Vanara.Security.dll" Component_="Vanara.Security.dll" FileName="VANARA~9.DLL|Vanara.Security.dll" Attributes="0" SourcePath="output\Vanara.Security.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.custcomp.AiControlConditionAliasComponent">
     <ROW AliasRowId="ExitDialog#LaunchProdCheckBox#Hide#((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))" AliasRowOperation="2" Condition="(((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))) OR NOT IS_STANDALONE_OR_NOT_CLUSTERED_OR_ON_ACTIVE_NODE"/>
@@ -1590,6 +1602,12 @@
     <ROW Feature_="MainFeature" Component_="LogPath"/>
     <ROW Feature_="MainFeature" Component_="AI_ExePath"/>
     <ROW Feature_="MainFeature" Component_="Parameters"/>
+    <ROW Feature_="MainFeature" Component_="dbupcore.dll"/>
+    <ROW Feature_="MainFeature" Component_="dbupsqlserver.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Azure.Services.AppAuthentication.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.IdentityModel.Clients.ActiveDirectory.dll"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.NTDSApi.dll"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.Security.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>

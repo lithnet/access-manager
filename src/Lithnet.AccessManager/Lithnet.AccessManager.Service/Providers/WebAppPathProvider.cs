@@ -10,13 +10,16 @@ namespace Lithnet.AccessManager.Service
         {
             string appPath = registryProvider.BasePath ?? env.ContentRootPath;
             string configPath = registryProvider.ConfigPath ?? Path.Combine(appPath, "config");
-
+            
+            configPath = configPath.TrimEnd('\\');
             this.AppPath = appPath.TrimEnd('\\');
+
             this.TemplatesPath = $"{configPath}\\audit-templates";
             this.ConfigFile = $"{configPath}\\appsettings.json";
             this.HostingConfigFile = $"{configPath}\\apphost.json";
             this.ScriptsPath = $"{configPath}\\scripts";
             this.LogoPath = $"{configPath}\\logo.png";
+            this.DbPath = $"{configPath}\\db";
         }
 
         public string AppPath { get; }
@@ -30,6 +33,8 @@ namespace Lithnet.AccessManager.Service
         public string ConfigFile { get; }
 
         public string HostingConfigFile { get; }
+        
+        public string DbPath { get; }
 
         public string GetRelativePath(string file, string basePath)
         {

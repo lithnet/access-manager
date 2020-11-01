@@ -4,7 +4,7 @@
     "HttpSys": {
       "HttpPort": 80,
       "HttpsPort": 443,
-      "Hostname": "",
+      "Hostname": null,
       "Path": null,
       "MaxAccepts": 100,
       "EnableResponseCaching": false,

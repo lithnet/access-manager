@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Security.Principal;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Lithnet.AccessManager.Service
 {
     public interface IRateLimiter
     {
-        RateLimitResult GetRateLimitResult(string userid, HttpRequest r);
+        Task<RateLimitResult> GetRateLimitResult(SecurityIdentifier userid, HttpRequest r);
     }
 }

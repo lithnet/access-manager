@@ -18,6 +18,8 @@ function Get-AuthorizationResponse{
 		IsLocalAdminPasswordHistoryDenied = $false
 		IsJitAllowed = $false
 		IsJitDenied = $false
+		IsBitLockerAllowed = $false
+		IsBitLockerDenied = $false
 	}
 
 	# Return the authorization response to Access Manager to process

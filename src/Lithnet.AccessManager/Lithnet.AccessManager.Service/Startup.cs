@@ -21,9 +21,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.IO;
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Principal;
+using DbUp.Engine.Output;
 
 namespace Lithnet.AccessManager.Service
 {
@@ -51,7 +49,7 @@ namespace Lithnet.AccessManager.Service
             services.TryAddScoped<IPowerShellSecurityDescriptorGenerator, PowerShellSecurityDescriptorGenerator>();
             services.TryAddScoped<IAuditEventProcessor, AuditEventProcessor>();
             services.TryAddScoped<ITemplateProvider, TemplateProvider>();
-            services.TryAddScoped<IRateLimiter, RateLimiter>();
+            services.TryAddScoped<IRateLimiter, SqlCacheRateLimiter>();
             services.TryAddScoped<IJitAccessProvider, JitAccessProvider>();
             services.TryAddScoped<IPhoneticPasswordTextProvider, PhoneticStringProvider>();
             services.TryAddScoped<IHtmlPasswordProvider, HtmlPasswordProvider>();
@@ -84,7 +82,9 @@ namespace Lithnet.AccessManager.Service
             services.TryAddSingleton<IWindowsServiceProvider, WindowsServiceProvider>();
             services.TryAddSingleton<ICertificatePermissionProvider, CertificatePermissionProvider>();
             services.TryAddSingleton<ILocalSam, LocalSam>();
-
+            services.TryAddSingleton<IUpgradeLog, DbUpgradeLogger>();
+            services.TryAddSingleton<IDbProvider, SqlDbProvider>();
+            
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();
             services.AddScoped<INotificationChannel, PowershellNotificationChannel>();
@@ -117,7 +117,7 @@ namespace Lithnet.AccessManager.Service
             this.ConfigureAuthorization(services);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<ForwardedHeadersAppOptions> fwdOptions, IOptions<ConfigurationMetadata> metadata, ILicenseManager licenseManager, ILogger<Startup> logger, IRegistryProvider registryProvider, ICertificateSynchronizationProvider certificateSynchronizationProvider)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<ForwardedHeadersAppOptions> fwdOptions, IOptions<ConfigurationMetadata> metadata, ILicenseManager licenseManager, ILogger<Startup> logger, ICertificateSynchronizationProvider certificateSynchronizationProvider, IDbProvider sqlProvider)
         {
             metadata.Value.ValidateMetadata();
 
@@ -186,6 +186,8 @@ namespace Lithnet.AccessManager.Service
             {
                 logger.LogError(EventIDs.CertificateSynchronizationImportError, ex, "Could not import from synchronization store");
             }
+
+            sqlProvider.InitializeDb();
         }
 
         private void ConfigureAuthentication(IServiceCollection services)

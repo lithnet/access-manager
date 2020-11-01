@@ -29,7 +29,7 @@ namespace Lithnet.AccessManager
             throw new UnsupportedPrincipalTypeException($"An object of type {de.SchemaClassName} was provided, but an object of one of the following types was expected '{string.Join(",", objectClasses)}'");
         }
 
-        internal static byte[] ToBytes(this SecurityIdentifier s)
+        public static byte[] ToBytes(this SecurityIdentifier s)
         {
             byte[] b = new byte[s.BinaryLength];
             s.GetBinaryForm(b, 0);

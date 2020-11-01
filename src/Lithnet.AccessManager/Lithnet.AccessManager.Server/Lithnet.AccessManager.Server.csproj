@@ -20,8 +20,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="DBScripts\00001-CreateServiceLogin.sql" />
+    <None Remove="DBScripts\00002-CreateRateLimitCacheTable.sql" />
+    <None Remove="DBScripts\00003-CreateAuditTable.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="DBScripts\00002-CreateRateLimitCacheTable.sql" />
+    <EmbeddedResource Include="DBScripts\00001-CreateServiceLogin.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DbUp-SqlServer" Version="4.4.0" />
     <PackageReference Include="htmlagilitypack" Version="1.11.24" />
-    <PackageReference Include="lithnet.accessmanager.enterprise" Version="1.0.7609.18308" />
+    <PackageReference Include="lithnet.accessmanager.enterprise" Version="1.0.7610.29656" />
     <PackageReference Include="lithnet.security.authorization" Version="1.0.7518.2238" />
     <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.1.9" />
