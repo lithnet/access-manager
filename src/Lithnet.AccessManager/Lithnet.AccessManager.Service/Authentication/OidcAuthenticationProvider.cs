@@ -1,12 +1,8 @@
-﻿using System;
-using System.Net;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
+﻿using System.Security.Claims;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -21,10 +17,12 @@ namespace Lithnet.AccessManager.Service.AppSettings
     public class OidcAuthenticationProvider : IdpAuthenticationProvider, IOidcAuthenticationProvider
     {
         private readonly OidcAuthenticationProviderOptions options;
+        private readonly IProtectedSecretProvider secretProvider;
 
-        public OidcAuthenticationProvider(IOptions<OidcAuthenticationProviderOptions> options, ILogger<OidcAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider)
+        public OidcAuthenticationProvider(IOptions<OidcAuthenticationProviderOptions> options, ILogger<OidcAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider, IProtectedSecretProvider secretProvider)
             : base(logger, directory, httpContextAccessor, authzContextProvider)
         {
+            this.secretProvider = secretProvider;
             this.options = options.Value;
         }
 
@@ -58,7 +56,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
              {
                  openIdConnectOptions.Authority = this.options.Authority;
                  openIdConnectOptions.ClientId = this.options.ClientID;
-                 openIdConnectOptions.ClientSecret = this.options.Secret?.GetSecret();
+                 openIdConnectOptions.ClientSecret = this.secretProvider.UnprotectSecret(this.options.Secret);
                  openIdConnectOptions.CallbackPath = "/auth";
                  openIdConnectOptions.SignedOutCallbackPath = "/auth/logout";
                  openIdConnectOptions.SignedOutRedirectUri = "/Home/LoggedOut";

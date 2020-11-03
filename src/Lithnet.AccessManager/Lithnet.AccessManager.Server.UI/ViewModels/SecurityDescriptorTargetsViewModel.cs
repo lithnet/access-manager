@@ -285,18 +285,7 @@ namespace Lithnet.AccessManager.Server.UI
                  this.ViewModels = new BindableCollection<SecurityDescriptorTargetViewModel>();
                  
                  var items = (await Task.WhenAll(this.Model.Select(t => factory.CreateViewModelAsync(t, this.ChildDisplaySettings)))).ToList();
-                 
-                 // Force the evaluation of these values on another thread to prevent the UI locking up when these are loaded into the view
-                 Parallel.ForEach(items, async item =>
-                 {
-                     var x = item.DisplayName;
-                     var y = item.Type;
-                     var z = item.Description;
-                     var a = item.JitGroupDisplayName;
 
-                     await item.Initialization;
-                 });
-                 
                  this.ViewModels.AddRange(items);
 
                  Execute.OnUIThreadSync(() =>

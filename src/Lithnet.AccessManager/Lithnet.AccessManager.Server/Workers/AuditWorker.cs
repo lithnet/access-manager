@@ -2,8 +2,6 @@
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Server.Auditing;
-using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -42,12 +40,12 @@ namespace Lithnet.AccessManager.Server.Workers
                     this.logger.LogTrace("Processing action from queue");
                     item.Invoke();
                 }
-                catch(OperationCanceledException)
+                catch (OperationCanceledException)
                 {
                 }
                 catch (Exception e)
                 {
-                    logger.LogEventError(EventIDs.BackgroundTaskUnhandledError, "An unhandled exception occurred in an audit worker background task", e);
+                    logger.LogError(EventIDs.BackgroundTaskUnhandledError, e, "An unhandled exception occurred in an audit worker background task");
                 }
             }
         }

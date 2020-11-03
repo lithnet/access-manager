@@ -6,18 +6,18 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class ActiveDirectoryDomainPermissionViewModelFactory : IActiveDirectoryDomainPermissionViewModelFactory
     {
-        private readonly IServiceSettingsProvider serviceSettings;
+        private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly ILogger<ActiveDirectoryDomainPermissionViewModel> logger;
 
-        public ActiveDirectoryDomainPermissionViewModelFactory(IServiceSettingsProvider serviceSettings, ILogger<ActiveDirectoryDomainPermissionViewModel> logger)
+        public ActiveDirectoryDomainPermissionViewModelFactory(IWindowsServiceProvider windowsServiceProvider, ILogger<ActiveDirectoryDomainPermissionViewModel> logger)
         {
-            this.serviceSettings = serviceSettings;
+            this.windowsServiceProvider = windowsServiceProvider;
             this.logger = logger;
         }
 
         public ActiveDirectoryDomainPermissionViewModel CreateViewModel(Domain model)
         {
-            return new ActiveDirectoryDomainPermissionViewModel(model, serviceSettings, logger);
+            return new ActiveDirectoryDomainPermissionViewModel(model, windowsServiceProvider, logger);
         }
     }
 }

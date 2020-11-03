@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.Extensions;
 
 namespace Lithnet.AccessManager.Server.Authorization
 {

@@ -9,6 +9,7 @@
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignWidth="800"
+             mah:DialogParticipation.Register="{Binding}"
              Margin="5">
     <StackPanel >
         <DockPanel>

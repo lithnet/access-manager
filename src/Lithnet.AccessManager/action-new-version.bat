@@ -4,4 +4,4 @@ SET /A build=build+1
 echo %build% > version.txt
 SET version=1.0.%build%.0
 
-echo New version is %version%
+ECHO [92mNew version is %version%[0m

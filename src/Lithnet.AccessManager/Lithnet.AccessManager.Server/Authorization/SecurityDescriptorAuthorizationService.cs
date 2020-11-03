@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Security.Principal;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.Authorization

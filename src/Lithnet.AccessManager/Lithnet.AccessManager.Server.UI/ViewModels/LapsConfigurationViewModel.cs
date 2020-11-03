@@ -5,6 +5,7 @@ using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.UI.Interop;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
@@ -18,20 +19,21 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ICertificateProvider certificateProvider;
         private readonly IX509Certificate2ViewModelFactory certificate2ViewModelFactory;
         private readonly IDialogCoordinator dialogCoordinator;
-        private readonly IServiceSettingsProvider serviceSettings;
+        private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly ILogger<LapsConfigurationViewModel> logger;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IDiscoveryServices discoveryServices;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
+        private readonly ICertificatePermissionProvider certPermissionProvider;
 
-        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IServiceSettingsProvider serviceSettings, ILogger<LapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IScriptTemplateProvider scriptTemplateProvider)
+        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IWindowsServiceProvider windowsServiceProvider, ILogger<LapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.certificateProvider = certificateProvider;
             this.certificate2ViewModelFactory = certificate2ViewModelFactory;
             this.dialogCoordinator = dialogCoordinator;
-            this.serviceSettings = serviceSettings;
+            this.windowsServiceProvider = windowsServiceProvider;
             this.logger = logger;
             this.domainTrustProvider = domainTrustProvider;
             this.discoveryServices = discoveryServices;
@@ -40,8 +42,9 @@ namespace Lithnet.AccessManager.Server.UI
             this.Forests = new List<Forest>();
             this.AvailableCertificates = new BindableCollection<X509Certificate2ViewModel>();
             this.DisplayName = "Local admin passwords";
+            this.certPermissionProvider = certPermissionProvider;
         }
-        
+
         public string HelpLink => Constants.HelpLinkPageLocalAdminPasswords;
 
         protected override void OnInitialActivate()
@@ -146,13 +149,12 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert(this.SelectedForest.Name);
+                X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert(this.SelectedForest.Name, CertificateProvider.LithnetAccessManagerPasswordEncryptionEku);
 
-                using X509Store store =
-                    this.certificateProvider.OpenServiceStore(AccessManager.Constants.ServiceName,
-                        OpenFlags.ReadWrite);
+                using X509Store store = X509ServiceStoreHelper.Open(AccessManager.Constants.ServiceName, OpenFlags.ReadWrite);
                 store.Add(cert);
-                cert.AddPrivateKeyReadPermission(this.serviceSettings.GetServiceAccount());
+
+                this.certPermissionProvider.AddReadPermission(cert);
 
                 var vm = this.certificate2ViewModelFactory.CreateViewModel(cert);
 
@@ -187,12 +189,84 @@ namespace Lithnet.AccessManager.Server.UI
             X509Certificate2UI.DisplayCertificate(this.SelectedCertificate.Model, this.GetHandle());
         }
 
+        public bool CanExportCertificate => this.SelectedCertificate != null && this.SelectedCertificate.HasPrivateKey;
+
+        public void ExportCertificate()
+        {
+            var cert = this.SelectedCertificate.Model;
+
+            if (cert != null && cert.HasPrivateKey)
+            {
+                NativeMethods.ShowCertificateExportDialog(this.GetHandle(), "Export certificate", cert);
+            }
+        }
+
+        public bool CanDeleteCertificate => this.SelectedCertificate != null;
+
+        public async Task DeleteCertificate()
+        {
+            var cert = this.SelectedCertificate.Model;
+
+            try
+            {
+                if (cert != null)
+                {
+                    if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", "If you delete this certificate, you will no longer be able to decrypt any passwords that have been encrypted with it. Are you sure you want to proceed?", MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings
+                    {
+                        AffirmativeButtonText = "Yes",
+                        NegativeButtonText = "No"
+                    }) == MessageDialogResult.Affirmative)
+                    {
+                        using (X509Store store = X509ServiceStoreHelper.Open(AccessManager.Constants.ServiceName, OpenFlags.ReadWrite))
+                        {
+                            store.Remove(cert);
+                        }
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(EventIDs.UIGenericError, ex, "Could not delete certificate");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not delete the certificate\r\n{ex.Message}");
+            }
+            finally
+            {
+                await this.RefreshAvailableCertificates();
+            }
+        }
+
+        public async Task ImportCertificate()
+        {
+            try
+            {
+                using (X509Store store = X509ServiceStoreHelper.Open(AccessManager.Constants.ServiceName, OpenFlags.ReadWrite))
+                {
+                    X509Certificate2 newCert = NativeMethods.ShowCertificateImportDialog(this.GetHandle(), "Import encryption certificate", store);
+
+                    if (newCert != null)
+                    {
+                        this.certPermissionProvider.AddReadPermission(newCert);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(EventIDs.UIGenericError, ex, "Could not import certificate");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not import the certificate\r\n{ex.Message}");
+            }
+            finally
+            {
+                await this.RefreshAvailableCertificates();
+            }
+        }
+
         public void DelegateServicePermission()
         {
             var vm = new ScriptContentViewModel(this.dialogCoordinator)
             {
                 HelpText = "Modify the OU variable in this script, and run it with domain admin rights to assign permissions for the service account to be able to read the encrypted local admin passwords and history from the directory",
-                ScriptText = this.scriptTemplateProvider.GrantAccessManagerPermissions.Replace("{serviceAccount}", this.serviceSettings.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
+                ScriptText = this.scriptTemplateProvider.GrantAccessManagerPermissions.Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
             };
 
             ExternalDialogWindow w = new ExternalDialogWindow
@@ -249,7 +323,7 @@ namespace Lithnet.AccessManager.Server.UI
             var vm = new ScriptContentViewModel(this.dialogCoordinator)
             {
                 HelpText = "Modify the OU variable in this script, and run it with domain admin rights to assign permissions for the service account to be able to read Microsoft LAPS passwords from the directory",
-                ScriptText = this.scriptTemplateProvider.GrantMsLapsPermissions.Replace("{serviceAccount}", this.serviceSettings.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
+                ScriptText = this.scriptTemplateProvider.GrantMsLapsPermissions.Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
             };
 
             ExternalDialogWindow w = new ExternalDialogWindow
@@ -279,7 +353,7 @@ namespace Lithnet.AccessManager.Server.UI
                     return;
                 }
 
-                var allCertificates = certificateProvider.GetEligibleCertificates(false).OfType<X509Certificate2>();
+                var allCertificates = certificateProvider.GetEligiblePasswordEncryptionCertificates(false).OfType<X509Certificate2>();
                 this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert,
                     this.SelectedForest.RootDomain.Name);
 

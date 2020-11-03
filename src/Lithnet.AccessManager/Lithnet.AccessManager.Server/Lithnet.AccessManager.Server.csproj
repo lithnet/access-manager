@@ -14,12 +14,27 @@
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <RuntimeIdentifier>win8-x64</RuntimeIdentifier>
   </PropertyGroup>
- 
+
   <ItemGroup>
+    <EmbeddedResource Include="..\Lithnet.AccessManager.Service.Setup\output\license*.dat" LinkBase="EmbeddedResources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="DBScripts\00001-CreateRateLimitCacheTable.sql" />
+    <None Remove="DBScripts\00003-CreateAuditTable.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="DBScripts\00001-CreateRateLimitCacheTable.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DbUp-SqlServer" Version="4.4.0" />
     <PackageReference Include="htmlagilitypack" Version="1.11.24" />
+    <PackageReference Include="lithnet.accessmanager.enterprise" Version="1.0.7610.29656" />
     <PackageReference Include="lithnet.security.authorization" Version="1.0.7518.2238" />
     <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.1.9" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="6.7.1" />
@@ -46,6 +61,10 @@
       <LastGenOutput>LogMessages.Designer.cs</LastGenOutput>
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="EmbeddedResources\" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

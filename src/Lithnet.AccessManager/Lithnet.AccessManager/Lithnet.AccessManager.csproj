@@ -19,13 +19,14 @@
     <PackageReference Include="CSVHelper" Version="15.0.5" />
     <PackageReference Include="lithnet.security.authorization" Version="1.0.7518.2238" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.6" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.9" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Nlog" Version="4.7.3" />
     <PackageReference Include="system.directoryservices" Version="4.7.0" />
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.7.0" />
     <PackageReference Include="System.DirectoryServices.Protocols" Version="4.7.0" />
     <PackageReference Include="system.security.Cryptography.Cng" Version="4.7.0" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="4.7.0" />
     <PackageReference Include="Vanara.PInvoke.Cryptography" Version="3.2.17" />
     <PackageReference Include="vanara.pinvoke.netapi32" Version="3.2.16" />
     <PackageReference Include="Vanara.pinvoke.Security" Version="3.2.17" />

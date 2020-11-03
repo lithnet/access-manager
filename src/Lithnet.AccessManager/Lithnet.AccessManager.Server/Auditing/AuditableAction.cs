@@ -17,6 +17,8 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         public IUser User { get; set; }
 
+        public AuthorizationTargetType TargetType { get; set; }
+
         public IComputer Computer { get; set; }
 
         public Exception Exception { get; set; }

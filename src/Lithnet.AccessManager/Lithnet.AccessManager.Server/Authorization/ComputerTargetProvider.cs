@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.Authorization
@@ -61,7 +60,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogEventError(EventIDs.TargetRuleProcessingError, $"An error occurred processing the target {target.Id}:{target.Type}:{target.Target}", ex);
+                    this.logger.LogError(EventIDs.TargetRuleProcessingError, ex, $"An error occurred processing the target {target.Id}:{target.Type}:{target.Target}");
                 }
             }
 

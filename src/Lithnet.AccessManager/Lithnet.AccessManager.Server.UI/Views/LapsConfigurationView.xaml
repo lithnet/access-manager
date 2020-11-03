@@ -131,9 +131,6 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
@@ -160,8 +157,6 @@
                                       ItemsSource="{Binding AvailableCertificates}"
                                       SelectedItem="{Binding SelectedCertificate}"
                                       ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                                      MinHeight="75"
-                                      MaxHeight="200"
                                       Margin="5">
                 <ListView.Resources>
                     <DataTemplate x:Key="PublishedIconTemplate">
@@ -231,6 +226,10 @@
                             Height="Auto"
                             VerticalAlignment="Bottom"
                             Margin="5"/>
+
+                <Button Command="{s:Action ExportCertificate}"
+                        Content="Export..."
+                        Margin="5"/>
                 <Button Command="{s:Action PublishSelectedCertificate}"
                     Margin="5" 
                     VerticalContentAlignment="Center">
@@ -241,16 +240,26 @@
                     </StackPanel>
                 </Button>
 
-                <Button Command="{s:Action GenerateEncryptionCertificate}"
-                            Content="Generate new..."
-                            Margin="5"/>
-
-
-                <Button Command="{s:Action Repermission}"
-                        Content="Reset permission..."
+                <Button Command="{s:Action DeleteCertificate}"
+                        Content="Delete..."
                         Margin="5"/>
+
+                <!--<Button Command="{s:Action Repermission}"
+                        Content="Reset permission..."
+                        Margin="5"/>-->
             </StackPanel>
 
+            <StackPanel Grid.Row="4" Grid.Column="1"
+                        HorizontalAlignment="Left"
+                        Orientation="Horizontal">
+                <Button Command="{s:Action GenerateEncryptionCertificate}"
+                        Content="Generate new..."
+                        Margin="5"/>
+
+                <Button Command="{s:Action ImportCertificate}"
+                        Content="Import..."
+                        Margin="5"/>
+            </StackPanel>
         </Grid>
     </StackPanel>
 </UserControl>

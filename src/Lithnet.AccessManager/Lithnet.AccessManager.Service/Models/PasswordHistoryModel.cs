@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Lithnet.AccessManager.Server;
 
 namespace Lithnet.AccessManager.Service.Models
 {

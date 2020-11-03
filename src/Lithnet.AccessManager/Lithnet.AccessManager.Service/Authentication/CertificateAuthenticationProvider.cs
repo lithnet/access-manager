@@ -7,9 +7,9 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.Extensions;
 using Lithnet.AccessManager.Service.App_LocalResources;
 using Lithnet.AccessManager.Service.Internal;
 using Microsoft.AspNetCore.Authentication.Certificate;
@@ -85,7 +85,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
                         {
                             context.Fail(ex);
                             context.Principal = null;
-                            this.logger.LogEventError(EventIDs.CertificateValidationError, $"The certificate could not be validated. {ex.Message}\r\n\r\n{claims}\r\n{context.HttpContext.Connection.ClientCertificate}", ex);
+                            this.logger.LogError(EventIDs.CertificateValidationError, ex, $"The certificate could not be validated. {ex.Message}\r\n\r\n{claims}\r\n{context.HttpContext.Connection.ClientCertificate}");
                             return Task.CompletedTask;
                         }
 
@@ -98,13 +98,13 @@ namespace Lithnet.AccessManager.Service.AppSettings
                         {
                             context.Fail(ex);
                             context.Principal = null;
-                            this.logger.LogEventError(EventIDs.CertificateIdentityNotFound, $"The identity represented by the certificate could not be resolved. {ex.Message}\r\n\r\n{claims}\r\n{context.HttpContext.Connection.ClientCertificate}", ex);
+                            this.logger.LogError(EventIDs.CertificateIdentityNotFound, ex, $"The identity represented by the certificate could not be resolved. {ex.Message}\r\n\r\n{claims}\r\n{context.HttpContext.Connection.ClientCertificate}");
                             return Task.CompletedTask;
                         }
 
                         var updatedClaims = (context.Principal?.Identity as ClaimsIdentity)?.ToClaimList();
 
-                        this.logger.LogEventSuccess(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, updatedClaims));
+                        this.logger.LogInformation(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, updatedClaims));
                         context.Success();
 
                         this.cache.Set(context.ClientCertificate.Thumbprint, context.Principal, TimeSpan.FromMinutes(30));
@@ -112,13 +112,13 @@ namespace Lithnet.AccessManager.Service.AppSettings
                     },
                     OnAuthenticationFailed = context =>
                     {
-                        this.logger.LogEventError(EventIDs.CertificateAuthNError, string.Format(LogMessages.CertificateAuthNGenericFailure, context.HttpContext.Connection.ClientCertificate), context.Exception);
+                        this.logger.LogError(EventIDs.CertificateAuthNError, context.Exception, string.Format(LogMessages.CertificateAuthNGenericFailure, context.HttpContext.Connection.ClientCertificate));
                         context.Response.Redirect($"/Home/AuthNError?messageID={(int)AuthNFailureMessageID.InvalidCertificate}");
                         return Task.CompletedTask;
                     },
                     OnChallenge = context =>
                     {
-                        this.logger.LogEventError(EventIDs.CertificateAuthNAccessDenied, string.Format(LogMessages.CertificateAuthNValidationFailure, context.HttpContext.Connection.ClientCertificate));
+                        this.logger.LogError(EventIDs.CertificateAuthNAccessDenied, string.Format(LogMessages.CertificateAuthNValidationFailure, context.HttpContext.Connection.ClientCertificate));
                         context.HandleResponse();
                         context.Response.Redirect($"/Home/AuthNError?messageID={(int)AuthNFailureMessageID.InvalidCertificate}");
                         return Task.CompletedTask;

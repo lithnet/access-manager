@@ -4,15 +4,14 @@ using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Service.App_LocalResources;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Service.AppSettings
 {
     public abstract class HttpContextAuthenticationProvider : IHttpContextAuthenticationProvider
     {
         private readonly IDirectory directory;
-
         private readonly IHttpContextAccessor httpContextAccessor;
-
         private readonly IAuthorizationContextProvider authzContextProvider;
 
         public abstract bool CanLogout { get; }

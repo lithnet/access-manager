@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Lithnet.AccessManager
+namespace Lithnet.AccessManager.Server
 {
     public interface IPasswordProvider
     {

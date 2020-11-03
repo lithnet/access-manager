@@ -189,7 +189,7 @@ namespace Lithnet.AccessManager.Server.Test
             s.Authority = TestContext.CurrentContext.Random.GetString();
             s.ClientID = TestContext.CurrentContext.Random.GetString();
             s.ResponseType = TestContext.CurrentContext.Random.GetString();
-            s.Secret = new EncryptedData()
+            s.Secret = new ProtectedSecret()
             {
                 Data = TestContext.CurrentContext.Random.GetString(),
                 Mode = TestContext.CurrentContext.Random.Next(),
@@ -419,7 +419,7 @@ namespace Lithnet.AccessManager.Server.Test
             EmailOptions s = new EmailOptions();
             s.FromAddress = TestContext.CurrentContext.Random.GetString();
             s.Host = TestContext.CurrentContext.Random.GetString();
-            s.Password = new EncryptedData()
+            s.Password = new ProtectedSecret()
             {
                 Data = TestContext.CurrentContext.Random.GetString(),
                 Mode = TestContext.CurrentContext.Random.Next(),

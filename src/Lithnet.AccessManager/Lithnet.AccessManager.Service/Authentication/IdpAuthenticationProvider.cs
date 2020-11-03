@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Authorization;
-using Lithnet.AccessManager.Server.Extensions;
 using Lithnet.AccessManager.Service.App_LocalResources;
 using Lithnet.AccessManager.Service.Internal;
 using Microsoft.AspNetCore.Authentication;
@@ -29,7 +29,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
 
         public Task HandleAuthNFailed(AccessDeniedContext context)
         {
-            this.logger.LogEventError(EventIDs.ExternalAuthNAccessDenied, LogMessages.AuthNAccessDenied, context.Result?.Failure);
+            this.logger.LogError(EventIDs.ExternalAuthNAccessDenied, context.Result?.Failure, LogMessages.AuthNAccessDenied);
             context.HandleResponse();
             context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.ExternalAuthNProviderDenied}");
 
@@ -38,7 +38,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
 
         public Task HandleRemoteFailure(RemoteFailureContext context)
         {
-            this.logger.LogEventError(EventIDs.ExternalAuthNProviderError, LogMessages.AuthNProviderError, context.Failure);
+            this.logger.LogError(EventIDs.ExternalAuthNProviderError, context.Failure, LogMessages.AuthNProviderError);
             context.HandleResponse();
             context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.ExternalAuthNProviderError}");
 
@@ -56,7 +56,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
                 if (sid == null)
                 {
                     string message = string.Format(LogMessages.UserNotFoundInDirectory, user.ToClaimList());
-                    this.logger.LogEventError(EventIDs.SsoIdentityNotFound, message, null);
+                    this.logger.LogError(EventIDs.SsoIdentityNotFound, message);
                     context.HandleResponse();
                     context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.SsoIdentityNotFound}");
                     return Task.CompletedTask;
@@ -64,12 +64,12 @@ namespace Lithnet.AccessManager.Service.AppSettings
 
                 user.AddClaim(new Claim(ClaimTypes.PrimarySid, sid));
                 this.AddAuthZClaims(directoryUser, user);
-                this.logger.LogEventSuccess(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, user.ToClaimList()));
+                this.logger.LogInformation(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, user.ToClaimList()));
                 return Task.CompletedTask;
             }
             catch (Exception ex)
             {
-                this.logger.LogEventError(EventIDs.AuthNResponseProcessingError, LogMessages.AuthNResponseProcessingError, ex);
+                this.logger.LogError(EventIDs.AuthNResponseProcessingError, ex, LogMessages.AuthNResponseProcessingError);
                 context.HandleResponse();
                 context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.SsoIdentityNotFound}");
                 return Task.CompletedTask;
@@ -90,7 +90,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogEventError(EventIDs.AuthNDirectoryLookupError, string.Format(LogMessages.AuthNDirectoryLookupError, c.Type, c.Value), ex);
+                    this.logger.LogError(EventIDs.AuthNDirectoryLookupError, ex, string.Format(LogMessages.AuthNDirectoryLookupError, c.Type, c.Value));
                 }
             }
 

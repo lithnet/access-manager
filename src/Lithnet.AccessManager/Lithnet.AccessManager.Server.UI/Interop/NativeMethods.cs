@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Security.AccessControl;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceProcess;
 using System.Windows;
 using Lithnet.AccessManager.Interop;
+using Vanara.PInvoke;
 
 namespace Lithnet.AccessManager.Server.UI.Interop
 {
@@ -100,7 +99,7 @@ namespace Lithnet.AccessManager.Server.UI.Interop
                 }
 
                 info.Flags |= DsBrowseInfoFlags.ReturnFormat | DsBrowseInfoFlags.ReturnObjectClass;
-                info.ReturnFormat = pathFormat ;
+                info.ReturnFormat = pathFormat;
                 info.ObjectClass = new string(new char[MAX_PATH]);
                 info.ObjectClassSize = MAX_PATH;
                 info.PathSize = info.Path.Length;
@@ -177,74 +176,65 @@ namespace Lithnet.AccessManager.Server.UI.Interop
             ServiceController controller = new ServiceController(serviceName);
 
             if (!ChangeServiceConfig(controller.ServiceHandle.DangerousGetHandle(), SERVICE_NO_CHANGE,
-                SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, null, null, IntPtr.Zero, null, username, password, null))
+                                     SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, null, null, IntPtr.Zero, null, username, password, null))
             {
                 throw new Win32Exception(Marshal.GetLastWin32Error());
             }
         }
 
-        public static string GetKeyLocation(X509Certificate2 cert)
+        public static X509Certificate2 ShowCertificateImportDialog(IntPtr hwnd, string title, StoreLocation location, StoreName name)
         {
-            var cng = cert.PrivateKey as RSACng;
-            var crypto = cert.PrivateKey as RSACryptoServiceProvider;
-
-            string name = cng.Key.UniqueName ?? crypto.CspKeyContainerInfo.UniqueKeyContainerName;
-
-            if (string.IsNullOrWhiteSpace(name))
+            using (X509Store store = new X509Store(name, StoreLocation.LocalMachine, OpenFlags.ReadWrite))
             {
-                return null;
+                return ShowCertificateImportDialog(hwnd, title, store);
+            }
+        }
+
+        public static X509Certificate2 ShowCertificateImportDialog(IntPtr hwnd, string title, X509Store store)
+        {
+            List<string> thumbprints = store.Certificates.OfType<X509Certificate2>().Select(t => t.Thumbprint).ToList();
+
+            if (!CryptUIWizImport(CRYPTUI_WIZ_IMPORT_ALLOW_CERT | CRYPTUI_WIZ_IMPORT_NO_CHANGE_DEST_STORE | ((store.Location == StoreLocation.LocalMachine) ? CRYPTUI_WIZ_IMPORT_TO_LOCALMACHINE : 0),
+                                  hwnd, title, IntPtr.Zero, store.StoreHandle))
+            {
+                int result = Marshal.GetLastWin32Error();
+                throw new Win32Exception(result);
             }
 
-            string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Application Data\Microsoft\Crypto\RSA\MachineKeys", name);
+            var newCertificateList = store.Certificates.OfType<X509Certificate2>().ToList();
 
-            if (File.Exists(path))
+            var newItems = newCertificateList.Where(t => thumbprints.All(u => u != t.Thumbprint));
+
+            foreach (var newItem in newItems)
             {
-                return path;
-            }
-
-            path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), @"Application Data\Microsoft\Crypto\Keys", name);
-
-
-            if (File.Exists(path))
-            {
-                return path;
+                if (newItem.HasPrivateKey)
+                {
+                    return newItem;
+                }
             }
 
             return null;
         }
 
-        public static X509Certificate2 ShowCertificateImportDialog(IntPtr hwnd, string title, StoreLocation location, StoreName name)
+        public static void ShowCertificateExportDialog(IntPtr hwnd, string title, X509Certificate2 certificate)
         {
-            List<string> thumbprints = new List<string>();
-
-            using (X509Store store = new X509Store(name, StoreLocation.LocalMachine, OpenFlags.ReadWrite))
+            CryptUI.CRYPTUI_WIZ_EXPORT_INFO exportInfo = new CryptUI.CRYPTUI_WIZ_EXPORT_INFO
             {
-                thumbprints = store.Certificates.OfType<X509Certificate2>().Select(t => t.Thumbprint).ToList();
-
-                if (!CryptUIWizImport(CRYPTUI_WIZ_IMPORT_ALLOW_CERT | CRYPTUI_WIZ_IMPORT_NO_CHANGE_DEST_STORE | CRYPTUI_WIZ_IMPORT_TO_LOCALMACHINE,
-                    hwnd, title, IntPtr.Zero, store.StoreHandle))
+                dwSubjectChoice = CryptUI.CryptUIWizExportType.CRYPTUI_WIZ_EXPORT_CERT_CONTEXT,
+                Subject =
                 {
-                    int result = Marshal.GetLastWin32Error();
-                    throw new Win32Exception(result);
-                }
+                    pCertContext = certificate.Handle
+                },
+            };
+
+            CryptUI.CryptUIWizFlags flags = 0;
+
+            if (certificate.HasPrivateKey)
+            {
+                flags = CryptUI.CryptUIWizFlags.CRYPTUI_WIZ_EXPORT_PRIVATE_KEY;
             }
 
-            using (X509Store store = new X509Store(name, StoreLocation.LocalMachine, OpenFlags.ReadWrite))
-            {
-                var newCertificateList = store.Certificates.OfType<X509Certificate2>().ToList();
-
-                var newItems = newCertificateList.Where(t => thumbprints.All(u => u != t.Thumbprint));
-
-                foreach (var newItem in newItems)
-                {
-                    if (newItem.HasPrivateKey)
-                    {
-                        return newItem;
-                    }
-                }
-            }
-
-            return null;
+            CryptUI.CryptUIWizExport(flags, hwnd, title, exportInfo);
         }
 
         public static string GetSecurityDescriptor(IntPtr pSD, SecurityInfos requestedInformation)
