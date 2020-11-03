@@ -18,7 +18,7 @@ namespace Lithnet.AccessManager.Service
 
         public async Task<string> StoreAsync(AuthenticationTicket ticket)
         {
-            string key = $"{KeyPrefix}{new Guid()}";
+            string key = $"{KeyPrefix}{Guid.NewGuid()}";
             await RenewAsync(key, ticket);
             return key;
         }

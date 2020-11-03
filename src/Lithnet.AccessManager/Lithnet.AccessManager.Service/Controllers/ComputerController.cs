@@ -582,8 +582,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             }
             catch (Exception ex)
             {
-                this.logger.LogError(EventIDs.ComputerDiscoveryError, ex, string.Format(LogMessages.ComputerDiscoveryError, user.MsDsPrincipalName, model.ComputerName));
-
+                this.logger.LogError(EventIDs.ComputerDiscoveryError, ex, string.Format(LogMessages.ComputerDiscoveryError, model.ComputerName));
                 model.FailureReason = UIMessages.ComputerDiscoveryError;
                 failure = this.View("AccessRequest", model);
             }

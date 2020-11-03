@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.DirectoryServices;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
@@ -381,7 +382,15 @@ namespace Lithnet.AccessManager
 
                     string hostname = parts[0];
                     string domain = string.Join(".", parts.Skip(1).ToArray());
-                    string netbiosDomain = this.discoveryServices.GetDomainNameNetBios(domain);
+                    string netbiosDomain;
+                    try
+                    {
+                        netbiosDomain = this.discoveryServices.GetDomainNameNetBios(domain);
+                    }
+                    catch (Win32Exception ex) when (ex.NativeErrorCode == 1355)
+                    {
+                        throw new ObjectNotFoundException($"Could not find computer {objectName} because the domain name {domain} could not be translated to a netBIOS name", ex);
+                    }
 
                     string nt4Name = $"{netbiosDomain}\\{hostname}$";
 

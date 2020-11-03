@@ -133,7 +133,7 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An unexpected error occurred while trying to find the requested computer.
+        ///   Looks up a localized string similar to Unable to locate the requested computer.
         /// </summary>
         public static string ComputerDiscoveryError {
             get {
@@ -345,6 +345,15 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         public static string NotAuthorized {
             get {
                 return ResourceManager.GetString("NotAuthorized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are not authorized to access this application.
+        /// </summary>
+        public static string NotAuthorizedMessage {
+            get {
+                return ResourceManager.GetString("NotAuthorizedMessage", resourceCulture);
             }
         }
         

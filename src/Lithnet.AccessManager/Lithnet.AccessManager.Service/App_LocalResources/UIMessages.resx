@@ -205,7 +205,7 @@
     <value>Your request could not be processed as your user information is not recognized</value>
   </data>
   <data name="ComputerDiscoveryError" xml:space="preserve">
-    <value>An unexpected error occurred while trying to find the requested computer</value>
+    <value>Unable to locate the requested computer</value>
   </data>
   <data name="JitError" xml:space="preserve">
     <value>Just-in-time access could not be granted because an unexpected error occurred</value>
@@ -248,5 +248,8 @@
   </data>
   <data name="HeadingBitLockerKeys" xml:space="preserve">
     <value>BitLocker recovery passwords</value>
+  </data>
+  <data name="NotAuthorizedMessage" xml:space="preserve">
+    <value>You are not authorized to access this application</value>
   </data>
 </root>

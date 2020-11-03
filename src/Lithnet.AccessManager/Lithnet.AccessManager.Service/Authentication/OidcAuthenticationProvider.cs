@@ -102,6 +102,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
              {
                  cookieAuthenticationOptions.LoginPath = "/Home/Login";
                  cookieAuthenticationOptions.LogoutPath = "/Home/SignOut";
+                 cookieAuthenticationOptions.AccessDeniedPath = "/Home/AccessDenied";
                  cookieAuthenticationOptions.Cookie.SameSite = SameSiteMode.None;
                  cookieAuthenticationOptions.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                  cookieAuthenticationOptions.SessionStore = new AuthenticationTicketCache();
