@@ -205,7 +205,7 @@
     <value>Your request could not be processed as your user information is not recognized</value>
   </data>
   <data name="ComputerDiscoveryError" xml:space="preserve">
-    <value>An unexpected error occurred while trying to find the requested computer</value>
+    <value>Unable to locate the requested computer</value>
   </data>
   <data name="JitError" xml:space="preserve">
     <value>Just-in-time access could not be granted because an unexpected error occurred</value>
