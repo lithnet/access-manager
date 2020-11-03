@@ -27,6 +27,18 @@ namespace Lithnet.AccessManager.Service.Controllers
             return this.RedirectToAction("AccessRequest", "Computer");
         }
 
+        public IActionResult AccessDenied()
+        {
+            ErrorModel model = new ErrorModel();
+
+            logger.LogTrace($"AuthZ error from {this.Request.HttpContext.Connection.RemoteIpAddress}");
+
+            model.Heading = UIMessages.AccessDenied;
+            model.Message = UIMessages.NotAuthorizedMessage;
+            return this.View("Error", model);
+
+        }
+
         public IActionResult AuthNError(AuthNFailureMessageID messageID)
         {
             ErrorModel model = new ErrorModel();

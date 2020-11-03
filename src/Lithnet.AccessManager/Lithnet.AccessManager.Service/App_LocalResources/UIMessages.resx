@@ -249,4 +249,7 @@
   <data name="HeadingBitLockerKeys" xml:space="preserve">
     <value>BitLocker recovery passwords</value>
   </data>
+  <data name="NotAuthorizedMessage" xml:space="preserve">
+    <value>You are not authorized to access this application</value>
+  </data>
 </root>

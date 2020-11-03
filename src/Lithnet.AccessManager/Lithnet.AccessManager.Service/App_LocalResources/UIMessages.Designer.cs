@@ -349,6 +349,15 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You are not authorized to access this application.
+        /// </summary>
+        public static string NotAuthorizedMessage {
+            get {
+                return ResourceManager.GetString("NotAuthorizedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Password.
         /// </summary>
         public static string Password {
