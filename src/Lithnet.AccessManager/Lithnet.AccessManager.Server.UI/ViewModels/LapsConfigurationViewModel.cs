@@ -5,6 +5,7 @@ using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
@@ -26,8 +27,10 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDiscoveryServices discoveryServices;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
         private readonly ICertificatePermissionProvider certPermissionProvider;
+        private readonly DataProtectionOptions dataProtectionOptions;
+        private readonly INotifyModelChangedEventPublisher eventPublisher;
 
-        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IWindowsServiceProvider windowsServiceProvider, ILogger<LapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider)
+        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IWindowsServiceProvider windowsServiceProvider, ILogger<LapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, DataProtectionOptions dataProtectionOptions, INotifyModelChangedEventPublisher eventPublisher)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.certificateProvider = certificateProvider;
@@ -38,6 +41,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.domainTrustProvider = domainTrustProvider;
             this.discoveryServices = discoveryServices;
             this.scriptTemplateProvider = scriptTemplateProvider;
+            this.dataProtectionOptions = dataProtectionOptions;
+            this.eventPublisher = eventPublisher;
 
             this.Forests = new List<Forest>();
             this.AvailableCertificates = new BindableCollection<X509Certificate2ViewModel>();
@@ -160,6 +165,13 @@ namespace Lithnet.AccessManager.Server.UI
 
                 this.AvailableCertificates.Add(vm);
                 this.SelectedCertificate = vm;
+
+                this.OnCertificateListChanged();
+
+                if (await this.dialogCoordinator.ShowMessageAsync(this, "Encryption certificate created", "A new certificate has been generated. Publish this certificate to the directory to allow clients to encrypt passwords with this certificate.\r\n\r\n Note, that if you loose this certificate, passwords encrypted with it will not be recoverable.\r\n\r\n Do you want to backup the encryption certificate now?", MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings { AffirmativeButtonText = "Yes", NegativeButtonText = "No" }) == MessageDialogResult.Affirmative)
+                {
+                    this.ExportCertificate();
+                }
             }
             catch (Exception ex)
             {
@@ -220,6 +232,7 @@ namespace Lithnet.AccessManager.Server.UI
                         using (X509Store store = X509ServiceStoreHelper.Open(AccessManager.Constants.ServiceName, OpenFlags.ReadWrite))
                         {
                             store.Remove(cert);
+                            this.OnCertificateListChanged();
                         }
                     }
 
@@ -247,6 +260,7 @@ namespace Lithnet.AccessManager.Server.UI
                     if (newCert != null)
                     {
                         this.certPermissionProvider.AddReadPermission(newCert);
+                        this.OnCertificateListChanged();
                     }
                 }
             }
@@ -282,40 +296,12 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task OpenAccessManagerAgentDownload()
         {
-            try
-            {
-                var psi = new ProcessStartInfo
-                {
-                    FileName = Constants.LinkDownloadAccessManagerAgent,
-                    UseShellExecute = true
-                };
-
-                Process.Start(psi);
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not open link");
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not open the default link handler\r\n{ex.Message}");
-            }
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.LinkDownloadAccessManagerAgent);
         }
 
         public async Task OpenMsLapsDownload()
         {
-            try
-            {
-                var psi = new ProcessStartInfo
-                {
-                    FileName = Constants.LinkDownloadMsLaps,
-                    UseShellExecute = true
-                };
-
-                Process.Start(psi);
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not open link");
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not open the default link handler\r\n{ex.Message}");
-            }
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.LinkDownloadMsLaps);
         }
 
         public void DelegateMsLapsPermission()
@@ -335,6 +321,14 @@ namespace Lithnet.AccessManager.Server.UI
             };
 
             w.ShowDialog();
+        }
+
+        private void OnCertificateListChanged()
+        {
+            if (this.dataProtectionOptions.EnableCertificateSynchronization)
+            {
+                this.eventPublisher.RaiseModelChangedEvent(this, "Certificates", false);
+            }
         }
 
         private async Task RefreshAvailableCertificates()

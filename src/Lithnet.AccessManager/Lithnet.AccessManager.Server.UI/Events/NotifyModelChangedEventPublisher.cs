@@ -36,11 +36,16 @@ namespace Lithnet.AccessManager.Server.UI
 
                         if (property.GetValue(item) is INotifyCollectionChanged v)
                         {
-                            v.CollectionChanged += delegate(object sender, NotifyCollectionChangedEventArgs e) { V_CollectionChanged(sender, e, attribute?.RequiresServiceRestart ?? false); };
+                            v.CollectionChanged += delegate (object sender, NotifyCollectionChangedEventArgs e) { V_CollectionChanged(sender, e, attribute?.RequiresServiceRestart ?? false); };
                         }
                     }
                 }
             }
+        }
+
+        public void RaiseModelChangedEvent(object sender, string propertyName, bool requiresServiceRestart)
+        {
+            this.eventAggregator.Publish(new ModelChangedEvent(sender, propertyName, requiresServiceRestart));
         }
 
         public void Pause()
@@ -60,7 +65,7 @@ namespace Lithnet.AccessManager.Server.UI
                 return;
             }
 
-            this.eventAggregator.Publish(new ModelChangedEvent(sender, "Collection", restartService));
+            this.RaiseModelChangedEvent(sender, "Collection", restartService);
         }
 
         private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -77,9 +82,9 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 if (Attribute.IsDefined(pi, typeof(NotifyModelChangedPropertyAttribute)))
                 {
-                    NotifyModelChangedPropertyAttribute attribute = (NotifyModelChangedPropertyAttribute)Attribute.GetCustomAttribute(pi, typeof(NotifyModelChangedPropertyAttribute));   
-                    
-                    this.eventAggregator.Publish(new ModelChangedEvent(sender, e.PropertyName, attribute?.RequiresServiceRestart ?? false));
+                    NotifyModelChangedPropertyAttribute attribute = (NotifyModelChangedPropertyAttribute)Attribute.GetCustomAttribute(pi, typeof(NotifyModelChangedPropertyAttribute));
+
+                    this.RaiseModelChangedEvent(sender, e.PropertyName, attribute?.RequiresServiceRestart ?? false);
                 }
             }
         }
