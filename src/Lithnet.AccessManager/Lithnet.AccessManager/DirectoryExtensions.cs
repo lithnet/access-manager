@@ -102,9 +102,11 @@ namespace Lithnet.AccessManager
         public static string ToClaimList(this ClaimsIdentity p)
         {
             StringBuilder builder = new StringBuilder();
-            foreach (Claim c in p.Claims)
+            var claimGroups = p.Claims.GroupBy(t => t.Type);
+
+            foreach (var g in claimGroups)
             {
-                builder.Append(c.Type).Append(": ").AppendLine(c.Value);
+                builder.Append(g.Key).Append(": ").AppendLine(string.Join(", ", g.Select(t => t.Value)));
             }
 
             return builder.ToString();
@@ -178,14 +180,14 @@ namespace Lithnet.AccessManager
 
 
         public static string GetPropertyString(this SearchResult result, string propertyName)
-        
+
         {
             if (!result.Properties.Contains(propertyName))
             {
                 return null;
             }
 
-            
+
             return result.Properties[propertyName][0]?.ToString();
         }
 
@@ -195,7 +197,7 @@ namespace Lithnet.AccessManager
             {
                 return null;
             }
-            
+
             return result.Properties[propertyName][0]?.ToString();
         }
 

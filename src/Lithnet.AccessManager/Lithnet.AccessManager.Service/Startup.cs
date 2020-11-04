@@ -3,7 +3,9 @@ using System.Configuration;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Security.Principal;
 using System.Threading.Channels;
+using DbUp.Engine.Output;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Auditing;
@@ -11,9 +13,10 @@ using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Workers;
 using Lithnet.AccessManager.Service.AppSettings;
-using Lithnet.AccessManager.Service.Internal;
 using Lithnet.AccessManager.Service.Extensions;
+using Lithnet.AccessManager.Service.Internal;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +24,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using DbUp.Engine.Output;
+using Microsoft.Win32;
 
 namespace Lithnet.AccessManager.Service
 {
@@ -44,12 +47,13 @@ namespace Lithnet.AccessManager.Service
             services.TryAddScoped<IOidcAuthenticationProvider, OidcAuthenticationProvider>();
             services.TryAddScoped<IWsFedAuthenticationProvider, WsFedAuthenticationProvider>();
             services.TryAddScoped<ICertificateAuthenticationProvider, CertificateAuthenticationProvider>();
+
             services.TryAddScoped<IAuthorizationService, SecurityDescriptorAuthorizationService>();
             services.TryAddScoped<SecurityDescriptorAuthorizationService>();
             services.TryAddScoped<IPowerShellSecurityDescriptorGenerator, PowerShellSecurityDescriptorGenerator>();
             services.TryAddScoped<IAuditEventProcessor, AuditEventProcessor>();
             services.TryAddScoped<ITemplateProvider, TemplateProvider>();
-            services.TryAddScoped<IRateLimiter, SqlCacheRateLimiter>();
+            services.TryAddScoped<IRateLimiter, MemoryCacheRateLimiter>();
             services.TryAddScoped<IJitAccessProvider, JitAccessProvider>();
             services.TryAddScoped<IPhoneticPasswordTextProvider, PhoneticStringProvider>();
             services.TryAddScoped<IHtmlPasswordProvider, HtmlPasswordProvider>();
@@ -72,7 +76,6 @@ namespace Lithnet.AccessManager.Service
             services.TryAddSingleton<IAuthorizationInformationMemoryCache, AuthorizationInformationMemoryCache>();
             services.TryAddSingleton<ITargetDataCache, TargetDataCache>();
             services.TryAddSingleton<IAuthorizationContextProvider, AuthorizationContextProvider>();
-            services.TryAddSingleton<ILicenseManager, LicenseManager>();
             services.TryAddSingleton<IClusterProvider, ClusterProvider>();
             services.TryAddSingleton<IProductSettingsProvider, ProductSettingsProvider>();
             services.TryAddSingleton<IProtectedSecretProvider, ProtectedSecretProvider>();
@@ -84,7 +87,7 @@ namespace Lithnet.AccessManager.Service
             services.TryAddSingleton<ILocalSam, LocalSam>();
             services.TryAddSingleton<IUpgradeLog, DbUpgradeLogger>();
             services.TryAddSingleton<IDbProvider, SqlDbProvider>();
-            
+
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();
             services.AddScoped<INotificationChannel, PowershellNotificationChannel>();
@@ -95,6 +98,7 @@ namespace Lithnet.AccessManager.Service
             services.AddSingleton(backgroundProcessingChannel.Writer);
             services.AddHostedService<AuditWorker>();
             services.AddHostedService<JitGroupWorker>();
+            services.AddHostedService<CertificateImportWorker>();
 
             services.Configure<UserInterfaceOptions>(Configuration.GetSection("UserInterface"));
             services.Configure<ConfigurationMetadata>(Configuration.GetSection("Metadata"));
@@ -111,13 +115,49 @@ namespace Lithnet.AccessManager.Service
             services.Configure<ForwardedHeadersAppOptions>(Configuration.GetSection("ForwardedHeaders"));
             services.Configure<JitConfigurationOptions>(Configuration.GetSection("JitConfiguration"));
             services.Configure<LicensingOptions>(Configuration.GetSection("Licensing"));
-            services.Configure<DataProtectionOptions>(Configuration.GetSection("DataProtection"));
+            services.Configure<Server.Configuration.DataProtectionOptions>(Configuration.GetSection("DataProtection"));
+
+            services.AddSingleton(this.CreateLicenseManager(services));
 
             this.ConfigureAuthentication(services);
             this.ConfigureAuthorization(services);
+            this.ConfigureDataProtection(services);
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<ForwardedHeadersAppOptions> fwdOptions, IOptions<ConfigurationMetadata> metadata, ILicenseManager licenseManager, ILogger<Startup> logger, ICertificateSynchronizationProvider certificateSynchronizationProvider, IDbProvider sqlProvider)
+        private ILicenseManager CreateLicenseManager(IServiceCollection services)
+        {
+            var provider = services.BuildServiceProvider();
+            var licenseDataProvider = provider.GetService<ILicenseDataProvider>();
+            var licenseLogger = provider.GetService<ILogger<LicenseManager>>();
+            var logger = provider.GetService<ILogger<Startup>>();
+            LicenseManager licenseManager = new LicenseManager(licenseLogger, licenseDataProvider);
+
+            try
+            {
+                var license = licenseManager.GetLicense();
+                if (license != null)
+                {
+                    logger.LogTrace("License information\r\n{licenseData}", license.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "An error occurred performing the license check. Enterprise edition features will not be available");
+            }
+
+            if (licenseManager.IsEnterpriseEdition())
+            {
+                logger.LogInformation("Starting Lithnet Access Manager Enterprise Edition");
+            }
+            else
+            {
+                logger.LogInformation("Starting Lithnet Access Manager Standard Edition");
+            }
+
+            return licenseManager;
+        }
+
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<ForwardedHeadersAppOptions> fwdOptions, IOptions<ConfigurationMetadata> metadata, ILicenseManager licenseManager, ILogger<Startup> logger)
         {
             metadata.Value.ValidateMetadata();
 
@@ -153,41 +193,36 @@ namespace Lithnet.AccessManager.Service
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            try
+           // sqlProvider.InitializeDb();
+        }
+
+        private void ConfigureDataProtection(IServiceCollection services)
+        {
+            var provider = services.BuildServiceProvider();
+            var dataProtectionOptions = provider.GetService<IOptions<Server.Configuration.DataProtectionOptions>>();
+            var licenseManager = provider.GetService<ILicenseManager>();
+            
+            IDataProtectionBuilder builder = services.AddDataProtection(options =>
             {
-                var license = licenseManager.GetLicense();
-                if (license != null)
+                options.ApplicationDiscriminator = "lithnetams";
+            });
+            
+            SecurityIdentifier sid = WindowsIdentity.GetCurrent().User;
+
+            RegistryKey key = Registry.LocalMachine.CreateSubKey($"Software\\Lithnet\\Access Manager Service\\Parameters\\Keys\\{sid}");
+            builder.PersistKeysToRegistry(key);
+
+            if (dataProtectionOptions.Value.EnableClusterCompatibleSecretEncryption && licenseManager.IsFeatureEnabled(LicensedFeatures.DpapiNgSecretEncryption))
+            {
+                if (dataProtectionOptions.Value.EnableClusterCompatibleSecretEncryption && licenseManager.IsFeatureEnabled(LicensedFeatures.DpapiNgSecretEncryption))
                 {
-                    logger.LogTrace("License information\r\n{licenseData}", license.ToString());
+                    builder.ProtectKeysWithDpapiNG($"SID={sid}", Microsoft.AspNetCore.DataProtection.XmlEncryption.DpapiNGProtectionDescriptorFlags.None);
+                }
+                else
+                {
+                    builder.ProtectKeysWithDpapi(false);
                 }
             }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "An error occurred performing the license check. Enterprise edition features will not be available");
-            }
-
-            if (licenseManager.IsEnterpriseEdition())
-            {
-                logger.LogInformation("Starting Lithnet Access Manager Enterprise Edition");
-            }
-            else
-            {
-                logger.LogInformation("Starting Lithnet Access Manager Standard Edition");
-            }
-
-            try
-            {
-                if (licenseManager.IsFeatureEnabled(LicensedFeatures.CertificateSynchronization))
-                {
-                    certificateSynchronizationProvider.ImportCertificatesFromConfig();
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(EventIDs.CertificateSynchronizationImportError, ex, "Could not import from synchronization store");
-            }
-
-            sqlProvider.InitializeDb();
         }
 
         private void ConfigureAuthentication(IServiceCollection services)

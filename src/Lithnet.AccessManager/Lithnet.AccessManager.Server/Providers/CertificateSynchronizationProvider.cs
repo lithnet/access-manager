@@ -148,43 +148,50 @@ namespace Lithnet.AccessManager.Server
                 return;
             }
 
-            this.licenseManager.ThrowOnMissingFeature(LicensedFeatures.CertificateSynchronization);
-
-            using (X509Store store = X509ServiceStoreHelper.Open(Constants.ServiceName, OpenFlags.ReadWrite))
+            try
             {
-                foreach (var certData in dataProtectionOptions.Certificates)
+                this.licenseManager.ThrowOnMissingFeature(LicensedFeatures.CertificateSynchronization);
+
+                using (X509Store store = X509ServiceStoreHelper.Open(Constants.ServiceName, OpenFlags.ReadWrite))
                 {
-                    if (certData.Operation != CertificateOperation.Add)
+                    foreach (var certData in dataProtectionOptions.Certificates)
                     {
-                        continue;
-                    }
-
-                    try
-                    {
-                        X509Certificate2 cert = store.Certificates.Find(X509FindType.FindByThumbprint, certData.Thumbprint, false).OfType<X509Certificate2>().FirstOrDefault();
-
-                        if (cert == null || !cert.HasPrivateKey)
+                        if (certData.Operation != CertificateOperation.Add)
                         {
-                            this.logger.LogTrace("The certificate {thumbprint} was not found in the local store and will be added", certData.Thumbprint);
-
-                            string password = this.secretProvider.UnprotectSecret(certData.Secret);
-
-                            cert = new X509Certificate2(Convert.FromBase64String(certData.Data), password, X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet);
-                            store.Add(cert);
-                            this.certPermissionProvider.AddReadPermission(cert);
-
-                            logger.LogTrace("Added certificate {thumbprint} to the service store", certData.Thumbprint);
+                            continue;
                         }
-                        else
+
+                        try
                         {
-                            logger.LogTrace("Certificate {thumbprint} was already in the store", certData.Thumbprint);
+                            X509Certificate2 cert = store.Certificates.Find(X509FindType.FindByThumbprint, certData.Thumbprint, false).OfType<X509Certificate2>().FirstOrDefault();
+
+                            if (cert == null || !cert.HasPrivateKey)
+                            {
+                                this.logger.LogTrace("The certificate {thumbprint} was not found in the local store and will be added", certData.Thumbprint);
+
+                                string password = this.secretProvider.UnprotectSecret(certData.Secret);
+
+                                cert = new X509Certificate2(Convert.FromBase64String(certData.Data), password, X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet);
+                                store.Add(cert);
+                                this.certPermissionProvider.AddReadPermission(cert);
+
+                                logger.LogTrace("Added certificate {thumbprint} to the service store", certData.Thumbprint);
+                            }
+                            else
+                            {
+                                logger.LogTrace("Certificate {thumbprint} was already in the store", certData.Thumbprint);
+                            }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        this.logger.LogError(EventIDs.CertificateSynchronizationImportError, ex, "Could not import certificate {thumbprint}", certData.Thumbprint);
+                        catch (Exception ex)
+                        {
+                            this.logger.LogError(EventIDs.CertificateSynchronizationImportError, ex, "Could not import certificate {thumbprint}", certData.Thumbprint);
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.CertificateSynchronizationImportError, ex, "Error performing certificate import");
             }
         }
     }

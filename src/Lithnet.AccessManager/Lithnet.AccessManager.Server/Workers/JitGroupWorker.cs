@@ -304,6 +304,12 @@ namespace Lithnet.AccessManager.Server.Workers
             foreach (var result in results)
             {
                 string cn = result.GetPropertyString("cn");
+
+                if (cn.Contains("\0CNF:", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
                 var name = this.groupResolver.BuildGroupName(template, null, cn);
                 yield return name.TrimStart('\\');
             }
