@@ -166,7 +166,7 @@ namespace Lithnet.AccessManager.Server.UI
                 this.AvailableCertificates.Add(vm);
                 this.SelectedCertificate = vm;
 
-                this.OnCertificateListChanged();
+                this.NotifyCertificateListChanged();
 
                 if (await this.dialogCoordinator.ShowMessageAsync(this, "Encryption certificate created", "A new certificate has been generated. Publish this certificate to the directory to allow clients to encrypt passwords with this certificate.\r\n\r\n Note, that if you loose this certificate, passwords encrypted with it will not be recoverable.\r\n\r\n Do you want to backup the encryption certificate now?", MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings { AffirmativeButtonText = "Yes", NegativeButtonText = "No" }) == MessageDialogResult.Affirmative)
                 {
@@ -232,7 +232,7 @@ namespace Lithnet.AccessManager.Server.UI
                         using (X509Store store = X509ServiceStoreHelper.Open(AccessManager.Constants.ServiceName, OpenFlags.ReadWrite))
                         {
                             store.Remove(cert);
-                            this.OnCertificateListChanged();
+                            this.NotifyCertificateListChanged();
                         }
                     }
 
@@ -260,7 +260,7 @@ namespace Lithnet.AccessManager.Server.UI
                     if (newCert != null)
                     {
                         this.certPermissionProvider.AddReadPermission(newCert);
-                        this.OnCertificateListChanged();
+                        this.NotifyCertificateListChanged();
                     }
                 }
             }
@@ -323,7 +323,7 @@ namespace Lithnet.AccessManager.Server.UI
             w.ShowDialog();
         }
 
-        private void OnCertificateListChanged()
+        private void NotifyCertificateListChanged()
         {
             if (this.dataProtectionOptions.EnableCertificateSynchronization)
             {
