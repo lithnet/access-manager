@@ -87,6 +87,7 @@
                     <GridView>
                         <GridViewColumn Header="Target" DisplayMemberBinding="{Binding DisplayName}" Width="Auto"/>
                         <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="Auto"/>
+                        <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status}" Width="Auto"/>
                         <GridViewColumn Header="Description" DisplayMemberBinding="{Binding Description}" Width="Auto"/>
                     </GridView>
                 </ListView.View>

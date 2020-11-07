@@ -13,6 +13,8 @@ using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.SimpleChildWindow;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
+using PropertyChanged;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -87,6 +89,38 @@ namespace Lithnet.AccessManager.Server.UI
                 this.Model.AuthorizationMode = value;
                 this.Script.ShouldValidate = (value == AuthorizationMode.PowershellScript);
             }
+        }
+
+        [DependsOn(nameof(Expiry), nameof(ExpireRule), nameof(IsDisabled))]
+        public string Status
+        {
+            get
+            {
+                return this.IsDisabled ? "Disabled" : this.HasExpired ? "Expired" : "Active";
+            }
+        }
+
+        public bool IsDisabled
+        {
+            get => this.Model.Disabled;
+            set => this.Model.Disabled = value;
+        }
+
+        public DateTime? Expiry
+        {
+            get => this.Model.Expiry?.ToLocalTime();
+            set => this.Model.Expiry = value?.ToUniversalTime();
+        }
+
+        public bool ExpireRule
+        {
+            get => this.Expiry != null;
+            set => this.Expiry = value ? this.Expiry == null ? DateTime.Now.AddDays(30) : this.Expiry : null;
+        }
+
+        public bool HasExpired
+        {
+            get => this.Model.HasExpired();
         }
 
         public bool IsModePermission { get => this.AuthorizationMode == AuthorizationMode.SecurityDescriptor; set => this.AuthorizationMode = value ? AuthorizationMode.SecurityDescriptor : AuthorizationMode.PowershellScript; }

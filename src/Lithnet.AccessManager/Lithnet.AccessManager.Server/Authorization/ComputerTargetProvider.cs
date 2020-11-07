@@ -33,6 +33,11 @@ namespace Lithnet.AccessManager.Server.Authorization
 
                 try
                 {
+                    if (target.IsInactive())
+                    {
+                        continue;
+                    }
+
                     if (target.Type == TargetType.Container)
                     {
                         if (computerParents.Value.Any(t => t == targetData.ContainerGuid))

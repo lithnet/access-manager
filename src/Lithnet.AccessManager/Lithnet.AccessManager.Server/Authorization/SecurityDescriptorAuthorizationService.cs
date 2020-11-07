@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Principal;
 using Lithnet.AccessManager.Server.Configuration;
 using Microsoft.Extensions.Logging;
@@ -61,7 +62,9 @@ namespace Lithnet.AccessManager.Server.Authorization
                     throw new AccessManagerException($"An invalid access mask combination was requested: {requestedAccess}");
                 }
 
-                if (successTargets.Count == 0 || !(info.EffectiveAccess.HasFlag(requestedAccess)))
+                var matchedTarget = successTargets?.FirstOrDefault(t => t.IsActive());
+
+                if (!info.EffectiveAccess.HasFlag(requestedAccess) || matchedTarget == null)
                 {
                     this.logger.LogTrace($"User {user.MsDsPrincipalName} is denied {requestedAccess} access for computer {computer.MsDsPrincipalName}");
 
@@ -72,9 +75,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                 }
                 else
                 {
-                    var matchedTarget = successTargets[0];
                     this.logger.LogTrace($"User {user.MsDsPrincipalName} is authorized for {requestedAccess} access to computer {computer.MsDsPrincipalName} from target {matchedTarget.Id}");
-
                     return BuildAuthZResponseSuccess(requestedAccess, matchedTarget, computer);
                 }
             }

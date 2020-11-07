@@ -13,23 +13,15 @@ namespace Lithnet.AccessManager.Server.Authorization
 {
     public class AuthorizationInformationBuilder : IAuthorizationInformationBuilder
     {
-        private readonly IDirectory directory;
-
         private readonly ILogger logger;
-
         private readonly AuthorizationOptions options;
-
         private readonly IPowerShellSecurityDescriptorGenerator powershell;
-
         private readonly IAuthorizationInformationMemoryCache authzCache;
-
         private readonly IComputerTargetProvider computerTargetProvider;
-
         private readonly IAuthorizationContextProvider authorizationContextProvider;
 
-        public AuthorizationInformationBuilder(IOptionsSnapshot<AuthorizationOptions> options, IDirectory directory, ILogger<AuthorizationInformationBuilder> logger, IPowerShellSecurityDescriptorGenerator powershell, IAuthorizationInformationMemoryCache authzCache, IComputerTargetProvider computerTargetProvider, IAuthorizationContextProvider authorizationContextProvider)
+        public AuthorizationInformationBuilder(IOptionsSnapshot<AuthorizationOptions> options, ILogger<AuthorizationInformationBuilder> logger, IPowerShellSecurityDescriptorGenerator powershell, IAuthorizationInformationMemoryCache authzCache, IComputerTargetProvider computerTargetProvider, IAuthorizationContextProvider authorizationContextProvider)
         {
-            this.directory = directory;
             this.logger = logger;
             this.options = options.Value;
             this.powershell = powershell;
@@ -90,6 +82,11 @@ namespace Lithnet.AccessManager.Server.Authorization
             foreach (var target in info.MatchedComputerTargets)
             {
                 CommonSecurityDescriptor sd;
+
+                if (target.IsInactive())
+                {
+                    continue;
+                }
 
                 if (target.AuthorizationMode == AuthorizationMode.PowershellScript)
                 {
