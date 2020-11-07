@@ -55,7 +55,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="9.0.1" />
-    <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7610.29656" />
+    <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7616.23549" />
     <PackageReference Include="mahapps.metro" Version="2.1.1" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="4.6.0" />
     <PackageReference Include="MahApps.Metro.SimpleChildWindow" Version="2.0.0-alpha0043" />
@@ -86,6 +86,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="UIComponents\EnterpriseEditionBadge - Copy.xaml.cs">
+      <DependentUpon>EnterpriseEditionBadge.xaml.cs</DependentUpon>
+    </Compile>
     <Compile Update="Views\JitConfigurationView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -119,6 +122,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="UIComponents\StandardEditionBadge.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="UIComponents\EnterpriseEditionBadge.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\HighAvailabilityView.xaml">
       <SubType>Designer</SubType>
     </Page>

@@ -13,20 +13,8 @@
              Margin="5">
     <StackPanel>
 
-        <Grid Background="LightYellow"
-              Margin="5" 
-              Visibility="{Binding Path=ShowEnterpriseEditionBanner, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <iconPacks:PackIconMaterial Kind="RocketLaunchOutline" Margin="5 5 0 5" Foreground="BlueViolet" VerticalAlignment="Center"/>
-            <TextBlock Grid.Column="1"  TextWrapping="Wrap" Margin="5">High availability is an Enterprise edition feature. <Hyperlink Click="{s:Action LinkHaLearnMore}">Learn more...</Hyperlink></TextBlock>
-        </Grid>
-
         <DockPanel>
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" >
-                <iconPacks:PackIconMaterial Kind="RocketLaunchOutline" Margin="5 5 0 5" Foreground="BlueViolet" VerticalAlignment="Center"/>
                 <Button Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
                     <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
                 </Button>
@@ -34,6 +22,9 @@
             <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="High Availability" />
         </DockPanel>
 
+        <local:EnterpriseEditionBadge Visibility="{Binding ShowEnterpriseEditionBanner, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                      ToolTipText="High availability is an enterprise edition feature. Click to learn more"
+                                      Margin="2 2 5 2" />
 
         <!--<Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
                Content="Shared encryption key"/>

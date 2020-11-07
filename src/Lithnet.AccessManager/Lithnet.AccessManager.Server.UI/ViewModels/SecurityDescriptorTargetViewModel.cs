@@ -6,6 +6,7 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using Lithnet.AccessManager.Server.UI.Providers;
@@ -28,6 +29,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly SecurityDescriptorTargetViewModelDisplaySettings displaySettings;
         private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly ScriptTemplateProvider scriptTemplateProvider;
+        private readonly ILicenseManager licenseManager;
 
         private string jitGroupDisplayName;
 
@@ -35,7 +37,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, ILicenseManager licenseManager)
         {
             this.directory = directory;
             this.Model = model;
@@ -49,6 +51,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.displaySettings = displaySettings ?? new SecurityDescriptorTargetViewModelDisplaySettings();
             this.objectSelectionProvider = objectSelectionProvider;
             this.scriptTemplateProvider = scriptTemplateProvider;
+            this.licenseManager = licenseManager;
 
             this.Script = fileSelectionViewModelFactory.CreateViewModel(model, () => model.Script, appPathProvider.ScriptsPath);
             this.Script.DefaultFileExtension = "ps1";
@@ -200,6 +203,14 @@ namespace Lithnet.AccessManager.Server.UI
         public bool ShowJitOptions => this.IsModeScript || SdHasMask(this.SecurityDescriptor, AccessMask.Jit);
 
         public bool CanEdit => this.Target != null;
+
+        public bool IsScriptPermissionAllowed => this.licenseManager.IsFeatureEnabled(LicensedFeatures.PowerShellAcl) && this.Target != null;
+
+        public bool IsScriptPermissionNotAllowed => !this.IsScriptPermissionAllowed;
+
+        public bool ShowPowerShellEnterpriseEditionBadge => !this.licenseManager.IsFeatureCoveredByFullLicense(LicensedFeatures.PowerShellAcl);
+
+        public bool ShowLapsHistoryEnterpriseEditionBadge => !this.licenseManager.IsFeatureCoveredByFullLicense(LicensedFeatures.PowerShellAcl) && SdHasMask(this.SecurityDescriptor, AccessMask.LocalAdminPasswordHistory);
 
         public bool CanEditPermissions => this.CanEdit && this.AuthorizationMode == AuthorizationMode.SecurityDescriptor && this.Target != null;
 

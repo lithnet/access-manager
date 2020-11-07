@@ -55,8 +55,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ISecretRekeyProvider rekeyProvider;
         private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly IDiscoveryServices discoveryServices;
+        private readonly ILicenseManager licenseManager;
 
-        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, IClusterProvider clusterProvider, ISecretRekeyProvider rekeyProvider, IObjectSelectionProvider objectSelectionProvider, IDiscoveryServices discoveryServices)
+        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, IClusterProvider clusterProvider, ISecretRekeyProvider rekeyProvider, IObjectSelectionProvider objectSelectionProvider, IDiscoveryServices discoveryServices, ILicenseManager licenseManager)
         {
             this.logger = logger;
             this.pathProvider = pathProvider;
@@ -75,6 +76,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.rekeyProvider = rekeyProvider;
             this.objectSelectionProvider = objectSelectionProvider;
             this.discoveryServices = discoveryServices;
+            this.licenseManager = licenseManager;
 
             this.WorkingModel = this.CloneModel(model);
             this.Certificate = this.GetCertificate();
@@ -82,6 +84,12 @@ namespace Lithnet.AccessManager.Server.UI
             this.ServiceAccount = this.windowsServiceProvider.GetServiceAccount();
             this.ServiceStatus = this.windowsServiceProvider.Status.ToString();
             this.DisplayName = "Web hosting";
+
+            this.licenseManager.OnLicenseDataChanged += delegate
+            {
+                this.NotifyOfPropertyChange(nameof(this.IsEnterpriseEdition));
+                this.NotifyOfPropertyChange(nameof(this.IsStandardEdition));
+            };
 
             eventPublisher.Register(this);
         }
@@ -107,6 +115,10 @@ namespace Lithnet.AccessManager.Server.UI
             this.servicePollCts.Cancel();
             base.OnDeactivate();
         }
+
+        public bool IsEnterpriseEdition => this.licenseManager.IsEnterpriseEdition();
+
+        public bool IsStandardEdition => !this.IsEnterpriseEdition;
 
         public string AvailableVersion { get; set; }
 

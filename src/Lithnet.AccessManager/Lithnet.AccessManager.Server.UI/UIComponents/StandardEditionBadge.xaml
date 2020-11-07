@@ -1,0 +1,103 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.StandardEditionBadge"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:s="https://github.com/canton7/Stylet"
+             mc:Ignorable="d">
+
+    <UserControl.ToolTip>
+        <ToolTip DataContext="{Binding Path=PlacementTarget, RelativeSource={x:Static RelativeSource.Self}}">
+            <TextBlock TextWrapping="Wrap"
+                       Foreground="{DynamicResource MahApps.Brushes.Text}"
+                       Text="{Binding ToolTipText, FallbackValue='Standard edition'}" />
+        </ToolTip>
+    </UserControl.ToolTip>
+
+    <UserControl.Resources>
+        <SolidColorBrush Color="#EEE"
+                         x:Key="SolidForegroundColor" />
+        <SolidColorBrush Color="RoyalBlue"
+                         x:Key="SolidBackgroundColor" />
+        <SolidColorBrush Color="RoyalBlue"
+                         x:Key="NotSolidForegroundColor" />
+        <SolidColorBrush Color="Transparent"
+                         x:Key="NotSolidBackgroundColor" />
+
+        <Style TargetType="{x:Type Border}">
+            <Setter Property="Background"
+                    Value="{DynamicResource NotSolidBackgroundColor}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=IsSolid}"
+                             Value="True">
+                    <Setter Property="Background"
+                            Value="{DynamicResource SolidBackgroundColor}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=IsSolid}"
+                             Value="False">
+                    <Setter Property="Background"
+                            Value="{DynamicResource NotSolidBackgroundColor}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource NotSolidForegroundColor}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=IsSolid}"
+                             Value="False">
+                    <Setter Property="Foreground"
+                            Value="{DynamicResource NotSolidForegroundColor}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=IsSolid}"
+                             Value="True">
+                    <Setter Property="Foreground"
+                            Value="{DynamicResource SolidForegroundColor}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="{x:Type iconPacks:PackIconMaterial}">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource NotSolidForegroundColor}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=IsSolid}"
+                             Value="False">
+                    <Setter Property="Foreground"
+                            Value="{DynamicResource NotSolidForegroundColor}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=IsSolid}"
+                             Value="True">
+                    <Setter Property="Foreground"
+                            Value="{DynamicResource SolidForegroundColor}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Border Grid.Row="2"
+            Grid.Column="2"
+            Grid.ColumnSpan="1"
+            Width="Auto"
+            HorizontalAlignment="Left"
+            BorderThickness="1"
+            BorderBrush="{DynamicResource NotSolidForegroundColor}"
+            Opacity=".8"
+            Padding="10 3 10 3"
+            CornerRadius="10">
+
+        <StackPanel Orientation="Horizontal">
+            <iconPacks:PackIconMaterial Kind="ShieldOutline"
+                                        Margin="0 0 0 0"
+                                        VerticalAlignment="Center" />
+
+            <TextBlock Margin="5 0 0 0"
+                       Text="Standard edition"
+                       FontWeight="Normal"
+                       VerticalAlignment="Center" />
+        </StackPanel>
+    </Border>
+</UserControl>

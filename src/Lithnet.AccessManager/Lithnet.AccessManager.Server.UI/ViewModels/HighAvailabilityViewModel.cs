@@ -1,23 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Principal;
-using System.Text;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.UI.Interop;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
-using Markdig.Extensions.TaskLists;
 using Microsoft.Extensions.Logging;
 using PropertyChanged;
 using Stylet;
-using Vanara.PInvoke;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -28,26 +18,22 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILicenseManager licenseManager;
         private readonly ILogger<HighAvailabilityViewModel> logger;
         private readonly HighAvailabilityOptions highAvailabilityOptions;
-        private readonly IProtectedSecretProvider secretProvider;
-        private readonly ILicenseDataProvider licenseProvider;
         private readonly DataProtectionOptions dataProtectionOptions;
         private readonly ICertificateSynchronizationProvider certSyncProvider;
         private readonly ISecretRekeyProvider rekeyProvider;
 
-        public HighAvailabilityViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, ILicenseManager licenseManager, ILogger<HighAvailabilityViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, HighAvailabilityOptions highAvailabilityOptions, IProtectedSecretProvider secretProvider, ILicenseDataProvider licenseProvider, DataProtectionOptions dataProtectionOptions, ICertificateSynchronizationProvider certSyncProvider, ISecretRekeyProvider rekeyProvider)
+        public HighAvailabilityViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, ILicenseManager licenseManager, ILogger<HighAvailabilityViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, HighAvailabilityOptions highAvailabilityOptions, DataProtectionOptions dataProtectionOptions, ICertificateSynchronizationProvider certSyncProvider, ISecretRekeyProvider rekeyProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.licenseManager = licenseManager;
             this.logger = logger;
             this.highAvailabilityOptions = highAvailabilityOptions;
-            this.secretProvider = secretProvider;
-            this.licenseProvider = licenseProvider;
             this.dataProtectionOptions = dataProtectionOptions;
             this.certSyncProvider = certSyncProvider;
             this.dialogCoordinator = dialogCoordinator;
             this.rekeyProvider = rekeyProvider;
 
-            this.licenseProvider.OnLicenseDataChanged += delegate
+            this.licenseManager.OnLicenseDataChanged += delegate
             {
                 this.NotifyOfPropertyChange(nameof(this.IsEnterpriseEdition));
                 this.NotifyOfPropertyChange(nameof(this.ShowEnterpriseEditionBanner));
