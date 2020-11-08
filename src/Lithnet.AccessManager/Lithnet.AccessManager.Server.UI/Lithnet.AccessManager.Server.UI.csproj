@@ -34,6 +34,7 @@
     <None Remove="ScriptTemplates\PublishLithnetAccessManagerCertificate.ps1" />
     <None Remove="ScriptTemplates\UpdateAdSchema.ps1" />
     <None Remove="ScriptTemplates\WriteAuditLog.ps1" />
+    <None Remove="splash-screen.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -82,7 +83,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="access-manager.png" />
+    <Content Include="access-manager.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SplashScreen Include="splash-screen.png" />
   </ItemGroup>
 
   <ItemGroup>
