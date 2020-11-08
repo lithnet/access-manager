@@ -441,14 +441,6 @@ namespace Lithnet.AccessManager.Service.Controllers
 
                 model.AllowedRequestTypes = authResponse.EvaluatedAccess;
 
-                if (model.AllowedRequestTypes.HasFlag(AccessMask.LocalAdminPasswordHistory))
-                {
-                    if (!this.licenseManager.IsFeatureEnabled(LicensedFeatures.LapsHistory))
-                    {
-                        model.AllowedRequestTypes = model.AllowedRequestTypes & ~AccessMask.LocalAdminPasswordHistory;
-                    }
-                }
-
                 if (model.AllowedRequestTypes.HasFlag(AccessMask.LocalAdminPassword))
                 {
                     model.RequestType = AccessMask.LocalAdminPassword;
