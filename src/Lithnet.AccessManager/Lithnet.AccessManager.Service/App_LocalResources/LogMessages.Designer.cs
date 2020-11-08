@@ -125,7 +125,7 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An unexpected error occurred during the authorization process for user {0} trying to access computer {1}.
+        ///   Looks up a localized string similar to An unexpected error occurred during the authorization process for user {0} requesting {2} access to computer {1}.
         /// </summary>
         internal static string AuthZError {
             get {
@@ -134,7 +134,7 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The user {0} requested access to computer {1} which was authorized, but one or more audit notification channels failed to deliver the audit response, and were configured to deny access to the password when auditing fails.
+        ///   Looks up a localized string similar to The user {0} requested {2} access to computer {1} which was authorized, but one or more audit notification channels failed to deliver the audit response, and were configured to deny access to the password when auditing fails.
         /// </summary>
         internal static string AuthZFailedAuditError {
             get {
@@ -161,7 +161,7 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The computer does not have any BitLocker recovery passwords in the directory.
+        ///   Looks up a localized string similar to User {1} requested access to the BitLocker recovery passwords for computer {0}, but the computer does not have any BitLocker recovery passwords in the directory.
         /// </summary>
         internal static string BitLockerKeysNotPresent {
             get {
@@ -201,7 +201,7 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An unexpected error occurred while trying to find a computer named {0}.
+        ///   Looks up a localized string similar to An unexpected error occurred while trying to find a computer named {0} in the directory for user {1} requesting {2} access..
         /// </summary>
         internal static string ComputerDiscoveryError {
             get {
@@ -210,7 +210,7 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The user {0} requested the password for computer {1}, but multiple computers matching that name were found in the directory.
+        ///   Looks up a localized string similar to The user {0} requested {2} access to computer {1}, but multiple computers matching that name were found in the directory.
         /// </summary>
         internal static string ComputerNameAmbiguous {
             get {
@@ -219,7 +219,7 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The user {0} requested the password for computer {1} which was not found in the directory.
+        ///   Looks up a localized string similar to The user {0} requested {2} access to computer {1} which was not found in the directory.
         /// </summary>
         internal static string ComputerNotFoundInDirectory {
             get {
@@ -246,7 +246,7 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An error occurred when trying to rollback the JIT access.
+        ///   Looks up a localized string similar to An error occurred when trying to rollback the JIT access for user {0} to computer {1}.
         /// </summary>
         internal static string JitRollbackFailed {
             get {
@@ -255,7 +255,7 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Rolling back JIT access due to an exception in the audit process.
+        ///   Looks up a localized string similar to Rolling back JIT access for user {0} to computer {1} due to an exception in the audit process.
         /// </summary>
         internal static string JitRollbackInProgress {
             get {
@@ -300,16 +300,7 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The user {0} requested access to computer {1} but no targets exist for this computer.
-        /// </summary>
-        internal static string NoTargetsExist {
-            get {
-                return ResourceManager.GetString("NoTargetsExist", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to An unexpected error occurred during the pre-authorization process for user {0} attempting to access {1}.
+        ///   Looks up a localized string similar to An unexpected error occurred during the pre-authorization process for user {0} requesting {2} access to {1}.
         /// </summary>
         internal static string PreAuthZError {
             get {
@@ -318,7 +309,7 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The user {0} on IP {1} has exceeded the maximum allowed number of requests per IP ({2} per {3} seconds).
+        ///   Looks up a localized string similar to The user {0} on IP {1} has exceeded the maximum allowed number of requests per IP ({2} per {3} seconds). The user requested {4} access to {5}..
         /// </summary>
         internal static string RateLimitExceededIP {
             get {
@@ -327,7 +318,7 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The user {0} on IP {1} has exceeded the maximum allowed number of requests per user ({2} per {3} seconds).
+        ///   Looks up a localized string similar to The user {0} on IP {1} has exceeded the maximum allowed number of requests per user ({2} per {3} seconds). The user requested {4} access to {5}..
         /// </summary>
         internal static string RateLimitExceededUser {
             get {
@@ -336,7 +327,7 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The user {0} did not fill out the mandatory request reason field.
+        ///   Looks up a localized string similar to The user {0} did not fill out the mandatory request reason field for their {1} access request to {2}.
         /// </summary>
         internal static string ReasonRequired {
             get {
@@ -354,7 +345,7 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to An unhandled error occurred while processing the request for the password for {0} by user {1}.
+        ///   Looks up a localized string similar to An unhandled error occurred while processing the request for {0} access to computer {1} for user {2}.
         /// </summary>
         internal static string UnhandledError {
             get {
@@ -372,20 +363,11 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} has requested access to computer {1}.
+        ///   Looks up a localized string similar to {0} has requested {2} access to computer {1}.
         /// </summary>
         internal static string UserHasRequestedAccessToComputer {
             get {
                 return ResourceManager.GetString("UserHasRequestedAccessToComputer", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {0} has requested the password for {1}.
-        /// </summary>
-        internal static string UserHasRequestedPassword {
-            get {
-                return ResourceManager.GetString("UserHasRequestedPassword", resourceCulture);
             }
         }
         

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Threading;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server;
@@ -12,7 +11,6 @@ using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Exceptions;
 using Lithnet.AccessManager.Service.App_LocalResources;
 using Lithnet.AccessManager.Service.AppSettings;
-using Lithnet.AccessManager.Service.Internal;
 using Lithnet.AccessManager.Service.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -91,7 +89,7 @@ namespace Lithnet.AccessManager.Service.Controllers
                     return actionResult;
                 }
 
-                this.logger.LogInformation(EventIDs.UserRequestedAccessToComputer, string.Format(LogMessages.UserHasRequestedAccessToComputer, user.MsDsPrincipalName, model.ComputerName));
+                this.logger.LogInformation(EventIDs.UserRequestedAccessToComputer, string.Format(LogMessages.UserHasRequestedAccessToComputer, user.MsDsPrincipalName, model.ComputerName, model.RequestType));
 
                 if (!ValidateRequestReason(model, user, out actionResult))
                 {
@@ -107,7 +105,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             }
             catch (Exception ex)
             {
-                this.logger.LogError(EventIDs.UnexpectedError, ex, string.Format(LogMessages.UnhandledError, computer?.MsDsPrincipalName, user?.MsDsPrincipalName));
+                this.logger.LogError(EventIDs.UnexpectedError, ex, string.Format(LogMessages.UnhandledError, model.RequestType, computer?.MsDsPrincipalName, user?.MsDsPrincipalName));
 
                 return this.View("AccessRequestError", new ErrorModel
                 {
@@ -142,7 +140,7 @@ namespace Lithnet.AccessManager.Service.Controllers
                     return actionResult;
                 }
 
-                this.logger.LogInformation(EventIDs.UserRequestedAccessToComputer, string.Format(LogMessages.UserHasRequestedAccessToComputer, user.MsDsPrincipalName, model.ComputerName));
+                this.logger.LogInformation(EventIDs.UserRequestedAccessToComputer, string.Format(LogMessages.UserHasRequestedAccessToComputer, user.MsDsPrincipalName, model.ComputerName, model.RequestType));
 
                 RateLimitResult result = await this.GetRateLimitResult(model, user);
                 if (result.IsRateLimitExceeded)
@@ -164,7 +162,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             }
             catch (Exception ex)
             {
-                this.logger.LogError(EventIDs.UnexpectedError, ex, string.Format(LogMessages.UnhandledError, computer?.MsDsPrincipalName, user?.MsDsPrincipalName));
+                this.logger.LogError(EventIDs.UnexpectedError, ex, string.Format(LogMessages.UnhandledError, model.RequestType, computer?.MsDsPrincipalName, user?.MsDsPrincipalName));
 
                 return this.View("AccessRequestError", new ErrorModel
                 {
@@ -236,7 +234,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             }
             catch (AuditLogFailureException ex)
             {
-                this.logger.LogError(EventIDs.AuthZFailedAuditError, ex, string.Format(LogMessages.AuthZFailedAuditError, user.MsDsPrincipalName, model.ComputerName));
+                this.logger.LogError(EventIDs.AuthZFailedAuditError, ex, string.Format(LogMessages.AuthZFailedAuditError, user.MsDsPrincipalName, model.ComputerName, model.RequestType));
 
                 return this.View("AccessRequestError", new ErrorModel
                 {
@@ -246,7 +244,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             }
             catch (Exception ex)
             {
-                this.logger.LogError(EventIDs.AuthZError, ex, string.Format(LogMessages.AuthZError, user.MsDsPrincipalName, computer.MsDsPrincipalName));
+                this.logger.LogError(EventIDs.AuthZError, ex, string.Format(LogMessages.AuthZError, user.MsDsPrincipalName, computer.MsDsPrincipalName, model.RequestType));
 
                 return this.View("AccessRequestError", new ErrorModel
                 {
@@ -460,7 +458,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             }
             catch (Exception ex)
             {
-                this.logger.LogError(EventIDs.PreAuthZError, ex, string.Format(LogMessages.PreAuthZError, user.MsDsPrincipalName, computer.MsDsPrincipalName));
+                this.logger.LogError(EventIDs.PreAuthZError, ex, string.Format(LogMessages.PreAuthZError, user.MsDsPrincipalName, computer.MsDsPrincipalName, model.RequestType));
 
                 return this.View("AccessRequestError", new ErrorModel
                 {
@@ -500,7 +498,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             {
                 if (undo != null)
                 {
-                    this.logger.LogWarning(EventIDs.JitRollbackInProgress, ex, LogMessages.JitRollbackInProgress);
+                    this.logger.LogWarning(EventIDs.JitRollbackInProgress, ex, LogMessages.JitRollbackInProgress, user.MsDsPrincipalName, computer.MsDsPrincipalName);
 
                     try
                     {
@@ -508,7 +506,7 @@ namespace Lithnet.AccessManager.Service.Controllers
                     }
                     catch (Exception ex2)
                     {
-                        this.logger.LogError(EventIDs.JitRollbackFailed, ex2, LogMessages.JitRollbackFailed);
+                        this.logger.LogError(EventIDs.JitRollbackFailed, ex2, LogMessages.JitRollbackFailed, user.MsDsPrincipalName, computer.MsDsPrincipalName);
                     }
                 }
 
@@ -537,12 +535,12 @@ namespace Lithnet.AccessManager.Service.Controllers
             if (rateLimitResult.IsUserRateLimit)
             {
                 action.EventID = EventIDs.RateLimitExceededUser;
-                action.Message = string.Format(LogMessages.RateLimitExceededUser, user.MsDsPrincipalName, rateLimitResult.IPAddress, rateLimitResult.Threshold, rateLimitResult.Duration);
+                action.Message = string.Format(LogMessages.RateLimitExceededUser, user.MsDsPrincipalName, rateLimitResult.IPAddress, rateLimitResult.Threshold, rateLimitResult.Duration, model.RequestType, model.ComputerName);
             }
             else
             {
                 action.EventID = EventIDs.RateLimitExceededIP;
-                action.Message = string.Format(LogMessages.RateLimitExceededIP, user.MsDsPrincipalName, rateLimitResult.IPAddress, rateLimitResult.Threshold, rateLimitResult.Duration);
+                action.Message = string.Format(LogMessages.RateLimitExceededIP, user.MsDsPrincipalName, rateLimitResult.IPAddress, rateLimitResult.Threshold, rateLimitResult.Duration, model.RequestType, model.ComputerName);
             }
 
             this.reporting.GenerateAuditEvent(action);
@@ -560,21 +558,21 @@ namespace Lithnet.AccessManager.Service.Controllers
             }
             catch (AmbiguousNameException ex)
             {
-                this.logger.LogError(EventIDs.ComputerNameAmbiguous, ex, string.Format(LogMessages.ComputerNameAmbiguous, user.MsDsPrincipalName, model.ComputerName));
+                this.logger.LogError(EventIDs.ComputerNameAmbiguous, ex, string.Format(LogMessages.ComputerNameAmbiguous, user.MsDsPrincipalName, model.ComputerName, model.RequestType));
 
                 model.FailureReason = UIMessages.ComputerNameAmbiguous;
                 failure = this.View("AccessRequest", model);
             }
             catch (ObjectNotFoundException ex)
             {
-                this.logger.LogError(EventIDs.ComputerNotFoundInDirectory, ex, string.Format(LogMessages.ComputerNotFoundInDirectory, user.MsDsPrincipalName, model.ComputerName));
+                this.logger.LogError(EventIDs.ComputerNotFoundInDirectory, ex, string.Format(LogMessages.ComputerNotFoundInDirectory, user.MsDsPrincipalName, model.ComputerName, model.RequestType));
 
                 model.FailureReason = UIMessages.ComputerNotFoundInDirectory;
                 failure = this.View("AccessRequest", model);
             }
             catch (Exception ex)
             {
-                this.logger.LogError(EventIDs.ComputerDiscoveryError, ex, string.Format(LogMessages.ComputerDiscoveryError, model.ComputerName));
+                this.logger.LogError(EventIDs.ComputerDiscoveryError, ex, string.Format(LogMessages.ComputerDiscoveryError, model.ComputerName, user.MsDsPrincipalName, model.RequestType));
                 model.FailureReason = UIMessages.ComputerDiscoveryError;
                 failure = this.View("AccessRequest", model);
             }
@@ -635,7 +633,7 @@ namespace Lithnet.AccessManager.Service.Controllers
 
             if (string.IsNullOrWhiteSpace(model.UserRequestReason) && this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required)
             {
-                logger.LogError(EventIDs.ReasonRequired, string.Format(LogMessages.ReasonRequired, user.MsDsPrincipalName));
+                logger.LogError(EventIDs.ReasonRequired, string.Format(LogMessages.ReasonRequired, user.MsDsPrincipalName, model.RequestType, model.ComputerName));
                 model.FailureReason = UIMessages.ReasonRequired;
                 actionResult = this.View("AccessRequest", model);
                 return false;
