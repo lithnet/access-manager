@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using CsvHelper;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using Stylet;
 
@@ -38,7 +41,7 @@ namespace Lithnet.AccessManager.Server.UI
         private IList selectedItems;
 
         public Task Initialization { get; private set; }
-        
+
         public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, ISecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IComputerTargetProvider computerTargetProvider, IEffectiveAccessViewModelFactory effectiveAccessFactory, IShellExecuteProvider shellExecuteProvider)
         {
             this.factory = factory;
@@ -283,7 +286,7 @@ namespace Lithnet.AccessManager.Server.UI
              {
                  this.IsLoading = true;
                  this.ViewModels = new BindableCollection<SecurityDescriptorTargetViewModel>();
-                 
+
                  var items = (await Task.WhenAll(this.Model.Select(t => factory.CreateViewModelAsync(t, this.ChildDisplaySettings)))).ToList();
 
                  this.ViewModels.AddRange(items);
@@ -385,6 +388,86 @@ namespace Lithnet.AccessManager.Server.UI
             }
 
             this.Items.Refresh();
+        }
+
+        public async Task CreatePermissionReport()
+        {
+            try
+            {
+                var items = this.selectedItems?.OfType<SecurityDescriptorTargetViewModel>()?.ToList() ?? this.Items.OfType<SecurityDescriptorTargetViewModel>().ToList();
+
+                if (items == null || items.Count == 0)
+                {
+                    return;
+                }
+
+                SaveFileDialog dialog = new SaveFileDialog
+                {
+                    AddExtension = true,
+                    DefaultExt = "csv",
+                    OverwritePrompt = true,
+                    Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*",
+                    Title = "Save permission report"
+                };
+
+                if (dialog.ShowDialog() != true)
+                {
+                    return;
+                }
+
+                var records = new List<object>();
+
+                foreach (var target in items)
+                {
+                    string name;
+
+                    if (target.Target.TryParseAsSid(out SecurityIdentifier sid))
+                    {
+                        name = sid.ToNtAccountNameOrSidString();
+                    }
+                    else
+                    {
+                        name = target.Target;
+                    }
+
+                    var aces = target.GetAceEntries();
+
+                    if (aces == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (var ace in aces)
+                    {
+                        records.Add(new
+                        {
+                            Target = name,
+                            Principal = ace.SecurityIdentifier.ToNtAccountNameOrSidString(),
+                            JitAllowed = ace.AceQualifier == System.Security.AccessControl.AceQualifier.AccessAllowed && ((AccessMask)ace.AccessMask).HasFlag(AccessMask.Jit),
+                            LapsAllowed = ace.AceQualifier == System.Security.AccessControl.AceQualifier.AccessAllowed && ((AccessMask)ace.AccessMask).HasFlag(AccessMask.LocalAdminPassword),
+                            LapsHistoryAllowed = ace.AceQualifier == System.Security.AccessControl.AceQualifier.AccessAllowed && ((AccessMask)ace.AccessMask).HasFlag(AccessMask.LocalAdminPasswordHistory),
+                            BitlockerAllowed = ace.AceQualifier == System.Security.AccessControl.AceQualifier.AccessAllowed && ((AccessMask)ace.AccessMask).HasFlag(AccessMask.BitLocker),
+                            JitDenied = ace.AceQualifier == System.Security.AccessControl.AceQualifier.AccessDenied && ((AccessMask)ace.AccessMask).HasFlag(AccessMask.Jit),
+                            LapsDenied = ace.AceQualifier == System.Security.AccessControl.AceQualifier.AccessDenied && ((AccessMask)ace.AccessMask).HasFlag(AccessMask.LocalAdminPassword),
+                            LapsHistoryDenied = ace.AceQualifier == System.Security.AccessControl.AceQualifier.AccessDenied && ((AccessMask)ace.AccessMask).HasFlag(AccessMask.LocalAdminPasswordHistory),
+                            BitlockerDenied = ace.AceQualifier == System.Security.AccessControl.AceQualifier.AccessDenied && ((AccessMask)ace.AccessMask).HasFlag(AccessMask.BitLocker),
+                        });
+                    }
+                }
+
+                using (var writer = new StreamWriter(dialog.FileName))
+                using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                {
+                    csv.WriteRecords(records);
+                }
+
+                await this.dialogCoordinator.ShowMessageAsync(this, "Report saved", "The permission report was successfully created");
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Unable to generate permission report");
+                await this.dialogCoordinator.ShowMessageAsync(this, "The report could not be created", ex.Message);
+            }
         }
     }
 }

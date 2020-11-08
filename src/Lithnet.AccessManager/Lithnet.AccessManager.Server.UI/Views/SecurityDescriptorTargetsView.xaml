@@ -10,118 +10,138 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:views="clr-namespace:Lithnet.AccessManager.Server.UI.Views"
              Dialog:DialogParticipation.Register="{Binding}"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             mc:Ignorable="d"
+             d:DesignHeight="450"
+             d:DesignWidth="800">
     <views:CanvasEx>
-        <Grid Height="{Binding Path=BindableActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}" 
-                    Width="{Binding Path=BindableActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}">
+        <Grid Height="{Binding Path=BindableActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}"
+              Width="{Binding Path=BindableActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}">
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0"
                   Visibility="{Binding HasLoaded, Converter={StaticResource  BooleanToVisibilityConverter}}"
                   Margin="0 5 0 0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <TextBox Grid.Column="0" Grid.Row="0"
+                <TextBox Grid.Column="0"
+                         Grid.Row="0"
                          Margin="0 2 2 2"
                          mah:TextBoxHelper.Watermark="Computer name or search text"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                          ToolTip="Enter a computer name to show all rules that match that computer. Otherwise, enter any text to search the target and description fields"
-                        KeyDown="{s:Action SearchTextBoxKeyDown}" />
-                <Button Grid.Column="1" Grid.Row="0"
+                         KeyDown="{s:Action SearchTextBoxKeyDown}" />
+                <Button Grid.Column="1"
+                        Grid.Row="0"
                         Content="Search"
                         MinWidth="65"
                         Command="{s:Action ApplySearchFilter}"
-                        Margin="2"/>
-                <Button Grid.Column="2" Grid.Row="0"
+                        Margin="2" />
+                <Button Grid.Column="2"
+                        Grid.Row="0"
                         Content="Clear"
                         MinWidth="65"
                         Command="{s:Action ClearSearchFilter}"
-                        Margin="2 2 0 2"/>
+                        Margin="2 2 0 2" />
 
             </Grid>
 
-            <StackPanel Grid.Row="2" 
+            <StackPanel Grid.Row="2"
                         Visibility="{Binding IsLoading, Converter={StaticResource  BooleanToVisibilityConverter}}"
                         Orientation="Horizontal"
                         Margin="5">
-                <mah:ProgressRing Height="15" Width="15"/>
+                <mah:ProgressRing Height="15"
+                                  Width="15" />
                 <TextBlock Margin="5 0 0 0"
-                          Text="Loading rules.."/>
+                           Text="Loading rules.." />
 
             </StackPanel>
 
             <ListView Grid.Row="3"
-                  x:Name="listbox"
-                  ItemsSource="{Binding Items}"
-                  SelectedItem="{Binding SelectedItem}" 
-                  BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" 
-                  BorderThickness="1" 
-                  Margin="0 5 0 5"
-                  Visibility="{Binding HasLoaded, Converter={StaticResource  BooleanToVisibilityConverter}}"
-                  GridViewColumnHeader.Click="{s:Action OnGridViewColumnHeaderClick}" 
-                  MouseDoubleClick="{s:Action OnListViewDoubleClick}"
-                  SelectionChanged="{s:Action SelectionChanged}"
-                 >
+                      x:Name="listbox"
+                      ItemsSource="{Binding Items}"
+                      SelectedItem="{Binding SelectedItem}"
+                      BorderBrush="{StaticResource MahApps.Brushes.Control.Border}"
+                      BorderThickness="1"
+                      Margin="0 5 0 5"
+                      Visibility="{Binding HasLoaded, Converter={StaticResource  BooleanToVisibilityConverter}}"
+                      GridViewColumnHeader.Click="{s:Action OnGridViewColumnHeaderClick}"
+                      MouseDoubleClick="{s:Action OnListViewDoubleClick}"
+                      SelectionChanged="{s:Action SelectionChanged}">
                 <b:Interaction.Behaviors>
                     <local:ListViewScrollBarBehavior />
-                    
+
                 </b:Interaction.Behaviors>
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Target" DisplayMemberBinding="{Binding DisplayName}" Width="Auto"/>
-                        <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="Auto"/>
-                        <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status}" Width="Auto"/>
-                        <GridViewColumn Header="Description" DisplayMemberBinding="{Binding Description}" Width="Auto"/>
+                        <GridViewColumn Header="Target"
+                                        DisplayMemberBinding="{Binding DisplayName}"
+                                        Width="Auto" />
+                        <GridViewColumn Header="Type"
+                                        DisplayMemberBinding="{Binding Type}"
+                                        Width="Auto" />
+                        <GridViewColumn Header="Status"
+                                        DisplayMemberBinding="{Binding Status}"
+                                        Width="Auto" />
+                        <GridViewColumn Header="Description"
+                                        DisplayMemberBinding="{Binding Description}"
+                                        Width="Auto" />
                     </GridView>
                 </ListView.View>
             </ListView>
 
-
             <Grid Grid.Row="4">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal"
                             Visibility="{Binding HasLoaded, Converter={StaticResource  BooleanToVisibilityConverter}}">
-                    <Button Command="{s:Action Add}" 
-                            Content="Add..." 
-                            Margin="0"/>
-                    <Button Command="{s:Action Delete}" CommandParameter="{Binding SelectedItems, ElementName=listbox}"
+                    <Button Command="{s:Action Add}"
+                            Content="Add..."
+                            ToolTip="Create a new authorization rule"
+                            Margin="0" />
+                    <Button Command="{s:Action Delete}"
+                            CommandParameter="{Binding SelectedItems, ElementName=listbox}"
                             Content="Delete selected..."
-                            Margin="5 0 0 0"/>
+                            ToolTip="Deletes the selected rule"
+                            Margin="5 0 0 0" />
                     <Button Command="{s:Action Edit}"
                             Content="Edit selected..."
-                            Margin="5 0 0 0"/>
-
+                            ToolTip="Edits the selected rule"
+                            Margin="5 0 0 0" />
                 </StackPanel>
 
-                <Button Grid.Column="1"
-                        Content="Effective access..."
-                        Height="Auto"
-                        Command="{s:Action ShowEffectivePermissions}"
-                        Margin="0"/>
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal">
+
+                    <Button Command="{s:Action CreatePermissionReport}"
+                            Content="Save permission report..."
+                            ToolTip="Creates a CSV file containing the principals assigned permissions on the selected targets"
+                            Margin="5 0 0 0" />
+
+                    <Button Content="Effective access..."
+                            Height="Auto"
+                            ToolTip="Calculate the effective permissions for a user"
+                            Command="{s:Action ShowEffectivePermissions}"
+                            Margin="5 0 0 0" />
+                </StackPanel>
             </Grid>
-
-
-
 
         </Grid>
     </views:CanvasEx>

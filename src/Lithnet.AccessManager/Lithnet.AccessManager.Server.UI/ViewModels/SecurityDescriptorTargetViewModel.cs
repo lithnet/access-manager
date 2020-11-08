@@ -589,6 +589,32 @@ namespace Lithnet.AccessManager.Server.UI
             return false;
         }
 
+        public IEnumerable<CommonAce> GetAceEntries()
+        {
+            if (this.IsModeScript || string.IsNullOrWhiteSpace(this.SecurityDescriptor))
+            {
+                return null;
+            }
+
+            try
+            {
+                RawSecurityDescriptor sd = new RawSecurityDescriptor(this.SecurityDescriptor);
+
+                if (sd.DiscretionaryAcl == null)
+                {
+                    return null;
+                }
+
+                return sd.DiscretionaryAcl.OfType<CommonAce>();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning(EventIDs.UIGenericWarning, ex, "Error processing security descriptor");
+            }
+
+            return null;
+        }
+
         public void AttachView(UIElement view)
         {
             this.View = view;

@@ -36,6 +36,18 @@ namespace Lithnet.AccessManager
             return b;
         }
 
+        public static string ToNtAccountNameOrSidString(this SecurityIdentifier s)
+        {
+            try
+            {
+                return ((NTAccount)s.Translate(typeof(NTAccount))).Value;
+            }
+            catch
+            {
+                return s.ToString();
+            }
+        }
+
         internal static byte[] ToBytes(this GenericSecurityDescriptor s)
         {
             byte[] b = new byte[s.BinaryLength];
