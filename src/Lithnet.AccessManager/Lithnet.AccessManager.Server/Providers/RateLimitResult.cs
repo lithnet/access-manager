@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Net;
 
-namespace Lithnet.AccessManager.Service
+namespace Lithnet.AccessManager.Server
 {
     public class RateLimitResult
     {
@@ -8,7 +9,7 @@ namespace Lithnet.AccessManager.Service
 
         public bool IsUserRateLimit { get; set; }
 
-        public string IPAddress { get; set; }
+        public IPAddress IPAddress { get; set; }
 
         public string UserID { get; set; }
 

@@ -5,11 +5,14 @@
   "title": "❌ Access to a computer was denied",
   "sections": [
     {
+      "text": "{message}"
+    },
+    {
       "title": "Details",
       "facts": [
         {
-          "name": "Access type",
-          "value": "{AuthZResult.AccessType}"
+          "name": "Requested access",
+          "value": "{AuthZResult.AccessTypeDescription}"
         },
         {
           "name": "Name",
@@ -24,16 +27,12 @@
           "value": "{computer.MsDsPrincipalName}"
         },
         {
-          "name": "Password expiry",
+          "name": "Access expiry",
           "value": "{computer.LapsExpiryDate}"
         },
         {
-          "name": "Matched rule description",
+          "name": "Matched rule",
           "value": "{AuthzResult.MatchedRuleDescription}"
-        },
-        {
-          "name": "Matched rule ID",
-          "value": "{AuthzResult.MatchedRule}"
         },
         {
           "name": "Request reason",

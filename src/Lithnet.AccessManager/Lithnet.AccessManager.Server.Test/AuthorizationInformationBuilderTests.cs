@@ -77,7 +77,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptionsForOUTarget(allowed, denied, targetOU, user);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
+            builder = new AuthorizationInformationBuilder(options, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
             var result = builder.GetAuthorizationInformation(user, computer);
 
             Assert.AreEqual(expected, result.EffectiveAccess);

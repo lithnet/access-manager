@@ -228,4 +228,22 @@
   <data name="BitLockerKeyAccessError" xml:space="preserve">
     <value>An error occurred when trying to get the BitLocker recovery passwords for computer {0} as requested by user {1}</value>
   </data>
+  <data name="AuthZResponseExplicitlyDenied" xml:space="preserve">
+    <value>The user was explicitly denied access to the computer</value>
+  </data>
+  <data name="AuthZResponseFallback" xml:space="preserve">
+    <value>Not authorized</value>
+  </data>
+  <data name="AuthZResponseIpRateLimitExceeded" xml:space="preserve">
+    <value>The user exceeded the per-IP address request limit</value>
+  </data>
+  <data name="AuthZResponseNoMatchingRuleForComputer" xml:space="preserve">
+    <value>There were no authorization rules that apply to the requested computer</value>
+  </data>
+  <data name="AuthZResponseNoMatchingRuleForUser" xml:space="preserve">
+    <value>There are no authorization rules that grant the user access to the requested computer</value>
+  </data>
+  <data name="AuthZResponseUserRateLimitExceeded" xml:space="preserve">
+    <value>The user exceeded the per-user request limit</value>
+  </data>
 </root>

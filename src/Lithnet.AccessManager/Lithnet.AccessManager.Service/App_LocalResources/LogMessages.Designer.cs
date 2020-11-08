@@ -152,6 +152,60 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The user was explicitly denied access to the computer.
+        /// </summary>
+        internal static string AuthZResponseExplicitlyDenied {
+            get {
+                return ResourceManager.GetString("AuthZResponseExplicitlyDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not authorized.
+        /// </summary>
+        internal static string AuthZResponseFallback {
+            get {
+                return ResourceManager.GetString("AuthZResponseFallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user exceeded the per-IP address request limit.
+        /// </summary>
+        internal static string AuthZResponseIpRateLimitExceeded {
+            get {
+                return ResourceManager.GetString("AuthZResponseIpRateLimitExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There were no authorization rules that apply to the requested computer.
+        /// </summary>
+        internal static string AuthZResponseNoMatchingRuleForComputer {
+            get {
+                return ResourceManager.GetString("AuthZResponseNoMatchingRuleForComputer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no authorization rules that grant the user access to the requested computer.
+        /// </summary>
+        internal static string AuthZResponseNoMatchingRuleForUser {
+            get {
+                return ResourceManager.GetString("AuthZResponseNoMatchingRuleForUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user exceeded the per-user request limit.
+        /// </summary>
+        internal static string AuthZResponseUserRateLimitExceeded {
+            get {
+                return ResourceManager.GetString("AuthZResponseUserRateLimitExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occurred when trying to get the BitLocker recovery passwords for computer {0} as requested by user {1}.
         /// </summary>
         internal static string BitLockerKeyAccessError {

@@ -70,6 +70,51 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BitLocker recovery password.
+        /// </summary>
+        public static string AccessMaskBitLocker {
+            get {
+                return ResourceManager.GetString("AccessMaskBitLocker", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Just-in-time access.
+        /// </summary>
+        public static string AccessMaskJit {
+            get {
+                return ResourceManager.GetString("AccessMaskJit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Local admin password.
+        /// </summary>
+        public static string AccessMaskLocalAdminPassword {
+            get {
+                return ResourceManager.GetString("AccessMaskLocalAdminPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Local admin password history.
+        /// </summary>
+        public static string AccessMaskLocalAdminPasswordHistory {
+            get {
+                return ResourceManager.GetString("AccessMaskLocalAdminPasswordHistory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to None.
+        /// </summary>
+        public static string AccessMaskNone {
+            get {
+                return ResourceManager.GetString("AccessMaskNone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An authentication error occurred.
         /// </summary>
         public static string AuthNError {

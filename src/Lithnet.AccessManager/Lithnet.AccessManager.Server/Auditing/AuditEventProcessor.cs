@@ -90,7 +90,7 @@ namespace Lithnet.AccessManager.Service.Internal
         {
             LapsAuthorizationResponse lapsAuthZResponse = action.AuthzResponse as LapsAuthorizationResponse;
             JitAuthorizationResponse jitAuthZResponse = action.AuthzResponse as JitAuthorizationResponse;
-
+            
             Dictionary<string, string> pairs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
                 { "{user.SamAccountName}", action.User?.SamAccountName},
                 { "{user.MsDsPrincipalName}", action.User?.MsDsPrincipalName},
@@ -118,7 +118,7 @@ namespace Lithnet.AccessManager.Service.Internal
                 { "{AuthzResult.ExpireAfter}", (lapsAuthZResponse?.ExpireAfter ?? jitAuthZResponse?.ExpireAfter)?.ToString()},
                 { "{AuthzResult.ResponseCode}", action.AuthzResponse?.Code.ToString()},
                 { "{AuthzResult.AccessType}", action.AuthzResponse?.EvaluatedAccess.ToString()},
-                { "{AuthzResult.AccessTypeDescription}", action.AuthzResponse?.EvaluatedAccess.ToDescription()},
+                { "{AuthzResult.AccessTypeDescription}", action.EvaluatedAccess ?? action.AuthzResponse?.EvaluatedAccess.ToDescription()},
                 { "{AuthZResult.AccessExpiryDate}", action.AccessExpiryDate},
                 { "{message}", action.Message},
                 { "{request.IPAddress}", httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString()},

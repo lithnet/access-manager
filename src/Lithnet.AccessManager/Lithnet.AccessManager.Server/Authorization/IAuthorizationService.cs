@@ -1,10 +1,12 @@
-﻿using Lithnet.AccessManager.Server.Configuration;
+﻿using System.Net;
+using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.Configuration;
 
 namespace Lithnet.AccessManager.Server.Authorization
 {
     public interface IAuthorizationService
     {
-        AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer, AccessMask requestedAccess);
+        Task<AuthorizationResponse> GetAuthorizationResponse(IUser user, IComputer computer, AccessMask requestedAccess, IPAddress ip);
 
         AuthorizationResponse GetPreAuthorization(IUser user, IComputer computer);
     }
