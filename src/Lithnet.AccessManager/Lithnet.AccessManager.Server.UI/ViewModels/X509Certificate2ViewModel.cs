@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using System.Windows;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Stylet;
@@ -48,7 +49,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool CanRepermission => !this.HasPermission;
 
-        public async Task Repermission()
+        public void Repermission()
         {
             try
             {
@@ -57,7 +58,7 @@ namespace Lithnet.AccessManager.Server.UI
             catch (Exception ex)
             {
                 this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Could not set permissions on the private key");
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not set permissions on the private key\r\n{ex.Message}");
+                MessageBox.Show($"Could not set permissions on the private key\r\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             this.CheckCertificatePermissions();

@@ -182,7 +182,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool CanRepermission => this.SelectedCertificate?.CanRepermission == true;
 
-        public async Task Repermission()
+        public void Repermission()
         {
             var cert = this.SelectedCertificate;
 
@@ -191,7 +191,7 @@ namespace Lithnet.AccessManager.Server.UI
                 return;
             }
 
-            await cert.Repermission();
+            cert.Repermission();
         }
 
         public bool CanShowCertificateDialog => this.SelectedCertificate != null;
@@ -348,8 +348,7 @@ namespace Lithnet.AccessManager.Server.UI
                 }
 
                 var allCertificates = certificateProvider.GetEligiblePasswordEncryptionCertificates(false).OfType<X509Certificate2>();
-                this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert,
-                    this.SelectedForest.RootDomain.Name);
+                this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert, this.SelectedForest.RootDomain.Name);
 
                 bool foundPublished = false;
 

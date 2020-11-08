@@ -71,7 +71,7 @@ namespace Lithnet.AccessManager.Server
 
         public bool ServiceAccountHasPermission(X509Certificate2 cert)
         {
-            return this.HasPermission(cert, this.windowsServiceProvider.GetServiceAccount());
+            return this.HasPermission(cert, this.windowsServiceProvider.ServiceSid);
         }
 
         public bool HasPermission(X509Certificate2 cert, SecurityIdentifier sid)

@@ -270,6 +270,7 @@ output/
 
 output-x64
 output-x86
+output-ps
 
 setup-packages/
 Prerequisites/

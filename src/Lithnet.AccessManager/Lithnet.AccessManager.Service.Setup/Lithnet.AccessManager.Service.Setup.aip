@@ -19,10 +19,10 @@
     <ROW Property="IAgree" Value="Yes" Type="4" MsiKey="IAgree"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{3F99E9DC-B161-41A4-9B17-5AFDF45439A5} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{F3B3C7FE-6369-49F2-ABB8-13172B1C54A7} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7775.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7793.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
@@ -42,6 +42,7 @@
     <ROW Directory="APPDIR" Directory_Parent="TARGETDIR" DefaultDir="APPDIR:." IsPseudoRoot="1"/>
     <ROW Directory="CONFIG_PATH" Directory_Parent="TARGETDIR" DefaultDir="CONFIG~1|CONFIG_PATH" IsPseudoRoot="1"/>
     <ROW Directory="CimCmdlets_Dir" Directory_Parent="Modules_Dir" DefaultDir="CIMCMD~1|CimCmdlets"/>
+    <ROW Directory="Lithnet.AccessManager.PowerShell_Directory" Directory_Parent="Modules_1_Dir" DefaultDir="LITHNE~1|LithnetAccessManager"/>
     <ROW Directory="Lithnet_Dir" Directory_Parent="ProgramMenuFolder" DefaultDir="LITHNE~1|Lithnet Access Manager"/>
     <ROW Directory="Microsoft.PowerShell.Diagnostic_Dir" Directory_Parent="Modules_Dir" DefaultDir="MICROS~1.DIA|Microsoft.PowerShell.Diagnostics"/>
     <ROW Directory="Microsoft.PowerShell.Host_Dir" Directory_Parent="Modules_Dir" DefaultDir="MICROS~1.HOS|Microsoft.PowerShell.Host"/>
@@ -49,10 +50,13 @@
     <ROW Directory="Microsoft.PowerShell.Security_Dir" Directory_Parent="Modules_Dir" DefaultDir="MICROS~1.SEC|Microsoft.PowerShell.Security"/>
     <ROW Directory="Microsoft.PowerShell.Utility_Dir" Directory_Parent="Modules_Dir" DefaultDir="MICROS~1.UTI|Microsoft.PowerShell.Utility"/>
     <ROW Directory="Microsoft.WSMan.Management_Dir" Directory_Parent="Modules_Dir" DefaultDir="MICROS~2.MAN|Microsoft.WSMan.Management"/>
+    <ROW Directory="Modules_1_Dir" Directory_Parent="WindowsPowerShell_Dir" DefaultDir="Modules"/>
     <ROW Directory="Modules_Dir" Directory_Parent="netcoreapp3.1_Dir" DefaultDir="Modules"/>
     <ROW Directory="PSDiagnostics_Dir" Directory_Parent="Modules_Dir" DefaultDir="PSDIAG~1|PSDiagnostics"/>
+    <ROW Directory="ProgramFiles64Folder" Directory_Parent="TARGETDIR" DefaultDir="PROGRA~2|ProgramFiles64Folder" IsPseudoRoot="1"/>
     <ROW Directory="ProgramMenuFolder" Directory_Parent="TARGETDIR" DefaultDir="PROGRA~1|ProgramMenuFolder" IsPseudoRoot="1"/>
     <ROW Directory="TARGETDIR" DefaultDir="SourceDir"/>
+    <ROW Directory="WindowsPowerShell_Dir" Directory_Parent="ProgramFiles64Folder" DefaultDir="WINDOW~1|WindowsPowerShell"/>
     <ROW Directory="audittemplates_Dir" Directory_Parent="CONFIG_PATH" DefaultDir="AUDIT-~1|audit-templates"/>
     <ROW Directory="bootstrap_Dir" Directory_Parent="lib_1_Dir" DefaultDir="BOOTST~1|bootstrap"/>
     <ROW Directory="css_1_Dir" Directory_Parent="bootstrap_Dir" DefaultDir="css"/>
@@ -87,6 +91,7 @@
     <ROW Component="ConfigPath" Directory_="APPDIR" Attributes="260" KeyPath="ConfigPath"/>
     <ROW Component="ControlzEx.dll" ComponentId="{1CD9446A-561D-45D3-A5E4-5A0E06494DD5}" Directory_="APPDIR" Attributes="0" KeyPath="ControlzEx.dll"/>
     <ROW Component="CsvHelper.dll" ComponentId="{08B7B9E9-1D25-432D-9721-162D884D6E7F}" Directory_="APPDIR" Attributes="0" KeyPath="CsvHelper.dll"/>
+    <ROW Component="CsvHelper.dll_1" ComponentId="{96F1755A-C9BA-41C8-993A-A852AB0B3C93}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="CsvHelper.dll_1"/>
     <ROW Component="Diagnostics.format.ps1xml" ComponentId="{7DE06D00-C7EE-4DB3-8476-7ABFF4866DE2}" Directory_="Microsoft.PowerShell.Diagnostic_Dir" Attributes="0" KeyPath="Diagnostics.format.ps1xml" Type="0"/>
     <ROW Component="EventLogMessages.dll" ComponentId="{129D2F9D-7538-4910-9BCE-F800CBE4525D}" Directory_="APPDIR" Attributes="256" KeyPath="EventLogMessages.dll"/>
     <ROW Component="FluentValidation.dll" ComponentId="{3C902A09-592B-4A74-9FA8-EED7160A4A49}" Directory_="APPDIR" Attributes="0" KeyPath="FluentValidation.dll"/>
@@ -94,6 +99,7 @@
     <ROW Component="InconsolataRegular.ttf" ComponentId="{2B224761-1D0A-4824-A37B-8B598F37DEDF}" Directory_="fonts_Dir" Attributes="0" Type="0"/>
     <ROW Component="Lithnet" ComponentId="{87EF8BF8-4942-4907-826F-8DC42D990F22}" Directory_="Lithnet_Dir" Attributes="0"/>
     <ROW Component="Lithnet.AccessManager.Enterprise.dll" ComponentId="{0FEDB414-A419-4E96-8E13-AD85F14E636A}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Enterprise.dll"/>
+    <ROW Component="Lithnet.AccessManager.PowerShell.dll" ComponentId="{D2C5B1A4-D826-41EE-8E11-EB53A034E8B7}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="256" KeyPath="Lithnet.AccessManager.PowerShell.dll"/>
     <ROW Component="Lithnet.AccessManager.Server.UI.deps.json" ComponentId="{CA3EF717-17AD-4352-8266-773068370A0A}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Server.UI.deps.json" Type="0"/>
     <ROW Component="Lithnet.AccessManager.Server.UI.dll" ComponentId="{0CB62EAE-066C-4730-80C5-904E34091113}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.Server.UI.dll"/>
     <ROW Component="Lithnet.AccessManager.Server.UI.exe" ComponentId="{12E3D520-C42D-4704-B2A5-EAC20746AEF3}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.Server.UI.exe"/>
@@ -102,7 +108,10 @@
     <ROW Component="Lithnet.AccessManager.Service.dll" ComponentId="{18992572-F57F-4670-8AC1-41AB668917F5}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.Service.dll"/>
     <ROW Component="Lithnet.AccessManager.Service.exe" ComponentId="{60FE24E2-608C-41B7-89F4-56207AFBF908}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.Service.exe"/>
     <ROW Component="Lithnet.AccessManager.dll" ComponentId="{80A81BCC-A3C6-4775-AEB1-4DFA58494F88}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.dll"/>
+    <ROW Component="Lithnet.AccessManager.dll_1" ComponentId="{5B775D12-F79E-4DBD-910F-C70CA68366B2}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="256" KeyPath="Lithnet.AccessManager.dll_1"/>
     <ROW Component="Lithnet.Security.Authorization.dll" ComponentId="{437FFB46-A08E-4719-AD83-04579D5497AA}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.Security.Authorization.dll"/>
+    <ROW Component="Lithnet.Security.Authorization.dll_1" ComponentId="{1089C632-C186-4B76-A4CF-37701B93502A}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Lithnet.Security.Authorization.dll_1"/>
+    <ROW Component="LithnetAccessManger.psd1" ComponentId="{EA41579C-D494-4B6A-AC7F-A676871A5538}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="LithnetAccessManager.psd1" Type="0"/>
     <ROW Component="LogPath" ComponentId="{56E5F3E8-0C8A-4B3D-B9BD-BCCDBD0E2B45}" Directory_="APPDIR" Attributes="260" KeyPath="LogPath"/>
     <ROW Component="MahApps.Metro.IconPacks.BootstrapIcons.dll" ComponentId="{E06B4FFD-FC98-4698-A822-1BB31FC36B89}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.BootstrapIcons.dll"/>
     <ROW Component="MahApps.Metro.IconPacks.BoxIcons.dll" ComponentId="{55D49843-28EA-4001-8EC9-33F9EB81D1ED}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.IconPacks.BoxIcons.dll"/>
@@ -153,12 +162,14 @@
     <ROW Component="Microsoft.AspNetCore.HttpOverrides.dll" ComponentId="{CE111FED-D5DA-482B-989E-3A4AE4E58796}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.HttpOverrides.dll"/>
     <ROW Component="Microsoft.Azure.Services.AppAuthentication.dll" ComponentId="{3D86B3E8-33B0-4D95-B12E-790A535D2058}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Azure.Services.AppAuthentication.dll"/>
     <ROW Component="Microsoft.Bcl.AsyncInterfaces.dll" ComponentId="{A77BDECC-4486-4D39-8A14-A617B82A13C4}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Bcl.AsyncInterfaces.dll"/>
+    <ROW Component="Microsoft.Bcl.AsyncInterfaces.dll_1" ComponentId="{0207CB87-FF5D-4B4D-BF9C-C805A3A207B8}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Bcl.AsyncInterfaces.dll_1"/>
     <ROW Component="Microsoft.CSharp.dll" ComponentId="{4C8A1964-3DE2-420E-9708-21727087580E}" Directory_="ref_Dir" Attributes="0" KeyPath="Microsoft.CSharp.dll"/>
     <ROW Component="Microsoft.CodeAnalysis.CSharp.dll" ComponentId="{37BAE656-E2DD-4FA9-BF42-72D9E8A4A64E}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.CodeAnalysis.CSharp.dll"/>
     <ROW Component="Microsoft.CodeAnalysis.dll" ComponentId="{B3251CC0-15A1-4EB7-BDA6-B9ADA0A67015}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.CodeAnalysis.dll"/>
     <ROW Component="Microsoft.Extensions.Caching.Abstractions.dll" ComponentId="{89ACFBE5-72D4-4CE6-8FE6-4E09D0F50410}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Caching.Abstractions.dll"/>
     <ROW Component="Microsoft.Extensions.Caching.Memory.dll" ComponentId="{75506AA8-5713-4B36-AF4F-7DECB3A9B005}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Caching.Memory.dll"/>
     <ROW Component="Microsoft.Extensions.Configuration.Abstractions.dll" ComponentId="{35BAB18A-5E58-4AC0-B853-EDF79958A81A}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.Abstractions.dll"/>
+    <ROW Component="Microsoft.Extensions.Configuration.Abstractions.dll_1" ComponentId="{9E5A8918-E662-4A34-908F-B5B2B8E02C2B}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.Abstractions.dll_1"/>
     <ROW Component="Microsoft.Extensions.Configuration.Binder.dll" ComponentId="{822C8103-F342-4629-B80D-2C950BB818C9}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.Binder.dll"/>
     <ROW Component="Microsoft.Extensions.Configuration.CommandLine.dll" ComponentId="{5C2B7B29-D773-4213-8BE8-93A067194B8F}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.CommandLine.dll"/>
     <ROW Component="Microsoft.Extensions.Configuration.EnvironmentVariables.dll" ComponentId="{904466DF-3F0B-419E-88C3-87B0D6FF13C8}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.EnvironmentVariables.dll"/>
@@ -167,15 +178,19 @@
     <ROW Component="Microsoft.Extensions.Configuration.UserSecrets.dll" ComponentId="{98B605EE-B4D3-43C9-9117-F26015FFDDE3}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.UserSecrets.dll"/>
     <ROW Component="Microsoft.Extensions.Configuration.dll" ComponentId="{76F1BF8D-4B34-4A15-AC9B-609E2D2FDE07}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.dll"/>
     <ROW Component="Microsoft.Extensions.DependencyInjection.Abstractions.dll" ComponentId="{AE77EA0B-A27E-4A19-A57A-BEA8923B12F6}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.DependencyInjection.Abstractions.dll"/>
+    <ROW Component="Microsoft.Extensions.DependencyInjection.Abstractions.dll_1" ComponentId="{651D8C3B-E654-4F08-9676-4E7B74E4D279}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Extensions.DependencyInjection.Abstractions.dll_1"/>
     <ROW Component="Microsoft.Extensions.DependencyInjection.dll" ComponentId="{97C395DA-90C6-46FA-AFEF-EDF56E48A6CE}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.DependencyInjection.dll"/>
     <ROW Component="Microsoft.Extensions.FileProviders.Abstractions.dll" ComponentId="{441281AD-4070-45D1-8BF3-0D1BE7A4E8BC}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.FileProviders.Abstractions.dll"/>
+    <ROW Component="Microsoft.Extensions.FileProviders.Abstractions.dll_1" ComponentId="{A405847E-C050-45CB-B473-23EAF6E92E43}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Extensions.FileProviders.Abstractions.dll_1"/>
     <ROW Component="Microsoft.Extensions.FileProviders.Embedded.dll" ComponentId="{14339109-D59D-4577-84A1-CDD02DE0240C}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.FileProviders.Embedded.dll"/>
     <ROW Component="Microsoft.Extensions.FileProviders.Physical.dll" ComponentId="{A0773D14-241A-42C0-9187-695874A05ED5}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.FileProviders.Physical.dll"/>
     <ROW Component="Microsoft.Extensions.FileSystemGlobbing.dll" ComponentId="{579817A5-F69F-4752-A905-D4AA5D484C58}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.FileSystemGlobbing.dll"/>
     <ROW Component="Microsoft.Extensions.Hosting.Abstractions.dll" ComponentId="{54026B35-D48D-4EC8-8FB7-BEC70C1C3EC9}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Hosting.Abstractions.dll"/>
+    <ROW Component="Microsoft.Extensions.Hosting.Abstractions.dll_1" ComponentId="{C4991B3A-800D-4009-BE3C-4053210742E5}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Extensions.Hosting.Abstractions.dll_1"/>
     <ROW Component="Microsoft.Extensions.Hosting.WindowsServices.dll" ComponentId="{090D5640-C2B4-497F-B15E-B86B54DF1DBD}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Hosting.WindowsServices.dll"/>
     <ROW Component="Microsoft.Extensions.Hosting.dll" ComponentId="{59C532E6-478F-4D6C-A0BC-B75DD99F6733}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Hosting.dll"/>
     <ROW Component="Microsoft.Extensions.Logging.Abstractions.dll" ComponentId="{C76DE922-2370-4D32-AD13-D0F5AE05A0BE}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.Abstractions.dll"/>
+    <ROW Component="Microsoft.Extensions.Logging.Abstractions.dll_1" ComponentId="{1A63A008-1845-4CB7-8C11-FEDBE660AFCA}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Extensions.Logging.Abstractions.dll_1"/>
     <ROW Component="Microsoft.Extensions.Logging.Configuration.dll" ComponentId="{66458EE4-913E-422F-AE1B-01690087E525}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.Configuration.dll"/>
     <ROW Component="Microsoft.Extensions.Logging.Console.dll" ComponentId="{1A791C3A-251C-44EF-9E64-E975577C767C}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.Console.dll"/>
     <ROW Component="Microsoft.Extensions.Logging.Debug.dll" ComponentId="{5E0B5DE8-0407-46A0-B26B-134FF2A08702}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.Debug.dll"/>
@@ -185,6 +200,7 @@
     <ROW Component="Microsoft.Extensions.Options.ConfigurationExtensions.dll" ComponentId="{EC187463-59FF-4C6B-82B0-7B7E18875569}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Options.ConfigurationExtensions.dll"/>
     <ROW Component="Microsoft.Extensions.Options.dll" ComponentId="{0C64A70C-C7C6-436F-B695-420DD8B7DBBE}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Options.dll"/>
     <ROW Component="Microsoft.Extensions.Primitives.dll" ComponentId="{2127C687-CCCC-4938-B644-6A7176D709EE}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Primitives.dll"/>
+    <ROW Component="Microsoft.Extensions.Primitives.dll_1" ComponentId="{C7C0B724-4CE8-4DB6-9914-A73A4D1229A5}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Extensions.Primitives.dll_1"/>
     <ROW Component="Microsoft.IdentityModel.Clients.ActiveDirectory.dll" ComponentId="{35220932-B204-4219-ABC6-9712A0B52E7A}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.Clients.ActiveDirectory.dll"/>
     <ROW Component="Microsoft.IdentityModel.JsonWebTokens.dll" ComponentId="{464C5831-7F75-4737-B76A-E8CC46B814C7}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.JsonWebTokens.dll"/>
     <ROW Component="Microsoft.IdentityModel.Logging.dll" ComponentId="{32DF9B3C-0BC5-483C-B22E-199E278586F4}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.Logging.dll"/>
@@ -224,10 +240,12 @@
     <ROW Component="NLog.Extensions.Logging.dll" ComponentId="{EBFD3BDF-498C-40E4-A3F8-9EACA8D85A24}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.Extensions.Logging.dll"/>
     <ROW Component="NLog.Web.AspNetCore.dll" ComponentId="{73F69022-9231-402D-920C-6F0AC94DC74E}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.Web.AspNetCore.dll"/>
     <ROW Component="NLog.dll" ComponentId="{15E312A9-DD08-42F7-9CBD-4A8535A00C74}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.dll"/>
+    <ROW Component="NLog.dll_1" ComponentId="{6FA0247A-00B2-491E-86D0-F66B93C07AF2}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="NLog.dll_1"/>
     <ROW Component="NamedPipeServerStream.NetFrameworkVersion.dll" ComponentId="{E4F606B3-AA38-4112-8E14-27706ABFDA4C}" Directory_="APPDIR" Attributes="0" KeyPath="NamedPipeServerStream.NetFrameworkVersion.dll"/>
     <ROW Component="Namotion.Reflection.dll" ComponentId="{9389DC0C-381C-4B7E-B8FF-77E23D9E02DF}" Directory_="APPDIR" Attributes="0" KeyPath="Namotion.Reflection.dll"/>
     <ROW Component="Nerdbank.Streams.dll" ComponentId="{24AE6EE6-D142-418B-82F9-3DD843D39A3C}" Directory_="APPDIR" Attributes="0" KeyPath="Nerdbank.Streams.dll"/>
     <ROW Component="Newtonsoft.Json.dll" ComponentId="{AD28598B-7779-423E-B6FC-F54E61CAAA11}" Directory_="APPDIR" Attributes="0" KeyPath="Newtonsoft.Json.dll"/>
+    <ROW Component="Newtonsoft.Json.dll_1" ComponentId="{D0DD279A-1463-4E98-91C0-E394BD6AD077}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Newtonsoft.Json.dll_1"/>
     <ROW Component="PSDiagnostics.psd1" ComponentId="{CA7AFEFD-15A3-422C-A604-B219B3C0AB14}" Directory_="PSDiagnostics_Dir" Attributes="0" KeyPath="PSDiagnostics.psd1" Type="0"/>
     <ROW Component="Parameters" ComponentId="{C49A6A94-56AB-4E85-B12B-9CC95241FEFB}" Directory_="APPDIR" Attributes="260" KeyPath="Parameters"/>
     <ROW Component="PowerShell.Core.Instrumentation.dll" ComponentId="{BF9FC8CA-DB7B-4B90-9A19-58322CFB8734}" Directory_="APPDIR" Attributes="256" KeyPath="PowerShell.Core.Instrumentation.dll"/>
@@ -238,6 +256,7 @@
     <ROW Component="Stylet.dll" ComponentId="{EE30EF72-9081-48E1-9ECB-28F49CD10A7F}" Directory_="APPDIR" Attributes="0" KeyPath="Stylet.dll"/>
     <ROW Component="System.AppContext.dll" ComponentId="{17D74163-9937-413C-AC4A-EEB2E204ECF6}" Directory_="ref_Dir" Attributes="0" KeyPath="System.AppContext.dll"/>
     <ROW Component="System.Buffers.dll" ComponentId="{B88998A9-D018-4DB6-8F67-EA78B72D8566}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Buffers.dll"/>
+    <ROW Component="System.Buffers.dll_1" ComponentId="{CA9E4941-F7DE-4273-8B86-170372FE6A7B}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="System.Buffers.dll_1"/>
     <ROW Component="System.CodeDom.dll" ComponentId="{FD5916A9-E290-4519-9162-F68798CCD006}" Directory_="APPDIR" Attributes="0" KeyPath="System.CodeDom.dll"/>
     <ROW Component="System.Collections.Concurrent.dll" ComponentId="{D01FF082-3BE9-485E-BE9E-7C1D886EFB55}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Collections.Concurrent.dll"/>
     <ROW Component="System.Collections.Immutable.dll" ComponentId="{FE5758DE-79DC-47A7-ADD5-391569511E90}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Collections.Immutable.dll"/>
@@ -304,8 +323,10 @@
     <ROW Component="System.Linq.Queryable.dll" ComponentId="{602E5239-7958-4877-A918-64D508546104}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Linq.Queryable.dll"/>
     <ROW Component="System.Linq.dll" ComponentId="{337C41AA-ED64-4457-A416-73C4595B7220}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Linq.dll"/>
     <ROW Component="System.Management.Automation.dll" ComponentId="{953A21C3-8B31-47A1-B4AB-1F4EB1AE0275}" Directory_="APPDIR" Attributes="0" KeyPath="System.Management.Automation.dll"/>
+    <ROW Component="System.Management.Automation.dll_1" ComponentId="{E0150576-0932-4EE1-97C7-96ED0E377533}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="System.Management.Automation.dll_1"/>
     <ROW Component="System.Management.dll" ComponentId="{96DD69C4-C431-4FCE-AD9A-43AD15F21FDE}" Directory_="APPDIR" Attributes="0" KeyPath="System.Management.dll"/>
     <ROW Component="System.Memory.dll" ComponentId="{E677F787-0F33-4181-A67C-652E9BFCDA7A}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Memory.dll"/>
+    <ROW Component="System.Memory.dll_1" ComponentId="{D4E87363-DEB4-4F10-97C0-A8BBF95061AA}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="System.Memory.dll_1"/>
     <ROW Component="System.Net.Http.WinHttpHandler.dll" ComponentId="{056875A0-7B34-416A-8CD7-D362ABC61FC5}" Directory_="APPDIR" Attributes="0" KeyPath="System.Net.Http.WinHttpHandler.dll"/>
     <ROW Component="System.Net.Http.dll" ComponentId="{16403F8E-388F-4A1F-AA7A-A7AAFB3D4784}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Net.Http.dll"/>
     <ROW Component="System.Net.HttpListener.dll" ComponentId="{E2429AD0-38D6-42D6-A975-017D2C4A5535}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Net.HttpListener.dll"/>
@@ -325,6 +346,7 @@
     <ROW Component="System.Net.WebSockets.dll" ComponentId="{FAE9E259-0D95-4BB5-B50F-7FB62A94C88E}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Net.WebSockets.dll"/>
     <ROW Component="System.Net.dll" ComponentId="{0B71652E-048B-4244-8522-144A59C883FD}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Net.dll"/>
     <ROW Component="System.Numerics.Vectors.dll" ComponentId="{37BF5ED0-C1D4-4347-8112-83433F13251D}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Numerics.Vectors.dll"/>
+    <ROW Component="System.Numerics.Vectors.dll_1" ComponentId="{C4EFE2A3-CD80-4D36-82B7-E359EEFABCA0}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="System.Numerics.Vectors.dll_1"/>
     <ROW Component="System.Numerics.dll" ComponentId="{D726BA18-8CA3-4A5E-A716-4237AF5B6D03}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Numerics.dll"/>
     <ROW Component="System.ObjectModel.dll" ComponentId="{974ABF54-889F-4EF5-8403-F6BB02CFF547}" Directory_="ref_Dir" Attributes="0" KeyPath="System.ObjectModel.dll"/>
     <ROW Component="System.Private.ServiceModel.dll" ComponentId="{C5EF8462-788C-47E2-BA7A-294ABD84881F}" Directory_="APPDIR" Attributes="0" KeyPath="System.Private.ServiceModel.dll"/>
@@ -343,6 +365,7 @@
     <ROW Component="System.Resources.Writer.dll" ComponentId="{827022ED-B5EC-4F2C-8F78-EB9EFCF0E6EE}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Resources.Writer.dll"/>
     <ROW Component="System.Runtime.Caching.dll" ComponentId="{97000012-0281-478B-89EC-14C6B0DEC2DF}" Directory_="APPDIR" Attributes="0" KeyPath="System.Runtime.Caching.dll"/>
     <ROW Component="System.Runtime.CompilerServices.Unsafe.dll" ComponentId="{8F54CDF4-C0BA-42BB-A9FB-3E452AB08BBE}" Directory_="APPDIR" Attributes="0" KeyPath="System.Runtime.CompilerServices.Unsafe.dll"/>
+    <ROW Component="System.Runtime.CompilerServices.Unsafe.dll_1" ComponentId="{930E458C-D976-4A30-8CDE-F69552068D5B}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="System.Runtime.CompilerServices.Unsafe.dll_1"/>
     <ROW Component="System.Runtime.CompilerServices.VisualC.dll" ComponentId="{B90B0A5E-70FE-4453-9E79-0507CB2BA098}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Runtime.CompilerServices.VisualC.dll"/>
     <ROW Component="System.Runtime.Extensions.dll" ComponentId="{6DFC83E2-D19F-469F-BCAC-A454FE084182}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Runtime.Extensions.dll"/>
     <ROW Component="System.Runtime.Handles.dll" ComponentId="{E5601C82-7028-4334-BC88-1A1A1C9A24B1}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Runtime.Handles.dll"/>
@@ -360,10 +383,12 @@
     <ROW Component="System.Runtime.dll" ComponentId="{A3B2914C-F69F-43F7-8F81-E260678C5603}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Runtime.dll"/>
     <ROW Component="System.Security.Claims.dll" ComponentId="{A06889FF-8D54-4162-AD3E-032915786F04}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Security.Claims.dll"/>
     <ROW Component="System.Security.Cryptography.Algorithms.dll" ComponentId="{9C7268E8-D382-48F6-98E9-C9471E58E42C}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Security.Cryptography.Algorithms.dll"/>
+    <ROW Component="System.Security.Cryptography.Cng.dll" ComponentId="{24B82605-201C-492F-BFE7-89630BCFDC07}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="System.Security.Cryptography.Cng.dll"/>
     <ROW Component="System.Security.Cryptography.Csp.dll" ComponentId="{7ABE5B59-57BB-4C49-83A2-CEAFCF34CBED}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Security.Cryptography.Csp.dll"/>
     <ROW Component="System.Security.Cryptography.Encoding.dll" ComponentId="{55CF9E4A-1D20-4F25-91D4-CFDCC7734D05}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Security.Cryptography.Encoding.dll"/>
     <ROW Component="System.Security.Cryptography.Primitives.dll" ComponentId="{51641F15-A32D-4E3A-BF18-DBA5B2D6A6C0}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Security.Cryptography.Primitives.dll"/>
     <ROW Component="System.Security.Cryptography.ProtectedData.dll" ComponentId="{60EC272A-E1F3-4F28-B3DD-0742D0AB591F}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Cryptography.ProtectedData.dll"/>
+    <ROW Component="System.Security.Cryptography.ProtectedData.dll_1" ComponentId="{103B33A8-E6A8-4509-A6E9-DA8661149A4A}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="System.Security.Cryptography.ProtectedData.dll_1"/>
     <ROW Component="System.Security.Cryptography.X509Certificates.dll" ComponentId="{2C5923EB-48EC-42C1-B25F-F9CA37C7991B}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Security.Cryptography.X509Certificates.dll"/>
     <ROW Component="System.Security.Principal.dll" ComponentId="{1FCA8DB1-8883-4891-9CF5-912AAE940D5B}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Security.Principal.dll"/>
     <ROW Component="System.Security.SecureString.dll" ComponentId="{FF58765F-8E6E-4015-9905-770511010DA0}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Security.SecureString.dll"/>
@@ -390,6 +415,7 @@
     <ROW Component="System.Threading.Overlapped.dll" ComponentId="{DEA8BA60-EF8B-432E-808A-7BF6DC3B85A2}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Threading.Overlapped.dll"/>
     <ROW Component="System.Threading.Tasks.Dataflow.dll" ComponentId="{192FB535-5AC5-424B-84CF-D65FA7F8FAF5}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Threading.Tasks.Dataflow.dll"/>
     <ROW Component="System.Threading.Tasks.Extensions.dll" ComponentId="{45EDA1AF-9377-455F-9D84-1B2FFC3C7BD3}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Threading.Tasks.Extensions.dll"/>
+    <ROW Component="System.Threading.Tasks.Extensions.dll_1" ComponentId="{A4F403B5-E666-409A-96EF-AF33E6459F2F}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="System.Threading.Tasks.Extensions.dll_1"/>
     <ROW Component="System.Threading.Tasks.Parallel.dll" ComponentId="{8AB97DF5-558B-43A5-AC67-928299985C07}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Threading.Tasks.Parallel.dll"/>
     <ROW Component="System.Threading.Tasks.dll" ComponentId="{BCCE5AF0-B8EA-47ED-8330-EB7596475986}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Threading.Tasks.dll"/>
     <ROW Component="System.Threading.Thread.dll" ComponentId="{8BC03840-039D-4C6E-8B0A-04EDDD24C0B4}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Threading.Thread.dll"/>
@@ -399,6 +425,7 @@
     <ROW Component="System.Transactions.Local.dll" ComponentId="{487296AD-7F7C-4BE0-928E-C38375CA1764}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Transactions.Local.dll"/>
     <ROW Component="System.Transactions.dll" ComponentId="{8DF3D64D-B24B-40E1-A18D-B8B9E0696787}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Transactions.dll"/>
     <ROW Component="System.ValueTuple.dll" ComponentId="{51BA459E-7DDF-4E8B-BD46-1310DB1143AD}" Directory_="ref_Dir" Attributes="0" KeyPath="System.ValueTuple.dll"/>
+    <ROW Component="System.ValueTuple.dll_1" ComponentId="{50A5F09E-CA68-477D-B617-AB1093CB757F}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="System.ValueTuple.dll_1"/>
     <ROW Component="System.Web.HttpUtility.dll" ComponentId="{3BB7B8D5-E4FD-46CF-B72B-CE3D1CD1F5A7}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Web.HttpUtility.dll"/>
     <ROW Component="System.Web.dll" ComponentId="{4AC15ED6-D3A0-4E4F-8CE0-48146F48E4A6}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Web.dll"/>
     <ROW Component="System.Windows.dll" ComponentId="{A9AEE381-614B-4BE4-848B-0FBDA823512B}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Windows.dll"/>
@@ -413,13 +440,20 @@
     <ROW Component="System.Xml.dll" ComponentId="{509FCA52-5AB4-4D16-A017-A3D323120AD3}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Xml.dll"/>
     <ROW Component="System.dll" ComponentId="{D25804D7-4A48-4D61-AEC4-48C8397D634E}" Directory_="ref_Dir" Attributes="0" KeyPath="System.dll"/>
     <ROW Component="Vanara.Core.dll" ComponentId="{FA834E56-A868-47C7-94FA-FC4ADA49B252}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.Core.dll"/>
+    <ROW Component="Vanara.Core.dll_1" ComponentId="{17AD286E-7F5A-4AA2-9B38-4D558870B87A}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Vanara.Core.dll_1"/>
     <ROW Component="Vanara.PInvoke.Cryptography.dll" ComponentId="{8B93AF4E-4CD3-459E-B48D-212F213B9EC4}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Cryptography.dll"/>
+    <ROW Component="Vanara.PInvoke.Cryptography.dll_1" ComponentId="{51FE38F8-2F71-4043-98A1-75529190C914}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Vanara.PInvoke.Cryptography.dll_1"/>
     <ROW Component="Vanara.PInvoke.Kernel32.dll" ComponentId="{9729AEB5-3376-4308-A18D-211F560F558D}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Kernel32.dll"/>
+    <ROW Component="Vanara.PInvoke.Kernel32.dll_1" ComponentId="{9E5E9962-9B6E-4FED-AA64-885660533096}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Vanara.PInvoke.Kernel32.dll_1"/>
     <ROW Component="Vanara.PInvoke.NTDSApi.dll" ComponentId="{69984269-B313-4BEB-BE4E-8925244323BE}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.NTDSApi.dll"/>
     <ROW Component="Vanara.PInvoke.NetApi32.dll" ComponentId="{4B29DD9A-1E9D-4153-A54F-C5E8EA590C86}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.NetApi32.dll"/>
+    <ROW Component="Vanara.PInvoke.NetApi32.dll_1" ComponentId="{FD098034-0C65-4F64-80F5-5833251BE6F1}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Vanara.PInvoke.NetApi32.dll_1"/>
     <ROW Component="Vanara.PInvoke.Security.dll" ComponentId="{15DDDFA1-53A5-483E-9CD1-2BC28E43A52E}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Security.dll"/>
+    <ROW Component="Vanara.PInvoke.Security.dll_1" ComponentId="{402AC6AC-4B08-45B7-A434-D462EE36C7D9}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Vanara.PInvoke.Security.dll_1"/>
     <ROW Component="Vanara.PInvoke.Shared.dll" ComponentId="{6822FBE4-08C1-4725-96ED-CC2041C67B38}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Shared.dll"/>
+    <ROW Component="Vanara.PInvoke.Shared.dll_1" ComponentId="{53E89629-054E-48DB-9DED-4CDEFE046A31}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Vanara.PInvoke.Shared.dll_1"/>
     <ROW Component="Vanara.PInvoke.Ws2_32.dll" ComponentId="{B779C0BE-7CC6-40E4-A232-BBF1D7BEF116}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Ws2_32.dll"/>
+    <ROW Component="Vanara.PInvoke.Ws2_32.dll_1" ComponentId="{ECE90902-650D-477C-8833-731F3AB89AA9}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Vanara.PInvoke.Ws2_32.dll_1"/>
     <ROW Component="Vanara.Security.dll" ComponentId="{117AC9F3-57DB-40AD-8AE4-24597651B7C7}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.Security.dll"/>
     <ROW Component="WindowsBase.dll" ComponentId="{3A0502A2-C6C3-4A36-8BF1-5DA4206072F1}" Directory_="ref_Dir" Attributes="0" KeyPath="WindowsBase.dll"/>
     <ROW Component="WindowsFirewallHelper.dll" ComponentId="{F445CAB7-AFFA-44E8-B5E2-BFE4DEC1B2AA}" Directory_="APPDIR" Attributes="0" KeyPath="WindowsFirewallHelper.dll"/>
@@ -925,13 +959,45 @@
     <ROW File="Microsoft.AspNetCore.Cryptography.Internal.dll" Component_="Microsoft.AspNetCore.Cryptography.Internal.dll" FileName="MICRO~67.DLL|Microsoft.AspNetCore.Cryptography.Internal.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.Cryptography.Internal.dll" SelfReg="false"/>
     <ROW File="Microsoft.AspNetCore.DataProtection.Abstractions.dll" Component_="Microsoft.AspNetCore.DataProtection.Abstractions.dll" FileName="MICRO~68.DLL|Microsoft.AspNetCore.DataProtection.Abstractions.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.DataProtection.Abstractions.dll" SelfReg="false"/>
     <ROW File="Microsoft.AspNetCore.DataProtection.dll" Component_="Microsoft.AspNetCore.DataProtection.dll" FileName="MICRO~69.DLL|Microsoft.AspNetCore.DataProtection.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.DataProtection.dll" SelfReg="false"/>
-    <ROW File="license.dat" Component_="Lithnet.AccessManager.Server.UI.deps.json" FileName="license.dat" Attributes="0" SourcePath="output\license.dat" SelfReg="false"/>
     <ROW File="dbupcore.dll" Component_="dbupcore.dll" FileName="DBUP-C~1.DLL|dbup-core.dll" Attributes="0" SourcePath="output\dbup-core.dll" SelfReg="false"/>
     <ROW File="dbupsqlserver.dll" Component_="dbupsqlserver.dll" FileName="DBUP-S~1.DLL|dbup-sqlserver.dll" Attributes="0" SourcePath="output\dbup-sqlserver.dll" SelfReg="false"/>
     <ROW File="Microsoft.Azure.Services.AppAuthentication.dll" Component_="Microsoft.Azure.Services.AppAuthentication.dll" FileName="MICRO~70.DLL|Microsoft.Azure.Services.AppAuthentication.dll" Attributes="0" SourcePath="output\Microsoft.Azure.Services.AppAuthentication.dll" SelfReg="false"/>
     <ROW File="Microsoft.IdentityModel.Clients.ActiveDirectory.dll" Component_="Microsoft.IdentityModel.Clients.ActiveDirectory.dll" FileName="MICRO~71.DLL|Microsoft.IdentityModel.Clients.ActiveDirectory.dll" Attributes="0" SourcePath="output\Microsoft.IdentityModel.Clients.ActiveDirectory.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.NTDSApi.dll" Component_="Vanara.PInvoke.NTDSApi.dll" FileName="VANARA~8.DLL|Vanara.PInvoke.NTDSApi.dll" Attributes="0" SourcePath="output\Vanara.PInvoke.NTDSApi.dll" SelfReg="false"/>
     <ROW File="Vanara.Security.dll" Component_="Vanara.Security.dll" FileName="VANARA~9.DLL|Vanara.Security.dll" Attributes="0" SourcePath="output\Vanara.Security.dll" SelfReg="false"/>
+    <ROW File="CsvHelper.dll_1" Component_="CsvHelper.dll_1" FileName="CSVHEL~1.DLL|CsvHelper.dll" Attributes="0" SourcePath="output-ps\CsvHelper.dll" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.PowerShell.dll" Component_="Lithnet.AccessManager.PowerShell.dll" FileName="LITHNE~2.DLL|Lithnet.AccessManager.PowerShell.dll" Attributes="0" SourcePath="output-ps\Lithnet.AccessManager.PowerShell.dll" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.PowerShell.pdb" Component_="Lithnet.AccessManager.PowerShell.dll" FileName="LITHNE~2.PDB|Lithnet.AccessManager.PowerShell.pdb" Attributes="0" SourcePath="output-ps\Lithnet.AccessManager.PowerShell.pdb" SelfReg="false"/>
+    <ROW File="Lithnet.Security.Authorization.dll_1" Component_="Lithnet.Security.Authorization.dll_1" FileName="LITHNE~3.DLL|Lithnet.Security.Authorization.dll" Attributes="0" SourcePath="output-ps\Lithnet.Security.Authorization.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Bcl.AsyncInterfaces.dll_1" Component_="Microsoft.Bcl.AsyncInterfaces.dll_1" FileName="MICROS~1.DLL|Microsoft.Bcl.AsyncInterfaces.dll" Attributes="0" SourcePath="output-ps\Microsoft.Bcl.AsyncInterfaces.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Configuration.Abstractions.dll_1" Component_="Microsoft.Extensions.Configuration.Abstractions.dll_1" FileName="MICROS~2.DLL|Microsoft.Extensions.Configuration.Abstractions.dll" Attributes="0" SourcePath="output-ps\Microsoft.Extensions.Configuration.Abstractions.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.DependencyInjection.Abstractions.dll_1" Component_="Microsoft.Extensions.DependencyInjection.Abstractions.dll_1" FileName="MICROS~5.DLL|Microsoft.Extensions.DependencyInjection.Abstractions.dll" Attributes="0" SourcePath="output-ps\Microsoft.Extensions.DependencyInjection.Abstractions.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.FileProviders.Abstractions.dll_1" Component_="Microsoft.Extensions.FileProviders.Abstractions.dll_1" FileName="MICROS~7.DLL|Microsoft.Extensions.FileProviders.Abstractions.dll" Attributes="0" SourcePath="output-ps\Microsoft.Extensions.FileProviders.Abstractions.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Hosting.Abstractions.dll_1" Component_="Microsoft.Extensions.Hosting.Abstractions.dll_1" FileName="MICROS~8.DLL|Microsoft.Extensions.Hosting.Abstractions.dll" Attributes="0" SourcePath="output-ps\Microsoft.Extensions.Hosting.Abstractions.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Logging.Abstractions.dll_1" Component_="Microsoft.Extensions.Logging.Abstractions.dll_1" FileName="MICROS~9.DLL|Microsoft.Extensions.Logging.Abstractions.dll" Attributes="0" SourcePath="output-ps\Microsoft.Extensions.Logging.Abstractions.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Primitives.dll_1" Component_="Microsoft.Extensions.Primitives.dll_1" FileName="MICRO~12.DLL|Microsoft.Extensions.Primitives.dll" Attributes="0" SourcePath="output-ps\Microsoft.Extensions.Primitives.dll" SelfReg="false"/>
+    <ROW File="Newtonsoft.Json.dll_1" Component_="Newtonsoft.Json.dll_1" FileName="NEWTON~1.DLL|Newtonsoft.Json.dll" Attributes="0" SourcePath="output-ps\Newtonsoft.Json.dll" SelfReg="false"/>
+    <ROW File="NLog.dll_1" Component_="NLog.dll_1" FileName="NLog.dll" Attributes="0" SourcePath="output-ps\NLog.dll" SelfReg="false"/>
+    <ROW File="System.Buffers.dll_1" Component_="System.Buffers.dll_1" FileName="SYSTEM~1.DLL|System.Buffers.dll" Attributes="0" SourcePath="output-ps\System.Buffers.dll" SelfReg="false"/>
+    <ROW File="System.Management.Automation.dll_1" Component_="System.Management.Automation.dll_1" FileName="SYSTEM~3.DLL|System.Management.Automation.dll" Attributes="0" SourcePath="output-ps\System.Management.Automation.dll" SelfReg="false"/>
+    <ROW File="System.Memory.dll_1" Component_="System.Memory.dll_1" FileName="SYSTEM~4.DLL|System.Memory.dll" Attributes="0" SourcePath="output-ps\System.Memory.dll" SelfReg="false"/>
+    <ROW File="System.Numerics.Vectors.dll_1" Component_="System.Numerics.Vectors.dll_1" FileName="SYSTEM~5.DLL|System.Numerics.Vectors.dll" Attributes="0" SourcePath="output-ps\System.Numerics.Vectors.dll" SelfReg="false"/>
+    <ROW File="System.Runtime.CompilerServices.Unsafe.dll_1" Component_="System.Runtime.CompilerServices.Unsafe.dll_1" FileName="SYSTEM~6.DLL|System.Runtime.CompilerServices.Unsafe.dll" Attributes="0" SourcePath="output-ps\System.Runtime.CompilerServices.Unsafe.dll" SelfReg="false"/>
+    <ROW File="System.Security.Cryptography.Cng.dll" Component_="System.Security.Cryptography.Cng.dll" FileName="SYSTEM~7.DLL|System.Security.Cryptography.Cng.dll" Attributes="0" SourcePath="output-ps\System.Security.Cryptography.Cng.dll" SelfReg="false"/>
+    <ROW File="System.Security.Cryptography.ProtectedData.dll_1" Component_="System.Security.Cryptography.ProtectedData.dll_1" FileName="SYSTEM~8.DLL|System.Security.Cryptography.ProtectedData.dll" Attributes="0" SourcePath="output-ps\System.Security.Cryptography.ProtectedData.dll" SelfReg="false"/>
+    <ROW File="System.Threading.Tasks.Extensions.dll_1" Component_="System.Threading.Tasks.Extensions.dll_1" FileName="SYSTEM~9.DLL|System.Threading.Tasks.Extensions.dll" Attributes="0" SourcePath="output-ps\System.Threading.Tasks.Extensions.dll" SelfReg="false"/>
+    <ROW File="System.ValueTuple.dll_1" Component_="System.ValueTuple.dll_1" FileName="SYSTE~10.DLL|System.ValueTuple.dll" Attributes="0" SourcePath="output-ps\System.ValueTuple.dll" SelfReg="false"/>
+    <ROW File="Vanara.Core.dll_1" Component_="Vanara.Core.dll_1" FileName="VANARA~1.DLL|Vanara.Core.dll" Attributes="0" SourcePath="output-ps\Vanara.Core.dll" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.Cryptography.dll_1" Component_="Vanara.PInvoke.Cryptography.dll_1" FileName="VANARA~2.DLL|Vanara.PInvoke.Cryptography.dll" Attributes="0" SourcePath="output-ps\Vanara.PInvoke.Cryptography.dll" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.Kernel32.dll_1" Component_="Vanara.PInvoke.Kernel32.dll_1" FileName="VANARA~3.DLL|Vanara.PInvoke.Kernel32.dll" Attributes="0" SourcePath="output-ps\Vanara.PInvoke.Kernel32.dll" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.NetApi32.dll_1" Component_="Vanara.PInvoke.NetApi32.dll_1" FileName="VANARA~4.DLL|Vanara.PInvoke.NetApi32.dll" Attributes="0" SourcePath="output-ps\Vanara.PInvoke.NetApi32.dll" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.Security.dll_1" Component_="Vanara.PInvoke.Security.dll_1" FileName="VANARA~5.DLL|Vanara.PInvoke.Security.dll" Attributes="0" SourcePath="output-ps\Vanara.PInvoke.Security.dll" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.Shared.dll_1" Component_="Vanara.PInvoke.Shared.dll_1" FileName="VANARA~6.DLL|Vanara.PInvoke.Shared.dll" Attributes="0" SourcePath="output-ps\Vanara.PInvoke.Shared.dll" SelfReg="false"/>
+    <ROW File="Vanara.PInvoke.Ws2_32.dll_1" Component_="Vanara.PInvoke.Ws2_32.dll_1" FileName="VANARA~7.DLL|Vanara.PInvoke.Ws2_32.dll" Attributes="0" SourcePath="output-ps\Vanara.PInvoke.Ws2_32.dll" SelfReg="false"/>
+    <ROW File="license.dat" Component_="Lithnet.AccessManager.Server.UI.deps.json" FileName="license.dat" Attributes="0" SourcePath="output\license.dat" SelfReg="false"/>
+    <ROW File="LithnetAccessManager.psd1" Component_="LithnetAccessManger.psd1" FileName="LITHNE~2.PSD|LithnetAccessManager.psd1" Attributes="0" SourcePath="output-ps\LithnetAccessManager.psd1" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.dll_1" Component_="Lithnet.AccessManager.dll_1" FileName="LITHNE~1.DLL|Lithnet.AccessManager.dll" Attributes="0" SourcePath="output-ps\Lithnet.AccessManager.dll" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.pdb_1" Component_="Lithnet.AccessManager.dll_1" FileName="LITHNE~1.PDB|Lithnet.AccessManager.pdb" Attributes="0" SourcePath="output-ps\Lithnet.AccessManager.pdb" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.custcomp.AiControlConditionAliasComponent">
     <ROW AliasRowId="ExitDialog#LaunchProdCheckBox#Hide#((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))" AliasRowOperation="2" Condition="(((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))) OR NOT IS_STANDALONE_OR_NOT_CLUSTERED_OR_ON_ACTIVE_NODE"/>
@@ -939,6 +1005,8 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.AiPersistentDataComponent">
     <ROW PersistentRow="CONFIG_PATH" Type="1" Condition="1"/>
+    <ROW PersistentRow="Modules_1_Dir" Type="1" Condition="1"/>
+    <ROW PersistentRow="WindowsPowerShell_Dir" Type="1" Condition="1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.AiRemoveRegComponent">
     <ROW RemoveReg="Configured" InstallMode="3" Condition="(REMOVE=&quot;ALL&quot; AND (NOT UPGRADINGPRODUCTCODE)) OR (ORIGINAL_USER_NAME &lt;&gt; USER_NAME)"/>
@@ -1608,6 +1676,36 @@
     <ROW Feature_="MainFeature" Component_="Microsoft.IdentityModel.Clients.ActiveDirectory.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.NTDSApi.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.Security.dll"/>
+    <ROW Feature_="MainFeature" Component_="CsvHelper.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.PowerShell.dll"/>
+    <ROW Feature_="MainFeature" Component_="Lithnet.Security.Authorization.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="LithnetAccessManger.psd1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Bcl.AsyncInterfaces.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Configuration.Abstractions.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.DependencyInjection.Abstractions.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.FileProviders.Abstractions.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Hosting.Abstractions.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Logging.Abstractions.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Primitives.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Newtonsoft.Json.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="NLog.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Buffers.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Management.Automation.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Memory.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Numerics.Vectors.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Runtime.CompilerServices.Unsafe.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Security.Cryptography.Cng.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Security.Cryptography.ProtectedData.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.Threading.Tasks.Extensions.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="System.ValueTuple.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.Core.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Cryptography.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Kernel32.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.NetApi32.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Security.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Shared.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Ws2_32.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.dll_1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>
@@ -1752,5 +1850,6 @@
   <COMPONENT cid="caphyon.advinst.msicomp.SynchronizedFolderComponent">
     <ROW Directory_="APPDIR" SourcePath="output" Feature="MainFeature" ExcludePattern="*~|#*#|%*%|._|CVS|.cvsignore|SCCS|vssver.scc|mssccprj.scc|vssver2.scc|.svn|.DS_Store|\config|\unix" ExcludeFlags="6"/>
     <ROW Directory_="CONFIG_PATH" SourcePath="output\config" Feature="MainFeature" ExcludePattern="*~|#*#|%*%|._|CVS|.cvsignore|SCCS|vssver.scc|mssccprj.scc|vssver2.scc|.svn|.DS_Store" ExcludeFlags="6" FileAddOptions="4" CompsCreationOptions="I"/>
+    <ROW Directory_="Lithnet.AccessManager.PowerShell_Directory" SourcePath="output-ps" Feature="MainFeature" ExcludePattern="*~|#*#|%*%|._|CVS|.cvsignore|SCCS|vssver.scc|mssccprj.scc|vssver2.scc|.svn|.DS_Store" ExcludeFlags="6" FileAddOptions="4"/>
   </COMPONENT>
 </DOCUMENT>
