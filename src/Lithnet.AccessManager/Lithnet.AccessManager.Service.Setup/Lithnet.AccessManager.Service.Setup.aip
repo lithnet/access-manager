@@ -19,10 +19,10 @@
     <ROW Property="IAgree" Value="Yes" Type="4" MsiKey="IAgree"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{5ADB45DB-484A-4FF6-B49B-2D3999C65447} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{FAB31B1A-E08B-4F97-BBDB-C24EF231CF49} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7797.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7801.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
@@ -147,6 +147,7 @@
     <ROW Component="MahApps.Metro.SimpleChildWindow.dll" ComponentId="{748357BA-E6B7-4A34-99DE-E80AD6D1CC2E}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.SimpleChildWindow.dll"/>
     <ROW Component="MahApps.Metro.dll" ComponentId="{2AC72B39-6A47-41FC-A941-7626E067125A}" Directory_="APPDIR" Attributes="0" KeyPath="MahApps.Metro.dll"/>
     <ROW Component="Markdig.Signed.dll" ComponentId="{182EAEED-84C7-41EE-AE79-CFC760D3ECE9}" Directory_="APPDIR" Attributes="0" KeyPath="Markdig.Signed.dll"/>
+    <ROW Component="MartinCostello.SqlLocalDb.dll" ComponentId="{A45BA938-8EB1-4940-AA1C-6C5269460E12}" Directory_="APPDIR" Attributes="0" KeyPath="MartinCostello.SqlLocalDb.dll"/>
     <ROW Component="MessagePack.Annotations.dll" ComponentId="{64FB74EE-5049-4007-8F34-55EAC5330E6B}" Directory_="APPDIR" Attributes="0" KeyPath="MessagePack.Annotations.dll"/>
     <ROW Component="MessagePack.dll" ComponentId="{654DBA7F-A873-4763-87F6-87715D3D5417}" Directory_="APPDIR" Attributes="0" KeyPath="MessagePack.dll"/>
     <ROW Component="Microsoft.ApplicationInsights.dll" ComponentId="{CCAB9053-5AF7-457A-A78C-91225A603750}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.ApplicationInsights.dll"/>
@@ -166,6 +167,7 @@
     <ROW Component="Microsoft.CSharp.dll" ComponentId="{6201D11C-A198-4D35-9407-FFF0D907B37F}" Directory_="ref_Dir" Attributes="0" KeyPath="Microsoft.CSharp.dll"/>
     <ROW Component="Microsoft.CodeAnalysis.CSharp.dll" ComponentId="{92B5C8B4-AA1C-4671-A6A7-3701660F1214}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.CodeAnalysis.CSharp.dll"/>
     <ROW Component="Microsoft.CodeAnalysis.dll" ComponentId="{FA510BBE-C203-4047-8E19-1ECEBE2DCAEE}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.CodeAnalysis.dll"/>
+    <ROW Component="Microsoft.Data.SqlClient.dll" ComponentId="{CD314EEF-76B8-4BF9-9A7A-E824E10BF18E}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Data.SqlClient.dll"/>
     <ROW Component="Microsoft.Extensions.Caching.Abstractions.dll" ComponentId="{080ECD81-4CBC-4B39-B871-0AEF129AD246}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Caching.Abstractions.dll"/>
     <ROW Component="Microsoft.Extensions.Caching.Memory.dll" ComponentId="{17B712D4-D493-403A-8622-B1BA845FE8D1}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Caching.Memory.dll"/>
     <ROW Component="Microsoft.Extensions.Configuration.Abstractions.dll" ComponentId="{CE2F1CDA-DC3A-4D9A-97F6-5BBDB001E26E}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.Abstractions.dll"/>
@@ -201,6 +203,7 @@
     <ROW Component="Microsoft.Extensions.Options.dll" ComponentId="{4EA295F0-69CA-4F41-A933-14FF8AE2E9D5}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Options.dll"/>
     <ROW Component="Microsoft.Extensions.Primitives.dll" ComponentId="{6E3A5759-974D-45BB-9C4F-F756D71128AF}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Primitives.dll"/>
     <ROW Component="Microsoft.Extensions.Primitives.dll_1" ComponentId="{4F7DD03E-F0B6-4404-884A-5CF3F9A16620}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Extensions.Primitives.dll_1"/>
+    <ROW Component="Microsoft.Identity.Client.dll" ComponentId="{744D75CE-E2A2-41DC-A8DC-EDFEA960AEBA}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Identity.Client.dll"/>
     <ROW Component="Microsoft.IdentityModel.Clients.ActiveDirectory.dll" ComponentId="{31922643-4D25-459A-B665-24AA9A634B2F}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.Clients.ActiveDirectory.dll"/>
     <ROW Component="Microsoft.IdentityModel.JsonWebTokens.dll" ComponentId="{7501CDE8-786E-4BE4-9272-A3B8938FD408}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.JsonWebTokens.dll"/>
     <ROW Component="Microsoft.IdentityModel.Logging.dll" ComponentId="{68DB3E96-64C9-44C6-BB18-4BDA8754DB18}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.Logging.dll"/>
@@ -998,6 +1001,9 @@
     <ROW File="LithnetAccessManager.psd1" Component_="LithnetAccessManger.psd1" FileName="LITHNE~2.PSD|LithnetAccessManager.psd1" Attributes="0" SourcePath="output-ps\LithnetAccessManager.psd1" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.dll_1" Component_="Lithnet.AccessManager.dll_1" FileName="LITHNE~1.DLL|Lithnet.AccessManager.dll" Attributes="0" SourcePath="output-ps\Lithnet.AccessManager.dll" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.pdb_1" Component_="Lithnet.AccessManager.dll_1" FileName="LITHNE~1.PDB|Lithnet.AccessManager.pdb" Attributes="0" SourcePath="output-ps\Lithnet.AccessManager.pdb" SelfReg="false"/>
+    <ROW File="MartinCostello.SqlLocalDb.dll" Component_="MartinCostello.SqlLocalDb.dll" FileName="MARTIN~1.DLL|MartinCostello.SqlLocalDb.dll" Attributes="0" SourcePath="output\MartinCostello.SqlLocalDb.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Data.SqlClient.dll" Component_="Microsoft.Data.SqlClient.dll" FileName="MICRO~72.DLL|Microsoft.Data.SqlClient.dll" Attributes="0" SourcePath="output\Microsoft.Data.SqlClient.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Identity.Client.dll" Component_="Microsoft.Identity.Client.dll" FileName="MICRO~73.DLL|Microsoft.Identity.Client.dll" Attributes="0" SourcePath="output\Microsoft.Identity.Client.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.custcomp.AiControlConditionAliasComponent">
     <ROW AliasRowId="ExitDialog#LaunchProdCheckBox#Hide#((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))" AliasRowOperation="2" Condition="(((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))) OR NOT IS_STANDALONE_OR_NOT_CLUSTERED_OR_ON_ACTIVE_NODE"/>
@@ -1705,6 +1711,9 @@
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Shared.dll_1"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Ws2_32.dll_1"/>
     <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="MartinCostello.SqlLocalDb.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Data.SqlClient.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Identity.Client.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>

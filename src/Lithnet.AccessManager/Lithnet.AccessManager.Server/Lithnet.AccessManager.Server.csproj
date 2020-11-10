@@ -33,6 +33,7 @@
     <PackageReference Include="htmlagilitypack" Version="1.11.24" />
     <PackageReference Include="lithnet.accessmanager.enterprise" Version="1.0.7616.23549" />
     <PackageReference Include="lithnet.security.authorization" Version="1.0.7518.2238" />
+    <PackageReference Include="MartinCostello.SqlLocalDb" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.1.9" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.6" />

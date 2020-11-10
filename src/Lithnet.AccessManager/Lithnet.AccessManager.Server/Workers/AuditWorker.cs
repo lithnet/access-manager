@@ -33,20 +33,26 @@ namespace Lithnet.AccessManager.Server.Workers
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            await foreach (var item in this.channel.ReadAllAsync(cancellationToken))
+            try
             {
-                try
+                await foreach (var item in this.channel.ReadAllAsync(cancellationToken))
                 {
-                    this.logger.LogTrace("Processing action from queue");
-                    item.Invoke();
+                    try
+                    {
+                        this.logger.LogTrace("Processing action from queue");
+                        item.Invoke();
+                    }
+                    catch (OperationCanceledException)
+                    {
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogError(EventIDs.BackgroundTaskUnhandledError, e, "An unhandled exception occurred in an audit worker background task");
+                    }
                 }
-                catch (OperationCanceledException)
-                {
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(EventIDs.BackgroundTaskUnhandledError, e, "An unhandled exception occurred in an audit worker background task");
-                }
+            }
+            catch (OperationCanceledException)
+            {
             }
         }
     }

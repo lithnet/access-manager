@@ -43,6 +43,12 @@ namespace Lithnet.AccessManager.Server
             set => baseKey.SetValue("Configured", value ? 1 : 0);
         }
 
+        public int CacheMode
+        {
+            get => (int)paramsKey?.GetValue("RateLimitCacheMode", 0);
+            set => paramsKey.SetValue("RateLimitCacheMode", value);
+        }
+
         public string HttpAcl
         {
             get => baseKey?.GetValue("HttpAcl") as string;

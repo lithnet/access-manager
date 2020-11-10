@@ -19,5 +19,6 @@
         string BasePath { get; }
 
         string ServiceKeyThumbprint { get; set; }
+        int CacheMode { get; set; }
     }
 }
