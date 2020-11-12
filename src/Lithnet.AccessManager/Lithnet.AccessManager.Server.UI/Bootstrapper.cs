@@ -11,6 +11,7 @@ using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.AuthorizationRuleImport;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.Converters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
 using Microsoft.Extensions.Options;
@@ -73,9 +74,12 @@ namespace Lithnet.AccessManager.Server.UI
 
                 if (provider.IsClustered && !provider.IsOnActiveNode())
                 {
-                    MessageBox.Show($"The AMS service is not active on this cluster node. Please edit the configuration on the currently active node", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
-                    Environment.Exit(2);
+                    throw new ClusterNodeNotActiveException("The AMS service is not active on this cluster node. Please edit the configuration on the currently active node");
                 }
+            }
+            catch (ClusterNodeNotActiveException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
@@ -87,47 +91,19 @@ namespace Lithnet.AccessManager.Server.UI
         {
             AppDomain.CurrentDomain.UnhandledException += AppDomain_UnhandledException;
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+            Dispatcher.CurrentDispatcher.UnhandledException += CurrentDispatcher_UnhandledException;
+
             base.OnStart();
         }
 
-        private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        protected override void OnExit(ExitEventArgs e)
         {
-            this.HandleException(e.Exception);
+            Dispatcher.CurrentDispatcher.UnhandledException -= CurrentDispatcher_UnhandledException;
+            TaskScheduler.UnobservedTaskException -= TaskScheduler_UnobservedTaskException;
+            AppDomain.CurrentDomain.UnhandledException -= AppDomain_UnhandledException;
+
+            base.OnExit(e);
         }
-
-        private void AppDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            this.HandleException(e.ExceptionObject as Exception ?? new Exception("An unhandled exception occurred in the app domain, but no exception was present"));
-        }
-
-        protected override void OnUnhandledException(DispatcherUnhandledExceptionEventArgs e)
-        {
-            this.HandleException(e.Exception);
-        }
-
-        private void HandleException(Exception ex)
-        {
-            logger.LogCritical(ex, "An unhandled exception occurred in the user interface");
-
-            string errorMessage = $"An unhandled error occurred and the application will terminate.\r\n\r\n{ex.Message}\r\n\r\n Do you want to attempt to save the current configuration?";
-
-            if (MessageBox.Show(errorMessage, "Error", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
-            {
-                try
-                {
-                    File.Copy(appconfig.Path, appconfig.Path + ".backup", true);
-                    appconfig?.Save(appconfig.Path);
-                }
-                catch (Exception ex2)
-                {
-                    logger.LogCritical(ex2, "Unable to save app config");
-                    MessageBox.Show("Unable to save the current configuration", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-
-            Environment.Exit(1);
-        }
-
         protected override void ConfigureIoC(IStyletIoCBuilder builder)
         {
             RegistryProvider registryProvider = new RegistryProvider(true);
@@ -138,15 +114,13 @@ namespace Lithnet.AccessManager.Server.UI
                 if (!File.Exists(pathProvider.ConfigFile))
                 {
                     this.logger.LogError(EventIDs.UIGenericError, "Config file was not found at path {path}", pathProvider.ConfigFile);
-                    MessageBox.Show($"The appsettings.config file could not be found at path {pathProvider.ConfigFile}. Please resolve the issue and restart the application", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    Environment.Exit(2);
+                    throw new MissingConfigurationException($"The appsettings.config file could not be found at path {pathProvider.ConfigFile}. Please resolve the issue and restart the application");
                 }
 
                 if (!File.Exists(pathProvider.HostingConfigFile))
                 {
                     this.logger.LogError(EventIDs.UIGenericError, "Apphost file was not found at path {path}", pathProvider.HostingConfigFile);
-                    MessageBox.Show($"The apphost.config file could not be found at path {pathProvider.HostingConfigFile}. Please resolve the issue and restart the application", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    Environment.Exit(2);
+                    throw new MissingConfigurationException($"The apphost.config file could not be found at path {pathProvider.HostingConfigFile}. Please resolve the issue and restart the application");
                 }
 
                 appconfig = ApplicationConfig.Load(pathProvider.ConfigFile);
@@ -229,24 +203,64 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind(typeof(ILogger<>)).To(typeof(Logger<>));
                 builder.Bind(typeof(IOptions<>)).To(typeof(OptionsWrapper<>)).InSingletonScope();
                 builder.Bind(typeof(IOptionsSnapshot<>)).To(typeof(OptionsManager<>));
-                //builder.Bind(typeof(IOptionsMonitor<>)).To(typeof(OptionsMonitor<>)).InSingletonScope();
                 builder.Bind(typeof(IOptionsFactory<>)).To(typeof(OptionsFactory<>));
                 builder.Bind(typeof(IOptionsMonitorCache<>)).To(typeof(OptionsCache<>)).InSingletonScope();
 
-
                 base.ConfigureIoC(builder);
             }
-            catch (ConfigurationException ex)
-            {
-                logger.LogCritical(ex, "Configuration load error");
-                MessageBox.Show($"There was a problem loading the configuration file, and the application will now terminate\r\n\r\nError message: {ex.Message}\r\n\r\nAdditional information may be available in the application log", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                Environment.Exit(1);
-            }
-            catch (Exception ex)
+            catch (ApplicationInitializationException ex)
             {
                 this.logger.LogError(EventIDs.UIInitializationError, ex, "Initialization error");
                 throw;
             }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIInitializationError, ex, "Initialization error");
+                throw new ApplicationInitializationException("The application failed to initialize", ex);
+            }
+        }
+
+
+        private void CurrentDispatcher_UnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            if (!e.Handled)
+            {
+                e.Handled = true;
+                this.HandleException(e.Exception);
+            }
+        }
+
+        private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            this.HandleException(e.Exception);
+        }
+
+        private void AppDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            this.HandleException(e.ExceptionObject as Exception ?? new Exception("An unhandled exception occurred in the app domain, but no exception was present"));
+        }
+
+        private void HandleException(Exception ex)
+        {
+            logger.LogCritical(ex, "An unhandled exception occurred in the user interface");
+
+            string errorMessage = $"An unhandled error occurred and the application will terminate.\r\n\r\n{ex.Message}\r\n\r\n Do you want to attempt to save the current configuration?";
+
+            if (MessageBox.Show(errorMessage, "Error", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    File.Copy(appconfig.Path, appconfig.Path + ".backup", true);
+                    appconfig?.Save(appconfig.Path);
+                }
+                catch (Exception ex2)
+                {
+                    logger.LogCritical(ex2, "Unable to save app config");
+                    MessageBox.Show("Unable to save the current configuration", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+
+            Environment.Exit(1);
         }
     }
 }
