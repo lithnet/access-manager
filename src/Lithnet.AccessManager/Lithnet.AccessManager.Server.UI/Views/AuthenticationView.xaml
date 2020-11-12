@@ -177,16 +177,13 @@
 
                 <TextBox Grid.Column="0" 
                          Text="{Binding NewEku, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
-                         IsEnabled="{Binding ValidateSpecificEku}"
                          Margin="5"/>
                 <Button Grid.Column="1" 
                         Command="{s:Action AddEku}"
-                        IsEnabled="{Binding ValidateSpecificEku}"
                         Content="Add" 
                         Margin="5"/>
                 <Button Grid.Column="2" 
                         Command="{s:Action RemoveEku}" 
-                        IsEnabled="{Binding ValidateSpecificEku}"
                         Content="Remove"
                         Margin="5"/>
             </Grid>

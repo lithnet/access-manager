@@ -51,9 +51,6 @@
                     <GridViewColumn Header="Group name template"
                                             DisplayMemberBinding="{Binding GroupNameTemplate}" 
                                             Width="Auto"/>
-                    <GridViewColumn Header="Group type"
-                                            DisplayMemberBinding="{Binding GroupType}" 
-                                            Width="Auto"/>
                 </GridView>
             </ListView.View>
         </ListView>
