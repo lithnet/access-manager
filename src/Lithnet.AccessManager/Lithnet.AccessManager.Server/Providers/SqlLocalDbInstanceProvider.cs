@@ -163,6 +163,8 @@ namespace Lithnet.AccessManager.Server
         {
             this.logger.LogInformation(EventIDs.DbNotFound, "The data file {databaseFile} was not found and will be created", this.localDbPath);
 
+            Directory.CreateDirectory(this.appPathProvider.DbPath);
+
             string createDbString = $@"CREATE DATABASE [AccessManager]
  CONTAINMENT = NONE
  ON  PRIMARY 

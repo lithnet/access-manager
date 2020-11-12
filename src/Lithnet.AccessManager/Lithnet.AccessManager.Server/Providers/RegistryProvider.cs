@@ -45,7 +45,7 @@ namespace Lithnet.AccessManager.Server
 
         public int CacheMode
         {
-            get => (int)paramsKey?.GetValue("RateLimitCacheMode", 0);
+            get => (int?)paramsKey?.GetValue("RateLimitCacheMode", 0) ?? 0;
             set => paramsKey.SetValue("RateLimitCacheMode", value);
         }
 

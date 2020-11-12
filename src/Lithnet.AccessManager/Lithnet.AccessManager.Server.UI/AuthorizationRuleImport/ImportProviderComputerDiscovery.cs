@@ -58,7 +58,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 
                 if (!computer.HasError && admins.Count > 0)
                 {
-                    targets.Add(this.ConvertToTarget(computer.Sid, admins));
+                    targets.Add(this.ConvertToTarget(computer, admins));
                 }
             }
 
@@ -68,13 +68,13 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
             }
         }
 
-        private SecurityDescriptorTarget ConvertToTarget(SecurityIdentifier computerSid, HashSet<SecurityIdentifier> admins)
+        private SecurityDescriptorTarget ConvertToTarget(ComputerPrincipalMapping computer, HashSet<SecurityIdentifier> admins)
         {
             SecurityDescriptorTarget target = new SecurityDescriptorTarget()
             {
                 AuthorizationMode = AuthorizationMode.SecurityDescriptor,
-                Description = settings.RuleDescription,
-                Target = computerSid.ToString(),
+                Description = settings.RuleDescription.Replace("{targetName}", computer.PrincipalName, StringComparison.OrdinalIgnoreCase),
+                Target = computer.Sid.ToString(),
                 Type = TargetType.Computer,
                 Id = Guid.NewGuid().ToString(),
                 Notifications = settings.Notifications,
@@ -114,7 +114,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
             SecurityDescriptorTarget target = new SecurityDescriptorTarget()
             {
                 AuthorizationMode = AuthorizationMode.SecurityDescriptor,
-                Description = settings.RuleDescription,
+                Description = settings.RuleDescription.Replace("{targetName}", entry.OUName, StringComparison.OrdinalIgnoreCase),
                 Target = entry.OUName,
                 Type = TargetType.Container,
                 Id = Guid.NewGuid().ToString(),
