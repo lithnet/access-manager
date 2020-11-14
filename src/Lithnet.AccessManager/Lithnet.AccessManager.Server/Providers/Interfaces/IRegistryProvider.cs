@@ -20,5 +20,6 @@
 
         string ServiceKeyThumbprint { get; set; }
         int CacheMode { get; set; }
+        bool DeleteLocalDbInstance { get; set; }
     }
 }

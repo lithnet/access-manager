@@ -53,7 +53,7 @@ namespace Lithnet.AccessManager.Server
 
             var upgrader = DeployChanges.To
             .SqlDatabase(this.ConnectionString)
-            .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
+            .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly(), script => script.StartsWith("Lithnet.AccessManager.Server.DBScripts.Upgrade", System.StringComparison.OrdinalIgnoreCase))
             .LogScriptOutput()
             .LogTo(this.upgradeLogger)
             .Build();

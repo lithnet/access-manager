@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -16,14 +17,21 @@ namespace Lithnet.AccessManager.Service
     {
         public static void Main(string[] args)
         {
-            RegistryProvider registryProvider = new RegistryProvider(false);
-            SetupNLog(registryProvider);
-            CreateHostBuilder(args, registryProvider).Build().Run();
+            if (args != null && args.Length > 0 && args[0] == "setup")
+            {
+                Setup.Process(args);
+            }
+            else
+            {
+                RegistryProvider registryProvider = new RegistryProvider(false);
+                SetupNLog(registryProvider);
+                CreateHostBuilder(args, registryProvider).Build().Run();
+            }
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args, RegistryProvider registryProvider)
         {
-            bool safeStart = args.Any(t => string.Equals(t, "/safeStart", System.StringComparison.OrdinalIgnoreCase));
+            bool safeStart = args.Any(t => string.Equals(t, "/safeStart", StringComparison.OrdinalIgnoreCase));
 
             if (safeStart || !registryProvider.IsConfigured)
             {

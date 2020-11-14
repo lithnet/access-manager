@@ -1,12 +1,12 @@
-﻿{
+{
   "profiles": {
     "Lithnet.AccessManager.Service": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:443;http://localhost:80",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "https://localhost:443;http://localhost:80"
     }
   }
 }

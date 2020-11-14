@@ -15,6 +15,7 @@ namespace Lithnet.AccessManager.Server
         private readonly IAppPathProvider appPathProvider;
         private readonly ILogger<SqlLocalDbInstanceProvider> logger;
         private readonly IHostApplicationLifetime appLifeTime;
+        private readonly IRegistryProvider registryProvider;
 
         private readonly string localDbPath;
         private readonly string localDbLogPath;
@@ -31,7 +32,9 @@ namespace Lithnet.AccessManager.Server
             this.appPathProvider = appPathProvider;
             this.logger = logger;
             this.appLifeTime = appLifeTime;
-
+         
+            this.registryProvider = new RegistryProvider(true);
+            this.localDbApi = new SqlLocalDbApi();
             this.localDbPath = Path.Combine(this.appPathProvider.DbPath, $"{dbFileNamePrefix}.mdf");
             this.localDbLogPath = Path.Combine(this.appPathProvider.DbPath, $"{dbFileNamePrefix}_log.ldf");
 
@@ -55,14 +58,39 @@ namespace Lithnet.AccessManager.Server
         public void InitializeDb()
         {
             this.logger.LogTrace("Initializing internal DB");
+            this.DeleteLocalDbInstanceIfFlagged();
             this.StartLocalDbInstance();
             this.holdConnection = this.GetConnection();
         }
 
+        private void DeleteLocalDbInstanceIfFlagged()
+        {
+            if (this.registryProvider.DeleteLocalDbInstance)
+            {
+                if (this.localDbApi.InstanceExists(dbInstanceName))
+                {
+                    this.logger.LogWarning(EventIDs.DbDeleting, "Deleting SqlLocalDB instance");
+
+                    if (this.localDbApi.GetInstanceInfo(dbInstanceName).IsRunning)
+                    {
+                        this.localDbApi.StopInstance(dbInstanceName);
+                    }
+
+                    this.localDbApi.DeleteInstance(dbInstanceName);
+
+                    this.logger.LogWarning(EventIDs.DbDeleted, "Deleted SqlLocalDB instance");
+                }
+
+                this.registryProvider.DeleteLocalDbInstance = false;
+            }
+        }
+
         private void StartLocalDbInstance()
         {
-            this.localDbApi = new SqlLocalDbApi();
-            this.logger.LogTrace($"Creating internal DB instance {dbInstanceName}");
+            bool creating = !this.localDbApi.InstanceExists(dbInstanceName);
+
+            this.logger.LogTrace($"{(creating ? "Creating" : "Connecting to")} internal DB instance {dbInstanceName}");
+
             this.localDbInstance = this.localDbApi.CreateInstance(dbInstanceName);
             this.instanceManager = this.localDbInstance.Manage();
 
@@ -71,7 +99,7 @@ namespace Lithnet.AccessManager.Server
                 this.logger.LogTrace($"Starting internal DB instance {dbInstanceName}");
                 this.instanceManager.Start();
             }
-        
+
             var bbuilder = this.localDbInstance.CreateConnectionStringBuilder();
             bbuilder.InitialCatalog = "master";
             bbuilder.ConnectTimeout = 30;
@@ -79,6 +107,11 @@ namespace Lithnet.AccessManager.Server
             this.masterDbConnectionString = bbuilder.ToString();
 
             this.logger.LogTrace($"Master DB connection string {this.masterDbConnectionString}");
+
+            if (creating)
+            {
+                this.EnableContainment();
+            }
 
             if (!this.IsDbAttached())
             {
@@ -139,23 +172,28 @@ namespace Lithnet.AccessManager.Server
             string sql;
             if (File.Exists(this.localDbLogPath))
             {
-                sql = $@"CREATE DATABASE [AccessManager]   
-    ON (FILENAME = N'{this.localDbPath}'),   
-    (FILENAME = N'{this.localDbLogPath}')   
-    FOR ATTACH;";
+                sql = EmbeddedResourceProvider.GetResourceString("AttachDatabaseWithLog.sql", "DBScripts.Creation");
             }
             else
             {
-                sql = $@"CREATE DATABASE [AccessManager]
-    ON (FILENAME = N'{this.localDbPath}')
-    FOR ATTACH;";
+                sql = EmbeddedResourceProvider.GetResourceString("AttachDatabase.sql", "DBScripts.Creation");
             }
 
             using (var con = new SqlConnection(masterDbConnectionString))
             {
                 con.Open();
-                SqlCommand command = new SqlCommand(sql, con);
-                command.ExecuteNonQuery();
+                this.ExecuteNonQuery(sql, con);
+            }
+        }
+
+        private void EnableContainment()
+        {
+            this.logger.LogTrace("Enabling database containment");
+
+            using (var con = new SqlConnection(masterDbConnectionString))
+            {
+                con.Open();
+                this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("EnableContainment.sql", "DBScripts.Creation"), con);
             }
         }
 
@@ -165,54 +203,28 @@ namespace Lithnet.AccessManager.Server
 
             Directory.CreateDirectory(this.appPathProvider.DbPath);
 
-            string createDbString = $@"CREATE DATABASE [AccessManager]
- CONTAINMENT = NONE
- ON  PRIMARY 
-( NAME = N'AccessManager', FILENAME = N'{this.localDbPath}' , SIZE = 65536KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
- LOG ON 
-( NAME = N'AccessManager_log', FILENAME = N'{this.localDbLogPath}' , SIZE = 65536KB, MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
- WITH CATALOG_COLLATION = DATABASE_DEFAULT";
 
             using (var con = new SqlConnection(masterDbConnectionString))
             {
                 con.Open();
-                SqlCommand command = new SqlCommand(createDbString, con);
-                command.ExecuteNonQuery();
-
-                command = new SqlCommand(@"
-USE [master]
-
-IF NOT EXISTS 
-    (SELECT name  
-     FROM master.sys.server_principals
-     WHERE name = 'NT SERVICE\lithnetams')
-BEGIN
-    CREATE LOGIN [NT SERVICE\lithnetams] FROM WINDOWS WITH DEFAULT_DATABASE=[AccessManager]
-END
-", con);
-                command.ExecuteNonQuery();
-
-                command = new SqlCommand(@"
-USE [AccessManager]
-
-IF NOT EXISTS
-    (SELECT name
-     FROM sys.database_principals
-     WHERE name = 'NT SERVICE\lithnetams')
-BEGIN
-    CREATE USER [NT SERVICE\lithnetams] FOR LOGIN [NT SERVICE\lithnetams]
-END
-", con);
-                command.ExecuteNonQuery();
-
-                command = new SqlCommand(@"
-USE [AccessManager]
-ALTER ROLE [db_owner] ADD MEMBER [NT SERVICE\lithnetams]
-", con);
-                command.ExecuteNonQuery();
+                this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("CreateNewDatabaseWithPaths.sql", "DBScripts.Creation"), con);
+                this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("CreateServiceAccountLoginToServer.sql", "DBScripts.Creation"), con);
+                this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("CreateServiceAccountLoginToDB.sql", "DBScripts.Creation"), con);
+                this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("CreateServiceAccountPermissionToDB.sql", "DBScripts.Creation"), con);
             }
 
             this.logger.LogInformation(EventIDs.DbCreated, "The [AccessManager] database was created");
+        }
+
+        private void ExecuteNonQuery(string commandText, SqlConnection con)
+        {
+            commandText = commandText
+                .Replace("{localDbPath}", this.localDbPath, StringComparison.OrdinalIgnoreCase)
+                .Replace("{localDbLogPath}", this.localDbLogPath, StringComparison.OrdinalIgnoreCase);
+
+            SqlCommand command = new SqlCommand(commandText, con);
+            this.logger.LogTrace("Executing commandr\n{sql}", command.CommandText);
+            command.ExecuteNonQuery();
         }
     }
 }

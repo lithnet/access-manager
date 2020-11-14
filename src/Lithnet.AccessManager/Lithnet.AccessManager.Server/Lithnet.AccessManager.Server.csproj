@@ -22,10 +22,24 @@
   <ItemGroup>
     <None Remove="DBScripts\00001-CreateRateLimitCacheTable.sql" />
     <None Remove="DBScripts\00003-CreateAuditTable.sql" />
+    <None Remove="DBScripts\Creation\AttachDatabase.sql" />
+    <None Remove="DBScripts\Creation\AttachDatabaseWithLog.sql" />
+    <None Remove="DBScripts\Creation\CreateNewDatabaseWithPaths.sql" />
+    <None Remove="DBScripts\Creation\CreateServiceAccountLoginToDB.sql" />
+    <None Remove="DBScripts\Creation\CreateServiceAccountLoginToServer.sql" />
+    <None Remove="DBScripts\Creation\CreateServiceAccountPermissionToDB.sql" />
+    <None Remove="DBScripts\Creation\EnableContainment.sql" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="DBScripts\00001-CreateRateLimitCacheTable.sql" />
+    <EmbeddedResource Include="DBScripts\Creation\AttachDatabaseWithLog.sql" />
+    <EmbeddedResource Include="DBScripts\Creation\AttachDatabase.sql" />
+    <EmbeddedResource Include="DBScripts\Creation\EnableContainment.sql" />
+    <EmbeddedResource Include="DBScripts\Creation\CreateServiceAccountPermissionToDB.sql" />
+    <EmbeddedResource Include="DBScripts\Creation\CreateServiceAccountLoginToDB.sql" />
+    <EmbeddedResource Include="DBScripts\Creation\CreateServiceAccountLoginToServer.sql" />
+    <EmbeddedResource Include="DBScripts\Creation\CreateNewDatabaseWithPaths.sql" />
+    <EmbeddedResource Include="DBScripts\Upgrade\00001-CreateRateLimitCacheTable.sql" />
   </ItemGroup>
 
   <ItemGroup>

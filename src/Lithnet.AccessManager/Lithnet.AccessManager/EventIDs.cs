@@ -87,6 +87,8 @@
         public const int DbUpgradeRequired = 5043;
         public const int DbNotFound = 5044;
         public const int DbCreated = 5045;
+        public const int DbDeleting = 5046;
+        public const int DbDeleted = 5047;
 
 
         // 6000 range - Reserved 

@@ -1,0 +1,8 @@
+﻿USE [master]
+
+CREATE DATABASE [AccessManager]
+ CONTAINMENT = PARTIAL
+ ON PRIMARY 
+( NAME = N'AccessManager', FILENAME = N'{localDbPath}' , SIZE = 65536KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+ LOG ON 
+( NAME = N'AccessManager_log', FILENAME = N'{localDbLogPath}' , SIZE = 65536KB, MAXSIZE = 2048GB , FILEGROWTH = 65536KB )

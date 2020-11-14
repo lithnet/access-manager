@@ -43,6 +43,22 @@ namespace Lithnet.AccessManager.Server
             set => baseKey.SetValue("Configured", value ? 1 : 0);
         }
 
+        public bool DeleteLocalDbInstance
+        {
+            get => (baseKey?.GetValue("DeleteLocalDbInstance", 0) is int value) && value == 1;
+            set
+            {
+                if (!value)
+                {
+                    baseKey.DeleteValue("DeleteLocalDbInstance");
+                }
+                else
+                {
+                    baseKey.SetValue("DeleteLocalDbInstance", 1);
+                }
+            }
+        }
+
         public int CacheMode
         {
             get => (int?)paramsKey?.GetValue("RateLimitCacheMode", 0) ?? 0;
