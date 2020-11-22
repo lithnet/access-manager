@@ -7,9 +7,11 @@ namespace Lithnet.AccessManager.Server.Configuration
     public class ApplicationConfig : IApplicationConfig
     {
         [JsonIgnore]
-        public string Path { get; set; }
+        public string Path { get; private set; }
 
         public ConfigurationMetadata Metadata { get; set; } = new ConfigurationMetadata();
+
+        public LicensingOptions Licensing { get; set; } = new LicensingOptions();
 
         public AuthenticationOptions Authentication { get; set; } = new AuthenticationOptions();
 
@@ -22,6 +24,10 @@ namespace Lithnet.AccessManager.Server.Configuration
         public UserInterfaceOptions UserInterface { get; set; } = new UserInterfaceOptions();
 
         public ForwardedHeadersAppOptions ForwardedHeaders { get; set; } = new ForwardedHeadersAppOptions();
+
+        public DatabaseConfigurationOptions DatabaseConfiguration { get; set; } = new DatabaseConfigurationOptions();
+
+        public DataProtectionOptions DataProtection { get; set; } = new DataProtectionOptions();
 
         public JitConfigurationOptions JitConfiguration { get; set; } = new JitConfigurationOptions();
 

@@ -1,4 +1,3 @@
-
 {
   "blocks": [
     {
@@ -10,10 +9,17 @@
     },
     {
       "type": "section",
+      "text": {
+        "type": "mrkdwn",
+        "text": "{message}"
+      }
+    },
+    {
+      "type": "section",
       "fields": [
         {
           "type": "mrkdwn",
-          "text": "*Access type:*\n{authZResult.AccessType}"
+          "text": "*Requested access:*\n{authZResult.AccessTypeDescription}"
         },
         {
           "type": "mrkdwn",
@@ -29,11 +35,7 @@
         },
         {
           "type": "mrkdwn",
-          "text": "*Matched rule description:*\n{AuthzResult.MatchedRuleDescription}"
-        },
-        {
-          "type": "mrkdwn",
-          "text": "*Matched rule ID:*\n{AuthzResult.MatchedRule}"
+          "text": "*Matched rule:*\n{AuthzResult.MatchedRuleDescription}"
         },
         {
           "type": "mrkdwn",

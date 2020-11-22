@@ -14,12 +14,50 @@
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <RuntimeIdentifier>win8-x64</RuntimeIdentifier>
   </PropertyGroup>
- 
+
   <ItemGroup>
+    <EmbeddedResource Include="..\Lithnet.AccessManager.Service.Setup\output\license*.dat" LinkBase="EmbeddedResources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="DBScripts\00001-CreateRateLimitCacheTable.sql" />
+    <None Remove="DBScripts\00003-CreateAuditTable.sql" />
+    <None Remove="DBScripts\ExternalSqlCreation\CreateNewDatabase.sql" />
+    <None Remove="DBScripts\ExternalSqlCreation\CreateServiceAccountLoginToDB.sql" />
+    <None Remove="DBScripts\ExternalSqlCreation\CreateServiceAccountLoginToServer.sql" />
+    <None Remove="DBScripts\ExternalSqlCreation\CreateServiceAccountPermissionToDB.sql" />
+    <None Remove="DBScripts\LocalDBCreation\AttachDatabase.sql" />
+    <None Remove="DBScripts\LocalDBCreation\AttachDatabaseWithLog.sql" />
+    <None Remove="DBScripts\LocalDBCreation\CreateNewDatabaseWithPaths.sql" />
+    <None Remove="DBScripts\LocalDBCreation\CreateServiceAccountLoginToDB.sql" />
+    <None Remove="DBScripts\LocalDBCreation\CreateServiceAccountLoginToServer.sql" />
+    <None Remove="DBScripts\LocalDBCreation\CreateServiceAccountPermissionToDB.sql" />
+    <None Remove="DBScripts\LocalDBCreation\EnableContainment.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="DBScripts\ExternalSqlCreation\CreateNewDatabase.sql" />
+    <EmbeddedResource Include="DBScripts\ExternalSqlCreation\CreateServiceAccountLoginToDB.sql" />
+    <EmbeddedResource Include="DBScripts\ExternalSqlCreation\CreateServiceAccountLoginToServer.sql" />
+    <EmbeddedResource Include="DBScripts\ExternalSqlCreation\CreateServiceAccountPermissionToDB.sql" />
+    <EmbeddedResource Include="DBScripts\LocalDBCreation\AttachDatabaseWithLog.sql" />
+    <EmbeddedResource Include="DBScripts\LocalDBCreation\AttachDatabase.sql" />
+    <EmbeddedResource Include="DBScripts\LocalDBCreation\EnableContainment.sql" />
+    <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateServiceAccountPermissionToDB.sql" />
+    <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateServiceAccountLoginToDB.sql" />
+    <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateServiceAccountLoginToServer.sql" />
+    <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateNewDatabaseWithPaths.sql" />
+    <EmbeddedResource Include="DBScripts\Upgrade\00001-CreateRateLimitCacheTable.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DbUp-SqlServer" Version="4.4.0" />
     <PackageReference Include="htmlagilitypack" Version="1.11.24" />
+    <PackageReference Include="lithnet.accessmanager.enterprise" Version="1.0.7616.23549" />
     <PackageReference Include="lithnet.security.authorization" Version="1.0.7518.2238" />
+    <PackageReference Include="MartinCostello.SqlLocalDb" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.1.9" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="6.7.1" />
@@ -46,6 +84,10 @@
       <LastGenOutput>LogMessages.Designer.cs</LastGenOutput>
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="EmbeddedResources\" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

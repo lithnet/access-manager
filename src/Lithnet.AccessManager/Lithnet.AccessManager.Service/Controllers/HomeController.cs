@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 using Lithnet.AccessManager.Service.App_LocalResources;
 using Lithnet.AccessManager.Service.AppSettings;
 using Lithnet.AccessManager.Service.Internal;
@@ -13,7 +14,6 @@ namespace Lithnet.AccessManager.Service.Controllers
     public class HomeController : Controller
     {
         private readonly IAuthenticationProvider authSettings;
-
         private readonly ILogger logger;
 
         public HomeController(IAuthenticationProvider authSettings, ILogger<HomeController> logger)

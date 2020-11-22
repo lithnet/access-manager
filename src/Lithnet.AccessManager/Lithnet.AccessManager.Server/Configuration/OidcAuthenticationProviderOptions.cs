@@ -10,7 +10,7 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public string ResponseType { get; set; }
 
-        public EncryptedData Secret { get; set; }
+        public ProtectedSecret Secret { get; set; }
 
         public string ClaimName { get; set; }
 

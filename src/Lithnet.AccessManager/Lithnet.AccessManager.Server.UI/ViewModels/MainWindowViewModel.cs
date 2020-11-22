@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.ServiceProcess;
-using System.Threading;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -14,33 +13,34 @@ namespace Lithnet.AccessManager.Server.UI
     public class MainWindowViewModel : Conductor<PropertyChangedBase>.Collection.OneActive, IHandle<ModelChangedEvent>
     {
         private readonly IApplicationConfig model;
-
         private readonly IEventAggregator eventAggregator;
-
         private readonly IDialogCoordinator dialogCoordinator;
-
         private readonly ILogger<MainWindowViewModel> logger;
-
         private readonly IShellExecuteProvider shellExecuteProvider;
-
-        private readonly IServiceSettingsProvider serviceSettingsProvider;
+        private readonly IWindowsServiceProvider windowsServiceProvider;
+        private readonly IRegistryProvider registryProvider;
+        private readonly ICertificateSynchronizationProvider certSyncProvider;
+        private readonly ILicenseManager licenseManager;
 
         public MainWindowViewModel(IApplicationConfig model, AuthenticationViewModel authentication, AuthorizationViewModel authorization, UserInterfaceViewModel ui, RateLimitsViewModel rate, IpDetectionViewModel ip,
             AuditingViewModel audit, EmailViewModel mail, HostingViewModel hosting, ActiveDirectoryConfigurationViewModel ad,
-            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IServiceSettingsProvider serviceSettingsProvider)
+            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, LicensingViewModel lic, HighAvailabilityViewModel havm, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider, ICertificateSynchronizationProvider certSyncProvider, ILicenseManager licenseManager)
         {
+            this.model = model;
             this.shellExecuteProvider = shellExecuteProvider;
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
-            this.serviceSettingsProvider = serviceSettingsProvider;
+            this.windowsServiceProvider = windowsServiceProvider;
+            this.hosting = hosting;
+            this.registryProvider = registryProvider;
             this.eventAggregator = eventAggregator;
+            this.certSyncProvider = certSyncProvider;
+            this.dialogCoordinator = dialogCoordinator;
+            this.licenseManager = licenseManager;
+
             this.eventAggregator.Subscribe(this);
             this.DisplayName = Constants.AppName;
 
-            this.model = model;
-            this.dialogCoordinator = dialogCoordinator;
-
-            this.hosting = hosting;
             this.Items.Add(hosting);
             this.Items.Add(authentication);
             this.Items.Add(ui);
@@ -53,9 +53,10 @@ namespace Lithnet.AccessManager.Server.UI
             this.Items.Add(jit);
             this.Items.Add(bitLocker);
             this.Items.Add(authorization);
+            this.Items.Add(lic);
+            this.Items.Add(havm);
 
-            this.OptionItems = new BindableCollection<PropertyChangedBase>();
-            this.OptionItems.Add(help);
+            this.OptionItems = new BindableCollection<PropertyChangedBase> { help };
 
             this.ActiveItem = this.Items.First();
 
@@ -74,8 +75,8 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
+                this.certSyncProvider.ExportCertificatesToConfig();
                 this.model.Save(this.model.Path);
-                this.IsDirty = false;
             }
             catch (Exception ex)
             {
@@ -96,6 +97,7 @@ namespace Lithnet.AccessManager.Server.UI
                 return false;
             }
 
+            this.IsDirty = false;
             this.UpdateIsConfigured();
 
             if (this.IsRestartRequiredOnSave)
@@ -113,19 +115,16 @@ namespace Lithnet.AccessManager.Server.UI
                 else
                 {
                     this.IsPendingServiceRestart = true;
-                    await Task.Run(() =>
-                      {
-                          try
-                          {
-                              this.serviceSettingsProvider.ServiceController.WaitForStatus(ServiceControllerStatus.Stopped);
-                              this.serviceSettingsProvider.ServiceController.WaitForStatus(ServiceControllerStatus.Running);
-                              this.IsPendingServiceRestart = false;
-                          }
-                          catch (Exception ex)
-                          {
-                              this.logger.LogError(EventIDs.UIGenericError, ex, "Service status polling error");
-                          }
-                      });
+                    try
+                    {
+                        await this.windowsServiceProvider.WaitForStatus(ServiceControllerStatus.Stopped);
+                        await this.windowsServiceProvider.WaitForStatus(ServiceControllerStatus.Running);
+                        this.IsPendingServiceRestart = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        this.logger.LogError(EventIDs.UIGenericError, ex, "Service status polling error");
+                    }
                 }
             }
 
@@ -206,16 +205,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         private void UpdateIsConfigured()
         {
-            int? value = Registry.GetValue(AccessManager.Constants.RootedBaseKey, "Configured", 0) as int?;
-
-            if (value == null)
-            {
-                this.IsConfigured = false;
-            }
-            else
-            {
-                this.IsConfigured = value == 1;
-            }
+            this.IsConfigured = this.registryProvider.IsConfigured;
         }
 
         public void Handle(ModelChangedEvent message)
@@ -230,22 +220,29 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task RestartService()
         {
+            ProgressDialogController progress = null;
+
             try
             {
-                var controller = this.serviceSettingsProvider.ServiceController;
-                controller.Refresh();
+                progress = await this.dialogCoordinator.ShowProgressAsync(this, "Restarting service", "Waiting for the service to stop", false);
+                progress.SetIndeterminate();
 
-                if (controller.Status == ServiceControllerStatus.Running)
-                {
-                    controller.Stop();
-                    await controller.WaitForStatusAsync(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30), CancellationToken.None);
-                }
+                await this.windowsServiceProvider.StopServiceAsync();
 
-                controller.Start();
+                progress.SetMessage("Wating for the service to start");
+
+                await this.windowsServiceProvider.StartServiceAsync();
             }
             catch (Exception ex)
             {
                 logger.LogError(EventIDs.UIGenericError, ex, "Could not restart service");
+            }
+            finally
+            {
+                if (progress?.IsOpen ?? false)
+                {
+                    await progress.CloseAsync();
+                }
             }
         }
     }

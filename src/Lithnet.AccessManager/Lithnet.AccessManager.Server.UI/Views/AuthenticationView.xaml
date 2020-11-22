@@ -6,7 +6,9 @@
              xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:s="https://github.com/canton7/Stylet" xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-             mc:Ignorable="d" 
+             xmlns:dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             dialog:DialogParticipation.Register="{Binding}"
+             mc:Ignorable="d"
              d:DesignWidth="800" Margin="5">
     <StackPanel>
         <DockPanel>
@@ -175,16 +177,13 @@
 
                 <TextBox Grid.Column="0" 
                          Text="{Binding NewEku, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
-                         IsEnabled="{Binding ValidateSpecificEku}"
                          Margin="5"/>
                 <Button Grid.Column="1" 
                         Command="{s:Action AddEku}"
-                        IsEnabled="{Binding ValidateSpecificEku}"
                         Content="Add" 
                         Margin="5"/>
                 <Button Grid.Column="2" 
                         Command="{s:Action RemoveEku}" 
-                        IsEnabled="{Binding ValidateSpecificEku}"
                         Content="Remove"
                         Margin="5"/>
             </Grid>

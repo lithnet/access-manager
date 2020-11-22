@@ -1,5 +1,5 @@
 ﻿AUDIT: FAILURE
-Access type:               {AuthzResult.AccessType}
+Requested access:          {AuthzResult.AccessType}
 Username:                  {user.MsDsPrincipalName}
 Name:                      {user.DisplayName}
 UPN:                       {user.UserPrincipalName}

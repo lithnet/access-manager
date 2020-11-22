@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Content Remove="dev-config\apphost.json" />
+    <Content Remove="dev-config\logo.png" />
     <Content Remove="dev-config\appsecrets.json" />
     <Content Remove="dev-config\appsettings.json" />
     <Content Remove="dev-config\audit-templates\webhook-slack-failure.json" />
@@ -33,6 +34,7 @@
     <None Remove="config\audit-templates\email-success.html" />
     <None Remove="config\audit-templates\eventlog-failure.txt" />
     <None Remove="config\audit-templates\eventlog-success.txt" />
+    <None Remove="config\logo.png" />
     <None Remove="config\scripts\example-audit.ps1" />
     <None Remove="config\scripts\example-authorization.ps1" />
   </ItemGroup>
@@ -49,6 +51,10 @@
     </Content>
     <Content Include="config\audit-templates\eventlog-success.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="config\logo.png">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <Content Include="config\scripts\example-audit.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -73,16 +79,19 @@
 
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.11.24" />
+    <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7616.23549" />
     <PackageReference Include="lithnet.EventLogMessages" Version="1.0.0.4" />
     <PackageReference Include="microsoft.aspnetcore.authentication.cookies" Version="2.2.0" />
     <PackageReference Include="microsoft.aspnetcore.authentication.jwtbearer" Version="3.1.6" />
     <PackageReference Include="microsoft.aspnetcore.authentication.openidconnect" Version="3.1.6" />
     <PackageReference Include="microsoft.aspnetcore.authentication.WsFederation" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.6" />
-    <PackageReference Include="nlog" Version="4.7.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.9" />
+    <PackageReference Include="nlog" Version="4.7.5" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.9.2" />
     <PackageReference Include="system.directoryservices" Version="4.7.0" />
     <PackageReference Include="system.security.Cryptography.Cng" Version="4.7.0" />
+    <PackageReference Include="Vanara.Security" Version="3.2.20" />
   </ItemGroup>
 
   <ItemGroup>
@@ -118,9 +127,6 @@
   <ItemGroup>
    <Content Update="libman.json" CopyToPublishDirectory="Never" CopyToOutputDirectory="Never">
     </Content>
-    <Content Update="wwwroot\images\custom.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Update="appsettings.*.json" CopyToPublishDirectory="Never" />
   </ItemGroup>
 
@@ -136,6 +142,9 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="dev-config\audit-templates\eventlog-success.txt">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <None Update="dev-config\logo.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="dev-config\scripts\example-audit.ps1">

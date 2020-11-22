@@ -10,6 +10,10 @@ namespace Lithnet.AccessManager.Server.Configuration
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
+        public bool Disabled { get; set; }
+
+        public DateTime? Expiry { get; set; }
+
         public string Target { get; set; }
 
         public string Description { get; set; }
@@ -29,6 +33,21 @@ namespace Lithnet.AccessManager.Server.Configuration
         public SecurityDescriptorTargetLapsDetails Laps { get; set; } = new SecurityDescriptorTargetLapsDetails();
 
         public AuditNotificationChannels Notifications { get; set; } = new AuditNotificationChannels();
+
+        public bool IsActive()
+        {
+            return !this.IsInactive();
+        }
+
+        public bool IsInactive()
+        {
+            return this.Disabled || this.HasExpired();
+        }
+
+        public bool HasExpired()
+        {
+            return this.Expiry != null && DateTime.UtcNow > this.Expiry.Value.ToUniversalTime();
+        }
 
         public override string ToString()
         {

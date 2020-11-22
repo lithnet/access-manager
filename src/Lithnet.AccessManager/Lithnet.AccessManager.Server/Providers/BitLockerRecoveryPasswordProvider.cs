@@ -5,7 +5,7 @@ using System.Linq;
 using System.Management.Automation.Runspaces;
 using Microsoft.Extensions.Logging;
 
-namespace Lithnet.AccessManager
+namespace Lithnet.AccessManager.Server
 {
     public class BitLockerRecoveryPasswordProvider : IBitLockerRecoveryPasswordProvider
     {

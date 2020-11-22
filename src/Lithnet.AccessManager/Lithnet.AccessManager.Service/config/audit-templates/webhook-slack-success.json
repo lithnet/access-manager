@@ -12,7 +12,7 @@
       "fields": [
         {
           "type": "mrkdwn",
-          "text": "*Access type:*\n{authZResult.AccessType}"
+          "text": "*Granted access:*\n{authZResult.AccessTypeDescription}"
         },
         {
           "type": "mrkdwn",
@@ -32,11 +32,7 @@
         },
         {
           "type": "mrkdwn",
-          "text": "*Matched rule description:*\n{AuthzResult.MatchedRuleDescription}"
-        },
-        {
-          "type": "mrkdwn",
-          "text": "*Matched rule ID:*\n{AuthzResult.MatchedRule}"
+          "text": "*Matched rule:*\n{AuthzResult.MatchedRuleDescription}"
         },
         {
           "type": "mrkdwn",

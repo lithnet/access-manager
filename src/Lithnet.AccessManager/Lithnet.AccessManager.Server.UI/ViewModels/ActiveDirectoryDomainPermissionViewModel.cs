@@ -21,11 +21,11 @@ namespace Lithnet.AccessManager.Server.UI
 
         private readonly ILogger logger;
 
-        public ActiveDirectoryDomainPermissionViewModel(Domain domain, IServiceSettingsProvider serviceSettings, ILogger<ActiveDirectoryDomainPermissionViewModel> logger)
+        public ActiveDirectoryDomainPermissionViewModel(Domain domain, IWindowsServiceProvider windowsServiceProvider, ILogger<ActiveDirectoryDomainPermissionViewModel> logger)
         {
             this.logger = logger;
             this.domain = domain;
-            this.serviceAccountSid = serviceSettings.GetServiceAccount();
+            this.serviceAccountSid = windowsServiceProvider.GetServiceSid();
         }
 
         public void RefreshGroupMembership()

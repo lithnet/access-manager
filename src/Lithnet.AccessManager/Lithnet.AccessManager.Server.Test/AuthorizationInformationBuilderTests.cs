@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Microsoft.Extensions.Logging;
@@ -14,20 +15,14 @@ namespace Lithnet.AccessManager.Server.Test
     public class AuthorizationInformationBuilderTests
     {
         private IDirectory directory;
-
         private AuthorizationInformationMemoryCache cache;
-
         private AuthorizationInformationBuilder builder;
-
         private ILogger<AuthorizationInformationBuilder> logger;
-
         private IPowerShellSecurityDescriptorGenerator powershell;
-
         private IComputerTargetProvider targetDataProvider;
-
         private IAuthorizationContextProvider authorizationContextProvider;
-
         private IDiscoveryServices discoveryServices;
+        private ILicenseManager licenseManager;
 
         [SetUp()]
         public void TestInitialize()
@@ -37,6 +32,12 @@ namespace Lithnet.AccessManager.Server.Test
             cache = new AuthorizationInformationMemoryCache();
             logger = Global.LogFactory.CreateLogger<AuthorizationInformationBuilder>();
             powershell = Mock.Of<IPowerShellSecurityDescriptorGenerator>();
+            var mockLicenseManager = new Mock<ILicenseManager>();
+            mockLicenseManager.Setup(l => l.IsEnterpriseEdition()).Returns(true);
+            mockLicenseManager.Setup(l => l.IsFeatureCoveredByFullLicense(It.IsAny<LicensedFeatures>())).Returns(true);
+            mockLicenseManager.Setup(l => l.IsFeatureEnabled(It.IsAny<LicensedFeatures>())).Returns(true);
+            this.licenseManager = mockLicenseManager.Object;
+
             targetDataProvider = new ComputerTargetProvider(directory,new TargetDataProvider(new TargetDataCache(), Global.LogFactory.CreateLogger<TargetDataProvider>()), Global.LogFactory.CreateLogger<ComputerTargetProvider>());
             authorizationContextProvider = new AuthorizationContextProvider(Mock.Of<IOptions<AuthorizationOptions>>(), Global.LogFactory.CreateLogger<AuthorizationContextProvider>(), discoveryServices);
         }
@@ -61,7 +62,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptionsForComputerTarget(allowed, denied, computer, user);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
+            builder = new AuthorizationInformationBuilder(options, logger, powershell, cache, targetDataProvider, authorizationContextProvider, licenseManager);
             var result = builder.GetAuthorizationInformation(user, computer);
 
             Assert.AreEqual(expected, result.EffectiveAccess);
@@ -77,7 +78,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptionsForOUTarget(allowed, denied, targetOU, user);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
+            builder = new AuthorizationInformationBuilder(options, logger, powershell, cache, targetDataProvider, authorizationContextProvider, licenseManager);
             var result = builder.GetAuthorizationInformation(user, computer);
 
             Assert.AreEqual(expected, result.EffectiveAccess);
@@ -109,7 +110,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
+            builder = new AuthorizationInformationBuilder(options, logger, powershell, cache, targetDataProvider, authorizationContextProvider, licenseManager);
 
             CollectionAssert.AreEquivalent(new[] { t1, t2, t3, t5, t7 }, targetDataProvider.GetMatchingTargetsForComputer(computer1, options.Value.ComputerTargets));
         }
@@ -127,7 +128,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1, t2, t3, t4);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
+            builder = new AuthorizationInformationBuilder(options, logger, powershell, cache, targetDataProvider, authorizationContextProvider, licenseManager);
 
             CollectionAssert.AreEqual(new[] { t3, t1, t2 }, targetDataProvider.GetMatchingTargetsForComputer(computer1, options.Value.ComputerTargets));
         }
@@ -163,7 +164,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
+            builder = new AuthorizationInformationBuilder(options, logger, powershell, cache, targetDataProvider, authorizationContextProvider, licenseManager);
             var result = builder.GetAuthorizationInformation(requestor, computer1);
 
             Assert.AreEqual(AccessMask.LocalAdminPassword, result.EffectiveAccess);
@@ -202,7 +203,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
+            builder = new AuthorizationInformationBuilder(options, logger, powershell, cache, targetDataProvider, authorizationContextProvider, licenseManager);
             var result = builder.GetAuthorizationInformation(requestor, computer1);
 
             Assert.AreEqual(AccessMask.LocalAdminPassword, result.EffectiveAccess);
@@ -241,7 +242,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
+            builder = new AuthorizationInformationBuilder(options, logger, powershell, cache, targetDataProvider, authorizationContextProvider, licenseManager);
             var result = builder.GetAuthorizationInformation(requestor, computer1);
 
             Assert.AreEqual(AccessMask.LocalAdminPassword, result.EffectiveAccess);
@@ -280,7 +281,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
+            builder = new AuthorizationInformationBuilder(options, logger, powershell, cache, targetDataProvider, authorizationContextProvider, licenseManager);
             var result = builder.GetAuthorizationInformation(requestor, computer1);
             Assert.AreEqual(AccessMask.None, result.EffectiveAccess);
             CollectionAssert.AreEquivalent(new[] { t1, t2, t3, t7 }, result.SuccessfulLapsTargets);
@@ -317,7 +318,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
+            builder = new AuthorizationInformationBuilder(options, logger, powershell, cache, targetDataProvider, authorizationContextProvider, licenseManager);
             var result = builder.GetAuthorizationInformation(requestor, computer1);
             CollectionAssert.AreEquivalent(new[] { t1, t3, t5, t7 }, result.SuccessfulLapsTargets);
             Assert.AreEqual(AccessMask.None, result.EffectiveAccess);
@@ -354,7 +355,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1, t2, t3, t4, t5, t6, t7, t8);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
+            builder = new AuthorizationInformationBuilder(options, logger, powershell, cache, targetDataProvider, authorizationContextProvider, licenseManager);
             var result = builder.GetAuthorizationInformation(requestor, computer1);
             CollectionAssert.AreEquivalent(new[] { t1, t2, t5, t3 }, result.SuccessfulLapsTargets);
             Assert.AreEqual(AccessMask.None, result.EffectiveAccess);
@@ -378,7 +379,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
+            builder = new AuthorizationInformationBuilder(options, logger, powershell, cache, targetDataProvider, authorizationContextProvider, licenseManager);
             var result = builder.GetAuthorizationInformation(requestor, computer);
             CollectionAssert.AreEquivalent(new[] { t1 }, result.SuccessfulLapsTargets);
             Assert.AreEqual(AccessMask.LocalAdminPassword, result.EffectiveAccess);
@@ -438,7 +439,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             var options = SetupOptions(t1);
 
-            builder = new AuthorizationInformationBuilder(options, directory, logger, powershell, cache, targetDataProvider, authorizationContextProvider);
+            builder = new AuthorizationInformationBuilder(options, logger, powershell, cache, targetDataProvider, authorizationContextProvider, licenseManager);
             var result = builder.GetAuthorizationInformation(requestor, computer);
 
             CollectionAssert.AreEquivalent(new[] { t1 }, result.SuccessfulLapsTargets);

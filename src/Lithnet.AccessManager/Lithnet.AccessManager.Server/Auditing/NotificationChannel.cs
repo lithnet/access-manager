@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Channels;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Exceptions;
-using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.Auditing
@@ -76,7 +75,7 @@ namespace Lithnet.AccessManager.Server.Auditing
             }
             catch (Exception ex)
             {
-                this.logger.LogEventError(EventIDs.NotificationChannelError, $"Delivery of audit notification to {channel.Id} failed", ex);
+                this.logger.LogError(EventIDs.NotificationChannelError, ex, $"Delivery of audit notification to {channel.Id} failed");
 
                 if (rethrowExceptions)
                 {

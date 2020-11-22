@@ -20,9 +20,9 @@
 
   <ItemGroup>
     <None Remove="access-manager.png" />
-    <None Remove="NLog.config" />
     <None Remove="ScriptTemplates\AddDomainGroupMembershipPermissions.ps1" />
     <None Remove="ScriptTemplates\CreateGmsa.ps1" />
+    <None Remove="ScriptTemplates\CreateNewDatabaseScript.sql" />
     <None Remove="ScriptTemplates\EnablePamFeature.ps1" />
     <None Remove="ScriptTemplates\Get-LocalAdministrators.ps1" />
     <None Remove="ScriptTemplates\GetAuthorizationResponse.ps1" />
@@ -35,19 +35,13 @@
     <None Remove="ScriptTemplates\PublishLithnetAccessManagerCertificate.ps1" />
     <None Remove="ScriptTemplates\UpdateAdSchema.ps1" />
     <None Remove="ScriptTemplates\WriteAuditLog.ps1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="NLog.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
+    <None Remove="splash-screen.png" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="ScriptTemplates\AddDomainGroupMembershipPermissions.ps1" />
     <EmbeddedResource Include="ScriptTemplates\CreateGmsa.ps1" />
+    <EmbeddedResource Include="ScriptTemplates\CreateNewDatabaseScript.sql" />
     <EmbeddedResource Include="ScriptTemplates\EnablePamFeature.ps1" />
     <EmbeddedResource Include="ScriptTemplates\Get-LocalAdministrators.ps1" />
     <EmbeddedResource Include="ScriptTemplates\GetAuthorizationResponse.ps1" />
@@ -64,20 +58,24 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="9.0.1" />
+    <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7616.23549" />
     <PackageReference Include="mahapps.metro" Version="2.1.1" />
-    <PackageReference Include="MahApps.Metro.IconPacks" Version="4.4.0" />
+    <PackageReference Include="MahApps.Metro.IconPacks" Version="4.6.0" />
     <PackageReference Include="MahApps.Metro.SimpleChildWindow" Version="2.0.0-alpha0043" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="3.1.9" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.8" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Logging.EventLog" Version="3.1.6" />
     <PackageReference Include="newtonsoft.json" Version="12.0.3" />
-    <PackageReference Include="NLog" Version="4.7.3" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="1.6.4" />
+    <PackageReference Include="NLog" Version="4.7.5" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="1.6.5" />
     <PackageReference Include="propertychanged.fody" Version="3.2.8" />
     <PackageReference Include="SslCertBinding.Net" Version="1.0.7486" />
     <PackageReference Include="Stylet" Version="1.3.4" />
     <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.7.0" />
     <PackageReference Include="system.serviceprocess.servicecontroller" Version="4.7.0" />
+    <PackageReference Include="vanara.pinvoke.cryptography" Version="3.2.20" />
+    <PackageReference Include="vanara.security" Version="3.2.20" />
     <PackageReference Include="WindowsFirewallHelper" Version="1.6.3.40" />
   </ItemGroup>
 
@@ -87,10 +85,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="access-manager.png" />
+    <Content Include="access-manager.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <SplashScreen Include="splash-screen.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="UIComponents\EnterpriseEditionBadge - Copy.xaml.cs">
+      <DependentUpon>EnterpriseEditionBadge.xaml.cs</DependentUpon>
+    </Compile>
     <Compile Update="Views\JitConfigurationView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -124,6 +129,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Page Update="UIComponents\StandardEditionBadge.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="UIComponents\EnterpriseEditionBadge.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\HighAvailabilityView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\LicensingView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\EffectiveAccessView.xaml">
       <SubType>Designer</SubType>
     </Page>

@@ -6,12 +6,15 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.SimpleChildWindow;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
+using PropertyChanged;
 using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -28,6 +31,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly SecurityDescriptorTargetViewModelDisplaySettings displaySettings;
         private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly ScriptTemplateProvider scriptTemplateProvider;
+        private readonly ILicenseManager licenseManager;
 
         private string jitGroupDisplayName;
 
@@ -35,7 +39,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, ILicenseManager licenseManager)
         {
             this.directory = directory;
             this.Model = model;
@@ -49,6 +53,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.displaySettings = displaySettings ?? new SecurityDescriptorTargetViewModelDisplaySettings();
             this.objectSelectionProvider = objectSelectionProvider;
             this.scriptTemplateProvider = scriptTemplateProvider;
+            this.licenseManager = licenseManager;
 
             this.Script = fileSelectionViewModelFactory.CreateViewModel(model, () => model.Script, appPathProvider.ScriptsPath);
             this.Script.DefaultFileExtension = "ps1";
@@ -84,6 +89,38 @@ namespace Lithnet.AccessManager.Server.UI
                 this.Model.AuthorizationMode = value;
                 this.Script.ShouldValidate = (value == AuthorizationMode.PowershellScript);
             }
+        }
+
+        [DependsOn(nameof(Expiry), nameof(ExpireRule), nameof(IsDisabled))]
+        public string Status
+        {
+            get
+            {
+                return this.IsDisabled ? "Disabled" : this.HasExpired ? "Expired" : "Active";
+            }
+        }
+
+        public bool IsDisabled
+        {
+            get => this.Model.Disabled;
+            set => this.Model.Disabled = value;
+        }
+
+        public DateTime? Expiry
+        {
+            get => this.Model.Expiry?.ToLocalTime();
+            set => this.Model.Expiry = value?.ToUniversalTime();
+        }
+
+        public bool ExpireRule
+        {
+            get => this.Expiry != null;
+            set => this.Expiry = value ? this.Expiry == null ? DateTime.Now.AddDays(30) : this.Expiry : null;
+        }
+
+        public bool HasExpired
+        {
+            get => this.Model.HasExpired();
         }
 
         public bool IsModePermission { get => this.AuthorizationMode == AuthorizationMode.SecurityDescriptor; set => this.AuthorizationMode = value ? AuthorizationMode.SecurityDescriptor : AuthorizationMode.PowershellScript; }
@@ -200,6 +237,14 @@ namespace Lithnet.AccessManager.Server.UI
         public bool ShowJitOptions => this.IsModeScript || SdHasMask(this.SecurityDescriptor, AccessMask.Jit);
 
         public bool CanEdit => this.Target != null;
+
+        public bool IsScriptPermissionAllowed => this.licenseManager.IsFeatureEnabled(LicensedFeatures.PowerShellAcl) && this.Target != null;
+
+        public bool IsScriptPermissionNotAllowed => !this.IsScriptPermissionAllowed;
+
+        public bool ShowPowerShellEnterpriseEditionBadge => !this.licenseManager.IsFeatureCoveredByFullLicense(LicensedFeatures.PowerShellAcl);
+
+        public bool ShowLapsHistoryEnterpriseEditionBadge => !this.licenseManager.IsFeatureCoveredByFullLicense(LicensedFeatures.PowerShellAcl) && SdHasMask(this.SecurityDescriptor, AccessMask.LocalAdminPasswordHistory);
 
         public bool CanEditPermissions => this.CanEdit && this.AuthorizationMode == AuthorizationMode.SecurityDescriptor && this.Target != null;
 
@@ -542,6 +587,32 @@ namespace Lithnet.AccessManager.Server.UI
             }
 
             return false;
+        }
+
+        public IEnumerable<CommonAce> GetAceEntries()
+        {
+            if (this.IsModeScript || string.IsNullOrWhiteSpace(this.SecurityDescriptor))
+            {
+                return null;
+            }
+
+            try
+            {
+                RawSecurityDescriptor sd = new RawSecurityDescriptor(this.SecurityDescriptor);
+
+                if (sd.DiscretionaryAcl == null)
+                {
+                    return null;
+                }
+
+                return sd.DiscretionaryAcl.OfType<CommonAce>();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning(EventIDs.UIGenericWarning, ex, "Error processing security descriptor");
+            }
+
+            return null;
         }
 
         public void AttachView(UIElement view)

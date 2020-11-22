@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 
-namespace Lithnet.AccessManager
+namespace Lithnet.AccessManager.Server
 {
     public class PasswordProvider : IPasswordProvider
     {
@@ -68,7 +68,7 @@ namespace Lithnet.AccessManager
             PasswordEntry current = new PasswordEntry()
             {
                 Created = item.Created,
-                Password = this.encryptionProvider.Decrypt(item.EncryptedData, (thumbprint) => this.certificateProvider.FindDecryptionCertificate(thumbprint, Constants.ServiceName)),
+                Password = this.encryptionProvider.Decrypt(item.EncryptedData, (thumbprint) => this.certificateProvider.FindDecryptionCertificate(thumbprint)),
                 ExpiryDate = newExpiry ?? this.lithnetProvider.GetExpiry(computer)
             };
 
@@ -96,7 +96,7 @@ namespace Lithnet.AccessManager
                         (thumbprint) =>
                         {
                             tp = thumbprint;
-                           return  this.certificateProvider.FindDecryptionCertificate(thumbprint, Constants.ServiceName);
+                           return  this.certificateProvider.FindDecryptionCertificate(thumbprint);
                         });
                 }
                 catch (Exception ex)

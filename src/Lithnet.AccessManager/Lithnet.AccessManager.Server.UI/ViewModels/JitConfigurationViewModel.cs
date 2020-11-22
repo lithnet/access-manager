@@ -19,7 +19,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IJitGroupMappingViewModelFactory groupMappingFactory;
         private readonly IJitDomainStatusViewModelFactory jitDomainStatusFactory;
-        private readonly IServiceSettingsProvider serviceSettings;
+        private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly INotifyModelChangedEventPublisher eventPublisher;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IDomainTrustProvider domainTrustProvider;
@@ -29,14 +29,14 @@ namespace Lithnet.AccessManager.Server.UI
 
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.UserClockSolid;
 
-        public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IJitGroupMappingViewModelFactory groupMappingFactory, INotifyModelChangedEventPublisher eventPublisher, IJitDomainStatusViewModelFactory jitDomainStatusFactory, IServiceSettingsProvider serviceSettings, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IObjectSelectionProvider objectSelectionProvider, IScriptTemplateProvider scriptTemplateProvider)
+        public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IJitGroupMappingViewModelFactory groupMappingFactory, INotifyModelChangedEventPublisher eventPublisher, IJitDomainStatusViewModelFactory jitDomainStatusFactory, IWindowsServiceProvider windowsServiceProvider, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IObjectSelectionProvider objectSelectionProvider, IScriptTemplateProvider scriptTemplateProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.dialogCoordinator = dialogCoordinator;
             this.jitOptions = jitOptions;
             this.groupMappingFactory = groupMappingFactory;
             this.jitDomainStatusFactory = jitDomainStatusFactory;
-            this.serviceSettings = serviceSettings;
+            this.windowsServiceProvider = windowsServiceProvider;
             this.eventPublisher = eventPublisher;
             this.domainTrustProvider = domainTrustProvider;
             this.discoveryServices = discoveryServices;
@@ -222,7 +222,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 HelpText = "Run this script to grant access for the AMS service account to manage groups in this OU",
                 ScriptText = this.scriptTemplateProvider.GrantGroupPermissions
-                    .Replace("{serviceAccount}", this.serviceSettings.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
+                    .Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceSid().ToString(), StringComparison.OrdinalIgnoreCase)
                     .Replace("{ou}", current.GroupOU)
                     .Replace("{domain}", discoveryServices.GetDomainNameDns(current.GroupOU))
             };
@@ -249,7 +249,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 HelpText = "Run this script to grant access for the AMS service account to manage groups in this OU",
                 ScriptText = this.scriptTemplateProvider.GrantGroupPermissions
-                    .Replace("{serviceAccount}", this.serviceSettings.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
+                    .Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceSid().ToString(), StringComparison.OrdinalIgnoreCase)
                     .Replace("{ou}", current.Mapping.GroupOU)
                     .Replace("{domain}", current.Domain.Name)
             };

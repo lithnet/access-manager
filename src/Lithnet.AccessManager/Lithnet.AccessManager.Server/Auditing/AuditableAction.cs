@@ -13,9 +13,13 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         public string RequestReason { get; set; }
 
+        public string EvaluatedAccess { get; set; }
+
         public AuthorizationResponse AuthzResponse { get; set; }
 
         public IUser User { get; set; }
+
+        public AuthorizationTargetType TargetType { get; set; }
 
         public IComputer Computer { get; set; }
 

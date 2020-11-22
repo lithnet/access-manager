@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
-using System.Text;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
@@ -23,22 +21,22 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IX509Certificate2ViewModelFactory x509ViewModelFactory;
         private readonly ILogger logger;
         private readonly IDirectory directory;
-        private readonly RandomNumberGenerator rng;
         private readonly INotifyModelChangedEventPublisher eventPublisher;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IObjectSelectionProvider objectSelectionProvider;
+        private readonly IProtectedSecretProvider secretProvider;
 
-        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, RandomNumberGenerator rng, IDirectory directory, IShellExecuteProvider shellExecuteProvider, IObjectSelectionProvider objectSelectionProvider)
+        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, IDirectory directory, IShellExecuteProvider shellExecuteProvider, IObjectSelectionProvider objectSelectionProvider, IProtectedSecretProvider secretProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.model = model;
             this.dialogCoordinator = dialogCoordinator;
             this.x509ViewModelFactory = x509ViewModelFactory;
             this.logger = logger;
-            this.rng = rng;
             this.directory = directory;
             this.eventPublisher = eventPublisher;
             this.objectSelectionProvider = objectSelectionProvider;
+            this.secretProvider = secretProvider;
 
             this.DisplayName = "Authentication";
 
@@ -198,12 +196,7 @@ namespace Lithnet.AccessManager.Server.UI
                         return;
                     }
 
-                    this.model.Oidc.Secret = new EncryptedData();
-                    this.model.Oidc.Secret.Mode = 1;
-                    byte[] salt = new byte[128];
-                    rng.GetBytes(salt);
-                    this.model.Oidc.Secret.Salt = Convert.ToBase64String(salt);
-                    this.model.Oidc.Secret.Data = Convert.ToBase64String(ProtectedData.Protect(Encoding.UTF8.GetBytes(value), salt, DataProtectionScope.LocalMachine));
+                    this.model.Oidc.Secret = this.secretProvider.ProtectSecret(value);
                 }
             }
         }

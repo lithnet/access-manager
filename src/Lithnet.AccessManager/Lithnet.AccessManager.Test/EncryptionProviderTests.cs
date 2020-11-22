@@ -13,7 +13,7 @@ namespace Lithnet.AccessManager.Test
         [SetUp()]
         public void TestInitialize()
         {
-            this.certificateProvider = new CertificateProvider(Mock.Of<ILogger<CertificateProvider>>(), Mock.Of<IDirectory>(), Mock.Of<IAppPathProvider>(), Mock.Of<IDiscoveryServices>());
+            this.certificateProvider = new CertificateProvider(Mock.Of<ILogger<CertificateProvider>>(), Mock.Of<IDiscoveryServices>());
         }
 
         [TestCase("A simple test", TestName = "Simple test v1")]
@@ -21,7 +21,7 @@ namespace Lithnet.AccessManager.Test
         public void EncryptRoundTripv1(string data)
         {
             EncryptionProvider p = new EncryptionProvider();
-            var cert = this.certificateProvider.CreateSelfSignedCert("test");
+            var cert = this.certificateProvider.CreateSelfSignedCert("test", CertificateProvider.LithnetAccessManagerPasswordEncryptionEku);
 
             string encrypted = p.Encrypt(cert, data, 1);
             string decrypted = p.Decrypt(encrypted, _ => cert);
@@ -35,7 +35,7 @@ namespace Lithnet.AccessManager.Test
         public void EncryptRoundTripv2(string data)
         {
             EncryptionProvider p = new EncryptionProvider();
-            var cert = this.certificateProvider.CreateSelfSignedCert("test");
+            var cert = this.certificateProvider.CreateSelfSignedCert("test", CertificateProvider.LithnetAccessManagerPasswordEncryptionEku);
 
             string encrypted = p.Encrypt(cert, data, 2);
             string decrypted = p.Decrypt(encrypted, _ => cert);

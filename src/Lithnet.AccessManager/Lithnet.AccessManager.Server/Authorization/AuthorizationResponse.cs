@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.Extensions;
 
 namespace Lithnet.AccessManager.Server.Authorization
 {
@@ -43,15 +42,6 @@ namespace Lithnet.AccessManager.Server.Authorization
         public bool IsAuthorized()
         {
             return this.Code == AuthorizationResponseCode.Success;
-        }
-
-        /// <summary>
-        /// Gets a value indicating if the AuthorizationResponseCode indicates that an explicit authorization decision was made, and that no other authorization providers should offered the opportunity to process the authorization request.
-        /// </summary>
-        /// <returns></returns>
-        public bool IsExplicitResult()
-        {
-            return this.Code == AuthorizationResponseCode.Success || this.Code == AuthorizationResponseCode.ExplicitlyDenied;
         }
 
         public static AuthorizationResponse CreateAuthorizationResponse(AccessMask mask)

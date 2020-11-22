@@ -118,13 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="ComputerNotFoundInDirectory" xml:space="preserve">
-    <value>The user {0} requested the password for computer {1} which was not found in the directory</value>
-  </data>
-  <data name="UserHasRequestedPassword" xml:space="preserve">
-    <value>{0} has requested the password for {1}</value>
-  </data>
-  <data name="NoTargetsExist" xml:space="preserve">
-    <value>The user {0} requested access to computer {1} but no targets exist for this computer</value>
+    <value>The user {0} requested {2} access to computer {1} which was not found in the directory</value>
   </data>
   <data name="NoLapsPassword" xml:space="preserve">
     <value>The computer {0} requested by {1} did not have a local admin password in the directory</value>
@@ -133,7 +127,7 @@
     <value>The user {0} requested access to computer {1} but does not match any of the reader principals that are allowed access to this computer</value>
   </data>
   <data name="UnhandledError" xml:space="preserve">
-    <value>An unhandled error occurred while processing the request for the password for {0} by user {1}</value>
+    <value>An unhandled error occurred while processing the request for {0} access to computer {1} for user {2}</value>
   </data>
   <data name="ClaimNotFound" xml:space="preserve">
     <value>No user claim was found with the type {0}</value>
@@ -159,16 +153,16 @@
     <value>An error occurred during the authorization code flow</value>
   </data>
   <data name="RateLimitExceededIP" xml:space="preserve">
-    <value>The user {0} on IP {1} has exceeded the maximum allowed number of requests per IP ({2} per {3} seconds)</value>
+    <value>The user {0} on IP {1} has exceeded the maximum allowed number of requests per IP ({2} per {3} seconds). The user requested {4} access to {5}.</value>
   </data>
   <data name="RateLimitExceededUser" xml:space="preserve">
-    <value>The user {0} on IP {1} has exceeded the maximum allowed number of requests per user ({2} per {3} seconds)</value>
+    <value>The user {0} on IP {1} has exceeded the maximum allowed number of requests per user ({2} per {3} seconds). The user requested {4} access to {5}.</value>
   </data>
   <data name="AuthorizationFailed" xml:space="preserve">
     <value>The user {0} is not authorized to access the computer {1}.</value>
   </data>
   <data name="ComputerNameAmbiguous" xml:space="preserve">
-    <value>The user {0} requested the password for computer {1}, but multiple computers matching that name were found in the directory</value>
+    <value>The user {0} requested {2} access to computer {1}, but multiple computers matching that name were found in the directory</value>
   </data>
   <data name="AuthNDirectoryLookupError" xml:space="preserve">
     <value>An error occurred looking up the claim value in the directory {0}:{1}</value>
@@ -180,10 +174,10 @@
     <value>The external authentication provider denied the logon request</value>
   </data>
   <data name="ReasonRequired" xml:space="preserve">
-    <value>The user {0} did not fill out the mandatory request reason field</value>
+    <value>The user {0} did not fill out the mandatory request reason field for their {1} access request to {2}</value>
   </data>
   <data name="AuthZFailedAuditError" xml:space="preserve">
-    <value>The user {0} requested access to computer {1} which was authorized, but one or more audit notification channels failed to deliver the audit response, and were configured to deny access to the password when auditing fails</value>
+    <value>The user {0} requested {2} access to computer {1} which was authorized, but one or more audit notification channels failed to deliver the audit response, and were configured to deny access to the password when auditing fails</value>
   </data>
   <data name="CertificateAuthNGenericFailure" xml:space="preserve">
     <value>The certificate could not be validated due to an unexpected error
@@ -196,19 +190,19 @@
 {0}</value>
   </data>
   <data name="UserHasRequestedAccessToComputer" xml:space="preserve">
-    <value>{0} has requested access to computer {1}</value>
+    <value>{0} has requested {2} access to computer {1}</value>
   </data>
   <data name="IdentityDiscoveryError" xml:space="preserve">
     <value>The request failed because the information about the authenticated user could not be found</value>
   </data>
   <data name="ComputerDiscoveryError" xml:space="preserve">
-    <value>An unexpected error occurred while trying to find a computer named {0}</value>
+    <value>An unexpected error occurred while trying to find a computer named {0} in the directory for user {1} requesting {2} access.</value>
   </data>
   <data name="JitRollbackFailed" xml:space="preserve">
-    <value>An error occurred when trying to rollback the JIT access</value>
+    <value>An error occurred when trying to rollback the JIT access for user {0} to computer {1}</value>
   </data>
   <data name="JitRollbackInProgress" xml:space="preserve">
-    <value>Rolling back JIT access due to an exception in the audit process</value>
+    <value>Rolling back JIT access for user {0} to computer {1} due to an exception in the audit process</value>
   </data>
   <data name="JitError" xml:space="preserve">
     <value>An error occurred when trying to grant JIT access to {0} for user {1}</value>
@@ -217,10 +211,10 @@
     <value>The computer {0} requested by {1} did not have any historical local admin passwords in the directory</value>
   </data>
   <data name="PreAuthZError" xml:space="preserve">
-    <value>An unexpected error occurred during the pre-authorization process for user {0} attempting to access {1}</value>
+    <value>An unexpected error occurred during the pre-authorization process for user {0} requesting {2} access to {1}</value>
   </data>
   <data name="AuthZError" xml:space="preserve">
-    <value>An unexpected error occurred during the authorization process for user {0} trying to access computer {1}</value>
+    <value>An unexpected error occurred during the authorization process for user {0} requesting {2} access to computer {1}</value>
   </data>
   <data name="LapsPasswordError" xml:space="preserve">
     <value>An error occurred when trying to get the password for computer {0} as requested by user {1}</value>
@@ -229,9 +223,27 @@
     <value>An error occurred when trying to get the password history for computer {0} as requested by user {1}</value>
   </data>
   <data name="BitLockerKeysNotPresent" xml:space="preserve">
-    <value>The computer does not have any BitLocker recovery passwords in the directory</value>
+    <value>User {1} requested access to the BitLocker recovery passwords for computer {0}, but the computer does not have any BitLocker recovery passwords in the directory</value>
   </data>
   <data name="BitLockerKeyAccessError" xml:space="preserve">
     <value>An error occurred when trying to get the BitLocker recovery passwords for computer {0} as requested by user {1}</value>
+  </data>
+  <data name="AuthZResponseExplicitlyDenied" xml:space="preserve">
+    <value>The user was explicitly denied access to the computer</value>
+  </data>
+  <data name="AuthZResponseFallback" xml:space="preserve">
+    <value>Not authorized</value>
+  </data>
+  <data name="AuthZResponseIpRateLimitExceeded" xml:space="preserve">
+    <value>The user exceeded the per-IP address request limit</value>
+  </data>
+  <data name="AuthZResponseNoMatchingRuleForComputer" xml:space="preserve">
+    <value>There were no authorization rules that apply to the requested computer</value>
+  </data>
+  <data name="AuthZResponseNoMatchingRuleForUser" xml:space="preserve">
+    <value>There are no authorization rules that grant the user access to the requested computer</value>
+  </data>
+  <data name="AuthZResponseUserRateLimitExceeded" xml:space="preserve">
+    <value>The user exceeded the per-user request limit</value>
   </data>
 </root>

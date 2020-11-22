@@ -252,4 +252,19 @@
   <data name="NotAuthorizedMessage" xml:space="preserve">
     <value>You are not authorized to access this application</value>
   </data>
+  <data name="AccessMaskBitLocker" xml:space="preserve">
+    <value>BitLocker recovery password</value>
+  </data>
+  <data name="AccessMaskJit" xml:space="preserve">
+    <value>Just-in-time access</value>
+  </data>
+  <data name="AccessMaskLocalAdminPassword" xml:space="preserve">
+    <value>Local admin password</value>
+  </data>
+  <data name="AccessMaskLocalAdminPasswordHistory" xml:space="preserve">
+    <value>Local admin password history</value>
+  </data>
+  <data name="AccessMaskNone" xml:space="preserve">
+    <value>None</value>
+  </data>
 </root>

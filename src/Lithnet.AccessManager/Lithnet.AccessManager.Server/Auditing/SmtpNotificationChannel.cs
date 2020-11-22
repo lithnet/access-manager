@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Mail;
-using System.Security.Cryptography;
 using System.Threading.Channels;
 using HtmlAgilityPack;
 using Lithnet.AccessManager.Server.App_LocalResources;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -16,21 +14,21 @@ namespace Lithnet.AccessManager.Server.Auditing
     public class SmtpNotificationChannel : NotificationChannel<SmtpNotificationChannelDefinition>
     {
         private readonly ILogger logger;
-
         private readonly EmailOptions emailSettings;
-
         private readonly ITemplateProvider templates;
+        private readonly IProtectedSecretProvider secretProvider;
 
         public override string Name => "smtp";
 
         protected override IList<SmtpNotificationChannelDefinition> NotificationChannelDefinitions { get; }
 
-        public SmtpNotificationChannel(ILogger<SmtpNotificationChannel> logger, IOptionsSnapshot<EmailOptions> emailSettings, ITemplateProvider templates, IOptionsSnapshot<AuditOptions> auditSettings, ChannelWriter<Action> queue)
+        public SmtpNotificationChannel(ILogger<SmtpNotificationChannel> logger, IOptionsSnapshot<EmailOptions> emailSettings, ITemplateProvider templates, IOptionsSnapshot<AuditOptions> auditSettings, ChannelWriter<Action> queue, IProtectedSecretProvider secretProvider)
             : base(logger, queue)
         {
             this.logger = logger;
             this.emailSettings = emailSettings.Value;
             this.templates = templates;
+            this.secretProvider = secretProvider;
             this.NotificationChannelDefinitions = auditSettings.Value.NotificationChannels.Smtp;
         }
 
@@ -119,7 +117,7 @@ namespace Lithnet.AccessManager.Server.Auditing
                 return null;
             }
 
-            return new NetworkCredential(this.emailSettings.Username, this.emailSettings.Password?.GetSecret());
+            return new NetworkCredential(this.emailSettings.Username, this.secretProvider.UnprotectSecret(this.emailSettings.Password));
         }
     }
 }

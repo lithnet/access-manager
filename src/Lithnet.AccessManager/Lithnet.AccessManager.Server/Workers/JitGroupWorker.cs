@@ -58,36 +58,42 @@ namespace Lithnet.AccessManager.Server.Workers
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            if (!this.options.EnableJitGroupCreation)
+            try
             {
-                return;
-            }
+                if (!this.options.EnableJitGroupCreation)
+                {
+                    return;
+                }
 
-            await WorkLoop(cancellationToken);
+                await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
+                await WorkLoop(cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+            }
         }
 
         private async Task WorkLoop(CancellationToken cancellationToken)
         {
-            await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
-
             while (!cancellationToken.IsCancellationRequested)
             {
-                this.ProcessJitGroups();
+                this.ProcessJitGroups(cancellationToken);
                 await Task.Delay(TimeSpan.FromMinutes(this.timerInterval), cancellationToken);
             }
         }
 
-        private void ProcessJitGroups()
+        private void ProcessJitGroups(CancellationToken cancellationToken)
         {
             foreach (var mapping in this.options.JitGroupMappings)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 try
                 {
-                    this.PerformSync(mapping);
+                    this.PerformSync(mapping, cancellationToken);
                 }
                 catch (OperationCanceledException)
-                {
-                }
+                { }
                 catch (Exception ex)
                 {
                     this.logger.LogError(EventIDs.JitWorkerUnexpectedError, ex, $"There was an unexpected error in the JIT group processing thread for the target {mapping.ComputerOU}");
@@ -119,7 +125,7 @@ namespace Lithnet.AccessManager.Server.Workers
             }
         }
 
-        private void PerformSync(JitGroupMapping mapping)
+        private void PerformSync(JitGroupMapping mapping, CancellationToken cancellationToken)
         {
             this.ThrowOnMappingConfigurationError(mapping);
 
@@ -135,6 +141,8 @@ namespace Lithnet.AccessManager.Server.Workers
                 this.deltaInformation.Add(mapping.ComputerOU, usnData);
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (this.deltaSyncInterval <= 0 || DateTime.UtcNow > usnData.LastFullSync.AddMinutes(this.fullSyncInterval))
             {
                 this.logger.LogTrace("Resetting for a full sync");
@@ -143,6 +151,7 @@ namespace Lithnet.AccessManager.Server.Workers
             }
 
             this.PopulateUsnDataWithFallback(usnData);
+            cancellationToken.ThrowIfCancellationRequested();
 
             if (usnData.LastUsn == usnData.HighestUsn)
             {
@@ -152,28 +161,32 @@ namespace Lithnet.AccessManager.Server.Workers
 
             if (usnData.LastUsn == 0)
             {
-                this.PerformFullSync(mapping, usnData);
+                this.PerformFullSync(mapping, usnData, cancellationToken);
                 usnData.LastFullSync = DateTime.UtcNow;
             }
             else
             {
-                this.PerformPartialSync(mapping, usnData);
+                this.PerformPartialSync(mapping, usnData, cancellationToken);
             }
 
             usnData.LastUsn = usnData.HighestUsn;
         }
 
-        private void PerformPartialSync(JitGroupMapping mapping, SearchParameters data)
+        private void PerformPartialSync(JitGroupMapping mapping, SearchParameters data, CancellationToken cancellationToken)
         {
             this.logger.LogTrace($"Performing delta JIT group synchronization for domain {data.DnsDomain} against server {data.Server}");
+            cancellationToken.ThrowIfCancellationRequested();
+
             var computers = GetComputers(mapping, data);
+            cancellationToken.ThrowIfCancellationRequested();
 
             var expectedGroupNames = GetExpectedGroupNames(computers, mapping.GroupNameTemplate).ToList();
+            cancellationToken.ThrowIfCancellationRequested();
 
             if (expectedGroupNames.Count > 0)
             {
                 this.logger.LogTrace($"{expectedGroupNames.Count} groups to create");
-                this.CreateGroups(expectedGroupNames, mapping.GroupOU, mapping.GroupDescription, mapping.GroupType);
+                this.CreateGroups(expectedGroupNames, mapping.GroupOU, mapping.GroupDescription, mapping.GroupType, cancellationToken);
             }
             else
             {
@@ -181,21 +194,25 @@ namespace Lithnet.AccessManager.Server.Workers
             }
         }
 
-        private void PerformFullSync(JitGroupMapping mapping, SearchParameters data)
+        private void PerformFullSync(JitGroupMapping mapping, SearchParameters data, CancellationToken cancellationToken)
         {
             this.logger.LogTrace($"Performing full JIT group synchronization for domain {data.DnsDomain} against server {data.Server}");
+            cancellationToken.ThrowIfCancellationRequested();
+
             var computers = GetComputers(mapping, data);
+            cancellationToken.ThrowIfCancellationRequested();
+
             var groups = GetGroups(mapping);
+            cancellationToken.ThrowIfCancellationRequested();
 
             var expectedGroupNames = GetExpectedGroupNames(computers, mapping.GroupNameTemplate).ToList();
             var currentGroupNames = groups.Select(t => t.GetPropertyString("cn")).ToList();
-
             var groupsToCreate = expectedGroupNames.Except(currentGroupNames, StringComparer.CurrentCultureIgnoreCase).ToList();
 
             if (groupsToCreate.Count > 0)
             {
                 this.logger.LogTrace($"{groupsToCreate.Count} groups to create");
-                this.CreateGroups(groupsToCreate, mapping.GroupOU, mapping.GroupDescription, mapping.GroupType);
+                this.CreateGroups(groupsToCreate, mapping.GroupOU, mapping.GroupDescription, mapping.GroupType, cancellationToken);
             }
             else
             {
@@ -211,7 +228,7 @@ namespace Lithnet.AccessManager.Server.Workers
                 if (groupsToDelete.Count > 0)
                 {
                     this.logger.LogTrace($"{groupsToDelete.Count} groups to delete");
-                    this.DeleteGroups(groupsToDelete);
+                    this.DeleteGroups(groupsToDelete, cancellationToken);
                 }
                 else
                 {
@@ -220,16 +237,16 @@ namespace Lithnet.AccessManager.Server.Workers
             }
         }
 
-        private void CreateGroups(IEnumerable<string> groupsToCreate, string groupOU, string groupDescription, GroupType groupType)
+        private void CreateGroups(IEnumerable<string> groupsToCreate, string groupOU, string groupDescription, GroupType groupType, CancellationToken cancellationToken)
         {
             foreach (var group in groupsToCreate)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 try
                 {
                     this.logger.LogTrace($"Creating JIT group {group} in OU {groupOU}");
-
-                    this.directory.CreateGroup(group, groupDescription ?? "JIT access group created by Lithnet Access Manager",
-                        groupType, groupOU, true);
+                    this.directory.CreateGroup(group, groupDescription ?? "JIT access group created by Lithnet Access Manager", groupType, groupOU, true);
                     this.logger.LogInformation(EventIDs.JitWorkerGroupCreated, $"Created JIT group {group} in OU {groupOU}");
                 }
                 catch (Exception ex)
@@ -239,10 +256,12 @@ namespace Lithnet.AccessManager.Server.Workers
             }
         }
 
-        private void DeleteGroups(IEnumerable<string> groupsToDelete)
+        private void DeleteGroups(IEnumerable<string> groupsToDelete, CancellationToken cancellationToken)
         {
             foreach (var group in groupsToDelete)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 string groupName = group;
 
                 try
@@ -304,6 +323,12 @@ namespace Lithnet.AccessManager.Server.Workers
             foreach (var result in results)
             {
                 string cn = result.GetPropertyString("cn");
+
+                if (cn.Contains("\0CNF:", StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
                 var name = this.groupResolver.BuildGroupName(template, null, cn);
                 yield return name.TrimStart('\\');
             }

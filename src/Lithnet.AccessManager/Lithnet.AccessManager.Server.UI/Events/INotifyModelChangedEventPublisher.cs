@@ -9,5 +9,6 @@ namespace Lithnet.AccessManager.Server.UI
         void Pause();
 
         void Unpause();
+        void RaiseModelChangedEvent(object sender, string propertyName, bool requiresServiceRestart);
     }
 }

@@ -39,6 +39,8 @@ namespace Lithnet.AccessManager.Server.UI
         public string WriteAuditLog => this.GetFileContent("WriteAuditLog.ps1");
 
         public string GetAuthorizationResponse => this.GetFileContent("GetAuthorizationResponse.ps1");
+        
+        public string CreateDatabase => this.GetFileContent("CreateNewDatabaseScript.sql");
 
         public string GetFileContent(string filename)
         {

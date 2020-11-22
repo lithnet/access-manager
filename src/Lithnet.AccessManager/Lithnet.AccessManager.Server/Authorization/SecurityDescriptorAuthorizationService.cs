@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Security.Principal;
+using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.Authorization
@@ -10,22 +12,21 @@ namespace Lithnet.AccessManager.Server.Authorization
     public class SecurityDescriptorAuthorizationService : IAuthorizationService
     {
         private readonly IDirectory directory;
-
         private readonly ILogger logger;
-
         private readonly IJitAccessGroupResolver jitResolver;
-
         private readonly IAuthorizationInformationBuilder authzBuilder;
+        private readonly IRateLimiter rateLimiter;
 
-        public SecurityDescriptorAuthorizationService(IDirectory directory, ILogger<SecurityDescriptorAuthorizationService> logger, IJitAccessGroupResolver jitResolver, IAuthorizationInformationBuilder authzBuilder)
+        public SecurityDescriptorAuthorizationService(IDirectory directory, ILogger<SecurityDescriptorAuthorizationService> logger, IJitAccessGroupResolver jitResolver, IAuthorizationInformationBuilder authzBuilder, IRateLimiter rateLimiter)
         {
             this.directory = directory;
             this.logger = logger;
             this.jitResolver = jitResolver;
             this.authzBuilder = authzBuilder;
+            this.rateLimiter = rateLimiter;
         }
 
-        public AuthorizationResponse GetAuthorizationResponse(IUser user, IComputer computer, AccessMask requestedAccess)
+        public async Task<AuthorizationResponse> GetAuthorizationResponse(IUser user, IComputer computer, AccessMask requestedAccess, IPAddress ip)
         {
             try
             {
@@ -35,7 +36,7 @@ namespace Lithnet.AccessManager.Server.Authorization
 
                 if (info.MatchedComputerTargets.Count == 0)
                 {
-                    this.logger.LogTrace($"User {user.MsDsPrincipalName} is denied access to the password for computer {computer.MsDsPrincipalName} because the computer did not match any of the configured targets");
+                    this.logger.LogTrace($"User {user.MsDsPrincipalName} is denied {requestedAccess} access to the computer {computer.MsDsPrincipalName} because the computer did not match any of the configured targets");
                     return BuildAuthZResponseFailed(requestedAccess, AuthorizationResponseCode.NoMatchingRuleForComputer);
                 }
 
@@ -62,7 +63,9 @@ namespace Lithnet.AccessManager.Server.Authorization
                     throw new AccessManagerException($"An invalid access mask combination was requested: {requestedAccess}");
                 }
 
-                if (successTargets.Count == 0 || !(info.EffectiveAccess.HasFlag(requestedAccess)))
+                var matchedTarget = successTargets?.FirstOrDefault(t => t.IsActive());
+
+                if (!info.EffectiveAccess.HasFlag(requestedAccess) || matchedTarget == null)
                 {
                     this.logger.LogTrace($"User {user.MsDsPrincipalName} is denied {requestedAccess} access for computer {computer.MsDsPrincipalName}");
 
@@ -73,9 +76,14 @@ namespace Lithnet.AccessManager.Server.Authorization
                 }
                 else
                 {
-                    var matchedTarget = successTargets[0];
-                    this.logger.LogTrace($"User {user.MsDsPrincipalName} is authorized for {requestedAccess} access to computer {computer.MsDsPrincipalName} from target {matchedTarget.Id}");
+                    var rateLimitResult = await this.rateLimiter.GetRateLimitResult(user.Sid, ip, requestedAccess);
 
+                    if (rateLimitResult.IsRateLimitExceeded)
+                    {
+                        return BuildAuthZResponseRateLimitExceeded(user, computer, requestedAccess, rateLimitResult, ip, matchedTarget);
+                    }
+
+                    this.logger.LogTrace($"User {user.MsDsPrincipalName} is authorized for {requestedAccess} access to computer {computer.MsDsPrincipalName} from target {matchedTarget.Id}");
                     return BuildAuthZResponseSuccess(requestedAccess, matchedTarget, computer);
                 }
             }
@@ -119,6 +127,16 @@ namespace Lithnet.AccessManager.Server.Authorization
             AuthorizationResponse response = AuthorizationResponse.CreateAuthorizationResponse(requestedAccess);
             response.Code = code;
             response.NotificationChannels = failureNotificationRecipients;
+            return response;
+        }
+
+        private AuthorizationResponse BuildAuthZResponseRateLimitExceeded(IUser user, IComputer computer, AccessMask requestedAccess, RateLimitResult result, IPAddress ip, SecurityDescriptorTarget matchedTarget)
+        {
+            this.logger.LogError(result.IsUserRateLimit ? EventIDs.RateLimitExceededUser : EventIDs.RateLimitExceededIP , $"User {user.MsDsPrincipalName} on IP {ip} is denied {requestedAccess} access for computer {computer.MsDsPrincipalName} because they have exceeded the {(result.IsUserRateLimit ? "user" : "IP")} rate limit of {result.Threshold}/{result.Duration.TotalSeconds} seconds");
+
+            AuthorizationResponse response = AuthorizationResponse.CreateAuthorizationResponse(requestedAccess);
+            response.Code = result.IsUserRateLimit ? AuthorizationResponseCode.UserRateLimitExceeded : AuthorizationResponseCode.IpRateLimitExceeded;
+            response.NotificationChannels = this.GetNotificationRecipients(matchedTarget.Notifications, false);
 
             return response;
         }

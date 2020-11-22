@@ -21,7 +21,9 @@
                                IsModal="True"
                                IsWindowHostActive="False"
                                AllowFocusElement="True"
-                               mc:Ignorable="d">
+                                xmlns:dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+                                dialog:DialogParticipation.Register="{Binding}"
+                                mc:Ignorable="d">
     <AdornerDecorator>
         <DockPanel LastChildFill="True"
                    Margin="15">

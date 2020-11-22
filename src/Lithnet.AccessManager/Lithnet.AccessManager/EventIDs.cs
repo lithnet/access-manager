@@ -39,6 +39,7 @@
         public const int RateLimitExceededIP = 4017;
         public const int RateLimitExceededUser = 4018;
         public const int BitLockerKeysNotPresent = 4019;
+        public const int AuthZRateLimitExceeded = 4020;
 
         // 5000 range - Server errors
         public const int LocalSamGroupMemberAddFailed = 5001;
@@ -76,6 +77,21 @@
         public const int CertificateAuthNAccessDenied = 5033;
         public const int CertificateAuthNError = 5034;
         public const int BitLockerKeyAccessError = 5035;
+        public const int ResourceReadError = 5036;
+        public const int CertificateSynchronizationImportError = 5037;
+        public const int CertificateSynchronizationExportError = 5038;
+        public const int CertificateSynchronizationExportWarningNoPrivateKey = 5039;
+        public const int DbUpgradeError = 5040;
+        public const int DbUpgradeWarning = 5041;
+        public const int DbUpgradeInfo = 5042;
+        public const int DbUpgradeRequired = 5043;
+        public const int DbNotFound = 5044;
+        public const int DbCreated = 5045;
+        public const int DbDeleting = 5046;
+        public const int DbDeleted = 5047;
+
+
+        // 6000 range - Reserved 
 
         // 8000 range - UI errors
         public const int UIGroupMembershipLookupError = 8000;

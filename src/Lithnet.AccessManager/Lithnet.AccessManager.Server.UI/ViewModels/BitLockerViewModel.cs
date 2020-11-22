@@ -11,16 +11,16 @@ namespace Lithnet.AccessManager.Server.UI
     public class BitLockerViewModel : Screen, IHelpLink
     {
         private readonly IDialogCoordinator dialogCoordinator;
-        private readonly IServiceSettingsProvider serviceSettings;
+        private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
         
-            public BitLockerViewModel(IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, IShellExecuteProvider shellExecuteProvider, IScriptTemplateProvider scriptTemplateProvider)
+            public BitLockerViewModel(IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, IShellExecuteProvider shellExecuteProvider, IScriptTemplateProvider scriptTemplateProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.scriptTemplateProvider = scriptTemplateProvider;
             this.dialogCoordinator = dialogCoordinator;
-            this.serviceSettings = serviceSettings;
+            this.windowsServiceProvider = windowsServiceProvider;
             this.DisplayName = "BitLocker";
         }
 
@@ -33,7 +33,7 @@ namespace Lithnet.AccessManager.Server.UI
             var vm = new ScriptContentViewModel(this.dialogCoordinator)
             {
                 HelpText = "Modify the OU variable in this script, and run it with domain admin rights to assign permissions for the service account to be able to read BitLocker recovery passwords from the directory",
-                ScriptText = this.scriptTemplateProvider.GrantBitLockerRecoveryPasswordPermissions.Replace("{serviceAccount}", this.serviceSettings.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
+                ScriptText = this.scriptTemplateProvider.GrantBitLockerRecoveryPasswordPermissions.Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceSid().ToString(), StringComparison.OrdinalIgnoreCase)
             };
 
             ExternalDialogWindow w = new ExternalDialogWindow

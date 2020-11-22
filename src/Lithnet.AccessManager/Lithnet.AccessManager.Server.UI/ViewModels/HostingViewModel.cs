@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.DirectoryServices.AccountManagement;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -13,15 +17,19 @@ using System.Security.Principal;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
+using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
 using Newtonsoft.Json;
 using SslCertBinding.Net;
 using Stylet;
+using Vanara.PInvoke;
+using Vanara.Security.AccessControl;
 using WindowsFirewallHelper;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -35,34 +43,53 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly ILogger<HostingViewModel> logger;
         private readonly IAppPathProvider pathProvider;
-        private readonly IServiceSettingsProvider serviceSettings;
+        private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly ICertificateProvider certProvider;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IEventAggregator eventAggregator;
         private readonly IDirectory directory;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
-        
-        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IServiceSettingsProvider serviceSettings, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider)
+        private readonly ICertificatePermissionProvider certPermissionProvider;
+        private readonly IRegistryProvider registryProvider;
+        private readonly IClusterProvider clusterProvider;
+        private readonly ISecretRekeyProvider rekeyProvider;
+        private readonly IObjectSelectionProvider objectSelectionProvider;
+        private readonly IDiscoveryServices discoveryServices;
+        private readonly ILicenseManager licenseManager;
+
+        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, IClusterProvider clusterProvider, ISecretRekeyProvider rekeyProvider, IObjectSelectionProvider objectSelectionProvider, IDiscoveryServices discoveryServices, ILicenseManager licenseManager)
         {
             this.logger = logger;
             this.pathProvider = pathProvider;
             this.OriginalModel = model;
             this.certProvider = certProvider;
             this.dialogCoordinator = dialogCoordinator;
-            this.serviceSettings = serviceSettings;
+            this.windowsServiceProvider = windowsServiceProvider;
             this.shellExecuteProvider = shellExecuteProvider;
             this.eventAggregator = eventAggregator;
             this.Validator = validator;
             this.directory = directory;
             this.scriptTemplateProvider = scriptTemplateProvider;
+            this.certPermissionProvider = certPermissionProvider;
+            this.registryProvider = registryProvider;
+            this.clusterProvider = clusterProvider;
+            this.rekeyProvider = rekeyProvider;
+            this.objectSelectionProvider = objectSelectionProvider;
+            this.discoveryServices = discoveryServices;
+            this.licenseManager = licenseManager;
 
             this.WorkingModel = this.CloneModel(model);
             this.Certificate = this.GetCertificate();
             this.OriginalCertificate = this.Certificate;
-            this.ServiceAccount = this.serviceSettings.GetServiceAccount();
-            this.OriginalServiceAccount = this.ServiceAccount;
-            this.ServiceStatus = this.serviceSettings.ServiceController.Status.ToString();
+            this.ServiceAccount = this.windowsServiceProvider.GetServiceSid();
+            this.ServiceStatus = this.windowsServiceProvider.Status.ToString();
             this.DisplayName = "Web hosting";
+
+            this.licenseManager.OnLicenseDataChanged += delegate
+            {
+                this.NotifyOfPropertyChange(nameof(this.IsEnterpriseEdition));
+                this.NotifyOfPropertyChange(nameof(this.IsStandardEdition));
+            };
 
             eventPublisher.Register(this);
         }
@@ -88,6 +115,10 @@ namespace Lithnet.AccessManager.Server.UI
             this.servicePollCts.Cancel();
             base.OnDeactivate();
         }
+
+        public bool IsEnterpriseEdition => this.licenseManager.IsEnterpriseEdition();
+
+        public bool IsStandardEdition => !this.IsEnterpriseEdition;
 
         public string AvailableVersion { get; set; }
 
@@ -265,8 +296,6 @@ namespace Lithnet.AccessManager.Server.UI
 
         private HostingOptions OriginalModel { get; set; }
 
-        private SecurityIdentifier OriginalServiceAccount { get; set; }
-
         private HostingOptions WorkingModel { get; set; }
 
         private string workingServiceAccountPassword { get; set; }
@@ -275,18 +304,10 @@ namespace Lithnet.AccessManager.Server.UI
 
         private void UpdateIsConfigured()
         {
-            int? value = Registry.GetValue(AccessManager.Constants.RootedBaseKey, "Configured", 0) as int?;
-
-            if (value == null)
-            {
-                this.IsConfigured = false;
-            }
-            else
-            {
-                this.IsConfigured = value == 1;
-            }
+            this.IsConfigured = registryProvider.IsConfigured;
         }
 
+        [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
         public async Task<bool> CommitSettings()
         {
             if (this.Certificate == null)
@@ -299,16 +320,10 @@ namespace Lithnet.AccessManager.Server.UI
 
             bool currentlyUnconfigured = this.IsUnconfigured;
 
-            bool updatePrivateKeyPermissions =
-                this.ServiceAccount != this.OriginalServiceAccount ||
-                this.Certificate?.Thumbprint != this.OriginalCertificate?.Thumbprint ||
-                currentlyUnconfigured;
-
             bool updateHttpReservations =
                 this.WorkingModel.HttpSys.Hostname != this.OriginalModel.HttpSys.Hostname ||
                 this.WorkingModel.HttpSys.HttpPort != this.OriginalModel.HttpSys.HttpPort ||
                 this.WorkingModel.HttpSys.HttpsPort != this.OriginalModel.HttpSys.HttpsPort ||
-                this.ServiceAccount != this.OriginalServiceAccount ||
                 currentlyUnconfigured;
 
             bool updateConfigFile = updateHttpReservations;
@@ -324,42 +339,6 @@ namespace Lithnet.AccessManager.Server.UI
 
             HostingSettingsRollbackContext rollbackContext = new HostingSettingsRollbackContext();
             rollbackContext.StartingUnconfigured = currentlyUnconfigured;
-
-            try
-            {
-                if (updatePrivateKeyPermissions)
-                {
-                    this.UpdateCertificatePermissions(rollbackContext);
-                }
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Could not add private key permissions for SSL certificate");
-                MessageDialogResult result = await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred while trying to add permissions for the service account {this.ServiceAccountDisplayName} to read the private key of the specified certificate. Try adding permissions for this manually using the Windows computer certificates MMC console. Do you want to continue with the operation?\r\n{ex.Message}", MessageDialogStyle.AffirmativeAndNegative);
-
-                if (result == MessageDialogResult.Canceled)
-                {
-                    return false;
-                }
-            }
-
-            try
-            {
-                if (updatePrivateKeyPermissions)
-                {
-                    this.UpdateEncryptionCertificateAcls(rollbackContext);
-                }
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Could not add private key permissions for encryption certificate");
-                MessageDialogResult result = await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred while trying to add permissions for the service account {this.ServiceAccountDisplayName} to read the private key of one of the existing password encryption certificates. Try adding permissions for this manually using the Windows service certificates MMC console. Do you want to continue with the operation?\r\n{ex.Message}", MessageDialogStyle.AffirmativeAndNegative);
-
-                if (result == MessageDialogResult.Canceled)
-                {
-                    return false;
-                }
-            }
 
             try
             {
@@ -452,6 +431,14 @@ namespace Lithnet.AccessManager.Server.UI
                 if (updateServiceAccount)
                 {
                     this.UpdateServiceAccount();
+
+                    if (!await this.rekeyProvider.TryReKeySecretsAsync(this))
+                    {
+                        await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"You'll need to re-enter the secrets before you can save the file");
+                        return false;
+                    }
+
+                    this.workingServiceAccountUserName = null;
                 }
             }
             catch (Exception ex)
@@ -466,17 +453,14 @@ namespace Lithnet.AccessManager.Server.UI
 
             if (currentlyUnconfigured)
             {
-                Registry.SetValue(AccessManager.Constants.RootedBaseKey, "Configured", 1);
+                this.registryProvider.IsConfigured = true;
                 this.UpdateIsConfigured();
             }
 
-            if (updateCertificateBinding || updateHttpReservations || updatePrivateKeyPermissions ||
-                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-                updateServiceAccount || updateConfigFile || updateFirewallRules)
+            if (updateCertificateBinding || updateHttpReservations || updateServiceAccount || updateConfigFile || updateFirewallRules)
             {
                 this.OriginalModel = this.CloneModel(this.WorkingModel);
                 this.OriginalCertificate = this.Certificate;
-                this.OriginalServiceAccount = this.ServiceAccount;
                 this.eventAggregator.Publish(new ModelChangedEvent(this, "Hosting", true));
             }
 
@@ -485,7 +469,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         private void UpdateServiceAccount()
         {
-            this.serviceSettings.SetServiceAccount(this.workingServiceAccountUserName, this.workingServiceAccountPassword);
+            this.windowsServiceProvider.SetServiceAccount(this.workingServiceAccountUserName, this.workingServiceAccountPassword);
         }
 
         private void SaveHostingConfigFile(HostingSettingsRollbackContext rollback)
@@ -494,20 +478,6 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.WorkingModel.Save(pathProvider.HostingConfigFile);
             rollback.RollbackActions.Add(() => originalSettings.Save(pathProvider.HostingConfigFile));
-        }
-
-        private void UpdateCertificatePermissions(HostingSettingsRollbackContext rollback)
-        {
-            if (this.Certificate == null)
-            {
-                return;
-            }
-
-            FileSecurity originalCertificateSecurity = this.Certificate.GetPrivateKeySecurity();
-            X509Certificate2 certificate = this.Certificate;
-
-            certificate.AddPrivateKeyReadPermission(this.ServiceAccount);
-            rollback.RollbackActions.Add(() => certificate.SetPrivateKeySecurity(originalCertificateSecurity));
         }
 
         public async Task DownloadUpdate()
@@ -569,49 +539,125 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task SelectServiceAccountUser()
         {
-            LoginDialogData r = await this.dialogCoordinator.ShowLoginAsync(this, "Service account", "Enter the credentials for the service account. If you are using a group-managed service account, leave the password field blank, and don't forget to include the '$' sign at the end of the account name", new LoginDialogSettings
-            {
-                EnablePasswordPreview = true,
-                AffirmativeButtonText = "OK"
-            });
-
-            if (r == null)
-            {
-                return;
-            }
-
             try
             {
-                if (directory.TryGetPrincipal(r.Username, out ISecurityPrincipal o))
+                if (!this.objectSelectionProvider.GetUserOrServiceAccount(this, out SecurityIdentifier sid))
                 {
-                    if (o is IGroup)
-                    {
-                        throw new DirectoryException("The selected object must be a user");
-                    }
+                    return;
+                }
 
-                    this.ServiceAccount = o.Sid;
+                if (!directory.TryGetPrincipal(sid, out ISecurityPrincipal o))
+                {
+                    await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not find user in the directory");
+                    return;
+                }
+
+                string password = null;
+                bool logonAsServiceFailed = false;
+
+                try
+                {
+                    SystemSecurity d = new SystemSecurity();
+                    var privs = d.UserPrivileges(o.MsDsPrincipalName);
+
+                    if (!privs[SystemPrivilege.ServiceLogon])
+                    {
+                        logger.LogInformation("Granting logon as a service right to account {account}", o.MsDsPrincipalName);
+                        privs[SystemPrivilege.ServiceLogon] = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logonAsServiceFailed = true;
+                    this.logger.LogError(EventIDs.UIGenericError, ex, "The service account could not be granted 'logon as a service right'");
+                    if (await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not grant the 'logon as a service' right to the account. Do you want to continue?", MessageDialogStyle.AffirmativeAndNegative) == MessageDialogResult.Negative)
+                    {
+                        return;
+                    }
+                }
+
+                if (o is IGroupManagedServiceAccount)
+                {
+                    var result = NetApi32.NetQueryServiceAccount(null, o.SamAccountName, 0, out NetApi32.SafeNetApiBuffer buffer);
+                    result.ThrowIfFailed();
+
+                    MsaInfo0 msaInfo = buffer.ToStructure<MsaInfo0>();
+
+                    this.logger.LogTrace($"NetQueryServiceAccount returned {msaInfo.State}");
+
+                    if (msaInfo.State != MsaInfoState.MsaInfoInstalled)
+                    {
+                        await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The managed service account is not able to be used on this machine. Use the Test-AdServiceAccount PowerShell cmdlet to find out more and resolve the issue before trying again");
+                        return;
+                    }
                 }
                 else
                 {
-                    using PrincipalContext p = new PrincipalContext(ContextType.Machine);
-                    UserPrincipal up = UserPrincipal.FindByIdentity(p, r.Username);
-
-                    if (up == null)
+                    while (true)
                     {
-                        throw new ObjectNotFoundException("The user could not be found");
-                    }
+                        LoginDialogData r = await this.dialogCoordinator.ShowLoginAsync(this, "Service account", "Enter the password for the service account", new LoginDialogSettings
+                        {
+                            EnablePasswordPreview = true,
+                            ShouldHideUsername = true,
+                            AffirmativeButtonText = "OK"
+                        });
 
-                    this.ServiceAccount = up.Sid;
+                        if (r?.Password == null)
+                        {
+                            return;
+                        }
+
+                        password = r.Password;
+
+                        var domain = discoveryServices.GetDomainNameNetBios(o.Sid);
+
+                        if (!AdvApi32.LogonUser(o.SamAccountName, domain, r.Password, AdvApi32.LogonUserType.LOGON32_LOGON_SERVICE, AdvApi32.LogonUserProvider.LOGON32_PROVIDER_DEFAULT, out AdvApi32.SafeHTOKEN token))
+                        {
+                            int result = Marshal.GetLastWin32Error();
+                            Exception ex = new Win32Exception(result);
+                            this.logger.LogError(EventIDs.UIGenericError, ex, "Unable to validate credentials");
+
+                            if (result == 1326)
+                            {
+                                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The username or password was incorrect");
+                                continue;
+                            }
+
+                            if (result == 1385)
+                            {
+                                if (logonAsServiceFailed)
+                                {
+                                    break;
+                                }
+
+                                if (await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The user does not have the 'Logon as a service' right on this computer. Do you want to continue anyway?", MessageDialogStyle.AffirmativeAndNegative) == MessageDialogResult.Negative)
+                                {
+                                    return;
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+
+                            return;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
                 }
 
-                this.workingServiceAccountUserName = r.Username;
-                this.workingServiceAccountPassword = r.Password;
+                this.ServiceAccount = sid;
+                this.workingServiceAccountUserName = o.MsDsPrincipalName;
+                this.workingServiceAccountPassword = password;
 
                 this.PopulateIsNotGmsa();
             }
             catch (Exception ex)
             {
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The credentials provided could not be validated\r\n{ex.Message}");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not change the service account\r\n{ex.Message}");
             }
         }
 
@@ -627,6 +673,7 @@ namespace Lithnet.AccessManager.Server.UI
             if (newCert != null)
             {
                 this.Certificate = newCert;
+                this.certPermissionProvider.AddReadPermission(this.Certificate);
             }
         }
 
@@ -637,55 +684,93 @@ namespace Lithnet.AccessManager.Server.UI
             if (results.Count == 1)
             {
                 this.Certificate = results[0];
+                this.certPermissionProvider.AddReadPermission(this.Certificate);
             }
         }
 
         public async Task StartService()
         {
+            ProgressDialogController progress = null;
+
             try
             {
                 if (this.CanStartService)
                 {
-                    this.serviceSettings.ServiceController.Start();
-                }
-            }
-            catch (Exception ex)
-            {
-                await dialogCoordinator.ShowMessageAsync(this, "Service control", $"Could not start service\r\n{ex.Message}");
-                return;
-            }
+                    progress = await this.dialogCoordinator.ShowProgressAsync(this, "Starting service", "Waiting for service to start", false, new MetroDialogSettings { AnimateHide = false, AnimateShow = false });
+                    progress.SetIndeterminate();
+                    await Task.Delay(500);
 
-            try
-            {
-                await this.serviceSettings.ServiceController.WaitForStatusAsync(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30), CancellationToken.None);
+                    await this.windowsServiceProvider.StartServiceAsync();
+                }
             }
             catch (System.ServiceProcess.TimeoutException)
             {
+                if (progress?.IsOpen ?? false)
+                {
+                    await progress?.CloseAsync();
+                }
+
                 await dialogCoordinator.ShowMessageAsync(this, "Service control", "The service did not start in the requested time");
+            }
+            catch (Exception ex)
+            {
+                if (progress?.IsOpen ?? false)
+                {
+                    await progress?.CloseAsync();
+                }
+
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not start service");
+                await dialogCoordinator.ShowMessageAsync(this, "Service control", $"Could not start service\r\n{ex.Message}");
+            }
+            finally
+            {
+                if (progress?.IsOpen ?? false)
+                {
+                    await progress?.CloseAsync();
+                }
             }
         }
 
         public async Task StopService()
         {
+            ProgressDialogController progress = null;
+
             try
             {
                 if (this.CanStopService)
                 {
-                    this.serviceSettings.ServiceController.Stop();
+                    progress = await this.dialogCoordinator.ShowProgressAsync(this, "Stopping service", "Waiting for service to stop", false, new MetroDialogSettings { AnimateHide = false, AnimateShow = false });
+                    progress.SetIndeterminate();
+                    await Task.Delay(500);
+
+                    await this.windowsServiceProvider.StopServiceAsync();
                 }
-            }
-            catch (Exception ex)
-            {
-                await dialogCoordinator.ShowMessageAsync(this, "Service control", $"Could not stop service\r\n{ex.Message}");
-                return;
-            }
-            try
-            {
-                await this.serviceSettings.ServiceController.WaitForStatusAsync(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30), CancellationToken.None);
             }
             catch (System.ServiceProcess.TimeoutException)
             {
+                if (progress?.IsOpen ?? false)
+                {
+                    await progress?.CloseAsync();
+                }
+
                 await dialogCoordinator.ShowMessageAsync(this, "Service control", "The service did not stop in the requested time");
+            }
+            catch (Exception ex)
+            {
+                if (progress?.IsOpen ?? false)
+                {
+                    await progress?.CloseAsync();
+                }
+
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not stop service");
+                await dialogCoordinator.ShowMessageAsync(this, "Service control", $"Could not stop service\r\n{ex.Message}");
+            }
+            finally
+            {
+                if (progress?.IsOpen ?? false)
+                {
+                    await progress?.CloseAsync();
+                }
             }
         }
 
@@ -735,7 +820,7 @@ namespace Lithnet.AccessManager.Server.UI
         private static async Task<string> DownloadFile(string url)
         {
             using HttpClientHandler handler = new HttpClientHandler
-            { 
+            {
                 DefaultProxyCredentials = CredentialCache.DefaultCredentials
             };
 
@@ -776,8 +861,7 @@ namespace Lithnet.AccessManager.Server.UI
             CommonSecurityDescriptor sd = new CommonSecurityDescriptor(false, false, acl.Sddl);
             foreach (CommonAce dacl in sd.DiscretionaryAcl.OfType<CommonAce>())
             {
-                if (dacl.SecurityIdentifier == this.ServiceAccount ||
-                    dacl.SecurityIdentifier == this.OriginalServiceAccount)
+                if (dacl.SecurityIdentifier == this.windowsServiceProvider.ServiceSid)
                 {
                     return false;
                 }
@@ -843,29 +927,16 @@ namespace Lithnet.AccessManager.Server.UI
                 rollback.RollbackActions.Add(() => UrlAcl.Create(existingHttpsNew.Prefix, existingHttpsNew.Sddl));
             }
 
-            this.CreateUrlReservation(httpNew, this.ServiceAccount);
+            this.CreateUrlReservation(httpNew, this.windowsServiceProvider.ServiceSid);
             rollback.RollbackActions.Add(() => UrlAcl.Delete(httpNew));
-            Registry.SetValue(AccessManager.Constants.RootedBaseKey, "HttpAcl", httpNew);
-            if (httpOld != null)
-            {
-                rollback.RollbackActions.Add(() => Registry.SetValue(AccessManager.Constants.RootedBaseKey, "HttpAcl", httpOld));
-            }
-            else
-            {
-                rollback.RollbackActions.Add(() => Registry.LocalMachine.OpenSubKey(AccessManager.Constants.BaseKey)?.DeleteValue("HttpAcl"));
-            }
+            this.registryProvider.HttpAcl = httpNew;
 
-            this.CreateUrlReservation(httpsNew, this.ServiceAccount);
+            rollback.RollbackActions.Add(() => this.registryProvider.HttpAcl = httpOld);
+
+            this.CreateUrlReservation(httpsNew, this.windowsServiceProvider.ServiceSid);
             rollback.RollbackActions.Add(() => UrlAcl.Delete(httpsNew));
-            Registry.SetValue(AccessManager.Constants.RootedBaseKey, "HttpsAcl", httpsNew);
-            if (httpsOld != null)
-            {
-                rollback.RollbackActions.Add(() => Registry.SetValue(AccessManager.Constants.RootedBaseKey, "HttpsAcl", httpsOld));
-            }
-            else
-            {
-                rollback.RollbackActions.Add(() => Registry.LocalMachine.OpenSubKey(AccessManager.Constants.BaseKey)?.DeleteValue("HttpsAcl"));
-            }
+            this.registryProvider.HttpsAcl = httpsNew;
+            rollback.RollbackActions.Add(() => this.registryProvider.HttpsAcl = httpsOld);
         }
 
         private void CreateUrlReservation(string url, SecurityIdentifier sid)
@@ -884,17 +955,6 @@ namespace Lithnet.AccessManager.Server.UI
             }
 
             return null;
-        }
-
-        private void UpdateEncryptionCertificateAcls(HostingSettingsRollbackContext rollback)
-        {
-            foreach (X509Certificate2 cert in this.certProvider.GetEligibleCertificates(true))
-            {
-                FileSecurity originalCertificateSecurity = cert.GetPrivateKeySecurity();
-
-                cert.AddPrivateKeyReadPermission(this.ServiceAccount);
-                rollback.RollbackActions.Add(() => cert.SetPrivateKeySecurity(originalCertificateSecurity));
-            }
         }
 
         private X509Certificate2Collection GetAvailableCertificateCollection()
@@ -1002,14 +1062,13 @@ namespace Lithnet.AccessManager.Server.UI
                 while (!token.IsCancellationRequested)
                 {
                     await Task.Delay(500, CancellationToken.None).ConfigureAwait(false);
-                    this.serviceSettings.ServiceController.Refresh();
 
-                    if (lastStatus == this.serviceSettings.ServiceController.Status)
+                    if (lastStatus == this.windowsServiceProvider.Status)
                     {
                         continue;
                     }
 
-                    ServiceControllerStatus currentStatus = this.serviceSettings.ServiceController.Status;
+                    ServiceControllerStatus currentStatus = this.windowsServiceProvider.Status;
 
                     switch (currentStatus)
                     {
@@ -1068,15 +1127,8 @@ namespace Lithnet.AccessManager.Server.UI
             bindingConfiguration.Bind(binding);
             rollback.RollbackActions.Add(() => bindingConfiguration.Delete(binding.IpPort));
 
-            Registry.SetValue(AccessManager.Constants.RootedBaseKey, "CertBinding", binding.IpPort.ToString());
-            if (originalBinding != null)
-            {
-                rollback.RollbackActions.Add(() => Registry.SetValue(AccessManager.Constants.RootedBaseKey, "CertBinding", originalBinding.IpPort.ToString()));
-            }
-            else
-            {
-                rollback.RollbackActions.Add(() => Registry.LocalMachine.OpenSubKey(AccessManager.Constants.BaseKey)?.DeleteValue("CertBinding"));
-            }
+            this.registryProvider.CertBinding = binding.IpPort.ToString();
+            rollback.RollbackActions.Add(() => this.registryProvider.CertBinding = originalBinding?.IpPort?.ToString());
         }
 
         private CertificateBinding GetCertificateBinding(CertificateBindingConfiguration config)

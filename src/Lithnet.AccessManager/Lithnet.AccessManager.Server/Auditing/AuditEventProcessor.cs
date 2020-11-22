@@ -3,28 +3,24 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Net;
+using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.App_LocalResources;
-using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Auditing;
-using Lithnet.AccessManager.Server.Exceptions;
-using Lithnet.AccessManager.Server.Extensions;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 using Lithnet.AccessManager.Server.Authorization;
+using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.AccessManager.Server.Exceptions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Service.Internal
 {
     public sealed class AuditEventProcessor : IAuditEventProcessor
     {
         private readonly ILogger logger;
-
         private readonly ITemplateProvider templates;
-
         private readonly IHttpContextAccessor httpContextAccessor;
-
         private readonly IEnumerable<INotificationChannel> notificationChannels;
-
         private readonly AuditOptions auditSettings;
 
         public AuditEventProcessor(ILogger<AuditEventProcessor> logger, ITemplateProvider templates, IEnumerable<INotificationChannel> notificationChannels, IHttpContextAccessor httpContextAccessor, IOptionsSnapshot<AuditOptions> auditSettings)
@@ -50,7 +46,7 @@ namespace Lithnet.AccessManager.Service.Internal
                 }
                 catch (Exception ex)
                 {
-                    this.logger.LogEventError(EventIDs.NotificationChannelError, string.Format(LogMessages.NotificationChannelError, channel.Name), ex);
+                    this.logger.LogError(EventIDs.NotificationChannelError, ex, string.Format(LogMessages.NotificationChannelError, channel.Name));
                     exceptions.Add(ex);
                 }
             }
@@ -65,7 +61,7 @@ namespace Lithnet.AccessManager.Service.Internal
                 }
                 else
                 {
-                    this.logger.LogEventError(EventIDs.NotificationChannelError, ex.Message, ex);
+                    this.logger.LogError(EventIDs.NotificationChannelError, ex, ex.Message);
                 }
             }
 
@@ -87,7 +83,7 @@ namespace Lithnet.AccessManager.Service.Internal
 
             message = this.ReplaceTokens(tokens, message, false);
 
-            this.logger.LogEvent(action.EventID, action.IsSuccess ? LogLevel.Information : LogLevel.Error, message, null);
+            this.logger.Log(action.IsSuccess ? LogLevel.Information : LogLevel.Error, action.EventID, message);
         }
 
         private Dictionary<string, string> BuildTokenDictionary(AuditableAction action)
@@ -95,7 +91,7 @@ namespace Lithnet.AccessManager.Service.Internal
             LapsAuthorizationResponse lapsAuthZResponse = action.AuthzResponse as LapsAuthorizationResponse;
             JitAuthorizationResponse jitAuthZResponse = action.AuthzResponse as JitAuthorizationResponse;
             
-            Dictionary<string, string> pairs = new Dictionary<string, string> (StringComparer.OrdinalIgnoreCase) {
+            Dictionary<string, string> pairs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
                 { "{user.SamAccountName}", action.User?.SamAccountName},
                 { "{user.MsDsPrincipalName}", action.User?.MsDsPrincipalName},
                 { "{user.DisplayName}", action.User?.DisplayName},
@@ -122,7 +118,7 @@ namespace Lithnet.AccessManager.Service.Internal
                 { "{AuthzResult.ExpireAfter}", (lapsAuthZResponse?.ExpireAfter ?? jitAuthZResponse?.ExpireAfter)?.ToString()},
                 { "{AuthzResult.ResponseCode}", action.AuthzResponse?.Code.ToString()},
                 { "{AuthzResult.AccessType}", action.AuthzResponse?.EvaluatedAccess.ToString()},
-                { "{AuthzResult.AccessTypeDescription}", action.AuthzResponse?.EvaluatedAccess.ToDescription()},
+                { "{AuthzResult.AccessTypeDescription}", action.EvaluatedAccess ?? action.AuthzResponse?.EvaluatedAccess.ToDescription()},
                 { "{AuthZResult.AccessExpiryDate}", action.AccessExpiryDate},
                 { "{message}", action.Message},
                 { "{request.IPAddress}", httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString()},

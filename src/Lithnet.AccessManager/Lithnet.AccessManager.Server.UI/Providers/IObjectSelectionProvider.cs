@@ -39,5 +39,7 @@ namespace Lithnet.AccessManager.Server.UI
         bool GetUserOrGroups(IViewAware owner, string targetServer, out List<SecurityIdentifier> sid);
 
         bool SelectContainer(IViewAware owner, string dialogTitle, string treeViewTitle, string baseContainer, string selectedContainer, out string container);
+        bool GetUserOrServiceAccount(IViewAware owner, string targetServer, out SecurityIdentifier sid);
+        bool GetUserOrServiceAccount(IViewAware owner, out SecurityIdentifier sid);
     }
 }

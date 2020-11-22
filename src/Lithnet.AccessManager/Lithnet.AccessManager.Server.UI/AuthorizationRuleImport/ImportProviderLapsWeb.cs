@@ -131,6 +131,8 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
             string expireAfter = node.SelectSingleNode("@expire-after")?.Value;
             List<string> readers = node.SelectNodes("readers/reader/@principal")?.OfType<XmlAttribute>().Select(t => t.Value).ToList();
 
+            string targetFriendlyName;
+
             if (string.IsNullOrWhiteSpace(name))
             {
                 this.logger.LogWarning("XmlElement had a null name");
@@ -141,6 +143,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
             {
                 target.Type = TargetType.Container;
                 target.Target = name;
+                targetFriendlyName = name;
             }
             else if (string.Equals(type, "computer", StringComparison.OrdinalIgnoreCase))
             {
@@ -149,6 +152,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
                 if (this.directory.TryGetComputer(name, out IComputer computer))
                 {
                     target.Target = computer.Sid.ToString();
+                    targetFriendlyName = computer.MsDsPrincipalName;
                 }
                 else
                 {
@@ -163,6 +167,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
                 if (this.directory.TryGetGroup(name, out IGroup group))
                 {
                     target.Target = group.Sid.ToString();
+                    targetFriendlyName = group.MsDsPrincipalName;
                 }
                 else
                 {
@@ -194,7 +199,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
             }
 
             target.AuthorizationMode = AuthorizationMode.SecurityDescriptor;
-            target.Description = settings.RuleDescription;
+            target.Description = settings.RuleDescription.Replace("{targetName}", targetFriendlyName, StringComparison.OrdinalIgnoreCase);
 
             foreach (string onSuccess in settings.Notifications.OnSuccess)
             {

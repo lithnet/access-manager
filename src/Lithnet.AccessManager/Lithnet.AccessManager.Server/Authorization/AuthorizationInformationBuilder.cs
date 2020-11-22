@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using System.Threading.Tasks.Sources;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.Security.Authorization;
 using Microsoft.Extensions.Caching.Memory;
@@ -13,29 +15,23 @@ namespace Lithnet.AccessManager.Server.Authorization
 {
     public class AuthorizationInformationBuilder : IAuthorizationInformationBuilder
     {
-        private readonly IDirectory directory;
-
         private readonly ILogger logger;
-
         private readonly AuthorizationOptions options;
-
         private readonly IPowerShellSecurityDescriptorGenerator powershell;
-
         private readonly IAuthorizationInformationMemoryCache authzCache;
-
         private readonly IComputerTargetProvider computerTargetProvider;
-
         private readonly IAuthorizationContextProvider authorizationContextProvider;
+        private readonly ILicenseManager licenseManager;
 
-        public AuthorizationInformationBuilder(IOptionsSnapshot<AuthorizationOptions> options, IDirectory directory, ILogger<AuthorizationInformationBuilder> logger, IPowerShellSecurityDescriptorGenerator powershell, IAuthorizationInformationMemoryCache authzCache, IComputerTargetProvider computerTargetProvider, IAuthorizationContextProvider authorizationContextProvider)
+        public AuthorizationInformationBuilder(IOptionsSnapshot<AuthorizationOptions> options, ILogger<AuthorizationInformationBuilder> logger, IPowerShellSecurityDescriptorGenerator powershell, IAuthorizationInformationMemoryCache authzCache, IComputerTargetProvider computerTargetProvider, IAuthorizationContextProvider authorizationContextProvider, ILicenseManager licenseManager)
         {
-            this.directory = directory;
             this.logger = logger;
             this.options = options.Value;
             this.powershell = powershell;
             this.authzCache = authzCache;
             this.computerTargetProvider = computerTargetProvider;
             this.authorizationContextProvider = authorizationContextProvider;
+            this.licenseManager = licenseManager;
         }
 
         public void ClearCache(IUser user, IComputer computer)
@@ -91,8 +87,18 @@ namespace Lithnet.AccessManager.Server.Authorization
             {
                 CommonSecurityDescriptor sd;
 
+                if (target.IsInactive())
+                {
+                    continue;
+                }
+
                 if (target.AuthorizationMode == AuthorizationMode.PowershellScript)
                 {
+                    if (!this.licenseManager.IsFeatureEnabled(LicensedFeatures.PowerShellAcl))
+                    {
+                        continue;
+                    }
+
                     sd = this.powershell.GenerateSecurityDescriptor(user, computer, target.Script, 30);
                 }
                 else
@@ -114,12 +120,20 @@ namespace Lithnet.AccessManager.Server.Authorization
 
                 foreach (var ace in sd.DiscretionaryAcl.OfType<CommonAce>())
                 {
-                    masterDacl.AddAccess(
-                        (AccessControlType)ace.AceType,
-                        ace.SecurityIdentifier,
-                        ace.AccessMask,
-                        ace.InheritanceFlags,
-                        ace.PropagationFlags);
+                    AccessMask mask = (AccessMask)ace.AccessMask;
+
+                    if (mask.HasFlag(AccessMask.LocalAdminPasswordHistory) && ace.AceType == AceType.AccessAllowed)
+                    {
+                        if (!this.licenseManager.IsFeatureEnabled(LicensedFeatures.LapsHistory))
+                        {
+                            mask &= ~AccessMask.LocalAdminPasswordHistory;
+                        }
+                    }
+
+                    if (mask != 0)
+                    {
+                        masterDacl.AddAccess((AccessControlType)ace.AceType, ace.SecurityIdentifier, (int)mask, ace.InheritanceFlags, ace.PropagationFlags);
+                    }
                 }
 
                 int i = matchedTargetCount;

@@ -29,11 +29,23 @@ namespace Lithnet.AccessManager
             throw new UnsupportedPrincipalTypeException($"An object of type {de.SchemaClassName} was provided, but an object of one of the following types was expected '{string.Join(",", objectClasses)}'");
         }
 
-        internal static byte[] ToBytes(this SecurityIdentifier s)
+        public static byte[] ToBytes(this SecurityIdentifier s)
         {
             byte[] b = new byte[s.BinaryLength];
             s.GetBinaryForm(b, 0);
             return b;
+        }
+
+        public static string ToNtAccountNameOrSidString(this SecurityIdentifier s)
+        {
+            try
+            {
+                return ((NTAccount)s.Translate(typeof(NTAccount))).Value;
+            }
+            catch
+            {
+                return s.ToString();
+            }
         }
 
         internal static byte[] ToBytes(this GenericSecurityDescriptor s)
@@ -102,9 +114,11 @@ namespace Lithnet.AccessManager
         public static string ToClaimList(this ClaimsIdentity p)
         {
             StringBuilder builder = new StringBuilder();
-            foreach (Claim c in p.Claims)
+            var claimGroups = p.Claims.GroupBy(t => t.Type);
+
+            foreach (var g in claimGroups)
             {
-                builder.Append(c.Type).Append(": ").AppendLine(c.Value);
+                builder.Append(g.Key).Append(": ").AppendLine(string.Join(", ", g.Select(t => t.Value)));
             }
 
             return builder.ToString();
@@ -178,14 +192,14 @@ namespace Lithnet.AccessManager
 
 
         public static string GetPropertyString(this SearchResult result, string propertyName)
-        
+
         {
             if (!result.Properties.Contains(propertyName))
             {
                 return null;
             }
 
-            
+
             return result.Properties[propertyName][0]?.ToString();
         }
 
@@ -195,7 +209,7 @@ namespace Lithnet.AccessManager
             {
                 return null;
             }
-            
+
             return result.Properties[propertyName][0]?.ToString();
         }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Unicode;
 using System.Threading.Tasks;
@@ -14,15 +13,14 @@ namespace Lithnet.AccessManager.Server.UI
     public class EmailViewModel : Screen, IHelpLink
     {
         private readonly EmailOptions model;
-        private readonly RandomNumberGenerator rng;
         private readonly IShellExecuteProvider shellExecuteProvider;
+        private readonly IProtectedSecretProvider secretProvider;
 
-
-        public EmailViewModel(EmailOptions model, RandomNumberGenerator rng, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider)
+        public EmailViewModel(EmailOptions model, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IProtectedSecretProvider secretProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
+            this.secretProvider = secretProvider;
             this.model = model;
-            this.rng = rng;
             this.DisplayName = "Email";
             eventPublisher.Register(this);
         }
@@ -61,12 +59,7 @@ namespace Lithnet.AccessManager.Server.UI
                         return;
                     }
 
-                    this.model.Password = new EncryptedData();
-                    this.model.Password.Mode = 1;
-                    byte[] salt = new byte[128];
-                    rng.GetBytes(salt);
-                    this.model.Password.Salt = Convert.ToBase64String(salt);
-                    this.model.Password.Data = Convert.ToBase64String(ProtectedData.Protect(Encoding.UTF8.GetBytes(value), salt, DataProtectionScope.LocalMachine));
+                    this.model.Password = this.secretProvider.ProtectSecret(value);
                 }
             }
         }

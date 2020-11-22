@@ -5,7 +5,7 @@ using Lithnet.AccessManager.Server.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Lithnet.AccessManager
+namespace Lithnet.AccessManager.Server
 {
     public class JitAccessProvider : IJitAccessProvider
     {

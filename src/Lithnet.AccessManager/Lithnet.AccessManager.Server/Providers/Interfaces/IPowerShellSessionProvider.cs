@@ -1,6 +1,6 @@
 ﻿using System.Management.Automation;
 
-namespace Lithnet.AccessManager.Server.Authorization
+namespace Lithnet.AccessManager.Server
 {
     public interface IPowerShellSessionProvider
     {

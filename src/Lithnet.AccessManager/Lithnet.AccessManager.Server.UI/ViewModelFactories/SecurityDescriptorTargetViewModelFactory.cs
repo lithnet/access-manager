@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
@@ -22,8 +23,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly Func<IModelValidator<SecurityDescriptorTargetViewModel>> validator;
         private readonly ScriptTemplateProvider scriptTemplateProvider;
+        private readonly ILicenseManager licenseManager;
 
-        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IDirectory directory, ILocalSam localsam, IObjectSelectionProvider objectSelectionProvider, Func<IModelValidator<SecurityDescriptorTargetViewModel>> validator, ScriptTemplateProvider scriptTemplateProvider)
+        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IDirectory directory, ILocalSam localsam, IObjectSelectionProvider objectSelectionProvider, Func<IModelValidator<SecurityDescriptorTargetViewModel>> validator, ScriptTemplateProvider scriptTemplateProvider, ILicenseManager licenseManager)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.appPathProvider = appPathProvider;
@@ -37,12 +39,13 @@ namespace Lithnet.AccessManager.Server.UI
             this.objectSelectionProvider = objectSelectionProvider;
             this.validator = validator;
             this.scriptTemplateProvider = scriptTemplateProvider;
+            this.licenseManager = licenseManager;
         }
 
         public async Task<SecurityDescriptorTargetViewModel> CreateViewModelAsync(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings settings)
         {
 
-            var item = new SecurityDescriptorTargetViewModel(model, settings, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, validator.Invoke(), directory, domainTrustProvider, discoveryServices, localSam, objectSelectionProvider, scriptTemplateProvider);
+            var item = new SecurityDescriptorTargetViewModel(model, settings, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, validator.Invoke(), directory, domainTrustProvider, discoveryServices, localSam, objectSelectionProvider, scriptTemplateProvider, this.licenseManager);
 
             await item.Initialization;
 

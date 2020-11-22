@@ -2,3 +2,12 @@
 
 # IDE0063: Use simple 'using' statement
 csharp_prefer_simple_using_statement = false:suggestion
+
+# VSTHRD200: Use "Async" suffix for async methods
+dotnet_diagnostic.VSTHRD200.severity = suggestion
+
+# VSTHRD002: Avoid problematic synchronous waits
+dotnet_diagnostic.VSTHRD002.severity = suggestion
+
+# VSTHRD110: Observe result of async calls
+dotnet_diagnostic.VSTHRD110.severity = suggestion

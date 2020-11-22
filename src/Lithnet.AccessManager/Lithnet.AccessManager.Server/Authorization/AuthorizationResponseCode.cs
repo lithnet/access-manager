@@ -1,4 +1,6 @@
-﻿namespace Lithnet.AccessManager.Server.Authorization
+﻿using System.ComponentModel;
+
+namespace Lithnet.AccessManager.Server.Authorization
 {
     public enum AuthorizationResponseCode
     {
@@ -31,10 +33,20 @@
         NoMatchingRuleForUser = 4,
 
         /// <summary>
-        /// The users is explicitly prohibited from accessing the password for the computer. This is usually the response from a 'deny' ACL. 
+        /// The user is explicitly prohibited from accessing the password for the computer. This is usually the response from a 'deny' ACL. 
         /// 
         /// If an authorization provider provides this response code, processing stops, and subsequent authorization providers are not called
         /// </summary>
         ExplicitlyDenied = 8,
+
+        /// <summary>
+        /// The user has exceeded the per-user rate limit
+        /// </summary>
+        UserRateLimitExceeded = 16,
+
+        /// <summary>
+        /// The user has exceeded the per-ip rate limit
+        /// </summary>
+        IpRateLimitExceeded = 32,
     }
 }
