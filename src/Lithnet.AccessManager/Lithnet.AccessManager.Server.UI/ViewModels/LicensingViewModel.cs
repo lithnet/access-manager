@@ -36,7 +36,7 @@ namespace Lithnet.AccessManager.Server.UI
             eventPublisher.Register(this);
         }
 
-        public string HelpLink => Constants.HelpLinkPageBitLocker;
+        public string HelpLink => Constants.HelpLinkPageLicensing;
 
         public PackIconMaterialKind Icon => PackIconMaterialKind.License;
 
@@ -220,19 +220,24 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public void HelpLinkRenewNow()
+        public async Task HelpLinkRenewNow()
         {
-
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkRenewNow);
         }
 
-        public void HelpLinkEnterpriseEditionLearnMore()
+        public async Task HelpLinkEnterpriseEditionLearnMore()
         {
-
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkLearnMoreAboutEnterpriseEdition);
         }
 
-        public void HelpLinkGetLicenseHelp()
+        public async Task UpgradeToEnterpriseEdition()
         {
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkUpgradeToEnterpriseEdition);
+        }
 
+        public async Task HelpLinkGetLicenseHelp()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkLicenseGetHelp);
         }
 
         public bool CanRemoveLicense => this.License?.Type != LicenseType.BuiltIn;

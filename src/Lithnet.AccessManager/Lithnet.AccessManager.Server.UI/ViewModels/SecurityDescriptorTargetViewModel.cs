@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -32,6 +33,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly ScriptTemplateProvider scriptTemplateProvider;
         private readonly ILicenseManager licenseManager;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
         private string jitGroupDisplayName;
 
@@ -39,7 +41,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, ILicenseManager licenseManager)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, ILicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider)
         {
             this.directory = directory;
             this.Model = model;
@@ -54,6 +56,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.objectSelectionProvider = objectSelectionProvider;
             this.scriptTemplateProvider = scriptTemplateProvider;
             this.licenseManager = licenseManager;
+            this.shellExecuteProvider = shellExecuteProvider;
 
             this.Script = fileSelectionViewModelFactory.CreateViewModel(model, () => model.Script, appPathProvider.ScriptsPath);
             this.Script.DefaultFileExtension = "ps1";
@@ -618,6 +621,16 @@ namespace Lithnet.AccessManager.Server.UI
         public void AttachView(UIElement view)
         {
             this.View = view;
+        }
+
+        public async Task LearnMoreLinkLapsHistory()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.EnterpriseEditionLearnMoreLinkLapsHistory);
+        }
+
+        public async Task LearnMoreLinkPowerShellAuthZ()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.EnterpriseEditionLearnMoreLinkPowerShellAuthz);
         }
     }
 }

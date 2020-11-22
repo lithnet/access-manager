@@ -54,18 +54,18 @@ namespace Lithnet.AccessManager.Server.UI
             this.isClusterCompatibleSecretEncryptionEnabled = this.dataProtectionOptions.EnableClusterCompatibleSecretEncryption;
         }
 
-        public string HelpLink => Constants.HelpLinkPageBitLocker;
+        public string HelpLink => Constants.HelpLinkPageHighAvailability;
 
         public PackIconMaterialKind Icon => PackIconMaterialKind.Server;
 
         public async Task Help()
         {
-            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink); // TODO Update link
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
         }
 
-        public void LinkHaLearnMore()
+        public async Task LinkHaLearnMore()
         {
-            // TODO Add link
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.EnterpriseEditionLearnMoreLinkHa);
         }
 
         public bool IsEnterpriseEdition => this.licenseManager.IsEnterpriseEdition();

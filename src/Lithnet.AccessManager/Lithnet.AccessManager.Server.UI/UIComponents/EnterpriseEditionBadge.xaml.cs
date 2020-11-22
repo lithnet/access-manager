@@ -12,6 +12,7 @@ namespace Lithnet.AccessManager.Server.UI
         public EnterpriseEditionBadge()
         {
             InitializeComponent();
+            this.PreviewMouseLeftButtonUp += (sender, args) => OnClick();
         }
 
         public string ToolTipText
@@ -38,6 +39,22 @@ namespace Lithnet.AccessManager.Server.UI
             set => SetValue(ShowTextProperty, value);
         }
 
+        public event RoutedEventHandler Click
+        {
+            add { AddHandler(ClickEvent, value); }
+            remove { RemoveHandler(ClickEvent, value); }
+        }
+
+        void RaiseClickEvent()
+        {
+            RoutedEventArgs newEventArgs = new RoutedEventArgs(ClickEvent);
+            RaiseEvent(newEventArgs);
+        }
+
+        void OnClick()
+        {
+            RaiseClickEvent();
+        }
 
         public static readonly DependencyProperty ToolTipTextProperty = DependencyProperty.Register(nameof(ToolTipText), typeof(string), typeof(EnterpriseEditionBadge), new PropertyMetadata());
 
@@ -46,5 +63,7 @@ namespace Lithnet.AccessManager.Server.UI
         public static readonly DependencyProperty IsSolidProperty = DependencyProperty.Register(nameof(IsSolid), typeof(bool), typeof(EnterpriseEditionBadge), new PropertyMetadata());
         
         public static readonly DependencyProperty ShowTextProperty = DependencyProperty.Register(nameof(ShowText), typeof(bool), typeof(EnterpriseEditionBadge), new PropertyMetadata(true));
+
+        public static readonly RoutedEvent ClickEvent = EventManager.RegisterRoutedEvent("Click", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(TabItem));
     }
 }

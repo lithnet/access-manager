@@ -20,6 +20,8 @@
         public const string HelpLinkPageLocalAdminPasswords = "https://go.lithnet.io/fwlink/vcbvhmkj";
         public const string HelpLinkPageChooseLapsStrategy = "https://go.lithnet.io/fwlink/vcbvhmkj";
         public const string HelpLinkPageHelp = "https://go.lithnet.io/fwlink/ytejxvsk";
+        public const string HelpLinkPageLicensing = "https://go.lithnet.io/fwlink/lflgtiao";
+        public const string HelpLinkPageHighAvailability = "https://go.lithnet.io/fwlink/mxtdtncd";
 
         public const string HelpLinkPageRateLimits = "https://go.lithnet.io/fwlink/zbllbamw";
         public const string HelpLinkPageBitLocker = "https://go.lithnet.io/fwlink/lixfecyh";
@@ -58,6 +60,15 @@
 
         public const string HelpLinkImportWizardImportTypeCsvHelp = "https://go.lithnet.io/fwlink/varohhyv";
         public const string HelpLinkImportWizardImportTypeLocalAdminRpcHelp = "https://go.lithnet.io/fwlink/ugrrixqx";
+
+        public const string HelpLinkLearnMoreAboutEnterpriseEdition = "https://go.lithnet.io/fwlink/yntrvhdy";
+        public const string HelpLinkUpgradeToEnterpriseEdition = "https://go.lithnet.io/fwlink/jptqgbav";
+        public const string HelpLinkRenewNow = "https://go.lithnet.io/fwlink/qqujdcjs";
+        public const string HelpLinkLicenseGetHelp = "https://go.lithnet.io/fwlink/hcpztfjm";
+
+        public const string EnterpriseEditionLearnMoreLinkHa = "https://go.lithnet.io/fwlink/vrcozgad";
+        public const string EnterpriseEditionLearnMoreLinkLapsHistory = "https://go.lithnet.io/fwlink/fiacsyog";
+        public const string EnterpriseEditionLearnMoreLinkPowerShellAuthz = "https://go.lithnet.io/fwlink/oockfltx";
 
         public const string LinkGettingStarted = "https://go.lithnet.io/fwlink/yynjgebg";
         public const string LinkInstallingAms = "https://go.lithnet.io/fwlink/garieonh";

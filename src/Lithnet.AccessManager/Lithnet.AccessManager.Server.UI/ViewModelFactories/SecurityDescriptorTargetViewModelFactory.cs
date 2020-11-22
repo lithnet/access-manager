@@ -24,8 +24,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly Func<IModelValidator<SecurityDescriptorTargetViewModel>> validator;
         private readonly ScriptTemplateProvider scriptTemplateProvider;
         private readonly ILicenseManager licenseManager;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IDirectory directory, ILocalSam localsam, IObjectSelectionProvider objectSelectionProvider, Func<IModelValidator<SecurityDescriptorTargetViewModel>> validator, ScriptTemplateProvider scriptTemplateProvider, ILicenseManager licenseManager)
+        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IDirectory directory, ILocalSam localsam, IObjectSelectionProvider objectSelectionProvider, Func<IModelValidator<SecurityDescriptorTargetViewModel>> validator, ScriptTemplateProvider scriptTemplateProvider, ILicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.appPathProvider = appPathProvider;
@@ -40,12 +41,13 @@ namespace Lithnet.AccessManager.Server.UI
             this.validator = validator;
             this.scriptTemplateProvider = scriptTemplateProvider;
             this.licenseManager = licenseManager;
+            this.shellExecuteProvider = shellExecuteProvider;
         }
 
         public async Task<SecurityDescriptorTargetViewModel> CreateViewModelAsync(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings settings)
         {
 
-            var item = new SecurityDescriptorTargetViewModel(model, settings, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, validator.Invoke(), directory, domainTrustProvider, discoveryServices, localSam, objectSelectionProvider, scriptTemplateProvider, this.licenseManager);
+            var item = new SecurityDescriptorTargetViewModel(model, settings, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, validator.Invoke(), directory, domainTrustProvider, discoveryServices, localSam, objectSelectionProvider, scriptTemplateProvider, licenseManager, shellExecuteProvider);
 
             await item.Initialization;
 

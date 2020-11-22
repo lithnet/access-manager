@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -20,7 +21,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             InitializeComponent();
             this.SaveButton.Focus();
-            this.Owner ??= Application.Current.MainWindow;
+            this.Owner ??= Application.Current.Windows.OfType<Window>().FirstOrDefault(t => t.IsVisible && t.IsEnabled);
         }
 
         public ExternalDialogWindow(IShellExecuteProvider shellExecuteProvider)

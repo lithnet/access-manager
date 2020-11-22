@@ -32,6 +32,7 @@
 
         <local:EnterpriseEditionBadge Visibility="{Binding ShowEnterpriseEditionBanner, Converter={StaticResource BooleanToVisibilityConverter}}"
                                       ToolTipText="High availability is an enterprise edition feature. Click to learn more"
+                                      Click="{s:Action LinkHaLearnMore}"
                                       Margin="2 2 5 2" />
 
         <!--<Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
