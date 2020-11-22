@@ -13,7 +13,7 @@ namespace Lithnet.AccessManager.Server
     public class SqlDbProvider : IDbProvider
     {
         private readonly ILicenseManager licenseManager;
-        private readonly HighAvailabilityOptions highAvailabilityOptions;
+        private readonly DatabaseConfigurationOptions highAvailabilityOptions;
         private readonly ILogger<SqlDbProvider> logger;
         private readonly IUpgradeLog upgradeLogger;
         private readonly SqlLocalDbInstanceProvider localDbInstanceProvider;
@@ -21,7 +21,7 @@ namespace Lithnet.AccessManager.Server
 
         private ISqlInstanceProvider activeInstanceProvider;
 
-        public SqlDbProvider(ILicenseManager licenseManager, IOptions<HighAvailabilityOptions> highAvailabilityOptions, ILogger<SqlDbProvider> logger, IUpgradeLog upgradeLogger, SqlLocalDbInstanceProvider localDbInstanceProvider, SqlServerInstanceProvider sqlServerInstanceProvider)
+        public SqlDbProvider(ILicenseManager licenseManager, IOptions<DatabaseConfigurationOptions> highAvailabilityOptions, ILogger<SqlDbProvider> logger, IUpgradeLog upgradeLogger, SqlLocalDbInstanceProvider localDbInstanceProvider, SqlServerInstanceProvider sqlServerInstanceProvider)
         {
             this.licenseManager = licenseManager;
             this.highAvailabilityOptions = highAvailabilityOptions.Value;
@@ -66,8 +66,6 @@ namespace Lithnet.AccessManager.Server
             {
                 this.logger.LogTrace("The database is up to date");
             }
-
-            // TODO: EventIDs
 
             var result = upgrader.PerformUpgrade();
 

@@ -8,6 +8,7 @@ using FluentValidation;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.AccessManager.Server.Providers;
 using Lithnet.AccessManager.Server.UI.AuthorizationRuleImport;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
@@ -138,7 +139,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<UserInterfaceOptions>().ToInstance(appconfig.UserInterface);
                 builder.Bind<JitConfigurationOptions>().ToInstance(appconfig.JitConfiguration);
                 builder.Bind<LicensingOptions>().ToInstance(appconfig.Licensing);
-                builder.Bind<HighAvailabilityOptions>().ToInstance(appconfig.HighAvailability);
+                builder.Bind<DatabaseConfigurationOptions>().ToInstance(appconfig.DatabaseConfiguration);
                 builder.Bind<DataProtectionOptions>().ToInstance(appconfig.DataProtection);
 
                 // ViewModel factories
@@ -189,6 +190,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IRegistryProvider>().ToInstance(registryProvider);
                 builder.Bind<ICertificatePermissionProvider>().To<CertificatePermissionProvider>();
                 builder.Bind<ICertificateSynchronizationProvider>().To<CertificateSynchronizationProvider>();
+                builder.Bind<SqlServerInstanceProvider>().ToSelf();
 
                 builder.Bind<IProtectedSecretProvider>().To<ProtectedSecretProvider>().InSingletonScope();
                 builder.Bind<IClusterProvider>().To<ClusterProvider>().InSingletonScope();

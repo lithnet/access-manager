@@ -1,8 +1,8 @@
 ﻿namespace Lithnet.AccessManager.Server.Configuration
 {
-    public class HighAvailabilityOptions
+    public class DatabaseConfigurationOptions
     {
-        public string DbConnectionString { get; set; }
+        public string ConnectionString { get; set; }
 
         public bool UseExternalSql { get; set; }
     }

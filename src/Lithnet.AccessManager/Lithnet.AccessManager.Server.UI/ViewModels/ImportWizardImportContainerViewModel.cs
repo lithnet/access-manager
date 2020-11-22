@@ -37,7 +37,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task Initialize()
         {
-            var serviceAccount = this.windowsServiceProvider.GetServiceAccount();
+            var serviceAccount = this.windowsServiceProvider.GetServiceSid();
             if (serviceAccount != null)
             {
                 this.FilteredSids.Add(new SecurityIdentifierViewModel(serviceAccount, directory));

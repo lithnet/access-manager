@@ -33,7 +33,7 @@ namespace Lithnet.AccessManager.Server.UI
             var vm = new ScriptContentViewModel(this.dialogCoordinator)
             {
                 HelpText = "Modify the OU variable in this script, and run it with domain admin rights to assign permissions for the service account to be able to read BitLocker recovery passwords from the directory",
-                ScriptText = this.scriptTemplateProvider.GrantBitLockerRecoveryPasswordPermissions.Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceAccount().ToString(), StringComparison.OrdinalIgnoreCase)
+                ScriptText = this.scriptTemplateProvider.GrantBitLockerRecoveryPasswordPermissions.Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceSid().ToString(), StringComparison.OrdinalIgnoreCase)
             };
 
             ExternalDialogWindow w = new ExternalDialogWindow

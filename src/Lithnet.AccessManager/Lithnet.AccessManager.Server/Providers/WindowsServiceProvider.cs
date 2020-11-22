@@ -40,16 +40,9 @@ namespace Lithnet.AccessManager.Server
 
         public SecurityIdentifier ServiceSid { get; } = new SecurityIdentifier(serviceSidString);
 
-        public SecurityIdentifier GetServiceAccount()
+        public SecurityIdentifier GetServiceSid()
         {
-            RegistryKey key = Registry.LocalMachine.OpenSubKey($@"SYSTEM\CurrentControlSet\Services\{AccessManager.Constants.ServiceName}", false);
-
-            if (key == null)
-            {
-                return null;
-            }
-
-            var name = key.GetValue("ObjectName") as string;
+            string name = this.GetRegistryObjectName();
 
             if (name == null)
             {
@@ -58,6 +51,30 @@ namespace Lithnet.AccessManager.Server
 
             NTAccount account = new NTAccount(name);
             return (SecurityIdentifier)account.Translate(typeof(SecurityIdentifier));
+        }
+
+        public NTAccount GetServiceNTAccount()
+        {
+            string name = this.GetRegistryObjectName();
+
+            if (name == null)
+            {
+                return (NTAccount)(new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null).Translate(typeof(NTAccount)));
+            }
+
+            return new NTAccount(name);
+        }
+
+        private string GetRegistryObjectName()
+        {
+            RegistryKey key = Registry.LocalMachine.OpenSubKey($@"SYSTEM\CurrentControlSet\Services\{AccessManager.Constants.ServiceName}", false);
+
+            if (key == null)
+            {
+                return null;
+            }
+
+            return key.GetValue("ObjectName") as string;
         }
 
         public void SetServiceAccount(string username, string password)

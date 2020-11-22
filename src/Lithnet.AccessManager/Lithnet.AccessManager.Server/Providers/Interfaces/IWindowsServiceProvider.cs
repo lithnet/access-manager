@@ -10,8 +10,8 @@ namespace Lithnet.AccessManager.Server
 
         ServiceControllerStatus Status { get; }
 
-        SecurityIdentifier GetServiceAccount();
-     
+        SecurityIdentifier GetServiceSid();
+        NTAccount GetServiceNTAccount();
         void SetServiceAccount(string username, string password);
 
         Task StartServiceAsync();

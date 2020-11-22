@@ -143,7 +143,7 @@ namespace Lithnet.AccessManager.Server.UI
                 HelpText = "Run the following script with Domain Admins rights to add the service account to the correct groups",
                 ScriptText = this.scriptTemplateProvider.AddDomainMembershipPermissions
                     .Replace("{domainDNS}", current.Name, StringComparison.OrdinalIgnoreCase)
-                    .Replace("{serviceAccountSid}", this.windowsServiceProvider.GetServiceAccount().Value, StringComparison.OrdinalIgnoreCase)
+                    .Replace("{serviceAccountSid}", this.windowsServiceProvider.GetServiceSid().Value, StringComparison.OrdinalIgnoreCase)
             };
 
             ExternalDialogWindow w = new ExternalDialogWindow

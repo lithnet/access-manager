@@ -81,7 +81,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.WorkingModel = this.CloneModel(model);
             this.Certificate = this.GetCertificate();
             this.OriginalCertificate = this.Certificate;
-            this.ServiceAccount = this.windowsServiceProvider.GetServiceAccount();
+            this.ServiceAccount = this.windowsServiceProvider.GetServiceSid();
             this.ServiceStatus = this.windowsServiceProvider.Status.ToString();
             this.DisplayName = "Web hosting";
 

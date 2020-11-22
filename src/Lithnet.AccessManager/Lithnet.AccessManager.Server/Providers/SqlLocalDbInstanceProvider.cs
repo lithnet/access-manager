@@ -172,11 +172,11 @@ namespace Lithnet.AccessManager.Server
             string sql;
             if (File.Exists(this.localDbLogPath))
             {
-                sql = EmbeddedResourceProvider.GetResourceString("AttachDatabaseWithLog.sql", "DBScripts.Creation");
+                sql = EmbeddedResourceProvider.GetResourceString("AttachDatabaseWithLog.sql", "DBScripts.LocalDBCreation");
             }
             else
             {
-                sql = EmbeddedResourceProvider.GetResourceString("AttachDatabase.sql", "DBScripts.Creation");
+                sql = EmbeddedResourceProvider.GetResourceString("AttachDatabase.sql", "DBScripts.LocalDBCreation");
             }
 
             using (var con = new SqlConnection(masterDbConnectionString))
@@ -193,7 +193,7 @@ namespace Lithnet.AccessManager.Server
             using (var con = new SqlConnection(masterDbConnectionString))
             {
                 con.Open();
-                this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("EnableContainment.sql", "DBScripts.Creation"), con);
+                this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("EnableContainment.sql", "DBScripts.LocalDBCreation"), con);
             }
         }
 
@@ -207,10 +207,10 @@ namespace Lithnet.AccessManager.Server
             using (var con = new SqlConnection(masterDbConnectionString))
             {
                 con.Open();
-                this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("CreateNewDatabaseWithPaths.sql", "DBScripts.Creation"), con);
-                this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("CreateServiceAccountLoginToServer.sql", "DBScripts.Creation"), con);
-                this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("CreateServiceAccountLoginToDB.sql", "DBScripts.Creation"), con);
-                this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("CreateServiceAccountPermissionToDB.sql", "DBScripts.Creation"), con);
+                this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("CreateNewDatabaseWithPaths.sql", "DBScripts.LocalDBCreation"), con);
+                this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("CreateServiceAccountLoginToServer.sql", "DBScripts.LocalDBCreation"), con);
+                this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("CreateServiceAccountLoginToDB.sql", "DBScripts.LocalDBCreation"), con);
+                this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("CreateServiceAccountPermissionToDB.sql", "DBScripts.LocalDBCreation"), con);
             }
 
             this.logger.LogInformation(EventIDs.DbCreated, "The [AccessManager] database was created");
@@ -223,7 +223,7 @@ namespace Lithnet.AccessManager.Server
                 .Replace("{localDbLogPath}", this.localDbLogPath, StringComparison.OrdinalIgnoreCase);
 
             SqlCommand command = new SqlCommand(commandText, con);
-            this.logger.LogTrace("Executing commandr\n{sql}", command.CommandText);
+            this.logger.LogTrace("Executing command\r\n{sql}", command.CommandText);
             command.ExecuteNonQuery();
         }
     }

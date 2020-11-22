@@ -25,14 +25,18 @@ namespace Lithnet.AccessManager.Server.UI
             Clipboard.SetText(this.ScriptText);
         }
 
+        public string DefaultExt { get; set; } = "ps1";
+
+        public string Filter { get; set; } = "PowerShell script (*.ps1)|*.ps1";
+
         public async Task Save()
         {
             SaveFileDialog dialog = new SaveFileDialog
             {
                 AddExtension = true,
-                DefaultExt = "ps1",
+                DefaultExt = this.DefaultExt,
                 OverwritePrompt = true,
-                Filter = "PowerShell script (*.ps1)|*.ps1",
+                Filter = this.Filter,
             };
 
             if (dialog.ShowDialog() != true)

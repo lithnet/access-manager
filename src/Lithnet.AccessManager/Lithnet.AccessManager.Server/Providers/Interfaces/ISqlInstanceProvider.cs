@@ -7,6 +7,7 @@ namespace Lithnet.AccessManager.Server
         string ConnectionString { get; }
 
         SqlConnection GetConnection();
+
         void InitializeDb();
     }
 }

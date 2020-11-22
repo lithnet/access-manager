@@ -22,6 +22,7 @@
     <None Remove="access-manager.png" />
     <None Remove="ScriptTemplates\AddDomainGroupMembershipPermissions.ps1" />
     <None Remove="ScriptTemplates\CreateGmsa.ps1" />
+    <None Remove="ScriptTemplates\CreateNewDatabaseScript.sql" />
     <None Remove="ScriptTemplates\EnablePamFeature.ps1" />
     <None Remove="ScriptTemplates\Get-LocalAdministrators.ps1" />
     <None Remove="ScriptTemplates\GetAuthorizationResponse.ps1" />
@@ -40,6 +41,7 @@
   <ItemGroup>
     <EmbeddedResource Include="ScriptTemplates\AddDomainGroupMembershipPermissions.ps1" />
     <EmbeddedResource Include="ScriptTemplates\CreateGmsa.ps1" />
+    <EmbeddedResource Include="ScriptTemplates\CreateNewDatabaseScript.sql" />
     <EmbeddedResource Include="ScriptTemplates\EnablePamFeature.ps1" />
     <EmbeddedResource Include="ScriptTemplates\Get-LocalAdministrators.ps1" />
     <EmbeddedResource Include="ScriptTemplates\GetAuthorizationResponse.ps1" />

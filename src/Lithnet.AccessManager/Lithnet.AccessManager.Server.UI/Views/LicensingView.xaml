@@ -112,34 +112,44 @@
                        TextWrapping="Wrap"
                        Text="License state" />
 
-            <StackPanel Grid.Row="0"
-                        Grid.Column="1"
-                        Orientation="Horizontal"
-                        VerticalAlignment="Center"
-                        Margin="5">
-                <iconPacks:PackIconFontAwesome Kind="CheckCircleRegular"
+            <Grid Grid.Row="0"
+                  Grid.Column="1"
+                  Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <iconPacks:PackIconFontAwesome Grid.Column="0"
+                                               Kind="CheckCircleRegular"
                                                Margin="0 0 5 0"
                                                Visibility="{Binding HasActiveLicenseNotExpiring, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                Foreground="Green" />
-                <iconPacks:PackIconFontAwesome Kind="ExclamationTriangleSolid"
+                <iconPacks:PackIconFontAwesome Grid.Column="0"
+                                               Kind="ExclamationTriangleSolid"
                                                Margin="0 0 5 0"
                                                Visibility="{Binding IsLicenseExpiring90Days, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                Foreground="DarkOrange" />
-                <iconPacks:PackIconFontAwesome Kind="ExclamationTriangleSolid"
+                <iconPacks:PackIconFontAwesome Grid.Column="0"
+                                               Kind="ExclamationTriangleSolid"
                                                Margin="0 0 5 0"
                                                Visibility="{Binding IsLicenseInvalidOrExpired, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                Foreground="Red" />
-                <TextBlock Text="{Binding LicenseStatusText, FallbackValue='Unknown'}"
+                <TextBlock Grid.Column="1"
+                           Text="{Binding LicenseStatusText, FallbackValue='Unknown'}"
                            TextWrapping="Wrap" />
 
-                <TextBlock Margin="5 0 0 0"
+                <TextBlock Grid.Column="2"
+                           Margin="5 0 0 0"
                            Visibility="{Binding IsLicenseExpiredOrExpiring, Converter={StaticResource BooleanToVisibilityConverter}}"
                            TextWrapping="Wrap"><Hyperlink Click="{s:Action HelpLinkRenewNow}">Renew now...</Hyperlink></TextBlock>
 
-                <TextBlock Margin="5 0 0 0"
+                <TextBlock Grid.Column="2"
+                    Margin="5 0 0 0"
                            Visibility="{Binding IsLicenseInvalid, Converter={StaticResource BooleanToVisibilityConverter}}"
                            TextWrapping="Wrap"><Hyperlink Click="{s:Action HelpLinkGetLicenseHelp}">Get help...</Hyperlink></TextBlock>
-            </StackPanel>
+            </Grid>
 
             <TextBlock Grid.Row="2"
                        Grid.Column="0"

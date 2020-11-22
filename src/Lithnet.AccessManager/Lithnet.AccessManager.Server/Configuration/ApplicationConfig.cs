@@ -25,7 +25,7 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public ForwardedHeadersAppOptions ForwardedHeaders { get; set; } = new ForwardedHeadersAppOptions();
 
-        public HighAvailabilityOptions HighAvailability { get; set; } = new HighAvailabilityOptions();
+        public DatabaseConfigurationOptions DatabaseConfiguration { get; set; } = new DatabaseConfigurationOptions();
 
         public DataProtectionOptions DataProtection { get; set; } = new DataProtectionOptions();
 

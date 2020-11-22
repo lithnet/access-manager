@@ -27,7 +27,8 @@
         string WriteAuditLog { get; }
 
         string GetAuthorizationResponse { get; }
-        
+        string CreateDatabase { get; }
+
         string GetFileContent(string filename);
     }
 }
