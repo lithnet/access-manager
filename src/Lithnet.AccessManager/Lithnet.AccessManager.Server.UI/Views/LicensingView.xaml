@@ -117,9 +117,12 @@
                   Margin="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
                 <iconPacks:PackIconFontAwesome Grid.Column="0"
                                                Kind="CheckCircleRegular"
@@ -137,16 +140,19 @@
                                                Visibility="{Binding IsLicenseInvalidOrExpired, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                Foreground="Red" />
                 <TextBlock Grid.Column="1"
+                           Margin="5 0 0 0"
                            Text="{Binding LicenseStatusText, FallbackValue='Unknown'}"
                            TextWrapping="Wrap" />
 
-                <TextBlock Grid.Column="2"
+                <TextBlock Grid.Row="1"
+                           Grid.Column="1"
                            Margin="5 0 0 0"
                            Visibility="{Binding IsLicenseExpiredOrExpiring, Converter={StaticResource BooleanToVisibilityConverter}}"
                            TextWrapping="Wrap"><Hyperlink Click="{s:Action HelpLinkRenewNow}">Renew now...</Hyperlink></TextBlock>
 
-                <TextBlock Grid.Column="2"
-                    Margin="5 0 0 0"
+                <TextBlock Grid.Row="1"
+                           Grid.Column="1"
+                           Margin="5 0 0 0"
                            Visibility="{Binding IsLicenseInvalid, Converter={StaticResource BooleanToVisibilityConverter}}"
                            TextWrapping="Wrap"><Hyperlink Click="{s:Action HelpLinkGetLicenseHelp}">Get help...</Hyperlink></TextBlock>
             </Grid>

@@ -5,7 +5,7 @@ using System.Text;
 namespace Lithnet.AccessManager.Server.UI
 {
     [Serializable]
-    public class MissingConfigurationException: ApplicationInitializationException 
+    public class MissingConfigurationException : ApplicationInitializationException
     {
         public MissingConfigurationException() { }
 

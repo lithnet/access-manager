@@ -12,7 +12,6 @@ using Lithnet.AccessManager.Server.Providers;
 using Lithnet.AccessManager.Server.UI.AuthorizationRuleImport;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
-using MahApps.Metro.Converters;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
 using Microsoft.Extensions.Options;
@@ -68,24 +67,6 @@ namespace Lithnet.AccessManager.Server.UI
             });
 
             logger = loggerFactory.CreateLogger<Bootstrapper>();
-
-            try
-            {
-                ClusterProvider provider = new ClusterProvider();
-
-                if (provider.IsClustered && !provider.IsOnActiveNode())
-                {
-                    throw new ClusterNodeNotActiveException("The AMS service is not active on this cluster node. Please edit the configuration on the currently active node");
-                }
-            }
-            catch (ClusterNodeNotActiveException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(EventIDs.UIGenericError, ex, "Unable to determine cluster node status");
-            }
         }
 
         protected override void OnStart()
@@ -112,6 +93,24 @@ namespace Lithnet.AccessManager.Server.UI
 
             try
             {
+                try
+                {
+                    ClusterProvider provider = new ClusterProvider();
+
+                    if (provider.IsClustered && !provider.IsOnActiveNode())
+                    {
+                        throw new ClusterNodeNotActiveException("The AMS service is not active on this cluster node. Please run this app on the currently active node");
+                    }
+                }
+                catch (ClusterNodeNotActiveException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(EventIDs.UIGenericError, ex, "Unable to determine cluster node status");
+                }
+
                 if (!File.Exists(pathProvider.ConfigFile))
                 {
                     this.logger.LogError(EventIDs.UIGenericError, "Config file was not found at path {path}", pathProvider.ConfigFile);
@@ -157,7 +156,6 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IEffectiveAccessViewModelFactory>().To<EffectiveAccessViewModelFactory>();
                 builder.Bind<IImportProviderFactory>().To<ImportProviderFactory>();
                 builder.Bind<IImportResultsViewModelFactory>().To<ImportResultsViewModelFactory>();
-
 
                 // Services
                 builder.Bind<RandomNumberGenerator>().ToInstance(RandomNumberGenerator.Create());

@@ -134,7 +134,7 @@ namespace Lithnet.AccessManager.Server.UI
                 else
                 {
                     this.WaagStatus = "Group membership not found";
-                    this.IsNotWaagMember = false;
+                    this.IsNotWaagMember = true;
                 }
             }
             catch (Exception ex)
