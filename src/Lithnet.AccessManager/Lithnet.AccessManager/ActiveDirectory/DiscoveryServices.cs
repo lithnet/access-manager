@@ -460,69 +460,102 @@ namespace Lithnet.AccessManager
 
         public bool DoesSchemaAttributeExist(string dnsDomain, string attributeName)
         {
-            return this.GetSchemaAttributeGuid(dnsDomain, attributeName) != null;
+            return this.DoesSchemaAttributeExist(dnsDomain, attributeName, false);
+        }
+
+        public bool DoesSchemaAttributeExist(string dnsDomain, string attributeName, bool refreshCache)
+        {
+            return this.GetSchemaAttributeGuid(dnsDomain, attributeName, refreshCache) != null;
         }
 
         public Guid? GetSchemaAttributeGuid(string dnsDomain, string attributeName)
         {
+            return this.GetSchemaAttributeGuid(dnsDomain, attributeName, false);
+        }
+
+        public Guid? GetSchemaAttributeGuid(string dnsDomain, string attributeName, bool refreshCache)
+        {
             string key = $"{dnsDomain}-{attributeName}";
 
-            return attributeGuidCache.GetOrAdd(key, k =>
+            if (!refreshCache)
             {
-                DirectorySearcher d = new DirectorySearcher
-                {
-                    SearchRoot = this.GetSchemaNamingContext(dnsDomain),
-                    SearchScope = SearchScope.Subtree,
-                    Filter = $"(&(objectClass=attributeSchema)(lDAPDisplayName={attributeName})(!(isDefunct=TRUE)))"
-                };
+                return attributeGuidCache.GetOrAdd(key, k => GetSchemaAttributeGuidFromDirectory(dnsDomain, attributeName));
+            }
+            else
+            {
+                return attributeGuidCache.AddOrUpdate(key, k => this.GetSchemaAttributeGuidFromDirectory(dnsDomain, attributeName), (k1, k2) => this.GetSchemaAttributeGuidFromDirectory(dnsDomain, attributeName));
+            }
+        }
 
-                d.PropertiesToLoad.Add("schemaIDGUID");
+        private Guid? GetSchemaAttributeGuidFromDirectory(string dnsDomain, string attributeName)
+        {
+            DirectorySearcher d = new DirectorySearcher
+            {
+                SearchRoot = this.GetSchemaNamingContext(dnsDomain),
+                SearchScope = SearchScope.Subtree,
+                Filter = $"(&(objectClass=attributeSchema)(lDAPDisplayName={attributeName})(!(isDefunct=TRUE)))"
+            };
 
-                SearchResultCollection result = d.FindAll();
+            d.PropertiesToLoad.Add("schemaIDGUID");
 
-                if (result.Count > 1)
-                {
-                    throw new InvalidOperationException($"More than one attribute called {attributeName} was found");
-                }
+            SearchResultCollection result = d.FindAll();
 
-                if (result.Count == 0)
-                {
-                    return null;
-                }
+            if (result.Count > 1)
+            {
+                throw new InvalidOperationException($"More than one attribute called {attributeName} was found");
+            }
 
-                return result[0].GetPropertyGuid("schemaIDGUID");
-            });
+            if (result.Count == 0)
+            {
+                return null;
+            }
+
+            return result[0].GetPropertyGuid("schemaIDGUID");
         }
 
         public Guid? GetSchemaObjectGuid(string dnsDomain, string objectName)
         {
+            return this.GetSchemaObjectGuid(dnsDomain, objectName, false);
+        }
+
+        public Guid? GetSchemaObjectGuid(string dnsDomain, string objectName, bool refreshCache)
+        {
             string key = $"{dnsDomain}-{objectName}";
 
-            return objectGuidCache.GetOrAdd(key, k =>
+            if (!refreshCache)
             {
-                DirectorySearcher d = new DirectorySearcher
-                {
-                    SearchRoot = this.GetSchemaNamingContext(dnsDomain),
-                    SearchScope = SearchScope.Subtree,
-                    Filter = $"(&(objectClass=classSchema)(lDAPDisplayName={objectName})(!(isDefunct=TRUE)))"
-                };
+                return objectGuidCache.GetOrAdd(key, k => GetSchemaObjectGuidFromDirectory(dnsDomain, objectName));
+            }
+            else
+            {
+                return objectGuidCache.AddOrUpdate(key, k => GetSchemaObjectGuidFromDirectory(dnsDomain, objectName), (k1, k2) => GetSchemaObjectGuidFromDirectory(dnsDomain, objectName));
+            }
+        }
 
-                d.PropertiesToLoad.Add("schemaIDGUID");
+        private Guid? GetSchemaObjectGuidFromDirectory(string dnsDomain, string objectName)
+        {
+            DirectorySearcher d = new DirectorySearcher
+            {
+                SearchRoot = this.GetSchemaNamingContext(dnsDomain),
+                SearchScope = SearchScope.Subtree,
+                Filter = $"(&(objectClass=classSchema)(lDAPDisplayName={objectName})(!(isDefunct=TRUE)))"
+            };
 
-                SearchResultCollection result = d.FindAll();
+            d.PropertiesToLoad.Add("schemaIDGUID");
 
-                if (result.Count > 1)
-                {
-                    throw new InvalidOperationException($"More than one object called {objectName} was found");
-                }
+            SearchResultCollection result = d.FindAll();
 
-                if (result.Count == 0)
-                {
-                    return null;
-                }
+            if (result.Count > 1)
+            {
+                throw new InvalidOperationException($"More than one object called {objectName} was found");
+            }
 
-                return result[0].GetPropertyGuid("schemaIDGUID");
-            });
+            if (result.Count == 0)
+            {
+                return null;
+            }
+
+            return result[0].GetPropertyGuid("schemaIDGUID");
         }
 
         public string GetDomainControllerFromDNOrDefault(string dn)

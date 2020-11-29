@@ -70,7 +70,7 @@ namespace Lithnet.AccessManager.Server.UI
                 this.IsLithnetSchemaPresent = false;
                 this.IsNotLithnetSchemaPresent = false;
 
-                if (this.discoveryServices.DoesSchemaAttributeExist(this.Forest.Name, "lithnetAdminPassword"))
+                if (this.discoveryServices.DoesSchemaAttributeExist(this.Forest.Name, "lithnetAdminPassword", true))
                 {
                     this.IsLithnetSchemaPresent = true;
                     this.LithnetAccessManagerSchemaPresentText = "Present";
@@ -102,7 +102,7 @@ namespace Lithnet.AccessManager.Server.UI
                 this.IsMsLapsSchemaPresent = false;
                 this.IsNotMsLapsSchemaPresent = false;
 
-                if (this.discoveryServices.DoesSchemaAttributeExist(this.Forest.Name, "ms-Mcs-AdmPwd"))
+                if (this.discoveryServices.DoesSchemaAttributeExist(this.Forest.Name, "ms-Mcs-AdmPwd", true))
                 {
                     this.IsMsLapsSchemaPresent = true;
                     this.MsLapsSchemaPresentText = "Present";

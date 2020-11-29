@@ -102,7 +102,7 @@ namespace Lithnet.AccessManager.Server.UI
                 {
                     this.IsPamNotSupported = false;
                     this.IsPamEnabled = false;
-                    this.IsPamEnabled = false;
+                    this.IsPamSupported = false;
 #if DEBUG
                     if (Mapping?.OverrideMode == 1)
                     {

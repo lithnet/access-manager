@@ -13,10 +13,11 @@ namespace Lithnet.AccessManager.Server.UI
 
         public SecurityIdentifierViewModel(SecurityIdentifier sid, IDirectory directory)
         {
+            this.directory = directory;
+
             this.SecurityIdentifier = sid;
             this.DisplayName = this.GetSidDisplayName(sid);
             this.Sid = sid.ToString();
-            this.directory = directory;
         }
 
         public SecurityIdentifier SecurityIdentifier { get; }

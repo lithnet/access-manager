@@ -29,18 +29,18 @@ namespace Lithnet.AccessManager.Server.UI
 
         private IApplicationConfig appconfig;
 
-        private static void SetupNLog()
-        {
-            RegistryProvider provider = new RegistryProvider(false);
+        private UiRegistryProvider registryProvider;
 
+        private void SetupNLog()
+        {
             var configuration = new NLog.Config.LoggingConfiguration();
 
             var uiLog = new NLog.Targets.FileTarget("access-manager-ui")
             {
-                FileName = Path.Combine(provider.LogPath, "access-manager-ui.log"),
+                FileName = Path.Combine(registryProvider.LogPath, "access-manager-ui.log"),
                 ArchiveEvery = NLog.Targets.FileArchivePeriod.Day,
                 ArchiveNumbering = NLog.Targets.ArchiveNumberingMode.Date,
-                MaxArchiveFiles = provider.RetentionDays,
+                MaxArchiveFiles = registryProvider.RetentionDays,
                 Layout = "${longdate}|${level:uppercase=true:padding=5}|${logger}|${message}${onexception:inner=${newline}${exception:format=ToString}}"
             };
 
@@ -51,18 +51,20 @@ namespace Lithnet.AccessManager.Server.UI
 
         public Bootstrapper()
         {
+            this.registryProvider = new UiRegistryProvider();
+
             SetupNLog();
 
             loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder.AddNLog();
-                builder.SetMinimumLevel(LogLevel.Information);
+                builder.SetMinimumLevel(this.registryProvider.UiLogLevel);
                 builder.AddDebug();
                 builder.AddEventLog(new EventLogSettings()
                 {
                     SourceName = Constants.EventSourceName,
                     LogName = Constants.EventLogName,
-                    Filter = (x, y) => y >= LogLevel.Warning
+                    Filter = (x, y) => y >= this.registryProvider.UiEventLogLevel
                 });
             });
 
@@ -86,9 +88,9 @@ namespace Lithnet.AccessManager.Server.UI
 
             base.OnExit(e);
         }
+
         protected override void ConfigureIoC(IStyletIoCBuilder builder)
         {
-            RegistryProvider registryProvider = new RegistryProvider(true);
             IAppPathProvider pathProvider = new AppPathProvider(registryProvider);
 
             try
@@ -113,13 +115,13 @@ namespace Lithnet.AccessManager.Server.UI
 
                 if (!File.Exists(pathProvider.ConfigFile))
                 {
-                    this.logger.LogError(EventIDs.UIGenericError, "Config file was not found at path {path}", pathProvider.ConfigFile);
+                    this.logger.LogCritical(EventIDs.UIGenericError, "Config file was not found at path {path}", pathProvider.ConfigFile);
                     throw new MissingConfigurationException($"The appsettings.config file could not be found at path {pathProvider.ConfigFile}. Please resolve the issue and restart the application");
                 }
 
                 if (!File.Exists(pathProvider.HostingConfigFile))
                 {
-                    this.logger.LogError(EventIDs.UIGenericError, "Apphost file was not found at path {path}", pathProvider.HostingConfigFile);
+                    this.logger.LogCritical(EventIDs.UIGenericError, "Apphost file was not found at path {path}", pathProvider.HostingConfigFile);
                     throw new MissingConfigurationException($"The apphost.config file could not be found at path {pathProvider.HostingConfigFile}. Please resolve the issue and restart the application");
                 }
 
@@ -210,12 +212,12 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (ApplicationInitializationException ex)
             {
-                this.logger.LogError(EventIDs.UIInitializationError, ex, "Initialization error");
+                this.logger.LogCritical(EventIDs.UIInitializationError, ex, "Initialization error");
                 throw;
             }
             catch (Exception ex)
             {
-                this.logger.LogError(EventIDs.UIInitializationError, ex, "Initialization error");
+                this.logger.LogCritical(EventIDs.UIInitializationError, ex, "Initialization error");
                 throw new ApplicationInitializationException("The application failed to initialize", ex);
             }
         }

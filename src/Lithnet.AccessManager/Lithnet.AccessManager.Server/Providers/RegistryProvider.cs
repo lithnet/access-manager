@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.Win32;
+using System;
 using System.IO;
-using System.Text;
-using Microsoft.Win32;
 
 namespace Lithnet.AccessManager.Server
 {
@@ -12,8 +10,8 @@ namespace Lithnet.AccessManager.Server
 
         public const string ParametersKey = "Software\\Lithnet\\Access Manager Service\\Parameters";
 
-        private readonly RegistryKey baseKey;
-        private readonly RegistryKey paramsKey;
+        protected readonly RegistryKey baseKey;
+        protected readonly RegistryKey paramsKey;
 
         public RegistryProvider(bool writable)
         {

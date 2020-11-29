@@ -42,6 +42,8 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 
         private void PopulateTargets(OUPrincipalMapping entry, List<SecurityDescriptorTarget> targets)
         {
+            this.logger.LogTrace("Processing OU {ou}", entry.AdsPath);
+
             bool doNotConsolidate = settings.DoNotConsolidate || (settings.DoNotConsolidateOnError && entry.HasDescendantsWithErrors);
 
             if (!doNotConsolidate)
@@ -70,6 +72,8 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 
         private SecurityDescriptorTarget ConvertToTarget(ComputerPrincipalMapping computer, HashSet<SecurityIdentifier> admins)
         {
+            this.logger.LogTrace("Converting computer {computer} to target with {admins} admins", computer.PrincipalName, admins.Count);
+
             SecurityDescriptorTarget target = new SecurityDescriptorTarget()
             {
                 AuthorizationMode = AuthorizationMode.SecurityDescriptor,
@@ -111,6 +115,8 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 
         private SecurityDescriptorTarget ConvertToTarget(OUPrincipalMapping entry)
         {
+            this.logger.LogTrace("Converting OU {ou} to target with {admins} admins", entry.AdsPath, entry.UniquePrincipals.Count);
+
             SecurityDescriptorTarget target = new SecurityDescriptorTarget()
             {
                 AuthorizationMode = AuthorizationMode.SecurityDescriptor,
