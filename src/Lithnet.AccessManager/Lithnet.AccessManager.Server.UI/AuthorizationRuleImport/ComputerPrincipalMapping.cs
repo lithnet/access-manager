@@ -9,6 +9,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
     public class ComputerPrincipalMapping
     {
         private HashSet<SecurityIdentifier> uniqueAdmins;
+
         private readonly SearchResult computer;
 
         internal ComputerPrincipalMapping(SearchResult computer, OUPrincipalMapping parent)
@@ -28,17 +29,14 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
         public bool HasError { get; internal set; }
 
         public bool IsMissing { get; internal set; }
-        public Exception Exception { get; internal set; }
 
-        //public string ExceptionMessage => this.Exception?.Message;
+        public Exception Exception { get; internal set; }
 
         public HashSet<SecurityIdentifier> Principals { get; } = new HashSet<SecurityIdentifier>();
 
-       // public Dictionary<SecurityIdentifier, string> FilteredPrincipals { get; } = new Dictionary<SecurityIdentifier, string>();
-
         public List<DiscoveryError> DiscoveryErrors { get; } = new List<DiscoveryError>();
 
-        public HashSet<SecurityIdentifier> UniquePrincipals
+        public HashSet<SecurityIdentifier> PrincipalsUniqueToThisLevel
         {
             get
             {

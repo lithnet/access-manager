@@ -125,31 +125,52 @@ namespace Lithnet.AccessManager.Server.UI
                 controller.SetProgress(0);
                 controller.SetIndeterminate();
 
-                await Task.Run(() =>
+                await Task.Run(async () =>
                 {
-                    if (!this.SearchText.StartsWith('?') && this.directory.TryGetComputer(this.SearchText, out IComputer computer))
+                    try
                     {
-                        if (!firstSearch)
+                        IComputer computer = null;
+
+                        try
                         {
-                            firstSearch = true;
-                            controller.SetMessage($"Please wait while we build the cache and search for rules that apply to computer {computer.MsDsPrincipalName}. This may take a minute.");
+                            this.directory.TryGetComputer(this.SearchText, out computer);
+                        }
+                        catch (Exception ex)
+                        {
+                            this.logger.LogTrace(ex, "Could not find computer object for {computer}", this.SearchText);
+                        }
+
+                        if (!this.SearchText.StartsWith('?') && computer != null)
+                        {
+                            if (!firstSearch)
+                            {
+                                firstSearch = true;
+                                controller.SetMessage($"Please wait while we build the cache and search for rules that apply to computer {computer.MsDsPrincipalName}. This may take a minute.");
+                            }
+                            else
+                            {
+                                controller.SetMessage($"Searching for rules that apply to computer {computer.MsDsPrincipalName}...");
+                            }
+
+                            this.matchedComputerViewModels = new HashSet<string>();
+
+                            foreach (var item in this.computerTargetProvider.GetMatchingTargetsForComputer(computer, this.Model))
+                            {
+                                this.matchedComputerViewModels.Add(item.Id);
+                            }
                         }
                         else
                         {
-                            controller.SetMessage($"Searching for rules that apply to computer {computer.MsDsPrincipalName}...");
-                        }
-
-                        this.matchedComputerViewModels = new HashSet<string>();
-
-                        foreach (var item in this.computerTargetProvider.GetMatchingTargetsForComputer(computer, this.Model))
-                        {
-                            this.matchedComputerViewModels.Add(item.Id);
+                            controller.SetMessage($"Searching for rules containing text '{this.SearchText}'...");
+                            this.matchedComputerViewModels = null;
                         }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        controller.SetMessage($"Searching for rules containing text '{this.SearchText}'...");
-                        this.matchedComputerViewModels = null;
+                        this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the search");
+                        await this.dialogCoordinator.ShowMessageAsync(this, "Search error", $"Could not complete the search\r\n{ex.Message}");
+                        this.ClearSearchFilter();
+                        return;
                     }
                 });
 

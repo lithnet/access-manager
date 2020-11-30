@@ -2,6 +2,7 @@
 using System.Linq;
 using System.ServiceProcess;
 using System.Threading.Tasks;
+using System.Windows;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
@@ -75,8 +76,31 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
+                if (this.model.HasFileBeenModified())
+                {
+                    var result = await this.dialogCoordinator.ShowMessageAsync(this, "Warning", $"The configuration file has been modified outside of the editor. Do you want to overwrite the external changes with the current configuration, discard the changes made in this app and reload the config from the file, or cancel the save request? ", MessageDialogStyle.AffirmativeAndNegativeAndSingleAuxiliary,
+                    new MetroDialogSettings
+                    {
+                        AffirmativeButtonText = "Overwrite external changes",
+                        NegativeButtonText = "Cancel save",
+                        FirstAuxiliaryButtonText = "Reload config and discard changes",
+                        DefaultButtonFocus = MessageDialogResult.Affirmative, 
+                    });
+                    
+                    if (result == MessageDialogResult.Negative)
+                    {
+                        return false;
+                    }
+                    else if (result == MessageDialogResult.FirstAuxiliary)
+                    {
+                        System.Diagnostics.Process.Start(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+                        Application.Current.Shutdown();
+                        return false;
+                    }
+                }
+
                 this.certSyncProvider.ExportCertificatesToConfig();
-                this.model.Save(this.model.Path);
+                this.model.Save(this.model.Path, true);
             }
             catch (Exception ex)
             {

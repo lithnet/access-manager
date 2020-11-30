@@ -6,6 +6,8 @@ namespace Lithnet.AccessManager.Server.Configuration
     {
         string Path { get; }
 
+        string Hash { get; }
+
         LicensingOptions Licensing { get; set; }
 
         AuditOptions Auditing { get; set; }
@@ -28,6 +30,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         JitConfigurationOptions JitConfiguration { get; set; }
 
-        void Save(string file);
+        void Save(string file, bool forceOverwrite);
+
+        bool HasFileBeenModified();
     }
 }

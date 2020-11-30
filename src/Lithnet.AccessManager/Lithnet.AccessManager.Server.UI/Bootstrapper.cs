@@ -88,7 +88,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             base.OnExit(e);
         }
-
+        
         protected override void ConfigureIoC(IStyletIoCBuilder builder)
         {
             IAppPathProvider pathProvider = new AppPathProvider(registryProvider);
@@ -253,7 +253,7 @@ namespace Lithnet.AccessManager.Server.UI
                 try
                 {
                     File.Copy(appconfig.Path, appconfig.Path + ".backup", true);
-                    appconfig?.Save(appconfig.Path);
+                    appconfig?.Save(appconfig.Path, true);
                 }
                 catch (Exception ex2)
                 {

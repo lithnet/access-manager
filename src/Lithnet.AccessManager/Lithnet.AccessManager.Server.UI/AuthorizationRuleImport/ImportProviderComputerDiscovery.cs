@@ -42,25 +42,120 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 
         private void PopulateTargets(OUPrincipalMapping entry, List<SecurityDescriptorTarget> targets)
         {
-            this.logger.LogTrace("Processing OU {ou}", entry.AdsPath);
+            bool canConsolidate = !(settings.DoNotConsolidate || (settings.DoNotConsolidateOnError && entry.HasDescendantsWithErrors));
 
-            bool doNotConsolidate = settings.DoNotConsolidate || (settings.DoNotConsolidateOnError && entry.HasDescendantsWithErrors);
+            this.logger.LogTrace(@"Processing OU
+Path: {ou}
+Consolidating: {consolidating}
+DoNotConsolidate flag: {DoNotConsolidate}
+DoNotConsolidateOnError flag : {DoNotConsolidateOnError}
+HasDescendantsWithErrors: {HasDescendantsWithErrors}
+ParentHasDescendantsWithErrors: {ParentHasDescendantsWithErrors}
+Computers: {ComputerCount} : {Computers}
+CommonPrincipalsFromDescendants: {CommonPrincipalsFromDescendantsCount} : {CommonPrincipalsFromDescendants}
+PrincipalsUniqueToThisLevel: {PrincipalsUniqueToThisLevelCount} : {PrincipalsUniqueToThisLevel}
+",
+entry.AdsPath,
+canConsolidate,
+settings.DoNotConsolidate,
+settings.DoNotConsolidateOnError,
+entry.HasDescendantsWithErrors,
+entry.Parent?.HasDescendantsWithErrors,
+entry.Computers.Count,
+string.Join(", ", entry.Computers.Select(t => t.PrincipalName)),
+entry.CommonPrincipalsFromDescendants.Count,
+string.Join(", ", entry.CommonPrincipalsFromDescendants),
+entry.PrincipalsUniqueToThisLevel.Count,
+string.Join(", ", entry.PrincipalsUniqueToThisLevel)
+);
 
-            if (!doNotConsolidate)
+            if (canConsolidate)
             {
-                if (entry.UniquePrincipals.Count > 0)
+                HashSet<SecurityIdentifier> admins;
+
+                if (settings.DoNotConsolidateOnError && (entry.Parent?.HasDescendantsWithErrors ?? false))
                 {
-                    targets.Add(this.ConvertToTarget(entry));
+                    // The parent OU is in error, so we cannot remove common principals that the parent may have
+                    admins = entry.CommonPrincipalsFromDescendants;
+                    this.logger.LogTrace("Permissions for the OU {OU} will not be consolidated against the parent OU because the parent OU one or more descendant errors", entry.AdsPath);
+                }
+                else
+                {
+                    // Principals that are present on the parent OU are removed from the principal set here
+                    admins = entry.PrincipalsUniqueToThisLevel;
+                    this.logger.LogTrace("Permissions for the OU {OU} will be consolidated against its parent", entry.AdsPath);
+                }
+
+                if (admins.Count > 0)
+                {
+                    targets.Add(this.ConvertToTarget(entry, admins));
+                }
+                else
+                {
+                    this.logger.LogTrace("There were no principals that require a rule being created for {target}", entry.AdsPath);
                 }
             }
 
             foreach (var computer in entry.Computers)
             {
-                var admins = doNotConsolidate ? computer.Principals : computer.UniquePrincipals;
+                this.logger.LogTrace(@"Processing computer
+Principal: {computer}
+Consolidating: {consolidating}
+DoNotConsolidate flag: {DoNotConsolidate}
+DoNotConsolidateOnError flag : {DoNotConsolidateOnError}
+HasError: {HasError}
+IsMissing: {IsMissing}
+ParentHasErrors: {ParentHasDescendantsWithErrors}
+DiscoveryErrors: {DiscoveryErrorCount} : {DiscoveryErrors}
+Principals: {PrincipalsCount} : {Principals}
+PrincipalsUniqueToThisLevel: {PrincipalsUniqueToThisLevelCount} : {PrincipalsUniqueToThisLevel}
+",
+computer.PrincipalName,
+canConsolidate,
+settings.DoNotConsolidate,
+settings.DoNotConsolidateOnError,
+computer.HasError,
+computer.IsMissing,
+entry.HasDescendantsWithErrors,
+computer.DiscoveryErrors.Count,
+string.Join(", ", computer.DiscoveryErrors?.Select(t => t.Message)),
+computer.Principals.Count,
+string.Join(", ", computer.Principals),
+computer.PrincipalsUniqueToThisLevel.Count,
+string.Join(", ", computer.PrincipalsUniqueToThisLevel)
+);
 
-                if (!computer.HasError && admins.Count > 0)
+                if (computer.HasError)
+                {
+                    this.logger.LogTrace("Skipping permissions for computer {computer} due to discovery errors", computer.PrincipalName);
+                    continue;
+                }
+
+                HashSet<SecurityIdentifier> admins;
+
+                if (settings.DoNotConsolidate)
+                {
+                    admins = computer.Principals;
+                    this.logger.LogTrace("Permissions for computer {computer} will not be consolidated because consolidation has been disabled", computer.PrincipalName);
+                }
+                else if (settings.DoNotConsolidateOnError && entry.HasDescendantsWithErrors)
+                {
+                    admins = computer.Principals;
+                    this.logger.LogTrace("Permissions for computer {computer} will not be consolidated because the parent OU has decendant errors", computer.PrincipalName);
+                }
+                else
+                {
+                    admins = computer.PrincipalsUniqueToThisLevel;
+                    this.logger.LogTrace("Permissions for computer {computer} can be consolidated", computer.PrincipalName);
+                }
+
+                if (admins.Count > 0)
                 {
                     targets.Add(this.ConvertToTarget(computer, admins));
+                }
+                else
+                {
+                    this.logger.LogTrace("There were no principals that require a rule being created for {target}", computer.PrincipalName);
                 }
             }
 
@@ -72,12 +167,12 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 
         private SecurityDescriptorTarget ConvertToTarget(ComputerPrincipalMapping computer, HashSet<SecurityIdentifier> admins)
         {
-            this.logger.LogTrace("Converting computer {computer} to target with {admins} admins", computer.PrincipalName, admins.Count);
+            this.logger.LogTrace("Creating new target for computer {computer} with the following principals\r\n{admins}", computer.PrincipalName, string.Join(", ", admins));
 
             SecurityDescriptorTarget target = new SecurityDescriptorTarget()
             {
                 AuthorizationMode = AuthorizationMode.SecurityDescriptor,
-                Description = settings.RuleDescription.Replace("{targetName}", computer.PrincipalName, StringComparison.OrdinalIgnoreCase),
+                Description = settings.RuleDescription?.Replace("{targetName}", computer.PrincipalName, StringComparison.OrdinalIgnoreCase),
                 Target = computer.Sid.ToString(),
                 Type = TargetType.Computer,
                 Id = Guid.NewGuid().ToString(),
@@ -113,14 +208,14 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
             return target;
         }
 
-        private SecurityDescriptorTarget ConvertToTarget(OUPrincipalMapping entry)
+        private SecurityDescriptorTarget ConvertToTarget(OUPrincipalMapping entry, HashSet<SecurityIdentifier> admins)
         {
-            this.logger.LogTrace("Converting OU {ou} to target with {admins} admins", entry.AdsPath, entry.UniquePrincipals.Count);
+            this.logger.LogTrace("Creating new target for OU {ou} with the following principals\r\n{admins}", entry.AdsPath, string.Join(", ", admins));
 
             SecurityDescriptorTarget target = new SecurityDescriptorTarget()
             {
                 AuthorizationMode = AuthorizationMode.SecurityDescriptor,
-                Description = settings.RuleDescription.Replace("{targetName}", entry.OUName, StringComparison.OrdinalIgnoreCase),
+                Description = settings.RuleDescription?.Replace("{targetName}", entry.OUName, StringComparison.OrdinalIgnoreCase),
                 Target = entry.OUName,
                 Type = TargetType.Container,
                 Id = Guid.NewGuid().ToString(),
@@ -142,9 +237,9 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
             mask |= settings.AllowLapsHistory ? AccessMask.LocalAdminPasswordHistory : 0;
             mask |= settings.AllowBitLocker ? AccessMask.BitLocker : 0;
 
-            DiscretionaryAcl acl = new DiscretionaryAcl(false, false, entry.UniquePrincipals.Count);
+            DiscretionaryAcl acl = new DiscretionaryAcl(false, false, admins.Count);
 
-            foreach (var sid in entry.UniquePrincipals)
+            foreach (var sid in admins)
             {
                 acl.AddAccess(AccessControlType.Allow, sid, (int)mask, InheritanceFlags.None, PropagationFlags.None);
             }

@@ -47,13 +47,12 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
             }
         }
 
-        public HashSet<SecurityIdentifier> UniquePrincipals
+        public HashSet<SecurityIdentifier> PrincipalsUniqueToThisLevel
         {
             get
             {
                 if (this.thisLevelAdmins == null)
                 {
-
                     if (this.Parent?.CommonPrincipalsFromDescendants == null)
                     {
                         this.thisLevelAdmins = this.CommonPrincipalsFromDescendants ?? new HashSet<SecurityIdentifier>();

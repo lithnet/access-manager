@@ -26,7 +26,7 @@ namespace Lithnet.AccessManager
                 }
             }
 
-            throw new UnsupportedPrincipalTypeException($"An object of type {de.SchemaClassName} was provided, but an object of one of the following types was expected '{string.Join(",", objectClasses)}'");
+            throw new UnsupportedPrincipalTypeException($"An object of type {de.SchemaClassName} was provided, but an object of one of the following types was expected '{string.Join(",", objectClasses)}'"); 
         }
 
         public static byte[] ToBytes(this SecurityIdentifier s)

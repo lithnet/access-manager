@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using Newtonsoft.Json;
 
 namespace Lithnet.AccessManager.Server.Configuration
@@ -8,6 +10,9 @@ namespace Lithnet.AccessManager.Server.Configuration
     {
         [JsonIgnore]
         public string Path { get; private set; }
+
+        [JsonIgnore]
+        public string Hash { get; private set; }
 
         public ConfigurationMetadata Metadata { get; set; } = new ConfigurationMetadata();
 
@@ -36,8 +41,16 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public AuthorizationOptions Authorization { get; set; } = new AuthorizationOptions();
 
-        public void Save(string file)
+        public void Save(string file, bool forceOverwrite)
         {
+            if (!forceOverwrite)
+            {
+                if (this.HasFileBeenModified())
+                {
+                    throw new ConfigurationModifiedException("The configuration file has been modified outside of this editor session");
+                }
+            }
+
             JsonSerializerSettings settings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented,
@@ -48,6 +61,13 @@ namespace Lithnet.AccessManager.Server.Configuration
 
             string data = JsonConvert.SerializeObject(this, settings);
             File.WriteAllText(file, data);
+            this.Hash = ApplicationConfig.BuildHash(file);
+        }
+
+        public bool HasFileBeenModified()
+        {
+            var existingFile = ApplicationConfig.Load(this.Path);
+            return existingFile.Hash != this.Hash;
         }
 
         public static IApplicationConfig Load(string file)
@@ -55,10 +75,21 @@ namespace Lithnet.AccessManager.Server.Configuration
             string data = File.ReadAllText(file);
             var result = JsonConvert.DeserializeObject<ApplicationConfig>(data);
             result.Path = file;
-
             result.Metadata.ValidateMetadata();
+            result.Hash = ApplicationConfig.BuildHash(file);
 
             return result;
+        }
+
+        private static string BuildHash(string file)
+        {
+            using (var hash = SHA1.Create())
+            {
+                using (var stream = File.OpenRead(file))
+                {
+                    return hash.ComputeHash(stream).ToHexString();
+                }
+            }
         }
     }
 }
