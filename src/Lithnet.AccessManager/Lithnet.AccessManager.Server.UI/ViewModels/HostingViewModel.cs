@@ -307,12 +307,13 @@ namespace Lithnet.AccessManager.Server.UI
             this.IsConfigured = registryProvider.IsConfigured;
         }
 
-        [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
-        public async Task<bool> CommitSettings()
+        public async Task<bool> CommitSettings(object dialogContext = null)
         {
+            dialogContext ??= this;
+
             if (this.Certificate == null)
             {
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", "You must select a HTTPS certificate");
+                await this.dialogCoordinator.ShowMessageAsync(dialogContext, "Error", "You must select a HTTPS certificate");
                 return false;
             }
 
@@ -351,7 +352,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                     if (this.IsReservationInUse(currentlyUnconfigured, httpOld, httpNew, out string user))
                     {
-                        MessageDialogResult result = await this.dialogCoordinator.ShowMessageAsync(this, "Warning", $"The HTTP URL '{this.WorkingModel.HttpSys.BuildHttpUrlPrefix()}' is already registered to user {user}. Do you want to overwrite it?", MessageDialogStyle.AffirmativeAndNegative);
+                        MessageDialogResult result = await this.dialogCoordinator.ShowMessageAsync(dialogContext, "Warning", $"The HTTP URL '{this.WorkingModel.HttpSys.BuildHttpUrlPrefix()}' is already registered to user {user}. Do you want to overwrite it?", MessageDialogStyle.AffirmativeAndNegative);
 
                         if (result == MessageDialogResult.Negative)
                         {
@@ -361,7 +362,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                     if (this.IsReservationInUse(currentlyUnconfigured, httpsOld, httpsNew, out user))
                     {
-                        MessageDialogResult result = await this.dialogCoordinator.ShowMessageAsync(this, "Warning", $"The HTTPS URL '{this.WorkingModel.HttpSys.BuildHttpsUrlPrefix()}' is already registered to user {user}. Do you want to overwrite it?", MessageDialogStyle.AffirmativeAndNegative);
+                        MessageDialogResult result = await this.dialogCoordinator.ShowMessageAsync(dialogContext, "Warning", $"The HTTPS URL '{this.WorkingModel.HttpSys.BuildHttpsUrlPrefix()}' is already registered to user {user}. Do you want to overwrite it?", MessageDialogStyle.AffirmativeAndNegative);
 
                         if (result == MessageDialogResult.Negative)
                         {
@@ -376,7 +377,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Error creating HTTP reservations");
                 rollbackContext.Rollback(this.logger);
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not create the HTTP reservations\r\n{ex.Message}");
+                await this.dialogCoordinator.ShowMessageAsync(dialogContext, "Error", $"Could not create the HTTP reservations\r\n{ex.Message}");
                 return false;
             }
 
@@ -392,7 +393,7 @@ namespace Lithnet.AccessManager.Server.UI
                 this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Error updating the firewall rules");
                 rollbackContext.Rollback(this.logger);
 
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not update the firewall rules. Please manually update them to ensure your users can access the application\r\n{ex.Message}");
+                await this.dialogCoordinator.ShowMessageAsync(dialogContext, "Error", $"Could not update the firewall rules. Please manually update them to ensure your users can access the application\r\n{ex.Message}");
                 return false;
             }
 
@@ -421,7 +422,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Error creating certificate binding");
                 rollbackContext.Rollback(this.logger);
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not bind the certificate to the specified port\r\n{ex.Message}");
+                await this.dialogCoordinator.ShowMessageAsync(dialogContext, "Error", $"Could not bind the certificate to the specified port\r\n{ex.Message}");
 
                 return false;
             }
@@ -434,7 +435,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                     if (!await this.rekeyProvider.TryReKeySecretsAsync(this))
                     {
-                        await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"You'll need to re-enter the secrets before you can save the file");
+                        await this.dialogCoordinator.ShowMessageAsync(dialogContext, "Error", $"You'll need to re-enter the secrets before you can save the file");
                         return false;
                     }
 
@@ -447,7 +448,7 @@ namespace Lithnet.AccessManager.Server.UI
                     "Could not change the service account to the specified account {serviceAccountName}",
                     workingServiceAccountUserName);
                 rollbackContext.Rollback(this.logger);
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The service account could not be changed\r\n{ex.Message}");
+                await this.dialogCoordinator.ShowMessageAsync(dialogContext, "Error", $"The service account could not be changed\r\n{ex.Message}");
                 return false;
             }
 

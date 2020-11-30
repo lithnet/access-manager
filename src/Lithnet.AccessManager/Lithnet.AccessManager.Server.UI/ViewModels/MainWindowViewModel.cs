@@ -110,7 +110,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             try
             {
-                if (!await this.hosting.CommitSettings())
+                if (!await this.hosting.CommitSettings(this))
                 {
                     return false;
                 }
