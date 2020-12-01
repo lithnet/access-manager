@@ -245,7 +245,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool IsScriptPermissionNotAllowed => !this.IsScriptPermissionAllowed;
 
-        public bool ShowPowerShellEnterpriseEditionBadge => !this.licenseManager.IsFeatureCoveredByFullLicense(LicensedFeatures.PowerShellAcl);
+        public bool ShowPowerShellEnterpriseEditionBadge => this.IsScriptVisible && !this.licenseManager.IsFeatureCoveredByFullLicense(LicensedFeatures.PowerShellAcl);
 
         public bool ShowLapsHistoryEnterpriseEditionBadge => !this.licenseManager.IsFeatureCoveredByFullLicense(LicensedFeatures.PowerShellAcl) && SdHasMask(this.SecurityDescriptor, AccessMask.LocalAdminPasswordHistory);
 
