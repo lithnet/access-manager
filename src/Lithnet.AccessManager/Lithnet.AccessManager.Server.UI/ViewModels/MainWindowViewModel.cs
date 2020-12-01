@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.ServiceProcess;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Lithnet.AccessManager.Enterprise;
@@ -22,10 +23,14 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IRegistryProvider registryProvider;
         private readonly ICertificateSynchronizationProvider certSyncProvider;
         private readonly ILicenseManager licenseManager;
+        private readonly IClusterProvider clusterProvider;
+
+        private SemaphoreSlim clusterWaitSemaphore;
+        private int isUiLocked;
 
         public MainWindowViewModel(IApplicationConfig model, AuthenticationViewModel authentication, AuthorizationViewModel authorization, UserInterfaceViewModel ui, RateLimitsViewModel rate, IpDetectionViewModel ip,
             AuditingViewModel audit, EmailViewModel mail, HostingViewModel hosting, ActiveDirectoryConfigurationViewModel ad,
-            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, LicensingViewModel lic, HighAvailabilityViewModel havm, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider, ICertificateSynchronizationProvider certSyncProvider, ILicenseManager licenseManager)
+            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, LicensingViewModel lic, HighAvailabilityViewModel havm, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider, ICertificateSynchronizationProvider certSyncProvider, ILicenseManager licenseManager, IClusterProvider clusterProvider)
         {
             this.model = model;
             this.shellExecuteProvider = shellExecuteProvider;
@@ -38,6 +43,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.certSyncProvider = certSyncProvider;
             this.dialogCoordinator = dialogCoordinator;
             this.licenseManager = licenseManager;
+            this.clusterProvider = clusterProvider;
+            this.clusterWaitSemaphore = new SemaphoreSlim(0, 1);
 
             this.eventAggregator.Subscribe(this);
             this.DisplayName = Constants.AppName;
@@ -62,6 +69,37 @@ namespace Lithnet.AccessManager.Server.UI
             this.ActiveItem = this.Items.First();
 
             this.UpdateIsConfigured();
+            this.SetupClusterMonitor();
+
+        }
+
+        private void SetupClusterMonitor()
+        {
+            try
+            {
+                if (this.clusterProvider.IsClustered)
+                {
+                    this.clusterProvider.NodeChangedEvent += ClusterProvider_NodeChangedEventAsync;
+                    this.clusterProvider.SetupClusterNodeChangeNotifications();
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Could not set up cluster change notifications");
+            }
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD100:Avoid async void methods", Justification = "Event handler")]
+        private async void ClusterProvider_NodeChangedEventAsync(object sender, EventArgs e)
+        {
+            if (this.clusterProvider.IsOnActiveNode())
+            {
+                this.clusterWaitSemaphore.Release();
+            }
+            else
+            {
+                await this.DisableUIAndWaitForNode();
+            }
         }
 
         public BindableCollection<PropertyChangedBase> OptionItems { get; }
@@ -71,6 +109,35 @@ namespace Lithnet.AccessManager.Server.UI
         public PropertyChangedBase ActiveOptionsItem { get; set; }
 
         public string HelpLink => (this.ActiveItem as IHelpLink)?.HelpLink ?? (this.ActiveOptionsItem as IHelpLink)?.HelpLink;
+
+        public async Task DisableUIAndWaitForNode()
+        {
+            ProgressDialogController controller = null;
+
+            if (Interlocked.CompareExchange(ref isUiLocked, 1, 0) != 0)
+            {
+                return;
+            }
+
+            try
+            {
+                controller = await this.dialogCoordinator.ShowProgressAsync(this, "Cluster node no longer active", "This server is no longer hosting the clustered service. Configuration is currently disabled. You can wait for the service to return to this node, or close the app without saving any configuration changes. ", true, new MetroDialogSettings() { NegativeButtonText = "Close app without saving" });
+                
+                controller.Canceled += (sender, args) =>
+                {
+                    this.clusterWaitSemaphore.Release();
+                    Application.Current.Shutdown();
+                };
+
+                await this.clusterWaitSemaphore.WaitAsync();
+            }
+            finally
+            {
+                isUiLocked = 0;
+                await controller?.CloseAsync();
+            }
+        }
+
 
         public async Task<bool> Save()
         {
@@ -84,9 +151,9 @@ namespace Lithnet.AccessManager.Server.UI
                         AffirmativeButtonText = "Overwrite external changes",
                         NegativeButtonText = "Cancel save",
                         FirstAuxiliaryButtonText = "Reload config and discard changes",
-                        DefaultButtonFocus = MessageDialogResult.Affirmative, 
+                        DefaultButtonFocus = MessageDialogResult.Affirmative,
                     });
-                    
+
                     if (result == MessageDialogResult.Negative)
                     {
                         return false;

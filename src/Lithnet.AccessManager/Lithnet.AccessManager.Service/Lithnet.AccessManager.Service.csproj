@@ -79,7 +79,7 @@
 
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.11.24" />
-    <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7616.23549" />
+    <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7640.20375" />
     <PackageReference Include="lithnet.EventLogMessages" Version="1.0.0.4" />
     <PackageReference Include="microsoft.aspnetcore.authentication.cookies" Version="2.2.0" />
     <PackageReference Include="microsoft.aspnetcore.authentication.jwtbearer" Version="3.1.6" />
