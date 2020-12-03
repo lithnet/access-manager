@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Configuration;
@@ -50,7 +53,9 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool DoDiscoveryButtonIsDefault { get; set; } = false;
 
-        public AuthorizationViewModel AuthorizationViewModel { get; set; }
+        public BindableCollection<SecurityDescriptorTargetViewModel> ImportTargetViewModels { get; set; }
+
+        public IList<SecurityDescriptorTarget> ImportTargetModels { get; set; }
 
         public ImportWizardWindowViewModel(IDialogCoordinator dialogCoordinator, ILogger<ImportWizardWindowViewModel> logger, ImportWizardImportTypeViewModel importTypeVm, ImportWizardCsvSettingsViewModel csvSettingsVm, ImportWizardImportContainerViewModel containerVm, ImportWizardRuleSettingsViewModel ruleVm, ImportWizardLapsWebSettingsViewModel lapsWebVm, ImportWizardImportReadyViewModel importReadyVm, IImportProviderFactory importProviderFactory, IImportResultsViewModelFactory resultsFactory, AuditOptions auditOptions, IEventAggregator eventAggregator, IShellExecuteProvider shellExecuteProvider)
         {
@@ -188,7 +193,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             this.RequestClose();
         }
-        
+
         public override async Task<bool> CanCloseAsync()
         {
             if (this.ActiveItem is ImportWizardImportTypeViewModel)
@@ -222,20 +227,20 @@ namespace Lithnet.AccessManager.Server.UI
                 }
 
                 bool plural = irvm.Targets.ViewModels.Count != 1;
-                
+
                 MetroDialogSettings settings = new MetroDialogSettings()
                 {
                     AffirmativeButtonText = "Yes",
                     NegativeButtonText = "No"
                 };
-                
+
                 if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm import", $"Are you sure you want to import {(plural ? $"these {irvm.Targets.ViewModels.Count}" : "this")} authorization rule{(plural ? "s" : "")}?", MessageDialogStyle.AffirmativeAndNegative, settings) != MessageDialogResult.Affirmative)
                 {
                     return;
                 }
 
                 this.auditOptions.NotificationChannels.Merge(irvm.NotificationChannels);
-                this.AuthorizationViewModel.Merge(irvm.Targets, irvm.Merge, irvm.MergeOverwrite);
+                this.Merge(irvm.Targets, irvm.Merge, irvm.MergeOverwrite);
 
                 this.eventAggregator.Publish(new NotificationSubscriptionReloadEvent());
 
@@ -491,6 +496,111 @@ namespace Lithnet.AccessManager.Server.UI
             var val = Interlocked.Increment(ref this.progressCurrent);
             this.logger.LogTrace("Progress {count}/{max}", val, this.progressMaximum);
             this.progress.SetProgress(Math.Min(val, this.progressMaximum));
+        }
+
+        private void Merge(SecurityDescriptorTargetsViewModel newTargets, bool merge, bool overwriteExisting)
+        {
+            foreach (var newTarget in newTargets.ViewModels)
+            {
+                newTarget.Model.LastModified = DateTime.UtcNow;
+                newTarget.Model.LastModifiedBy = WindowsIdentity.GetCurrent().User.ToString();
+                newTarget.Model.Created = newTarget.Model.LastModified;
+                newTarget.Model.CreatedBy = newTarget.Model.LastModifiedBy;
+
+                if (!merge)
+                {
+                    Execute.OnUIThread(() => this.ImportTargetViewModels.Add(newTarget));
+                    this.ImportTargetModels.Add(newTarget.Model);
+                    continue;
+                }
+
+                var existingTarget = this.ImportTargetViewModels.FirstOrDefault(t => t.IsModePermission && string.Equals(t.Target, newTarget.Target, StringComparison.OrdinalIgnoreCase));
+
+                if (existingTarget == null)
+                {
+                    Execute.OnUIThread(() => this.ImportTargetViewModels.Add(newTarget));
+                    this.ImportTargetModels.Add(newTarget.Model);
+                    continue;
+                }
+
+                existingTarget.Model.LastModified = newTarget.Model.LastModified;
+                existingTarget.Model.LastModifiedBy = newTarget.Model.LastModifiedBy;
+
+                if (string.IsNullOrWhiteSpace(existingTarget.JitAuthorizingGroup) || overwriteExisting)
+                {
+                    if (!string.IsNullOrWhiteSpace(newTarget.JitAuthorizingGroup))
+                    {
+                        existingTarget.JitAuthorizingGroup = newTarget.JitAuthorizingGroup;
+                    }
+                }
+
+                if (existingTarget.JitExpireMinutes == 0 || overwriteExisting)
+                {
+                    if (newTarget.JitExpireMinutes > 0)
+                    {
+                        existingTarget.JitExpireAfter = newTarget.JitExpireAfter;
+                    }
+                }
+
+                if (existingTarget.LapsExpireMinutes == 0 || overwriteExisting)
+                {
+                    if (newTarget.LapsExpireMinutes > 0)
+                    {
+                        existingTarget.LapsExpireAfter = newTarget.LapsExpireAfter;
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(existingTarget.Description) || overwriteExisting)
+                {
+                    if (!string.IsNullOrWhiteSpace(newTarget.Description))
+                    {
+                        existingTarget.Description = newTarget.Description;
+                    }
+                }
+
+                if (overwriteExisting && newTarget.Notifications.SuccessSubscriptions.Count > 0)
+                {
+                    existingTarget.Notifications.SuccessSubscriptions.Clear();
+                    existingTarget.Notifications.Model.OnSuccess.Clear();
+                }
+
+                foreach (var notification in newTarget.Notifications.SuccessSubscriptions)
+                {
+                    if (existingTarget.Notifications.SuccessSubscriptions.All(t => t.Id != notification.Id))
+                    {
+                        existingTarget.Notifications.SuccessSubscriptions.Add(notification);
+                        existingTarget.Notifications.Model.OnSuccess.Add(notification.Id);
+                    }
+                }
+
+
+                if (overwriteExisting && newTarget.Notifications.FailureSubscriptions.Count > 0)
+                {
+                    existingTarget.Notifications.FailureSubscriptions.Clear();
+                    existingTarget.Notifications.Model.OnFailure.Clear();
+                }
+
+                foreach (var notification in newTarget.Notifications.FailureSubscriptions)
+                {
+                    if (existingTarget.Notifications.FailureSubscriptions.All(t => t.Id != notification.Id))
+                    {
+                        existingTarget.Notifications.FailureSubscriptions.Add(notification);
+                        existingTarget.Notifications.Model.OnFailure.Add(notification.Id);
+                    }
+                }
+
+                RawSecurityDescriptor existingrsd = new RawSecurityDescriptor(existingTarget.SecurityDescriptor);
+                RawSecurityDescriptor newrsd = new RawSecurityDescriptor(newTarget.SecurityDescriptor);
+                CommonSecurityDescriptor existingsd = new CommonSecurityDescriptor(false, false, existingrsd);
+                CommonSecurityDescriptor newsd = new CommonSecurityDescriptor(false, false, newrsd);
+
+                foreach (var ace in newsd.DiscretionaryAcl.OfType<CommonAce>())
+                {
+                    existingsd.DiscretionaryAcl.AddAccess((AccessControlType)ace.AceType, ace.SecurityIdentifier, ace.AccessMask, ace.InheritanceFlags, ace.PropagationFlags);
+                }
+
+                existingTarget.SecurityDescriptor = existingsd.GetSddlForm(AccessControlSections.All);
+            }
         }
     }
 }

@@ -34,6 +34,16 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public AuditNotificationChannels Notifications { get; set; } = new AuditNotificationChannels();
 
+        public string CreatedBy { get; set; }
+
+        public DateTime? Created { get; set; }
+
+        public string LastModifiedBy { get; set; }
+
+        public DateTime? LastModified { get; set; }
+
+        public string Notes { get; set; }
+
         public bool IsActive()
         {
             return !this.IsInactive();

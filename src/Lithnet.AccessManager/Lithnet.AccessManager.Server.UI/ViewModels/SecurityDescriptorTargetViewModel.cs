@@ -76,6 +76,8 @@ namespace Lithnet.AccessManager.Server.UI
             await this.UpdateDisplayName();
             await this.UpdateJitGroupDisplayName();
             await this.ValidateAsync();
+            this.LastModifiedBy = await this.GetNameFromSidOrDefaultAsync(this.Model.LastModifiedBy);
+            this.CreatedBy = await this.GetNameFromSidOrDefaultAsync(this.Model.CreatedBy);
         }
 
         private void Script_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -103,6 +105,15 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
+        public bool IsEditing
+        {
+            get => !this.IsAdding;
+            set => this.IsAdding = !value;
+        }
+
+        public bool IsAdding { get; set; } = true;
+
+
         public bool IsDisabled
         {
             get => this.Model.Disabled;
@@ -125,6 +136,20 @@ namespace Lithnet.AccessManager.Server.UI
         {
             get => this.Model.HasExpired();
         }
+
+        public string Notes
+        {
+            get => this.Model.Notes;
+            set => this.Model.Notes = value;
+        }
+
+        public string CreatedBy { get; private set; }
+
+        public string LastModifiedBy { get; private set; }
+
+        public DateTime? Created => this.Model.Created?.ToLocalTime();
+
+        public DateTime? LastModified => this.Model.LastModified?.ToLocalTime();
 
         public bool IsModePermission { get => this.AuthorizationMode == AuthorizationMode.SecurityDescriptor; set => this.AuthorizationMode = value ? AuthorizationMode.SecurityDescriptor : AuthorizationMode.PowershellScript; }
 

@@ -14,329 +14,389 @@
 
     <AdornerDecorator>
         <StackPanel>
-
-            <!--<StackPanel>
-                <Grid Background="LightYellow"
-              Margin="5">
+            <Expander Expanded="HandleExpanderExpanded"
+                      IsExpanded="true"
+                      Style="{x:Null}">
+                <Expander.Header>
+                    <StackPanel>
+                        <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
+                               Content="Rule settings"
+                               Margin="0 0 0 0" />
+                    </StackPanel>
+                </Expander.Header>
+                <Grid Margin="25 0 0 0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <iconPacks:PackIconMaterial Kind="RocketLaunchOutline" Margin="5 5 0 5" Foreground="BlueViolet" VerticalAlignment="Center"/>
-                    <TextBlock Grid.Column="1"  TextWrapping="Wrap" Margin="5"><TextBlock Text="{Binding FeatureName, FallbackValue='This'}"></TextBlock> is an Enterprise edition feature. <Hyperlink Click="Hyperlink_Click">Learn more...</Hyperlink></TextBlock>
-                </Grid>
-            </StackPanel>-->
-
-            <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
-                   Content="Rule settings"
-                   Margin="0 5 0 0" />
-            <Separator Margin="5 0 0 10"
-                       Height="1"
-                       Width="Auto"
-                       HorizontalAlignment="Stretch"
-                       VerticalAlignment="Top"
-                       Background="#11000000" />
-
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="150" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <Label Grid.Row="0"
-                       Grid.Column="0"
-                       Content="Target"
-                       Margin="5 2 5 2" />
-                <TextBox Grid.Row="0"
-                         Grid.Column="1"
-                         Text="{Binding DisplayName, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                         IsReadOnly="True"
-                         Margin="2" />
-                <Button Grid.Row="0"
-                        Grid.Column="2"
-                        Command="{s:Action SelectTarget}"
-                        Content="..."
-                        Width="30"
-                        Margin="2" />
-
-                <Label Grid.Row="1"
-                       Grid.Column="0"
-                       Content="Description"
-                       Margin="5 2 5 2" />
-                <TextBox Grid.Row="1"
-                         Grid.Column="1"
-                         Text="{Binding Description}"
-                         Margin="2" />
-
-                <CheckBox Grid.Row="2"
-                          Grid.Column="1"
-                          Content="Disable rule"
-                          Margin="2 5 5 5"
-                          IsChecked="{Binding IsDisabled}" />
-
-                <StackPanel Grid.Row="3"
-                            Grid.Column="1"
-                            Orientation="Horizontal">
-                    <CheckBox Content="Expire rule"
-                              Margin="2 5 5 5"
-                              IsChecked="{Binding ExpireRule}" />
-
-                    <mah:DateTimePicker Margin="5"
-                                        SecondsItemStringFormat="D2"
-                                        MinutesItemStringFormat="D2"
-                                        MinWidth="300"
-                                        IsEnabled="{Binding ExpireRule}"
-                                        SelectedDateTime="{Binding Expiry}"
-                                        SelectedTimeFormat="Short"
-                                        SelectedDateFormat="Long" />
-
-                </StackPanel>
-
-            </Grid>
-
-            <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
-                   Margin="0 20 0 0"
-                   Content="Access control" />
-            <Separator Margin="5 0 0 10"
-                       Height="1"
-                       Width="Auto"
-                       HorizontalAlignment="Stretch"
-                       VerticalAlignment="Top"
-                       Background="#11000000" />
-
-            <Grid IsEnabled="{Binding CanEdit, Mode=OneWay}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="150" />
-                    <ColumnDefinition Width="500" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-
-                <Label Grid.Row="0"
-                       Grid.Column="0"
-                       Content="Access control type"
-                       VerticalAlignment="Top"
-                       Margin="5 2 5 2" />
-
-                <Grid Grid.Row="0"
-                      Grid.Column="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="150" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
+                    <Label Grid.Row="0"
+                           Grid.Column="0"
+                           Content="Target" />
+                    <TextBox Grid.Row="0"
+                             Grid.Column="1"
+                             Text="{Binding DisplayName, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                             IsReadOnly="True"
+                             Margin="2" />
+                    <Button Grid.Row="0"
+                            Grid.Column="2"
+                            Command="{s:Action SelectTarget}"
+                            Content="..."
+                            Width="30"
+                            Margin="2" />
+
+                    <Label Grid.Row="1"
+                           Grid.Column="0"
+                           Content="Description" />
+                    <TextBox Grid.Row="1"
+                             Grid.Column="1"
+                             Text="{Binding Description}"
+                             Margin="2" />
+
+                    <Label Grid.Row="2"
+                           Grid.Column="0"
+                           Content="Notes" />
+                    <TextBox Grid.Row="2"
+                             Grid.Column="1"
+                             Text="{Binding Notes}"
+                             Height="100"
+                             AcceptsReturn="True"
+                             Margin="2" />
+
+                    <CheckBox Grid.Row="3"
+                              Grid.Column="1"
+                              Content="Disable rule"
+                              Margin="2 5 5 5"
+                              IsChecked="{Binding IsDisabled}" />
+
+                    <StackPanel Grid.Row="4"
+                                Grid.Column="1"
+                                Orientation="Horizontal">
+                        <CheckBox Content="Expire rule"
+                                  Margin="2 5 5 5"
+                                  IsChecked="{Binding ExpireRule}" />
+
+                        <mah:DateTimePicker Margin="5"
+                                            SecondsItemStringFormat="D2"
+                                            MinutesItemStringFormat="D2"
+                                            MinWidth="300"
+                                            IsEnabled="{Binding ExpireRule}"
+                                            SelectedDateTime="{Binding Expiry}"
+                                            SelectedTimeFormat="Short"
+                                            SelectedDateFormat="Long" />
+
+                    </StackPanel>
+
+                </Grid>
+            </Expander>
+
+            <Expander Expanded="HandleExpanderExpanded"
+                      Style="{x:Null}">
+                <Expander.Header>
+                    <StackPanel>
+                        <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
+                               Content="Access control" />
+                    </StackPanel>
+                </Expander.Header>
+                <Grid Margin="25 0 0 0"
+                      IsEnabled="{Binding CanEdit, Mode=OneWay}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="500" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition />
                         <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
                     </Grid.RowDefinitions>
 
-                    <RadioButton Grid.Row="0"
-                                 Grid.Column="0"
-                                 IsChecked="{Binding IsModePermission}"
-                                 Content="Use in-built permissions"
-                                 IsEnabled="{Binding CanEdit, Mode=OneWay}"
-                                 Background="Transparent"
-                                 Margin="2 2 5 2" />
+                    <Label Grid.Row="0"
+                           Grid.Column="0"
+                           Content="Access control type" />
 
-                    <Button Grid.Row="0"
-                            Grid.Column="2"
-                            Command="{s:Action EditPermissions}"
-                            Content="Edit permissions..."
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            Margin="2" />
+                    <Grid Grid.Row="0"
+                          Grid.Column="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
 
-                    <!--<Button Grid.Row="1"
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+
+                        <RadioButton Grid.Row="0"
+                                     Grid.Column="0"
+                                     IsChecked="{Binding IsModePermission}"
+                                     Content="Use in-built permissions"
+                                     IsEnabled="{Binding CanEdit, Mode=OneWay}"
+                                     Background="Transparent"
+                                     Margin="2 2 5 2" />
+
+                        <Button Grid.Row="0"
+                                Grid.Column="2"
+                                Command="{s:Action EditPermissions}"
+                                Content="Edit permissions..."
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Margin="2" />
+
+                        <!--<Button Grid.Row="1"
                             Grid.Column="2"
                             Command="{s:Action ImportJitAdminsFromComputer}"
                             Content="Import admins from computer..."
                             HorizontalAlignment="Left"
                             Margin="2" />-->
 
-                    <local:EnterpriseEditionBadge Grid.Row="0"
-                                                  Grid.Column="1"
-                                                  VerticalAlignment="Top"
-                                                  Visibility="{Binding ShowLapsHistoryEnterpriseEditionBadge, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
-                                                  ToolTipText="Web-based access to the historical local admin passwords is an enterprise edition feature. Click to learn more"
-                                                  Click="{s:Action LearnMoreLinkLapsHistory}"
-                                                  ShowText="False"
-                                                  Margin="2 0 5 0" />
+                        <local:EnterpriseEditionBadge Grid.Row="0"
+                                                      Grid.Column="1"
+                                                      VerticalAlignment="Top"
+                                                      Visibility="{Binding ShowLapsHistoryEnterpriseEditionBadge, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+                                                      ToolTipText="Web-based access to the historical local admin passwords is an enterprise edition feature. Click to learn more"
+                                                      Click="{s:Action LearnMoreLinkLapsHistory}"
+                                                      ShowText="False"
+                                                      Margin="2 0 5 0" />
 
-                    <StackPanel  Grid.Row="2"
-                                 Grid.Column="0"
-                                 Orientation="Horizontal">
-                        <RadioButton IsChecked="{Binding IsModeScript}"
-                                     VerticalAlignment="Top"
-                                     Background="Transparent"
-                                     IsEnabled="{Binding IsScriptPermissionAllowed, Mode=OneWay}"
-                                     Visibility="{Binding IsScriptVisible, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
-                                     Margin="2 2 5 2"
-                                     Content="Use a PowerShell script" />
+                        <StackPanel  Grid.Row="2"
+                                     Grid.Column="0"
+                                     Orientation="Horizontal">
+                            <RadioButton IsChecked="{Binding IsModeScript}"
+                                         VerticalAlignment="Top"
+                                         Background="Transparent"
+                                         IsEnabled="{Binding IsScriptPermissionAllowed, Mode=OneWay}"
+                                         Visibility="{Binding IsScriptVisible, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+                                         Margin="2 2 5 2"
+                                         Content="Use a PowerShell script" />
 
+                        </StackPanel>
+
+                        <local:EnterpriseEditionBadge Grid.Row="2"
+                                                      Grid.Column="1"
+                                                      VerticalAlignment="Top"
+                                                      Visibility="{Binding ShowPowerShellEnterpriseEditionBadge, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+                                                      ToolTipText="PowerShell-based authorization is an enterprise edition feature. Click to learn more"
+                                                      Click="{s:Action LearnMoreLinkPowerShellAuthZ}"
+                                                      ShowText="False"
+                                                      Margin="2 0 5 0" />
+
+                        <ContentControl Grid.Row="2"
+                                        Grid.Column="2"
+                                        s:View.Model="{Binding Script}"
+                                        VerticalAlignment="Top"
+                                        IsEnabled="{Binding IsModeScript}"
+                                        Visibility="{Binding IsScriptVisible, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+                                        Margin="2" />
+                    </Grid>
+                </Grid>
+
+            </Expander>
+
+            <Expander Expanded="HandleExpanderExpanded"
+                      Visibility="{Binding ShowLapsOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                      Style="{x:Null}">
+                <Expander.Header>
+                    <StackPanel>
+                        <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
+                               Content="Password settings"
+                               Margin="0 0 0 0" />
+                    </StackPanel>
+                </Expander.Header>
+                <Grid Margin="25 0 0 0"
+                      IsEnabled="{Binding CanEdit, Mode=OneWay}"
+                      Visibility="{Binding ShowLapsOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Label Grid.Row="0"
+                           Grid.Column="0"
+                           Content="Password rotation" />
+
+                    <StackPanel Grid.Row="0"
+                                Grid.Column="1"
+                                Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding ExpireLapsPassword}"
+                                  Margin="0 0 5 0"
+                                  Content="Expire the local admin password" />
+                        <mah:NumericUpDown Value="{Binding LapsExpireMinutes}"
+                                           Minimum="0"
+                                           Interval="15"
+                                           HideUpDownButtons="False"
+                                           Width="100"
+                                           VerticalAlignment="Center"
+                                           TextAlignment="Left"
+                                           HorizontalAlignment="Left" />
+                        <Label Content="minutes after it has been accessed"
+                               VerticalAlignment="Center" />
                     </StackPanel>
 
-                    <local:EnterpriseEditionBadge Grid.Row="2"
-                                                  Grid.Column="1"
-                                                  VerticalAlignment="Top"
-                                                  Visibility="{Binding ShowPowerShellEnterpriseEditionBadge, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
-                                                  ToolTipText="PowerShell-based authorization is an enterprise edition feature. Click to learn more"
-                                                  Click="{s:Action LearnMoreLinkPowerShellAuthZ}"
-                                                  ShowText="False"
-                                                  Margin="2 0 5 0" />
-
-                    <ContentControl Grid.Row="2"
-                                    Grid.Column="2"
-                                    s:View.Model="{Binding Script}"
-                                    VerticalAlignment="Top"
-                                    IsEnabled="{Binding IsModeScript}"
-                                    Visibility="{Binding IsScriptVisible, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
-                                    Margin="2" />
                 </Grid>
-            </Grid>
 
-            <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
-                   Visibility="{Binding ShowLapsOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                   Margin="0 20 0 0"
-                   Content="Local admin password settings" />
-            <Separator Margin="5 0 0 10"
-                       Height="1"
-                       Visibility="{Binding ShowLapsOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                       Width="Auto"
-                       HorizontalAlignment="Stretch"
-                       VerticalAlignment="Top"
-                       Background="#11000000" />
+            </Expander>
 
-            <Grid IsEnabled="{Binding CanEdit, Mode=OneWay}"
-                  Visibility="{Binding ShowLapsOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="150" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+            <Expander Expanded="HandleExpanderExpanded"
+                      Visibility="{Binding ShowJitOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                      Style="{x:Null}">
+                <Expander.Header>
+                    <StackPanel>
+                        <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
+                               Content="JIT settings" />
+                    </StackPanel>
+                </Expander.Header>
 
-                <Label Grid.Row="0"
-                       Grid.Column="0"
-                       Margin="5"
-                       Content="Password rotation" />
+                <Grid Margin="25 0 0 0"
+                      IsEnabled="{Binding CanEdit, Mode=OneWay}"
+                      Visibility="{Binding ShowJitOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="500" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Row="0"
-                            Grid.Column="1"
-                            Orientation="Horizontal">
-                    <CheckBox IsChecked="{Binding ExpireLapsPassword}"
-                              Margin="0 0 5 0"
-                              Content="Expire the local admin password" />
-                    <mah:NumericUpDown Value="{Binding LapsExpireMinutes}"
-                                       Minimum="0"
-                                       Interval="15"
-                                       HideUpDownButtons="False"
-                                       Width="100"
-                                       VerticalAlignment="Center"
-                                       TextAlignment="Left"
-                                       HorizontalAlignment="Left" />
-                    <Label Content="minutes after it has been accessed"
-                           VerticalAlignment="Center" />
-                </StackPanel>
+                    <Label Grid.Row="0"
+                           Grid.Column="0"
+                           Content="Add user to this group" />
 
-            </Grid>
+                    <TextBox Grid.Row="0"
+                             Grid.Column="1"
+                             Text="{Binding JitGroupDisplayName,  ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=LostFocus}"
+                             VerticalAlignment="Center"
+                             Margin="0" />
+                    <Button Grid.Row="0"
+                            Grid.Column="2"
+                            Command="{s:Action SelectJitGroup}"
+                            Content="..."
+                            Width="30"
+                            HorizontalAlignment="Left"
+                            Margin="5" />
 
-            <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
-                   IsEnabled="{Binding CanEdit, Mode=OneWay}"
-                   Visibility="{Binding ShowJitOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                   Margin="0 20 0 0"
-                   Content="Just-in-time access settings" />
-            <Separator Margin="5 0 0 10"
-                       Height="1"
-                       Visibility="{Binding ShowJitOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                       Width="Auto"
-                       HorizontalAlignment="Stretch"
-                       VerticalAlignment="Top"
-                       Background="#11000000" />
+                    <TextBlock Grid.Row="1"
+                               Grid.Column="1"
+                               Text="Select the group to add the user to, or build a template using the %computername% and %computerdomain% placeholders. For example, if you specify '%computerdomain%\JIT-%computername%', for a computer in the domain LITHNET with the name PC1, the user will be added to a group called 'LITHNET\JIT-PC1'"
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Center"
+                               Margin="5 0 5 5 " />
 
-            <Grid IsEnabled="{Binding CanEdit, Mode=OneWay}"
-                  Visibility="{Binding ShowJitOptions, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="150" />
-                    <ColumnDefinition Width="500" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+                    <Label Grid.Row="2"
+                           Grid.Column="0"
+                           Content="Access duration" />
 
-                <Label Grid.Row="0"
-                       Grid.Column="0"
-                       Content="Add user to this group"
-                       Margin="5" />
+                    <StackPanel Grid.Row="2"
+                                Grid.Column="1"
+                                Orientation="Horizontal">
+                        <Label Content="Expire the access after"
+                               VerticalAlignment="Center"
+                               Margin="0 0 5 0" />
+                        <mah:NumericUpDown Value="{Binding JitExpireMinutes}"
+                                           Minimum="15"
+                                           Interval="15"
+                                           HideUpDownButtons="False"
+                                           Width="100"
+                                           VerticalAlignment="Center"
+                                           TextAlignment="Left"
+                                           HorizontalAlignment="Left" />
+                        <Label Content="minutes"
+                               VerticalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+            </Expander>
 
-                <TextBox Grid.Row="0"
-                         Grid.Column="1"
-                         Text="{Binding JitGroupDisplayName,  ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=LostFocus}"
-                         VerticalAlignment="Center"
-                         Margin="0" />
-                <Button Grid.Row="0"
-                        Grid.Column="2"
-                        Command="{s:Action SelectJitGroup}"
-                        Content="..."
-                        Width="30"
-                        HorizontalAlignment="Left"
-                        Margin="5" />
+            <Expander Expanded="HandleExpanderExpanded"
+                      Style="{x:Null}">
+                <Expander.Header>
+                    <StackPanel>
+                        <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
+                               Content="Notifications" />
+                    </StackPanel>
+                </Expander.Header>
 
-                <TextBlock Grid.Row="1"
+                <Grid Margin="25 0 0 0">
+                    <ContentControl s:View.Model="{Binding Notifications}"
+                                    HorizontalAlignment="Left"
+                                    IsTabStop="False" />
+                </Grid>
+            </Expander>
+
+            <Expander Expanded="HandleExpanderExpanded"
+                      Style="{x:Null}">
+                <Expander.Header>
+                    <StackPanel>
+                        <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
+                               Content="Other info" />
+                    </StackPanel>
+                </Expander.Header>
+
+                <Grid Margin="25 0 0 0"
+                      mah:VisibilityHelper.IsVisible="{Binding IsEditing}">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="150" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Row="0"
+                           Grid.Column="0"
+                           Content="Created by" />
+
+                    <Label Grid.Row="0"
                            Grid.Column="1"
-                           Text="Select the group to add the user to, or build a template using the %computername% and %computerdomain% placeholders. For example, if you specify '%computerdomain%\JIT-%computername%', for a computer in the domain LITHNET with the name PC1, the user will be added to a group called 'LITHNET\JIT-PC1'"
-                           TextWrapping="Wrap"
-                           HorizontalAlignment="Left"
-                           VerticalAlignment="Center"
-                           Margin="5 0 5 5 " />
+                           Content="{Binding CreatedBy}" />
 
-                <Label Grid.Row="2"
-                       Grid.Column="0"
-                       Content="Access duration"
-                       Margin="5" />
+                    <Label Grid.Row="1"
+                           Grid.Column="0"
+                           Content="Created date" />
 
-                <StackPanel Grid.Row="2"
-                            Grid.Column="1"
-                            Orientation="Horizontal">
-                    <Label Content="Expire the access after"
-                           VerticalAlignment="Center"
-                           Margin="0 0 5 0" />
-                    <mah:NumericUpDown Value="{Binding JitExpireMinutes}"
-                                       Minimum="15"
-                                       Interval="15"
-                                       HideUpDownButtons="False"
-                                       Width="100"
-                                       VerticalAlignment="Center"
-                                       TextAlignment="Left"
-                                       HorizontalAlignment="Left" />
-                    <Label Content="minutes"
-                           VerticalAlignment="Center" />
-                </StackPanel>
-            </Grid>
+                    <Label Grid.Row="1"
+                           Grid.Column="1"
+                           Content="{Binding Created}" />
 
-            <Grid Margin="0 20 0 0">
-                <ContentControl s:View.Model="{Binding Notifications}"
-                                HorizontalAlignment="Left"
-                                IsTabStop="False" />
-            </Grid>
+                    <Label Grid.Row="2"
+                           Grid.Column="0"
+                           Content="Last modified by" />
+
+                    <Label Grid.Row="2"
+                           Grid.Column="1"
+                           Content="{Binding LastModifiedBy}" />
+
+                    <Label Grid.Row="3"
+                           Grid.Column="0"
+                           Content="Last modified date" />
+
+                    <Label Grid.Row="3"
+                           Grid.Column="1"
+                           Content="{Binding LastModified}" />
+                </Grid>
+            </Expander>
         </StackPanel>
     </AdornerDecorator>
 </UserControl>

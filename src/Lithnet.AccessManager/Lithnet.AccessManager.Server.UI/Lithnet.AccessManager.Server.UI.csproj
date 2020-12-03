@@ -180,6 +180,9 @@
     <Page Update="Views\ScriptContentView.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Views\SecurityDescriptorTargetView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
     <Page Update="Views\SelectForestView.xaml">
       <SubType>Designer</SubType>
     </Page>

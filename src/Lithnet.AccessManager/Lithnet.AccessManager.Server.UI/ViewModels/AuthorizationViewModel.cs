@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
@@ -57,7 +58,8 @@ namespace Lithnet.AccessManager.Server.UI
         public void Import()
         {
             var vm = importWizardFactory.Invoke();
-            vm.AuthorizationViewModel = this;
+            vm.ImportTargetViewModels = this.Targets.ViewModels;
+            vm.ImportTargetModels = this.Targets.Model;
 
             windowManager.ShowDialog(vm);
         }
@@ -66,6 +68,11 @@ namespace Lithnet.AccessManager.Server.UI
         {
             foreach (var newTarget in newTargets.ViewModels)
             {
+                newTarget.Model.LastModified = DateTime.UtcNow;
+                newTarget.Model.LastModifiedBy = WindowsIdentity.GetCurrent().User.ToString();
+                newTarget.Model.Created = newTarget.Model.LastModified;
+                newTarget.Model.CreatedBy = newTarget.Model.LastModifiedBy;
+
                 if (!merge)
                 {
                     Execute.OnUIThread(() => this.Targets.ViewModels.Add(newTarget));
@@ -81,6 +88,9 @@ namespace Lithnet.AccessManager.Server.UI
                     this.Targets.Model.Add(newTarget.Model);
                     continue;
                 }
+
+                existingTarget.Model.LastModified = newTarget.Model.LastModified;
+                existingTarget.Model.LastModifiedBy = newTarget.Model.LastModifiedBy;
 
                 if (string.IsNullOrWhiteSpace(existingTarget.JitAuthorizingGroup) || overwriteExisting)
                 {

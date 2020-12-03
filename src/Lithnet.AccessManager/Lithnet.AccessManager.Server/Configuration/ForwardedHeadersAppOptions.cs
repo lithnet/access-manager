@@ -15,26 +15,20 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public string ForwardedHostHeaderName { get; set; } = defaultOptions.ForwardedHostHeaderName;
 
-        public string ForwardedProtoHeaderName { get; set; }
-         = defaultOptions.ForwardedProtoHeaderName;
+        public string ForwardedProtoHeaderName { get; set; } = defaultOptions.ForwardedProtoHeaderName;
 
-        public string OriginalForHeaderName { get; set; }
-         = defaultOptions.OriginalForHeaderName;
+        public string OriginalForHeaderName { get; set; } = defaultOptions.OriginalForHeaderName;
 
-        public string OriginalHostHeaderName { get; set; }
-         = defaultOptions.OriginalHostHeaderName;
+        public string OriginalHostHeaderName { get; set; } = defaultOptions.OriginalHostHeaderName;
 
-        public string OriginalProtoHeaderName { get; set; }
-         = defaultOptions.OriginalProtoHeaderName;
+        public string OriginalProtoHeaderName { get; set; } = defaultOptions.OriginalProtoHeaderName;
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public ForwardedHeaders ForwardedHeaders { get; set; }
-         = defaultOptions.ForwardedHeaders;
+        public ForwardedHeaders ForwardedHeaders { get; set; } = defaultOptions.ForwardedHeaders;
 
-        public int? ForwardLimit { get; set; }
-         = defaultOptions.ForwardLimit;
+        public int? ForwardLimit { get; set; } = defaultOptions.ForwardLimit;
 
-        public IList<string> AllowedHosts { get; set; } = defaultOptions.AllowedHosts;
+        public IList<string> AllowedHosts { get; set; } =  new List<string>(defaultOptions.AllowedHosts);
 
         public bool RequireHeaderSymmetry { get; set; } = defaultOptions.RequireHeaderSymmetry;
 

@@ -24,6 +24,8 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class SecurityDescriptorTargetsViewModel : Screen
     {
+        private const int childWindowHeight = 586;
+        private const int childWindowWidth = 862;
         private readonly IComputerTargetProvider computerTargetProvider;
         private readonly SecurityDescriptorTargetViewModelComparer customComparer;
         private readonly IDialogCoordinator dialogCoordinator;
@@ -94,7 +96,8 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 Title = "Add authorization rule",
                 SaveButtonIsDefault = true,
-                Height = 735
+                Height = childWindowHeight,
+                Width = childWindowWidth,
             };
 
             var m = new SecurityDescriptorTarget();
@@ -103,6 +106,11 @@ namespace Lithnet.AccessManager.Server.UI
 
             if (w.ShowDialog() == true)
             {
+                m.CreatedBy = WindowsIdentity.GetCurrent().User.ToString();
+                m.Created = DateTime.UtcNow;
+                m.LastModifiedBy = WindowsIdentity.GetCurrent().User.ToString();
+                m.LastModified = m.Created;
+
                 this.Model.Add(m);
                 this.ViewModels.Add(vm);
             }
@@ -265,11 +273,15 @@ namespace Lithnet.AccessManager.Server.UI
                 {
                     Title = "Edit rule",
                     SaveButtonIsDefault = true,
-                    Height = 735
+                    Height = childWindowHeight,
+                    Width = childWindowWidth,
+                    Owner = owner
                 };
 
                 var m = JsonConvert.DeserializeObject<SecurityDescriptorTarget>(JsonConvert.SerializeObject(selectedItem.Model));
                 var vm = await this.factory.CreateViewModelAsync(m, this.ChildDisplaySettings);
+
+                vm.IsEditing = true;
 
                 w.DataContext = vm;
 
@@ -281,6 +293,10 @@ namespace Lithnet.AccessManager.Server.UI
 
                     this.ViewModels.Remove(selectedItem);
                     this.Model.Add(m);
+
+                    m.LastModifiedBy = WindowsIdentity.GetCurrent().User.ToString();
+                    m.LastModified = DateTime.UtcNow;
+
                     this.ViewModels.Insert(Math.Min(Math.Max(existingPosition, 0), this.ViewModels.Count), vm);
                     this.SelectedItem = vm;
                 }
