@@ -189,16 +189,16 @@ namespace Lithnet.AccessManager.Server.Authorization
             return u;
         }
 
-        private PSObject ToPSObject(IComputer user)
+        private PSObject ToPSObject(IComputer computer)
         {
             PSObject u = new PSObject();
-            u.Properties.Add(new PSNoteProperty("Description", user.Description));
-            u.Properties.Add(new PSNoteProperty("DisplayName", user.DisplayName));
-            u.Properties.Add(new PSNoteProperty("DistinguishedName", user.DistinguishedName));
-            u.Properties.Add(new PSNoteProperty("Guid", user.Guid));
-            u.Properties.Add(new PSNoteProperty("MsDsPrincipalName", user.MsDsPrincipalName));
-            u.Properties.Add(new PSNoteProperty("SamAccountName", user.SamAccountName));
-            u.Properties.Add(new PSNoteProperty("Sid", user.Sid.ToString()));
+            u.Properties.Add(new PSNoteProperty("Description", computer.Description));
+            u.Properties.Add(new PSNoteProperty("DisplayName", computer.DisplayName));
+            u.Properties.Add(new PSNoteProperty("DistinguishedName", computer.DistinguishedName));
+            u.Properties.Add(new PSNoteProperty("Guid", computer.Guid));
+            u.Properties.Add(new PSNoteProperty("MsDsPrincipalName", computer.MsDsPrincipalName));
+            u.Properties.Add(new PSNoteProperty("SamAccountName", computer.SamAccountName));
+            u.Properties.Add(new PSNoteProperty("Sid", computer.Sid.ToString()));
 
             return u;
         }

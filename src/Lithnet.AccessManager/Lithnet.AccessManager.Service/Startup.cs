@@ -26,6 +26,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Win32;
+using Quartz;
 
 namespace Lithnet.AccessManager.Service
 {
@@ -93,6 +94,28 @@ namespace Lithnet.AccessManager.Service
             services.TryAddSingleton<SqlLocalDbInstanceProvider>();
             services.TryAddSingleton<SqlServerInstanceProvider>();
 
+            services.AddOptions<QuartzOptions>()
+                .Configure<IDbProvider>(
+                (o, s) =>
+                {
+                    o.Add("quartz.dataSource.mydb.connectionString", s.ConnectionString);
+                    o.Add("quartz.jobStore.type", "Quartz.Impl.AdoJobStore.JobStoreTX, Quartz");
+                    o.Add("quartz.jobStore.driverDelegateType", "Quartz.Impl.AdoJobStore.SqlServerDelegate, Quartz");
+                    o.Add("quartz.dataSource.mydb.provider", "SqlServer");
+                    o.Add("quartz.jobStore.dataSource", "mydb");
+                    o.Add("quartz.serializer.type", "json");
+                    o.Add("quartz.scheduler.instanceName", "AMSCoreScheduler");
+                    o.Add("quartz.scheduler.instanceId", "AUTO");
+                });
+
+            services.AddQuartz(q =>
+            {
+                q.UseMicrosoftDependencyInjectionJobFactory(options =>
+                {
+                    options.AllowDefaultConstructor = true;
+                });
+            });
+
             services.AddScoped<INotificationChannel, SmtpNotificationChannel>();
             services.AddScoped<INotificationChannel, WebhookNotificationChannel>();
             services.AddScoped<INotificationChannel, PowershellNotificationChannel>();
@@ -104,6 +127,7 @@ namespace Lithnet.AccessManager.Service
             services.AddHostedService<AuditWorker>();
             services.AddHostedService<JitGroupWorker>();
             services.AddHostedService<CertificateImportWorker>();
+            services.AddHostedService<SchedulerService>();
 
             if (registryProvider.CacheMode == 0)
             {
@@ -134,11 +158,14 @@ namespace Lithnet.AccessManager.Service
             services.Configure<DatabaseConfigurationOptions>(Configuration.GetSection("DatabaseConfiguration"));
             services.Configure<Server.Configuration.DataProtectionOptions>(Configuration.GetSection("DataProtection"));
 
-            services.AddSingleton(this.CreateLicenseManager(services));
+            ILicenseManager licenseManager = this.CreateLicenseManager(services);
 
+            services.AddSingleton(licenseManager);
+
+            
             this.ConfigureAuthentication(services);
             this.ConfigureAuthorization(services);
-            this.ConfigureDataProtection(services);
+            this.ConfigureDataProtection(services, licenseManager);
         }
 
         private ILicenseManager CreateLicenseManager(IServiceCollection services)
@@ -174,7 +201,7 @@ namespace Lithnet.AccessManager.Service
             return licenseManager;
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<ForwardedHeadersAppOptions> fwdOptions, IOptions<ConfigurationMetadata> metadata, ILicenseManager licenseManager, ILogger<Startup> logger, IDbProvider dbProvider)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<ForwardedHeadersAppOptions> fwdOptions, IOptions<ConfigurationMetadata> metadata)
         {
             metadata.Value.ValidateMetadata();
 
@@ -209,18 +236,12 @@ namespace Lithnet.AccessManager.Service
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
-
-            if (registryProvider.CacheMode == 0)
-            {
-                dbProvider.InitializeDb();
-            }
         }
 
-        private void ConfigureDataProtection(IServiceCollection services)
+        private void ConfigureDataProtection(IServiceCollection services, ILicenseManager licenseManager)
         {
             var provider = services.BuildServiceProvider();
             var dataProtectionOptions = provider.GetService<IOptions<Server.Configuration.DataProtectionOptions>>();
-            var licenseManager = provider.GetService<ILicenseManager>();
 
             IDataProtectionBuilder builder = services.AddDataProtection(options =>
             {
@@ -265,8 +286,7 @@ namespace Lithnet.AccessManager.Service
 
         private void ConfigureAuthorization(IServiceCollection services)
         {
-            var provider = services.BuildServiceProvider();
-            var authSettings = provider.GetService<IOptions<AuthenticationOptions>>().Value;
+            var authSettings = Configuration.GetSection("Authentication").Get<AuthenticationOptions>();
 
             services.AddAuthorization(options =>
             {

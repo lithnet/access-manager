@@ -33,6 +33,7 @@
     <None Remove="DBScripts\LocalDBCreation\CreateServiceAccountLoginToServer.sql" />
     <None Remove="DBScripts\LocalDBCreation\CreateServiceAccountPermissionToDB.sql" />
     <None Remove="DBScripts\LocalDBCreation\EnableContainment.sql" />
+    <None Remove="DBScripts\Upgrade\00002-CreateQuartzTables.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,6 +48,7 @@
     <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateServiceAccountLoginToDB.sql" />
     <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateServiceAccountLoginToServer.sql" />
     <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateNewDatabaseWithPaths.sql" />
+    <EmbeddedResource Include="DBScripts\Upgrade\00002-CreateQuartzTables.sql" />
     <EmbeddedResource Include="DBScripts\Upgrade\00001-CreateRateLimitCacheTable.sql" />
   </ItemGroup>
 
@@ -63,6 +65,10 @@
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="6.7.1" />
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.0.3" />
     <PackageReference Include="newtonsoft.json" Version="12.0.3" />
+    <PackageReference Include="quartz" Version="3.2.3" />
+    <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.2.3" />
+    <PackageReference Include="Quartz.Extensions.Hosting" Version="3.2.3" />
+    <PackageReference Include="Quartz.Serialization.Json" Version="3.2.3" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="4.7.0" />
   </ItemGroup>
 
@@ -88,6 +94,7 @@
 
   <ItemGroup>
     <Folder Include="EmbeddedResources\" />
+    <Folder Include="Fulfillment\Interfaces\" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
