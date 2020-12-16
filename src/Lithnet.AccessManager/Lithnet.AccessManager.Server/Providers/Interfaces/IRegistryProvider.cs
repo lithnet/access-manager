@@ -15,11 +15,19 @@
         string CertBinding { get; set; }
 
         string ConfigPath { get; }
-        
+
         string BasePath { get; }
 
         int CacheMode { get; set; }
 
         bool DeleteLocalDbInstance { get; set; }
+
+        string LastNotifiedVersion { get; set; }
+
+        string LastNotifiedCertificateKey { get; set; }
+
+        bool ResetScheduler { get; set; }
+
+        bool ResetMaintenanceTaskSchedules { get; set; }
     }
 }

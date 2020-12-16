@@ -10,8 +10,11 @@ namespace Lithnet.AccessManager.Server
 
         ServiceControllerStatus Status { get; }
 
-        SecurityIdentifier GetServiceSid();
+        bool CanGmsaBeUsedOnThisMachine(string samAccountName);
+        SecurityIdentifier GetServiceAccountSid();
         NTAccount GetServiceNTAccount();
+        void GrantLogonAsAService(string accountName);
+        int LogonServiceAccount(ISecurityPrincipal o, string password);
         void SetServiceAccount(string username, string password);
 
         Task StartServiceAsync();

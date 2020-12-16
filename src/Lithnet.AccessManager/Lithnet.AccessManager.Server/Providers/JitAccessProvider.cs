@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Principal;
+using Lithnet.AccessManager.Interop;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Exceptions;
 using Microsoft.Extensions.Logging;
@@ -63,7 +64,7 @@ namespace Lithnet.AccessManager.Server
 
             IGroup dynamicGroup = null;
 
-            this.discoveryServices.FindDcAndExecuteWithRetry(dcLocatorTarget, this.discoveryServices.GetDomainNameDns(mapping.GroupOU), Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | Interop.DsGetDcNameFlags.DS_WRITABLE_REQUIRED, this.GetDcLocatorMode(), dc =>
+            this.discoveryServices.FindDcAndExecuteWithRetry(dcLocatorTarget, this.discoveryServices.GetDomainNameDns(mapping.GroupOU), DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | DsGetDcNameFlags.DS_WRITABLE_REQUIRED, this.GetDcLocatorMode(), dc =>
             {
                 this.logger.LogTrace("Attempting to perform dynamic group operation against DC {dc}", dc);
 
@@ -131,7 +132,7 @@ namespace Lithnet.AccessManager.Server
                 return existingTtl.Value;
             }
 
-            this.discoveryServices.FindDcAndExecuteWithRetry(dcLocatorTarget, this.discoveryServices.GetDomainNameDns(group.Sid), Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | Interop.DsGetDcNameFlags.DS_WRITABLE_REQUIRED, this.GetDcLocatorMode(), dc =>
+            this.discoveryServices.FindDcAndExecuteWithRetry(dcLocatorTarget, this.discoveryServices.GetDomainNameDns(group.Sid), DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | DsGetDcNameFlags.DS_WRITABLE_REQUIRED, this.GetDcLocatorMode(), dc =>
             {
                 this.logger.LogTrace("Attempting to perform pam group operation against DC {dc}", dc);
                 group.RetargetToDc(dc);

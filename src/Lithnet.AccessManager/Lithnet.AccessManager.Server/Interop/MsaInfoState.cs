@@ -1,4 +1,4 @@
-﻿namespace Lithnet.AccessManager.Server.UI.Interop
+﻿namespace Lithnet.AccessManager.Server.Interop
 {
     public enum MsaInfoState
     {

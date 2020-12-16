@@ -9,5 +9,7 @@ namespace Lithnet.AccessManager
         public string CurrentVersion { get; set; }
 
         public string UserUrl { get; set; }
+
+        public string ReleaseNotes { get; set; }
     }
 }

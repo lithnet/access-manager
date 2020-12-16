@@ -18,6 +18,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         EmailOptions Email { get; set; }
 
+        AdminNotificationOptions AdminNotifications { get; set; }
+
         ForwardedHeadersAppOptions ForwardedHeaders { get; set; }
 
         RateLimitOptions RateLimits { get; set; }

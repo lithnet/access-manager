@@ -24,6 +24,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public EmailOptions Email { get; set; } = new EmailOptions();
 
+        public AdminNotificationOptions AdminNotifications { get; set; } = new AdminNotificationOptions();
+
         public RateLimitOptions RateLimits { get; set; } = new RateLimitOptions();
 
         public UserInterfaceOptions UserInterface { get; set; } = new UserInterfaceOptions();

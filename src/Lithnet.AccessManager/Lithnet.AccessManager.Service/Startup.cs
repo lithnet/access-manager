@@ -37,7 +37,7 @@ namespace Lithnet.AccessManager.Service
         public Startup(IConfiguration configuration)
         {
             this.Configuration = configuration;
-            this.registryProvider = new RegistryProvider(false);
+            this.registryProvider = new RegistryProvider(true);
         }
 
         public IConfiguration Configuration { get; }
@@ -69,6 +69,8 @@ namespace Lithnet.AccessManager.Service
             services.TryAddScoped<IBitLockerRecoveryPasswordProvider, BitLockerRecoveryPasswordProvider>();
             services.TryAddScoped<IComputerTargetProvider, ComputerTargetProvider>();
 
+            services.TryAddSingleton<ISmtpProvider, SmtpProvider>();
+            services.TryAddSingleton<IApplicationUpgradeProvider, ApplicationUpgradeProvider>();
             services.TryAddSingleton<IDirectory, ActiveDirectory>();
             services.TryAddSingleton<IDiscoveryServices, DiscoveryServices>();
             services.TryAddSingleton<IEncryptionProvider, EncryptionProvider>();
@@ -83,7 +85,7 @@ namespace Lithnet.AccessManager.Service
             services.TryAddSingleton<IClusterProvider, ClusterProvider>();
             services.TryAddSingleton<IProductSettingsProvider, ProductSettingsProvider>();
             services.TryAddSingleton<IProtectedSecretProvider, ProtectedSecretProvider>();
-            services.TryAddSingleton<IRegistryProvider>(new RegistryProvider(false));
+            services.TryAddSingleton<IRegistryProvider>(new RegistryProvider(true));
             services.TryAddSingleton<ILicenseDataProvider, OptionsMonitorLicenseDataProvider>();
             services.TryAddSingleton<ICertificateSynchronizationProvider, CertificateSynchronizationProvider>();
             services.TryAddSingleton<IWindowsServiceProvider, WindowsServiceProvider>();
@@ -93,6 +95,10 @@ namespace Lithnet.AccessManager.Service
             services.TryAddSingleton<IDbProvider, SqlDbProvider>();
             services.TryAddSingleton<SqlLocalDbInstanceProvider>();
             services.TryAddSingleton<SqlServerInstanceProvider>();
+            services.TryAddSingleton<IHttpSysConfigurationProvider, HttpSysConfigurationProvider>();
+
+            services.TryAddTransient<NewVersionCheckJob>();
+            services.TryAddTransient<CertificateExpiryCheckJob>();
 
             services.AddOptions<QuartzOptions>()
                 .Configure<IDbProvider>(
@@ -106,6 +112,7 @@ namespace Lithnet.AccessManager.Service
                     o.Add("quartz.serializer.type", "json");
                     o.Add("quartz.scheduler.instanceName", "AMSCoreScheduler");
                     o.Add("quartz.scheduler.instanceId", "AUTO");
+                    o.Add("quartz.threadPool.threadCount", "10");
                 });
 
             services.AddQuartz(q =>
@@ -157,12 +164,13 @@ namespace Lithnet.AccessManager.Service
             services.Configure<LicensingOptions>(Configuration.GetSection("Licensing"));
             services.Configure<DatabaseConfigurationOptions>(Configuration.GetSection("DatabaseConfiguration"));
             services.Configure<Server.Configuration.DataProtectionOptions>(Configuration.GetSection("DataProtection"));
+            services.Configure<AdminNotificationOptions>(Configuration.GetSection("AdminNotifications"));
 
             ILicenseManager licenseManager = this.CreateLicenseManager(services);
 
             services.AddSingleton(licenseManager);
 
-            
+
             this.ConfigureAuthentication(services);
             this.ConfigureAuthorization(services);
             this.ConfigureDataProtection(services, licenseManager);
