@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.DirectoryServices;
+using System.DirectoryServices.AccountManagement;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.AccessControl;
@@ -358,6 +359,46 @@ namespace Lithnet.AccessManager
             return result;
         }
 
+        public bool CanAccountBeDelegated(SecurityIdentifier serviceAccount)
+        {
+            using (PrincipalContext ctx = new PrincipalContext(ContextType.Domain))
+            {
+                using (UserPrincipal u = UserPrincipal.FindByIdentity(ctx, IdentityType.Sid, serviceAccount.ToString()))
+                {
+                    if (u != null)
+                    {
+                        return u.DelegationPermitted;
+                    }
+                }
+
+                using (ComputerPrincipal cmp = ComputerPrincipal.FindByIdentity(ctx, IdentityType.Sid, serviceAccount.ToString()))
+                {
+
+                    if (cmp != null)
+                    {
+                        return cmp.DelegationPermitted;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public bool IsAccountGmsa(SecurityIdentifier serviceAccount)
+        {
+            using (PrincipalContext ctx = new PrincipalContext(ContextType.Domain))
+            {
+                using (ComputerPrincipal cmp = ComputerPrincipal.FindByIdentity(ctx, IdentityType.Sid, serviceAccount.ToString()))
+                {
+
+                    if (cmp != null)
+                    {
+                        return string.Equals(cmp.StructuralObjectClass, "msDS-GroupManagedServiceAccount", StringComparison.OrdinalIgnoreCase);
+                    }
+                }
+            }
+            return false;
+        }
 
         private DirectoryEntry FindComputerInGc(string objectName)
         {

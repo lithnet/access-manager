@@ -18,5 +18,7 @@ namespace Lithnet.AccessManager
         bool TryGetCertificateFromDirectory(out X509Certificate2 cert, string dnsDomain);
 
         X509Certificate2 CreateSelfSignedCert(string subject, Oid eku);
+
+        X509Certificate2Collection GetEligibleServerAuthenticationCertificates();
     }
 }

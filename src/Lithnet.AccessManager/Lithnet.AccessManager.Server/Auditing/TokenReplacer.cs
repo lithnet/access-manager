@@ -9,6 +9,11 @@ namespace Lithnet.AccessManager.Server.Auditing
     {
         public static string ReplaceAsPlainText(Dictionary<string, string> tokens, string text)
         {
+            if (tokens == null)
+            {
+                return text;
+            }
+
             foreach (KeyValuePair<string, string> token in tokens)
             {
                 text = text?.Replace(token.Key, token.Value ?? string.Empty, StringComparison.OrdinalIgnoreCase);
@@ -19,6 +24,11 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         public static string ReplaceAsHtml(Dictionary<string, string> tokens, string text)
         {
+            if (tokens == null)
+            {
+                return text;
+            }
+
             foreach (KeyValuePair<string, string> token in tokens)
             {
                 text = text?.Replace(token.Key, WebUtility.HtmlEncode(token.Value ?? string.Empty), StringComparison.OrdinalIgnoreCase);
@@ -29,6 +39,11 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         public static string ReplaceAsJson(Dictionary<string, string> tokens, string text)
         {
+            if (tokens == null)
+            {
+                return text;
+            }
+
             foreach (KeyValuePair<string, string> token in tokens)
             {
                 text = text?.Replace(token.Key, HttpUtility.JavaScriptStringEncode(token.Value ?? string.Empty), StringComparison.OrdinalIgnoreCase);

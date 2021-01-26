@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
 using System.Security.Principal;
+using Lithnet.AccessManager.Interop;
 using Lithnet.AccessManager.Server.Configuration;
 
 namespace Lithnet.AccessManager.Server.Authorization
@@ -38,7 +39,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             {
                 return new AuthorizationServer
                 {
-                    Name = this.discoveryServices.GetDomainController(null, this.DomainDnsName, Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_8_REQUIRED | (requireNew ? Interop.DsGetDcNameFlags.DS_FORCE_REDISCOVERY : 0)),
+                    Name = this.discoveryServices.GetDomainController(null, this.DomainDnsName, DsGetDcNameFlags.DS_DIRECTORY_SERVICE_8_REQUIRED | (requireNew ? DsGetDcNameFlags.DS_FORCE_REDISCOVERY : 0)),
                     Type = AuthorizationServerType.Default
                 };
             }

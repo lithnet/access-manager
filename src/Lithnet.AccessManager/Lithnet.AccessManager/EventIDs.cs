@@ -89,7 +89,8 @@
         public const int DbCreated = 5045;
         public const int DbDeleting = 5046;
         public const int DbDeleted = 5047;
-
+        public const int NewVersionCheckJobFailed = 5048;
+        public const int CertificateExpiryCheckJobFailed = 5049;
 
         // 6000 range - Reserved 
 

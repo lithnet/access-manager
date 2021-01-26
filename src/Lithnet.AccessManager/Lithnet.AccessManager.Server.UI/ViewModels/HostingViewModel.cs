@@ -1,23 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.DirectoryServices.AccountManagement;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Security.AccessControl;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
@@ -26,18 +13,12 @@ using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using SslCertBinding.Net;
 using Stylet;
-using Vanara.PInvoke;
-using Vanara.Security.AccessControl;
-using WindowsFirewallHelper;
 
 namespace Lithnet.AccessManager.Server.UI
 {
     public sealed class HostingViewModel : Screen, IHelpLink
     {
-        private const string SddlTemplate = "D:(A;;GX;;;{0})";
-
         private CancellationTokenSource servicePollCts;
 
         private readonly IDialogCoordinator dialogCoordinator;
@@ -51,13 +32,15 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IScriptTemplateProvider scriptTemplateProvider;
         private readonly ICertificatePermissionProvider certPermissionProvider;
         private readonly IRegistryProvider registryProvider;
-        private readonly IClusterProvider clusterProvider;
         private readonly ISecretRekeyProvider rekeyProvider;
         private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly IDiscoveryServices discoveryServices;
         private readonly ILicenseManager licenseManager;
+        private readonly IApplicationUpgradeProvider appUpgradeProvider;
+        private readonly IHttpSysConfigurationProvider certificateBindingProvider;
+        private readonly IFirewallProvider firewallProvider;
 
-        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, IClusterProvider clusterProvider, ISecretRekeyProvider rekeyProvider, IObjectSelectionProvider objectSelectionProvider, IDiscoveryServices discoveryServices, ILicenseManager licenseManager)
+        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, ISecretRekeyProvider rekeyProvider, IObjectSelectionProvider objectSelectionProvider, IDiscoveryServices discoveryServices, ILicenseManager licenseManager, IApplicationUpgradeProvider appUpgradeProvider, IHttpSysConfigurationProvider certificateBindingProvider, IFirewallProvider firewallProvider)
         {
             this.logger = logger;
             this.pathProvider = pathProvider;
@@ -72,16 +55,18 @@ namespace Lithnet.AccessManager.Server.UI
             this.scriptTemplateProvider = scriptTemplateProvider;
             this.certPermissionProvider = certPermissionProvider;
             this.registryProvider = registryProvider;
-            this.clusterProvider = clusterProvider;
             this.rekeyProvider = rekeyProvider;
             this.objectSelectionProvider = objectSelectionProvider;
             this.discoveryServices = discoveryServices;
             this.licenseManager = licenseManager;
+            this.appUpgradeProvider = appUpgradeProvider;
+            this.certificateBindingProvider = certificateBindingProvider;
+            this.firewallProvider = firewallProvider;
 
             this.WorkingModel = this.CloneModel(model);
-            this.Certificate = this.GetCertificate();
+            this.Certificate = this.certificateBindingProvider.GetCertificate();
             this.OriginalCertificate = this.Certificate;
-            this.ServiceAccount = this.windowsServiceProvider.GetServiceSid();
+            this.ServiceAccount = this.windowsServiceProvider.GetServiceAccountSid();
             this.ServiceStatus = this.windowsServiceProvider.Status.ToString();
             this.DisplayName = "Web hosting";
 
@@ -191,22 +176,7 @@ namespace Lithnet.AccessManager.Server.UI
             try
             {
                 this.CanBeDelegated = false;
-
-                using PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
-                using UserPrincipal u = UserPrincipal.FindByIdentity(ctx, IdentityType.Sid, this.ServiceAccount.ToString());
-
-                if (u != null)
-                {
-                    this.CanBeDelegated = u.DelegationPermitted;
-                    return;
-                }
-
-                using ComputerPrincipal cmp = ComputerPrincipal.FindByIdentity(ctx, IdentityType.Sid, this.ServiceAccount.ToString());
-
-                if (cmp != null)
-                {
-                    this.CanBeDelegated = cmp.DelegationPermitted;
-                }
+                this.CanBeDelegated = this.directory.CanAccountBeDelegated(this.ServiceAccount);
             }
             catch (Exception ex)
             {
@@ -219,14 +189,7 @@ namespace Lithnet.AccessManager.Server.UI
             try
             {
                 this.IsNotGmsa = false;
-
-                using PrincipalContext ctx = new PrincipalContext(ContextType.Domain);
-                using ComputerPrincipal cmp = ComputerPrincipal.FindByIdentity(ctx, IdentityType.Sid, this.ServiceAccount.ToString());
-
-                if (cmp != null)
-                {
-                    this.IsNotGmsa = !string.Equals(cmp.StructuralObjectClass, "msDS-GroupManagedServiceAccount", StringComparison.OrdinalIgnoreCase);
-                }
+                this.IsNotGmsa = !this.directory.IsAccountGmsa(this.ServiceAccount);
             }
             catch (Exception ex)
             {
@@ -370,7 +333,7 @@ namespace Lithnet.AccessManager.Server.UI
                         }
                     }
 
-                    this.CreateNewHttpReservations(rollbackContext);
+                    this.certificateBindingProvider.CreateNewHttpReservations(this.OriginalModel.HttpSys, this.WorkingModel.HttpSys, rollbackContext.RollbackActions);
                 }
             }
             catch (Exception ex)
@@ -385,7 +348,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 if (updateFirewallRules)
                 {
-                    this.ReplaceFirewallRules(rollbackContext);
+                    this.firewallProvider.ReplaceFirewallRules(this.HttpPort, this.HttpsPort, rollbackContext.RollbackActions);
                 }
             }
             catch (Exception ex)
@@ -415,7 +378,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 if (updateCertificateBinding)
                 {
-                    this.UpdateCertificateBinding(rollbackContext);
+                    this.certificateBindingProvider.UpdateCertificateBinding(this.Certificate.Thumbprint, this.WorkingModel.HttpSys.HttpsPort, rollbackContext.RollbackActions);
                 }
             }
             catch (Exception ex)
@@ -483,26 +446,12 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task DownloadUpdate()
         {
-            try
+            if (this.UpdateLink == null)
             {
-                if (this.UpdateLink == null)
-                {
-                    return;
-                }
-
-                ProcessStartInfo psi = new ProcessStartInfo
-                {
-                    FileName = this.UpdateLink,
-                    UseShellExecute = true
-                };
-
-                Process.Start(psi);
+                return;
             }
-            catch (Exception ex)
-            {
-                logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not open editor");
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not start default browser\r\n{ex.Message}");
-            }
+
+            await this.shellExecuteProvider.OpenWithShellExecute(this.UpdateLink);
         }
 
         public void OnCertificateChanged()
@@ -558,14 +507,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                 try
                 {
-                    SystemSecurity d = new SystemSecurity();
-                    var privs = d.UserPrivileges(o.MsDsPrincipalName);
-
-                    if (!privs[SystemPrivilege.ServiceLogon])
-                    {
-                        logger.LogInformation("Granting logon as a service right to account {account}", o.MsDsPrincipalName);
-                        privs[SystemPrivilege.ServiceLogon] = true;
-                    }
+                    this.windowsServiceProvider.GrantLogonAsAService(o.MsDsPrincipalName);
                 }
                 catch (Exception ex)
                 {
@@ -579,14 +521,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                 if (o is IGroupManagedServiceAccount)
                 {
-                    var result = NetApi32.NetQueryServiceAccount(null, o.SamAccountName, 0, out NetApi32.SafeNetApiBuffer buffer);
-                    result.ThrowIfFailed();
-
-                    MsaInfo0 msaInfo = buffer.ToStructure<MsaInfo0>();
-
-                    this.logger.LogTrace($"NetQueryServiceAccount returned {msaInfo.State}");
-
-                    if (msaInfo.State != MsaInfoState.MsaInfoInstalled)
+                    if (!this.windowsServiceProvider.CanGmsaBeUsedOnThisMachine(o.SamAccountName))
                     {
                         await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The managed service account is not able to be used on this machine. Use the Test-AdServiceAccount PowerShell cmdlet to find out more and resolve the issue before trying again");
                         return;
@@ -610,43 +545,37 @@ namespace Lithnet.AccessManager.Server.UI
 
                         password = r.Password;
 
-                        var domain = discoveryServices.GetDomainNameNetBios(o.Sid);
+                        var result = this.windowsServiceProvider.LogonServiceAccount(o, password);
 
-                        if (!AdvApi32.LogonUser(o.SamAccountName, domain, r.Password, AdvApi32.LogonUserType.LOGON32_LOGON_SERVICE, AdvApi32.LogonUserProvider.LOGON32_PROVIDER_DEFAULT, out AdvApi32.SafeHTOKEN token))
-                        {
-                            int result = Marshal.GetLastWin32Error();
-                            Exception ex = new Win32Exception(result);
-                            this.logger.LogError(EventIDs.UIGenericError, ex, "Unable to validate credentials");
-
-                            if (result == 1326)
-                            {
-                                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The username or password was incorrect");
-                                continue;
-                            }
-
-                            if (result == 1385)
-                            {
-                                if (logonAsServiceFailed)
-                                {
-                                    break;
-                                }
-
-                                if (await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The user does not have the 'Logon as a service' right on this computer. Do you want to continue anyway?", MessageDialogStyle.AffirmativeAndNegative) == MessageDialogResult.Negative)
-                                {
-                                    return;
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-
-                            return;
-                        }
-                        else
+                        if (result == 0)
                         {
                             break;
                         }
+
+                        if (result == 1326)
+                        {
+                            await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The username or password was incorrect");
+                            continue;
+                        }
+
+                        if (result == 1385)
+                        {
+                            if (logonAsServiceFailed)
+                            {
+                                break;
+                            }
+
+                            if (await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"The user does not have the 'Logon as a service' right on this computer. Do you want to continue anyway?", MessageDialogStyle.AffirmativeAndNegative) == MessageDialogResult.Negative)
+                            {
+                                return;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+
+                        return;
                     }
                 }
 
@@ -680,7 +609,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public void ShowSelectCertificateDialog()
         {
-            X509Certificate2Collection results = X509Certificate2UI.SelectFromCollection(this.GetAvailableCertificateCollection(), "Select TLS certificate", "Select a certificate to use as the TLS certificate for this web site", X509SelectionFlag.SingleSelection, this.GetHandle());
+            X509Certificate2Collection results = X509Certificate2UI.SelectFromCollection(this.certProvider.GetEligibleServerAuthenticationCertificates(), "Select TLS certificate", "Select a certificate to use as the TLS certificate for this web site", X509SelectionFlag.SingleSelection, this.GetHandle());
 
             if (results.Count == 1)
             {
@@ -784,56 +713,24 @@ namespace Lithnet.AccessManager.Server.UI
 
             try
             {
-                Version currentVersion = Assembly.GetEntryAssembly()?.GetName().Version;
-                this.CurrentVersion = currentVersion?.ToString() ?? "Could not determine version";
+                var versionInfo = await this.appUpgradeProvider.GetVersionInfo();
+                this.CurrentVersion = versionInfo.CurrentVersion?.ToString() ?? "Could not determine version";
 
-                string appdata = await DownloadFile(Constants.UrlProductVersionInfo);
-                if (appdata != null)
+                if (versionInfo.Status == VersionInfoStatus.Failed || versionInfo.Status == VersionInfoStatus.Unknown)
                 {
-                    PublishedVersionInfo versionInfo = JsonConvert.DeserializeObject<PublishedVersionInfo>(appdata);
-
-                    if (Version.TryParse(versionInfo.CurrentVersion, out Version onlineVersion))
-                    {
-                        this.AvailableVersion = onlineVersion.ToString();
-
-                        if (onlineVersion > currentVersion)
-                        {
-                            this.UpdateAvailable = true;
-                            this.IsUpToDate = false;
-                            this.UpdateLink = versionInfo.UserUrl;
-                        }
-                        else
-                        {
-                            this.UpdateAvailable = false;
-                            this.IsUpToDate = true;
-                            this.UpdateLink = null;
-                        }
-                    }
+                    this.AvailableVersion = "Unable to determine latest application version";
                 }
+
+                this.AvailableVersion = versionInfo.AvailableVersion?.ToString();
+                this.UpdateLink = versionInfo.UpdateUrl;
+                this.IsUpToDate = versionInfo.Status == VersionInfoStatus.Current;
+                this.UpdateAvailable = versionInfo.Status == VersionInfoStatus.UpdateAvailable;
             }
             catch (Exception ex)
             {
                 logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not get version update");
                 this.AvailableVersion = "Unable to determine latest application version";
             }
-        }
-
-        private static async Task<string> DownloadFile(string url)
-        {
-            using HttpClientHandler handler = new HttpClientHandler
-            {
-                DefaultProxyCredentials = CredentialCache.DefaultCredentials
-            };
-
-            using HttpClient client = new HttpClient(handler);
-            using HttpResponseMessage result = await client.GetAsync(url);
-
-            if (result.IsSuccessStatusCode)
-            {
-                return await result.Content.ReadAsStringAsync();
-            }
-
-            return null;
         }
 
         private T CloneModel<T>(T model)
@@ -850,207 +747,7 @@ namespace Lithnet.AccessManager.Server.UI
                 return false;
             }
 
-            UrlAcl acl = this.GetUrlReservation(newurl);
-
-            if (acl == null)
-            {
-                return false;
-            }
-
-            SecurityIdentifier currentOwner = null;
-
-            CommonSecurityDescriptor sd = new CommonSecurityDescriptor(false, false, acl.Sddl);
-            foreach (CommonAce dacl in sd.DiscretionaryAcl.OfType<CommonAce>())
-            {
-                if (dacl.SecurityIdentifier == this.windowsServiceProvider.ServiceSid)
-                {
-                    return false;
-                }
-
-                currentOwner = dacl.SecurityIdentifier;
-            }
-
-            if (currentOwner == null)
-            {
-                return false;
-            }
-
-            try
-            {
-                user = ((NTAccount)currentOwner.Translate(typeof(NTAccount))).Value;
-            }
-            catch
-            {
-                user = currentOwner.ToString();
-            }
-
-            return true;
-        }
-
-
-        private void CreateNewHttpReservations(HostingSettingsRollbackContext rollback)
-        {
-            if (this.ServiceAccount == null)
-            {
-                return;
-            }
-
-            string httpOld = this.OriginalModel.HttpSys.BuildHttpUrlPrefix();
-            string httpsOld = this.OriginalModel.HttpSys.BuildHttpsUrlPrefix();
-            string httpNew = this.WorkingModel.HttpSys.BuildHttpUrlPrefix();
-            string httpsNew = this.WorkingModel.HttpSys.BuildHttpsUrlPrefix();
-
-            UrlAcl existingHttpOld = this.GetUrlReservation(httpOld);
-            if (existingHttpOld != null)
-            {
-                UrlAcl.Delete(existingHttpOld.Prefix);
-                rollback.RollbackActions.Add(() => UrlAcl.Create(existingHttpOld.Prefix, existingHttpOld.Sddl));
-            }
-
-            UrlAcl existingHttpsOld = this.GetUrlReservation(httpsOld);
-            if (existingHttpsOld != null)
-            {
-                UrlAcl.Delete(existingHttpsOld.Prefix);
-                rollback.RollbackActions.Add(() => UrlAcl.Create(existingHttpsOld.Prefix, existingHttpsOld.Sddl));
-            }
-
-            UrlAcl existingHttpNew = this.GetUrlReservation(httpNew);
-            if (existingHttpNew != null)
-            {
-                UrlAcl.Delete(existingHttpNew.Prefix);
-                rollback.RollbackActions.Add(() => UrlAcl.Create(existingHttpNew.Prefix, existingHttpNew.Sddl));
-            }
-
-            UrlAcl existingHttpsNew = this.GetUrlReservation(httpsNew);
-            if (existingHttpsNew != null)
-            {
-                UrlAcl.Delete(existingHttpsNew.Prefix);
-                rollback.RollbackActions.Add(() => UrlAcl.Create(existingHttpsNew.Prefix, existingHttpsNew.Sddl));
-            }
-
-            this.CreateUrlReservation(httpNew, this.windowsServiceProvider.ServiceSid);
-            rollback.RollbackActions.Add(() => UrlAcl.Delete(httpNew));
-            this.registryProvider.HttpAcl = httpNew;
-
-            rollback.RollbackActions.Add(() => this.registryProvider.HttpAcl = httpOld);
-
-            this.CreateUrlReservation(httpsNew, this.windowsServiceProvider.ServiceSid);
-            rollback.RollbackActions.Add(() => UrlAcl.Delete(httpsNew));
-            this.registryProvider.HttpsAcl = httpsNew;
-            rollback.RollbackActions.Add(() => this.registryProvider.HttpsAcl = httpsOld);
-        }
-
-        private void CreateUrlReservation(string url, SecurityIdentifier sid)
-        {
-            UrlAcl.Create(url, string.Format(SddlTemplate, sid));
-        }
-
-        private UrlAcl GetUrlReservation(string url)
-        {
-            foreach (UrlAcl acl in UrlAcl.GetAllBindings())
-            {
-                if (string.Equals(acl.Prefix, url, StringComparison.OrdinalIgnoreCase))
-                {
-                    return acl;
-                }
-            }
-
-            return null;
-        }
-
-        private X509Certificate2Collection GetAvailableCertificateCollection()
-        {
-            X509Certificate2Collection certs = new X509Certificate2Collection();
-
-            X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine, OpenFlags.ReadOnly);
-            Oid serverAuthOid = new Oid("1.3.6.1.5.5.7.3.1");
-
-            foreach (X509Certificate2 c in store.Certificates.Find(X509FindType.FindByTimeValid, DateTime.Now, false).OfType<X509Certificate2>().Where(t => t.HasPrivateKey))
-            {
-                foreach (X509EnhancedKeyUsageExtension x in c.Extensions.OfType<X509EnhancedKeyUsageExtension>())
-                {
-                    foreach (Oid o in x.EnhancedKeyUsages)
-                    {
-                        if (o.Value == serverAuthOid.Value)
-                        {
-                            certs.Add(c);
-                        }
-                    }
-                }
-            }
-
-            return certs;
-        }
-
-        private X509Certificate2 GetCertificate()
-        {
-            foreach (CertificateBinding binding in this.GetCertificateBindings())
-            {
-                if (binding.AppId == HttpSysHostingOptions.AppId)
-                {
-                    return this.GetCertificateFromStore(binding.StoreName, binding.Thumbprint);
-                }
-            }
-
-            return null;
-        }
-
-        private List<CertificateBinding> GetCertificateBindings()
-        {
-            CertificateBindingConfiguration config = new CertificateBindingConfiguration();
-            CertificateBinding[] results = config.Query();
-
-            return results.ToList();
-        }
-
-        private X509Certificate2 GetCertificateFromStore(string storeName, string thumbprint)
-        {
-            X509Store store = new X509Store(storeName, StoreLocation.LocalMachine, OpenFlags.ReadOnly);
-
-            return store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false).OfType<X509Certificate2>().FirstOrDefault();
-        }
-
-        private void ReplaceFirewallRules(HostingSettingsRollbackContext rollback)
-        {
-            this.DeleteFirewallRules(rollback);
-
-            IRule firewallRule = CreateNetFwRule((ushort)this.HttpPort, (ushort)this.HttpsPort);
-
-            FirewallManager.Instance.Rules.Add(firewallRule);
-
-            rollback.RollbackActions.Add(() => FirewallManager.Instance.Rules.Remove(firewallRule));
-        }
-
-        private IRule CreateNetFwRule(params ushort[] ports)
-        {
-            IRule firewallRule = FirewallManager.Instance.CreateApplicationRule(FirewallProfiles.Domain | FirewallProfiles.Private | FirewallProfiles.Public,
-                Constants.FirewallRuleName,
-                FirewallAction.Allow,
-               "System",
-                FirewallProtocol.TCP
-            );
-
-            firewallRule.IsEnable = true;
-            firewallRule.Direction = FirewallDirection.Inbound;
-            firewallRule.LocalPorts = ports;
-            return firewallRule;
-        }
-
-        private void DeleteFirewallRules(HostingSettingsRollbackContext rollback)
-        {
-            try
-            {
-                IRule existingFirewallRule = FirewallManager.Instance.Rules.SingleOrDefault(t => string.Equals(t.Name, Constants.FirewallRuleName, StringComparison.OrdinalIgnoreCase));
-                if (existingFirewallRule != null)
-                {
-                    FirewallManager.Instance.Rules.Remove(existingFirewallRule);
-                    rollback.RollbackActions.Add(() => FirewallManager.Instance.Rules.Add(existingFirewallRule));
-                }
-            }
-            catch
-            {
-                // ignore
-            }
+            return this.certificateBindingProvider.IsReservationInUse(newurl, out user);
         }
 
         private async Task PollServiceStatus(CancellationToken token)
@@ -1110,39 +807,6 @@ namespace Lithnet.AccessManager.Server.UI
             }
 
             Debug.WriteLine("Poll stopped");
-        }
-
-
-        private void UpdateCertificateBinding(HostingSettingsRollbackContext rollback)
-        {
-            CertificateBindingConfiguration bindingConfiguration = new CertificateBindingConfiguration();
-            CertificateBinding originalBinding = this.GetCertificateBinding(bindingConfiguration);
-
-            if (originalBinding != null)
-            {
-                bindingConfiguration.Delete(originalBinding.IpPort);
-                rollback.RollbackActions.Add(() => bindingConfiguration.Bind(originalBinding));
-            }
-
-            CertificateBinding binding = new CertificateBinding(this.Certificate.Thumbprint, "My", new IPEndPoint(IPAddress.Parse("0.0.0.0"), this.WorkingModel.HttpSys.HttpsPort), HttpSysHostingOptions.AppId, new BindingOptions());
-            bindingConfiguration.Bind(binding);
-            rollback.RollbackActions.Add(() => bindingConfiguration.Delete(binding.IpPort));
-
-            this.registryProvider.CertBinding = binding.IpPort.ToString();
-            rollback.RollbackActions.Add(() => this.registryProvider.CertBinding = originalBinding?.IpPort?.ToString());
-        }
-
-        private CertificateBinding GetCertificateBinding(CertificateBindingConfiguration config)
-        {
-            foreach (CertificateBinding binding in config.Query())
-            {
-                if (binding.AppId == HttpSysHostingOptions.AppId)
-                {
-                    return binding;
-                }
-            }
-
-            return null;
         }
 
         public async Task Help()

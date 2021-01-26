@@ -88,7 +88,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             base.OnExit(e);
         }
-        
+
         protected override void ConfigureIoC(IStyletIoCBuilder builder)
         {
             IAppPathProvider pathProvider = new AppPathProvider(registryProvider);
@@ -142,6 +142,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<LicensingOptions>().ToInstance(appconfig.Licensing);
                 builder.Bind<DatabaseConfigurationOptions>().ToInstance(appconfig.DatabaseConfiguration);
                 builder.Bind<DataProtectionOptions>().ToInstance(appconfig.DataProtection);
+                builder.Bind<AdminNotificationOptions>().ToInstance(appconfig.AdminNotifications);
 
                 // ViewModel factories
                 builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
@@ -190,6 +191,9 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IRegistryProvider>().ToInstance(registryProvider);
                 builder.Bind<ICertificatePermissionProvider>().To<CertificatePermissionProvider>();
                 builder.Bind<ICertificateSynchronizationProvider>().To<CertificateSynchronizationProvider>();
+                builder.Bind<IApplicationUpgradeProvider>().To<ApplicationUpgradeProvider>();
+                builder.Bind<IFirewallProvider>().To<FirewallProvider>();
+                builder.Bind<IHttpSysConfigurationProvider>().To<HttpSysConfigurationProvider>();
                 builder.Bind<SqlServerInstanceProvider>().ToSelf();
 
                 builder.Bind<IProtectedSecretProvider>().To<ProtectedSecretProvider>().InSingletonScope();

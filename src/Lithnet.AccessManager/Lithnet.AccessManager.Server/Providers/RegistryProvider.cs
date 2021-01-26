@@ -30,7 +30,7 @@ namespace Lithnet.AccessManager.Server
         public string BasePath => baseKey?.GetValue("BasePath") as string;
 
         public string ConfigPath => paramsKey?.GetValue("ConfigPath") as string;
-        
+
         public string LogPath => paramsKey?.GetValue("LogPath") as string ?? Path.Combine(Directory.GetCurrentDirectory(), "logs");
 
         public int RetentionDays => Math.Max(paramsKey?.GetValue("LogRetentionDays") as int? ?? 7, 1);
@@ -48,11 +48,43 @@ namespace Lithnet.AccessManager.Server
             {
                 if (!value)
                 {
-                    baseKey.DeleteValue("DeleteLocalDbInstance");
+                    baseKey.DeleteValue("DeleteLocalDbInstance", false);
                 }
                 else
                 {
                     baseKey.SetValue("DeleteLocalDbInstance", 1);
+                }
+            }
+        }
+
+        public bool ResetScheduler
+        {
+            get => (paramsKey?.GetValue("ResetScheduler", 0) is int value) && value == 1;
+            set
+            {
+                if (!value)
+                {
+                    paramsKey.DeleteValue("ResetScheduler", false);
+                }
+                else
+                {
+                    paramsKey.SetValue("ResetScheduler", 1);
+                }
+            }
+        }
+
+        public bool ResetMaintenanceTaskSchedules
+        {
+            get => (paramsKey?.GetValue("ResetMaintenanceTaskSchedules", 0) is int value) && value == 1;
+            set
+            {
+                if (!value)
+                {
+                    paramsKey.DeleteValue("ResetMaintenanceTaskSchedules", false);
+                }
+                else
+                {
+                    paramsKey.SetValue("ResetMaintenanceTaskSchedules", 1);
                 }
             }
         }
@@ -70,7 +102,7 @@ namespace Lithnet.AccessManager.Server
             {
                 if (value == null)
                 {
-                    baseKey.DeleteValue("HttpAcl");
+                    baseKey.DeleteValue("HttpAcl", false);
                 }
                 else
                 {
@@ -79,7 +111,38 @@ namespace Lithnet.AccessManager.Server
             }
         }
 
-        
+        public string LastNotifiedVersion
+        {
+            get => paramsKey?.GetValue("LastNotifiedVersion") as string;
+            set
+            {
+                if (value == null)
+                {
+                    paramsKey.DeleteValue("LastNotifiedVersion", false);
+                }
+                else
+                {
+                    paramsKey.SetValue("LastNotifiedVersion", value);
+                }
+            }
+        }
+
+        public string LastNotifiedCertificateKey
+        {
+            get => paramsKey?.GetValue("LastNotifiedCertificateKey") as string;
+            set
+            {
+                if (value == null)
+                {
+                    paramsKey.DeleteValue("LastNotifiedCertificateKey", false);
+                }
+                else
+                {
+                    paramsKey.SetValue("LastNotifiedCertificateKey", value);
+                }
+            }
+        }
+
         public string ServiceKeyThumbprint
         {
             get => paramsKey?.GetValue("ServiceKeyThumbprint") as string;
@@ -87,7 +150,7 @@ namespace Lithnet.AccessManager.Server
             {
                 if (value == null)
                 {
-                    paramsKey.DeleteValue("ServiceKeyThumbprint");
+                    paramsKey.DeleteValue("ServiceKeyThumbprint", false);
                 }
                 else
                 {
@@ -103,7 +166,7 @@ namespace Lithnet.AccessManager.Server
             {
                 if (value == null)
                 {
-                    baseKey.DeleteValue("HttpsAcl");
+                    baseKey.DeleteValue("HttpsAcl", false);
                 }
                 else
                 {
@@ -119,7 +182,7 @@ namespace Lithnet.AccessManager.Server
             {
                 if (value == null)
                 {
-                    baseKey.DeleteValue("CertBinding");
+                    baseKey.DeleteValue("CertBinding", false);
                 }
                 else
                 {

@@ -9,6 +9,6 @@ namespace Lithnet.AccessManager.Server
 
         string ConnectionString { get; }
 
-        void InitializeDb();
+        //void InitializeDb();
     }
 }

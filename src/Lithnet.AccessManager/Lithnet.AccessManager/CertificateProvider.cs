@@ -20,6 +20,7 @@ namespace Lithnet.AccessManager
 
         public static Oid LithnetAccessManagerPasswordEncryptionEku = new Oid("1.3.6.1.4.1.55989.2.1.1", "Lithnet Access Manager password encryption");
         public static Oid LithnetAccessManagerClusterEncryptionEku = new Oid("1.3.6.1.4.1.55989.2.1.2", "Lithnet Access Manager cluster encryption");
+        public static Oid ServerAuthenticationEku = new Oid("1.3.6.1.5.5.7.3.1", "Server Authentication");
 
         public X509Certificate2 CreateSelfSignedCert(string subject, Oid eku)
         {
@@ -147,6 +148,17 @@ namespace Lithnet.AccessManager
             throw new ObjectNotFoundException("There was no certificate published in the directory");
         }
 
+        public X509Certificate2Collection GetEligibleServerAuthenticationCertificates()
+        {
+            X509Certificate2Collection certs = new X509Certificate2Collection();
+
+            X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+            store.Open(OpenFlags.ReadOnly);
+            GetEligibleCertificates(true, ServerAuthenticationEku, store, certs);
+
+            return certs;
+        }
+
         public bool TryGetCertificateFromDirectory(out X509Certificate2 cert, string dnsDomain)
         {
             cert = null;
@@ -163,14 +175,6 @@ namespace Lithnet.AccessManager
 
             return false;
         }
-
-        //private X509Certificate2 ResolveCertificateFromLocalStore(string thumbprint)
-        //{
-        //    return GetCertificateFromServiceStore(thumbprint, null) ??
-        //           GetCertificateFromStore(thumbprint, StoreLocation.CurrentUser) ??
-        //            GetCertificateFromStore(thumbprint, StoreLocation.LocalMachine) ??
-        //            throw new CertificateNotFoundException($"A certificate with the thumbprint {thumbprint} could not be found");
-        //}
 
         private X509Certificate2 ResolveCertificateFromLocalStore(string thumbprint)
         {

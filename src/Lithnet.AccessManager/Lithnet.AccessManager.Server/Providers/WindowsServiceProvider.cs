@@ -1,13 +1,17 @@
 ﻿using System;
 using System.ComponentModel;
+using System.DirectoryServices.AccountManagement;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Enterprise;
+using Lithnet.AccessManager.Server.Interop;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
+using Vanara.PInvoke;
+using Vanara.Security.AccessControl;
 
 namespace Lithnet.AccessManager.Server
 {
@@ -17,7 +21,9 @@ namespace Lithnet.AccessManager.Server
 
         private readonly IClusterProvider clusterProvider;
         private readonly ILogger<WindowsServiceProvider> logger;
-        private readonly ServiceController serviceController = new ServiceController(AccessManager.Constants.ServiceName);
+        private readonly ServiceController serviceController = new ServiceController(Constants.ServiceName);
+        private readonly IDiscoveryServices discoveryServices;
+
         private const string serviceSidString = "S-1-5-80-125788923-1836679867-2653951330-153436886-93372159";
 
         [DllImport("advapi32.dll", SetLastError = true)]
@@ -32,15 +38,16 @@ namespace Lithnet.AccessManager.Server
             }
         }
 
-        public WindowsServiceProvider(IClusterProvider clusterProvider, ILogger<WindowsServiceProvider> logger)
+        public WindowsServiceProvider(IClusterProvider clusterProvider, ILogger<WindowsServiceProvider> logger, IDiscoveryServices discoveryServices)
         {
             this.clusterProvider = clusterProvider;
             this.logger = logger;
+            this.discoveryServices = discoveryServices;
         }
 
         public SecurityIdentifier ServiceSid { get; } = new SecurityIdentifier(serviceSidString);
 
-        public SecurityIdentifier GetServiceSid()
+        public SecurityIdentifier GetServiceAccountSid()
         {
             string name = this.GetRegistryObjectName();
 
@@ -130,14 +137,54 @@ namespace Lithnet.AccessManager.Server
             await this.serviceController.WaitForStatusAsync(ServiceControllerStatus.Running, TimeSpan.FromSeconds(30), CancellationToken.None);
         }
 
-        private static void ChangeServiceCredentials(string serviceName, string username, string password)
+        public void GrantLogonAsAService(string accountName)
         {
-            ServiceController controller = new ServiceController(serviceName);
+            SystemSecurity d = new SystemSecurity();
+            var privs = d.UserPrivileges(accountName);
 
-            if (!ChangeServiceConfig(controller.ServiceHandle.DangerousGetHandle(), SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, null, null, IntPtr.Zero, null, username, password, null))
+            if (!privs[SystemPrivilege.ServiceLogon])
             {
-                throw new Win32Exception(Marshal.GetLastWin32Error());
+                logger.LogInformation("Granting logon as a service right to account {account}", accountName);
+                privs[SystemPrivilege.ServiceLogon] = true;
             }
         }
+
+        public bool CanGmsaBeUsedOnThisMachine(string samAccountName)
+        {
+            var result = NetApi32.NetQueryServiceAccount(null, samAccountName, 0, out NetApi32.SafeNetApiBuffer buffer);
+            result.ThrowIfFailed();
+
+            MsaInfo0 msaInfo = buffer.ToStructure<MsaInfo0>();
+
+            this.logger.LogTrace($"NetQueryServiceAccount returned {msaInfo.State}");
+
+            return msaInfo.State == MsaInfoState.MsaInfoInstalled;
+        }
+
+        public int LogonServiceAccount(ISecurityPrincipal o, string password)
+        {
+            var domain = this.discoveryServices.GetDomainNameNetBios(o.Sid);
+
+            if (AdvApi32.LogonUser(o.SamAccountName, domain, password, AdvApi32.LogonUserType.LOGON32_LOGON_SERVICE, AdvApi32.LogonUserProvider.LOGON32_PROVIDER_DEFAULT, out AdvApi32.SafeHTOKEN token))
+            {
+                return 0;
+            }
+
+            int result = Marshal.GetLastWin32Error();
+            Exception ex = new Win32Exception(result);
+            this.logger.LogError(EventIDs.UIGenericError, ex, "Unable to validate credentials");
+
+            return result;
+        }
+
+    private static void ChangeServiceCredentials(string serviceName, string username, string password)
+    {
+        ServiceController controller = new ServiceController(serviceName);
+
+        if (!ChangeServiceConfig(controller.ServiceHandle.DangerousGetHandle(), SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, SERVICE_NO_CHANGE, null, null, IntPtr.Zero, null, username, password, null))
+        {
+            throw new Win32Exception(Marshal.GetLastWin32Error());
+        }
     }
+}
 }

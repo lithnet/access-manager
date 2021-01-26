@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Mail;
 using System.Threading.Channels;
 using HtmlAgilityPack;
 using Lithnet.AccessManager.Server.App_LocalResources;
@@ -14,31 +12,30 @@ namespace Lithnet.AccessManager.Server.Auditing
     public class SmtpNotificationChannel : NotificationChannel<SmtpNotificationChannelDefinition>
     {
         private readonly ILogger logger;
-        private readonly EmailOptions emailSettings;
         private readonly ITemplateProvider templates;
-        private readonly IProtectedSecretProvider secretProvider;
+        private readonly ISmtpProvider smtpProvider;
 
         public override string Name => "smtp";
 
         protected override IList<SmtpNotificationChannelDefinition> NotificationChannelDefinitions { get; }
 
-        public SmtpNotificationChannel(ILogger<SmtpNotificationChannel> logger, IOptionsSnapshot<EmailOptions> emailSettings, ITemplateProvider templates, IOptionsSnapshot<AuditOptions> auditSettings, ChannelWriter<Action> queue, IProtectedSecretProvider secretProvider)
+        public SmtpNotificationChannel(ILogger<SmtpNotificationChannel> logger, ITemplateProvider templates, IOptionsSnapshot<AuditOptions> auditSettings, ChannelWriter<Action> queue, ISmtpProvider smtpProvider)
             : base(logger, queue)
         {
             this.logger = logger;
-            this.emailSettings = emailSettings.Value;
             this.templates = templates;
-            this.secretProvider = secretProvider;
             this.NotificationChannelDefinitions = auditSettings.Value.NotificationChannels.Smtp;
+            this.smtpProvider = smtpProvider;
         }
 
         protected override void Send(AuditableAction action, Dictionary<string, string> tokens, SmtpNotificationChannelDefinition settings)
         {
-            string message = action.IsSuccess ? templates.GetTemplate(settings.TemplateSuccess) : templates.GetTemplate(settings.TemplateFailure);
-            string subject = GetSubjectLine(message, action.IsSuccess);
+            string body = action.IsSuccess ? templates.GetTemplate(settings.TemplateSuccess) : templates.GetTemplate(settings.TemplateFailure);
+            string subject = GetSubjectLine(body) ?? (action.IsSuccess ? LogMessages.AuditEmailSubjectSuccess : LogMessages.AuditEmailSubjectFailure);
 
-            message = TokenReplacer.ReplaceAsHtml(tokens, message);
+            body = TokenReplacer.ReplaceAsHtml(tokens, body);
             subject = TokenReplacer.ReplaceAsPlainText(tokens, subject);
+
             HashSet<string> recipients = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
             settings.EmailAddresses.ForEach(t => recipients.Add(t));
@@ -51,73 +48,17 @@ namespace Lithnet.AccessManager.Server.Auditing
                 }
             }
 
-            this.SendEmail(recipients, subject, message);
+            this.smtpProvider.SendEmail(recipients, subject, body);
         }
 
-        private string GetSubjectLine(string content, bool isSuccess)
+        private string GetSubjectLine(string content)
         {
             HtmlDocument d = new HtmlDocument();
             d.LoadHtml(content);
 
             var titleNode = d.DocumentNode.SelectSingleNode("html/head/title");
 
-            if (titleNode == null || string.IsNullOrWhiteSpace(titleNode.InnerText))
-            {
-                return isSuccess ? LogMessages.AuditEmailSubjectSuccess : LogMessages.AuditEmailSubjectFailure;
-            }
-
-            return titleNode.InnerText;
-        }
-
-        private void SendEmail(IEnumerable<string> recipients, string subject, string body)
-        {
-            if (!this.emailSettings.IsConfigured)
-            {
-                this.logger.LogTrace("SMTP is not configured, discarding mail message");
-                return;
-            }
-
-            using SmtpClient client = new SmtpClient()
-            {
-                Host = this.emailSettings.Host,
-                Port = this.emailSettings.Port,
-                UseDefaultCredentials = this.emailSettings.UseDefaultCredentials,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                EnableSsl = this.emailSettings.UseSsl,
-                Credentials = this.GetCredentials()
-            };
-
-            using MailMessage message = new MailMessage
-            {
-                From = new MailAddress(this.emailSettings.FromAddress)
-            };
-
-            foreach (string recipient in recipients)
-            {
-                message.To.Add(recipient);
-            }
-
-            if (message.To.Count == 0)
-            {
-                this.logger.LogTrace($"Not sending notification email because there are no recipients");
-                return;
-            }
-
-            message.IsBodyHtml = true;
-            message.Subject = subject;
-            message.Body = body;
-            client.Send(message);
-        }
-
-        private NetworkCredential GetCredentials()
-        {
-
-            if (this.emailSettings.UseDefaultCredentials || string.IsNullOrWhiteSpace(this.emailSettings.Username))
-            {
-                return null;
-            }
-
-            return new NetworkCredential(this.emailSettings.Username, this.secretProvider.UnprotectSecret(this.emailSettings.Password));
+            return string.IsNullOrWhiteSpace(titleNode?.InnerText) ? null : titleNode.InnerText;
         }
     }
 }

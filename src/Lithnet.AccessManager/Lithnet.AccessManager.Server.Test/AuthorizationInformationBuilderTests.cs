@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using Lithnet.AccessManager.Enterprise;
+using Lithnet.AccessManager.Interop;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Microsoft.Extensions.Logging;
@@ -97,7 +98,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
             IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
 
-            var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
+            var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
             var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
             var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
@@ -151,7 +152,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
             IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
 
-            var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
+            var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
             var t1 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
             var t2 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
@@ -190,7 +191,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
             IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
 
-            var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
+            var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
             var t1 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
             var t2 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
@@ -229,7 +230,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
             IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
 
-            var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
+            var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
             var t1 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
             var t2 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
@@ -268,7 +269,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
             IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
 
-            var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
+            var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
             var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
             var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
@@ -305,7 +306,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
             IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
 
-            var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
+            var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
             var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
             var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.LocalAdminPassword, $"OU=LAPS Testing,{namingContext}", trustee);
@@ -342,7 +343,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
             IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
 
-            var namingContext = directory.TranslateName(targetDomain + "\\", Interop.DsNameFormat.Nt4Name, Interop.DsNameFormat.DistinguishedName);
+            var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
             var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
             var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
