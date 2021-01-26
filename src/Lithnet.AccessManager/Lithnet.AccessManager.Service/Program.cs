@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Service.Internal;
 using Microsoft.AspNetCore.Hosting;
@@ -25,24 +27,40 @@ namespace Lithnet.AccessManager.Service
             {
                 RegistryProvider registryProvider = new RegistryProvider(false);
                 SetupNLog(registryProvider);
-                CreateHostBuilder(args, registryProvider).Build().Run();
+
+                List<Task> tasks = new List<Task>();
+
+                foreach (var host in CreateHosts(args, registryProvider))
+                {
+                    tasks.Add(host.Build().RunAsync());
+                }
+
+                Task.WaitAll(tasks.ToArray());
             }
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args, RegistryProvider registryProvider)
+        public static IEnumerable<IHostBuilder> CreateHosts(string[] args, RegistryProvider registryProvider)
         {
             bool safeStart = args.Any(t => string.Equals(t, "/safeStart", StringComparison.OrdinalIgnoreCase));
 
             if (safeStart || !registryProvider.IsConfigured)
             {
-                return Host.CreateDefaultBuilder().ConfigureServices((hostContext, services) =>
-                    {
-                        services.AddHostedService<UnconfiguredHost>();
-                    })
+                yield return Host.CreateDefaultBuilder().ConfigureServices((hostContext, services) =>
+                {
+                    services.AddHostedService<UnconfiguredHost>();
+                })
                     .UseWindowsService()
                     .ConfigureAccessManagerLogging();
             }
+            else
+            {
+                yield return CreateHttpRedirectorHostBuilder(args);
+                yield return CreateHttpsHostBuilder(args);
+            }
+        }
 
+        private static IHostBuilder CreateHostBuilderCommon(string[] args)
+        {
             var host = new HostBuilder();
 
             host.UseContentRoot(Directory.GetCurrentDirectory());
@@ -77,6 +95,15 @@ namespace Lithnet.AccessManager.Service
                 options.ValidateOnBuild = isDevelopment;
             });
 
+            host.UseWindowsService();
+
+            return host;
+        }
+
+        private static IHostBuilder CreateHttpsHostBuilder(string[] args)
+        {
+            var host = CreateHostBuilderCommon(args);
+
             host.ConfigureWebHostDefaults(webBuilder =>
             {
                 var httpsysConfig = new ConfigurationBuilder().ConfigureAppSettings().Build();
@@ -85,7 +112,20 @@ namespace Lithnet.AccessManager.Service
                 webBuilder.UseStartup<Startup>();
             });
 
-            host.UseWindowsService();
+            return host;
+        }
+
+        private static IHostBuilder CreateHttpRedirectorHostBuilder(string[] args)
+        {
+            var host = CreateHostBuilderCommon(args);
+
+            host.ConfigureWebHostDefaults(webBuilder =>
+            {
+                var httpsysConfig = new ConfigurationBuilder().ConfigureAppSettings().Build();
+
+                webBuilder.UseHttpSysHttpRedirector(httpsysConfig);
+                webBuilder.UseStartup<HttpRedirectHostStartup>();
+            });
 
             return host;
         }
@@ -100,7 +140,7 @@ namespace Lithnet.AccessManager.Service
                 ArchiveEvery = NLog.Targets.FileArchivePeriod.Day,
                 ArchiveNumbering = NLog.Targets.ArchiveNumberingMode.Date,
                 MaxArchiveFiles = registryProvider.RetentionDays,
-                Layout= "${longdate}|${level:uppercase=true:padding=5}|${logger}|${message}${onexception:inner=${newline}${exception:format=ToString}}"
+                Layout = "${longdate}|${level:uppercase=true:padding=5}|${logger}|${message}${onexception:inner=${newline}${exception:format=ToString}}"
             };
 
             var serviceLog = new NLog.Targets.FileTarget("access-manager-service")

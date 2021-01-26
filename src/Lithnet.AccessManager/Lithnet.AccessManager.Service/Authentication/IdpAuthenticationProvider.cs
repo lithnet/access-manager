@@ -61,7 +61,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
                     context.Response.Redirect($"/Home/AuthNError?messageid={(int)AuthNFailureMessageID.SsoIdentityNotFound}");
                     return Task.CompletedTask;
                 }
-
+                
                 user.AddClaim(new Claim(ClaimTypes.PrimarySid, sid));
                 this.AddAuthZClaims(directoryUser, user);
                 this.logger.LogInformation(EventIDs.UserAuthenticated, string.Format(LogMessages.AuthenticatedAndMappedUser, user.ToClaimList()));

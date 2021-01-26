@@ -40,6 +40,9 @@ namespace Lithnet.AccessManager.Service.AppSettings
                 wsFederationOptions.MetadataAddress = this.options.Metadata;
                 wsFederationOptions.Wtrealm = this.options.Realm;
                 wsFederationOptions.SignOutWreply = "/Home/LoggedOut";
+                wsFederationOptions.CorrelationCookie.SameSite = SameSiteMode.None;
+                wsFederationOptions.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+                wsFederationOptions.CorrelationCookie.HttpOnly = true;
                 wsFederationOptions.Events = new WsFederationEvents()
                 {
                     OnAccessDenied = this.HandleAuthNFailed,
@@ -52,8 +55,9 @@ namespace Lithnet.AccessManager.Service.AppSettings
                 cookieAuthenticationOptions.LoginPath = "/Home/Login";
                 cookieAuthenticationOptions.LogoutPath = "/Home/SignOut";
                 cookieAuthenticationOptions.AccessDeniedPath = "/Home/AccessDenied";
-                cookieAuthenticationOptions.Cookie.SameSite = SameSiteMode.None;
+                cookieAuthenticationOptions.Cookie.SameSite = SameSiteMode.Lax;
                 cookieAuthenticationOptions.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                cookieAuthenticationOptions.Cookie.HttpOnly = true;
                 cookieAuthenticationOptions.SessionStore = new AuthenticationTicketCache();
             });
         }

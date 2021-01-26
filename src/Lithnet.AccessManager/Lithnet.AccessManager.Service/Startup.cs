@@ -47,6 +47,20 @@ namespace Lithnet.AccessManager.Service
             services.AddHttpContextAccessor();
             services.AddResponseCaching();
 
+            services.AddHsts(options =>
+            {
+                options.Preload = false;
+                options.IncludeSubDomains = true;
+                options.MaxAge = TimeSpan.FromDays(365);
+            });
+
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.Unspecified;
+                options.HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always;
+                options.Secure = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
+            });
+
             services.TryAddScoped<IIwaAuthenticationProvider, IwaAuthenticationProvider>();
             services.TryAddScoped<IOidcAuthenticationProvider, OidcAuthenticationProvider>();
             services.TryAddScoped<IWsFedAuthenticationProvider, WsFedAuthenticationProvider>();
@@ -194,7 +208,7 @@ namespace Lithnet.AccessManager.Service
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseResponseCaching();
-
+            app.UseCookiePolicy();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseFeaturePolicy();

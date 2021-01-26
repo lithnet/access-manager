@@ -64,6 +64,13 @@ namespace Lithnet.AccessManager.Service.AppSettings
                  openIdConnectOptions.SaveTokens = true;
                  openIdConnectOptions.GetClaimsFromUserInfoEndpoint = this.options.GetUserInfoEndpointClaims ?? openIdConnectOptions.ResponseType.Contains(OpenIdConnectResponseType.Code);
                  openIdConnectOptions.UseTokenLifetime = true;
+                 openIdConnectOptions.CorrelationCookie.SameSite = SameSiteMode.None;
+                 openIdConnectOptions.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+                 openIdConnectOptions.CorrelationCookie.HttpOnly = true;
+                 openIdConnectOptions.NonceCookie.SameSite = SameSiteMode.None;
+                 openIdConnectOptions.NonceCookie.SecurePolicy = CookieSecurePolicy.Always;
+                 openIdConnectOptions.NonceCookie.HttpOnly = true;
+
                  openIdConnectOptions.Events = new OpenIdConnectEvents()
                  {
                      OnRemoteFailure = this.HandleRemoteFailure,
@@ -103,8 +110,9 @@ namespace Lithnet.AccessManager.Service.AppSettings
                  cookieAuthenticationOptions.LoginPath = "/Home/Login";
                  cookieAuthenticationOptions.LogoutPath = "/Home/SignOut";
                  cookieAuthenticationOptions.AccessDeniedPath = "/Home/AccessDenied";
-                 cookieAuthenticationOptions.Cookie.SameSite = SameSiteMode.None;
+                 cookieAuthenticationOptions.Cookie.SameSite = SameSiteMode.Lax;
                  cookieAuthenticationOptions.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                 cookieAuthenticationOptions.Cookie.HttpOnly = true;
                  cookieAuthenticationOptions.SessionStore = new AuthenticationTicketCache();
              });
         }
