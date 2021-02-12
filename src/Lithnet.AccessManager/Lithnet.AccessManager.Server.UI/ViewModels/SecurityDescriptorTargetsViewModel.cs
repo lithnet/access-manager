@@ -381,6 +381,11 @@ namespace Lithnet.AccessManager.Server.UI
                 return;
             }
 
+            if (gridViewColumnHeader.Column == null)
+            {
+                return;
+            }
+
             ListSortDirection newSortDirection = ListSortDirection.Ascending;
 
             if ((lastHeaderClicked == null || lastHeaderClicked == gridViewColumnHeader) && currentSortDirection == ListSortDirection.Ascending)
