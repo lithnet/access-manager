@@ -41,7 +41,7 @@ namespace Lithnet.AccessManager.Server
             var domainAdmins = new SecurityIdentifier(WellKnownSidType.AccountDomainAdminsSid, Domain.GetComputerDomain().GetDirectoryEntry().GetPropertySid("objectSid"));
             CommonSecurityDescriptor sd = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, domainAdmins, null, null, new DiscretionaryAcl(false, false, 1));
 
-            sd.DiscretionaryAcl.AddAccess(AccessControlType.Allow, this.windowsServiceProvider.GetServiceSid(), ReadPublicAndPrivateKey, InheritanceFlags.None, PropagationFlags.None);
+            sd.DiscretionaryAcl.AddAccess(AccessControlType.Allow, this.windowsServiceProvider.GetServiceAccountSid(), ReadPublicAndPrivateKey, InheritanceFlags.None, PropagationFlags.None);
 
             if (!string.IsNullOrWhiteSpace(dataProtectionOptions.AuthorizedSecretReaders))
             {

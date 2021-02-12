@@ -12,15 +12,18 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class EmailViewModel : Screen, IHelpLink
     {
-        private readonly EmailOptions model;
+        private readonly EmailOptions emailOptions;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IProtectedSecretProvider secretProvider;
+        private readonly AdminNotificationOptions adminNotificationOptions;
 
-        public EmailViewModel(EmailOptions model, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IProtectedSecretProvider secretProvider)
+        public EmailViewModel(EmailOptions emailOptions, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IProtectedSecretProvider secretProvider, AdminNotificationOptions adminNotificationOptions)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.secretProvider = secretProvider;
-            this.model = model;
+            this.adminNotificationOptions = adminNotificationOptions;
+            this.emailOptions = emailOptions;
+
             this.DisplayName = "Email";
             eventPublisher.Register(this);
         }
@@ -28,41 +31,54 @@ namespace Lithnet.AccessManager.Server.UI
         public string HelpLink => Constants.HelpLinkPageEmail;
 
         [NotifyModelChangedProperty]
-        public string FromAddress { get => this.model.FromAddress; set => this.model.FromAddress = value; }
+        public string FromAddress { get => this.emailOptions.FromAddress; set => this.emailOptions.FromAddress = value; }
 
         [NotifyModelChangedProperty]
-        public int Port { get => this.model.Port; set => this.model.Port = value; }
+        public int Port { get => this.emailOptions.Port; set => this.emailOptions.Port = value; }
 
         [NotifyModelChangedProperty]
-        public string Host { get => this.model.Host; set => this.model.Host = value; }
+        public string Host { get => this.emailOptions.Host; set => this.emailOptions.Host = value; }
 
         [NotifyModelChangedProperty]
-        public bool UseSsl { get => this.model.UseSsl; set => this.model.UseSsl = value; }
+        public bool UseSsl { get => this.emailOptions.UseSsl; set => this.emailOptions.UseSsl = value; }
 
         [NotifyModelChangedProperty]
-        public bool UseSpecifiedCredentials { get => !this.model.UseDefaultCredentials; set => this.model.UseDefaultCredentials = !value; }
+        public bool UseSpecifiedCredentials { get => !this.emailOptions.UseDefaultCredentials; set => this.emailOptions.UseDefaultCredentials = !value; }
 
         [NotifyModelChangedProperty]
-        public string Username { get => this.model.Username; set => this.model.Username = value; }
+        public string Username { get => this.emailOptions.Username; set => this.emailOptions.Username = value; }
 
         [NotifyModelChangedProperty]
         public string Password
         {
-            get => this.model.Password?.Data == null ? null : "-placeholder-";
+            get => this.emailOptions.Password?.Data == null ? null : "-placeholder-";
             set
             {
                 if (value != "-placeholder-")
                 {
                     if (string.IsNullOrWhiteSpace(value))
                     {
-                        this.model.Password = null;
+                        this.emailOptions.Password = null;
                         return;
                     }
 
-                    this.model.Password = this.secretProvider.ProtectSecret(value);
+                    this.emailOptions.Password = this.secretProvider.ProtectSecret(value);
                 }
             }
         }
+
+        [NotifyModelChangedProperty]
+        public string AdminNotificationRecipients
+        {
+            get => this.adminNotificationOptions.AdminAlertRecipients;
+            set => this.adminNotificationOptions.AdminAlertRecipients = value;
+        }
+
+        [NotifyModelChangedProperty]
+        public bool EnableCertificateExpiryAlerts { get => this.adminNotificationOptions.EnableCertificateExpiryAlerts; set => this.adminNotificationOptions.EnableCertificateExpiryAlerts = value; }
+
+        [NotifyModelChangedProperty]
+        public bool EnableNewVersionAlerts { get => this.adminNotificationOptions.EnableNewVersionAlerts; set => this.adminNotificationOptions.EnableNewVersionAlerts = value; }
 
         public PackIconUniconsKind Icon => PackIconUniconsKind.At;
 

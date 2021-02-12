@@ -222,7 +222,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 HelpText = "Run this script to grant access for the AMS service account to manage groups in this OU",
                 ScriptText = this.scriptTemplateProvider.GrantGroupPermissions
-                    .Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceSid().ToString(), StringComparison.OrdinalIgnoreCase)
+                    .Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceAccountSid().ToString(), StringComparison.OrdinalIgnoreCase)
                     .Replace("{ou}", current.GroupOU)
                     .Replace("{domain}", discoveryServices.GetDomainNameDns(current.GroupOU))
             };
@@ -249,7 +249,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 HelpText = "Run this script to grant access for the AMS service account to manage groups in this OU",
                 ScriptText = this.scriptTemplateProvider.GrantGroupPermissions
-                    .Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceSid().ToString(), StringComparison.OrdinalIgnoreCase)
+                    .Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceAccountSid().ToString(), StringComparison.OrdinalIgnoreCase)
                     .Replace("{ou}", current.Mapping.GroupOU)
                     .Replace("{domain}", current.Domain.Name)
             };

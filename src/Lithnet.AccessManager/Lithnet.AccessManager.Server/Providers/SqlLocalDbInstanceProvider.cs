@@ -27,13 +27,13 @@ namespace Lithnet.AccessManager.Server
 
         private string masterDbConnectionString;
 
-        public SqlLocalDbInstanceProvider(IAppPathProvider appPathProvider, ILogger<SqlLocalDbInstanceProvider> logger, IHostApplicationLifetime appLifeTime)
+        public SqlLocalDbInstanceProvider(IAppPathProvider appPathProvider, ILogger<SqlLocalDbInstanceProvider> logger, IHostApplicationLifetime appLifeTime, IRegistryProvider registryProvider)
         {
             this.appPathProvider = appPathProvider;
             this.logger = logger;
             this.appLifeTime = appLifeTime;
-         
-            this.registryProvider = new RegistryProvider(true);
+
+            this.registryProvider = registryProvider;
             this.localDbApi = new SqlLocalDbApi();
             this.localDbPath = Path.Combine(this.appPathProvider.DbPath, $"{dbFileNamePrefix}.mdf");
             this.localDbLogPath = Path.Combine(this.appPathProvider.DbPath, $"{dbFileNamePrefix}_log.ldf");

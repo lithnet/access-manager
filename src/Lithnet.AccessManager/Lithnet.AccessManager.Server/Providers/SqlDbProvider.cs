@@ -29,6 +29,7 @@ namespace Lithnet.AccessManager.Server
             this.upgradeLogger = upgradeLogger;
             this.localDbInstanceProvider = localDbInstanceProvider;
             this.sqlServerInstanceProvider = sqlServerInstanceProvider;
+            this.InitializeDb();
         }
 
         public SqlConnection GetConnection()
@@ -38,7 +39,7 @@ namespace Lithnet.AccessManager.Server
 
         public string ConnectionString => this.activeInstanceProvider.ConnectionString;
 
-        public void InitializeDb()
+        private void InitializeDb()
         {
             if (licenseManager.IsFeatureEnabled(LicensedFeatures.ExternalSql) && highAvailabilityOptions.UseExternalSql)
             {

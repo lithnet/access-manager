@@ -65,7 +65,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            provider.GrantJitAccessDynamicGroup(jitGroup, user, computer, false, TimeSpan.FromMinutes(1), out _);
+            provider.GrantJitAccessDynamicGroup(jitGroup, user, null, false, TimeSpan.FromMinutes(1), out _);
             Thread.Sleep(TimeSpan.FromSeconds(20));
 
             IGroup ttlGroup = directory.GetGroup(fqGroupName);
@@ -99,13 +99,13 @@ namespace Lithnet.AccessManager.Server.Test
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            TimeSpan allowedAccess = provider.GrantJitAccessDynamicGroup(jitGroup, user, computer, false, TimeSpan.FromMinutes(1), out _);
+            TimeSpan allowedAccess = provider.GrantJitAccessDynamicGroup(jitGroup, user, null, false, TimeSpan.FromMinutes(1), out _);
 
             Assert.AreEqual(1, allowedAccess.TotalMinutes);
 
             Thread.Sleep(TimeSpan.FromSeconds(20));
 
-            TimeSpan allowedAccess2 = provider.GrantJitAccessDynamicGroup(jitGroup, user, computer, false, TimeSpan.FromMinutes(1), out _);
+            TimeSpan allowedAccess2 = provider.GrantJitAccessDynamicGroup(jitGroup, user, null, false, TimeSpan.FromMinutes(1), out _);
 
             Assert.LessOrEqual(allowedAccess2.TotalSeconds, 50);
         }
@@ -132,13 +132,13 @@ namespace Lithnet.AccessManager.Server.Test
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            TimeSpan allowedAccess = provider.GrantJitAccessDynamicGroup(jitGroup, user, computer, true, TimeSpan.FromMinutes(1), out _);
+            TimeSpan allowedAccess = provider.GrantJitAccessDynamicGroup(jitGroup, user, null, true, TimeSpan.FromMinutes(1), out _);
 
             Assert.AreEqual(1, allowedAccess.TotalMinutes);
 
             Thread.Sleep(TimeSpan.FromSeconds(20));
 
-            TimeSpan allowedAccess2 = provider.GrantJitAccessDynamicGroup(jitGroup, user, computer, true, TimeSpan.FromMinutes(1), out _);
+            TimeSpan allowedAccess2 = provider.GrantJitAccessDynamicGroup(jitGroup, user, null, true, TimeSpan.FromMinutes(1), out _);
 
             Assert.AreEqual(allowedAccess2.TotalSeconds, 60);
         }
@@ -169,7 +169,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            provider.GrantJitAccessDynamicGroup(jitGroup, user, computer, true, TimeSpan.FromMinutes(1), out Action undo);
+            provider.GrantJitAccessDynamicGroup(jitGroup, user, null, true, TimeSpan.FromMinutes(1), out Action undo);
 
             Thread.Sleep(TimeSpan.FromSeconds(20));
 
@@ -197,7 +197,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            TimeSpan allowedAccess = provider.GrantJitAccessPam(jitGroup, user, computer, true, TimeSpan.FromMinutes(1), out _);
+            TimeSpan allowedAccess = provider.GrantJitAccessPam(jitGroup, user, null, true, TimeSpan.FromMinutes(1), out _);
             TimeSpan? actualTtl = jitGroup.GetMemberTtl(user);
 
             Assert.AreEqual(1, allowedAccess.TotalMinutes);
@@ -206,7 +206,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             Thread.Sleep(TimeSpan.FromSeconds(10));
 
-            TimeSpan allowedAccess2 = provider.GrantJitAccessPam(jitGroup, user, computer, true, TimeSpan.FromMinutes(2), out _);
+            TimeSpan allowedAccess2 = provider.GrantJitAccessPam(jitGroup, user, null, true, TimeSpan.FromMinutes(2), out _);
 
             actualTtl = jitGroup.GetMemberTtl(user);
 
@@ -232,7 +232,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            TimeSpan allowedAccess = provider.GrantJitAccessPam(jitGroup, user, computer, false, TimeSpan.FromMinutes(1), out _);
+            TimeSpan allowedAccess = provider.GrantJitAccessPam(jitGroup, user, null, false, TimeSpan.FromMinutes(1), out _);
             TimeSpan? actualTtl = jitGroup.GetMemberTtl(user);
 
             Assert.AreEqual(1, allowedAccess.TotalMinutes);
@@ -241,7 +241,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             Thread.Sleep(TimeSpan.FromSeconds(10));
 
-            TimeSpan allowedAccess2 = provider.GrantJitAccessPam(jitGroup, user, computer, false, TimeSpan.FromMinutes(2), out _);
+            TimeSpan allowedAccess2 = provider.GrantJitAccessPam(jitGroup, user, null, false, TimeSpan.FromMinutes(2), out _);
 
             actualTtl = jitGroup.GetMemberTtl(user);
 
@@ -266,7 +266,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            TimeSpan allowedAccess = provider.GrantJitAccessPam(jitGroup, user, computer, false, TimeSpan.FromMinutes(1), out Action undo);
+            TimeSpan allowedAccess = provider.GrantJitAccessPam(jitGroup, user, null, false, TimeSpan.FromMinutes(1), out Action undo);
             TimeSpan? actualTtl = jitGroup.GetMemberTtl(user);
 
             Assert.AreEqual(1, allowedAccess.TotalMinutes);
@@ -288,7 +288,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            Assert.Throws<NoDynamicGroupMappingForDomainException>(() => provider.GrantJitAccessDynamicGroup(jitGroup, user, computer, false, TimeSpan.FromMinutes(1), out _));
+            Assert.Throws<NoDynamicGroupMappingForDomainException>(() => provider.GrantJitAccessDynamicGroup(jitGroup, user, null, false, TimeSpan.FromMinutes(1), out _));
         }
 
         [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "IDMDEV1\\user1")]
@@ -307,7 +307,7 @@ namespace Lithnet.AccessManager.Server.Test
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
-            provider.GrantJitAccessPam(jitGroup, user, computer, false, TimeSpan.FromMinutes(1), out _);
+            provider.GrantJitAccessPam(jitGroup, user, null, false, TimeSpan.FromMinutes(1), out _);
 
             directory.IsSidInPrincipalToken(user.Sid, jitGroup.Sid);
         }

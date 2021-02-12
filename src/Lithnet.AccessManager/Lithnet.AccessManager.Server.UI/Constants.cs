@@ -2,7 +2,6 @@
 {
     public static class Constants
     {
-        public const string UrlProductVersionInfo = "https://lithnet.github.io/access-manager/version.json";
 
         public const string LinkDownloadMsLaps = "https://aka.ms/LAPS";
 
@@ -83,7 +82,6 @@
         
         public const string EventSourceName = "Lithnet Access Manager Configuration Tool";
         public const string EventLogName = "Lithnet Access Manager";
-        public const string FirewallRuleName = "Lithnet Access Manager Web Service (HTTP/HTTPS-In)"; // This value also needs to be updated in the installer
         public const string ServiceExeName = "Lithnet.AccessManager.Service.exe";
         public const string AppName = "Lithnet Access Manager Service (AMS) Configuration";
     }

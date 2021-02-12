@@ -25,7 +25,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             this.logger = logger;
             this.domain = domain;
-            this.serviceAccountSid = windowsServiceProvider.GetServiceSid();
+            this.serviceAccountSid = windowsServiceProvider.GetServiceAccountSid();
         }
 
         public void RefreshGroupMembership()

@@ -40,6 +40,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="quartz" Version="3.2.3" />
+    <PackageReference Include="Quartz.Serialization.Json" Version="3.2.3" />
   </ItemGroup>
 
   <ItemGroup>

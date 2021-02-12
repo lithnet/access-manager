@@ -72,5 +72,7 @@ namespace Lithnet.AccessManager
         string TranslateName(string name, DsNameFormat nameFormat, DsNameFormat requiredFormat, string dnsDomainName);
 
         string TranslateName(string name, DsNameFormat nameFormat, DsNameFormat requiredFormat);
+        bool CanAccountBeDelegated(SecurityIdentifier serviceAccount);
+        bool IsAccountGmsa(SecurityIdentifier serviceAccount);
     }
 }

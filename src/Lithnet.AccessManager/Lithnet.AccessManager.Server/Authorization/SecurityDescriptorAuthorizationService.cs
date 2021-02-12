@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Interop;
 using Lithnet.AccessManager.Server.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -229,7 +230,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             try
             {
                 SecurityIdentifier s = new SecurityIdentifier(sid);
-                return this.directory.TranslateName(s.ToString(), Interop.DsNameFormat.SecurityIdentifier, Interop.DsNameFormat.Nt4Name);
+                return this.directory.TranslateName(s.ToString(), DsNameFormat.SecurityIdentifier, DsNameFormat.Nt4Name);
             }
             catch (Exception)
             {
