@@ -6,11 +6,13 @@ using Lithnet.AccessManager.Service.Internal;
 using Lithnet.AccessManager.Service.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Service.Controllers
 {
+    [AllowAnonymous]
     public class HomeController : Controller
     {
         private readonly IAuthenticationProvider authSettings;
