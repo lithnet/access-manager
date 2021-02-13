@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
 using Quartz;
 using System.Security.Cryptography;
+using C = Lithnet.AccessManager.Test.TestEnvironmentConstants;
 
 namespace Lithnet.AccessManager.Server.Test
 {

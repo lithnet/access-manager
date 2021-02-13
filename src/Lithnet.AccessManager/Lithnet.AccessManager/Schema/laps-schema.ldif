@@ -1,0 +1,48 @@
+# Attribute: ms-Mcs-AdmPwdExpirationTime
+dn: CN=ms-Mcs-AdmPwdExpirationTime,CN=Schema,CN=Configuration,DC=X
+changetype: ntdsschemaadd
+objectClass: top
+objectClass: attributeSchema
+attributeId: 1.2.840.113556.1.8000.2554.50051.45980.28112.18903.35903.6685103.1224907.2.2
+ldapDisplayName: ms-Mcs-AdmPwdExpirationTime
+attributeSyntax: 2.5.5.16
+adminDescription: LAPs expiry date
+oMSyntax: 65
+isSingleValued: TRUE
+systemOnly: FALSE
+searchFlags: 0
+showInAdvancedViewOnly: FALSE
+
+# Attribute: ms-Mcs-AdmPwd
+dn: CN=ms-Mcs-AdmPwd,CN=Schema,CN=Configuration,DC=X
+changetype: ntdsschemaadd
+objectClass: top
+objectClass: attributeSchema
+attributeId: 1.2.840.113556.1.8000.2554.50051.45980.28112.18903.35903.6685103.1224907.2.1
+ldapDisplayName: ms-Mcs-AdmPwd
+attributeSyntax: 2.5.5.5
+adminDescription: LAPs admin password
+oMSyntax: 19
+isSingleValued: TRUE
+systemOnly: FALSE
+searchFlags: 904
+showInAdvancedViewOnly: FALSE
+
+dn: 
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-
+
+dn: CN=Computer,CN=Schema,CN=Configuration,DC=x
+changetype: modify
+add: mayContain
+mayContain: ms-Mcs-AdmPwdExpirationTime
+mayContain: ms-Mcs-AdmPwd
+-
+
+dn: 
+changetype: modify
+add: schemaUpdateNow
+schemaUpdateNow: 1
+-

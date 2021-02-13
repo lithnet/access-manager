@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using C = Lithnet.AccessManager.Test.TestEnvironmentConstants;
 
 namespace Lithnet.AccessManager.Server.Test
 {
@@ -43,19 +44,19 @@ namespace Lithnet.AccessManager.Server.Test
             authorizationContextProvider = new AuthorizationContextProvider(Mock.Of<IOptions<AuthorizationOptions>>(), Global.LogFactory.CreateLogger<AuthorizationContextProvider>(), discoveryServices);
         }
 
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.LocalAdminPassword, AccessMask.None, AccessMask.LocalAdminPassword)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.LocalAdminPassword, AccessMask.LocalAdminPassword, AccessMask.None)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.None, AccessMask.LocalAdminPassword, AccessMask.None)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.LocalAdminPasswordHistory, AccessMask.None, AccessMask.LocalAdminPasswordHistory)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.LocalAdminPasswordHistory, AccessMask.LocalAdminPasswordHistory, AccessMask.None)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.None, AccessMask.LocalAdminPasswordHistory, AccessMask.None)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.Jit, AccessMask.None, AccessMask.Jit)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.Jit, AccessMask.Jit, AccessMask.None)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.None, AccessMask.Jit, AccessMask.None)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.None, AccessMask.None, AccessMask.None)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory | AccessMask.Jit, AccessMask.Jit, AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory | AccessMask.Jit, AccessMask.LocalAdminPassword, AccessMask.Jit | AccessMask.LocalAdminPasswordHistory)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory | AccessMask.Jit, AccessMask.LocalAdminPasswordHistory, AccessMask.LocalAdminPassword | AccessMask.Jit)]
+        [TestCase(C.DEV_User1, C.DEV_PC1, AccessMask.LocalAdminPassword, AccessMask.None, AccessMask.LocalAdminPassword)]
+        [TestCase(C.DEV_User1, C.DEV_PC1, AccessMask.LocalAdminPassword, AccessMask.LocalAdminPassword, AccessMask.None)]
+        [TestCase(C.DEV_User1, C.DEV_PC1, AccessMask.None, AccessMask.LocalAdminPassword, AccessMask.None)]
+        [TestCase(C.DEV_User1, C.DEV_PC1, AccessMask.LocalAdminPasswordHistory, AccessMask.None, AccessMask.LocalAdminPasswordHistory)]
+        [TestCase(C.DEV_User1, C.DEV_PC1, AccessMask.LocalAdminPasswordHistory, AccessMask.LocalAdminPasswordHistory, AccessMask.None)]
+        [TestCase(C.DEV_User1, C.DEV_PC1, AccessMask.None, AccessMask.LocalAdminPasswordHistory, AccessMask.None)]
+        [TestCase(C.DEV_User1, C.DEV_PC1, AccessMask.Jit, AccessMask.None, AccessMask.Jit)]
+        [TestCase(C.DEV_User1, C.DEV_PC1, AccessMask.Jit, AccessMask.Jit, AccessMask.None)]
+        [TestCase(C.DEV_User1, C.DEV_PC1, AccessMask.None, AccessMask.Jit, AccessMask.None)]
+        [TestCase(C.DEV_User1, C.DEV_PC1, AccessMask.None, AccessMask.None, AccessMask.None)]
+        [TestCase(C.DEV_User1, C.DEV_PC1, AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory | AccessMask.Jit, AccessMask.Jit, AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory)]
+        [TestCase(C.DEV_User1, C.DEV_PC1, AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory | AccessMask.Jit, AccessMask.LocalAdminPassword, AccessMask.Jit | AccessMask.LocalAdminPasswordHistory)]
+        [TestCase(C.DEV_User1, C.DEV_PC1, AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory | AccessMask.Jit, AccessMask.LocalAdminPasswordHistory, AccessMask.LocalAdminPassword | AccessMask.Jit)]
         public void TestAclAuthorizationOnComputerTarget(string username, string computerName, AccessMask allowed, AccessMask denied, AccessMask expected)
         {
             IUser user = directory.GetUser(username);
@@ -69,9 +70,9 @@ namespace Lithnet.AccessManager.Server.Test
             Assert.AreEqual(expected, result.EffectiveAccess);
         }
 
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", "OU=Computers,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", AccessMask.LocalAdminPassword, AccessMask.None, AccessMask.LocalAdminPassword)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", "OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", AccessMask.LocalAdminPassword, AccessMask.None, AccessMask.LocalAdminPassword)]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1", "DC=IDMDEV1,DC=LOCAL", AccessMask.LocalAdminPassword, AccessMask.None, AccessMask.LocalAdminPassword)]
+        [TestCase(C.DEV_User1, C.DEV_PC1, C.Computers_AmsTesting_DevDN, AccessMask.LocalAdminPassword, AccessMask.None, AccessMask.LocalAdminPassword)]
+        [TestCase(C.DEV_User1, C.DEV_PC1, C.AmsTesting_DevDN, AccessMask.LocalAdminPassword, AccessMask.None, AccessMask.LocalAdminPassword)]
+        [TestCase(C.DEV_User1, C.DEV_PC1, C.DevDN, AccessMask.LocalAdminPassword, AccessMask.None, AccessMask.LocalAdminPassword)]
         public void TestAclAuthorizationOnOUTarget(string username, string computerName, string targetOU, AccessMask allowed, AccessMask denied, AccessMask expected)
         {
             IUser user = directory.GetUser(username);
@@ -86,9 +87,9 @@ namespace Lithnet.AccessManager.Server.Test
         }
 
 
-        [TestCase("IDMDEV1")]
-        [TestCase("SUBDEV1")]
-        [TestCase("EXTDEV1")]
+        [TestCase(C.Dev)]
+        [TestCase(C.SubDev)]
+        [TestCase(C.ExtDev)]
         public void GetMatchingTargetsForComputer(string targetDomain)
         {
             ISecurityPrincipal trustee = directory.GetPrincipal($"{targetDomain}\\user1");
@@ -100,10 +101,10 @@ namespace Lithnet.AccessManager.Server.Test
 
             var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
-            var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
-            var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=Computers,OU=AMS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=AMS Testing,{namingContext}", trustee);
             var t3 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"{namingContext}", trustee);
-            var t4 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=JIT Groups,OU=AMS Testing,{namingContext}", trustee);
             var t5 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer1, trustee);
             var t6 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer2, trustee);
             var t7 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, group1, trustee);
@@ -119,13 +120,13 @@ namespace Lithnet.AccessManager.Server.Test
         [Test]
         public void ValidateTargetSortOrder()
         {
-            ISecurityPrincipal trustee = directory.GetPrincipal("IDMDEV1\\user1");
-            IComputer computer1 = directory.GetComputer("IDMDEV1\\PC1");
+            ISecurityPrincipal trustee = directory.GetPrincipal(C.DEV_User1);
+            IComputer computer1 = directory.GetComputer(C.DEV_PC1);
 
-            var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, "OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", trustee);
-            var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, "DC=IDMDEV1,DC=LOCAL", trustee);
-            var t3 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, "OU=Computers,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", trustee);
-            var t4 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, "OU=JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", trustee);
+            var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, C.AmsTesting_DevDN, trustee);
+            var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, C.DevDN, trustee);
+            var t3 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, C.Computers_AmsTesting_DevDN, trustee);
+            var t4 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, C.JitGroups_AmsTesting_DevDN, trustee);
 
             var options = SetupOptions(t1, t2, t3, t4);
 
@@ -134,14 +135,14 @@ namespace Lithnet.AccessManager.Server.Test
             CollectionAssert.AreEqual(new[] { t3, t1, t2 }, targetDataProvider.GetMatchingTargetsForComputer(computer1, options.Value.ComputerTargets));
         }
 
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "IDMDEV1")]
-        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "IDMDEV1")]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "SUBDEV1")]
-        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "SUBDEV1")]
-        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "SUBDEV1")]
-        [TestCase("SUBDEV1\\G-UG-1", "SUBDEV1\\user1", "SUBDEV1")]
-        [TestCase("EXTDEV1\\user1", "EXTDEV1\\user1", "EXTDEV1")]
-        [TestCase("EXTDEV1\\G-UG-1", "EXTDEV1\\user1", "EXTDEV1")]
+        [TestCase(C.DEV_User1, C.DEV_User1, C.Dev)]
+        [TestCase(C.DEV_G_UG_1, C.DEV_User1, C.Dev)]
+        [TestCase(C.DEV_User1, C.DEV_User1, C.SubDev)]
+        [TestCase(C.DEV_G_UG_1, C.DEV_User1, C.SubDev)]
+        [TestCase(C.SUBDEV_User1, C.SUBDEV_User1, C.SubDev)]
+        [TestCase(C.SUBDEV_G_UG_1, C.SUBDEV_User1, C.SubDev)]
+        [TestCase(C.EXTDEV_User1, C.EXTDEV_User1, C.ExtDev)]
+        [TestCase(C.EXTDEV_G_UG_1, C.EXTDEV_User1, C.ExtDev)]
         public void AllowTrusteeOnComputerTarget(string trusteeName, string requestorName, string targetDomain)
         {
             ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
@@ -154,10 +155,10 @@ namespace Lithnet.AccessManager.Server.Test
 
             var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
-            var t1 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
-            var t2 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t1 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=Computers,OU=AMS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=AMS Testing,{namingContext}", trustee);
             var t3 = CreateTarget(AccessMask.None, AccessMask.None, $"{namingContext}", trustee);
-            var t4 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=JIT Groups,OU=AMS Testing,{namingContext}", trustee);
             var t5 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer1, trustee);
             var t6 = CreateTarget(AccessMask.None, AccessMask.None, computer2, trustee);
             var t7 = CreateTarget(AccessMask.None, AccessMask.None, group1, trustee);
@@ -173,14 +174,14 @@ namespace Lithnet.AccessManager.Server.Test
             CollectionAssert.AreEquivalent(new[] { t5 }, result.SuccessfulLapsTargets);
         }
 
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "IDMDEV1")]
-        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "IDMDEV1")]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "SUBDEV1")]
-        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "SUBDEV1")]
-        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "SUBDEV1")]
-        [TestCase("SUBDEV1\\G-UG-1", "SUBDEV1\\user1", "SUBDEV1")]
-        [TestCase("EXTDEV1\\user1", "EXTDEV1\\user1", "EXTDEV1")]
-        [TestCase("EXTDEV1\\G-UG-1", "EXTDEV1\\user1", "EXTDEV1")]
+        [TestCase(C.DEV_User1, C.DEV_User1, C.Dev)]
+        [TestCase(C.DEV_G_UG_1, C.DEV_User1, C.Dev)]
+        [TestCase(C.DEV_User1, C.DEV_User1, C.SubDev)]
+        [TestCase(C.DEV_G_UG_1, C.DEV_User1, C.SubDev)]
+        [TestCase(C.SUBDEV_User1, C.SUBDEV_User1, C.SubDev)]
+        [TestCase(C.SUBDEV_G_UG_1, C.SUBDEV_User1, C.SubDev)]
+        [TestCase(C.EXTDEV_User1, C.EXTDEV_User1, C.ExtDev)]
+        [TestCase(C.EXTDEV_G_UG_1, C.EXTDEV_User1, C.ExtDev)]
         public void AllowTrusteeOnGroupTarget(string trusteeName, string requestorName, string targetDomain)
         {
             ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
@@ -193,10 +194,10 @@ namespace Lithnet.AccessManager.Server.Test
 
             var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
-            var t1 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
-            var t2 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t1 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=Computers,OU=AMS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=AMS Testing,{namingContext}", trustee);
             var t3 = CreateTarget(AccessMask.None, AccessMask.None, $"{namingContext}", trustee);
-            var t4 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=JIT Groups,OU=AMS Testing,{namingContext}", trustee);
             var t5 = CreateTarget(AccessMask.None, AccessMask.None, computer1, trustee);
             var t6 = CreateTarget(AccessMask.None, AccessMask.None, computer2, trustee);
             var t7 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, group1, trustee);
@@ -212,14 +213,14 @@ namespace Lithnet.AccessManager.Server.Test
             CollectionAssert.AreEquivalent(new[] { t7 }, result.SuccessfulLapsTargets);
         }
 
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "IDMDEV1")]
-        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "IDMDEV1")]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "SUBDEV1")]
-        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "SUBDEV1")]
-        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "SUBDEV1")]
-        [TestCase("SUBDEV1\\G-UG-1", "SUBDEV1\\user1", "SUBDEV1")]
-        [TestCase("EXTDEV1\\user1", "EXTDEV1\\user1", "EXTDEV1")]
-        [TestCase("EXTDEV1\\G-UG-1", "EXTDEV1\\user1", "EXTDEV1")]
+        [TestCase(C.DEV_User1, C.DEV_User1, C.Dev)]
+        [TestCase(C.DEV_G_UG_1, C.DEV_User1, C.Dev)]
+        [TestCase(C.DEV_User1, C.DEV_User1, C.SubDev)]
+        [TestCase(C.DEV_G_UG_1, C.DEV_User1, C.SubDev)]
+        [TestCase(C.SUBDEV_User1, C.SUBDEV_User1, C.SubDev)]
+        [TestCase(C.SUBDEV_G_UG_1, C.SUBDEV_User1, C.SubDev)]
+        [TestCase(C.EXTDEV_User1, C.EXTDEV_User1, C.ExtDev)]
+        [TestCase(C.EXTDEV_G_UG_1, C.EXTDEV_User1, C.ExtDev)]
         public void AllowTrusteeOnOUTarget(string trusteeName, string requestorName, string targetDomain)
         {
             ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
@@ -232,10 +233,10 @@ namespace Lithnet.AccessManager.Server.Test
 
             var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
-            var t1 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
-            var t2 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t1 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=Computers,OU=AMS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=AMS Testing,{namingContext}", trustee);
             var t3 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"{namingContext}", trustee);
-            var t4 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.None, AccessMask.None, $"OU=JIT Groups,OU=AMS Testing,{namingContext}", trustee);
             var t5 = CreateTarget(AccessMask.None, AccessMask.None, computer1, trustee);
             var t6 = CreateTarget(AccessMask.None, AccessMask.None, computer2, trustee);
             var t7 = CreateTarget(AccessMask.None, AccessMask.None, group1, trustee);
@@ -251,14 +252,14 @@ namespace Lithnet.AccessManager.Server.Test
             CollectionAssert.AreEquivalent(new[] { t3 }, result.SuccessfulLapsTargets);
         }
 
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "IDMDEV1")]
-        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "IDMDEV1")]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "SUBDEV1")]
-        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "SUBDEV1")]
-        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "SUBDEV1")]
-        [TestCase("SUBDEV1\\G-UG-1", "SUBDEV1\\user1", "SUBDEV1")]
-        [TestCase("EXTDEV1\\user1", "EXTDEV1\\user1", "EXTDEV1")]
-        [TestCase("EXTDEV1\\G-UG-1", "EXTDEV1\\user1", "EXTDEV1")]
+        [TestCase(C.DEV_User1, C.DEV_User1, C.Dev)]
+        [TestCase(C.DEV_G_UG_1, C.DEV_User1, C.Dev)]
+        [TestCase(C.DEV_User1, C.DEV_User1, C.SubDev)]
+        [TestCase(C.DEV_G_UG_1, C.DEV_User1, C.SubDev)]
+        [TestCase(C.SUBDEV_User1, C.SUBDEV_User1, C.SubDev)]
+        [TestCase(C.SUBDEV_G_UG_1, C.SUBDEV_User1, C.SubDev)]
+        [TestCase(C.EXTDEV_User1, C.EXTDEV_User1, C.ExtDev)]
+        [TestCase(C.EXTDEV_G_UG_1, C.EXTDEV_User1, C.ExtDev)]
         public void DenyTrusteeOnComputerTarget(string trusteeName, string requestorName, string targetDomain)
         {
             ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
@@ -271,10 +272,10 @@ namespace Lithnet.AccessManager.Server.Test
 
             var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
-            var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
-            var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=Computers,OU=AMS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=AMS Testing,{namingContext}", trustee);
             var t3 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"{namingContext}", trustee);
-            var t4 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=JIT Groups,OU=AMS Testing,{namingContext}", trustee);
             var t5 = CreateTarget(AccessMask.None, AccessMask.LocalAdminPassword, computer1, trustee);
             var t6 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer2, trustee);
             var t7 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, group1, trustee);
@@ -288,14 +289,14 @@ namespace Lithnet.AccessManager.Server.Test
             CollectionAssert.AreEquivalent(new[] { t1, t2, t3, t7 }, result.SuccessfulLapsTargets);
         }
 
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "IDMDEV1")]
-        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "IDMDEV1")]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "SUBDEV1")]
-        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "SUBDEV1")]
-        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "SUBDEV1")]
-        [TestCase("SUBDEV1\\G-UG-1", "SUBDEV1\\user1", "SUBDEV1")]
-        [TestCase("EXTDEV1\\user1", "EXTDEV1\\user1", "EXTDEV1")]
-        [TestCase("EXTDEV1\\G-UG-1", "EXTDEV1\\user1", "EXTDEV1")]
+        [TestCase(C.DEV_User1, C.DEV_User1, C.Dev)]
+        [TestCase(C.DEV_G_UG_1, C.DEV_User1, C.Dev)]
+        [TestCase(C.DEV_User1, C.DEV_User1, C.SubDev)]
+        [TestCase(C.DEV_G_UG_1, C.DEV_User1, C.SubDev)]
+        [TestCase(C.SUBDEV_User1, C.SUBDEV_User1, C.SubDev)]
+        [TestCase(C.SUBDEV_G_UG_1, C.SUBDEV_User1, C.SubDev)]
+        [TestCase(C.EXTDEV_User1, C.EXTDEV_User1, C.ExtDev)]
+        [TestCase(C.EXTDEV_G_UG_1, C.EXTDEV_User1, C.ExtDev)]
         public void DenyTrusteeOnOUTarget(string trusteeName, string requestorName, string targetDomain)
         {
             ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
@@ -308,10 +309,10 @@ namespace Lithnet.AccessManager.Server.Test
 
             var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
-            var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
-            var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.LocalAdminPassword, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=Computers,OU=AMS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.LocalAdminPassword, $"OU=AMS Testing,{namingContext}", trustee);
             var t3 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"{namingContext}", trustee);
-            var t4 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=JIT Groups,OU=AMS Testing,{namingContext}", trustee);
             var t5 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer1, trustee);
             var t6 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer2, trustee);
             var t7 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, group1, trustee);
@@ -325,14 +326,14 @@ namespace Lithnet.AccessManager.Server.Test
             Assert.AreEqual(AccessMask.None, result.EffectiveAccess);
         }
 
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "IDMDEV1")]
-        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "IDMDEV1")]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "SUBDEV1")]
-        [TestCase("IDMDEV1\\G-UG-1", "IDMDEV1\\user1", "SUBDEV1")]
-        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "SUBDEV1")]
-        [TestCase("SUBDEV1\\G-UG-1", "SUBDEV1\\user1", "SUBDEV1")]
-        [TestCase("EXTDEV1\\user1", "EXTDEV1\\user1", "EXTDEV1")]
-        [TestCase("EXTDEV1\\G-UG-1", "EXTDEV1\\user1", "EXTDEV1")]
+        [TestCase(C.DEV_User1, C.DEV_User1, C.Dev)]
+        [TestCase(C.DEV_G_UG_1, C.DEV_User1, C.Dev)]
+        [TestCase(C.DEV_User1, C.DEV_User1, C.SubDev)]
+        [TestCase(C.DEV_G_UG_1, C.DEV_User1, C.SubDev)]
+        [TestCase(C.SUBDEV_User1, C.SUBDEV_User1, C.SubDev)]
+        [TestCase(C.SUBDEV_G_UG_1, C.SUBDEV_User1, C.SubDev)]
+        [TestCase(C.EXTDEV_User1, C.EXTDEV_User1, C.ExtDev)]
+        [TestCase(C.EXTDEV_G_UG_1, C.EXTDEV_User1, C.ExtDev)]
         public void DenyTrusteeOnGroupTarget(string trusteeName, string requestorName, string targetDomain)
         {
             ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
@@ -345,10 +346,10 @@ namespace Lithnet.AccessManager.Server.Test
 
             var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
-            var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=Computers,OU=LAPS Testing,{namingContext}", trustee);
-            var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=LAPS Testing,{namingContext}", trustee);
+            var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=Computers,OU=AMS Testing,{namingContext}", trustee);
+            var t2 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=AMS Testing,{namingContext}", trustee);
             var t3 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"{namingContext}", trustee);
-            var t4 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=JIT Groups,OU=LAPS Testing,{namingContext}", trustee);
+            var t4 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, $"OU=JIT Groups,OU=AMS Testing,{namingContext}", trustee);
             var t5 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer1, trustee);
             var t6 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer2, trustee);
             var t7 = CreateTarget(AccessMask.None, AccessMask.LocalAdminPassword, group1, trustee);
@@ -363,13 +364,13 @@ namespace Lithnet.AccessManager.Server.Test
         }
 
 
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "IDMDEV1\\PC1")]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "SUBDEV1\\PC1")]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1", "EXTDEV1\\PC1")]
-        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "IDMDEV1\\PC1")]
-        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "SUBDEV1\\PC1")]
-        [TestCase("SUBDEV1\\user1", "SUBDEV1\\user1", "EXTDEV1\\PC1")]
-        [TestCase("EXTDEV1\\user1", "EXTDEV1\\user1", "EXTDEV1\\PC1")]
+        [TestCase(C.DEV_User1, C.DEV_User1, C.DEV_PC1)]
+        [TestCase(C.DEV_User1, C.DEV_User1, C.SUBDEV_PC1)]
+        [TestCase(C.DEV_User1, C.DEV_User1, C.EXTDEV_PC1)]
+        [TestCase(C.SUBDEV_User1, C.SUBDEV_User1, C.DEV_PC1)]
+        [TestCase(C.SUBDEV_User1, C.SUBDEV_User1, C.SUBDEV_PC1)]
+        [TestCase(C.SUBDEV_User1, C.SUBDEV_User1, C.EXTDEV_PC1)]
+        [TestCase(C.EXTDEV_User1, C.EXTDEV_User1, C.EXTDEV_PC1)]
         public void UserCanAccessComputer(string requestorName, string trusteeName, string computerName)
         {
             IUser requestor = directory.GetUser(requestorName);
@@ -387,48 +388,48 @@ namespace Lithnet.AccessManager.Server.Test
         }
 
         // IDMDEV1\\user1 can access PCs in all domains via global groups in their home domain
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\G-GG-1", "IDMDEV1\\PC1")]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\G-GG-1", "SUBDEV1\\PC1")]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\G-GG-1", "EXTDEV1\\PC1")]
+        [TestCase(C.DEV_User1, C.DEV_G_GG_1, C.DEV_PC1)]
+        [TestCase(C.DEV_User1, C.DEV_G_GG_1, C.SUBDEV_PC1)]
+        [TestCase(C.DEV_User1, C.DEV_G_GG_1, C.EXTDEV_PC1)]
 
         // IDMDEV1\\user1 can access PCs in all domains via universal groups in their own forest
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\G-UG-1", "IDMDEV1\\PC1")]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\G-UG-1", "SUBDEV1\\PC1")]
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\G-UG-1", "EXTDEV1\\PC1")]
-        [TestCase("IDMDEV1\\user1", "SUBDEV1\\G-UG-1", "IDMDEV1\\PC1")]
-        [TestCase("IDMDEV1\\user1", "SUBDEV1\\G-UG-1", "SUBDEV1\\PC1")]
-        [TestCase("IDMDEV1\\user1", "SUBDEV1\\G-UG-1", "EXTDEV1\\PC1")]
+        [TestCase(C.DEV_User1, C.DEV_G_UG_1, C.DEV_PC1)]
+        [TestCase(C.DEV_User1, C.DEV_G_UG_1, C.SUBDEV_PC1)]
+        [TestCase(C.DEV_User1, C.DEV_G_UG_1, C.EXTDEV_PC1)]
+        [TestCase(C.DEV_User1, C.SUBDEV_G_UG_1, C.DEV_PC1)]
+        [TestCase(C.DEV_User1, C.SUBDEV_G_UG_1, C.SUBDEV_PC1)]
+        [TestCase(C.DEV_User1, C.SUBDEV_G_UG_1, C.EXTDEV_PC1)]
 
         // IDMDEV1\\user1 can access PCs in their own forest via domain local groups in each domain
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\G-DL-1", "IDMDEV1\\PC1")]
-        [TestCase("IDMDEV1\\user1", "SUBDEV1\\G-DL-1", "SUBDEV1\\PC1")]
+        [TestCase(C.DEV_User1, C.DEV_G_DL_1, C.DEV_PC1)]
+        [TestCase(C.DEV_User1, C.SUBDEV_G_DL_1, C.SUBDEV_PC1)]
 
 
         // SUBDEV1\\user1 can access PCs in all domains via global groups in their home domain
-        [TestCase("SUBDEV1\\user1", "SUBDEV1\\G-GG-1", "IDMDEV1\\PC1")]
-        [TestCase("SUBDEV1\\user1", "SUBDEV1\\G-GG-1", "SUBDEV1\\PC1")]
-        [TestCase("SUBDEV1\\user1", "SUBDEV1\\G-GG-1", "EXTDEV1\\PC1")]
+        [TestCase(C.SUBDEV_User1, C.SUBDEV_G_GG_1, C.DEV_PC1)]
+        [TestCase(C.SUBDEV_User1, C.SUBDEV_G_GG_1, C.SUBDEV_PC1)]
+        [TestCase(C.SUBDEV_User1, C.SUBDEV_G_GG_1, C.EXTDEV_PC1)]
 
         // SUBDEV1\\user1 can access PCs in all domains via universal groups in their own forest
-        [TestCase("SUBDEV1\\user1", "IDMDEV1\\G-UG-1", "IDMDEV1\\PC1")]
-        [TestCase("SUBDEV1\\user1", "IDMDEV1\\G-UG-1", "SUBDEV1\\PC1")]
-        [TestCase("SUBDEV1\\user1", "IDMDEV1\\G-UG-1", "EXTDEV1\\PC1")]
-        [TestCase("SUBDEV1\\user1", "SUBDEV1\\G-UG-1", "IDMDEV1\\PC1")]
-        [TestCase("SUBDEV1\\user1", "SUBDEV1\\G-UG-1", "SUBDEV1\\PC1")]
-        [TestCase("SUBDEV1\\user1", "SUBDEV1\\G-UG-1", "EXTDEV1\\PC1")]
+        [TestCase(C.SUBDEV_User1, C.DEV_G_UG_1, C.DEV_PC1)]
+        [TestCase(C.SUBDEV_User1, C.DEV_G_UG_1, C.SUBDEV_PC1)]
+        [TestCase(C.SUBDEV_User1, C.DEV_G_UG_1, C.EXTDEV_PC1)]
+        [TestCase(C.SUBDEV_User1, C.SUBDEV_G_UG_1, C.DEV_PC1)]
+        [TestCase(C.SUBDEV_User1, C.SUBDEV_G_UG_1, C.SUBDEV_PC1)]
+        [TestCase(C.SUBDEV_User1, C.SUBDEV_G_UG_1, C.EXTDEV_PC1)]
 
         // SUBDEV1\\user1 can access PCs in their own forest via domain local groups in each domain
-        [TestCase("SUBDEV1\\user1", "IDMDEV1\\G-DL-1", "IDMDEV1\\PC1")]
-        [TestCase("SUBDEV1\\user1", "SUBDEV1\\G-DL-1", "SUBDEV1\\PC1")]
+        [TestCase(C.SUBDEV_User1, C.DEV_G_DL_1, C.DEV_PC1)]
+        [TestCase(C.SUBDEV_User1, C.SUBDEV_G_DL_1, C.SUBDEV_PC1)]
 
         // EXTDEV1\\user1 can access PCs via global groups only in their home domain
-        [TestCase("EXTDEV1\\user1", "EXTDEV1\\G-GG-1", "EXTDEV1\\PC1")]
+        [TestCase(C.EXTDEV_User1, C.EXTDEV_G_GG_1, C.EXTDEV_PC1)]
 
         // EXTDEV1\\user1 can access PCs via universal groups in their home domain forest
-        [TestCase("EXTDEV1\\user1", "EXTDEV1\\G-UG-1", "EXTDEV1\\PC1")]
+        [TestCase(C.EXTDEV_User1, C.EXTDEV_G_UG_1, C.EXTDEV_PC1)]
 
         // EXTDEV1\\user1 can access PCs in their own forest via domain local groups
-        [TestCase("EXTDEV1\\user1", "EXTDEV1\\G-DL-1", "EXTDEV1\\PC1")]
+        [TestCase(C.EXTDEV_User1, C.EXTDEV_G_DL_1, C.EXTDEV_PC1)]
 
         public void GroupCanAccessComputer(string requestorName, string trusteeName, string computerName)
         {

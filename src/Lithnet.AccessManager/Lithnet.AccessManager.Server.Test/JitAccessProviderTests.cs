@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using C = Lithnet.AccessManager.Test.TestEnvironmentConstants;
 
 namespace Lithnet.AccessManager.Server.Test
 {
@@ -39,13 +40,13 @@ namespace Lithnet.AccessManager.Server.Test
             logger = Global.LogFactory.CreateLogger<JitAccessProvider>();
         }
 
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\PC1$", "IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\PC1$", "IDMDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\PC1$", "SUBDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\PC1$", "SUBDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\PC1$", "EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\PC1$", "EXTDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\PC1$", "EXTDEV1\\JIT-PC1", "SUBDEV1\\user1")]
+        [TestCase(C.DynamicJitGroups_AmsTesting_DevDN, C.DEV_PC1,C.DEV_JIT_PC1, C.DEV_User1)]
+        [TestCase(C.DynamicJitGroups_AmsTesting_DevDN, C.DEV_PC1,C.DEV_JIT_PC1, C.SUBDEV_User1)]
+        [TestCase(C.DynamicJitGroups_AmsTesting_SubDevDN, C.SUBDEV_PC1, C.SUBDEV_JIT_PC1, C.SUBDEV_User1)]
+        [TestCase(C.DynamicJitGroups_AmsTesting_SubDevDN, C.SUBDEV_PC1, C.SUBDEV_JIT_PC1, C.DEV_User1)]
+        [TestCase(C.DynamicJitGroups_AmsTesting_ExtDevDN, C.EXTDEV_PC1, C.EXTDEV_JIT_PC1, C.EXTDEV_User1)]
+        [TestCase(C.DynamicJitGroups_AmsTesting_ExtDevDN, C.EXTDEV_PC1, C.EXTDEV_JIT_PC1, C.DEV_User1)]
+        [TestCase(C.DynamicJitGroups_AmsTesting_ExtDevDN, C.EXTDEV_PC1, C.EXTDEV_JIT_PC1, C.SUBDEV_User1)]
         public void CreateDynamicGroup(string groupou, string computerName, string jitGroupName, string userName)
         {
             string groupname = Guid.NewGuid().ToString();
@@ -77,9 +78,9 @@ namespace Lithnet.AccessManager.Server.Test
             directory.IsSidInPrincipalToken(user.Sid, jitGroup.Sid);
         }
 
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\PC1$", "IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\PC1$", "EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\PC1$", "SUBDEV1\\JIT-PC1", "SUBDEV1\\user1")]
+        [TestCase(C.DynamicJitGroups_AmsTesting_DevDN, C.DEV_PC1,C.DEV_JIT_PC1, C.DEV_User1)]
+        [TestCase(C.DynamicJitGroups_AmsTesting_ExtDevDN, C.EXTDEV_PC1, C.EXTDEV_JIT_PC1, C.EXTDEV_User1)]
+        [TestCase(C.DynamicJitGroups_AmsTesting_SubDevDN, C.SUBDEV_PC1, C.SUBDEV_JIT_PC1, C.SUBDEV_User1)]
         public void TestDynamicGroupAccessExtensionNotAllowed(string groupou, string computerName, string jitGroupName, string userName)
         {
             string groupname = Guid.NewGuid().ToString();
@@ -110,9 +111,9 @@ namespace Lithnet.AccessManager.Server.Test
             Assert.LessOrEqual(allowedAccess2.TotalSeconds, 50);
         }
 
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\PC1$", "IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\PC1$", "EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\PC1$", "SUBDEV1\\JIT-PC1", "SUBDEV1\\user1")]
+        [TestCase(C.DynamicJitGroups_AmsTesting_DevDN, C.DEV_PC1,C.DEV_JIT_PC1, C.DEV_User1)]
+        [TestCase(C.DynamicJitGroups_AmsTesting_ExtDevDN, C.EXTDEV_PC1, C.EXTDEV_JIT_PC1, C.EXTDEV_User1)]
+        [TestCase(C.DynamicJitGroups_AmsTesting_SubDevDN, C.SUBDEV_PC1, C.SUBDEV_JIT_PC1, C.SUBDEV_User1)]
         public void TestDynamicGroupAccessExtensionAllowed(string groupou, string computerName, string jitGroupName, string userName)
         {
             string groupname = Guid.NewGuid().ToString();
@@ -143,13 +144,13 @@ namespace Lithnet.AccessManager.Server.Test
             Assert.AreEqual(allowedAccess2.TotalSeconds, 60);
         }
 
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\PC1$", "IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1\\PC1$", "IDMDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\PC1$", "SUBDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1\\PC1$", "SUBDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\PC1$", "EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\PC1$", "EXTDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("OU=Dynamic JIT Groups,OU=LAPS Testing,DC=EXTDEV1,DC=LOCAL", "EXTDEV1\\PC1$", "EXTDEV1\\JIT-PC1", "SUBDEV1\\user1")]
+        [TestCase(C.DynamicJitGroups_AmsTesting_DevDN, C.DEV_PC1,C.DEV_JIT_PC1, C.DEV_User1)]
+        [TestCase(C.DynamicJitGroups_AmsTesting_DevDN, C.DEV_PC1,C.DEV_JIT_PC1, C.SUBDEV_User1)]
+        [TestCase(C.DynamicJitGroups_AmsTesting_SubDevDN, C.SUBDEV_PC1, C.SUBDEV_JIT_PC1, C.SUBDEV_User1)]
+        [TestCase(C.DynamicJitGroups_AmsTesting_SubDevDN, C.SUBDEV_PC1, C.SUBDEV_JIT_PC1, C.DEV_User1)]
+        [TestCase(C.DynamicJitGroups_AmsTesting_ExtDevDN, C.EXTDEV_PC1, C.EXTDEV_JIT_PC1, C.EXTDEV_User1)]
+        [TestCase(C.DynamicJitGroups_AmsTesting_ExtDevDN, C.EXTDEV_PC1, C.EXTDEV_JIT_PC1, C.DEV_User1)]
+        [TestCase(C.DynamicJitGroups_AmsTesting_ExtDevDN, C.EXTDEV_PC1, C.EXTDEV_JIT_PC1, C.SUBDEV_User1)]
         public void TestDynamicGroupAccessUndo(string groupou, string computerName, string jitGroupName, string userName)
         {
             string groupname = Guid.NewGuid().ToString();
@@ -181,13 +182,13 @@ namespace Lithnet.AccessManager.Server.Test
         }
 
 
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "IDMDEV1\\user1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1$", "SUBDEV1\\user1")]
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "SUBDEV1\\user1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1$", "IDMDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "SUBDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "EXTDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "IDMDEV1\\user1")]
+        [TestCase(C.DEV_JIT_PC1, C.DEV_PC1, C.DEV_User1)]
+        [TestCase(C.SUBDEV_JIT_PC1, C.SUBDEV_PC1, C.SUBDEV_User1)]
+        [TestCase(C.DEV_JIT_PC1, C.DEV_PC1, C.SUBDEV_User1)]
+        [TestCase(C.SUBDEV_JIT_PC1, C.SUBDEV_PC1, C.DEV_User1)]
+        [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_PC1, C.SUBDEV_User1)]
+        [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_PC1, C.EXTDEV_User1)]
+        [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_PC1, C.DEV_User1)]
         public void TestPamGroupAccessExtensionAllowed(string jitGroupName, string computerName, string userName)
         {
             IGroup jitGroup = directory.GetGroup(jitGroupName);
@@ -216,13 +217,13 @@ namespace Lithnet.AccessManager.Server.Test
         }
 
 
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "IDMDEV1\\user1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1$", "SUBDEV1\\user1")]
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "SUBDEV1\\user1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1$", "IDMDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "SUBDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "EXTDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "IDMDEV1\\user1")]
+        [TestCase(C.DEV_JIT_PC1, C.DEV_PC1, C.DEV_User1)]
+        [TestCase(C.SUBDEV_JIT_PC1, C.SUBDEV_PC1, C.SUBDEV_User1)]
+        [TestCase(C.DEV_JIT_PC1, C.DEV_PC1, C.SUBDEV_User1)]
+        [TestCase(C.SUBDEV_JIT_PC1, C.SUBDEV_PC1, C.DEV_User1)]
+        [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_PC1, C.SUBDEV_User1)]
+        [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_PC1, C.EXTDEV_User1)]
+        [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_PC1, C.DEV_User1)]
         public void TestPamGroupAccessExtensionNotAllowed(string jitGroupName, string computerName, string userName)
         {
             IGroup jitGroup = directory.GetGroup(jitGroupName);
@@ -250,13 +251,13 @@ namespace Lithnet.AccessManager.Server.Test
             Assert.LessOrEqual(allowedAccess2.TotalSeconds, 60);
         }
 
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "IDMDEV1\\user1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1$", "SUBDEV1\\user1")]
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "SUBDEV1\\user1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1$", "IDMDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "SUBDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "EXTDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "IDMDEV1\\user1")]
+        [TestCase(C.DEV_JIT_PC1, C.DEV_PC1, C.DEV_User1)]
+        [TestCase(C.SUBDEV_JIT_PC1, C.SUBDEV_PC1, C.SUBDEV_User1)]
+        [TestCase(C.DEV_JIT_PC1, C.DEV_PC1, C.SUBDEV_User1)]
+        [TestCase(C.SUBDEV_JIT_PC1, C.SUBDEV_PC1, C.DEV_User1)]
+        [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_PC1, C.SUBDEV_User1)]
+        [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_PC1, C.EXTDEV_User1)]
+        [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_PC1, C.DEV_User1)]
         public void TestPamGroupAccessUndo(string jitGroupName, string computerName, string userName)
         {
             IGroup jitGroup = directory.GetGroup(jitGroupName);
@@ -278,7 +279,7 @@ namespace Lithnet.AccessManager.Server.Test
         }
 
 
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "IDMDEV1\\user1")]
+        [TestCase(C.DEV_JIT_PC1, C.DEV_PC1, C.DEV_User1)]
         public void ThrowOnNoMappingForDomain(string jitGroupName, string computerName, string userName)
         {
             IGroup jitGroup = directory.GetGroup(jitGroupName);
@@ -291,13 +292,13 @@ namespace Lithnet.AccessManager.Server.Test
             Assert.Throws<NoDynamicGroupMappingForDomainException>(() => provider.GrantJitAccessDynamicGroup(jitGroup, user, null, false, TimeSpan.FromMinutes(1), out _));
         }
 
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "IDMDEV1\\user1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1$", "SUBDEV1\\user1")]
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1$", "SUBDEV1\\user1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1$", "IDMDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "SUBDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "EXTDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1$", "IDMDEV1\\user1")]
+        [TestCase(C.DEV_JIT_PC1, C.DEV_PC1, C.DEV_User1)]
+        [TestCase(C.SUBDEV_JIT_PC1, C.SUBDEV_PC1, C.SUBDEV_User1)]
+        [TestCase(C.DEV_JIT_PC1, C.DEV_PC1, C.SUBDEV_User1)]
+        [TestCase(C.SUBDEV_JIT_PC1, C.SUBDEV_PC1, C.DEV_User1)]
+        [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_PC1, C.SUBDEV_User1)]
+        [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_PC1, C.EXTDEV_User1)]
+        [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_PC1, C.DEV_User1)]
         public void AddUserToGroupPam(string jitGroupName, string computerName, string userName)
         {
             IGroup jitGroup = directory.GetGroup(jitGroupName);

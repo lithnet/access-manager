@@ -14,6 +14,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Lithnet.AccessManager.Server.Test\TestEnvironmentConstants.cs" Link="TestEnvironmentConstants.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="TestFiles\DigiCertGlobalRootG3.crt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -4,6 +4,7 @@ using System.Linq;
 using Lithnet.AccessManager.Server.Configuration;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using C = Lithnet.AccessManager.Test.TestEnvironmentConstants;
 
 namespace Lithnet.AccessManager.Server.Test
 {

@@ -9,7 +9,7 @@ schemaVersion="1.0" xmlns="http://www.microsoft.com/GroupPolicy/PolicyDefinition
     <stringTable>
       <string id="cat_lithnet_accessManagerAgent">Access Manager Agent</string>
       <string id="pol_enableAgent">Enable the Lithnet Access Manager Agent</string>
-      <string id="pol_enableAgent_help">When enabled, the agent will run at the interval specified below to check for required local admin password changes and JIT activities. Note that the local admin password and JIT settings must be enabled independently of this setting</string>
+      <string id="pol_enableAgent_help">When enabled, the agent will run at the interval specified below to check for required local admin password changes. Note that the local admin password settings must be enabled independently of this setting</string>
 
       <string id="TS_SUPPORTED_OS">At least Microsoft Windows 8.1 or Windows Server 2012</string>
     </stringTable>

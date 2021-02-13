@@ -1,7 +1,7 @@
 # ==================================================================
 # 
 #  This file should be imported with the following command:
-#    ldifde -i -u -f ad0-schema.ldf -s server:port -b username domain password -j . -c "cn=Schema,cn=Configuration,dc=X" #schemaNamingContext
+#    ldifde -i -u -f ad-schema.ldf -s server:port -b username domain password -j . -c "cn=Schema,cn=Configuration,dc=X" #schemaNamingContext
 # 
 # ==================================================================
 

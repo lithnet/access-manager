@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using C = Lithnet.AccessManager.Test.TestEnvironmentConstants;
 
 namespace Lithnet.AccessManager.Server.Test
 {
@@ -28,7 +29,7 @@ namespace Lithnet.AccessManager.Server.Test
             logger = Global.LogFactory.CreateLogger<AuthorizationContextProvider>();
         }
 
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1")]
+        [TestCase(C.DEV_User1, C.DEV_PC1)]
         public void TestFailoverToNextHost(string username, string computerName)
         {
             IUser user = directory.GetUser(username);
@@ -69,7 +70,7 @@ namespace Lithnet.AccessManager.Server.Test
             Assert.AreEqual(c.Server, dc);
         }
 
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1")]
+        [TestCase(C.DEV_User1, C.DEV_PC1)]
         public void ExceptionThrownWhenHostListRecycles(string username, string computerName)
         {
             IUser user = directory.GetUser(username);
@@ -110,7 +111,7 @@ namespace Lithnet.AccessManager.Server.Test
             Assert.Throws<AuthorizationContextException>(() => authorizationContextProvider.GetAuthorizationContext(user, computer.Sid));
         }
 
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\PC1")]
+        [TestCase(C.DEV_User1, C.DEV_PC1)]
         public void TestFailbackToLocalHost(string username, string computerName)
         {
             IUser user = directory.GetUser(username);

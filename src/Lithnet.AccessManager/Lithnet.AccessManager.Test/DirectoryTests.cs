@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Lithnet.Security.Authorization;
+using Microsoft.Extensions.Logging;
+using Moq;
+using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.DirectoryServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading;
-using Lithnet.AccessManager.Interop;
-using Lithnet.Security.Authorization;
-using Microsoft.Extensions.Logging;
-using Moq;
-using NUnit.Framework;
+using C = Lithnet.AccessManager.Test.TestEnvironmentConstants;
 using ILogger = NLog.ILogger;
 
 namespace Lithnet.AccessManager.Test
@@ -87,27 +87,27 @@ namespace Lithnet.AccessManager.Test
         }
 
         // THIS domain user found in THIS domain group
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\G-DL-1"), TestCase("IDMDEV1\\user1", "IDMDEV1\\G-GG-1"), TestCase("IDMDEV1\\user1", "IDMDEV1\\G-UG-1")]
-        [TestCase("IDMDEV1\\user2", "IDMDEV1\\G-UG-2"), TestCase("IDMDEV1\\user2", "IDMDEV1\\G-GG-2"), TestCase("IDMDEV1\\user2", "IDMDEV1\\G-UG-2")]
-        [TestCase("IDMDEV1\\user3", "IDMDEV1\\G-DL-3"), TestCase("IDMDEV1\\user3", "IDMDEV1\\G-GG-3"), TestCase("IDMDEV1\\user3", "IDMDEV1\\G-UG-3")]
+        [TestCase(C.DEV_User1, C.DEV_G_DL_1), TestCase(C.DEV_User1, C.DEV_G_GG_1), TestCase(C.DEV_User1, C.DEV_G_UG_1)]
+        [TestCase(C.DEV_User2, C.DEV_G_UG_2), TestCase(C.DEV_User2, C.DEV_G_GG_2), TestCase(C.DEV_User2, C.DEV_G_UG_2)]
+        [TestCase(C.DEV_User3, C.DEV_G_DL_3), TestCase(C.DEV_User3, C.DEV_G_GG_3), TestCase(C.DEV_User3, C.DEV_G_UG_3)]
 
         // THIS domain user found in CHILD domain group
-        [TestCase("IDMDEV1\\user1", "SUBDEV1\\G-DL-1"), TestCase("IDMDEV1\\user1", "SUBDEV1\\G-UG-1")]
-        [TestCase("IDMDEV1\\user2", "SUBDEV1\\G-DL-2"), TestCase("IDMDEV1\\user2", "SUBDEV1\\G-UG-2")]
-        [TestCase("IDMDEV1\\user3", "SUBDEV1\\G-DL-3"), TestCase("IDMDEV1\\user3", "SUBDEV1\\G-UG-3")]
+        [TestCase(C.DEV_User1, C.SUBDEV_G_DL_1), TestCase(C.DEV_User1, C.SUBDEV_G_UG_1)]
+        [TestCase(C.DEV_User2, C.SUBDEV_G_DL_2), TestCase(C.DEV_User2, C.SUBDEV_G_UG_2)]
+        [TestCase(C.DEV_User3, C.SUBDEV_G_DL_3), TestCase(C.DEV_User3, C.SUBDEV_G_UG_3)]
 
         // User principals match themselves
-        [TestCase("IDMDEV1\\user1", "IDMDEV1\\user1"), TestCase("SUBDEV1\\user1", "SUBDEV1\\user1")]
+        [TestCase(C.DEV_User1, C.DEV_User1), TestCase(C.SUBDEV_User1, C.SUBDEV_User1)]
 
         // CHILD domain user found in CHILD domain group
-        [TestCase("SUBDEV1\\user1", "SUBDEV1\\G-DL-1"), TestCase("SUBDEV1\\user1", "SUBDEV1\\G-GG-1"), TestCase("SUBDEV1\\user1", "SUBDEV1\\G-UG-1")]
-        [TestCase("SUBDEV1\\user2", "SUBDEV1\\G-DL-2"), TestCase("SUBDEV1\\user2", "SUBDEV1\\G-GG-2"), TestCase("SUBDEV1\\user2", "SUBDEV1\\G-UG-2")]
-        [TestCase("SUBDEV1\\user3", "SUBDEV1\\G-DL-3"), TestCase("SUBDEV1\\user3", "SUBDEV1\\G-GG-3"), TestCase("SUBDEV1\\user3", "SUBDEV1\\G-UG-3")]
+        [TestCase(C.SUBDEV_User1, C.SUBDEV_G_DL_1), TestCase(C.SUBDEV_User1, C.SUBDEV_G_GG_1), TestCase(C.SUBDEV_User1, C.SUBDEV_G_UG_1)]
+        [TestCase(C.SUBDEV_User2, C.SUBDEV_G_DL_2), TestCase(C.SUBDEV_User2, C.SUBDEV_G_GG_2), TestCase(C.SUBDEV_User2, C.SUBDEV_G_UG_2)]
+        [TestCase(C.SUBDEV_User3, C.SUBDEV_G_DL_3), TestCase(C.SUBDEV_User3, C.SUBDEV_G_GG_3), TestCase(C.SUBDEV_User3, C.SUBDEV_G_UG_3)]
 
         // CHILD domain user found in THIS domain group
-        [TestCase("SUBDEV1\\user1", "IDMDEV1\\G-DL-1"), TestCase("SUBDEV1\\user1", "IDMDEV1\\G-UG-1")]
-        [TestCase("SUBDEV1\\user2", "IDMDEV1\\G-DL-2"), TestCase("SUBDEV1\\user2", "IDMDEV1\\G-UG-2")]
-        [TestCase("SUBDEV1\\user3", "IDMDEV1\\G-DL-3"), TestCase("SUBDEV1\\user3", "IDMDEV1\\G-UG-3")]
+        [TestCase(C.SUBDEV_User1, C.DEV_G_DL_1), TestCase(C.SUBDEV_User1, C.DEV_G_UG_1)]
+        [TestCase(C.SUBDEV_User2, C.DEV_G_DL_2), TestCase(C.SUBDEV_User2, C.DEV_G_UG_2)]
+        [TestCase(C.SUBDEV_User3, C.DEV_G_DL_3), TestCase(C.SUBDEV_User3, C.DEV_G_UG_3)]
         public void IsSidInToken(string targetToFind, string targetTokensToCheck)
         {
             ISecurityPrincipal userPrincipal = this.directory.GetPrincipal(targetToFind);
@@ -116,10 +116,10 @@ namespace Lithnet.AccessManager.Test
             Assert.IsTrue(this.directory.IsSidInPrincipalToken(userOrGroupPrincipal.Sid, userPrincipal, userOrGroupPrincipal.Sid.AccountDomainSid));
         }
 
-        [TestCase("SUBDEV1\\user1", "IDMDEV1\\G-GG-1"), TestCase("SUBDEV1\\user2", "IDMDEV1\\G-GG-2"), TestCase("SUBDEV1\\user3", "IDMDEV1\\G-GG-3")]
-        [TestCase("SUBDEV1\\G-DL-1", "IDMDEV1\\G-DL-1"), TestCase("SUBDEV1\\G-UG-1", "IDMDEV1\\G-UG-1"), TestCase("SUBDEV1\\G-GG-1", "IDMDEV1\\G-GG-1")]
-        [TestCase("IDMDEV1\\G-DL-1", "IDMDEV1\\user1")]
-        [TestCase("IDMDEV1\\user1", "SUBDEV1\\user1")]
+        [TestCase(C.SUBDEV_User1, C.DEV_G_GG_1), TestCase(C.SUBDEV_User2, C.DEV_G_GG_2), TestCase(C.SUBDEV_User3, C.DEV_G_GG_3)]
+        [TestCase(C.SUBDEV_G_DL_1, C.DEV_G_DL_1), TestCase(C.SUBDEV_G_UG_1, C.DEV_G_UG_1), TestCase(C.SUBDEV_G_GG_1, C.DEV_G_GG_1)]
+        [TestCase(C.DEV_G_DL_1, C.DEV_User1)]
+        [TestCase(C.DEV_User1, C.SUBDEV_User1)]
         public void IsSidNotInToken(string targetToFind, string targetTokensToCheck)
         {
             ISecurityPrincipal userPrincipal = this.directory.GetPrincipal(targetToFind);
@@ -128,158 +128,134 @@ namespace Lithnet.AccessManager.Test
             Assert.IsFalse(this.directory.IsSidInPrincipalToken(userOrGroupPrincipal.Sid, userPrincipal, userOrGroupPrincipal.Sid.AccountDomainSid));
         }
 
-        [TestCase("IDMDEV1\\PC1", "DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("IDMDEV1\\PC1", "OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("IDMDEV1\\PC1", "OU=Computers,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("SUBDEV1\\PC1", "OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("SUBDEV1\\PC1", "OU=Computers,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL")]
+        [TestCase(C.DEV_PC1, C.DevDN)]
+        [TestCase(C.DEV_PC1, C.AmsTesting_DevDN)]
+        [TestCase(C.DEV_PC1, C.Computers_AmsTesting_DevDN)]
+        [TestCase(C.SUBDEV_PC1, C.AmsTesting_SubDevDN)]
+        [TestCase(C.SUBDEV_PC1, C.Computers_AmsTesting_SubDevDN)]
         public void CheckComputerIsInOU(string computerName, string ou)
         {
             Assert.IsTrue(this.IsComputerInOU(computerName, ou));
         }
 
-        [TestCase("IDMDEV1\\PC1", "OU=Domain Controllers, DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("IDMDEV1\\PC1", "OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("IDMDEV1\\PC1", "OU=Computers,OU=LAPS Testing, DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("SUBDEV1\\PC1", "OU=LAPS Testing, DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("SUBDEV1\\PC1", "OU=Computers, OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL")]
+        [TestCase(C.DEV_PC1, "OU=Domain Controllers," + C.DevDN)]
+        [TestCase(C.DEV_PC1, C.AmsTesting_SubDevDN)]
+        [TestCase(C.DEV_PC1, C.Computers_AmsTesting_SubDevDN)]
+        [TestCase(C.SUBDEV_PC1, C.AmsTesting_DevDN)]
+        [TestCase(C.SUBDEV_PC1, C.Computers_AmsTesting_DevDN)]
         public void CheckComputerIsNotInOU(string computerName, string ou)
         {
             Assert.IsFalse(this.IsComputerInOU(computerName, ou));
         }
 
-        //[TestCase("IDMDEV1\\PC1", "IDMDEV1\\PC1 Password")]
-        //[TestCase("SUBDEV1\\PC1", "SUBDEV1\\PC1 Password")]
-        //public void ValidateLapsPassword(string computerName, string expectedPassword)
-        //{
-        //    PasswordData data = this.GetLapsPassword(computerName);
-        //    Assert.AreEqual(expectedPassword, data.Value);
-        //}
-
-        //[TestCase("IDMDEV1\\PC1", 9999999999999)]
-        //[TestCase("SUBDEV1\\PC1", 9999999999999)]
-        //public void ValidateLapsPasswordExpiry(string computerName, long expiryDate)
-        //{
-        //    PasswordData data = this.GetLapsPassword(computerName);
-        //    Assert.AreEqual(expiryDate, data?.ExpirationTime?.ToFileTimeUtc());
-        //}
-
-        [TestCase("IDMDEV1\\PC1$", "PC1$", "CN=PC1,OU=Computers,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1")]
-        [TestCase("IDMDEV1\\PC2", "PC2$", "CN=PC2,OU=Computers,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1")]
-        [TestCase("SUBDEV1\\PC1$", "PC1$", "CN=PC1,OU=Computers,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1")]
-        [TestCase("SUBDEV1\\PC2", "PC2$", "CN=PC2,OU=Computers,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1")]
+        [TestCase(C.DEV_PC1_D, C.PC1_D, "CN=" + C.PC1 + "," + C.Computers_AmsTesting_DevDN, C.Dev)]
+        [TestCase(C.DEV_PC2, C.PC2_D, "CN=" + C.PC2 + "," + C.Computers_AmsTesting_DevDN, C.Dev)]
+        [TestCase(C.SUBDEV_PC1_D, C.PC1_D, "CN=" + C.PC1 + "," + C.Computers_AmsTesting_SubDevDN, C.SubDev)]
+        [TestCase(C.SUBDEV_PC2, C.PC2_D, "CN=" + C.PC2 + "," + C.Computers_AmsTesting_SubDevDN, C.SubDev)]
         public void ValidateComputerDetails(string computerToGet, string samAccountName, string dn, string domain)
         {
             var computer = this.directory.GetComputer(computerToGet);
 
-            Assert.AreEqual(samAccountName, computer.SamAccountName);
+            StringAssert.AreEqualIgnoringCase(samAccountName, computer.SamAccountName);
             var d = (NTAccount)computer.Sid.Translate(typeof(NTAccount));
 
-            Assert.AreEqual(domain, d.Value.Split('\\')[0]);
+            StringAssert.AreEqualIgnoringCase(domain, d.Value.Split('\\')[0]);
 
             string qualifiedName = computerToGet.EndsWith("$") ? computerToGet : computerToGet + "$";
 
-            Assert.AreEqual(qualifiedName, d.Value);
-            Assert.AreEqual(dn, computer.DistinguishedName);
+            StringAssert.AreEqualIgnoringCase(qualifiedName, d.Value);
+            StringAssert.AreEqualIgnoringCase(dn, computer.DistinguishedName);
         }
 
-        [TestCase("IDMDEV1\\user1", "user1", "CN=user1,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1")]
-        [TestCase("SUBDEV1\\user1", "user1", "CN=user1,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1")]
+        [TestCase(C.DEV_User1, C.User1, "CN=" + C.User1 + "," + C.Users_AmsTesting_DevDN, C.Dev)]
+        [TestCase(C.SUBDEV_User1, C.User1, "CN=" + C.User1 + "," + C.Users_AmsTesting_SubDevDN, C.SubDev)]
         public void ValidateUserDetails(string userToGet, string samAccountName, string dn, string domain)
         {
             var user = this.directory.GetUser(userToGet);
 
-            Assert.AreEqual(samAccountName, user.SamAccountName);
+            StringAssert.AreEqualIgnoringCase(samAccountName, user.SamAccountName);
             var d = (NTAccount)user.Sid.Translate(typeof(NTAccount));
 
-            Assert.AreEqual(domain, d.Value.Split('\\')[0]);
-            Assert.AreEqual(userToGet, d.Value);
-            Assert.AreEqual(dn, user.DistinguishedName);
+            StringAssert.AreEqualIgnoringCase(domain, d.Value.Split('\\')[0]);
+            StringAssert.AreEqualIgnoringCase(userToGet, d.Value);
+            StringAssert.AreEqualIgnoringCase(dn, user.DistinguishedName);
         }
 
-        [TestCase("DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("CN=Computers,DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("OU=Domain Controllers,DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("CN=Computers,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("OU=Domain Controllers,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL")]
+        [TestCase(C.DevDN)]
+        [TestCase("CN=Computers," + C.DevDN)]
+        [TestCase("OU=Domain Controllers," + C.DevDN)]
+        [TestCase(C.SubDevDN)]
+        [TestCase("CN=Computers," + C.SubDevDN)]
+        [TestCase("OU=Domain Controllers," + C.SubDevDN)]
         public void ValidateIsContainer(string dn)
         {
             DirectoryEntry de = new DirectoryEntry($"LDAP://{dn}");
             Assert.IsTrue(this.directory.IsContainer(de));
         }
 
-        [TestCase("CN=G-GG-1,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("CN=user1,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("CN=PC1,OU=Computers,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("CN=G-GG-1,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("CN=user1,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL")]
-        [TestCase("CN=PC1,OU=Computers,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL")]
+        [TestCase("CN=G-GG-1," + C.Groups_AmsTesting_DevDN)]
+        [TestCase("CN=user1," + C.Users_AmsTesting_DevDN)]
+        [TestCase("CN=PC1," + C.Computers_AmsTesting_DevDN)]
+        [TestCase("CN=G-GG-1," + C.Groups_AmsTesting_SubDevDN)]
+        [TestCase("CN=user1," + C.Users_AmsTesting_SubDevDN)]
+        [TestCase("CN=PC1," + C.Computers_AmsTesting_DevDN)]
         public void ValidateIsNotContainer(string dn)
         {
             DirectoryEntry de = new DirectoryEntry($"LDAP://{dn}");
             Assert.IsFalse(this.directory.IsContainer(de));
         }
 
-        [TestCase("IDMDEV1\\G-GG-1", "G-GG-1", "CN=G-GG-1,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1")]
-        [TestCase("IDMDEV1\\G-DL-1", "G-DL-1", "CN=G-DL-1,OU=LAPS Testing,DC=IDMDEV1,DC=LOCAL", "IDMDEV1")]
-        [TestCase("SUBDEV1\\G-GG-1", "G-GG-1", "CN=G-GG-1,OU=LAPS Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "SUBDEV1")]
+        [TestCase(C.DEV_G_GG_1, C.G_GG_1, "CN=G-GG-1," + C.Groups_AmsTesting_DevDN, C.Dev)]
+        [TestCase(C.DEV_G_DL_1, C.G_DL_1, "CN=G-DL-1," + C.Groups_AmsTesting_DevDN, C.Dev)]
+        [TestCase(C.SUBDEV_G_GG_1, C.G_GG_1, "CN=G-GG-1," + C.Groups_AmsTesting_SubDevDN, C.SubDev)]
         public void ValidateGroupDetails(string groupToGet, string samAccountName, string dn, string domain)
         {
             var group = this.directory.GetGroup(groupToGet);
 
-            Assert.AreEqual(samAccountName, group.SamAccountName);
+            StringAssert.AreEqualIgnoringCase(samAccountName, group.SamAccountName);
             var d = (NTAccount)group.Sid.Translate(typeof(NTAccount));
-            Assert.AreEqual(domain, d.Value.Split('\\')[0]);
-            Assert.AreEqual(groupToGet, d.Value);
-            Assert.AreEqual(dn, group.DistinguishedName);
+            StringAssert.AreEqualIgnoringCase(domain, d.Value.Split('\\')[0]);
+            StringAssert.AreEqualIgnoringCase(groupToGet, d.Value);
+            StringAssert.AreEqualIgnoringCase(dn, group.DistinguishedName);
         }
 
-        [TestCase("PC1$")]
-        [TestCase("PC2")]
+        [TestCase(C.PC1_D)]
+        [TestCase(C.PC2)]
         public void TestAmbiguousComputerNameLookup(string computerToGet)
         {
             Assert.Throws<AmbiguousNameException>(() => this.directory.GetComputer(computerToGet));
         }
 
-        [TestCase("G-GG-1")]
-        [TestCase("G-UG-1")]
+        [TestCase(C.G_GG_1)]
+        [TestCase(C.G_UG_1)]
         public void TestAmbiguousGroupNameLookup(string group)
         {
             Assert.Throws<AmbiguousNameException>(() => this.directory.GetGroup(group));
         }
 
-        [TestCase("G-DG-1")]
+        [TestCase("GroupThatDoesntExist")]
         public void TestUnqualifiedDomainLocalGroupNotFound(string group)
         {
             Assert.Throws<ObjectNotFoundException>(() => this.directory.GetGroup(group));
         }
 
-        [TestCase("user1")]
-        [TestCase("user2")]
-        [TestCase("user3")]
+        [TestCase(C.User1)]
+        [TestCase(C.User2)]
+        [TestCase(C.User3)]
         public void TestAmbiguousUserNameLookup(string user)
         {
             Assert.Throws<AmbiguousNameException>(() => this.directory.GetUser(user));
         }
 
         [Test]
-        public void CreateTtlTestGroup()
-        {
-            string dc = discoveryServices.GetDomainController("idmdev1.local");
-
-            this.directory.CreateTtlGroup("G-DL-Test-TTL", "G-DL-Test-TTL", "TTL test group", "OU=Computers,OU=Laps Testing,DC=idmdev1,DC=local", dc, TimeSpan.FromMinutes(1), GroupType.DomainLocal, true);
-        }
-
-        [Test]
         public void TestPamIsEnabled()
         {
-            Assert.IsTrue(this.directory.IsPamFeatureEnabled(this.directory.GetUser("idmdev1\\user1").Sid, true));
+            Assert.IsTrue(this.directory.IsPamFeatureEnabled(this.directory.GetUser(C.DEV_User1).Sid, true));
         }
 
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("IDMDEV1\\JIT-PC1", "SUBDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\user1")]
+        [TestCase(C.DEV_JIT_PC1, C.DEV_User1)]
+        [TestCase(C.DEV_JIT_PC1, C.SUBDEV_User1)]
+        [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_User1)]
         public void TestTimeBasedMembershipIntraForest(string groupName, string memberName)
         {
             IGroup group = this.directory.GetGroup(groupName);
@@ -296,8 +272,8 @@ namespace Lithnet.AccessManager.Test
             CollectionAssert.DoesNotContain(group.GetMemberDNs(), p.DistinguishedName);
         }
 
-        [TestCase("EXTDEV1\\JIT-PC1", "IDMDEV1\\user1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "SUBDEV1\\user1")]
+        [TestCase(C.EXTDEV_JIT_PC1, C.DEV_User1)]
+        [TestCase(C.EXTDEV_JIT_PC1, C.SUBDEV_User1)]
         public void TestTimeBasedMembershipCrossForest(string groupName, string memberName)
         {
             IGroup group = this.directory.GetGroup(groupName);
@@ -337,44 +313,44 @@ namespace Lithnet.AccessManager.Test
         public void AddGroupMemberToTtlGroup()
         {
             string groupName = TestContext.CurrentContext.Random.GetString(10, "abcdefghijklmnop");
-            string dc = discoveryServices.GetDomainController("idmdev1.local");
-            this.directory.CreateTtlGroup(groupName, groupName, "TTL test group 2", "OU=Laps Testing,DC=idmdev1,DC=local", dc, TimeSpan.FromMinutes(1), GroupType.DomainLocal, true);
+            string dc = discoveryServices.GetDomainController(C.DevLocal);
+            this.directory.CreateTtlGroup(groupName, groupName, "TTL test group 2", C.AmsTesting_DevDN, dc, TimeSpan.FromMinutes(1), GroupType.DomainLocal, true);
 
             Thread.Sleep(20000);
-            IGroup group = this.directory.GetGroup($"IDMDEV1\\{groupName}");
-            ISecurityPrincipal user = this.directory.GetUser("IDMDEV1\\user1");
+            IGroup group = this.directory.GetGroup($"{C.Dev}\\{groupName}");
+            ISecurityPrincipal user = this.directory.GetUser(C.DEV_User1);
 
             group.AddMember(user);
 
             CollectionAssert.Contains(group.GetMemberDNs(), user.DistinguishedName);
 
-            this.directory.DeleteGroup($"IDMDEV1\\{groupName}");
+            this.directory.DeleteGroup($"{C.Dev}\\{groupName}");
         }
 
         public void TryGetGroup()
         {
-            IGroup group = this.directory.GetGroup("IDMDEV1\\G-GG-1");
+            IGroup group = this.directory.GetGroup(C.DEV_G_GG_1);
             Assert.IsTrue(this.directory.TryGetGroup(group.Sid, out IGroup group2));
             Assert.AreEqual(group.Sid, group2.Sid);
         }
 
         public void TryGetUser()
         {
-            Assert.IsTrue(this.directory.TryGetUser("IDMDEV1\\user1", out _));
-            Assert.IsFalse(this.directory.TryGetUser("IDMDEV1\\doesntexist", out _));
+            Assert.IsTrue(this.directory.TryGetUser(C.DEV_User1, out _));
+            Assert.IsFalse(this.directory.TryGetUser($"{C.Dev}\\doesntexist", out _));
         }
 
 
         public void TryGetComputer()
         {
-            Assert.IsTrue(this.directory.TryGetUser("IDMDEV1\\PC1", out _));
-            Assert.IsFalse(this.directory.TryGetUser("IDMDEV1\\doesntexist", out _));
+            Assert.IsTrue(this.directory.TryGetUser(C.DEV_PC1, out _));
+            Assert.IsFalse(this.directory.TryGetUser($"{C.Dev}\\doesntexist", out _));
         }
 
         public void TryGetPrincipal()
         {
-            Assert.IsTrue(this.directory.TryGetPrincipal("IDMDEV1\\PC1", out _)); ;
-            Assert.IsFalse(this.directory.TryGetPrincipal("IDMDEV1\\doesntexist", out _));
+            Assert.IsTrue(this.directory.TryGetPrincipal(C.DEV_PC1, out _)); ;
+            Assert.IsFalse(this.directory.TryGetPrincipal($"{C.Dev}\\doesntexist", out _));
         }
     }
 }

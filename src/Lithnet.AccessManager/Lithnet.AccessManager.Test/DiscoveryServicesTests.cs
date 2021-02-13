@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Vanara.PInvoke;
+using C = Lithnet.AccessManager.Test.TestEnvironmentConstants;
 
 namespace Lithnet.AccessManager.Test
 {
@@ -18,58 +19,57 @@ namespace Lithnet.AccessManager.Test
             this.discoveryServices = new DiscoveryServices(Global.LogFactory.CreateLogger<DiscoveryServices>());
         }
 
-        [TestCase("idmdev1.local", "CN=Configuration,DC=IDMDEV1,DC=local")]
-        [TestCase("subdev1.idmdev1.local", "CN=Configuration,DC=IDMDEV1,DC=local")]
-        [TestCase("extdev1.local", "CN=Configuration,DC=extdev1,DC=local")]
+        [TestCase(C.DevLocal, "CN=Configuration," + C.DevDN)]
+        [TestCase(C.SubDevLocal, "CN=Configuration," + C.DevDN)]
+        [TestCase(C.ExtDevLocal, "CN=Configuration," + C.ExtDevDN)]
         public void GetConfigurationNamingContext(string domain, string expected)
         {
             var de = this.discoveryServices.GetConfigurationNamingContext(domain);
             StringAssert.AreEqualIgnoringCase(expected, de.GetPropertyString("distinguishedName"));
         }
 
-
-        [TestCase("idmdev1.local", "CN=Schema,CN=Configuration,DC=IDMDEV1,DC=local")]
-        [TestCase("subdev1.idmdev1.local", "CN=Schema,CN=Configuration,DC=IDMDEV1,DC=local")]
-        [TestCase("extdev1.local", "CN=Schema,CN=Configuration,DC=extdev1,DC=local")]
+        [TestCase(C.DevLocal, "CN=Schema,CN=Configuration," + C.DevDN)]
+        [TestCase(C.SubDevLocal, "CN=Schema,CN=Configuration," + C.DevDN)]
+        [TestCase(C.ExtDevLocal, "CN=Schema,CN=Configuration," + C.ExtDevDN)]
         public void GetSchemaNamingContext(string domain, string expected)
         {
             var de = this.discoveryServices.GetSchemaNamingContext(domain);
             StringAssert.AreEqualIgnoringCase(expected, de.GetPropertyString("distinguishedName"));
         }
 
-        [TestCase("idmdev1.local", "idmd1ad1.idmdev1.local")]
-        [TestCase("subdev1.idmdev1.local", "idmd1ad2.subdev1.idmdev1.local")]
-        [TestCase("extdev1.local", "idmd1ad3.extdev1.local")]
+        [TestCase(C.DevLocal, C.DevDc)]
+        [TestCase(C.SubDevLocal, C.SubDevDc)]
+        [TestCase(C.ExtDevLocal, C.ExtDevDc)]
         public void GetDc(string domain, string expected)
         {
             StringAssert.AreEqualIgnoringCase(expected, discoveryServices.GetDomainController(domain));
         }
 
-        [TestCase("DC=IDMDEV1,DC=LOCAL", "idmdev1.local")]
-        [TestCase("OU=Laps Testing,DC=IDMDEV1,DC=LOCAL", "idmdev1.local")]
-        [TestCase("DC=EXTDEV1,DC=LOCAL", "extdev1.local")]
-        [TestCase("OU=Laps Testing,DC=EXTDEV1,DC=LOCAL", "extdev1.local")]
-        [TestCase("DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "subdev1.idmdev1.local")]
-        [TestCase("OU=Laps Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "subdev1.idmdev1.local")]
+        [TestCase(C.DevDN, C.DevLocal)]
+        [TestCase(C.AmsTesting_DevDN, C.DevLocal)]
+        [TestCase(C.ExtDevDN, C.ExtDevLocal)]
+        [TestCase(C.AmsTesting_ExtDevDN, C.ExtDevLocal)]
+        [TestCase(C.SubDevDN, C.SubDevLocal)]
+        [TestCase(C.AmsTesting_SubDevDN, C.SubDevLocal)]
         public void GetDomainNameDnsFromDn(string dn, string expected)
         {
             StringAssert.AreEqualIgnoringCase(expected, discoveryServices.GetDomainNameDns(dn));
         }
 
-        [TestCase("DC=IDMDEV1,DC=LOCAL", "idmdev1.local")]
-        [TestCase("OU=Laps Testing,DC=IDMDEV1,DC=LOCAL", "idmdev1.local")]
-        [TestCase("DC=EXTDEV1,DC=LOCAL", "extdev1.local")]
-        [TestCase("OU=Laps Testing,DC=EXTDEV1,DC=LOCAL", "extdev1.local")]
-        [TestCase("DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "idmdev1.local")]
-        [TestCase("OU=Laps Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "idmdev1.local")]
+        [TestCase(C.DevDN, C.DevLocal)]
+        [TestCase(C.AmsTesting_DevDN, C.DevLocal)]
+        [TestCase(C.ExtDevDN, C.ExtDevLocal)]
+        [TestCase(C.AmsTesting_ExtDevDN, C.ExtDevLocal)]
+        [TestCase(C.SubDevDN, C.DevLocal)]
+        [TestCase(C.AmsTesting_SubDevDN, C.DevLocal)]
         public void GetForestNameDnsFromDn(string dn, string expected)
         {
             StringAssert.AreEqualIgnoringCase(expected, discoveryServices.GetForestNameDns(dn));
         }
 
-        [TestCase("IDMDEV1\\user1", "idmdev1")]
-        [TestCase("extdev1\\user1", "extdev1")]
-        [TestCase("subdev1\\user1", "subdev1")]
+        [TestCase(C.DEV_User1, C.Dev)]
+        [TestCase(C.EXTDEV_User1, C.ExtDev)]
+        [TestCase(C.SUBDEV_User1, C.SubDev)]
         public void GetDomainNameNetBiosFromSid(string referenceAccount, string expected)
         {
             ActiveDirectory ad = new ActiveDirectory(discoveryServices);
@@ -77,9 +77,9 @@ namespace Lithnet.AccessManager.Test
             StringAssert.AreEqualIgnoringCase(expected, discoveryServices.GetDomainNameNetBios(sid));
         }
 
-        [TestCase("IDMDEV1\\user1", "idmdev1.local")]
-        [TestCase("extdev1\\user1", "extdev1.local")]
-        [TestCase("subdev1\\user1", "subdev1.idmdev1.local")]
+        [TestCase(C.DEV_User1, C.DevLocal)]
+        [TestCase(C.EXTDEV_User1, C.ExtDevLocal)]
+        [TestCase(C.SUBDEV_User1, C.SubDevLocal)]
         public void GetDomainNameDnsFromSid(string referenceAccount, string expected)
         {
             ActiveDirectory ad = new ActiveDirectory(discoveryServices);
@@ -87,45 +87,32 @@ namespace Lithnet.AccessManager.Test
             StringAssert.AreEqualIgnoringCase(expected, discoveryServices.GetDomainNameDns(sid));
         }
 
-        [TestCase("DC=IDMDEV1,DC=LOCAL", "idmd1ad1.idmdev1.local")]
-        [TestCase("OU=Laps Testing,DC=IDMDEV1,DC=LOCAL", "idmd1ad1.idmdev1.local")]
-        [TestCase("DC=EXTDEV1,DC=LOCAL", "idmd1ad3.extdev1.local")]
-        [TestCase("OU=Laps Testing,DC=EXTDEV1,DC=LOCAL", "idmd1ad3.extdev1.local")]
-        [TestCase("DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "idmd1ad2.subdev1.idmdev1.local")]
-        [TestCase("OU=Laps Testing,DC=SUBDEV1,DC=IDMDEV1,DC=LOCAL", "idmd1ad2.subdev1.idmdev1.local")]
+        [TestCase(C.DevDN, C.DevDc)]
+        [TestCase(C.AmsTesting_DevDN, C.DevDc)]
+        [TestCase(C.ExtDevDN, C.ExtDevDc)]
+        [TestCase(C.AmsTesting_ExtDevDN, C.ExtDevDc)]
+        [TestCase(C.SubDevDN, C.SubDevDc)]
+        [TestCase(C.AmsTesting_SubDevDN, C.SubDevDc)]
         public void GetDomainControllerFromDN(string dn, string expected)
         {
             StringAssert.AreEqualIgnoringCase(expected, discoveryServices.GetDomainControllerFromDN(dn));
         }
 
-
-        [TestCase("IDMD1AD1.idmdev1.local", "idmdev1.local", "IDMD1AD1.IDMDEV1.LOCAL")]
-        [TestCase("PC1.idmdev1.local", "idmdev1.local", "IDMD1AD1.IDMDEV1.LOCAL")]
-        [TestCase("IDMD1AD2.subdev1.idmdev1.local", "subdev1.idmdev1.local", "IDMD1AD2.SUBDEV1.IDMDEV1.LOCAL")]
-        [TestCase("IDMD1AD3.extdev1.local", "extdev1.local", "IDMD1AD3.EXTDEV1.LOCAL")]
+        [TestCase(C.DevDc, C.DevLocal, C.DevDc)]
+        [TestCase("PC1." + C.DevLocal, C.DevLocal, C.DevDc)]
+        [TestCase(C.SubDevDc, C.SubDevLocal, C.SubDevDc)]
+        [TestCase(C.ExtDevDc, C.ExtDevLocal, C.ExtDevDc)]
         public void GetDomainControllerForComputer(string computerName, string domain, string expected)
         {
             StringAssert.AreEqualIgnoringCase(expected, discoveryServices.GetDomainController(computerName, domain, Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED));
         }
 
-        [TestCase("IDMD1AD1", "IDMDEV1-Default-Site")]
-        [TestCase("IDMD1AD3", "EXTDEV1-Default-Site")]
-        [TestCase("IDMD1AD1.idmdev1.local", "IDMDEV1-Default-Site")]
-        [TestCase("IDMD1AD2.subdev1.idmdev1.local", "IDMDEV1-Default-Site")]
-        [TestCase("IDMD1AD3.extdev1.local", "EXTDEV1-Default-Site")]
+        [TestCase(C.DevDc, C.DevDefaultSite)]
+        [TestCase(C.SubDevDc, C.SubDevDefaultSite)]
+        [TestCase(C.ExtDevDc, C.ExtDevDefaultSite)]
         public void GetSiteForComputer(string computer, string expected)
         {
             StringAssert.AreEqualIgnoringCase(expected, discoveryServices.GetComputerSiteNameRpc(computer));
-        }
-
-        [Test]
-        public void Text()
-        {
-            DcLocatorMode mode = DcLocatorMode.RemoteDcLocator | DcLocatorMode.SiteLookup;
-            discoveryServices.GetDc("idmd1lds1.idmdev1.local", "idmdev1.local", Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED, ref mode);
-            discoveryServices.GetDc("idmd1lds1.idmdev1.local", "idmdev1.local", Interop.DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED, ref mode);
-
-            discoveryServices.GetComputerSiteNameManual("idmdev1.local", "idmd1lds1.idmdev1.local");
         }
     }
 }

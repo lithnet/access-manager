@@ -6,6 +6,7 @@ using Lithnet.Security.Authorization;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using C = Lithnet.AccessManager.Test.TestEnvironmentConstants;
 
 namespace Lithnet.AccessManager.Server.Test
 {
@@ -38,7 +39,7 @@ namespace Lithnet.AccessManager.Server.Test
         public void TestScriptGrantLapsJit()
         {
             IUser user = directory.GetUser(WindowsIdentity.GetCurrent().User);
-            IComputer computer = directory.GetComputer("IDMDEV1\\PC1"); 
+            IComputer computer = directory.GetComputer(C.DEV_PC1); 
             var sd = generator.GenerateSecurityDescriptor(user, computer, "AuthZTestGrantLapsJit.ps1", 30);
 
             using AuthorizationContext context = new AuthorizationContext(user.Sid);
@@ -51,7 +52,7 @@ namespace Lithnet.AccessManager.Server.Test
         public void TestScriptDenyLapsJitGrantLapsHistory()
         {
             IUser user = directory.GetUser(WindowsIdentity.GetCurrent().User);
-            IComputer computer = directory.GetComputer("IDMDEV1\\PC1");
+            IComputer computer = directory.GetComputer(C.DEV_PC1);
             var sd = generator.GenerateSecurityDescriptor(user, computer, "AuthZTestDenyLapsJitGrantLapsHistory.ps1", 30);
 
             using AuthorizationContext context = new AuthorizationContext(user.Sid);

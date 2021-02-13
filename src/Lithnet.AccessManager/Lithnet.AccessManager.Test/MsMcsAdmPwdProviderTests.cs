@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using C = Lithnet.AccessManager.Test.TestEnvironmentConstants;
 
 namespace Lithnet.AccessManager.Test
 {
@@ -21,7 +22,7 @@ namespace Lithnet.AccessManager.Test
             provider = new MsMcsAdmPwdProvider(Mock.Of<ILogger<MsMcsAdmPwdProvider>>());
         }
 
-        [TestCase("IDMDEV1\\PC1")]
+        [TestCase(C.DEV_PC1)]
         public void UpdatePassword(string computerName)
         {
             var computer = this.directory.GetComputer(computerName);
@@ -36,7 +37,7 @@ namespace Lithnet.AccessManager.Test
             Assert.AreEqual(expiry, result.ExpiryDate);
         }
 
-        [TestCase("IDMDEV1\\PC1")]
+        [TestCase(C.DEV_PC1)]
         public void GetPasswordWithUpdatedExpiry(string computerName)
         {
             var computer = this.directory.GetComputer(computerName);
@@ -52,7 +53,7 @@ namespace Lithnet.AccessManager.Test
             Assert.AreEqual(expiry2, result.ExpiryDate);
         }
 
-        [TestCase("IDMDEV1\\PC1")]
+        [TestCase(C.DEV_PC1)]
         public void GetExpiry(string computerName)
         {
             var computer = this.directory.GetComputer(computerName);

@@ -7,6 +7,7 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using C = Lithnet.AccessManager.Test.TestEnvironmentConstants;
 
 namespace Lithnet.AccessManager.Server.Test
 {
@@ -26,9 +27,9 @@ namespace Lithnet.AccessManager.Server.Test
             this.resolver = new JitAccessGroupResolver(directory, discoveryServices);
         }
 
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1")]
+        [TestCase(C.Dev + "\\JIT-PC1", C.DEV_PC1)]
+        [TestCase(C.SubDev + "\\JIT-PC1", C.SUBDEV_PC1)]
+        [TestCase(C.ExtDev + "\\JIT-PC1", C.EXTDEV_PC1)]
         public void GetGroupByTemplate(string groupName, string computerName)
         {
             IComputer computer = directory.GetComputer(computerName);
@@ -36,9 +37,9 @@ namespace Lithnet.AccessManager.Server.Test
             Assert.AreEqual(groupName, group.MsDsPrincipalName);
         }
 
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1")]
+        [TestCase(C.Dev + "\\JIT-PC1", C.DEV_PC1)]
+        [TestCase(C.SubDev + "\\JIT-PC1", C.SUBDEV_PC1)]
+        [TestCase(C.ExtDev + "\\JIT-PC1", C.EXTDEV_PC1)]
         public void GetGroupByName(string groupName, string computerName)
         {
             IComputer computer = directory.GetComputer(computerName);
@@ -47,9 +48,9 @@ namespace Lithnet.AccessManager.Server.Test
             Assert.AreEqual(groupName, group.MsDsPrincipalName);
         }
 
-        [TestCase("IDMDEV1\\JIT-PC1", "IDMDEV1\\PC1")]
-        [TestCase("SUBDEV1\\JIT-PC1", "SUBDEV1\\PC1")]
-        [TestCase("EXTDEV1\\JIT-PC1", "EXTDEV1\\PC1")]
+        [TestCase(C.Dev + "\\JIT-PC1", C.DEV_PC1)]
+        [TestCase(C.SubDev + "\\JIT-PC1", C.SUBDEV_PC1)]
+        [TestCase(C.ExtDev + "\\JIT-PC1", C.EXTDEV_PC1)]
         public void GetGroupBySid(string groupName, string computerName)
         {
             IComputer computer = directory.GetComputer(computerName);

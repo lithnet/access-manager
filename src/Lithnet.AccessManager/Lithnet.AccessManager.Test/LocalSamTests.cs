@@ -6,6 +6,7 @@ using System.Security.Principal;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using C = Lithnet.AccessManager.Test.TestEnvironmentConstants;
 
 namespace Lithnet.AccessManager.Test
 {
@@ -82,9 +83,9 @@ namespace Lithnet.AccessManager.Test
                 Assert.AreEqual(admin, p.Sid);
             }
 
-            SecurityIdentifier user1 = this.directory.GetUser("IDMDEV1\\user1").Sid;
-            SecurityIdentifier user2 = this.directory.GetUser("IDMDEV1\\user2").Sid;
-            SecurityIdentifier user3 = this.directory.GetUser("IDMDEV1\\user3").Sid;
+            SecurityIdentifier user1 = this.directory.GetUser(C.DEV_User1).Sid;
+            SecurityIdentifier user2 = this.directory.GetUser(C.DEV_User2).Sid;
+            SecurityIdentifier user3 = this.directory.GetUser(C.DEV_User3).Sid;
             var expected = new[] { user1, user2, user3 };
 
             sam.UpdateLocalGroupMembership(testGroupName, expected, false, false);
@@ -105,9 +106,9 @@ namespace Lithnet.AccessManager.Test
                 Assert.AreEqual(admin, p.Sid);
             }
 
-            SecurityIdentifier user1 = this.directory.GetUser("IDMDEV1\\user1").Sid;
-            SecurityIdentifier user2 = this.directory.GetUser("IDMDEV1\\user2").Sid;
-            SecurityIdentifier user3 = this.directory.GetUser("IDMDEV1\\user3").Sid;
+            SecurityIdentifier user1 = this.directory.GetUser(C.DEV_User1).Sid;
+            SecurityIdentifier user2 = this.directory.GetUser(C.DEV_User2).Sid;
+            SecurityIdentifier user3 = this.directory.GetUser(C.DEV_User3).Sid;
             var expected = new List<SecurityIdentifier> { user1, user2, user3 };
 
             sam.UpdateLocalGroupMembership(testGroupName, expected, true, false);
@@ -156,7 +157,7 @@ namespace Lithnet.AccessManager.Test
 
             using (PrincipalContext c = new PrincipalContext(ContextType.Machine))
             {
-                var user = UserPrincipal.FindByIdentity(c, "testlocal1");
+                var user = UserPrincipal.FindByIdentity(c, C.LocalAccountTestUser);
                 this.sam.SetLocalAccountPassword(user.Sid, newPassword);
 
                 Assert.AreEqual(DateTime.UtcNow.Trim(TimeSpan.TicksPerMinute), user.LastPasswordSet.Value.Trim(TimeSpan.TicksPerMinute));

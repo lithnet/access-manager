@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using C = Lithnet.AccessManager.Test.TestEnvironmentConstants;
 
 namespace Lithnet.AccessManager.Test
 {
@@ -25,19 +26,19 @@ namespace Lithnet.AccessManager.Test
             this.resolver = new JitAccessGroupResolver(directory, discoveryServices);
         }
 
-        [TestCase("PC1", "IDMDEV1", "%computerDomain%\\%computerName%", "IDMDEV1\\PC1")]
-        [TestCase("PC1", "IDMDEV1", "IDMDEV2\\%computerName%", "IDMDEV2\\PC1")]
-        [TestCase("PC1", "IDMDEV1", "IDMDEV2\\PC3", "IDMDEV2\\PC3")]
-        [TestCase("PC1", "IDMDEV1", "Something", "IDMDEV1\\Something")]
+        [TestCase(C.PC1, C.Dev, "%computerDomain%\\%computerName%", C.DEV_PC1)]
+        [TestCase(C.PC1, C.Dev, "IDMDEV2\\%computerName%", "IDMDEV2\\PC1")]
+        [TestCase(C.PC1, C.Dev, "IDMDEV2\\PC3", "IDMDEV2\\PC3")]
+        [TestCase(C.PC1, C.Dev, "Something", C.Dev + "\\Something")]
         public void TestBuildNameFromTemplate(string computerName, string domain, string template, string expected)
         {
             string actual = this.resolver.BuildGroupName(template, domain, computerName);
             Assert.AreEqual(expected, actual);
         }
 
-        [TestCase("IDMDEV1\\PC1", "IDMDEV1\\JIT-%ComputerName%", "IDMDEV1\\JIT-PC1")]
-        [TestCase("IDMDEV1\\PC1", "IDMDEV1\\JIT-PC2", "IDMDEV1\\JIT-PC2")]
-        [TestCase("IDMDEV1\\PC1", "%computerDomain%\\JIT-%computerName%", "IDMDEV1\\JIT-PC1")]
+        [TestCase(C.DEV_PC1, C.Dev + "\\JIT-%ComputerName%", C.DEV_JIT_PC1)]
+        [TestCase(C.DEV_PC2, C.DEV_JIT_PC2, C.DEV_JIT_PC2)]
+        [TestCase(C.DEV_PC1, "%computerDomain%\\JIT-%computerName%", C.DEV_JIT_PC1)]
         public void GetGroupFromName(string computerName, string template, string expected)
         {
             IComputer computer = this.directory.GetComputer(computerName);
@@ -46,11 +47,11 @@ namespace Lithnet.AccessManager.Test
             Assert.AreEqual(expected, group.MsDsPrincipalName.ToUpper());
         }
 
-        [TestCase("IDMDEV1\\JIT-PC1")]
+        [TestCase(C.DEV_JIT_PC1)]
         public void GetGroupFromSid(string groupName)
         {
             IGroup group = this.directory.GetGroup(groupName);
-            IComputer computer = this.directory.GetComputer("IDMDEV1\\PC1");
+            IComputer computer = this.directory.GetComputer(C.DEV_PC1);
 
             IGroup found = this.resolver.GetJitGroup(computer, group.Sid.ToString());
 

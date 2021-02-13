@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using C = Lithnet.AccessManager.Test.TestEnvironmentConstants;
 
 namespace Lithnet.AccessManager.Test
 {
@@ -29,9 +30,9 @@ namespace Lithnet.AccessManager.Test
             provider = new LithnetAdminPasswordProvider(Mock.Of<ILogger<LithnetAdminPasswordProvider>>(), encryptionProvider, certificateProvider);
         }
 
-        [TestCase("EXTDEV1\\PC1")]
-        [TestCase("IDMDEV1\\PC1")]
-        [TestCase("SUBDEV1\\PC1")]
+        [TestCase(C.DEV_PC1)]
+        [TestCase(C.SUBDEV_PC1)]
+        [TestCase(C.EXTDEV_PC1)]
         public void SetFirstPassword(string computerName)
         {
             IComputer computer = directory.GetComputer(computerName);
@@ -58,9 +59,9 @@ namespace Lithnet.AccessManager.Test
             CollectionAssert.IsEmpty(history);
         }
 
-        [TestCase("EXTDEV1\\PC1")]
-        [TestCase("IDMDEV1\\PC1")]
-        [TestCase("SUBDEV1\\PC1")]
+        [TestCase(C.DEV_PC1)]
+        [TestCase(C.SUBDEV_PC1)]
+        [TestCase(C.EXTDEV_PC1)]
         public void AddToPasswordHistory(string computerName)
         {
             IComputer computer = directory.GetComputer(computerName);
@@ -110,9 +111,9 @@ namespace Lithnet.AccessManager.Test
             Assert.AreEqual(null, currentPassword.Retired);
         }
 
-        [TestCase("EXTDEV1\\PC1")]
-        [TestCase("IDMDEV1\\PC1")]
-        [TestCase("SUBDEV1\\PC1")]
+        [TestCase(C.DEV_PC1)]
+        [TestCase(C.SUBDEV_PC1)]
+        [TestCase(C.EXTDEV_PC1)]
         public void AgeOutPasswordHistory(string computerName)
         {
             IComputer computer = directory.GetComputer(computerName);

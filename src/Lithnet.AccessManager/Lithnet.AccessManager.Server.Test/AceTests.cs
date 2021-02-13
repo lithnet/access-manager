@@ -1,12 +1,11 @@
-using System.Collections.Generic;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using Castle.Core.Logging;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.Security.Authorization;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using C = Lithnet.AccessManager.Test.TestEnvironmentConstants;
 
 namespace Lithnet.AccessManager.Server.Test
 {
@@ -55,104 +54,104 @@ namespace Lithnet.AccessManager.Server.Test
         /// <param name="requestor">The user who is requesting access to the resource that we are checking the ACE against</param>
 
         // Test global groups in THIS domain against a user in THIS domain
-        [TestCase("idmdev1\\G-GG-1", "idmdev1\\user1")]
-        [TestCase("idmdev1\\G-GG-2", "idmdev1\\user2")]
-        [TestCase("idmdev1\\G-GG-3", "idmdev1\\user3")]
+        [TestCase(C.DEV_G_GG_1, C.DEV_User1)]
+        [TestCase(C.DEV_G_GG_2, C.DEV_User2)]
+        [TestCase(C.DEV_G_GG_3, C.DEV_User3)]
 
         // Test global groups in CHILD domain against a user in CHILD domain
-        [TestCase("subdev1\\G-GG-1", "subdev1\\user1")]
-        [TestCase("subdev1\\G-GG-2", "subdev1\\user2")]
-        [TestCase("subdev1\\G-GG-3", "subdev1\\user3")]
+        [TestCase(C.SUBDEV_G_GG_1, C.SUBDEV_User1)]
+        [TestCase(C.SUBDEV_G_GG_2, C.SUBDEV_User2)]
+        [TestCase(C.SUBDEV_G_GG_3, C.SUBDEV_User3)]
 
         // Test domain local groups in THIS domain against a user in THIS domain
-        [TestCase("idmdev1\\G-DL-1", "idmdev1\\user1")]
-        [TestCase("idmdev1\\G-DL-2", "idmdev1\\user2")]
-        [TestCase("idmdev1\\G-DL-3", "idmdev1\\user3")]
+        [TestCase(C.DEV_G_DL_1, C.DEV_User1)]
+        [TestCase(C.DEV_G_DL_2, C.DEV_User2)]
+        [TestCase(C.DEV_G_DL_3, C.DEV_User3)]
 
         // Test domain local groups in THIS domain against a user in CHILD domain
-        [TestCase("idmdev1\\G-DL-1", "subdev1\\user1")]
-        [TestCase("idmdev1\\G-DL-2", "subdev1\\user2")]
-        [TestCase("idmdev1\\G-DL-3", "subdev1\\user3")]
+        [TestCase(C.DEV_G_DL_1, C.SUBDEV_User1)]
+        [TestCase(C.DEV_G_DL_2, C.SUBDEV_User2)]
+        [TestCase(C.DEV_G_DL_3, C.SUBDEV_User3)]
 
         // Test universal groups in THIS domain against a user in THIS domain
-        [TestCase("idmdev1\\G-UG-1", "idmdev1\\user1")]
-        [TestCase("idmdev1\\G-UG-2", "idmdev1\\user2")]
-        [TestCase("idmdev1\\G-UG-3", "idmdev1\\user3")]
+        [TestCase(C.DEV_G_UG_1, C.DEV_User1)]
+        [TestCase(C.DEV_G_UG_2, C.DEV_User2)]
+        [TestCase(C.DEV_G_UG_3, C.DEV_User3)]
 
         // Test universal groups in THIS domain against a user in CHILD domain
-        [TestCase("idmdev1\\G-UG-1", "subdev1\\user1")]
-        [TestCase("idmdev1\\G-UG-2", "subdev1\\user2")]
-        [TestCase("idmdev1\\G-UG-3", "subdev1\\user3")]
+        [TestCase(C.DEV_G_UG_1, C.SUBDEV_User1)]
+        [TestCase(C.DEV_G_UG_2, C.SUBDEV_User2)]
+        [TestCase(C.DEV_G_UG_3, C.SUBDEV_User3)]
 
         // Test universal groups in CHILD domain against a user in THIS domain
-        [TestCase("subdev1\\G-UG-1", "idmdev1\\user1")]
-        [TestCase("subdev1\\G-UG-2", "idmdev1\\user2")]
-        [TestCase("subdev1\\G-UG-3", "idmdev1\\user3")]
+        [TestCase(C.SUBDEV_G_UG_1, C.DEV_User1)]
+        [TestCase(C.SUBDEV_G_UG_2, C.DEV_User2)]
+        [TestCase(C.SUBDEV_G_UG_3, C.DEV_User3)]
 
         // Test universal groups in CHILD domain against a user in CHILD domain
-        [TestCase("subdev1\\G-UG-1", "subdev1\\user1")]
-        [TestCase("subdev1\\G-UG-2", "subdev1\\user2")]
-        [TestCase("subdev1\\G-UG-3", "subdev1\\user3")]
+        [TestCase(C.SUBDEV_G_UG_1, C.SUBDEV_User1)]
+        [TestCase(C.SUBDEV_G_UG_2, C.SUBDEV_User2)]
+        [TestCase(C.SUBDEV_G_UG_3, C.SUBDEV_User3)]
 
         // Test domain local groups in CHILD domain against a user in THIS domain
-        [TestCase("subdev1\\G-DL-1", "idmdev1\\user1")]
-        [TestCase("subdev1\\G-DL-2", "idmdev1\\user2")]
-        [TestCase("subdev1\\G-DL-3", "idmdev1\\user3")]
+        [TestCase(C.SUBDEV_G_DL_1, C.DEV_User1)]
+        [TestCase(C.SUBDEV_G_DL_2, C.DEV_User2)]
+        [TestCase(C.SUBDEV_G_DL_3, C.DEV_User3)]
 
         // Test domain local groups in CHILD domain against a user in CHILD domain
-        [TestCase("subdev1\\G-DL-1", "subdev1\\user1")]
-        [TestCase("subdev1\\G-DL-2", "subdev1\\user2")]
-        [TestCase("subdev1\\G-DL-3", "subdev1\\user3")]
+        [TestCase(C.SUBDEV_G_DL_1, C.SUBDEV_User1)]
+        [TestCase(C.SUBDEV_G_DL_2, C.SUBDEV_User2)]
+        [TestCase(C.SUBDEV_G_DL_3, C.SUBDEV_User3)]
 
         // Test domain local groups in EXT EXT domain against a user in EXT domain
-        [TestCase("extdev1\\G-DL-1", "extdev1\\user1")]
-        [TestCase("extdev1\\G-DL-2", "extdev1\\user2")]
-        [TestCase("extdev1\\G-DL-3", "extdev1\\user3")]
+        [TestCase(C.EXTDEV_G_DL_1, C.EXTDEV_User1)]
+        [TestCase(C.EXTDEV_G_DL_2, C.EXTDEV_User2)]
+        [TestCase(C.EXTDEV_G_DL_3, C.EXTDEV_User3)]
 
         // Test global groups in EXT EXT domain against a user in EXT domain
-        [TestCase("extdev1\\G-GG-1", "extdev1\\user1")]
-        [TestCase("extdev1\\G-GG-2", "extdev1\\user2")]
-        [TestCase("extdev1\\G-GG-3", "extdev1\\user3")]
+        [TestCase(C.EXTDEV_G_GG_1, C.EXTDEV_User1)]
+        [TestCase(C.EXTDEV_G_GG_2, C.EXTDEV_User2)]
+        [TestCase(C.EXTDEV_G_GG_3, C.EXTDEV_User3)]
 
         // Test universal groups in EXT EXT domain against a user in EXT domain
-        [TestCase("extdev1\\G-UG-1", "extdev1\\user1")]
-        [TestCase("extdev1\\G-UG-2", "extdev1\\user2")]
-        [TestCase("extdev1\\G-UG-3", "extdev1\\user3")]
+        [TestCase(C.EXTDEV_G_UG_1, C.EXTDEV_User1)]
+        [TestCase(C.EXTDEV_G_UG_2, C.EXTDEV_User2)]
+        [TestCase(C.EXTDEV_G_UG_3, C.EXTDEV_User3)]
         public void TestAceMatch(string acePrincipal, string requestor)
         {
             Assert.IsTrue(this.IsMatch(acePrincipal, requestor, null));
         }
 
         // These cases fail because the AuthzInitializeContextFromSid API fails when used with a one-way trust
-        //[TestCase("extdev1\\G-DL-1", "idmdev1\\user1")]
-        //[TestCase("extdev1\\G-DL-1", "subdev1\\user1")]
-        //[TestCase("extdev1\\G-DL-2", "idmdev1\\user2")]
-        //[TestCase("extdev1\\G-DL-2", "subdev1\\user2")]
-        //[TestCase("extdev1\\G-DL-3", "idmdev1\\user3")]
-        //[TestCase("extdev1\\G-DL-3", "subdev1\\user3")]
+        //[TestCase(C.EXTDEV_G_DL_1, C.DEV_User1)]
+        //[TestCase(C.EXTDEV_G_DL_1, C.SUBDEV_User1)]
+        //[TestCase(C.EXTDEV_G_DL_2, C.DEV_User2)]
+        //[TestCase(C.EXTDEV_G_DL_2, C.SUBDEV_User2)]
+        //[TestCase(C.EXTDEV_G_DL_3, C.DEV_User3)]
+        //[TestCase(C.EXTDEV_G_DL_3, C.SUBDEV_User3)]
 
         // Test to make sure mismatched group membership is not a match
-        [TestCase("subdev1\\G-DL-2", "idmdev1\\user1", "subdev1.idmdev1.local")]
-        [TestCase("subdev1\\G-DL-2", "subdev1\\user1", "subdev1.idmdev1.local")]
-        [TestCase("subdev1\\G-DL-3", "idmdev1\\user2", "subdev1.idmdev1.local")]
-        [TestCase("subdev1\\G-DL-3", "subdev1\\user2", "subdev1.idmdev1.local")]
-        [TestCase("subdev1\\G-DL-1", "idmdev1\\user3", "subdev1.idmdev1.local")]
-        [TestCase("subdev1\\G-DL-1", "subdev1\\user3", "subdev1.idmdev1.local")]
+        [TestCase(C.SUBDEV_G_DL_2, C.DEV_User1, C.SubDevLocal)]
+        [TestCase(C.SUBDEV_G_DL_2, C.SUBDEV_User1, C.SubDevLocal)]
+        [TestCase(C.SUBDEV_G_DL_3, C.DEV_User2, C.SubDevLocal)]
+        [TestCase(C.SUBDEV_G_DL_3, C.SUBDEV_User2, C.SubDevLocal)]
+        [TestCase(C.SUBDEV_G_DL_1, C.DEV_User3, C.SubDevLocal)]
+        [TestCase(C.SUBDEV_G_DL_1, C.SUBDEV_User3, C.SubDevLocal)]
 
-        [TestCase("idmdev1\\G-DL-2", "idmdev1\\user1", "idmdev1.local")]
-        [TestCase("idmdev1\\G-DL-2", "subdev1\\user1", "idmdev1.local")]
-        [TestCase("idmdev1\\G-DL-3", "idmdev1\\user2", "idmdev1.local")]
-        [TestCase("idmdev1\\G-DL-3", "subdev1\\user2", "idmdev1.local")]
-        [TestCase("idmdev1\\G-DL-1", "idmdev1\\user3", "idmdev1.local")]
-        [TestCase("idmdev1\\G-DL-1", "subdev1\\user3", "idmdev1.local")]
+        [TestCase(C.DEV_G_DL_2, C.DEV_User1, C.DevLocal)]
+        [TestCase(C.DEV_G_DL_2, C.SUBDEV_User1, C.DevLocal)]
+        [TestCase(C.DEV_G_DL_3, C.DEV_User2, C.DevLocal)]
+        [TestCase(C.DEV_G_DL_3, C.SUBDEV_User2, C.DevLocal)]
+        [TestCase(C.DEV_G_DL_1, C.DEV_User3, C.DevLocal)]
+        [TestCase(C.DEV_G_DL_1, C.SUBDEV_User3, C.DevLocal)]
         public void TestAceNotMatch(string trustee, string requestor, string servername)
         {
             Assert.IsFalse(this.IsMatch(trustee, requestor, servername));
         }
 
-        [TestCase("idmdev1\\G-XX-1", "idmdev1\\user3")] // Test a group we know doesn't exist in THIS domain
-        [TestCase("subdev1\\G-XX-1", "subdev1\\user3")] // Test a group we know doesn't exist in CHILD domain
-        [TestCase("extdev1\\G-XX-1", "extdev1\\user3")] // Test a group we know doesn't exist in EXT domain
+        [TestCase(C.Dev + "\\G-XX-1", C.DEV_User3)] // Test a group we know doesn't exist in THIS domain
+        [TestCase(C.SubDev + "\\G-XX-1", C.SUBDEV_User3)] // Test a group we know doesn't exist in CHILD domain
+        [TestCase(C.ExtDev + "\\G-XX-1", C.EXTDEV_User3)] // Test a group we know doesn't exist in EXT domain
         public void TestAceExceptionThrownOnDeny(string trustee, string requestor)
         {
             Assert.Throws<ObjectNotFoundException>(() => this.IsMatch(trustee, requestor, null, AccessControlType.Deny));

@@ -5,6 +5,7 @@ using System.Text;
 using Quartz;
 using Quartz.Impl;
 using System.Threading.Tasks;
+using C = Lithnet.AccessManager.Test.TestEnvironmentConstants;
 
 namespace Lithnet.AccessManager.Server.Test
 {

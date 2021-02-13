@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="17.3" version="17.7" Modules="professional" RootPath="." Language="en" Id="{6231D1B4-23AF-4C6E-998C-070D74534FAD}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="17.3" version="17.9" Modules="professional" RootPath="." Language="en" Id="{6231D1B4-23AF-4C6E-998C-070D74534FAD}">
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
     <ROW Property="AI_PREDEF_LCONDS_PROPS" Value="AI_DETECTED_DOTNET_VERSION"/>
@@ -9,10 +9,10 @@
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="ARPPRODUCTICON" Value="accessmanager.exe" Type="8"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
-    <ROW Property="ProductCode" Value="1033:{B3E1737A-4EF2-41D9-AD45-ADA629399728} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{5CA1FD72-1E11-44EF-A8C4-452206A7FF39} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Agent"/>
-    <ROW Property="ProductVersion" Value="1.0.7857.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7870.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
     <ROW Property="SETUPEXEDIR" Value="1"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{EEDECF4C-BABB-4AE0-9CB9-DC051FF1AE75}"/>
