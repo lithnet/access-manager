@@ -412,7 +412,7 @@ namespace Lithnet.AccessManager
                         this.logger.LogTrace("Remote DCLocator: Found DC {dc} for server {server} in domain {domainDns}, with flags {flags}", dc, server, domainDns, flags.ToString());
                         return dc;
                     }
-                    catch (DirectoryException dex) when (dex.InnerException is Win32Exception wex && wex.NativeErrorCode == 1722)
+                    catch (DirectoryException dex) //when (dex.InnerException is Win32Exception wex && wex.NativeErrorCode == 1722)
                     {
                         mode &= ~DcLocatorMode.RemoteDcLocator;
                         this.logger.LogWarning(dex, "Could not connect to server {server} to find DC", server);
