@@ -356,13 +356,6 @@ body {
     font-size: 1.1rem;
 }
 
-.password-content {
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-    font-family: Inconsolata, Consolas, Courier New, Courier, monospace;
-    font-weight: bold;
-}
-
 .password-details-footer {
     text-align: right;
     background-color: #fcfcfc;
@@ -409,29 +402,75 @@ body {
         height: 32px;
     }
 
-.password-field {
+.password-content {
+    margin-bottom: 1rem;
     font-family: Inconsolata, Consolas, Courier New, Courier, monospace;
-    font-size: large;
     font-weight: bold;
 }
 
-#copy-button {
-    margin-left: 10px;
+.password-font-size-large {
+    font-size: 2.5rem;
+}
+
+.password-font-size-normal {
+    font-size: 1.5rem;
+}
+
+.password-font-spacing-normal {
+    letter-spacing: 0.033em;
+}
+
+.password-font-spacing-wide {
+    letter-spacing: 0.1em;
+}
+
+.password-content span {
+    display: inline-block;
 }
 
 .password-char-digit {
     color: darkblue;
-    display: inline-block;
 }
 
 .password-char-letter {
     color: slategray;
-    display: inline-block;
 }
 
 .password-char-other {
     color: darkred;
-    display: inline-block;
+}
+
+.monochrome .password-char-digit {
+    color: #404040;
+}
+
+.monochrome .password-char-other {
+    color: #404040;
+}
+
+.monochrome .password-char-letter {
+    color: #404040;
+}
+
+.form-computer-details {
+    position: relative;
+}
+
+.font-options-button {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+.dropdown-item-checked::before {
+    position: absolute;
+    left: .4rem;
+    content: '✓';
+    font-weight: 600;
+}
+
+#copy-button {
+    margin-left: 10px;
 }
 
 @media (min-width: 993px) {

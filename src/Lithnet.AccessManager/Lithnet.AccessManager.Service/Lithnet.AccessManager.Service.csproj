@@ -19,6 +19,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\StatusCode\**" />
+    <Content Remove="Views\StatusCode\**" />
+    <EmbeddedResource Remove="Views\StatusCode\**" />
+    <None Remove="Views\StatusCode\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="dev-config\apphost.json" />
     <Content Remove="dev-config\logo.png" />
     <Content Remove="dev-config\appsecrets.json" />
@@ -128,10 +135,6 @@
    <Content Update="libman.json" CopyToPublishDirectory="Never" CopyToOutputDirectory="Never">
     </Content>
     <Content Update="appsettings.*.json" CopyToPublishDirectory="Never" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Views\StatusCode\" />
   </ItemGroup>
 
   <ItemGroup>

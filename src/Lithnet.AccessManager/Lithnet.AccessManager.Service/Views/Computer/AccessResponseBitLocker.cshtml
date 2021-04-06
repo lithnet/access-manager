@@ -17,9 +17,20 @@
     </div>
     <div class="form-content">
 
-        <section>
+        <section class="form-computer-details">
             <label class="title">Computer</label>
             <p class="lead">@Model.ComputerName</p>
+
+            <div class="dropdown font-options-button">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Display options
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenu2" style="">
+                    <button class="dropdown-item" id="button-monochrome" type="button">Monochrome</button>
+                    <button class="dropdown-item" id="button-large-font" type="button">Larger font</button>
+                    <button class="dropdown-item" id="button-increase-spacing" type="button">Increase spacing</button>
+                </div>
+            </div>
         </section>
 
         <div class="accordion" id="history-panel">
@@ -37,7 +48,7 @@
                     </div>
                     <div id="password-details-@index" class="collapse" aria-labelledby="password-summary-@index" data-parent="#history-panel">
                         <div class="card-body">
-                            <div class="password-content" id="password-content-@index">
+                            <div class="password-content password-font-size-normal password-font-spacing-normal notranslate" id="password-content-@index">
                                 @Html.Raw(htmlProvider.GetHtmlPassword(e.RecoveryPassword))
                             </div>
 
@@ -90,6 +101,9 @@
 
 
 @section Scripts {
+
+    <script src="@Url.Content("~/js/password-display-options.js")"></script>
+
     @if (!uiOptions.Value.PhoneticSettings.DisableTextToSpeech)
     {
         <script src="@Url.Content("~/js/speech.js")"></script>
