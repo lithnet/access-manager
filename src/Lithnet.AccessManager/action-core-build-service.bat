@@ -22,9 +22,11 @@ md %outputdirservice% || exit /b %errorlevel%
 ECHO [92mCreating output directory "%outputdirps%"[0m
 md %outputdirps% || exit /b %errorlevel%
 
+
+
 if "%buildingbeta%" EQU "1" (
 ECHO [94mWriting license file[0m
-"D:\dev\git\lithnet\access-manager-enterprise\src\Lithnet.AccessManager.Enterprise.LicenseManager.Cli\bin\Debug\netcoreapp3.1\amsliccli" --subject "Beta program participant" --type BuiltIn --audiences * --units -1 --min-version %version% --max-version %version% --expire-in-days 90 --out-file "%outputdirservice%\license.dat"
+"D:\dev\git\lithnet\Lithnet.Licensing\src\Lithnet.Licensing.Cli\bin\Debug\netcoreapp3.1\Lithnet.Licensing.Cli.exe" --licensed-to "Beta program participant" --product-name "Lithnet Access Manager" --product-id  "B5ABACF5-BB38-40CC-BEC9-7D6013AA3FF0" --type "BuiltIn" --feature-mask 0xFFFFFFFF --sku 1 --audiences "*" --units "1" --unit-type "Instance" --min-version "%version%" --max-version "%version%" --expire-in-days "90" --out-file "%outputdirservice%\license.dat"
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 )
 

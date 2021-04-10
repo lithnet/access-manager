@@ -6,6 +6,7 @@ using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Interop;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.Licensing.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -24,7 +25,7 @@ namespace Lithnet.AccessManager.Server.Test
         private IComputerTargetProvider targetDataProvider;
         private IAuthorizationContextProvider authorizationContextProvider;
         private IDiscoveryServices discoveryServices;
-        private ILicenseManager licenseManager;
+        private IAmsLicenseManager licenseManager;
 
         [SetUp()]
         public void TestInitialize()
@@ -34,7 +35,7 @@ namespace Lithnet.AccessManager.Server.Test
             cache = new AuthorizationInformationMemoryCache();
             logger = Global.LogFactory.CreateLogger<AuthorizationInformationBuilder>();
             powershell = Mock.Of<IPowerShellSecurityDescriptorGenerator>();
-            var mockLicenseManager = new Mock<ILicenseManager>();
+            var mockLicenseManager = new Mock<IAmsLicenseManager>();
             mockLicenseManager.Setup(l => l.IsEnterpriseEdition()).Returns(true);
             mockLicenseManager.Setup(l => l.IsFeatureCoveredByFullLicense(It.IsAny<LicensedFeatures>())).Returns(true);
             mockLicenseManager.Setup(l => l.IsFeatureEnabled(It.IsAny<LicensedFeatures>())).Returns(true);

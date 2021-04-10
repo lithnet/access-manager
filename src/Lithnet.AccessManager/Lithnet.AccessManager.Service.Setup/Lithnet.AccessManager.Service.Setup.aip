@@ -18,10 +18,10 @@
     <ROW Property="IAgree" Value="No" Type="4" MsiKey="IAgree"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{8EF72B64-6816-4B87-B1AD-80ADF981EBA4} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{C18D3455-D5DB-4302-AFBD-EF021F0F5FBF} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7875.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7879.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
@@ -108,6 +108,7 @@
     <ROW Component="Lithnet.AccessManager.Service.exe" ComponentId="{FD43CD7C-E665-4B9A-B5CB-EC0022F31894}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.Service.exe"/>
     <ROW Component="Lithnet.AccessManager.dll" ComponentId="{6A6DC61C-4336-4E01-ACA3-C24052A9ADB0}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.dll"/>
     <ROW Component="Lithnet.AccessManager.dll_1" ComponentId="{1E2DCC19-7EB1-46FA-9BEF-B0050D6440B2}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="256" KeyPath="Lithnet.AccessManager.dll_1"/>
+    <ROW Component="Lithnet.Licensing.Core.dll" ComponentId="{61EB432C-AF25-4324-B4AC-1AFD4470410A}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.Licensing.Core.dll"/>
     <ROW Component="Lithnet.Security.Authorization.dll" ComponentId="{B9AFB1D8-2BC8-488C-BE72-DB4D4CA01EEA}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.Security.Authorization.dll"/>
     <ROW Component="Lithnet.Security.Authorization.dll_1" ComponentId="{2F7944C3-DFC6-4638-A614-500C632CEBA1}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Lithnet.Security.Authorization.dll_1"/>
     <ROW Component="LithnetAccessManger.psd1" ComponentId="{57AA045C-86E2-4564-A752-6214BAF2CB10}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="LithnetAccessManager.psd1" Type="0"/>
@@ -1013,6 +1014,8 @@
     <ROW File="Quartz.Extensions.Hosting.dll" Component_="Quartz.Extensions.Hosting.dll" FileName="QUARTZ~2.DLL|Quartz.Extensions.Hosting.dll" Attributes="0" SourcePath="output\Quartz.Extensions.Hosting.dll" SelfReg="false"/>
     <ROW File="Quartz.Serialization.Json.dll" Component_="Quartz.Serialization.Json.dll" FileName="QUARTZ~3.DLL|Quartz.Serialization.Json.dll" Attributes="0" SourcePath="output\Quartz.Serialization.Json.dll" SelfReg="false"/>
     <ROW File="System.Diagnostics.DiagnosticSource.dll_1" Component_="System.Diagnostics.DiagnosticSource.dll_1" FileName="SYSTE~36.DLL|System.Diagnostics.DiagnosticSource.dll" Attributes="0" SourcePath="output\System.Diagnostics.DiagnosticSource.dll" SelfReg="false"/>
+    <ROW File="Lithnet.Licensing.Core.dll" Component_="Lithnet.Licensing.Core.dll" FileName="LITHNE~8.DLL|Lithnet.Licensing.Core.dll" Attributes="0" SourcePath="output\Lithnet.Licensing.Core.dll" SelfReg="false"/>
+    <ROW File="passworddisplayoptions.js" Component_="clipboard.js" FileName="PASSWO~1.JS|password-display-options.js" Attributes="0" SourcePath="output\wwwroot\js\password-display-options.js" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.custcomp.AiControlConditionAliasComponent">
     <ROW AliasRowId="ExitDialog#LaunchProdCheckBox#Hide#((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))" AliasRowOperation="2" Condition="(((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))) OR NOT IS_STANDALONE_OR_NOT_CLUSTERED_OR_ON_ACTIVE_NODE"/>
@@ -1730,6 +1733,7 @@
     <ROW Feature_="MainFeature" Component_="Quartz.Extensions.Hosting.dll"/>
     <ROW Feature_="MainFeature" Component_="Quartz.Serialization.Json.dll"/>
     <ROW Feature_="MainFeature" Component_="System.Diagnostics.DiagnosticSource.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Lithnet.Licensing.Core.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>

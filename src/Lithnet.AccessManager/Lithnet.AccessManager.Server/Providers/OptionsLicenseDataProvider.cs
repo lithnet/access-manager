@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.Licensing.Core;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Options;
 
@@ -23,7 +24,6 @@ namespace Lithnet.AccessManager.Server
             try
             {
                 string data = this.options.Data;
-
                 return string.IsNullOrWhiteSpace(data) ? EmbeddedResourceProvider.GetResourceString("license.dat") : data;
             }
             catch

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.DirectoryServices.ActiveDirectory;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.Licensing.Core;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Microsoft.Extensions.Logging;
@@ -16,13 +18,13 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IShellExecuteProvider shellExecuteProvider;
-        private readonly ILicenseManager licenseManager;
+        private readonly IAmsLicenseManager licenseManager;
         private readonly ILogger<LicensingViewModel> logger;
         private readonly LicensingOptions licensingOptions;
         private readonly ILicenseDataProvider licenseDataProvider;
         private readonly IEventAggregator eventAggregator;
 
-        public LicensingViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, ILicenseManager licenseManager, ILogger<LicensingViewModel> logger, LicensingOptions licensingOptions, INotifyModelChangedEventPublisher eventPublisher, ILicenseDataProvider licenseDataProvider, IEventAggregator eventAggregator)
+        public LicensingViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, IAmsLicenseManager licenseManager, ILogger<LicensingViewModel> logger, LicensingOptions licensingOptions, INotifyModelChangedEventPublisher eventPublisher, ILicenseDataProvider licenseDataProvider, IEventAggregator eventAggregator)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.licenseManager = licenseManager;
@@ -156,15 +158,15 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string KeyId => this.License?.KeyId;
 
-        public string Product => this.License?.Product;
+        public string Product => this.License?.ProductName;
 
-        public string EffectiveProductEdition => this.ValidationResult.EffectiveEdition == Enterprise.ProductEdition.Enterprise ? "Enterprise" : "Standard";
+        public string EffectiveProductEdition => this.ValidationResult.EffectiveSku == (uint)ProductSku.Enterprise ? "Enterprise" : "Standard";
 
-        public string ProductEdition => this.License == null ? null : this.License.ProductEdition == Enterprise.ProductEdition.Enterprise ? "Enterprise" : "Standard";
+        public string ProductEdition => this.License == null ? null : this.License.ProductSku == (uint)ProductSku.Enterprise ? "Enterprise" : "Standard";
 
         public string Units => this.License?.Units.ToString();
 
-        public bool HasEnterpriseLicense => this.ValidationResult.EffectiveEdition == Enterprise.ProductEdition.Enterprise;
+        public bool HasEnterpriseLicense => this.ValidationResult.EffectiveSku == (uint)ProductSku.Enterprise;
 
         public bool HasStandardLicense => !this.HasEnterpriseLicense;
 

@@ -9,6 +9,7 @@ using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using Lithnet.AccessManager.Server.UI.Providers;
+using Lithnet.Licensing.Core;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Microsoft.Extensions.Logging;
@@ -35,12 +36,12 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ISecretRekeyProvider rekeyProvider;
         private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly IDiscoveryServices discoveryServices;
-        private readonly ILicenseManager licenseManager;
+        private readonly IAmsLicenseManager licenseManager;
         private readonly IApplicationUpgradeProvider appUpgradeProvider;
         private readonly IHttpSysConfigurationProvider certificateBindingProvider;
         private readonly IFirewallProvider firewallProvider;
 
-        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, ISecretRekeyProvider rekeyProvider, IObjectSelectionProvider objectSelectionProvider, IDiscoveryServices discoveryServices, ILicenseManager licenseManager, IApplicationUpgradeProvider appUpgradeProvider, IHttpSysConfigurationProvider certificateBindingProvider, IFirewallProvider firewallProvider)
+        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, ISecretRekeyProvider rekeyProvider, IObjectSelectionProvider objectSelectionProvider, IDiscoveryServices discoveryServices, IAmsLicenseManager licenseManager, IApplicationUpgradeProvider appUpgradeProvider, IHttpSysConfigurationProvider certificateBindingProvider, IFirewallProvider firewallProvider)
         {
             this.logger = logger;
             this.pathProvider = pathProvider;

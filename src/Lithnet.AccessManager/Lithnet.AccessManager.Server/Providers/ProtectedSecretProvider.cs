@@ -8,6 +8,7 @@ using System.Security.Principal;
 using System.Text;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.Licensing.Core;
 using Microsoft.Extensions.Options;
 using Vanara.InteropServices;
 using Vanara.PInvoke;
@@ -22,11 +23,11 @@ namespace Lithnet.AccessManager.Server
         private readonly ICertificateProvider certificateProvider;
         private readonly DataProtectionOptions dataProtectionOptions;
         private readonly IEncryptionProvider encryptionProvider;
-        private readonly ILicenseManager licenseManager;
+        private readonly IAmsLicenseManager licenseManager;
         private readonly RandomNumberGenerator rng;
         private readonly IWindowsServiceProvider windowsServiceProvider;
 
-        public ProtectedSecretProvider(IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider, RandomNumberGenerator rng, IOptions<DataProtectionOptions> dataProtectionOptions, IWindowsServiceProvider windowsServiceProvider, ILicenseManager licenseManager)
+        public ProtectedSecretProvider(IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider, RandomNumberGenerator rng, IOptions<DataProtectionOptions> dataProtectionOptions, IWindowsServiceProvider windowsServiceProvider, IAmsLicenseManager licenseManager)
         {
             this.encryptionProvider = encryptionProvider;
             this.certificateProvider = certificateProvider;

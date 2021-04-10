@@ -5,6 +5,7 @@ using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Providers;
 using Lithnet.AccessManager.Server.UI.Providers;
+using Lithnet.Licensing.Core;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Markdig.Extensions.TaskLists;
@@ -18,7 +19,7 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IShellExecuteProvider shellExecuteProvider;
-        private readonly ILicenseManager licenseManager;
+        private readonly IAmsLicenseManager licenseManager;
         private readonly ILogger<HighAvailabilityViewModel> logger;
         private readonly DatabaseConfigurationOptions dbOptions;
         private readonly DataProtectionOptions dataProtectionOptions;
@@ -28,7 +29,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IScriptTemplateProvider scriptTemplateProvider;
         private readonly IWindowsServiceProvider windowsServiceProvider;
 
-        public HighAvailabilityViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, ILicenseManager licenseManager, ILogger<HighAvailabilityViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, DatabaseConfigurationOptions highAvailabilityOptions, DataProtectionOptions dataProtectionOptions, ICertificateSynchronizationProvider certSyncProvider, ISecretRekeyProvider rekeyProvider, SqlServerInstanceProvider sqlInstanceProvider, IScriptTemplateProvider scriptTemplateProvider, IWindowsServiceProvider windowsServiceProvider)
+        public HighAvailabilityViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, IAmsLicenseManager licenseManager, ILogger<HighAvailabilityViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, DatabaseConfigurationOptions highAvailabilityOptions, DataProtectionOptions dataProtectionOptions, ICertificateSynchronizationProvider certSyncProvider, ISecretRekeyProvider rekeyProvider, SqlServerInstanceProvider sqlInstanceProvider, IScriptTemplateProvider scriptTemplateProvider, IWindowsServiceProvider windowsServiceProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.licenseManager = licenseManager;
@@ -70,7 +71,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool IsEnterpriseEdition => this.licenseManager.IsEnterpriseEdition();
 
-        public bool ShowEnterpriseEditionBanner => this.licenseManager.IsEvaulatingOrBuiltIn() || !this.licenseManager.IsEnterpriseEdition();
+        public bool ShowEnterpriseEditionBanner => this.licenseManager.IsEvaluatingOrBuiltIn() || !this.licenseManager.IsEnterpriseEdition();
 
         [NotifyModelChangedProperty]
         [AlsoNotifyFor(nameof(UseSqlServer))]

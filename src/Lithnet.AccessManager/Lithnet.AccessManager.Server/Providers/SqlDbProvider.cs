@@ -5,6 +5,7 @@ using DbUp.Engine.Output;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Providers;
+using Lithnet.Licensing.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -12,7 +13,7 @@ namespace Lithnet.AccessManager.Server
 {
     public class SqlDbProvider : IDbProvider
     {
-        private readonly ILicenseManager licenseManager;
+        private readonly IAmsLicenseManager licenseManager;
         private readonly DatabaseConfigurationOptions highAvailabilityOptions;
         private readonly ILogger<SqlDbProvider> logger;
         private readonly IUpgradeLog upgradeLogger;
@@ -21,7 +22,7 @@ namespace Lithnet.AccessManager.Server
 
         private ISqlInstanceProvider activeInstanceProvider;
 
-        public SqlDbProvider(ILicenseManager licenseManager, IOptions<DatabaseConfigurationOptions> highAvailabilityOptions, ILogger<SqlDbProvider> logger, IUpgradeLog upgradeLogger, SqlLocalDbInstanceProvider localDbInstanceProvider, SqlServerInstanceProvider sqlServerInstanceProvider)
+        public SqlDbProvider(IAmsLicenseManager licenseManager, IOptions<DatabaseConfigurationOptions> highAvailabilityOptions, ILogger<SqlDbProvider> logger, IUpgradeLog upgradeLogger, SqlLocalDbInstanceProvider localDbInstanceProvider, SqlServerInstanceProvider sqlServerInstanceProvider)
         {
             this.licenseManager = licenseManager;
             this.highAvailabilityOptions = highAvailabilityOptions.Value;

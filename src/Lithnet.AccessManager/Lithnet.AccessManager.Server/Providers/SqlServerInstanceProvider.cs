@@ -2,6 +2,7 @@
 using System.Data.SqlClient;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.Licensing.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -11,15 +12,15 @@ namespace Lithnet.AccessManager.Server.Providers
     {
         private readonly ILogger<SqlServerInstanceProvider> logger;
         private readonly DatabaseConfigurationOptions highAvailabilityOptions;
-        private readonly ILicenseManager licenseManager;
+        private readonly IAmsLicenseManager licenseManager;
         private readonly IWindowsServiceProvider windowsServiceProvider;
 
-        public SqlServerInstanceProvider(ILogger<SqlServerInstanceProvider> logger, IOptions<DatabaseConfigurationOptions> highAvailabilityOptions, ILicenseManager licenseManager, IWindowsServiceProvider windowsServiceProvider)
+        public SqlServerInstanceProvider(ILogger<SqlServerInstanceProvider> logger, IOptions<DatabaseConfigurationOptions> highAvailabilityOptions, IAmsLicenseManager licenseManager, IWindowsServiceProvider windowsServiceProvider)
             : this(logger, highAvailabilityOptions.Value, licenseManager, windowsServiceProvider)
         {
         }
 
-        public SqlServerInstanceProvider(ILogger<SqlServerInstanceProvider> logger, DatabaseConfigurationOptions highAvailabilityOptions, ILicenseManager licenseManager, IWindowsServiceProvider windowsServiceProvider)
+        public SqlServerInstanceProvider(ILogger<SqlServerInstanceProvider> logger, DatabaseConfigurationOptions highAvailabilityOptions, IAmsLicenseManager licenseManager, IWindowsServiceProvider windowsServiceProvider)
         {
             this.logger = logger;
             this.highAvailabilityOptions = highAvailabilityOptions;

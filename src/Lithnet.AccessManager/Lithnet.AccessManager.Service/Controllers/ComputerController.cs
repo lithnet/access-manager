@@ -12,6 +12,7 @@ using Lithnet.AccessManager.Server.Exceptions;
 using Lithnet.AccessManager.Service.App_LocalResources;
 using Lithnet.AccessManager.Service.AppSettings;
 using Lithnet.AccessManager.Service.Models;
+using Lithnet.Licensing.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -33,10 +34,10 @@ namespace Lithnet.AccessManager.Service.Controllers
         private readonly IAuditEventProcessor reporting;
         private readonly UserInterfaceOptions userInterfaceSettings;
         private readonly IBitLockerRecoveryPasswordProvider bitLockerProvider;
-        private readonly ILicenseManager licenseManager;
+        private readonly IAmsLicenseManager licenseManager;
 
         public ComputerController(IAuthorizationService authorizationService, ILogger<ComputerController> logger, IDirectory directory,
-            IAuditEventProcessor reporting, IOptionsSnapshot<UserInterfaceOptions> userInterfaceSettings, IAuthenticationProvider authenticationProvider, IPasswordProvider passwordProvider, IJitAccessProvider jitAccessProvider, IBitLockerRecoveryPasswordProvider bitLockerProvider, ILicenseManager licenseManager)
+            IAuditEventProcessor reporting, IOptionsSnapshot<UserInterfaceOptions> userInterfaceSettings, IAuthenticationProvider authenticationProvider, IPasswordProvider passwordProvider, IJitAccessProvider jitAccessProvider, IBitLockerRecoveryPasswordProvider bitLockerProvider, IAmsLicenseManager licenseManager)
         {
             this.authorizationService = authorizationService;
             this.logger = logger;

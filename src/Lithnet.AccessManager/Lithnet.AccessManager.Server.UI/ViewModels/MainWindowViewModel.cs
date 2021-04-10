@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.Licensing.Core;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Stylet;
@@ -22,7 +23,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly IRegistryProvider registryProvider;
         private readonly ICertificateSynchronizationProvider certSyncProvider;
-        private readonly ILicenseManager licenseManager;
+        private readonly IAmsLicenseManager licenseManager;
         private readonly IClusterProvider clusterProvider;
 
         private SemaphoreSlim clusterWaitSemaphore;
@@ -30,7 +31,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public MainWindowViewModel(IApplicationConfig model, AuthenticationViewModel authentication, AuthorizationViewModel authorization, UserInterfaceViewModel ui, RateLimitsViewModel rate, IpDetectionViewModel ip,
             AuditingViewModel audit, EmailViewModel mail, HostingViewModel hosting, ActiveDirectoryConfigurationViewModel ad,
-            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, LicensingViewModel lic, HighAvailabilityViewModel havm, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider, ICertificateSynchronizationProvider certSyncProvider, ILicenseManager licenseManager, IClusterProvider clusterProvider)
+            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, LicensingViewModel lic, HighAvailabilityViewModel havm, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider, ICertificateSynchronizationProvider certSyncProvider, IAmsLicenseManager licenseManager, IClusterProvider clusterProvider)
         {
             this.model = model;
             this.shellExecuteProvider = shellExecuteProvider;

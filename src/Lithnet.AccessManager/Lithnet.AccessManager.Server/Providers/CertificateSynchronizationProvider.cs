@@ -7,6 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.Licensing.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -19,9 +20,9 @@ namespace Lithnet.AccessManager.Server
         private DataProtectionOptions dataProtectionOptions;
         private readonly IProtectedSecretProvider secretProvider;
         private readonly ICertificatePermissionProvider certPermissionProvider;
-        private readonly ILicenseManager licenseManager;
+        private readonly IAmsLicenseManager licenseManager;
 
-        public CertificateSynchronizationProvider(RandomNumberGenerator rng, ILogger<CertificateSynchronizationProvider> logger, IOptionsMonitor<DataProtectionOptions> dataProtectionOptions, IProtectedSecretProvider secretProvider, ICertificatePermissionProvider certPermissionProvider, ILicenseManager licenseManager)
+        public CertificateSynchronizationProvider(RandomNumberGenerator rng, ILogger<CertificateSynchronizationProvider> logger, IOptionsMonitor<DataProtectionOptions> dataProtectionOptions, IProtectedSecretProvider secretProvider, ICertificatePermissionProvider certPermissionProvider, IAmsLicenseManager licenseManager)
             : this(rng, logger, secretProvider, certPermissionProvider, licenseManager)
         {
             this.dataProtectionOptions = dataProtectionOptions.CurrentValue;
@@ -32,13 +33,13 @@ namespace Lithnet.AccessManager.Server
             });
         }
 
-        public CertificateSynchronizationProvider(RandomNumberGenerator rng, ILogger<CertificateSynchronizationProvider> logger, DataProtectionOptions dataProtectionOptions, IProtectedSecretProvider secretProvider, ICertificatePermissionProvider certPermissionProvider, ILicenseManager licenseManager)
+        public CertificateSynchronizationProvider(RandomNumberGenerator rng, ILogger<CertificateSynchronizationProvider> logger, DataProtectionOptions dataProtectionOptions, IProtectedSecretProvider secretProvider, ICertificatePermissionProvider certPermissionProvider, IAmsLicenseManager licenseManager)
             : this(rng, logger, secretProvider, certPermissionProvider, licenseManager)
         {
             this.dataProtectionOptions = dataProtectionOptions;
         }
 
-        private CertificateSynchronizationProvider(RandomNumberGenerator rng, ILogger<CertificateSynchronizationProvider> logger, IProtectedSecretProvider secretProvider, ICertificatePermissionProvider certPermissionProvider, ILicenseManager licenseManager)
+        private CertificateSynchronizationProvider(RandomNumberGenerator rng, ILogger<CertificateSynchronizationProvider> logger, IProtectedSecretProvider secretProvider, ICertificatePermissionProvider certPermissionProvider, IAmsLicenseManager licenseManager)
         {
             this.rng = rng;
             this.logger = logger;

@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.Licensing.Core;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Options;
 using Vanara.Extensions.Reflection;

@@ -6,6 +6,7 @@ using System.Security.Principal;
 using System.Threading.Tasks.Sources;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.Licensing.Core;
 using Lithnet.Security.Authorization;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -21,9 +22,9 @@ namespace Lithnet.AccessManager.Server.Authorization
         private readonly IAuthorizationInformationMemoryCache authzCache;
         private readonly IComputerTargetProvider computerTargetProvider;
         private readonly IAuthorizationContextProvider authorizationContextProvider;
-        private readonly ILicenseManager licenseManager;
+        private readonly IAmsLicenseManager licenseManager;
 
-        public AuthorizationInformationBuilder(IOptionsSnapshot<AuthorizationOptions> options, ILogger<AuthorizationInformationBuilder> logger, IPowerShellSecurityDescriptorGenerator powershell, IAuthorizationInformationMemoryCache authzCache, IComputerTargetProvider computerTargetProvider, IAuthorizationContextProvider authorizationContextProvider, ILicenseManager licenseManager)
+        public AuthorizationInformationBuilder(IOptionsSnapshot<AuthorizationOptions> options, ILogger<AuthorizationInformationBuilder> logger, IPowerShellSecurityDescriptorGenerator powershell, IAuthorizationInformationMemoryCache authzCache, IComputerTargetProvider computerTargetProvider, IAuthorizationContextProvider authorizationContextProvider, IAmsLicenseManager licenseManager)
         {
             this.logger = logger;
             this.options = options.Value;

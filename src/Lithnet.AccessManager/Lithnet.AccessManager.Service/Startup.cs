@@ -16,6 +16,7 @@ using Lithnet.AccessManager.Server.Workers;
 using Lithnet.AccessManager.Service.AppSettings;
 using Lithnet.AccessManager.Service.Extensions;
 using Lithnet.AccessManager.Service.Internal;
+using Lithnet.Licensing.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
@@ -180,7 +181,7 @@ namespace Lithnet.AccessManager.Service
             services.Configure<Server.Configuration.DataProtectionOptions>(Configuration.GetSection("DataProtection"));
             services.Configure<AdminNotificationOptions>(Configuration.GetSection("AdminNotifications"));
 
-            ILicenseManager licenseManager = this.CreateLicenseManager(services);
+            IAmsLicenseManager licenseManager = this.CreateLicenseManager(services);
 
             services.AddSingleton(licenseManager);
 
@@ -190,13 +191,13 @@ namespace Lithnet.AccessManager.Service
             this.ConfigureDataProtection(services, licenseManager);
         }
 
-        private ILicenseManager CreateLicenseManager(IServiceCollection services)
+        private IAmsLicenseManager CreateLicenseManager(IServiceCollection services)
         {
             var provider = services.BuildServiceProvider();
             var licenseDataProvider = provider.GetService<ILicenseDataProvider>();
-            var licenseLogger = provider.GetService<ILogger<LicenseManager>>();
+            var licenseLogger = provider.GetService<ILogger<AmsLicenseManager>>();
             var logger = provider.GetService<ILogger<Startup>>();
-            LicenseManager licenseManager = new LicenseManager(licenseLogger, licenseDataProvider);
+            AmsLicenseManager licenseManager = new AmsLicenseManager(licenseLogger, licenseDataProvider);
 
             try
             {
@@ -260,7 +261,7 @@ namespace Lithnet.AccessManager.Service
             });
         }
 
-        private void ConfigureDataProtection(IServiceCollection services, ILicenseManager licenseManager)
+        private void ConfigureDataProtection(IServiceCollection services, IAmsLicenseManager licenseManager)
         {
             var provider = services.BuildServiceProvider();
             var dataProtectionOptions = provider.GetService<IOptions<Server.Configuration.DataProtectionOptions>>();

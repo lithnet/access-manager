@@ -11,6 +11,7 @@ using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Providers;
 using Lithnet.AccessManager.Server.UI.AuthorizationRuleImport;
 using Lithnet.AccessManager.Server.UI.Providers;
+using Lithnet.Licensing.Core;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
@@ -199,7 +200,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IProtectedSecretProvider>().To<ProtectedSecretProvider>().InSingletonScope();
                 builder.Bind<IClusterProvider>().To<ClusterProvider>().InSingletonScope();
                 builder.Bind<IProductSettingsProvider>().To<ProductSettingsProvider>().InSingletonScope();
-                builder.Bind<ILicenseManager>().To<LicenseManager>().InSingletonScope();
+                builder.Bind<IAmsLicenseManager>().To<AmsLicenseManager>().InSingletonScope();
                 builder.Bind<ISecretRekeyProvider>().To<SecretRekeyProvider>().InSingletonScope();
                 builder.Bind<ILicenseDataProvider>().To<OptionsLicenseDataProvider>().InSingletonScope();
 
