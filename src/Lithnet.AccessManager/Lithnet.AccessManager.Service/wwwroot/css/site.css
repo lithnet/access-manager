@@ -548,3 +548,7 @@ body {
 .hidden {
     display: none;
 }
+
+.btn {
+    white-space: nowrap;
+}
