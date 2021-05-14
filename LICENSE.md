@@ -19,7 +19,7 @@ This Software Licence Agreement is made between you and Lithnet Pty Ltd (ABN 62 
 
 **Licensed Software** means the software owned by the Licensor and downloaded by you or delivered to you by the Licensor pursuant to this Agreement.
 
-**Moral Rights* *has the meaning given under the *Copyright Act *1968 (Cth) and includes any similar rights existing in other countries.
+**Moral Rights** has the meaning given under the *Copyright Act* 1968 (Cth) and includes any similar rights existing in other countries.
 
 Unless the context requires otherwise:
    a) a reference to a person includes a corporation or any other legal entity;
