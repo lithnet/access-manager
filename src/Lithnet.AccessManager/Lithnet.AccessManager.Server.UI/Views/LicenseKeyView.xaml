@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.LicenseKeyView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             dialog:DialogParticipation.Register="{Binding}"
+             mc:Ignorable="d" d:DesignWidth="800"
+             Margin="5">
+    <DockPanel LastChildFill="True">
+
+        <StackPanel DockPanel.Dock="Top">
+            <Label Style="{DynamicResource DescriptionHeaderStyle}"
+               Content="Enter license data" />
+
+            <TextBlock Margin="10 0 0 0">Paste the license data provided by Lithnet in the text box below</TextBlock>
+        </StackPanel>
+
+        <TextBox Margin="10 5 0 0"
+                     DockPanel.Dock="Bottom"
+                  Text="{Binding LicenseKeyData}" 
+                     AcceptsReturn="True"
+                  TextWrapping="Wrap"/>
+
+    </DockPanel>
+
+</UserControl>

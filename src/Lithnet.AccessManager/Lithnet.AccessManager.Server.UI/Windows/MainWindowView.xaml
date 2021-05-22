@@ -81,7 +81,10 @@
                 <MenuItem.ItemsSource>
                     <CompositeCollection>
                         <MenuItem Header="Online Help"
-                                      Command="{s:Action Help}"/>
+                                  Command="{s:Action Help}"/>
+                        <Separator/>
+                        <MenuItem Header="About"
+                                  Command="{s:Action About}"/>
                     </CompositeCollection>
                 </MenuItem.ItemsSource>
             </MenuItem>

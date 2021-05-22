@@ -1,0 +1,600 @@
+####################################################################################################
+Package:CsvHelper
+Version:15.0.5
+project URL:https://joshclose.github.io/CsvHelper/
+Description:A library for reading and writing CSV files. Extremely fast, flexible, and easy to use. Supports reading and writing of custom class objects.
+licenseUrl:https://licenses.nuget.org/MS-PL%20OR%20Apache-2.0
+license Type:MS-PL OR Apache-2.0
+
+####################################################################################################
+Package:dbup-sqlserver
+Version:4.4.0
+project URL:http://dbup.github.com/
+Description:DbUp makes it easy to deploy and upgrade SQL Server databases by running change scripts.
+licenseUrl:http://www.opensource.org/licenses/mit-license.php
+license Type:MIT
+
+####################################################################################################
+Package:FluentValidation
+Version:9.0.1
+project URL:https://fluentvalidation.net/
+Description:A validation library for .NET that uses a fluent interface to construct strongly-typed validation rules.
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:HtmlAgilityPack
+Version:1.11.24
+project URL:http://html-agility-pack.net/
+Description:This is an agile HTML parser that builds a read/write DOM and supports plain XPATH or XSLT (you actually don't HAVE to understand XPATH nor XSLT to use it, don't worry...). It is a .NET code library that allows you to parse "out of the web" HTML files. The parser is very tolerant with "real world" malformed HTML. The object model is very similar to what proposes System.Xml, but for HTML documents (or streams).
+licenseUrl:https://github.com/zzzprojects/html-agility-pack/blob/master/LICENSE
+license Type:MIT
+
+####################################################################################################
+Package:Lithnet.AccessManager.Enterprise
+Version:1.0.7770.30380
+project URL:
+Description:Package Description
+licenseUrl:
+license Type:
+
+####################################################################################################
+Package:Lithnet.EventLogMessages
+Version:1.0.0.4
+project URL:https://github.com/lithnet/eventlogmessages
+Description:Provides a generic message resource DLL for event log messages
+licenseUrl:
+license Type:
+
+####################################################################################################
+Package:Lithnet.Security.Authorization
+Version:1.0.7518.2238
+project URL:https://github.com/lithnet/security
+Description:Package Description
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:MahApps.Metro
+Version:2.1.1
+project URL:https://github.com/MahApps/MahApps.Metro
+Description:The goal of MahApps.Metro is to allow devs to quickly and easily cobble together a 'Modern' UI for their WPF apps (>= .Net 4.5), with minimal effort.
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:MahApps.Metro.IconPacks
+Version:4.6.0
+project URL:https://github.com/MahApps/MahApps.Metro.IconPacks
+Description:IconPacks for stylish awesome WPF and UWP applications.
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:MahApps.Metro.SimpleChildWindow
+Version:2.0.0-alpha0043
+project URL:https://github.com/punker76/MahApps.Metro.SimpleChildWindow
+Description:A simple child window for MahApps.Metro (A toolkit for creating Metro / Modern UI styled WPF apps).
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:MartinCostello.SqlLocalDb
+Version:3.0.0
+project URL:https://github.com/martincostello/sqllocaldb
+Description:A .NET assembly providing interop with the SQL LocalDB native API from managed code using .NET APIs.
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Microsoft.AspNetCore.Authentication.Cookies
+Version:2.2.0
+project URL:https://asp.net/
+Description:ASP.NET Core middleware that enables an application to use cookie based authentication.
+
+This package was built from the source code at https://github.com/aspnet/Security/tree/93926543f8469614c2feb23de8a8c0561b8b2463
+licenseUrl:https://raw.githubusercontent.com/aspnet/AspNetCore/2.0.0/LICENSE.txt
+license Type:
+
+####################################################################################################
+Package:Microsoft.AspNetCore.Authentication.JwtBearer
+Version:3.1.6
+project URL:https://asp.net/
+Description:ASP.NET Core middleware that enables an application to receive an OpenID Connect bearer token.
+
+This package was built from the source code at https://github.com/aspnet/AspNetCore/tree/62c098bc170f50feca15916e81cb7f321ffc52ff
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Microsoft.AspNetCore.Authentication.OpenIdConnect
+Version:3.1.6
+project URL:https://asp.net/
+Description:ASP.NET Core middleware that enables an application to support the OpenID Connect authentication workflow.
+
+This package was built from the source code at https://github.com/aspnet/AspNetCore/tree/62c098bc170f50feca15916e81cb7f321ffc52ff
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Microsoft.AspNetCore.Authentication.WsFederation
+Version:3.1.6
+project URL:https://asp.net/
+Description:ASP.NET Core middleware that enables an application to support the WsFederation authentication workflow.
+
+This package was built from the source code at https://github.com/aspnet/AspNetCore/tree/62c098bc170f50feca15916e81cb7f321ffc52ff
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Microsoft.AspNetCore.DataProtection
+Version:3.1.9
+project URL:https://asp.net/
+Description:ASP.NET Core logic to protect and unprotect data, similar to DPAPI.
+
+This package was built from the source code at https://github.com/aspnet/AspNetCore/tree/d12868dd7c10ff0433c16b06d3b59d03c40d987a
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Microsoft.AspNetCore.HttpOverrides
+Version:2.2.0
+project URL:https://asp.net/
+Description:ASP.NET Core basic middleware for supporting HTTP method overrides. Includes:
+* X-Forwarded-* headers to forward headers from a proxy.
+* HTTP method override header.
+
+This package was built from the source code at https://github.com/aspnet/BasicMiddleware/tree/2d3ad1cb0f9872da40c6d143ce4554563971ae04
+licenseUrl:https://raw.githubusercontent.com/aspnet/AspNetCore/2.0.0/LICENSE.txt
+license Type:
+
+####################################################################################################
+Package:Microsoft.Extensions.Caching.Abstractions
+Version:3.1.9
+project URL:https://asp.net/
+Description:Caching abstractions for in-memory cache and distributed cache.
+Commonly used types:
+Microsoft.Extensions.Caching.Distributed.IDistributedCache
+Microsoft.Extensions.Caching.Memory.IMemoryCache
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Microsoft.Extensions.Caching.Memory
+Version:3.1.6
+project URL:https://asp.net/
+Description:In-memory cache implementation of Microsoft.Extensions.Caching.Memory.IMemoryCache.
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Microsoft.Extensions.Configuration.Abstractions
+Version:3.1.6
+project URL:https://asp.net/
+Description:Abstractions of key-value pair based configuration.
+Commonly used types:
+Microsoft.Extensions.Configuration.IConfiguration
+Microsoft.Extensions.Configuration.IConfigurationBuilder
+Microsoft.Extensions.Configuration.IConfigurationProvider
+Microsoft.Extensions.Configuration.IConfigurationRoot
+Microsoft.Extensions.Configuration.IConfigurationSection
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Microsoft.Extensions.DependencyInjection
+Version:3.1.9
+project URL:https://asp.net/
+Description:Default implementation of dependency injection for Microsoft.Extensions.DependencyInjection.
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Microsoft.Extensions.FileProviders.Embedded
+Version:3.1.8
+project URL:https://asp.net/
+Description:File provider for files in embedded resources for Microsoft.Extensions.FileProviders.
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Microsoft.Extensions.Hosting
+Version:3.1.6
+project URL:https://asp.net/
+Description:.NET Core hosting and startup infrastructures for applications.
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Microsoft.Extensions.Hosting.Abstractions
+Version:3.1.6
+project URL:https://asp.net/
+Description:.NET Core hosting and startup abstractions for applications.
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Microsoft.Extensions.Hosting.WindowsServices
+Version:3.1.6
+project URL:https://asp.net/
+Description:.NET hosting infrastructure for Windows Services.
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Microsoft.Extensions.Logging
+Version:3.1.9
+project URL:https://asp.net/
+Description:Logging infrastructure default implementation for Microsoft.Extensions.Logging.
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Microsoft.Extensions.Logging.Abstractions
+Version:3.1.9
+project URL:https://asp.net/
+Description:Logging abstractions for Microsoft.Extensions.Logging.
+Commonly used types:
+Microsoft.Extensions.Logging.ILogger
+Microsoft.Extensions.Logging.ILoggerFactory
+Microsoft.Extensions.Logging.ILogger<TCategoryName>
+Microsoft.Extensions.Logging.LogLevel
+Microsoft.Extensions.Logging.Logger<T>
+Microsoft.Extensions.Logging.LoggerMessage
+Microsoft.Extensions.Logging.Abstractions.NullLogger
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Microsoft.Extensions.Logging.Debug
+Version:3.1.6
+project URL:https://asp.net/
+Description:Debug output logger provider implementation for Microsoft.Extensions.Logging. This logger logs messages to a debugger monitor by writing messages with System.Diagnostics.Debug.WriteLine().
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Microsoft.Extensions.Logging.EventLog
+Version:3.1.6
+project URL:https://asp.net/
+Description:Windows Event Log logger provider implementation for Microsoft.Extensions.Logging.
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Microsoft.IdentityModel.Protocols.OpenIdConnect
+Version:6.7.1
+project URL:https://github.com/AzureAD/azure-activedirectory-identitymodel-extensions-for-dotnet
+Description:Includes types that provide support for OpenIdConnect protocol.
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:Microsoft.NET.Test.Sdk
+Version:16.6.1
+project URL:https://github.com/microsoft/vstest/
+Description:The MSbuild targets and properties for building .NET test projects.
+licenseUrl:http://www.microsoft.com/web/webpi/eula/net_library_eula_enu.htm
+license Type:MS-EULA
+
+####################################################################################################
+Package:Microsoft.PowerShell.5.ReferenceAssemblies
+Version:1.1.0
+project URL:https://msdn.microsoft.com/en-us/mt173057.aspx
+Description:Contains the SDK reference assemblies for PowerShell version 5
+licenseUrl:https://github.com/PowerShell/PowerShell-Tests/blob/master/LICENSE
+license Type:
+
+####################################################################################################
+Package:Microsoft.PowerShell.SDK
+Version:7.0.3
+project URL:https://github.com/PowerShell/PowerShell
+Description:Runtime for hosting PowerShell
+licenseUrl:https://github.com/PowerShell/PowerShell/blob/master/LICENSE.txt
+license Type:
+
+####################################################################################################
+Package:Microsoft.Win32.Registry
+Version:4.7.0
+project URL:https://github.com/dotnet/corefx
+Description:Provides support for accessing and modifying the Windows Registry.
+
+Commonly Used Types:
+Microsoft.Win32.RegistryKey
+Microsoft.Win32.Registry
+Microsoft.Win32.RegistryValueKind
+Microsoft.Win32.RegistryHive
+Microsoft.Win32.RegistryView
+ 
+When using NuGet 3.x this package requires at least version 3.4.
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:Moq
+Version:4.14.5
+project URL:https://github.com/moq/moq4
+Description:Moq is the most popular and friendly mocking framework for .NET.
+licenseUrl:https://raw.githubusercontent.com/moq/moq4/master/License.txt
+license Type:
+
+####################################################################################################
+Package:Newtonsoft.Json
+Version:12.0.3
+project URL:https://www.newtonsoft.com/json
+Description:Json.NET is a popular high-performance JSON framework for .NET
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:NLog
+Version:4.7.5
+project URL:https://nlog-project.org/
+Description:NLog is a logging platform for .NET with rich log routing and management capabilities.
+NLog supports traditional logging, structured logging and the combination of both.
+
+Supported platforms:
+
+- .NET Framework 3.5, 4, 4.5, 4.6, 4.7 & 4.8
+- .NET Core 1, 2 and 3
+- .NET Standard 1.3+ and 2.0+;
+- .NET Framework 4 client profile
+- Xamarin Android, Xamarin iOs
+- UWP
+- Windows Phone 8
+- Silverlight 4 and 5
+- Mono 4
+
+For ASP.NET Core, check: https://www.nuget.org/packages/NLog.Web.AspNetCore
+licenseUrl:https://github.com/NLog/NLog/blob/master/LICENSE.txt
+license Type:
+
+####################################################################################################
+Package:NLog.Extensions.Logging
+Version:1.6.5
+project URL:https://github.com/NLog/NLog.Extensions.Logging
+Description:NLog LoggerProvider for Microsoft.Extensions.Logging for logging in .NET Standard libraries and .NET Core applications.
+
+For ASP.NET Core, use NLog.Web.AspNetCore: https://www.nuget.org/packages/NLog.Web.AspNetCore
+licenseUrl:https://github.com/NLog/NLog.Extensions.Logging/blob/master/LICENSE
+license Type:
+
+####################################################################################################
+Package:NLog.Web.AspNetCore
+Version:4.9.2
+project URL:https://github.com/NLog/NLog.Web
+Description:NLog LoggerProvider for Microsoft.Extensions.Logging and ASP.NET Core platform. Adds helpers and layout renderers for websites and web applications.
+
+Supported platforms:
+
+- For ASP.NET Core 3, .NET Core 3.0
+- For ASP.NET Core 2, .NET Standard 2.0+ and .NET 4.6+
+- For ASP.NET Core 1, .NET Standard 1.5+ and .NET 4.5.x
+licenseUrl:https://github.com/NLog/NLog.Web/blob/master/LICENSE
+license Type:
+
+####################################################################################################
+Package:NUnit
+Version:3.12.0
+project URL:https://nunit.org/
+Description:NUnit features a fluent assert syntax, parameterized, generic and theory tests and is user-extensible.
+
+This package includes the NUnit 3 framework assembly, which is referenced by your tests. You will need to install version 3 of the nunit3-console program or a third-party runner that supports NUnit 3 in order to execute tests. Runners intended for use with NUnit 2.x will not run NUnit 3 tests correctly.
+
+Supported platforms:
+- .NET Framework 3.5+
+- .NET Standard 1.4+
+- .NET Core
+licenseUrl:https://www.nuget.org/packages/NUnit/3.12.0/License
+license Type:LICENSE.txt
+
+####################################################################################################
+Package:NUnit3TestAdapter
+Version:3.17.0
+project URL:https://github.com/nunit/docs/wiki/Visual-Studio-Test-Adapter
+Description:The NUnit3 TestAdapter for Visual Studio, all versions from 2012 and onwards, and DotNet (incl. .Net core).
+
+          Note that this package ONLY contains the adapter, not the NUnit framework.
+          For VS 2017 and forward, you should add this package to every test project in your solution. (Earlier versions only require a single adapter package per solution.)
+
+          Note that with this package you should not install the VSIX adapter package.
+licenseUrl:https://www.nuget.org/packages/NUnit3TestAdapter/3.17.0/License
+license Type:LICENSE.txt
+
+####################################################################################################
+Package:PropertyChanged.Fody
+Version:3.2.8
+project URL:https://github.com/Fody/PropertyChanged
+Description:Add property notification to all classes that implement INotifyPropertyChanged.
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:Quartz
+Version:3.2.3
+project URL:https://www.quartz-scheduler.net/
+Description:Quartz Scheduling Framework for .NET
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Quartz.Extensions.DependencyInjection
+Version:3.2.3
+project URL:https://www.quartz-scheduler.net/
+Description:Quartz.NET Microsoft.Extensions.DependencyInjection integration; Quartz Scheduling Framework for .NET
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Quartz.Extensions.Hosting
+Version:3.2.3
+project URL:https://www.quartz-scheduler.net/
+Description:Quartz.NET Generic Host integration; Quartz Scheduling Framework for .NET
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:Quartz.Serialization.Json
+Version:3.2.3
+project URL:https://www.quartz-scheduler.net/
+Description:Quartz.NET JSON Serialization Support; Quartz Scheduling Framework for .NET
+licenseUrl:https://licenses.nuget.org/Apache-2.0
+license Type:Apache-2.0
+
+####################################################################################################
+Package:SslCertBinding.Net
+Version:1.0.7486
+project URL:
+Description:Package Description
+licenseUrl:
+license Type: MIT
+
+####################################################################################################
+Package:Stylet
+Version:1.3.4
+project URL:http://github.com/canton7/Stylet
+Description:A very lightweight but powerful ViewModel-First MVVM framework for WPF, inspired by Caliburn.Micro.
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:System.DirectoryServices
+Version:4.7.0
+project URL:https://github.com/dotnet/corefx
+Description:Provides easy access to Active Directory Domain Services.
+
+Commonly Used Types:
+System.DirectoryServices.DirectoryEntry
+System.DirectoryServices.DirectorySearcher
+System.DirectoryServices.ActiveDirectory.ActiveDirectorySite
+System.DirectoryServices.ActiveDirectory.ApplicationPartition
+System.DirectoryServices.ActiveDirectory.DirectoryContext
+System.DirectoryServices.ActiveDirectory.DirectoryServer
+System.DirectoryServices.ActiveDirectory.Domain
+System.DirectoryServices.ActiveDirectory.DomainController
+ 
+When using NuGet 3.x this package requires at least version 3.4.
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:System.DirectoryServices.AccountManagement
+Version:4.7.0
+project URL:https://github.com/dotnet/corefx
+Description:Provides uniform access and manipulation of user, computer, and group security principals across the multiple principal stores: Active Directory Domain Services (AD DS), Active Directory Lightweight Directory Services (AD LDS), and Machine SAM (MSAM). 
+When using NuGet 3.x this package requires at least version 3.4.
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:System.DirectoryServices.Protocols
+Version:4.7.0
+project URL:https://github.com/dotnet/corefx
+Description:Provides the methods defined in the Lightweight Directory Access Protocol (LDAP) version 3 (V3) and Directory Services Markup Language (DSML) version 2.0 (V2) standards. 
+When using NuGet 3.x this package requires at least version 3.4.
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:System.IO.FileSystem.AccessControl
+Version:4.7.0
+project URL:https://github.com/dotnet/corefx
+Description:Provides types for managing access and audit control lists for files and directories.
+
+Commonly Used Types:
+System.Security.AccessControl.DirectoryObjectSecurity
+System.Security.AccessControl.DirectorySecurity
+System.Security.AccessControl.FileSecurity
+System.Security.AccessControl.FileSystemAccessRule
+System.Security.AccessControl.FileSystemAuditRule
+System.Security.AccessControl.FileSystemRights
+System.Security.AccessControl.FileSystemSecurity
+ 
+When using NuGet 3.x this package requires at least version 3.4.
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:System.Security.Cryptography.Cng
+Version:4.7.0
+project URL:https://github.com/dotnet/corefx
+Description:Provides cryptographic algorithm implementations and key management with Windows Cryptographic Next Generation API (CNG).
+
+Commonly Used Types:
+System.Security.Cryptography.RSACng
+System.Security.Cryptography.ECDsaCng
+System.Security.Cryptography.CngKey
+ 
+When using NuGet 3.x this package requires at least version 3.4.
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:System.Security.Cryptography.ProtectedData
+Version:4.7.0
+project URL:https://github.com/dotnet/corefx
+Description:Provides access to Windows Data Protection Api.
+
+Commonly Used Types:
+System.Security.Cryptography.DataProtectionScope
+System.Security.Cryptography.ProtectedData
+ 
+When using NuGet 3.x this package requires at least version 3.4.
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:System.ServiceProcess.ServiceController
+Version:4.7.0
+project URL:https://github.com/dotnet/corefx
+Description:Provides the System.ServiceProcess.ServiceContainer class, which allows you to connect to a running or stopped service, manipulate it, or get information about it.
+
+Commonly Used Types:
+System.ServiceProcess.ServiceController
+System.ServiceProcess.ServiceControllerStatus
+System.ServiceProcess.ServiceType
+ 
+When using NuGet 3.x this package requires at least version 3.4.
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:Vanara.PInvoke.Cryptography
+Version:3.2.20
+project URL:https://github.com/dahall/vanara
+Description:PInvoke API (methods, structures and constants) imported from Windows crypt32.dll, bcrypt.dll, ncrypt.dll, tokenbinding.dll, cryptnet.dll, cryptdlg.dll and cryptui.dll.
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:Vanara.PInvoke.NetApi32
+Version:3.2.16
+project URL:https://github.com/dahall/vanara
+Description:PInvoke API (methods, structures and constants) imported from Windows NetApi32.dll.
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:Vanara.PInvoke.Security
+Version:3.2.17
+project URL:https://github.com/dahall/vanara
+Description:PInvoke API (methods, structures and constants) imported from Windows AdvApi32.dll, Authz.dll and Secur32.dll.
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:Vanara.Security
+Version:3.3.0
+project URL:https://github.com/dahall/vanara
+Description:Classes for security related items derived from the Vanara PInvoke libraries. Includes extension methods for Active Directory and access control classes, methods for working with accounts, UAC, privileges, system access, impersonation and SIDs, and a full LSA wrapper.
+licenseUrl:https://licenses.nuget.org/MIT
+license Type:MIT
+
+####################################################################################################
+Package:WindowsFirewallHelper
+Version:1.6.3.40
+project URL:https://github.com/falahati/WindowsFirewallHelper
+Description:A class library to manage the Windows Firewall as well as adding your program to the Windows Firewall Exception list. Supporting Windows XP+.
+licenseUrl:https://github.com/falahati/WindowsFirewallHelper/blob/master/LICENSE
+license Type: MIT
+

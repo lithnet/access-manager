@@ -241,7 +241,18 @@ namespace Lithnet.AccessManager.Server.UI
 
         public void About()
         {
+            ExternalDialogWindow w = new ExternalDialogWindow
+            {
+                Title = "About",
+                SaveButtonIsDefault = false,
+                SaveButtonVisible = false,
+                CancelButtonName = "Close"
+            };
 
+
+            var vm = new AboutViewModel();
+            w.DataContext = vm;
+            w.ShowDialog();
         }
 
         public override async Task<bool> CanCloseAsync()

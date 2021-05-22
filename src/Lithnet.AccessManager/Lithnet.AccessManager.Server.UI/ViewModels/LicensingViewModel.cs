@@ -190,7 +190,20 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task ApplyNewLicense()
         {
-            string data = await this.dialogCoordinator.ShowInputAsync(this, "Enter license data", "Paste the license data received from Lithnet in the text box below");
+            LicenseKeyViewModel vm = new LicenseKeyViewModel();
+            ExternalDialogWindow window = new ExternalDialogWindow
+            {
+                DataContext = vm,
+                Height = 600,
+                SaveButtonName = "OK"
+            };
+
+            if (window.ShowDialog() == false)
+            {
+                return;
+            }
+
+            string data = vm.LicenseKeyData;
 
             if (string.IsNullOrWhiteSpace(data))
             {
@@ -199,7 +212,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             try
             {
-                data = data.Trim().Replace("\r", "").Replace("\n", "");
+                data = data.Trim().Replace("\r", "").Replace("\n", "").Replace(" ", "").Replace("\t", "");
 
                 var validationResult = this.licenseManager.ValidateLicense(data);
 

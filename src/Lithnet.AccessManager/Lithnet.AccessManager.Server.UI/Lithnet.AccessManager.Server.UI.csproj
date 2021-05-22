@@ -36,6 +36,7 @@
     <None Remove="ScriptTemplates\UpdateAdSchema.ps1" />
     <None Remove="ScriptTemplates\WriteAuditLog.ps1" />
     <None Remove="splash-screen.png" />
+    <None Remove="ThirdPartyNotices.rtf" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,6 +55,7 @@
     <EmbeddedResource Include="ScriptTemplates\PublishLithnetAccessManagerCertificate.ps1" />
     <EmbeddedResource Include="ScriptTemplates\UpdateAdSchema.ps1" />
     <EmbeddedResource Include="ScriptTemplates\WriteAuditLog.ps1" />
+    <EmbeddedResource Include="EmbeddedResources\ThirdPartyNotices.rtf" />
   </ItemGroup>
 
   <ItemGroup>
@@ -81,7 +83,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="access-manager.png" />
+    <Resource Include="access-manager.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -129,6 +131,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="UIComponents\EnterpriseEditionBadge.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\LicenseKeyView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\HighAvailabilityView.xaml">
@@ -184,6 +190,9 @@
     </Page>
     <Page Update="Views\SelectTargetTypeView.xaml">
       <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\AboutView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
     <Page Update="Windows\ImportWizardWindowView.xaml">
       <SubType>Designer</SubType>

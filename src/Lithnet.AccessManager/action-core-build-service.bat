@@ -9,18 +9,18 @@ SET powerShellProject=%solutiondir%\Lithnet.AccessManager.PowerShell\Lithnet.Acc
 SET setupProject=%solutiondir%\Lithnet.AccessManager.Service.Setup\Lithnet.AccessManager.Service.Setup.aip
 
 ECHO [92mClearing output directory "%outputdirservice%"[0m
-IF EXIST "%outputdirservice%" rd /s /q "%outputdirservice%" || exit /b %errorlevel%
+IF EXIST "%outputdirservice%" powershell -Command "& Remove-Item '%outputdirservice%\*' -recurse -force" || exit /b %errorlevel%
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 ECHO [92mClearing output directory "%outputdirps%"[0m
-IF EXIST "%outputdirps%" rd /s /q "%outputdirps%" || exit /b %errorlevel%
+IF EXIST "%outputdirps%" powershell -Command "& Remove-Item '%outputdirps%\*' -recurse -force" || exit /b %errorlevel%
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 ECHO [92mCreating output directory "%outputdirservice%"[0m
-md %outputdirservice% || exit /b %errorlevel%
+IF NOT EXIST "%outputdirservice%" md %outputdirservice% || exit /b %errorlevel%
 
 ECHO [92mCreating output directory "%outputdirps%"[0m
-md %outputdirps% || exit /b %errorlevel%
+IF NOT EXIST "%outputdirps%" md %outputdirps% || exit /b %errorlevel%
 
 
 

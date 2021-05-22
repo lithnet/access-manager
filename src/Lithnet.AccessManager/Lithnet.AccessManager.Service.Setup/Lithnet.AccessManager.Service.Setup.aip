@@ -18,10 +18,10 @@
     <ROW Property="IAgree" Value="No" Type="4" MsiKey="IAgree"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{699F22CE-1EA1-4301-9924-7B70E22C3D8D} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{0C16DADE-F411-4139-A587-D45ABD922081} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7888.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7920.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
@@ -1002,7 +1002,6 @@
     <ROW File="Vanara.PInvoke.Security.dll_1" Component_="Vanara.PInvoke.Security.dll_1" FileName="VANARA~5.DLL|Vanara.PInvoke.Security.dll" Attributes="0" SourcePath="output-ps\Vanara.PInvoke.Security.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.Shared.dll_1" Component_="Vanara.PInvoke.Shared.dll_1" FileName="VANARA~6.DLL|Vanara.PInvoke.Shared.dll" Attributes="0" SourcePath="output-ps\Vanara.PInvoke.Shared.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.Ws2_32.dll_1" Component_="Vanara.PInvoke.Ws2_32.dll_1" FileName="VANARA~7.DLL|Vanara.PInvoke.Ws2_32.dll" Attributes="0" SourcePath="output-ps\Vanara.PInvoke.Ws2_32.dll" SelfReg="false"/>
-    <ROW File="license.dat" Component_="Lithnet.AccessManager.Server.UI.deps.json" FileName="license.dat" Attributes="0" SourcePath="output\license.dat" SelfReg="false"/>
     <ROW File="LithnetAccessManager.psd1" Component_="LithnetAccessManger.psd1" FileName="LITHNE~2.PSD|LithnetAccessManager.psd1" Attributes="0" SourcePath="output-ps\LithnetAccessManager.psd1" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.dll_1" Component_="Lithnet.AccessManager.dll_1" FileName="LITHNE~1.DLL|Lithnet.AccessManager.dll" Attributes="0" SourcePath="output-ps\Lithnet.AccessManager.dll" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.pdb_1" Component_="Lithnet.AccessManager.dll_1" FileName="LITHNE~1.PDB|Lithnet.AccessManager.pdb" Attributes="0" SourcePath="output-ps\Lithnet.AccessManager.pdb" SelfReg="false"/>
@@ -1050,7 +1049,7 @@
     <ROW Path="&lt;AI_DICTS&gt;ui_en.ail"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DigCertStoreComponent">
-    <ROW TimeStampUrl="http://timestamp.digicert.com" SignerDescription="[|ProductName]" SignOptions="7" SignTool="0" UseSha256="1" Thumbprint="963b96e04c888e01267f46abbd2134c9eae9717b Subject: Lithnet&#10;Issuer: DigiCert SHA2 Assured ID Code Signing CA&#10;Valid from 10/26/2020 to 01/23/2024&#10;User\MY" Subject="CN=Lithnet, O=Lithnet, L=Chadstone, S=Victoria, C=AU"/>
+    <ROW TimeStampUrl="http://timestamp.digicert.com" SignerDescription="[|ProductName]" SignOptions="7" SignTool="0" UseSha256="1" Thumbprint="479022a1e03466ca9e836acf38a540e0fd6ebeb5 Subject: Lithnet&#10;Issuer: DigiCert EV Code Signing CA (SHA2)&#10;Valid from 07/18/2019 to 07/22/2022&#10;User\MY" Subject="CN=Lithnet, O=Lithnet, L=Chadstone, S=VIC, C=AU, SERIALNUMBER=DOC:20160919, OID.2.5.4.15=Business Entity, OID.1.3.6.1.4.1.311.60.2.1.3=AU"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.FragmentComponent">
     <ROW Fragment="CommonUI.aip" Path="&lt;AI_FRAGS&gt;CommonUI.aip"/>

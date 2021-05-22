@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		action-new-version.bat = action-new-version.bat
 		build-agent.bat = build-agent.bat
 		build-all-beta.bat = build-all-beta.bat
+		build-all-ev.bat = build-all-ev.bat
 		build-all.bat = build-all.bat
 		build-service-beta.bat = build-service-beta.bat
 		build-service.bat = build-service.bat
@@ -36,7 +37,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager.Agent
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager.PowerShell", "Lithnet.AccessManager.PowerShell\Lithnet.AccessManager.PowerShell.csproj", "{C8E94E87-F4BC-4623-A72D-7DF376A2DAEC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lithnet.AccessManager.PowerShell.Test", "Lithnet.AccessManager.PowerShell.Test\Lithnet.AccessManager.PowerShell.Test.csproj", "{22F8D82B-84B7-4D44-83AC-33BCB3B6EEBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager.PowerShell.Test", "Lithnet.AccessManager.PowerShell.Test\Lithnet.AccessManager.PowerShell.Test.csproj", "{22F8D82B-84B7-4D44-83AC-33BCB3B6EEBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

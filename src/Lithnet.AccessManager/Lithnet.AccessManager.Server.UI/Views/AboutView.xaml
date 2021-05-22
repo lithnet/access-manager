@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.AboutView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             dialog:DialogParticipation.Register="{Binding}"
+             mc:Ignorable="d" d:DesignWidth="800"
+             Margin="5">
+    <StackPanel>
+        <Image Source="/access-manager.png" Height="50" HorizontalAlignment="Left"/>
+
+        <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
+               Content="About" />
+
+        <TextBlock Margin="5">Lithnet Access Manager (c) 2021 Lithnet Pty Ltd</TextBlock>
+
+        <TextBlock Margin="5" Text="{Binding CurrentVersion, FallbackValue='1.0.0.0'}" />
+     
+
+        <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
+               Content="Third party notices" />
+        <local:BindableRichTextBox FlowDocument="{Binding ThirdPartyNotices}" IsReadOnly="True" Height="200" VerticalScrollBarVisibility="Visible"></local:BindableRichTextBox>
+
+    </StackPanel>
+
+</UserControl>
