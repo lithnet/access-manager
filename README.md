@@ -52,16 +52,17 @@ The webhook functionality makes it really easy to get alerts via Slack or Micros
 ![](https://github.com/lithnet/access-manager/wiki/images/auditing-example-slack.png)
 
 ### Modern authentication options
-The web app supports traditional integrated windows authentication, as well as external authentication providers such as [ADFS](https://github.com/lithnet/access-manager/wiki/Setting-up-authentication-with-ADFS) or 3rd party OpenID Connect providers such as [Azure AD](https://github.com/lithnet/access-manager/wiki/Setting-up-authentication-with-Azure-AD) and [Okta](https://github.com/lithnet/access-manager/wiki/Setting-up-authentication-with-Okta). Using an external authentication provider allows you the option of providing additional protections for the application such as multi-factor authentication.
+The web app supports traditional integrated windows authentication, smart card authentication, as well as external authentication providers such as [ADFS](https://github.com/lithnet/access-manager/wiki/Setting-up-authentication-with-ADFS) or 3rd party OpenID Connect providers such as [Azure AD](https://github.com/lithnet/access-manager/wiki/Setting-up-authentication-with-Azure-AD) and [Okta](https://github.com/lithnet/access-manager/wiki/Setting-up-authentication-with-Okta). Using an external authentication provider allows you the option of providing additional protections for the application such as multi-factor authentication.
 
 ## Editions
-Access Manager comes in two editions. Standard edition is free for all organizations to use. It provides the core capability to defend against ransomware attacks, and comes with community support. Enterprise edition is our paid offering that includes additional features such as high availability, and comes with priority support. See our [comparison guide](https://github.com/lithnet/access-manager/wiki/Access-Manager-Editions) for more details.
+Access Manager comes in two editions. Standard edition is free for all organizations to use. It provides the core capability to defend against ransomware attacks, and support is provided by the GitHub Access Manager community. Enterprise edition is our paid offering that includes additional features such as high availability, advanced authorization scripting, and comes with full support by Lithnet. See our [comparison guide](https://github.com/lithnet/access-manager/wiki/Access-Manager-Editions) for more details.
+
+To get a free enterprise edition trial license, or to enquire about Enterprise edition pricing, please email support@lithnet.io.
 
 ## Guides
 *   [Getting started](https://github.com/lithnet/access-manager/wiki/Getting-Started)
 
 ## Download the app
-Access Manager is currently in release candidate phase. The final release is due in March/April 2021.
 Download the [current release](https://github.com/lithnet/access-manager/releases/latest)
 
 ## Help and support
