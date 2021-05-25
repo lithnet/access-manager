@@ -303,6 +303,7 @@ namespace Lithnet.AccessManager.Server.Workers
             };
 
             d.PropertiesToLoad.Add("cn");
+            d.PropertiesToLoad.Add("samAccountName");
             d.PropertiesToLoad.Add("msDS-PrincipalName");
 
             SearchResultCollection result = d.FindAll();
@@ -329,7 +330,9 @@ namespace Lithnet.AccessManager.Server.Workers
                     continue;
                 }
 
-                var name = this.groupResolver.BuildGroupName(template, null, cn);
+                string samAccountName = result.GetPropertyString("samAccountName").TrimEnd('$');
+                
+                var name = this.groupResolver.BuildGroupName(template, null, samAccountName);
                 yield return name.TrimStart('\\');
             }
         }

@@ -205,11 +205,29 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The computer name contains unsupported characters.
+        /// </summary>
+        public static string ComputerNameInvalid {
+            get {
+                return ResourceManager.GetString("ComputerNameInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Computer name is required.
         /// </summary>
         public static string ComputerNameIsRequired {
             get {
                 return ResourceManager.GetString("ComputerNameIsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The computer name is too long.
+        /// </summary>
+        public static string ComputerNameIsTooLong {
+            get {
+                return ResourceManager.GetString("ComputerNameIsTooLong", resourceCulture);
             }
         }
         

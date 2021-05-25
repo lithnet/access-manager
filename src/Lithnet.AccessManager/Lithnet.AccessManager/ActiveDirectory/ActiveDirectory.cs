@@ -457,7 +457,8 @@ namespace Lithnet.AccessManager
                 }
                 else
                 {
-                    string dn = GcGetDnFromAttributeSearch("samAccountName", objectName, "computer");
+                    string dn = GcGetDnFromAttributeSearch("samAccountName", objectName, "computer") ??
+                                GcGetDnFromAttributeSearch("cn", objectName.TrimEnd('$'), "computer");
 
                     if (dn == null)
                     {

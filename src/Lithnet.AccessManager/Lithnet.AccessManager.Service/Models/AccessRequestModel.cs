@@ -9,6 +9,8 @@ namespace Lithnet.AccessManager.Service.Models
     public class AccessRequestModel
     {
         [Required(ErrorMessageResourceType = typeof(UIMessages), ErrorMessageResourceName = "ComputerNameIsRequired")]
+        [MaxLength(256, ErrorMessageResourceType = typeof(UIMessages), ErrorMessageResourceName = "ComputerNameIsTooLong")]
+        [RegularExpression(@"[A-Za-z0-9\.\-\\$]+", ErrorMessageResourceType = typeof(UIMessages), ErrorMessageResourceName = "ComputerNameInvalid")]
         public string ComputerName { get; set; }
 
         [MaxLength(4096, ErrorMessageResourceType = typeof(UIMessages), ErrorMessageResourceName = "ReasonTooLong")]

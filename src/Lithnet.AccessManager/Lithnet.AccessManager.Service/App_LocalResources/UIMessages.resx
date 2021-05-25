@@ -267,4 +267,10 @@
   <data name="AccessMaskNone" xml:space="preserve">
     <value>None</value>
   </data>
+  <data name="ComputerNameInvalid" xml:space="preserve">
+    <value>The computer name contains unsupported characters</value>
+  </data>
+  <data name="ComputerNameIsTooLong" xml:space="preserve">
+    <value>The computer name is too long</value>
+  </data>
 </root>

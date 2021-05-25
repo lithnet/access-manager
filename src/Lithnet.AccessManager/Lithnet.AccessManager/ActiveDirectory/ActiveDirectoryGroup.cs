@@ -134,7 +134,7 @@ namespace Lithnet.AccessManager
 
                 string dn = match.Groups["dn"].Value;
                 string ttl = match.Groups["ttl"].Value;
-                string sidDn = $"CN={user.Sid},";
+                string sidDn = $"<SID={user.Sid}>";
 
                 if (string.Equals(user.DistinguishedName, dn, StringComparison.CurrentCultureIgnoreCase) ||
                     dn.StartsWith(sidDn, StringComparison.OrdinalIgnoreCase))

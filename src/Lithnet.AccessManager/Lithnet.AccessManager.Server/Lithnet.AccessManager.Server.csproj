@@ -20,6 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Fulfillment\**" />
+    <EmbeddedResource Remove="Fulfillment\**" />
+    <None Remove="Fulfillment\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="DBScripts\00001-CreateRateLimitCacheTable.sql" />
     <None Remove="DBScripts\00003-CreateAuditTable.sql" />
     <None Remove="DBScripts\ExternalSqlCreation\CreateNewDatabase.sql" />
@@ -97,10 +103,6 @@
       <LastGenOutput>LogMessages.Designer.cs</LastGenOutput>
       <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Fulfillment\Interfaces\" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
