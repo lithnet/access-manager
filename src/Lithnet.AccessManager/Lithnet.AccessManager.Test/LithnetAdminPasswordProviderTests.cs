@@ -46,7 +46,7 @@ namespace Lithnet.AccessManager.Test
             DateTime created = DateTime.UtcNow.Trim(TimeSpan.TicksPerSecond);
             DateTime expired = DateTime.UtcNow.AddDays(-5).Trim(TimeSpan.TicksPerSecond);
 
-            string password = "this is my data";
+            string password = "abcd1234";
 
             this.provider.UpdateCurrentPassword(computer, password, created, expired, 0, MsMcsAdmPwdBehaviour.Ignore);
 
@@ -59,9 +59,9 @@ namespace Lithnet.AccessManager.Test
             CollectionAssert.IsEmpty(history);
         }
 
-        [TestCase(C.DEV_PC1)]
-        [TestCase(C.SUBDEV_PC1)]
-        [TestCase(C.EXTDEV_PC1)]
+        [TestCase(C.DEV_PC2)]
+        [TestCase(C.SUBDEV_PC2)]
+        [TestCase(C.EXTDEV_PC2)]
         public void AddToPasswordHistory(string computerName)
         {
             IComputer computer = directory.GetComputer(computerName);
@@ -71,7 +71,7 @@ namespace Lithnet.AccessManager.Test
 
             DateTime firstCreated = DateTime.UtcNow.Trim(TimeSpan.TicksPerSecond);
             DateTime firstExpiry = DateTime.UtcNow.AddDays(-3).Trim(TimeSpan.TicksPerSecond);
-            string firstPassword = "first password";
+            string firstPassword = "P@fdsf234sdgfsd";
 
             provider.UpdateCurrentPassword(computer, firstPassword, firstCreated, firstExpiry, 0, MsMcsAdmPwdBehaviour.Ignore);
             IReadOnlyList<ProtectedPasswordHistoryItem> history = provider.GetPasswordHistory(computer);
@@ -88,7 +88,7 @@ namespace Lithnet.AccessManager.Test
 
             DateTime secondCreated = DateTime.UtcNow.AddDays(2).Trim(TimeSpan.TicksPerSecond);
             DateTime secondExpiry = DateTime.UtcNow.AddDays(-5).Trim(TimeSpan.TicksPerSecond);
-            string secondPassword = "second password";
+            string secondPassword = "jmklofdsafio324534S2@";
 
             provider.UpdateCurrentPassword(computer, secondPassword, secondCreated, secondExpiry, 30, MsMcsAdmPwdBehaviour.Ignore);
 

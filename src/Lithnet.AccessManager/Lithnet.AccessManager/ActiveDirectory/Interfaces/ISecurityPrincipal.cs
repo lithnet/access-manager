@@ -9,5 +9,7 @@ namespace Lithnet.AccessManager
         SecurityIdentifier Sid { get; }
 
         string MsDsPrincipalName { get; }
+
+        string Type { get; }
     }
 }

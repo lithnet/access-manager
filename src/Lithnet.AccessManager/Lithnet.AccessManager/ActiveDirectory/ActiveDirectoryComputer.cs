@@ -50,5 +50,7 @@ namespace Lithnet.AccessManager
         }
 
         public DirectoryEntry DirectoryEntry => this.de;
+
+        public string Type => "Computer";
     }
 }

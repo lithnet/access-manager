@@ -36,5 +36,7 @@ namespace Lithnet.AccessManager
         public string GivenName => this.de.GetPropertyString("givenName");
 
         public string Surname => this.de.GetPropertyString("sn");
+
+        public string Type => "GroupManagedServiceAccount";
     }
 }

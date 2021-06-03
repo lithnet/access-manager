@@ -82,7 +82,32 @@ namespace Lithnet.AccessManager
                 X500DistinguishedName x1 = new X500DistinguishedName(dn1);
                 X500DistinguishedName x2 = new X500DistinguishedName(dn2);
 
-                return (string.Equals(x1.Decode(X500DistinguishedNameFlags.UseUTF8Encoding), x2.Decode(X500DistinguishedNameFlags.UseUTF8Encoding), StringComparison.InvariantCultureIgnoreCase));
+                return x1.IsDnMatch(x2);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool IsDnMatch(this X500DistinguishedName dn1, string dn2)
+        {
+            try
+            {
+                X500DistinguishedName x2 = new X500DistinguishedName(dn2);
+                return dn1.IsDnMatch(x2);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool IsDnMatch(this X500DistinguishedName dn1, X500DistinguishedName dn2)
+        {
+            try
+            {
+                return (string.Equals(dn1.Decode(X500DistinguishedNameFlags.UseUTF8Encoding), dn2.Decode(X500DistinguishedNameFlags.UseUTF8Encoding), StringComparison.InvariantCultureIgnoreCase));
             }
             catch
             {

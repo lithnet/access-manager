@@ -42,6 +42,8 @@ namespace Lithnet.AccessManager
 
         public string MsDsPrincipalName => this.de.GetPropertyString("msDS-PrincipalName");
 
+        public string Type => "Group";
+
         public SecurityIdentifier Sid => this.de.GetPropertySid("objectSid");
 
         public string SamAccountName => this.de.GetPropertyString("samAccountName");
