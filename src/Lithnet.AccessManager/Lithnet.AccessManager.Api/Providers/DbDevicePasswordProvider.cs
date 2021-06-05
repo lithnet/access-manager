@@ -39,14 +39,15 @@ namespace Lithnet.AccessManager.Api.Providers
 
                 await reader.ReadAsync();
                 DbPasswordData data = new DbPasswordData(reader);
-                return data.EffectiveDate.AddDays(this.passwordPolicy.Value.MaximumPasswordAgeDays) < DateTime.UtcNow;
+                return (data.EffectiveDate.AddDays(this.passwordPolicy.Value.MaximumPasswordAgeDays) < DateTime.UtcNow ||
+                        data.ExpiryDate > DateTime.UtcNow);
 
             }
             catch (SqlException ex)
             {
                 if (ex.Number == 50000)
                 {
-                    throw new ObjectNotFoundException($"The device {deviceId} was not found");
+                    throw new DeviceNotFoundException($"The device {deviceId} was not found");
                 }
 
                 throw;
@@ -68,6 +69,7 @@ namespace Lithnet.AccessManager.Api.Providers
                 command.Parameters.AddWithValue("@RequestId", requestId);
                 command.Parameters.AddWithValue("@AccountName", request.AccountName);
                 command.Parameters.AddWithValue("@EffectiveDate", DateTime.UtcNow);
+                command.Parameters.AddWithValue("@ExpiryDate", DateTime.UtcNow.AddDays(passwordPolicy.Value.MaximumPasswordAgeDays));
 
                 await command.ExecuteNonQueryAsync();
 
@@ -79,7 +81,7 @@ namespace Lithnet.AccessManager.Api.Providers
             {
                 if (ex.Number == 50000)
                 {
-                    throw new ObjectNotFoundException($"The device {deviceId} was not found");
+                    throw new DeviceNotFoundException($"The device {deviceId} was not found");
                 }
 
                 throw;
@@ -127,7 +129,7 @@ namespace Lithnet.AccessManager.Api.Providers
             {
                 if (ex.Number == 50000)
                 {
-                    throw new ObjectNotFoundException($"The device {deviceId} was not found");
+                    throw new DeviceNotFoundException($"The device {deviceId} was not found");
                 }
 
                 throw;

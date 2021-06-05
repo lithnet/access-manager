@@ -1,28 +1,102 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
+using System.Security.Cryptography.X509Certificates;
+using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Api.Controllers
 {
     [ApiController]
     [Route("agent/metadata")]
-    [Authorize("ComputersOnly", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Produces("application/json")]
+    [AllowAnonymous]
+    [ResponseCache(NoStore = true)]
     public class MetadataController : Controller
     {
+        private readonly IOptions<AgentOptions> agentOptions;
+        private readonly ICertificateProvider certificateProvider;
+        private readonly ILogger<MetadataController> logger;
+        private readonly IApiErrorResponseProvider errorProvider;
+        private string certData;
+        private DateTime certificateLastAccessed;
+
+        public MetadataController(IOptions<AgentOptions> agentOptions, ICertificateProvider certificateProvider, ILogger<MetadataController> logger, IApiErrorResponseProvider errorProvider)
+        {
+            this.agentOptions = agentOptions;
+            this.certificateProvider = certificateProvider;
+            this.logger = logger;
+            this.errorProvider = errorProvider;
+        }
+
         public IActionResult Index()
         {
-            return this.Json(new
+            try
             {
-                passwordManagement = new
+                List<string> allowedOptions = new List<string>();
+
+                if (this.agentOptions.Value.AllowAadAuth)
                 {
-                    schemes = new[] { "ad", "aad", "psk" }
-                }, 
-                passwordEncryptionCertificate = "ABC123"
-            });
+                    if (this.agentOptions.Value.AllowAzureAdJoinedDevices)
+                    {
+                        allowedOptions.Add("aadj");
+                    }
+
+                    if (this.agentOptions.Value.AllowAzureAdRegisteredDevices)
+                    {
+                        allowedOptions.Add("aadr");
+                    }
+                }
+
+                if (this.agentOptions.Value.AllowWindowsAuth)
+                {
+                    allowedOptions.Add("iwa");
+                }
+
+                if (this.agentOptions.Value.AllowSelfSignedAuth)
+                {
+                    allowedOptions.Add("ssa");
+                }
+
+                return this.Json(new
+                {
+                    AgentAuthentication = new
+                    {
+                        Schemes = allowedOptions
+                    },
+                    PasswordManagement = new
+                    {
+                        EncryptionCertificate = this.GetCertificateString()
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return this.errorProvider.GetErrorResult(ex);
+            }
+        }
+
+        private string GetCertificateString()
+        {
+            if (this.certData == null || (this.certificateLastAccessed.AddMinutes(this.agentOptions.Value.EncryptionCertificateCacheDurationMinutes) < DateTime.UtcNow))
+            {
+                try
+                {
+                    X509Certificate2 cert = this.certificateProvider.FindEncryptionCertificate();
+                    if (cert != null)
+                    {
+                        certData = Convert.ToBase64String(cert.Export(X509ContentType.Cert));
+                        certificateLastAccessed = DateTime.UtcNow;
+                    }
+                }
+                catch (CertificateNotFoundException)
+                {
+                    this.logger.LogWarning("The encryption certificate requested by the metadata agent could not be found");
+                }
+            }
+
+            return certData;
         }
     }
 }

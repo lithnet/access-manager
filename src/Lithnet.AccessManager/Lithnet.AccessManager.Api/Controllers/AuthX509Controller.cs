@@ -3,38 +3,41 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
+using Lithnet.AccessManager.Api.Models;
 
 namespace Lithnet.AccessManager.Api.Controllers
 {
     [ApiController]
     [Route("auth/x509")]
     [AllowAnonymous]
+    [Produces("application/json")]
+    [ResponseCache(NoStore = true, Duration = 0)]
     public class AuthX509Controller : Controller
     {
         private readonly ILogger<AuthX509Controller> logger;
         private readonly ISecurityTokenGenerator tokenGenerator;
         private readonly IDeviceProvider devices;
-        private readonly ISelfSignedAssertionValidator assertionValidator;
-        private readonly IReplayNonceProvider nonceProvider;
-        private readonly IConfiguration config;
+        private readonly ISignedAssertionValidator signedAssertionValidator;
         private readonly IAadGraphApiProvider graphProvider;
+        private readonly IOptions<AgentOptions> agentOptions;
         private readonly IOptions<AzureAdOptions> azureAdOptions;
+        private readonly IApiErrorResponseProvider errorProvider;
 
-        public AuthX509Controller(ISecurityTokenGenerator tokenGenerator, IDeviceProvider devices, ISelfSignedAssertionValidator assertionValidator, IReplayNonceProvider nonceProvider, IConfiguration config, IAadGraphApiProvider graphProvider, ILogger<AuthX509Controller> logger, IOptions<AzureAdOptions> azureAdOptions)
+        public AuthX509Controller(ISecurityTokenGenerator tokenGenerator, IDeviceProvider devices, ISignedAssertionValidator signedAssertionValidator, IAadGraphApiProvider graphProvider, ILogger<AuthX509Controller> logger, IOptions<AgentOptions> agentOptions, IOptions<AzureAdOptions> azureAdOptions, IApiErrorResponseProvider errorProvider)
         {
             this.tokenGenerator = tokenGenerator;
             this.devices = devices;
-            this.assertionValidator = assertionValidator;
-            this.nonceProvider = nonceProvider;
-            this.config = config;
+            this.signedAssertionValidator = signedAssertionValidator;
             this.graphProvider = graphProvider;
             this.logger = logger;
+            this.agentOptions = agentOptions;
             this.azureAdOptions = azureAdOptions;
+            this.errorProvider = errorProvider;
         }
 
         [HttpPost]
@@ -42,51 +45,45 @@ namespace Lithnet.AccessManager.Api.Controllers
         {
             try
             {
-                this.assertionValidator.Validate(request.Assertion, "https://localhost:44385/api/v1.0/agent/register", out X509Certificate2 signingCertificate);
+                if (!this.agentOptions.Value.AllowAadAuth && !this.agentOptions.Value.AllowSelfSignedAuth)
+                {
+                    this.logger.LogWarning("A client attempted to authenticate with a signed assertion, but no assertion-enabled authentication methods are enabled");
+                    throw new UnsupportedAuthenticationTypeException();
+                }
 
-                string token;
+                this.signedAssertionValidator.Validate(request.Assertion, "https://localhost:44385/api/v1.0/agent/register", out X509Certificate2 signingCertificate);
+
+                TokenResponse token;
 
                 if (this.IsAadCertificate(signingCertificate))
                 {
-                    if (this.azureAdOptions.Value.AllowAzureAdJoinedDevices || this.azureAdOptions.Value.AllowAzureAdRegisteredDevices)
+                    if (this.agentOptions.Value.AllowAadAuth)
                     {
                         token = await this.ValidateAadAssertionAsync(signingCertificate);
                     }
                     else
                     {
-                        this.logger.LogError($"The device presented an Azure Active Directory certificate ({signingCertificate.Subject}), but AAD authentication is not enabled");
-                        return this.Unauthorized();
+                        throw new UnsupportedAuthenticationTypeException($"The device presented an Azure Active Directory certificate ({signingCertificate.Subject}), but AAD authentication is not enabled");
                     }
                 }
                 else
                 {
-                    token = await this.ValidateSelfSignedAssertionAsync(signingCertificate);
+                    if (this.agentOptions.Value.AllowSelfSignedAuth)
+                    {
+                        token = await this.ValidateSelfSignedAssertionAsync(signingCertificate);
+                    }
+                    else
+                    {
+                        throw new UnsupportedAuthenticationTypeException($"The device presented an self-signed assertion, but self-asserted device authentication is not enabled");
+                    }
                 }
 
-                return this.Json(new { access_token = token });
-            }
-            catch (BadRequestException ex)
-            {
-                this.logger.LogError(ex, "The request could not be processed due to an input error");
-                return this.BadRequest();
-            }
-            catch (ObjectNotFoundException ex)
-            {
-                this.logger.LogError(ex, "The device could not be found");
-                return this.Unauthorized();
+                return this.Ok(token);
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "The request could not be processed");
-                throw;
+                return this.errorProvider.GetErrorResult(ex);
             }
-        }
-
-        [HttpGet]
-        public IActionResult GetNonce()
-        {
-            this.Response.Headers.Add("Replay-Nonce", this.nonceProvider.GenerateNonce());
-            return this.Ok();
         }
 
         private bool IsAadCertificate(X509Certificate2 signingCertificate)
@@ -104,7 +101,7 @@ namespace Lithnet.AccessManager.Api.Controllers
             return false;
         }
 
-        private async Task<string> ValidateAadAssertionAsync(X509Certificate2 signingCertificate)
+        private async Task<TokenResponse> ValidateAadAssertionAsync(X509Certificate2 signingCertificate)
         {
             if (signingCertificate.Subject == null || !signingCertificate.Subject.StartsWith("CN=", StringComparison.OrdinalIgnoreCase))
             {
@@ -113,26 +110,45 @@ namespace Lithnet.AccessManager.Api.Controllers
 
             string deviceId = signingCertificate.Subject.Remove(0, 3);
 
-            this.logger.LogTrace($"Client has presented an AzureAD join certificate for authentication of device {deviceId}");
+            this.logger.LogTrace($"Client has presented an Azure AD certificate for authentication of device {deviceId}");
 
             Microsoft.Graph.Device aadDevice = await this.graphProvider.GetAadDeviceAsync(deviceId);
 
             if (!aadDevice.HasDeviceThumbprint(signingCertificate.Thumbprint))
             {
-                throw new CertificateIdentityNotFoundException($"The certificate thumbprint '{signingCertificate.Thumbprint}' could not be found on device {deviceId} in the Azure Active Directory");
+                throw new AadDeviceNotFoundException($"The certificate thumbprint '{signingCertificate.Thumbprint}' could not be found on device {deviceId} in the Azure Active Directory");
             }
 
             aadDevice.ThrowOnDeviceDisabled();
-            //aadDevice.TrustType == "AzureAD"
 
-            Device device = await this.devices.GetOrCreateDeviceAsync(aadDevice, this.config["TenantID"]);
+            switch (aadDevice.TrustType.ToLowerInvariant())
+            {
+                case "azuread":
+                    if (!this.agentOptions.Value.AllowAzureAdJoinedDevices)
+                    {
+                        throw new UnsupportedAuthenticationTypeException("The device is Azure AD joined, but Azure AD-joined devices are not permitted to authenticate to the system");
+                    }
+                    break;
+
+                case "workplace":
+                    if (!this.agentOptions.Value.AllowAzureAdRegisteredDevices)
+                    {
+                        throw new UnsupportedAuthenticationTypeException("The device is Azure AD registered, but Azure AD-registered devices are not permitted to authenticate to the system");
+                    }
+                    break;
+
+                default:
+                    throw new UnsupportedAuthenticationTypeException($"The AAD device has an unknown trust type '{aadDevice.TrustType}'");
+            }
+
+            Device device = await this.devices.GetOrCreateDeviceAsync(aadDevice, this.azureAdOptions.Value.TenantId);
             ClaimsIdentity identity = device.ToClaimsIdentity();
 
             this.logger.LogInformation($"Successfully authenticated device {device.ComputerName} ({device.ObjectId}) from AzureAD");
             return this.tokenGenerator.GenerateToken(identity);
         }
 
-        private async Task<string> ValidateSelfSignedAssertionAsync(X509Certificate2 signingCertificate)
+        private async Task<TokenResponse> ValidateSelfSignedAssertionAsync(X509Certificate2 signingCertificate)
         {
             Device device = await this.devices.GetDeviceAsync(signingCertificate);
             ClaimsIdentity identity = device.ToClaimsIdentity();

@@ -11,28 +11,33 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Api.Controllers
 {
     [ApiController]
     [Route("agent/register")]
+    [Produces("application/json")]
     [AllowAnonymous]
     public class AgentRegisterController : Controller
     {
         private readonly ILogger<AgentRegisterController> logger;
-        private readonly IReplayNonceProvider nonceProvider;
         private readonly ICertificateProvider certificateProvider;
-        private readonly ISelfSignedAssertionValidator assertionValidator;
+        private readonly ISignedAssertionValidator assertionValidator;
         private readonly IDeviceProvider devices;
+        private readonly IOptions<AgentOptions> agentOptions;
+        private readonly IApiErrorResponseProvider errorProvider;
 
-        public AgentRegisterController(ILogger<AgentRegisterController> logger, IReplayNonceProvider nonceProvider, ICertificateProvider certificateProvider, ISelfSignedAssertionValidator assertionValidator, IDeviceProvider devices)
+        public AgentRegisterController(ILogger<AgentRegisterController> logger, ICertificateProvider certificateProvider, ISignedAssertionValidator assertionValidator, IDeviceProvider devices, IOptions<AgentOptions> agentOptions, IApiErrorResponseProvider errorProvider)
         {
             this.logger = logger;
-            this.nonceProvider = nonceProvider;
             this.certificateProvider = certificateProvider;
             this.assertionValidator = assertionValidator;
             this.devices = devices;
+            this.agentOptions = agentOptions;
+            this.errorProvider = errorProvider;
         }
 
         [HttpPost()]
@@ -40,51 +45,66 @@ namespace Lithnet.AccessManager.Api.Controllers
         {
             try
             {
+                if (!this.agentOptions.Value.AllowSelfSignedAuth)
+                {
+                    this.logger.LogWarning("A client attempted to register, but registration is disabled");
+                    return this.Forbid(JwtBearerDefaults.AuthenticationScheme);
+                }
+
                 JwtSecurityToken token = this.assertionValidator.Validate(request.Assertion, "https://localhost:44385/api/v1.0/agent/register", out X509Certificate2 signingCertificate);
 
                 Device device = this.ValidateRegistrationClaims(token);
+                device.ApprovalState = this.agentOptions.Value.AutoApproveSelfSignedAuth ? ApprovalState.Approved : ApprovalState.Pending;
 
                 device = await this.devices.CreateDeviceAsync(device, signingCertificate);
 
                 return this.GetDeviceApprovalResult(device);
             }
-            catch (BadRequestException ex)
-            {
-                this.logger.LogError(ex, "The request could not be processed due to an input error");
-                return this.BadRequest();
-            }
+
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "The request could not be processed");
-                throw;
+                return this.errorProvider.GetErrorResult(ex);
             }
         }
 
         [HttpGet("{requestId}")]
         public async Task<IActionResult> GetStatus([FromRoute] string requestId)
         {
-            Device device = await this.devices.GetDeviceAsync(AuthorityType.SelfAsserted, "ams", requestId);
+            try
+            {
+                if (!this.agentOptions.Value.AllowSelfSignedAuth)
+                {
+                    this.logger.LogWarning("A client attempted to validate its registration status, but registration is disabled");
+                    return this.Forbid(JwtBearerDefaults.AuthenticationScheme);
+                }
 
-            return this.GetDeviceApprovalResult(device);
+                Device device = await this.devices.GetDeviceAsync(AuthorityType.SelfAsserted, "ams", requestId);
+
+                return this.GetDeviceApprovalResult(device);
+            }
+            catch (Exception ex)
+            {
+                return this.errorProvider.GetErrorResult(ex);
+            }
         }
 
         private IActionResult GetDeviceApprovalResult(Device device)
         {
             if (device.ApprovalState == ApprovalState.Approved)
             {
-                return this.Json(new { state = "approved", client_id = device.Id });
+                return this.Json(new { state = "approved", client_id = device.ObjectId });
             }
             else if (device.ApprovalState == ApprovalState.Pending)
             {
                 string newPath = this.Request.PathBase + this.Request.Path.Add(new PathString($"/{device.ObjectId}"));
                 this.Response.Headers.Add("Location", newPath);
-                JsonResult result = this.Json(new { state = "pending" });
+                JsonResult result = this.Json(new { state = "pending", client_id = device.ObjectId });
                 result.StatusCode = StatusCodes.Status202Accepted;
                 return result;
             }
             else
             {
-                JsonResult result = this.Json(new { state = "rejected" });
+                JsonResult result = this.Json(new { state = "rejected", client_id = device.ObjectId });
                 result.StatusCode = StatusCodes.Status403Forbidden;
                 return result;
             }
@@ -98,7 +118,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                 throw new BadRequestException("The registration information did not include a hostname");
             }
 
-            string dnsName = token.Claims.FirstOrDefault(t => t.Type == "dns-name")?.Value;
+            string dnsName = token.Claims.FirstOrDefault(t => t.Type == "dnsname")?.Value;
             if (dnsName == null)
             {
                 throw new BadRequestException("The registration information did not include a dns name");
@@ -123,8 +143,8 @@ namespace Lithnet.AccessManager.Api.Controllers
         public IActionResult GetAadJwt()
         {
             string hostname = "carbon";
-            string dnsName = "carbon.lithnet.local";
-            string registrationKey = "1234";
+            //string dnsName = "carbon.lithnet.local";
+            //string registrationKey = "1234";
 
             //CN = d763852d-0c7b-4dce-8532-d3a21ead0140
             X509Store store = new X509Store(StoreLocation.CurrentUser);
@@ -143,12 +163,9 @@ namespace Lithnet.AccessManager.Api.Controllers
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim("jti", Guid.NewGuid().ToString()),
-                    new Claim("hostname", hostname),
-                    new Claim("dns-name", dnsName),
-                    new Claim("registration-key", registrationKey),
-                    new Claim("nonce", this.nonceProvider.GenerateNonce()),
                 }),
-                Expires = DateTime.UtcNow.AddHours(1),
+                IssuedAt = DateTime.UtcNow,
+                Expires = DateTime.UtcNow.AddMinutes(4), 
                 Issuer = myIssuer,
                 Audience = myAudience,
                 SigningCredentials = new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSha256)
@@ -181,11 +198,10 @@ namespace Lithnet.AccessManager.Api.Controllers
                 {
                     new Claim("jti", Guid.NewGuid().ToString()),
                     new Claim("hostname", hostname),
-                    new Claim("dns-name", dnsName),
+                    new Claim("dnsname", dnsName),
                     new Claim("registration-key", registrationKey),
-                    new Claim("nonce", this.nonceProvider.GenerateNonce()),
                 }),
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddMinutes(4),
                 Issuer = myIssuer,
                 Audience = myAudience,
                 SigningCredentials = new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSha256)

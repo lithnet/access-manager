@@ -26,7 +26,7 @@ namespace Lithnet.AccessManager.Api.Providers
             {
                 return await this.GetDeviceAsync(AuthorityType.AzureActiveDirectory, authority, deviceId);
             }
-            catch (ObjectNotFoundException)
+            catch (DeviceNotFoundException)
             {
                 this.logger.LogTrace($"The AAD-joined computer {aadDevice.DeviceId} was not found in the AMS database and will be created");
             }
@@ -42,7 +42,7 @@ namespace Lithnet.AccessManager.Api.Providers
             {
                 return await this.GetDeviceAsync(AuthorityType.ActiveDirectory, authority, deviceId);
             }
-            catch (ObjectNotFoundException)
+            catch (DeviceNotFoundException)
             {
                 this.logger.LogTrace($"The AD-joined computer {principal.MsDsPrincipalName} was not found in the AMS database and will be created");
             }
@@ -66,7 +66,7 @@ namespace Lithnet.AccessManager.Api.Providers
                 return new Device(reader);
             }
 
-            throw new ObjectNotFoundException($"Could not find a device with ID {deviceId} from authority {authority} ({authorityType})");
+            throw new DeviceNotFoundException($"Could not find a device with ID {deviceId} from authority {authority} ({authorityType})");
         }
 
         public async Task<Device> GetDeviceAsync(X509Certificate2 certificate)
@@ -83,7 +83,7 @@ namespace Lithnet.AccessManager.Api.Providers
                 return new Device(reader);
             }
 
-            throw new ObjectNotFoundException($"Could not find a device with credentials for the certificate issued to '{certificate.Subject}' with thumbprint {certificate.Thumbprint}");
+            throw new DeviceNotFoundException($"Could not find a device with credentials for the certificate issued to '{certificate.Subject}' with thumbprint {certificate.Thumbprint}");
         }
 
         public async Task<Device> CreateDeviceAsync(Device device, X509Certificate2 certificate)

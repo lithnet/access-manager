@@ -1,21 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 
 namespace Lithnet.AccessManager.Api.Providers
 {
-    public class SelfSignedAssertionValidator : ISelfSignedAssertionValidator
+    public class SignedAssertionValidator : ISignedAssertionValidator
     {
-        private readonly IReplayNonceProvider nonceProvider;
+        private readonly IOptions<SignedAssertionValidationOptions> validatorOptions;
 
-        public SelfSignedAssertionValidator(IReplayNonceProvider nonceProvider)
+        public SignedAssertionValidator(IOptions<SignedAssertionValidationOptions> validatorOptions)
         {
-            this.nonceProvider = nonceProvider;
+            this.validatorOptions = validatorOptions;
         }
 
         public JwtSecurityToken Validate(string assertion, string audience, out X509Certificate2 signingCertificate)
@@ -28,33 +27,26 @@ namespace Lithnet.AccessManager.Api.Providers
             handler.ValidateToken(assertion, new TokenValidationParameters()
             {
                 ValidateAudience = true,
+                ValidateLifetime = true, 
+                ValidateActor = false,
                 ValidateIssuer = false,
-                ValidateLifetime = true,
-                ValidAlgorithms = new[]
-                {
-                    SecurityAlgorithms.RsaSha256,
-                    SecurityAlgorithms.RsaSha384,
-                    SecurityAlgorithms.RsaSha512,
-                    SecurityAlgorithms.RsaSsaPssSha256,
-                    SecurityAlgorithms.RsaSsaPssSha384,
-                    SecurityAlgorithms.RsaSsaPssSha512
-                },
+                ValidateTokenReplay = true,
+                ValidateIssuerSigningKey = false,
+                ValidAlgorithms = this.validatorOptions.Value.AllowedSigningAlgorithms,
                 ValidAudience = audience,
                 IssuerSigningKey = new RsaSecurityKey(signingCertificate.GetRSAPublicKey())
             }, out SecurityToken validatedToken);
 
             JwtSecurityToken jwt = (JwtSecurityToken)validatedToken;
 
-            string nonce = jwt.Claims.FirstOrDefault(t => t.Type == "nonce")?.Value;
-
-            if (nonce == null)
+            if (this.validatorOptions.Value.MaximumAssertionValidityMinutes > 0)
             {
-                throw new AssertionMissingNonceException();
-            }
+                TimeSpan validityWindow = jwt.ValidTo - jwt.ValidFrom;
 
-            if (!this.nonceProvider.ConsumeNonce(nonce))
-            {
-                throw new AssertionReplayException();
+                if (this.validatorOptions.Value.MaximumAssertionValidityMinutes < validityWindow.TotalMinutes)
+                {
+                    throw new SecurityTokenInvalidLifetimeException("The token was generated for a duration longer than the allowable token length");
+                }
             }
 
             return jwt;
@@ -62,6 +54,11 @@ namespace Lithnet.AccessManager.Api.Providers
 
         private X509Certificate2 GetCertificateFromToken(JwtSecurityToken securityToken)
         {
+            if (securityToken.Header.X5c == null)
+            {
+                throw new SecurityTokenInvalidSigningKeyException("The x5c claim on the JWT was not present");
+            }
+
             string base64CertificateData = JArray.Parse(securityToken.Header.X5c)[0].ToString();
             return new X509Certificate2(Convert.FromBase64String(base64CertificateData));
         }

@@ -16,6 +16,8 @@ namespace Lithnet.AccessManager.Api
 
         public DateTime RetiredDate { get; set; }
 
+        public DateTime ExpiryDate { get; set; }
+
         public string RequestId { get; set; }
 
         public string AccountName { get; set; }
@@ -30,6 +32,7 @@ namespace Lithnet.AccessManager.Api
             this.PasswordData = reader["PasswordData"].CastOrDefault<string>();
             this.EffectiveDate= reader["EffectiveDate"].CastOrDefault<DateTime>();
             this.RetiredDate = reader["RetiredDate"].CastOrDefault<DateTime>();
+            this.ExpiryDate = reader["ExpiryDate"].CastOrDefault<DateTime>();
             this.RequestId = reader["RequestId"].CastOrDefault<string>();
             this.AccountName = reader["AccountName"].CastOrDefault<string>();
         }

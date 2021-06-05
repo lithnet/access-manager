@@ -1,16 +1,18 @@
-﻿using System;
-using Lithnet.AccessManager.Api.Providers;
+﻿using Lithnet.AccessManager.Api.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.HttpSys;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Api.Controllers
 {
     [ApiController]
     [Route("auth/iwa")]
+    [Produces("application/json")]
     [Authorize(AuthenticationSchemes = HttpSysDefaults.AuthenticationScheme)]
     public class AuthIwaController : Controller
     {
@@ -19,20 +21,30 @@ namespace Lithnet.AccessManager.Api.Controllers
         private readonly IDeviceProvider devices;
         private readonly IDiscoveryServices discoveryServices;
         private readonly ILogger<AuthIwaController> logger;
+        private readonly IOptions<AgentOptions> agentOptions;
+        private readonly IApiErrorResponseProvider errorProvider;
 
-        public AuthIwaController(ISecurityTokenGenerator tokenGenerator, IDirectory directory, IDeviceProvider devices, IDiscoveryServices discoveryServices, ILogger<AuthIwaController> logger)
+        public AuthIwaController(ISecurityTokenGenerator tokenGenerator, IDirectory directory, IDeviceProvider devices, IDiscoveryServices discoveryServices, ILogger<AuthIwaController> logger, IOptions<AgentOptions> agentOptions, IApiErrorResponseProvider errorProvider)
         {
             this.tokenGenerator = tokenGenerator;
             this.directory = directory;
             this.devices = devices;
             this.discoveryServices = discoveryServices;
             this.logger = logger;
+            this.agentOptions = agentOptions;
+            this.errorProvider = errorProvider;
         }
 
         public async Task<IActionResult> IndexAsync()
         {
             try
-            { 
+            {
+                if (!this.agentOptions.Value.AllowWindowsAuth)
+                {
+                    this.logger.LogWarning("A client attempted to authenticate with Windows Authentication, but it is disabled");
+                    throw new UnsupportedAuthenticationTypeException();
+                }
+
                 string sid;
 
                 if (System.Diagnostics.Debugger.IsAttached &&
@@ -45,9 +57,14 @@ namespace Lithnet.AccessManager.Api.Controllers
                     sid = this.HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid);
                 }
 
+                if (sid == null)
+                {
+                    throw new BadRequestException("The primary SID was missing from the token");
+                }
+
                 if (!this.directory.TryGetComputer(sid, out IComputer computer))
                 {
-                    throw new ObjectNotFoundException($"The object with SID {sid} was either not a computer, or could not be found in the domain");
+                    throw new DeviceNotFoundException($"The object with SID {sid} was either not a computer, or could not be found in the domain");
                 }
 
                 this.logger.LogTrace($"Attempting to authenticate {computer.MsDsPrincipalName} using IWA");
@@ -56,24 +73,11 @@ namespace Lithnet.AccessManager.Api.Controllers
 
                 ClaimsIdentity identity = device.ToClaimsIdentity();
 
-                string token = this.tokenGenerator.GenerateToken(identity);
-
-                return this.Json(new { access_token = token });
-            }
-            catch (BadRequestException ex)
-            {
-                this.logger.LogError(ex, "The request could not be processed due to an input error");
-                return this.BadRequest();
-            }
-            catch (ObjectNotFoundException ex)
-            {
-                this.logger.LogError(ex, "The device could not be found");
-                return this.Unauthorized();
+                return this.Ok(this.tokenGenerator.GenerateToken(identity));
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "The request could not be processed");
-                throw;
+                return this.errorProvider.GetErrorResult(ex);
             }
         }
     }

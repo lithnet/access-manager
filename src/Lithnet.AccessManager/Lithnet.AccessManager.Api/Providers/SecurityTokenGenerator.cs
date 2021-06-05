@@ -1,92 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Lithnet.AccessManager.Api.Models;
+using Lithnet.AccessManager.Server;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
-using Microsoft.IdentityModel.Tokens;
 
 
 namespace Lithnet.AccessManager.Api.Providers
 {
     public class SecurityTokenGenerator : ISecurityTokenGenerator
     {
-        public string GenerateToken(string subject, IEnumerable<Claim> claims)
+        private readonly IOptionsMonitor<TokenIssuerOptions> tokenIssuerOptions;
+        private readonly IProtectedSecretProvider protectedSecretProvider;
+
+        public SecurityTokenGenerator(IOptionsMonitor<TokenIssuerOptions> tokenIssuerOptions, IProtectedSecretProvider protectedSecretProvider)
         {
-            SymmetricSecurityKey sharedKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("mysupers3cr3tsharedkey!"));
-
-            string myIssuer = "https://{yourOktaDomain}/oauth2/default";
-            string myAudience = "api://default";
-
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[] { new Claim(ClaimTypes.NameIdentifier, subject) }),
-                Claims = claims.ToDictionary<Claim, string, object>(t => t.Type, u => u),
-                Expires = DateTime.UtcNow.AddHours(1),
-                Issuer = myIssuer,
-                Audience = myAudience,
-                SigningCredentials = new SigningCredentials(sharedKey, SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            this.tokenIssuerOptions = tokenIssuerOptions;
+            this.protectedSecretProvider = protectedSecretProvider;
         }
 
-        public string GenerateToken(ClaimsIdentity identity)
+        public TokenResponse GenerateToken(ClaimsIdentity identity)
         {
-            SymmetricSecurityKey sharedKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("mysupers3cr3tsharedkey!"));
+            var options = this.tokenIssuerOptions.CurrentValue;
 
-            string myIssuer = "https://{yourOktaDomain}/oauth2/default";
-            string myAudience = "api://default";
+            SymmetricSecurityKey sharedKey =
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.protectedSecretProvider.UnprotectSecret(options.SigningKey)));
 
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
             SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = identity,
-                Expires = DateTime.UtcNow.AddHours(1),
-                Issuer = myIssuer,
-                Audience = myAudience,
-                SigningCredentials = new SigningCredentials(sharedKey, SecurityAlgorithms.HmacSha256Signature)
+                Expires = DateTime.UtcNow.AddMinutes(options.TokenValidityMinutes),
+                Issuer = options.Issuer,
+                Audience = options.Audience,
+                SigningCredentials = new SigningCredentials(sharedKey, options.SigningAlgorithm)
             };
 
             SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
+            string rawToken = tokenHandler.WriteToken(token);
 
-        public string GenerateToken(IList<Claim> claims)
-        {
-            SymmetricSecurityKey sharedKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("mysupers3cr3tsharedkey!"));
-
-            string myIssuer = "https://{yourOktaDomain}/oauth2/default";
-            string myAudience = "api://default";
-
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-
-            JwtSecurityToken tokenDescriptor = new JwtSecurityToken
-            (
-                myIssuer, 
-                myAudience,
-                claims,
-                DateTime.UtcNow,
-                DateTime.UtcNow.AddHours(1),
-                new SigningCredentials(sharedKey, SecurityAlgorithms.HmacSha256)
-            );
-
-           // var tokenDescriptor = new SecurityTokenDescriptor
-            //{
-            //    Subject = principal.Identity as ClaimsIdentity,
-            //    Expires = DateTime.UtcNow.AddHours(1),
-            //    Issuer = myIssuer,
-            //    Audience = myAudience,
-            //    SigningCredentials = new SigningCredentials(sharedKey, SecurityAlgorithms.HmacSha256Signature)
-            //};
-
-            //var token = tokenHandler.CreateToken(tokenDescriptor);
-            string token = tokenHandler.WriteToken(tokenDescriptor);
-
-            return token;
+            return new TokenResponse(rawToken, tokenDescriptor.Expires.Value);
         }
     }
 }

@@ -54,7 +54,7 @@ namespace Lithnet.AccessManager.Api
         {
             if (device.AccountEnabled == null || device.AccountEnabled.Value == false)
             {
-                throw new InvalidAccountStateException($"The AAD device {device.DeviceId} is disabled");
+                throw new DeviceDisabledException($"The AAD device {device.DeviceId} is disabled");
             }
         }
     }

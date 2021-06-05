@@ -5,7 +5,6 @@ using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Providers;
 using Lithnet.Licensing.Core;
-using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -13,12 +12,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Lithnet.AccessManager.Api
 {
@@ -35,64 +33,62 @@ namespace Lithnet.AccessManager.Api
         {
             services.AddControllers();
 
+            // Dependencies
+
             services.AddSingleton<IUpgradeLog, DbUpgradeLogger>();
             services.AddSingleton<IDbProvider, SqlDbProvider>();
             services.AddSingleton<SqlLocalDbInstanceProvider>();
             services.AddSingleton<SqlServerInstanceProvider>();
             services.AddSingleton<RNGCryptoServiceProvider>();
-            services.AddSingleton<ISecurityTokenCache, SecurityTokenCache>();
-            services.AddSingleton<RandomStringGenerator>();
-            services.AddSingleton<IReplayNonceProvider, InMemoryReplayNonceProvider>();
-            services.AddSingleton<ISecurityTokenGenerator, SecurityTokenGenerator>();
             services.AddSingleton<IDirectory, ActiveDirectory>();
             services.AddSingleton<ICertificateProvider, CertificateProvider>();
-
             services.AddSingleton<IClusterProvider, ClusterProvider>();
             services.AddSingleton<IDiscoveryServices, DiscoveryServices>();
             services.AddSingleton<IWindowsServiceProvider, WindowsServiceProvider>();
             services.AddSingleton<IRegistryProvider>(new RegistryProvider(true));
-            services.AddSingleton<IAppPathProvider, ApiAppPathProvider>();
-            services.AddSingleton<ISelfSignedAssertionValidator, SelfSignedAssertionValidator>();
             services.AddSingleton<ILicenseDataProvider, OptionsMonitorLicenseDataProvider>();
+            services.AddSingleton<IProtectedSecretProvider, ProtectedSecretProvider>();
+            services.AddSingleton<IEncryptionProvider, EncryptionProvider>();
+            services.AddSingleton<IWindowsServiceProvider, WindowsServiceProvider>();
+            services.AddSingleton(RandomNumberGenerator.Create());
+
+            // Our services
 
             services.AddScoped<IDeviceProvider, DbDeviceProvider>();
             services.AddScoped<IAadGraphApiProvider, AadGraphApiProvider>();
             services.AddScoped<IDbDevicePasswordProvider, DbDevicePasswordProvider>();
+            services.AddSingleton<IApiErrorResponseProvider, ApiErrorResponseProvider>();
+            services.AddSingleton<IAppPathProvider, ApiAppPathProvider>();
+            services.AddSingleton<ISecurityTokenCache, SecurityTokenCache>();
+            services.AddSingleton<ISecurityTokenGenerator, SecurityTokenGenerator>();
+            services.AddSingleton<ISignedAssertionValidator, SignedAssertionValidator>();
+            services.AddSingleton<RandomStringGenerator>();
 
             services.Configure<DatabaseConfigurationOptions>(this.Configuration.GetSection("DatabaseConfiguration"));
             services.Configure<LicensingOptions>(this.Configuration.GetSection("Licensing"));
             services.Configure<AzureAdOptions>(this.Configuration.GetSection("AzureAd"));
             services.Configure<PasswordPolicyOptions>(this.Configuration.GetSection("PasswordPolicy"));
+            services.Configure<AgentOptions>(this.Configuration.GetSection("Agent"));
+            services.Configure<TokenIssuerOptions>(this.Configuration.GetSection("TokenIssuer"));
+            services.Configure<SignedAssertionValidationOptions>(this.Configuration.GetSection("TokenValidation"));
+            services.Configure<DataProtectionOptions>(this.Configuration.GetSection("DataProtection"));
 
 
             IAmsLicenseManager licenseManager = this.CreateLicenseManager(services);
             services.AddSingleton(licenseManager);
 
+            this.ConfigureAuthentication(services);
+        }
 
-            SymmetricSecurityKey sharedKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("mysupers3cr3tsharedkey!"));
+        private void ConfigureAuthentication(IServiceCollection services)
+        {
+            var serviceProvider = services.BuildServiceProvider();
+            var options = serviceProvider.GetRequiredService<IOptions<TokenIssuerOptions>>().Value;
+            var secretProvider = serviceProvider.GetRequiredService<IProtectedSecretProvider>();
+
+            SymmetricSecurityKey sharedKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretProvider.UnprotectSecret(options.SigningKey)));
 
             services.AddAuthentication()
-                .AddCertificate(CertificateAuthenticationDefaults.AuthenticationScheme, o =>
-            {
-                o.AllowedCertificateTypes = CertificateTypes.All;
-                o.RevocationFlag = X509RevocationFlag.EndCertificateOnly;
-                o.RevocationMode = X509RevocationMode.NoCheck;
-                o.ValidateCertificateUse = false;
-                o.ValidateValidityPeriod = false;
-
-                o.Events = new CertificateAuthenticationEvents
-                {
-                    OnCertificateValidated = context =>
-                    {
-                        return Task.CompletedTask;
-                    },
-                    OnAuthenticationFailed = context =>
-                    {
-                        return Task.CompletedTask;
-                    }
-                };
-
-            })
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, o =>
                 {
                     o.TokenValidationParameters = new TokenValidationParameters
@@ -103,16 +99,17 @@ namespace Lithnet.AccessManager.Api
                         RequireExpirationTime = true,
                         ValidateLifetime = true,
                         ValidateAudience = true,
-                        ValidAudience = "api://default",
+                        ValidAudience = options.Audience,
+                        RequireAudience = true,
                         ValidateIssuer = true,
-                        ValidIssuer = "https://{yourOktaDomain}/oauth2/default",
-                        // ValidAlgorithms = new [] {"PS512", "PS256"},
+                        ValidIssuer = options.Issuer,
+                        ValidAlgorithms = new[] { options.SigningAlgorithm }
                     };
                 });
 
-            services.AddAuthorization(options =>
+            services.AddAuthorization(o =>
             {
-                options.AddPolicy("ComputersOnly", policy => policy.RequireClaim("object-type", "Computer", "User"));
+                o.AddPolicy("ComputersOnly", policy => policy.RequireClaim("object-type", "Computer"));
             });
         }
 
@@ -149,8 +146,6 @@ namespace Lithnet.AccessManager.Api
             return licenseManager;
         }
 
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -163,6 +158,7 @@ namespace Lithnet.AccessManager.Api
             app.UseRouting();
 
             app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

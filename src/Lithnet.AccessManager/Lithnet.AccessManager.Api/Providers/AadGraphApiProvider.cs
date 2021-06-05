@@ -4,26 +4,27 @@ using Microsoft.Graph.Auth;
 using Microsoft.Identity.Client;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Api.Providers
 {
     public class AadGraphApiProvider : IAadGraphApiProvider
     {
-        private readonly IConfiguration config;
         private IGraphServiceClient client;
+        private readonly IOptions<AzureAdOptions> azureAdOptions;
 
-        public AadGraphApiProvider(IConfiguration config)
+        public AadGraphApiProvider(IOptions<AzureAdOptions> azureAdOptions)
         {
-            this.config = config;
+            this.azureAdOptions = azureAdOptions;
             this.Initialize();
         }
 
         private void Initialize()
         {
             IConfidentialClientApplication confidentialClientApplication = ConfidentialClientApplicationBuilder
-                .Create(this.config["ClientId"])
-                .WithTenantId(this.config["TenantID"])
-                .WithClientSecret(this.config["ClientSecret"])
+                .Create(this.azureAdOptions.Value.ClientId)
+                .WithTenantId(this.azureAdOptions.Value.TenantId)
+                .WithClientSecret(this.azureAdOptions.Value.ClientSecret)
                 .Build();
 
             ClientCredentialProvider authProvider = new ClientCredentialProvider(confidentialClientApplication);
@@ -36,7 +37,7 @@ namespace Lithnet.AccessManager.Api.Providers
             
             if (aadDevices.Count == 0)
             {
-                throw new ObjectNotFoundException($"Object with device ID {deviceId} was not found in the directory");
+                throw new AadDeviceNotFoundException($"Object with device ID {deviceId} was not found in the directory");
             }
 
             if (aadDevices.Count > 1)

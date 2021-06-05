@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
@@ -12,61 +13,27 @@ namespace Lithnet.AccessManager.Api.Controllers
 {
     [ApiController]
     [Route("agent/password")]
+    [Produces("application/json")]
     [Authorize("ComputersOnly", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AgentPasswordController : Controller
     {
         private readonly ILogger<AgentPasswordController> logger;
         private readonly IDbDevicePasswordProvider passwordProvider;
+        private readonly ICertificateProvider certificateProvider;
+        private readonly IApiErrorResponseProvider errorProvider;
 
-        public AgentPasswordController(ILogger<AgentPasswordController> logger, IDbDevicePasswordProvider passwordProvider)
+        private X509Certificate2 encryptionCertificate;
+
+        public AgentPasswordController(ILogger<AgentPasswordController> logger, IDbDevicePasswordProvider passwordProvider, ICertificateProvider certificateProvider, IApiErrorResponseProvider errorProvider)
         {
             this.logger = logger;
             this.passwordProvider = passwordProvider;
+            this.certificateProvider = certificateProvider;
+            this.errorProvider = errorProvider;
         }
 
         [HttpGet()]
-        public async Task<IActionResult> Get()
-        {
-            try
-            {
-                string deviceId = "abs";// this.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                if (deviceId == null)
-                {
-                    throw new BadRequestException("The device ID was not found in the claim");
-                }
-
-                this.logger.LogTrace($"Checking to see if device {deviceId} requires a password change");
-                if (await this.passwordProvider.HasPasswordExpired(deviceId))
-                {
-                    this.logger.LogTrace($"Device {deviceId} requires a password change");
-                    return this.StatusCode(StatusCodes.Status205ResetContent);
-                }
-                else
-                {
-                    this.logger.LogTrace($"Device {deviceId} does not require a password change");
-                    return this.NoContent();
-                }
-            }
-            catch (BadRequestException ex)
-            {
-                this.logger.LogError(ex, "The request could not be processed due to an input error");
-                return this.BadRequest();
-            }
-            catch (ObjectNotFoundException ex)
-            {
-                this.logger.LogError(ex, "The device could not be found");
-                return this.BadRequest();
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "The request could not be processed");
-                throw;
-            }
-        }
-
-        [HttpPost()]
-        public async Task<IActionResult> Update([FromBody] PasswordUpdateRequest request)
+        public async Task<IActionResult> GetAsync()
         {
             try
             {
@@ -77,65 +44,93 @@ namespace Lithnet.AccessManager.Api.Controllers
                     throw new BadRequestException("The device ID was not found in the claim");
                 }
 
-                string requestId = await this.passwordProvider.UpdateDevicePassword(deviceId, request);
+                this.logger.LogTrace($"Checking to see if device {deviceId} requires a password change");
+                if (await this.passwordProvider.HasPasswordExpired(deviceId))
+                {
+                    this.logger.LogTrace($"Device {deviceId} requires a password change");
 
-                return this.Json(new { request_id = requestId });
-            }
-            catch (BadRequestException ex)
-            {
-                this.logger.LogError(ex, "The request could not be processed due to an input error");
-                return this.BadRequest();
-            }
-            catch (ObjectNotFoundException ex)
-            {
-                this.logger.LogError(ex, "The device could not be found");
-                return this.BadRequest();
+                    return this.StatusCode(StatusCodes.Status205ResetContent, 
+                        new
+                        {
+                            EncryptionCertificateThumbprint = this.EncryptionCertificate.Thumbprint
+                        });
+                }
+                else
+                {
+                    this.logger.LogTrace($"Device {deviceId} does not require a password change");
+                    return this.NoContent();
+                }
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "The request could not be processed");
-                throw;
+                return this.errorProvider.GetErrorResult(ex);
             }
         }
 
-        [HttpDelete("{requestId}")]
-        public async Task<IActionResult> Delete([FromRoute] string requestId)
+        [HttpPost()]
+        public async Task<IActionResult> UpdateAsync([FromBody] PasswordUpdateRequest request)
         {
-            string deviceId = null;
-
             try
             {
-                deviceId = this.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                string deviceId = this.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 if (deviceId == null)
                 {
                     throw new BadRequestException("The device ID was not found in the claim");
                 }
 
-                await this.passwordProvider.RevertLastPasswordChange(deviceId, requestId);
+                this.logger.LogTrace($"Attempting update for device {deviceId} ");
 
-                return this.Ok();
-            }
-            catch (PasswordRollbackDeniedException ex)
-            {
-                this.logger.LogError(ex, $"The request to rollback password request Id {requestId} for device {deviceId} was denied");
-                return this.Forbid(JwtBearerDefaults.AuthenticationScheme);
-            }
-            catch (BadRequestException ex)
-            {
-                this.logger.LogError(ex, "The request could not be processed due to an input error");
-                return this.BadRequest();
-            }
-            catch (ObjectNotFoundException ex)
-            {
-                this.logger.LogError(ex, "The device could not be found");
-                return this.BadRequest();
+                string passwordId = await this.passwordProvider.UpdateDevicePassword(deviceId, request);
+
+                this.logger.LogInformation($"Successfully updated password for device {deviceId}. Password ID {passwordId}");
+
+                return this.Json(new { PasswordId = passwordId });
             }
             catch (Exception ex)
             {
-                this.logger.LogError(ex, "The request could not be processed");
-                throw;
+                return this.errorProvider.GetErrorResult(ex);
             }
         }
+
+        [HttpDelete("{requestId}")]
+        public async Task<IActionResult> DeleteAsync([FromRoute] string requestId)
+        {
+            try
+            {
+                string deviceId = this.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (deviceId == null)
+                {
+                    throw new BadRequestException("The device ID was not found in the claim");
+                }
+
+                this.logger.LogTrace($"Attempting to rollback password ID {requestId} for device {deviceId} ");
+
+                await this.passwordProvider.RevertLastPasswordChange(deviceId, requestId);
+
+                this.logger.LogInformation($"Successfully rolled-back password ID {requestId} for device {deviceId} ");
+
+                return this.Ok();
+            }
+            catch (Exception ex)
+            {
+                return this.errorProvider.GetErrorResult(ex);
+            }
+        }
+
+        private X509Certificate2 EncryptionCertificate
+        {
+            get
+            {
+                if (this.encryptionCertificate == null)
+                {
+                    this.encryptionCertificate = this.certificateProvider.FindEncryptionCertificate();
+                }
+
+                return this.encryptionCertificate;
+            }
+        }
+
     }
 }
