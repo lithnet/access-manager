@@ -93,7 +93,7 @@ namespace Lithnet.AccessManager
             de.CommitChanges();
         }
 
-        public void UpdateCurrentPassword(IComputer computer, string password, DateTime rotationInstant, DateTime expiryDate, int maximumPasswordHistory, MsMcsAdmPwdBehaviour msLapsBehaviour)
+        public void UpdateCurrentPassword(IComputer computer, string password, DateTime rotationInstant, DateTime expiryDate, int maximumPasswordHistory, PasswordAttributeBehaviour msLapsBehaviour)
         {
             DirectoryEntry de = computer.DirectoryEntry;
 
@@ -127,12 +127,12 @@ namespace Lithnet.AccessManager
             de.Properties[AttrLithnetAdminPasswordExpiry].Value = expiryDate.ToFileTimeUtc().ToString();
             de.Properties[AttrLithnetAdminPassword].Value = JsonConvert.SerializeObject(newPassword);
 
-            if (msLapsBehaviour == MsMcsAdmPwdBehaviour.Populate)
+            if (msLapsBehaviour == PasswordAttributeBehaviour.Populate)
             {
                 de.Properties[AttrMsMcsAdmPwd].Value = password;
                 de.Properties[AttrMsMcsAdmPwdExpirationTime].Value = expiryDate.ToFileTimeUtc().ToString();
             }
-            else if (msLapsBehaviour == MsMcsAdmPwdBehaviour.Clear)
+            else if (msLapsBehaviour == PasswordAttributeBehaviour.Clear)
             {
                 de.Properties[AttrMsMcsAdmPwd].Clear();
                 de.Properties[AttrMsMcsAdmPwdExpirationTime].Clear();

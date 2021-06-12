@@ -1,7 +1,9 @@
-﻿namespace Lithnet.AccessManager.Agent
+﻿using System.Threading.Tasks;
+
+namespace Lithnet.AccessManager.Agent
 {
     public interface ILapsAgent
     {
-        void DoCheck();
+         Task DoCheck();
     }
 }

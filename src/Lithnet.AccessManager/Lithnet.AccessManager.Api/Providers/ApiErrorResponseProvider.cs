@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Lithnet.AccessManager.Api.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Lithnet.AccessManager.Api.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using System;
 
 namespace Lithnet.AccessManager.Api
 {

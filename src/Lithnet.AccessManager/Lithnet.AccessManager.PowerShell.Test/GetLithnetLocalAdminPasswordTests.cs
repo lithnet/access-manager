@@ -48,13 +48,13 @@ namespace Lithnet.AccessManager.PowerShell.Test
             DateTime firstExpiry = DateTime.UtcNow.AddDays(-3).Trim(TimeSpan.TicksPerSecond);
             string firstPassword = Guid.NewGuid().ToString();
 
-            provider.UpdateCurrentPassword(computer, firstPassword, firstCreated, firstExpiry, 0, MsMcsAdmPwdBehaviour.Ignore);
+            provider.UpdateCurrentPassword(computer, firstPassword, firstCreated, firstExpiry, 0, PasswordAttributeBehaviour.Ignore);
 
             DateTime secondCreated = DateTime.UtcNow.AddDays(2).Trim(TimeSpan.TicksPerSecond);
             DateTime secondExpiry = DateTime.UtcNow.AddDays(-5).Trim(TimeSpan.TicksPerSecond);
             string secondPassword = Guid.NewGuid().ToString();
 
-            provider.UpdateCurrentPassword(computer, secondPassword, secondCreated, secondExpiry, 30, MsMcsAdmPwdBehaviour.Ignore);
+            provider.UpdateCurrentPassword(computer, secondPassword, secondCreated, secondExpiry, 30, PasswordAttributeBehaviour.Ignore);
 
             System.Management.Automation.PowerShell ps = System.Management.Automation.PowerShell.Create();
             ps.AddCommand(new CmdletInfo("Get-LithnetLocalAdminPasswordHistory", typeof(GetLocalAdminPasswordHistory)));
@@ -88,7 +88,7 @@ namespace Lithnet.AccessManager.PowerShell.Test
             DateTime expired = DateTime.UtcNow.AddDays(-5).Trim(TimeSpan.TicksPerSecond);
             string password = Guid.NewGuid().ToString();
 
-            this.provider.UpdateCurrentPassword(computer, password, created, expired, 0, MsMcsAdmPwdBehaviour.Ignore);
+            this.provider.UpdateCurrentPassword(computer, password, created, expired, 0, PasswordAttributeBehaviour.Ignore);
 
             System.Management.Automation.PowerShell ps = System.Management.Automation.PowerShell.Create();
             ps.AddCommand(new CmdletInfo("Get-LithnetLocalAdminPassword", typeof(GetLocalAdminPassword)));

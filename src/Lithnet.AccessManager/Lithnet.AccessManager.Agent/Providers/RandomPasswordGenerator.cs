@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using Lithnet.AccessManager.Agent.Providers;
 
 namespace Lithnet.AccessManager.Agent
 {
     public class RandomPasswordGenerator : IPasswordGenerator
     {
-        private readonly ILapsSettings settings;
-
+        private readonly ISettingsProvider settings;
         private readonly RNGCryptoServiceProvider csp;
 
         private static readonly char[] SymbolCharacterSet = {
@@ -27,7 +27,7 @@ namespace Lithnet.AccessManager.Agent
             'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
               };
 
-        public RandomPasswordGenerator(ILapsSettings settings, RNGCryptoServiceProvider csp)
+        public RandomPasswordGenerator(ISettingsProvider settings, RNGCryptoServiceProvider csp)
         {
             this.settings = settings;
             this.csp = csp;
@@ -40,15 +40,9 @@ namespace Lithnet.AccessManager.Agent
 
         private string GenerateRandomString(int length)
         {
-            char[] selectedChars = GetSelectedCharacters();
+            char[] selectedChars = this.GetSelectedCharacters();
 
-            string rawString = GenerateRandomString(length, selectedChars);
-
-            if (this.settings.UseReadabilitySeparator)
-            {
-                var split = this.Split(rawString, Math.Max(this.settings.ReadabilitySeparatorInterval, 3));
-                rawString = string.Join(this.settings.ReadabilitySeparator, split);
-            }
+            string rawString = this.GenerateRandomString(length, selectedChars);
 
             return rawString;
         }
@@ -95,14 +89,6 @@ namespace Lithnet.AccessManager.Agent
                 selectedChars.AddRange(SymbolCharacterSet);
             }
 
-            if (this.settings.UseReadabilitySeparator)
-            {
-                foreach (char c in this.settings.ReadabilitySeparator)
-                {
-                    selectedChars.Remove(c);
-                }
-            }
-
             return selectedChars.ToArray();
         }
 
@@ -115,7 +101,7 @@ namespace Lithnet.AccessManager.Agent
         private string GenerateRandomString(int length, params char[] allowedChars)
         {
             char[] identifier = new char[length];
-            byte[] randomData = GetRandomBytes(length);
+            byte[] randomData = this.GetRandomBytes(length);
 
             for (int idx = 0; idx < identifier.Length; idx++)
             {
@@ -129,7 +115,7 @@ namespace Lithnet.AccessManager.Agent
         private byte[] GetRandomBytes(int size)
         {
             byte[] buffer = new byte[size];
-            csp.GetBytes(buffer);
+            this.csp.GetBytes(buffer);
             return buffer;
         }
     }

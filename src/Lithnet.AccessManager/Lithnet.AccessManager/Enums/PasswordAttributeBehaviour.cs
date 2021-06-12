@@ -3,7 +3,7 @@
 namespace Lithnet.AccessManager
 {
     [Flags]
-    public enum MsMcsAdmPwdBehaviour
+    public enum PasswordAttributeBehaviour
     {
         Ignore = 0,
         Populate = 1,

@@ -1,5 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using Lithnet.AccessManager.Api.Shared;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.Win32;
 
 namespace Lithnet.AccessManager.Agent
@@ -42,5 +50,56 @@ namespace Lithnet.AccessManager.Agent
 
             return rawvalue;
         }
+
+        public static void ConfigureWritable<T>(this IServiceCollection services, IConfigurationSection section,  string file = "appsettings.json") where T : class, new()
+        {
+            services.Configure<T>(section);
+            services.AddTransient<IWritableOptions<T>>(provider =>
+            {
+                IHostEnvironment environment = provider.GetService<IHostEnvironment>();
+                IOptionsMonitor<T> options = provider.GetService<IOptionsMonitor<T>>();
+                return new WritableOptions<T>(environment, options, section.Key, file);
+            });
+        }
+
+        public static void EnsureSuccessStatusCode(this HttpResponseMessage message, string content)
+        {
+            if (message.IsSuccessStatusCode)
+            {
+                return;
+            }
+
+            throw message.CreateException(content);
+        }
+
+        public static Exception CreateException(this HttpResponseMessage message, string content)
+        {
+            try
+            {
+                JsonDocument j = JsonDocument.Parse(content);
+                if (j.RootElement.TryGetProperty("Error", out _))
+                {
+                    ApiError error = JsonSerializer.Deserialize<ApiError>(content);
+                    return new ApiException(error, message);
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+
+            string messageContent = string.IsNullOrWhiteSpace(content) ? string.Empty : $"Content: {content}";
+
+            return new HttpRequestException(string.Format(
+                System.Globalization.CultureInfo.InvariantCulture,
+                "Response status code does not indicate success: {0} ({1}).\r\n{2}",
+                (int)message.StatusCode,
+                message.ReasonPhrase,
+                messageContent)
+            );
+        }
+
+        public static StringContent AsJsonStringContent(this object o) => new StringContent(JsonSerializer.Serialize(o), Encoding.UTF8, "application/json");
+
     }
 }

@@ -1,14 +1,13 @@
 ﻿using Lithnet.AccessManager.Api.Providers;
+using Lithnet.AccessManager.Api.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Api.Models;
 
 namespace Lithnet.AccessManager.Api.Controllers
 {
@@ -41,7 +40,7 @@ namespace Lithnet.AccessManager.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ValidateAssertionAsync([FromBody] RegistrationRequest request)
+        public async Task<IActionResult> ValidateAssertionAsync([FromBody] ClientAssertion request)
         {
             try
             {
@@ -51,7 +50,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                     throw new UnsupportedAuthenticationTypeException();
                 }
 
-                this.signedAssertionValidator.Validate(request.Assertion, "https://localhost:44385/api/v1.0/agent/register", out X509Certificate2 signingCertificate);
+                this.signedAssertionValidator.Validate(request.Assertion, "https://localhost:44385/api/v1.0/auth/x509", out X509Certificate2 signingCertificate);
 
                 TokenResponse token;
 

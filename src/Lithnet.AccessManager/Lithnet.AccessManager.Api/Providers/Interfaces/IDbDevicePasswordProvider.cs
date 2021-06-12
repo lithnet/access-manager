@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Api.Shared;
 
 namespace Lithnet.AccessManager.Api.Providers
 {

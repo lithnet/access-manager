@@ -81,10 +81,19 @@ namespace Lithnet.AccessManager
             NTAccount adminGroup = (NTAccount)this.GetWellKnownSid(WellKnownSidType.BuiltinAdministratorsSid).Translate(typeof(NTAccount));
             return adminGroup.Value.Split('\\')[1];
         }
+
+        public string GetBuiltInAdministratorAccountName()
+        {
+            NTAccount admin = (NTAccount)this.GetWellKnownSid(WellKnownSidType.AccountAdministratorSid).Translate(typeof(NTAccount));
+            return admin.Value.Split('\\')[1];
+        }
+
+
         public string GetBuiltInAdministratorsGroupName(string server)
         {
             return NativeMethods.GetBuiltInAdministratorsGroupName(server);
         }
+
         public string GetBuiltInAdministratorsGroupNameOrDefault(string server)
         {
             try

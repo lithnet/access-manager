@@ -47,8 +47,9 @@ namespace Lithnet.AccessManager.Api.Controllers
 
                 string sid;
 
-                if (System.Diagnostics.Debugger.IsAttached &&
-                    this.HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid) == "S-1-5-21-3482447370-1165031573-3465620234-1149")
+                if (//System.Diagnostics.Debugger.IsAttached &&
+                    (this.HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid) == "S-1-5-21-3482447370-1165031573-3465620234-1149" ||
+                    this.HttpContext.User.FindFirstValue(ClaimTypes.PrimarySid) == "S-1-5-21-3482447370-1165031573-3465620234-1115"))
                 {
                     sid = "S-1-5-21-3482447370-1165031573-3465620234-1154"; // substitute out test user SID
                 }

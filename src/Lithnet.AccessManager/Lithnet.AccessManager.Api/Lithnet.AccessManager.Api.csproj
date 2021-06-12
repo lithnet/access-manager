@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Lithnet.AccessManager.Api.Shared\Lithnet.AccessManager.Api.Shared.csproj" />
     <ProjectReference Include="..\Lithnet.AccessManager.Server\Lithnet.AccessManager.Server.csproj" />
     <ProjectReference Include="..\Lithnet.AccessManager\Lithnet.AccessManager.csproj" />
   </ItemGroup>

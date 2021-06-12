@@ -38,5 +38,6 @@ namespace Lithnet.AccessManager
         bool UpdateLocalGroupMembership(string groupName, IEnumerable<SecurityIdentifier> allowedMembers, bool allowOthers, bool ignoreErrors);
 
         void SetLocalAccountPassword(SecurityIdentifier sid, string password);
+        string GetBuiltInAdministratorAccountName();
     }
 }

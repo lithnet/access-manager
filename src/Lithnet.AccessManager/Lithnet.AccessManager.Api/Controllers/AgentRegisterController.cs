@@ -11,6 +11,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Api.Shared;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -29,6 +30,7 @@ namespace Lithnet.AccessManager.Api.Controllers
         private readonly IDeviceProvider devices;
         private readonly IOptions<AgentOptions> agentOptions;
         private readonly IApiErrorResponseProvider errorProvider;
+        private readonly RandomStringGenerator randomStringGenerator;
 
         public AgentRegisterController(ILogger<AgentRegisterController> logger, ICertificateProvider certificateProvider, ISignedAssertionValidator assertionValidator, IDeviceProvider devices, IOptions<AgentOptions> agentOptions, IApiErrorResponseProvider errorProvider)
         {
@@ -41,7 +43,7 @@ namespace Lithnet.AccessManager.Api.Controllers
         }
 
         [HttpPost()]
-        public async Task<IActionResult> RegisterAsync([FromBody] RegistrationRequest request)
+        public async Task<IActionResult> RegisterAsync([FromBody] ClientAssertion request)
         {
             try
             {
@@ -92,19 +94,21 @@ namespace Lithnet.AccessManager.Api.Controllers
         {
             if (device.ApprovalState == ApprovalState.Approved)
             {
-                return this.Json(new { state = "approved", client_id = device.ObjectId });
+                return this.Json(new RegistrationResponse { State = "approved", ClientId = device.ObjectId });
+
             }
             else if (device.ApprovalState == ApprovalState.Pending)
             {
                 string newPath = this.Request.PathBase + this.Request.Path.Add(new PathString($"/{device.ObjectId}"));
                 this.Response.Headers.Add("Location", newPath);
-                JsonResult result = this.Json(new { state = "pending", client_id = device.ObjectId });
+                JsonResult result = this.Json(new RegistrationResponse { State = "pending", ClientId = device.ObjectId });
+
                 result.StatusCode = StatusCodes.Status202Accepted;
                 return result;
             }
             else
             {
-                JsonResult result = this.Json(new { state = "rejected", client_id = device.ObjectId });
+                JsonResult result = this.Json(new RegistrationResponse { State = "rejected", ClientId = device.ObjectId });
                 result.StatusCode = StatusCodes.Status403Forbidden;
                 return result;
             }

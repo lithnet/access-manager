@@ -152,16 +152,16 @@ namespace Lithnet.AccessManager.Agent.Test
         [Test]
         public void WriteToMsMcsAdmPasswordAttributes()
         {
-            Assert.AreEqual(MsMcsAdmPwdBehaviour.Ignore, this.registrySettings.MsMcsAdmPwdBehaviour);
+            Assert.AreEqual(PasswordAttributeBehaviour.Ignore, this.registrySettings.MsMcsAdmPwdBehaviour);
 
-            policyKey.SetValue("MsMcsAdmPwdBehaviour", (int)MsMcsAdmPwdBehaviour.Populate);
-            Assert.AreEqual(MsMcsAdmPwdBehaviour.Populate, this.registrySettings.MsMcsAdmPwdBehaviour);
+            policyKey.SetValue("MsMcsAdmPwdBehaviour", (int)PasswordAttributeBehaviour.Populate);
+            Assert.AreEqual(PasswordAttributeBehaviour.Populate, this.registrySettings.MsMcsAdmPwdBehaviour);
 
-            policyKey.SetValue("MsMcsAdmPwdBehaviour", (int)MsMcsAdmPwdBehaviour.Clear);
-            Assert.AreEqual(MsMcsAdmPwdBehaviour.Clear, this.registrySettings.MsMcsAdmPwdBehaviour);
+            policyKey.SetValue("MsMcsAdmPwdBehaviour", (int)PasswordAttributeBehaviour.Clear);
+            Assert.AreEqual(PasswordAttributeBehaviour.Clear, this.registrySettings.MsMcsAdmPwdBehaviour);
 
             policyKey.SetValue("MsMcsAdmPwdBehaviour", 0);
-            Assert.AreEqual(MsMcsAdmPwdBehaviour.Ignore, this.registrySettings.MsMcsAdmPwdBehaviour);
+            Assert.AreEqual(PasswordAttributeBehaviour.Ignore, this.registrySettings.MsMcsAdmPwdBehaviour);
         }
     }
 }

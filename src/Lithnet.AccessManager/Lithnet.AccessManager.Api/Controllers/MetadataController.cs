@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
+using Lithnet.AccessManager.Api.Shared;
 using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Api.Controllers
@@ -59,17 +60,12 @@ namespace Lithnet.AccessManager.Api.Controllers
                     allowedOptions.Add("ssa");
                 }
 
-                return this.Json(new
+                return this.Json(new MetadataResponse
                 {
-                    AgentAuthentication = new
-                    {
-                        Schemes = allowedOptions
-                    },
-                    PasswordManagement = new
-                    {
-                        EncryptionCertificate = this.GetCertificateString()
-                    }
+                    AgentAuthentication = new AgentAuthentication { AllowedOptions = allowedOptions },
+                    PasswordManagement = new PasswordManagement { EncryptionCertificate = this.GetCertificateString() }
                 });
+
             }
             catch (Exception ex)
             {

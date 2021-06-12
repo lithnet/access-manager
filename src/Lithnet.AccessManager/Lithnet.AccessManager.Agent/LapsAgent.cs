@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Security.Principal;
-using System.ServiceModel.Configuration;
+using System.Threading.Tasks;
+using Lithnet.AccessManager.Agent.Providers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 
@@ -9,36 +11,26 @@ namespace Lithnet.AccessManager.Agent
     public class LapsAgent : ILapsAgent
     {
         private readonly ILogger<LapsAgent> logger;
+        private readonly ISettingsProvider settings;
+        private readonly LegacyLapsAgent legacyAgent;
+        private readonly AdvancedLapsAgent advancedLapsAgent;
 
-        private readonly IDirectory directory;
-
-        private readonly ILapsSettings settings;
-
-        private readonly IPasswordGenerator passwordGenerator;
-
-        private readonly ILocalSam sam;
-
-        private readonly ILithnetAdminPasswordProvider lithnetAdminPasswordProvider;
-
-        private bool mslapsInstaled;
-
+        private bool msLapsInstalled;
         private bool isDisabledLogged;
 
-        public LapsAgent(ILogger<LapsAgent> logger, IDirectory directory, ILapsSettings settings, IPasswordGenerator passwordGenerator, ILocalSam sam, ILithnetAdminPasswordProvider lithnetAdminPasswordProvider)
+        public LapsAgent(ILogger<LapsAgent> logger, ISettingsProvider settings, LegacyLapsAgent legacyAgent, AdvancedLapsAgent advancedLapsAgent)
         {
             this.logger = logger;
-            this.directory = directory;
             this.settings = settings;
-            this.passwordGenerator = passwordGenerator;
-            this.sam = sam;
-            this.lithnetAdminPasswordProvider = lithnetAdminPasswordProvider;
+            this.legacyAgent = legacyAgent;
+            this.advancedLapsAgent = advancedLapsAgent;
         }
 
-        public void DoCheck()
+        public async Task DoCheck()
         {
             try
             {
-                if (!this.settings.Enabled)
+                if (!this.settings.PasswordManagementEnabled)
                 {
                     if (!this.isDisabledLogged)
                     {
@@ -55,36 +47,37 @@ namespace Lithnet.AccessManager.Agent
                     this.isDisabledLogged = false;
                 }
 
-                if (this.IsMsLapsInstalled())
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    if (!this.mslapsInstaled)
+                    if (this.IsMsLapsInstalled())
                     {
-                        logger.LogWarning(EventIDs.LapsConflict, "The Microsoft LAPS client is installed and enabled. Disable the Microsoft LAPS agent via group policy or uninstall it to allow this tool to manage the local administrator password");
-                        mslapsInstaled = true;
-                    }
+                        if (!this.msLapsInstalled)
+                        {
+                            this.logger.LogWarning(EventIDs.LapsConflict, "The Microsoft LAPS client is installed and enabled. Disable the Microsoft LAPS agent via group policy or uninstall it to allow this tool to manage the local administrator password");
+                            this.msLapsInstalled = true;
+                        }
 
-                    return;
+                        return;
+                    }
+                    else
+                    {
+                        if (this.msLapsInstalled)
+                        {
+                            this.msLapsInstalled = false;
+                            this.logger.LogInformation(EventIDs.LapsConflictResolved, "The Microsoft LAPS client has been removed or disabled. Lithnet Access Manager will now set the local admin password for this machine");
+                        }
+                    }
+                }
+
+                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || this.settings.AdvancedAgentEnabled)
+                {
+                    await this.advancedLapsAgent.DoCheckAsync();
                 }
                 else
                 {
-                    if (mslapsInstaled)
-                    {
-                        mslapsInstaled = false;
-                        logger.LogInformation(EventIDs.LapsConflictResolved, "The Microsoft LAPS client has been removed or disabled. Lithnet Access Manager will now set the local admin password for this machine");
-                    }
+                    this.legacyAgent.DoCheck();
                 }
 
-                IComputer computer = this.directory.GetComputer(this.sam.GetMachineNTAccountName());
-
-                if (this.HasPasswordExpired(computer))
-                {
-                    logger.LogTrace(EventIDs.PasswordExpired, "Password has expired and needs to be changed");
-                    this.ChangePassword(computer);
-                }
-                //else
-                //{
-                //    logger.LogTrace(EventIDs.PasswordChangeNotRequired, "Password does not need to be changed");
-                //}
             }
             catch (Exception ex)
             {
@@ -92,7 +85,7 @@ namespace Lithnet.AccessManager.Agent
             }
         }
 
-        public bool IsMsLapsInstalled()
+        private bool IsMsLapsInstalled()
         {
             var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
             RegistryKey r = baseKey.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Installer\UpgradeCodes\77F1646A33805F848A7A683CFB6B88A7", false);
@@ -105,50 +98,6 @@ namespace Lithnet.AccessManager.Agent
             r = baseKey.OpenSubKey(@"SOFTWARE\Policies\Microsoft Services\AdmPwd", false);
 
             return r?.GetValue<int>("AdmPwdEnabled", 0) == 1;
-        }
-
-        public bool HasPasswordExpired(IComputer computer)
-        {
-            try
-            {
-                return this.lithnetAdminPasswordProvider.HasPasswordExpired(computer, this.settings.MsMcsAdmPwdBehaviour == MsMcsAdmPwdBehaviour.Populate);
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(EventIDs.PasswordExpiryCheckFailure, ex, "Could not check the password expiry date");
-                return false;
-            }
-        }
-
-        public void ChangePassword(IComputer computer, SecurityIdentifier sid = null)
-        {
-            try
-            {
-                if (sid == null)
-                {
-                    sid = this.sam.GetWellKnownSid(WellKnownSidType.AccountAdministratorSid);
-                }
-
-                string newPassword = this.passwordGenerator.Generate();
-                DateTime rotationInstant = DateTime.UtcNow;
-                DateTime expiryDate = DateTime.UtcNow.AddDays(this.settings.MaximumPasswordAge);
-
-                lithnetAdminPasswordProvider.UpdateCurrentPassword(computer, newPassword, rotationInstant, expiryDate, this.settings.PasswordHistoryDaysToKeep, this.settings.MsMcsAdmPwdBehaviour);
-
-                this.logger.LogTrace(EventIDs.SetPasswordOnAmAttribute, "Set password on Lithnet Access Manager attribute");
-                
-                if (this.settings.MsMcsAdmPwdBehaviour == MsMcsAdmPwdBehaviour.Populate)
-                {
-                    this.logger.LogTrace(EventIDs.SetPasswordOnLapsAttribute, "Set password on Microsoft LAPS attribute");
-                }
-               
-                this.sam.SetLocalAccountPassword(sid, newPassword);
-                this.logger.LogInformation(EventIDs.SetPassword, "The local administrator password has been changed and will expire on {expiryDate}", expiryDate.ToLocalTime());
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(EventIDs.PasswordChangeFailure, ex, "The password change operation failed");
-            }
         }
     }
 }

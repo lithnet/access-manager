@@ -48,7 +48,7 @@ namespace Lithnet.AccessManager.Test
 
             string password = "abcd1234";
 
-            this.provider.UpdateCurrentPassword(computer, password, created, expired, 0, MsMcsAdmPwdBehaviour.Ignore);
+            this.provider.UpdateCurrentPassword(computer, password, created, expired, 0, PasswordAttributeBehaviour.Ignore);
 
             ProtectedPasswordHistoryItem current = this.provider.GetCurrentPassword(computer, null);
             IReadOnlyList<ProtectedPasswordHistoryItem> history = this.provider.GetPasswordHistory(computer);
@@ -73,7 +73,7 @@ namespace Lithnet.AccessManager.Test
             DateTime firstExpiry = DateTime.UtcNow.AddDays(-3).Trim(TimeSpan.TicksPerSecond);
             string firstPassword = "P@fdsf234sdgfsd";
 
-            provider.UpdateCurrentPassword(computer, firstPassword, firstCreated, firstExpiry, 0, MsMcsAdmPwdBehaviour.Ignore);
+            provider.UpdateCurrentPassword(computer, firstPassword, firstCreated, firstExpiry, 0, PasswordAttributeBehaviour.Ignore);
             IReadOnlyList<ProtectedPasswordHistoryItem> history = provider.GetPasswordHistory(computer);
             ProtectedPasswordHistoryItem currentPassword = provider.GetCurrentPassword(computer, null);
             DateTime? currentExpiry = provider.GetExpiry(computer);
@@ -90,7 +90,7 @@ namespace Lithnet.AccessManager.Test
             DateTime secondExpiry = DateTime.UtcNow.AddDays(-5).Trim(TimeSpan.TicksPerSecond);
             string secondPassword = "jmklofdsafio324534S2@";
 
-            provider.UpdateCurrentPassword(computer, secondPassword, secondCreated, secondExpiry, 30, MsMcsAdmPwdBehaviour.Ignore);
+            provider.UpdateCurrentPassword(computer, secondPassword, secondCreated, secondExpiry, 30, PasswordAttributeBehaviour.Ignore);
 
 
             history = provider.GetPasswordHistory(computer);
@@ -125,7 +125,7 @@ namespace Lithnet.AccessManager.Test
             DateTime firstExpiry = DateTime.UtcNow.AddDays(-5).Trim(TimeSpan.TicksPerSecond);
             string firstPassword = "first password";
 
-            provider.UpdateCurrentPassword(computer, firstPassword, firstCreated, firstExpiry, 0, MsMcsAdmPwdBehaviour.Ignore);
+            provider.UpdateCurrentPassword(computer, firstPassword, firstCreated, firstExpiry, 0, PasswordAttributeBehaviour.Ignore);
             IReadOnlyList<ProtectedPasswordHistoryItem> history = provider.GetPasswordHistory(computer);
             ProtectedPasswordHistoryItem currentPassword = provider.GetCurrentPassword(computer, null);
             DateTime? currentExpiry = provider.GetExpiry(computer);
@@ -142,7 +142,7 @@ namespace Lithnet.AccessManager.Test
             DateTime secondExpiry = DateTime.UtcNow.AddDays(-5).Trim(TimeSpan.TicksPerSecond);
             string secondPassword = "second password";
 
-            provider.UpdateCurrentPassword(computer, secondPassword, secondCreated, secondExpiry, 30, MsMcsAdmPwdBehaviour.Ignore);
+            provider.UpdateCurrentPassword(computer, secondPassword, secondCreated, secondExpiry, 30, PasswordAttributeBehaviour.Ignore);
             history = provider.GetPasswordHistory(computer);
             currentPassword = provider.GetCurrentPassword(computer, null);
             currentExpiry = provider.GetExpiry(computer);
@@ -163,7 +163,7 @@ namespace Lithnet.AccessManager.Test
             DateTime thirdExpiry = DateTime.UtcNow.AddDays(-5).Trim(TimeSpan.TicksPerSecond);
             string thirdPassword = "third password";
 
-            provider.UpdateCurrentPassword(computer, thirdPassword, thirdCreated, thirdExpiry, 2, MsMcsAdmPwdBehaviour.Ignore);
+            provider.UpdateCurrentPassword(computer, thirdPassword, thirdCreated, thirdExpiry, 2, PasswordAttributeBehaviour.Ignore);
             history = provider.GetPasswordHistory(computer);
 
             Assert.AreEqual(1, history.Count);

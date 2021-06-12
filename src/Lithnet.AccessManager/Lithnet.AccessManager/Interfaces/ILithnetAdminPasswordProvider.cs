@@ -11,7 +11,7 @@ namespace Lithnet.AccessManager
         
         DateTime? GetExpiry(IComputer computer);
         
-        void UpdateCurrentPassword(IComputer computer, string password, DateTime rotationInstant, DateTime expiryDate, int maximumPasswordHistory, MsMcsAdmPwdBehaviour msLapsBehaviour);
+        void UpdateCurrentPassword(IComputer computer, string password, DateTime rotationInstant, DateTime expiryDate, int maximumPasswordHistory, PasswordAttributeBehaviour msLapsBehaviour);
 
         bool HasPasswordExpired(IComputer computer, bool considerMsMcsAdmPwdExpiry);
 

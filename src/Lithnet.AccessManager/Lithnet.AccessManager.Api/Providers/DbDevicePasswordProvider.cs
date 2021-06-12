@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Api.Shared;
 using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Api.Providers
@@ -40,7 +41,7 @@ namespace Lithnet.AccessManager.Api.Providers
                 await reader.ReadAsync();
                 DbPasswordData data = new DbPasswordData(reader);
                 return (data.EffectiveDate.AddDays(this.passwordPolicy.Value.MaximumPasswordAgeDays) < DateTime.UtcNow ||
-                        data.ExpiryDate > DateTime.UtcNow);
+                        data.ExpiryDate < DateTime.UtcNow);
 
             }
             catch (SqlException ex)
@@ -58,6 +59,20 @@ namespace Lithnet.AccessManager.Api.Providers
         {
             try
             {
+                DateTime expiryDate = request.ExpiryDate;
+
+                if (passwordPolicy.Value.MaximumPasswordAgeDays > 0)
+                {
+                    DateTime policyMax = DateTime.UtcNow.AddDays(this.passwordPolicy.Value.MaximumPasswordAgeDays);
+
+                    if (expiryDate > policyMax)
+                    {
+                        expiryDate = policyMax;
+                    }
+                }
+              
+           
+
                 await using SqlConnection con = this.dbProvider.GetConnection();
 
                 string requestId = Guid.NewGuid().ToString();
@@ -69,7 +84,7 @@ namespace Lithnet.AccessManager.Api.Providers
                 command.Parameters.AddWithValue("@RequestId", requestId);
                 command.Parameters.AddWithValue("@AccountName", request.AccountName);
                 command.Parameters.AddWithValue("@EffectiveDate", DateTime.UtcNow);
-                command.Parameters.AddWithValue("@ExpiryDate", DateTime.UtcNow.AddDays(passwordPolicy.Value.MaximumPasswordAgeDays));
+                command.Parameters.AddWithValue("@ExpiryDate", expiryDate);
 
                 await command.ExecuteNonQueryAsync();
 

@@ -1,11 +1,11 @@
-﻿using Lithnet.AccessManager.Api.Models;
-using Lithnet.AccessManager.Server;
+﻿using Lithnet.AccessManager.Server;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Lithnet.AccessManager.Api.Shared;
 
 
 namespace Lithnet.AccessManager.Api.Providers
