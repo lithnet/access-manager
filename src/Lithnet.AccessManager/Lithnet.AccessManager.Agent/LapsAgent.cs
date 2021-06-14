@@ -18,6 +18,13 @@ namespace Lithnet.AccessManager.Agent
         private bool msLapsInstalled;
         private bool isDisabledLogged;
 
+        public LapsAgent(ILogger<LapsAgent> logger, ISettingsProvider settings, AdvancedLapsAgent advancedLapsAgent)
+        {
+            this.logger = logger;
+            this.settings = settings;
+            this.advancedLapsAgent = advancedLapsAgent;
+        }
+
         public LapsAgent(ILogger<LapsAgent> logger, ISettingsProvider settings, LegacyLapsAgent legacyAgent, AdvancedLapsAgent advancedLapsAgent)
         {
             this.logger = logger;

@@ -1,20 +1,17 @@
 ﻿using Lithnet.AccessManager.Api.Providers;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 using Lithnet.AccessManager.Api.Shared;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Lithnet.AccessManager.Api.Controllers
 {
@@ -25,21 +22,20 @@ namespace Lithnet.AccessManager.Api.Controllers
     public class AgentRegisterController : Controller
     {
         private readonly ILogger<AgentRegisterController> logger;
-        private readonly ICertificateProvider certificateProvider;
         private readonly ISignedAssertionValidator assertionValidator;
         private readonly IDeviceProvider devices;
         private readonly IOptions<AgentOptions> agentOptions;
         private readonly IApiErrorResponseProvider errorProvider;
-        private readonly RandomStringGenerator randomStringGenerator;
+        private readonly ICheckInDataValidator checkInDataValidator;
 
-        public AgentRegisterController(ILogger<AgentRegisterController> logger, ICertificateProvider certificateProvider, ISignedAssertionValidator assertionValidator, IDeviceProvider devices, IOptions<AgentOptions> agentOptions, IApiErrorResponseProvider errorProvider)
+        public AgentRegisterController(ILogger<AgentRegisterController> logger, ISignedAssertionValidator assertionValidator, IDeviceProvider devices, IOptions<AgentOptions> agentOptions, IApiErrorResponseProvider errorProvider, ICheckInDataValidator checkInDataValidator)
         {
             this.logger = logger;
-            this.certificateProvider = certificateProvider;
             this.assertionValidator = assertionValidator;
             this.devices = devices;
             this.agentOptions = agentOptions;
             this.errorProvider = errorProvider;
+            this.checkInDataValidator = checkInDataValidator;
         }
 
         [HttpPost()]
@@ -53,7 +49,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                     return this.Forbid(JwtBearerDefaults.AuthenticationScheme);
                 }
 
-                JwtSecurityToken token = this.assertionValidator.Validate(request.Assertion, "https://localhost:44385/api/v1.0/agent/register", out X509Certificate2 signingCertificate);
+                JwtSecurityToken token = this.assertionValidator.Validate(request.Assertion, "agent/register", out X509Certificate2 signingCertificate);
 
                 Device device = this.ValidateRegistrationClaims(token);
                 device.ApprovalState = this.agentOptions.Value.AutoApproveSelfSignedAuth ? ApprovalState.Approved : ApprovalState.Pending;
@@ -70,7 +66,7 @@ namespace Lithnet.AccessManager.Api.Controllers
         }
 
         [HttpGet("{requestId}")]
-        public async Task<IActionResult> GetStatus([FromRoute] string requestId)
+        public async Task<IActionResult> GetRegistrationStatusAsync([FromRoute] string requestId)
         {
             try
             {
@@ -99,7 +95,7 @@ namespace Lithnet.AccessManager.Api.Controllers
             }
             else if (device.ApprovalState == ApprovalState.Pending)
             {
-                string newPath = this.Request.PathBase + this.Request.Path.Add(new PathString($"/{device.ObjectId}"));
+                string newPath = this.Request.PathBase.Add(new PathString($"/agent/register/{device.ObjectId}"));
                 this.Response.Headers.Add("Location", newPath);
                 JsonResult result = this.Json(new RegistrationResponse { State = "pending", ClientId = device.ObjectId });
 
@@ -116,108 +112,109 @@ namespace Lithnet.AccessManager.Api.Controllers
 
         private Device ValidateRegistrationClaims(JwtSecurityToken token)
         {
-            string computerName = token.Claims.FirstOrDefault(t => t.Type == "hostname")?.Value;
-            if (computerName == null)
-            {
-                throw new BadRequestException("The registration information did not include a hostname");
-            }
-
-            string dnsName = token.Claims.FirstOrDefault(t => t.Type == "dnsname")?.Value;
-            if (dnsName == null)
-            {
-                throw new BadRequestException("The registration information did not include a dns name");
-            }
-
             string registrationKey = token.Claims.FirstOrDefault(t => t.Type == "registration-key")?.Value;
             if (registrationKey == null)
             {
                 throw new BadRequestException("The registration information did not include a registration key");
             }
 
+            string data = token.Claims.FirstOrDefault(t => t.Type == "data")?.Value;
+            if (data == null)
+            {
+                throw new BadRequestException("The registration information did not include a data element");
+            }
+
+            AgentCheckIn checkInData = JsonSerializer.Deserialize<AgentCheckIn>(data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            this.checkInDataValidator.ValidateCheckInData(checkInData);
+
             Device device = new Device()
             {
-                ComputerName = computerName,
-                DnsName = dnsName,
+                ComputerName = checkInData.Hostname,
+                DnsName = checkInData.DnsName,
+                AgentVersion = checkInData.AgentVersion,
+                OperatingSystemFamily = checkInData.OperatingSystem,
+                OperatingSystemVersion = checkInData.OperationSystemVersion
             };
 
             return device;
         }
 
-        [HttpGet("aad")]
-        public IActionResult GetAadJwt()
-        {
-            string hostname = "carbon";
-            //string dnsName = "carbon.lithnet.local";
-            //string registrationKey = "1234";
+        //[HttpGet("aad")]
+        //public IActionResult GetAadJwt()
+        //{
+        //    string hostname = "carbon";
+        //    //string dnsName = "carbon.lithnet.local";
+        //    //string registrationKey = "1234";
 
-            //CN = d763852d-0c7b-4dce-8532-d3a21ead0140
-            X509Store store = new X509Store(StoreLocation.CurrentUser);
-            store.Open(OpenFlags.ReadOnly);
-            X509Certificate2 cert = store.Certificates.Find(X509FindType.FindBySubjectName, "d763852d-0c7b-4dce-8532-d3a21ead0140", false)[0];
-            RsaSecurityKey rsaSecurityKey = new RsaSecurityKey(cert.GetRSAPrivateKey());
+        //    //CN = d763852d-0c7b-4dce-8532-d3a21ead0140
+        //    X509Store store = new X509Store(StoreLocation.CurrentUser);
+        //    store.Open(OpenFlags.ReadOnly);
+        //    X509Certificate2 cert = store.Certificates.Find(X509FindType.FindBySubjectName, "d763852d-0c7b-4dce-8532-d3a21ead0140", false)[0];
+        //    RsaSecurityKey rsaSecurityKey = new RsaSecurityKey(cert.GetRSAPrivateKey());
 
-            string exportedCertificate = Convert.ToBase64String(cert.Export(X509ContentType.Cert));
+        //    string exportedCertificate = Convert.ToBase64String(cert.Export(X509ContentType.Cert));
 
-            string myIssuer = hostname;
-            string myAudience = "https://localhost:44385/api/v1.0/agent/register";
+        //    string myIssuer = hostname;
+        //    string myAudience = "https://localhost:44385/api/v1.0/agent/register";
 
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim("jti", Guid.NewGuid().ToString()),
-                }),
-                IssuedAt = DateTime.UtcNow,
-                Expires = DateTime.UtcNow.AddMinutes(4), 
-                Issuer = myIssuer,
-                Audience = myAudience,
-                SigningCredentials = new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSha256)
-            };
+        //    JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+        //    SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
+        //    {
+        //        Subject = new ClaimsIdentity(new[]
+        //        {
+        //            new Claim("jti", Guid.NewGuid().ToString()),
+        //        }),
+        //        IssuedAt = DateTime.UtcNow,
+        //        Expires = DateTime.UtcNow.AddMinutes(4), 
+        //        Issuer = myIssuer,
+        //        Audience = myAudience,
+        //        SigningCredentials = new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSha256)
+        //    };
 
-            // Add x5c header parameter containing the signing certificate:
-            JwtSecurityToken token = tokenHandler.CreateToken(tokenDescriptor) as JwtSecurityToken;
-            token.Header.Add(JwtHeaderParameterNames.X5c, new List<string> { exportedCertificate });
+        //    // Add x5c header parameter containing the signing certificate:
+        //    JwtSecurityToken token = tokenHandler.CreateToken(tokenDescriptor) as JwtSecurityToken;
+        //    token.Header.Add(JwtHeaderParameterNames.X5c, new List<string> { exportedCertificate });
 
-            string t = tokenHandler.WriteToken(token);
+        //    string t = tokenHandler.WriteToken(token);
 
-            return this.Ok($"{t}");
-        }
+        //    return this.Ok($"{t}");
+        //}
 
-        [HttpGet("{hostname}/{dnsName}/{registrationKey}")]
-        public IActionResult GetJwt([FromRoute] string hostname, [FromRoute] string dnsName, [FromRoute] string registrationKey)
-        {
-            X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert(Environment.MachineName, new Oid("1.2.3.4.5.6.7.8"));
-            RsaSecurityKey rsaSecurityKey = new RsaSecurityKey(cert.GetRSAPrivateKey());
+        //[HttpGet("{hostname}/{dnsName}/{registrationKey}")]
+        //public IActionResult GetJwt([FromRoute] string hostname, [FromRoute] string dnsName, [FromRoute] string registrationKey)
+        //{
+        //    X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert(Environment.MachineName, new Oid("1.2.3.4.5.6.7.8"));
+        //    RsaSecurityKey rsaSecurityKey = new RsaSecurityKey(cert.GetRSAPrivateKey());
 
-            string exportedCertificate = Convert.ToBase64String(cert.Export(X509ContentType.Cert));
+        //    string exportedCertificate = Convert.ToBase64String(cert.Export(X509ContentType.Cert));
 
-            string myIssuer = hostname;
-            string myAudience = "https://localhost:44385/api/v1.0/agent/register";
+        //    string myIssuer = hostname;
+        //    string myAudience = "https://localhost:44385/api/v1.0/agent/register";
 
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim("jti", Guid.NewGuid().ToString()),
-                    new Claim("hostname", hostname),
-                    new Claim("dnsname", dnsName),
-                    new Claim("registration-key", registrationKey),
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(4),
-                Issuer = myIssuer,
-                Audience = myAudience,
-                SigningCredentials = new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSha256)
-            };
+        //    JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+        //    SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
+        //    {
+        //        Subject = new ClaimsIdentity(new[]
+        //        {
+        //            new Claim("jti", Guid.NewGuid().ToString()),
+        //            new Claim("hostname", hostname),
+        //            new Claim("dnsname", dnsName),
+        //            new Claim("registration-key", registrationKey),
+        //        }),
+        //        Expires = DateTime.UtcNow.AddMinutes(4),
+        //        Issuer = myIssuer,
+        //        Audience = myAudience,
+        //        SigningCredentials = new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSha256)
+        //    };
 
-            // Add x5c header parameter containing the signing certificate:
-            JwtSecurityToken token = tokenHandler.CreateToken(tokenDescriptor) as JwtSecurityToken;
-            token.Header.Add(JwtHeaderParameterNames.X5c, new List<string> { exportedCertificate });
+        //    // Add x5c header parameter containing the signing certificate:
+        //    JwtSecurityToken token = tokenHandler.CreateToken(tokenDescriptor) as JwtSecurityToken;
+        //    token.Header.Add(JwtHeaderParameterNames.X5c, new List<string> { exportedCertificate });
 
-            string t = tokenHandler.WriteToken(token);
+        //    string t = tokenHandler.WriteToken(token);
 
-            return this.Ok($"{t}");
-        }
+        //    return this.Ok($"{t}");
+        //}
     }
 }

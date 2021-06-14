@@ -15,7 +15,7 @@ namespace Lithnet.AccessManager.Api
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
-                    .UseUrls("https://localhost:44385/api/v1.0")
+                    .UseUrls("https://localhost:44385/api/v1.0", "https://carbon.dev.lithnet.local:44385/api/v1.0")
                     .UseHttpSys(x =>
                     {
                         x.Authentication.Schemes = Microsoft.AspNetCore.Server.HttpSys.AuthenticationSchemes.Negotiate | Microsoft.AspNetCore.Server.HttpSys.AuthenticationSchemes.NTLM;

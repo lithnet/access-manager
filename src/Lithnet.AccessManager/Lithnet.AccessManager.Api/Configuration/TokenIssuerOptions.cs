@@ -12,7 +12,5 @@ namespace Lithnet.AccessManager.Api
         public string SigningAlgorithm { get; set; } = SecurityAlgorithms.HmacSha512;
 
         public ProtectedSecret SigningKey { get; set; }
-
-        public string Audience { get; set; }
     }
 }

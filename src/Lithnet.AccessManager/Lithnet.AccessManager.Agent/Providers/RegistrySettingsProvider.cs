@@ -6,23 +6,30 @@ namespace Lithnet.AccessManager.Agent
 {
     public class RegistrySettingsProvider
     {
-        private readonly string policyKeyName;
+        private readonly string qualifiedKeyName;
+        private readonly string keyName;
 
-        public RegistrySettingsProvider(string keyBaseName, bool relative)
+        public RegistrySettingsProvider(string keyBaseName)
         {
-            if (relative)
+            this.qualifiedKeyName = $"HKEY_LOCAL_MACHINE\\SOFTWARE\\{keyBaseName}";
+            this.keyName = $"SOFTWARE\\{keyBaseName}";
+        }
+
+        public void SetValue<T>(string valueName, T value)
+        {
+            if (value == null)
             {
-                this.policyKeyName = $"HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\{keyBaseName}";
+                RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default).OpenSubKey(this.keyName, true)?.DeleteValue(valueName, false);
             }
             else
             {
-                this.policyKeyName = keyBaseName;
+                Registry.SetValue(this.qualifiedKeyName, valueName, value);
             }
         }
 
         public T GetValue<T>(string valueName, T defaultValue)
         {
-            object rawvalue = Registry.GetValue(this.policyKeyName, valueName, defaultValue);
+            object rawvalue = Registry.GetValue(this.qualifiedKeyName, valueName, defaultValue);
 
             if (rawvalue == null)
             {
@@ -50,7 +57,7 @@ namespace Lithnet.AccessManager.Agent
 
         public T GetValue<T>(string valueName)
         {
-            object rawvalue = Registry.GetValue(this.policyKeyName, valueName, null);
+            object rawvalue = Registry.GetValue(this.qualifiedKeyName, valueName, null);
 
             if (rawvalue == null)
             {
@@ -78,7 +85,7 @@ namespace Lithnet.AccessManager.Agent
 
         public IEnumerable<string> GetValues(string name)
         {
-            string[] rawvalue = Registry.GetValue(this.policyKeyName, name, null) as string[];
+            string[] rawvalue = Registry.GetValue(this.qualifiedKeyName, name, null) as string[];
 
             if (rawvalue == null)
             {

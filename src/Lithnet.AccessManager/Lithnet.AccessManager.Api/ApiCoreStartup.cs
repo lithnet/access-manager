@@ -17,7 +17,6 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
 
 namespace Lithnet.AccessManager.Api
 {
@@ -61,12 +60,12 @@ namespace Lithnet.AccessManager.Api
 
             // Our services
 
+            services.AddSingleton<ICheckInDataValidator, CheckInDataValidator>();
             services.AddScoped<IDeviceProvider, DbDeviceProvider>();
             services.AddScoped<IAadGraphApiProvider, AadGraphApiProvider>();
             services.AddScoped<IDbDevicePasswordProvider, DbDevicePasswordProvider>();
             services.AddSingleton<IApiErrorResponseProvider, ApiErrorResponseProvider>();
             services.AddSingleton<IAppPathProvider, ApiAppPathProvider>();
-            services.AddSingleton<ISecurityTokenCache, SecurityTokenCache>();
             services.AddSingleton<ISecurityTokenGenerator, SecurityTokenGenerator>();
             services.AddSingleton<ISignedAssertionValidator, SignedAssertionValidator>();
             services.AddSingleton<RandomStringGenerator>();
@@ -79,6 +78,7 @@ namespace Lithnet.AccessManager.Api
             services.Configure<TokenIssuerOptions>(this.Configuration.GetSection("TokenIssuer"));
             services.Configure<SignedAssertionValidationOptions>(this.Configuration.GetSection("TokenValidation"));
             services.Configure<DataProtectionOptions>(this.Configuration.GetSection("DataProtection"));
+            services.Configure<ApiOptions>(this.Configuration.GetSection("Api"));
 
 
             IAmsLicenseManager licenseManager = this.CreateLicenseManager(services);
@@ -90,10 +90,11 @@ namespace Lithnet.AccessManager.Api
         private void ConfigureAuthentication(IServiceCollection services)
         {
             var serviceProvider = services.BuildServiceProvider();
-            var options = serviceProvider.GetRequiredService<IOptions<TokenIssuerOptions>>().Value;
+            var tokenIssuerOptions = serviceProvider.GetRequiredService<IOptions<TokenIssuerOptions>>().Value;
+            var apiOptions = serviceProvider.GetRequiredService<IOptions<ApiOptions>>().Value;
             var secretProvider = serviceProvider.GetRequiredService<IProtectedSecretProvider>();
 
-            SymmetricSecurityKey sharedKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretProvider.UnprotectSecret(options.SigningKey)));
+            SymmetricSecurityKey sharedKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretProvider.UnprotectSecret(tokenIssuerOptions.SigningKey)));
 
             services.AddAuthentication()
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, o =>
@@ -106,11 +107,11 @@ namespace Lithnet.AccessManager.Api
                         RequireExpirationTime = true,
                         ValidateLifetime = true,
                         ValidateAudience = true,
-                        ValidAudience = options.Audience,
+                        ValidAudiences = apiOptions.BuildValidAudiences(),
                         RequireAudience = true,
                         ValidateIssuer = true,
-                        ValidIssuer = options.Issuer,
-                        ValidAlgorithms = new[] { options.SigningAlgorithm }
+                        ValidIssuer = tokenIssuerOptions.Issuer,
+                        ValidAlgorithms = new[] { tokenIssuerOptions.SigningAlgorithm }
                     };
                 });
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Lithnet.AccessManager.Agent.Providers
 {
@@ -34,8 +35,20 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         PasswordAttributeBehaviour MsMcsAdmPwdAttributeBehaviour { get; }
 
-        int MaximumPasswordAge { get; }
+        int MaximumPasswordAgeDays { get; }
 
-        IList<string> AadIssuerDNs { get; }
+        string RegistrationKey { get; set; }
+
+        string ClientId { get; set; }
+
+        string CheckRegistrationUrl { get; set; }
+
+        RegistrationState RegistrationState { get; set; }
+
+        string AuthCertificate { get; set; }
+
+        DateTime LastCheckIn { get; set; }
+
+        int CheckInIntervalHours { get; }
     }
 }

@@ -1,11 +1,9 @@
-﻿using Lithnet.AccessManager.Agent.Configuration;
+﻿using Lithnet.AccessManager.Agent.Providers;
 using Lithnet.AccessManager.Api.Shared;
-using Microsoft.Extensions.Options;
 using System;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Agent.Providers;
 
 namespace Lithnet.AccessManager.Agent.Authentication
 {
@@ -40,7 +38,6 @@ namespace Lithnet.AccessManager.Agent.Authentication
 
             return (await this.RequestAccessToken()).Token;
         }
-
 
         private async Task<TokenResponse> RequestAccessToken()
         {

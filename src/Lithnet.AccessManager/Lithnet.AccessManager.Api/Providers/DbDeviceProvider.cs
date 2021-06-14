@@ -20,6 +20,9 @@ namespace Lithnet.AccessManager.Api.Providers
 
         public async Task<Device> GetOrCreateDeviceAsync(Microsoft.Graph.Device aadDevice, string authority)
         {
+            authority.ThrowIfNull(nameof(authority));
+            aadDevice.ThrowIfNull(nameof(aadDevice));
+
             string deviceId = aadDevice.Id;
 
             try
@@ -36,6 +39,9 @@ namespace Lithnet.AccessManager.Api.Providers
 
         public async Task<Device> GetOrCreateDeviceAsync(IComputer principal, string authority)
         {
+            authority.ThrowIfNull(nameof(authority));
+            principal.ThrowIfNull(nameof(principal));
+
             string deviceId = principal.Sid.ToString();
 
             try
@@ -50,15 +56,18 @@ namespace Lithnet.AccessManager.Api.Providers
             return await this.CreateDeviceAsync(principal, authority, deviceId);
         }
 
-        public async Task<Device> GetDeviceAsync(AuthorityType authorityType, string authority, string deviceId)
+        public async Task<Device> GetDeviceAsync(AuthorityType authorityType, string authority, string authorityDeviceId)
         {
+            authority.ThrowIfNull(nameof(authority));
+            authorityDeviceId.ThrowIfNull(nameof(authorityDeviceId));
+
             await using SqlConnection con = this.dbProvider.GetConnection();
 
             SqlCommand command = new SqlCommand("spGetDeviceByAuthority", con);
             command.CommandType = System.Data.CommandType.StoredProcedure;
             command.Parameters.AddWithValue("@AuthorityType", (int)authorityType);
             command.Parameters.AddWithValue("@Authority", authority);
-            command.Parameters.AddWithValue("@AuthorityDeviceId", deviceId);
+            command.Parameters.AddWithValue("@AuthorityDeviceId", authorityDeviceId);
 
             await using SqlDataReader reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
@@ -66,11 +75,33 @@ namespace Lithnet.AccessManager.Api.Providers
                 return new Device(reader);
             }
 
-            throw new DeviceNotFoundException($"Could not find a device with ID {deviceId} from authority {authority} ({authorityType})");
+            throw new DeviceNotFoundException($"Could not find a device with ID {authorityDeviceId} from authority {authority} ({authorityType})");
+
+        }
+
+        public async Task<Device> GetDeviceAsync(string deviceId)
+        {
+            deviceId.ThrowIfNull(nameof(deviceId));
+           
+            await using SqlConnection con = this.dbProvider.GetConnection();
+
+            SqlCommand command = new SqlCommand("spGetDevice", con);
+            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@ObjectID", deviceId);
+
+            await using SqlDataReader reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                return new Device(reader);
+            }
+
+            throw new DeviceNotFoundException($"Could not find a device with ID {deviceId}");
         }
 
         public async Task<Device> GetDeviceAsync(X509Certificate2 certificate)
         {
+            certificate.ThrowIfNull(nameof(certificate));
+           
             await using SqlConnection con = this.dbProvider.GetConnection();
 
             SqlCommand command = new SqlCommand("spGetDeviceByX509Thumbprint", con);
@@ -88,6 +119,9 @@ namespace Lithnet.AccessManager.Api.Providers
 
         public async Task<Device> CreateDeviceAsync(Device device, X509Certificate2 certificate)
         {
+            device.ThrowIfNull(nameof(device));
+            certificate.ThrowIfNull(nameof(certificate));
+
             device.ObjectId ??= Guid.NewGuid().ToString();
             device.Authority = "ams";
             device.AuthorityDeviceId = device.ObjectId;
@@ -99,7 +133,7 @@ namespace Lithnet.AccessManager.Api.Providers
             command.CommandType = System.Data.CommandType.StoredProcedure;
             command.Parameters.AddWithValue("@X509Certificate", certificate.Export(X509ContentType.Cert));
             command.Parameters.AddWithValue("@X509CertificateThumbprint", certificate.Thumbprint);
-            device.ToCommandParameters(command);
+            device.ToCreateCommandParameters(command);
 
             await using SqlDataReader reader = await command.ExecuteReaderAsync();
             await reader.ReadAsync();
@@ -108,6 +142,9 @@ namespace Lithnet.AccessManager.Api.Providers
 
         public async Task<Device> CreateDeviceAsync(Microsoft.Graph.Device aadDevice, string authority)
         {
+            aadDevice.ThrowIfNull(nameof(aadDevice));
+            authority.ThrowIfNull(nameof(authority));
+
             Device device = new Device
             {
                 Authority = authority,
@@ -124,6 +161,10 @@ namespace Lithnet.AccessManager.Api.Providers
 
         public async Task<Device> CreateDeviceAsync(IComputer computer, string authority, string deviceId)
         {
+            computer.ThrowIfNull(nameof(computer));
+            authority.ThrowIfNull(nameof(authority));
+            deviceId.ThrowIfNull(nameof(deviceId));
+
             Device device = new Device
             {
                 ApprovalState = ApprovalState.Approved,
@@ -139,13 +180,35 @@ namespace Lithnet.AccessManager.Api.Providers
 
         public async Task<Device> CreateDeviceAsync(Device device)
         {
+            device.ThrowIfNull(nameof(device));
+
             device.ObjectId ??= Guid.NewGuid().ToString();
 
             await using SqlConnection con = this.dbProvider.GetConnection();
 
             SqlCommand command = new SqlCommand("spCreateDevice", con);
             command.CommandType = System.Data.CommandType.StoredProcedure;
-            device.ToCommandParameters(command);
+            device.ToCreateCommandParameters(command);
+
+            await using SqlDataReader reader = await command.ExecuteReaderAsync();
+            await reader.ReadAsync();
+            return new Device(reader);
+        }
+
+        public async Task<Device> UpdateDeviceAsync(Device device)
+        {
+            device.ThrowIfNull(nameof(device));
+
+            if (device.ObjectId == null)
+            {
+                throw new BadRequestException("Could not update the device because the device ID was not found");
+            }
+
+            await using SqlConnection con = this.dbProvider.GetConnection();
+
+            SqlCommand command = new SqlCommand("spUpdateDevice", con);
+            command.CommandType = System.Data.CommandType.StoredProcedure;
+            device.ToUpdateCommandParameters(command);
 
             await using SqlDataReader reader = await command.ExecuteReaderAsync();
             await reader.ReadAsync();

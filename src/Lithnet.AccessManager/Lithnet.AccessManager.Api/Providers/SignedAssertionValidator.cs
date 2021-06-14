@@ -3,7 +3,6 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 
 namespace Lithnet.AccessManager.Api.Providers
@@ -11,13 +10,15 @@ namespace Lithnet.AccessManager.Api.Providers
     public class SignedAssertionValidator : ISignedAssertionValidator
     {
         private readonly IOptions<SignedAssertionValidationOptions> validatorOptions;
+        private readonly IOptions<ApiOptions> apiOptions;
 
-        public SignedAssertionValidator(IOptions<SignedAssertionValidationOptions> validatorOptions)
+        public SignedAssertionValidator(IOptions<SignedAssertionValidationOptions> validatorOptions, IOptions<ApiOptions> apiOptions)
         {
             this.validatorOptions = validatorOptions;
+            this.apiOptions = apiOptions;
         }
 
-        public JwtSecurityToken Validate(string assertion, string audience, out X509Certificate2 signingCertificate)
+        public JwtSecurityToken Validate(string assertion, string audiencePath, out X509Certificate2 signingCertificate)
         {
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
             JwtSecurityToken rawToken = handler.ReadJwtToken(assertion);
@@ -33,7 +34,7 @@ namespace Lithnet.AccessManager.Api.Providers
                 ValidateTokenReplay = true,
                 ValidateIssuerSigningKey = false,
                 ValidAlgorithms = this.validatorOptions.Value.AllowedSigningAlgorithms,
-                ValidAudience = audience,
+                ValidAudiences = this.apiOptions.Value.BuildValidAudiences(audiencePath),
                 IssuerSigningKey = new RsaSecurityKey(signingCertificate.GetRSAPublicKey())
             }, out SecurityToken validatedToken);
 

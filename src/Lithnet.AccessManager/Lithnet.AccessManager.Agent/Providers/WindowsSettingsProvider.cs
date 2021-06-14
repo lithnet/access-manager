@@ -9,51 +9,88 @@ namespace Lithnet.AccessManager.Agent.Providers
 {
     public class WindowsSettingsProvider : ISettingsProvider
     {
+        private readonly RegistrySettingsProvider policySettingsAgent;
+        private readonly RegistrySettingsProvider policySettingsPassword;
         private readonly RegistrySettingsProvider registrySettingsAgent;
-        private readonly RegistrySettingsProvider registrySettingsPassword;
         private readonly IOptionsMonitor<AgentOptions> agentOptions;
 
         public WindowsSettingsProvider(IOptionsMonitor<AgentOptions> agentOptions)
         {
             this.agentOptions = agentOptions;
-            this.registrySettingsAgent = new RegistrySettingsProvider("Lithnet\\Access Manager Agent", true);
-            this.registrySettingsPassword = new RegistrySettingsProvider("Lithnet\\Access Manager Agent\\Password", true);
+            this.policySettingsAgent = new RegistrySettingsProvider("Policies\\Lithnet\\Access Manager Agent");
+            this.policySettingsPassword = new RegistrySettingsProvider("Policies\\Lithnet\\Access Manager Agent\\Password");
+            this.registrySettingsAgent = new RegistrySettingsProvider("Lithnet\\Access Manager Agent");
         }
 
-        public int Interval => this.registrySettingsAgent.GetValue<int>("Interval", agentOptions.CurrentValue.Interval);
+        public int Interval => this.policySettingsAgent.GetValue<int>("Interval", agentOptions.CurrentValue.Interval);
 
-        public bool Enabled => this.registrySettingsAgent.GetValue<bool>("Enabled", agentOptions.CurrentValue.Enabled);
+        public bool Enabled => this.policySettingsAgent.GetValue<bool>("Enabled", agentOptions.CurrentValue.Enabled);
 
-        public bool AdvancedAgentEnabled => this.registrySettingsAgent.GetValue<bool>("AdvancedAgent", agentOptions.CurrentValue.AdvancedAgent.Enabled);
+        public bool AdvancedAgentEnabled => this.policySettingsAgent.GetValue<bool>("AdvancedAgent", agentOptions.CurrentValue.AdvancedAgent.Enabled);
 
-        public AuthenticationMode AuthenticationMode => this.registrySettingsAgent.GetValue<AuthenticationMode>("AuthenticationMode", agentOptions.CurrentValue.AdvancedAgent.AuthenticationMode);
+        public AuthenticationMode AuthenticationMode => this.policySettingsAgent.GetValue<AuthenticationMode>("AuthenticationMode", agentOptions.CurrentValue.AdvancedAgent.AuthenticationMode);
 
 
-        public string Server => this.registrySettingsAgent.GetValue<string>("Server", agentOptions.CurrentValue.AdvancedAgent.Server);
+        public string Server => this.policySettingsAgent.GetValue<string>("Server", agentOptions.CurrentValue.AdvancedAgent.Server);
 
-        public bool PasswordManagementEnabled => this.registrySettingsPassword.GetValue<bool>("Enabled", agentOptions.CurrentValue.Enabled);
+        public bool PasswordManagementEnabled => this.policySettingsPassword.GetValue<bool>("Enabled", agentOptions.CurrentValue.Enabled);
 
-        public int PasswordLength => this.registrySettingsPassword.GetValue<int>("PasswordLength", agentOptions.CurrentValue.PasswordManagement.PasswordPolicy.PasswordLength);
+        public int PasswordLength => this.policySettingsPassword.GetValue<int>("PasswordLength", agentOptions.CurrentValue.PasswordManagement.PasswordPolicy.PasswordLength);
 
-        public string PasswordCharacters => this.registrySettingsPassword.GetValue<string>("PasswordCharacters", agentOptions.CurrentValue.PasswordManagement.PasswordPolicy.PasswordCharacters);
+        public string PasswordCharacters => this.policySettingsPassword.GetValue<string>("PasswordCharacters", agentOptions.CurrentValue.PasswordManagement.PasswordPolicy.PasswordCharacters);
 
-        public bool UseUpper => this.registrySettingsPassword.GetValue<bool>("UseUpper", agentOptions.CurrentValue.PasswordManagement.PasswordPolicy.UseUpper);
+        public bool UseUpper => this.policySettingsPassword.GetValue<bool>("UseUpper", agentOptions.CurrentValue.PasswordManagement.PasswordPolicy.UseUpper);
 
-        public bool UseLower => this.registrySettingsPassword.GetValue<bool>("UseLower", agentOptions.CurrentValue.PasswordManagement.PasswordPolicy.UseLower);
+        public bool UseLower => this.policySettingsPassword.GetValue<bool>("UseLower", agentOptions.CurrentValue.PasswordManagement.PasswordPolicy.UseLower);
 
-        public bool UseSymbol => this.registrySettingsPassword.GetValue<bool>("UseSymbol", agentOptions.CurrentValue.PasswordManagement.PasswordPolicy.UseSymbol);
+        public bool UseSymbol => this.policySettingsPassword.GetValue<bool>("UseSymbol", agentOptions.CurrentValue.PasswordManagement.PasswordPolicy.UseSymbol);
 
-        public bool UseNumeric => this.registrySettingsPassword.GetValue<bool>("UseNumeric", agentOptions.CurrentValue.PasswordManagement.PasswordPolicy.UseNumeric);
+        public bool UseNumeric => this.policySettingsPassword.GetValue<bool>("UseNumeric", agentOptions.CurrentValue.PasswordManagement.PasswordPolicy.UseNumeric);
 
-        public int LithnetLocalAdminPasswordHistoryDaysToKeep => this.registrySettingsPassword.GetValue<int>("PasswordHistoryDaysToKeep", agentOptions.CurrentValue.PasswordManagement.ActiveDirectorySettings.LithnetLocalAdminPasswordHistoryDaysToKeep);
+        public int LithnetLocalAdminPasswordHistoryDaysToKeep => this.policySettingsPassword.GetValue<int>("PasswordHistoryDaysToKeep", agentOptions.CurrentValue.PasswordManagement.ActiveDirectorySettings.LithnetLocalAdminPasswordHistoryDaysToKeep);
 
-        public PasswordAttributeBehaviour LithnetLocalAdminPasswordAttributeBehaviour => this.registrySettingsPassword.GetValue<PasswordAttributeBehaviour>("LithnetLocalAdminPasswordBehaviour", agentOptions.CurrentValue.PasswordManagement.ActiveDirectorySettings.LithnetLocalAdminPasswordAttributeBehaviour);
+        public PasswordAttributeBehaviour LithnetLocalAdminPasswordAttributeBehaviour => this.policySettingsPassword.GetValue<PasswordAttributeBehaviour>("LithnetLocalAdminPasswordBehaviour", agentOptions.CurrentValue.PasswordManagement.ActiveDirectorySettings.LithnetLocalAdminPasswordAttributeBehaviour);
 
-        public PasswordAttributeBehaviour MsMcsAdmPwdAttributeBehaviour => this.registrySettingsPassword.GetValue<PasswordAttributeBehaviour>("MsMcsAdmPwdBehaviour", agentOptions.CurrentValue.PasswordManagement.ActiveDirectorySettings.MsMcsAdmPwdAttributeBehaviour);
+        public PasswordAttributeBehaviour MsMcsAdmPwdAttributeBehaviour => this.policySettingsPassword.GetValue<PasswordAttributeBehaviour>("MsMcsAdmPwdBehaviour", agentOptions.CurrentValue.PasswordManagement.ActiveDirectorySettings.MsMcsAdmPwdAttributeBehaviour);
 
-        public int MaximumPasswordAge => this.registrySettingsPassword.GetValue<int>("MaximumPasswordAge", agentOptions.CurrentValue.PasswordManagement.PasswordPolicy.MaximumPasswordAge);
+        public int MaximumPasswordAgeDays => this.policySettingsPassword.GetValue<int>("MaximumPasswordAge", agentOptions.CurrentValue.PasswordManagement.PasswordPolicy.MaximumPasswordAgeDays);
 
-        public IList<string> AadIssuerDNs => this.registrySettingsAgent.GetValue<string>("Server", null)?.Split(";").ToList<string>() ?? agentOptions.CurrentValue.AdvancedAgent.AadIssuerDNs;
+        public string RegistrationKey
+        {
+            get => this.registrySettingsAgent.GetValue<string>("RegistrationKey", null);
+            set => this.registrySettingsAgent.SetValue("RegistrationKey", value);
+        }
 
+        public string ClientId
+        {
+            get => this.registrySettingsAgent.GetValue<string>("ClientId", null);
+            set => this.registrySettingsAgent.SetValue("ClientId", value);
+        }
+
+        public string CheckRegistrationUrl
+        {
+            get => this.registrySettingsAgent.GetValue<string>("CheckRegistrationUrl", null);
+            set => this.registrySettingsAgent.SetValue("CheckRegistrationUrl", value);
+        }
+
+        public string AuthCertificate
+        {
+            get => this.registrySettingsAgent.GetValue<string>("AuthCertificate", null);
+            set => this.registrySettingsAgent.SetValue("AuthCertificate", value);
+        }
+
+        public DateTime LastCheckIn
+        {
+            get => new DateTime(this.registrySettingsAgent.GetValue<long>("LastCheckIn", 0));
+            set => this.registrySettingsAgent.SetValue("LastCheckIn", value.Ticks);
+        }
+
+        public int CheckInIntervalHours => this.policySettingsAgent.GetValue<int>("CheckInIntervalHours", agentOptions.CurrentValue.CheckInIntervalHours);
+
+        public RegistrationState RegistrationState
+        {
+            get => (RegistrationState)this.registrySettingsAgent.GetValue("RegistrationState", 0);
+            set => this.registrySettingsAgent.SetValue("RegistrationState", (int)value);
+        }
     }
 }

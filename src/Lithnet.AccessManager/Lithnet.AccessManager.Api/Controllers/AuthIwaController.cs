@@ -35,7 +35,7 @@ namespace Lithnet.AccessManager.Api.Controllers
             this.errorProvider = errorProvider;
         }
 
-        public async Task<IActionResult> IndexAsync()
+        public async Task<IActionResult> PerformIwaAuthAsync()
         {
             try
             {

@@ -1,62 +1,125 @@
 ﻿using Lithnet.AccessManager.Agent.Providers;
 using System;
-using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using Vanara.PInvoke;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Agent
 {
     public class AuthenticationCertificateProvider : IAuthenticationCertificateProvider
     {
         private readonly ISettingsProvider settings;
+        private readonly IAadJoinInformationProvider aadProvider;
+        private readonly ILogger<AuthenticationCertificateProvider> logger;
 
-        public AuthenticationCertificateProvider(ISettingsProvider settings)
+        private X509Certificate2 cachedCertificate;
+
+        public AuthenticationCertificateProvider(ISettingsProvider settings, IAadJoinInformationProvider aadProvider, ILogger<AuthenticationCertificateProvider> logger)
         {
             this.settings = settings;
+            this.aadProvider = aadProvider;
+            this.logger = logger;
         }
 
         public X509Certificate2 GetCertificate()
         {
             if (this.settings.AuthenticationMode == AuthenticationMode.Ssa)
             {
-                X509Certificate2 cert = this.GetCertificateFromStoreByOid(Constants.AgentAuthenticationCertificateOid, StoreLocation.CurrentUser);
-
-                if (cert == null)
+                if (string.IsNullOrWhiteSpace(this.settings.AuthCertificate))
                 {
-                    throw new CertificateNotFoundException("No valid certificate could be found in the store");
+                    throw new CertificateNotFoundException("The authentication certificate thumbprint was not specified in the application settings");
                 }
 
+                var cert = this.ResolveCertificateFromLocalStore(this.settings.AuthCertificate);
+
+                this.logger.LogTrace($"Found SSA certificate with thumbprint {cert.Thumbprint}");
                 return cert;
             }
 
             if (this.settings.AuthenticationMode == AuthenticationMode.Aadj)
             {
-                return this.GetAadJoinCertificate();
+                var cert = this.aadProvider.GetAadCertificate();
+                this.logger.LogTrace($"Found AAD certificate with thumbprint {cert.Thumbprint}");
+
+                return cert;
             }
 
             throw new InvalidOperationException("The authentication mode is not supported");
         }
 
-        private X509Certificate2 GetAadJoinCertificate()
+
+        public X509Certificate2 GetOrCreateAgentCertificate()
         {
-            NetApi32.NetGetAadJoinInformation(null, out NetApi32.DSREG_JOIN_INFO joinInfo).ThrowIfFailed();
+            X509Certificate2 cert;
 
-            if (joinInfo == null)
+            if (!string.IsNullOrWhiteSpace(this.settings.AuthCertificate))
             {
-                throw new InvalidOperationException("The machine was not joined to an Azure Active Directory");
+                if (this.cachedCertificate != null)
+                {
+                    if (string.Equals(this.cachedCertificate.Thumbprint, this.settings.AuthCertificate, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return this.cachedCertificate;
+                    }
+                }
+
+                try
+                {
+                    this.cachedCertificate = this.ResolveCertificateFromLocalStore(this.settings.AuthCertificate);
+                    this.logger.LogTrace($"Found authentication certificate ({this.settings.AuthCertificate}) in the local store");
+                    return this.cachedCertificate;
+                }
+                catch (CertificateNotFoundException)
+                {
+                }
             }
 
-            if (!joinInfo.pJoinCertificate.HasValue)
+            cert = this.GetCertificateFromStoreByOid(Constants.AgentAuthenticationCertificateOid, StoreLocation.LocalMachine);
+
+            if (cert != null)
             {
-                throw new CertificateNotFoundException("The AAD join information was found, but a certificate was not present");
+                this.settings.AuthCertificate = cert.Thumbprint;
+                this.cachedCertificate = cert;
+                this.logger.LogTrace($"Found an existing, but unattached certificate ({this.settings.AuthCertificate}) in the local store");
+
+                return this.cachedCertificate;
             }
 
-            byte[] data = new byte[joinInfo.pJoinCertificate.Value.cbCertEncoded];
-            Marshal.Copy(joinInfo.pJoinCertificate.Value.pbCertEncoded, data, 0, data.Length);
+            cert = this.CreateSelfSignedCert();
+            this.cachedCertificate = cert;
+            this.settings.AuthCertificate = cert.Thumbprint;
 
-            var tcert = new X509Certificate2(data);
+            this.logger.LogTrace($"Created a new authentication certificate ({this.settings.AuthCertificate})");
+            return cert;
+        }
 
-            return this.ResolveCertificateFromLocalStore(tcert.Thumbprint);
+        public X509Certificate2 CreateSelfSignedCert()
+        {
+            CertificateRequest request = new CertificateRequest($"CN={Environment.MachineName},OU=Agent,OU=Access Manager,O=Lithnet", RSA.Create(3072), HashAlgorithmName.SHA384, RSASignaturePadding.Pss);
+
+            request.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(new OidCollection
+            {
+                new Oid("1.3.6.1.5.5.7.3.2", "Client authentication"),
+                new Oid(Constants.AgentAuthenticationCertificateOid, "Access Manager Agent Authentication")
+            }, true));
+            request.CertificateExtensions.Add(new X509KeyUsageExtension(
+                X509KeyUsageFlags.KeyEncipherment |
+                X509KeyUsageFlags.DigitalSignature |
+                X509KeyUsageFlags.NonRepudiation
+                , true));
+            request.CertificateExtensions.Add(new X509BasicConstraintsExtension(false, false, 0, true));
+
+            X509Certificate2 cert = request.CreateSelfSigned(DateTimeOffset.UtcNow, DateTime.UtcNow.AddYears(10));
+            string p = Guid.NewGuid().ToString();
+            var raw = cert.Export(X509ContentType.Pfx, p);
+            var f = new X509Certificate2(raw, p, X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet);
+
+            X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+            store.Open(OpenFlags.ReadWrite);
+            store.Add(f);
+            store.Close();
+
+            return f;
         }
 
         private X509Certificate2 GetCertificateFromStoreByOid(string oid, StoreLocation storeLocation)
@@ -78,7 +141,7 @@ namespace Lithnet.AccessManager.Agent
         {
             return GetCertificateFromStore(thumbprint, StoreLocation.CurrentUser) ??
                    GetCertificateFromStore(thumbprint, StoreLocation.LocalMachine) ??
-                   throw new CertificateNotFoundException($"A certificate with the thumbprint {thumbprint} could not be found");
+                   throw new CertificateNotFoundException($"An authentication certificate with the thumbprint {thumbprint} could not be found");
         }
 
         private X509Certificate2 GetCertificateFromStore(string thumbprint, StoreLocation storeLocation)

@@ -5,6 +5,6 @@ namespace Lithnet.AccessManager.Api.Providers
 {
     public interface ISignedAssertionValidator
     {
-        JwtSecurityToken Validate(string assertion, string audience, out X509Certificate2 signingCertificate);
+        JwtSecurityToken Validate(string assertion, string audiencePath, out X509Certificate2 signingCertificate);
     }
 }

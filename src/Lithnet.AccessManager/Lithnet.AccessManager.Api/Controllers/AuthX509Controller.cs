@@ -50,7 +50,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                     throw new UnsupportedAuthenticationTypeException();
                 }
 
-                this.signedAssertionValidator.Validate(request.Assertion, "https://localhost:44385/api/v1.0/auth/x509", out X509Certificate2 signingCertificate);
+                this.signedAssertionValidator.Validate(request.Assertion, "auth/x509", out X509Certificate2 signingCertificate);
 
                 TokenResponse token;
 

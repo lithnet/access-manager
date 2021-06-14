@@ -1,13 +1,11 @@
-﻿using Lithnet.AccessManager.Agent.Configuration;
+﻿using Lithnet.AccessManager.Agent.Providers;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Agent.Providers;
 
 namespace Lithnet.AccessManager.Agent
 {
-    public class AdvancedLapsAgent 
+    public class AdvancedLapsAgent
     {
         private readonly ILogger<AdvancedLapsAgent> logger;
         private readonly ISettingsProvider settings;
@@ -15,8 +13,9 @@ namespace Lithnet.AccessManager.Agent
         private readonly IPasswordChangeProvider passwordChangeProvider;
         private readonly IPasswordStorageProvider passwordStorageProvider;
         private readonly IRegistrationProvider registrationProvider;
+        private readonly IAgentCheckInProvider checkInProvider;
 
-        public AdvancedLapsAgent(ILogger<AdvancedLapsAgent> logger, ISettingsProvider settings, IPasswordGenerator passwordGenerator, IPasswordChangeProvider passwordChangeProvider, IPasswordStorageProvider passwordStorageProvider, IRegistrationProvider registrationProvider)
+        public AdvancedLapsAgent(ILogger<AdvancedLapsAgent> logger, ISettingsProvider settings, IPasswordGenerator passwordGenerator, IPasswordChangeProvider passwordChangeProvider, IPasswordStorageProvider passwordStorageProvider, IRegistrationProvider registrationProvider, IAgentCheckInProvider checkInProvider)
         {
             this.logger = logger;
             this.settings = settings;
@@ -24,6 +23,7 @@ namespace Lithnet.AccessManager.Agent
             this.passwordChangeProvider = passwordChangeProvider;
             this.passwordStorageProvider = passwordStorageProvider;
             this.registrationProvider = registrationProvider;
+            this.checkInProvider = checkInProvider;
         }
 
         public async Task DoCheckAsync()
@@ -48,7 +48,12 @@ namespace Lithnet.AccessManager.Agent
                                 await this.CheckAndChangePassword();
                             }
                         }
+                        else
+                        {
+                            this.logger.LogWarning("The client is not eligible to register itself. Please ensure the client has an active registration key");
+                        }
                         break;
+
 
                     case RegistrationState.Pending:
                     case RegistrationState.Rejected:
@@ -57,6 +62,7 @@ namespace Lithnet.AccessManager.Agent
             }
             else
             {
+                await this.checkInProvider.CheckinIfRequired();
                 await this.CheckAndChangePassword();
             }
         }
@@ -86,7 +92,7 @@ namespace Lithnet.AccessManager.Agent
             try
             {
                 string newPassword = this.passwordGenerator.Generate();
-                DateTime expiryDate = DateTime.UtcNow.AddDays(this.settings.MaximumPasswordAge);
+                DateTime expiryDate = DateTime.UtcNow.AddDays(Math.Max(this.settings.MaximumPasswordAgeDays, 1));
 
                 await this.passwordStorageProvider.UpdatePassword(this.passwordChangeProvider.GetAccountName(), newPassword, expiryDate);
 

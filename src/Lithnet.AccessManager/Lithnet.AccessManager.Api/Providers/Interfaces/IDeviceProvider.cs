@@ -11,12 +11,14 @@ namespace Lithnet.AccessManager.Api.Providers
 
         Task<Device> CreateDeviceAsync(IComputer computer, string authority, string deviceId);
 
-        Task<Device> GetDeviceAsync(AuthorityType authorityType, string authority, string deviceId);
+        Task<Device> GetDeviceAsync(AuthorityType authorityType, string authority, string authorityDeviceId);
 
         Task<Device> GetDeviceAsync(X509Certificate2 certificate);
 
         Task<Device> CreateDeviceAsync(Device device, X509Certificate2 certificate);
 
         Task<Device> CreateDeviceAsync(Device device);
+        Task<Device> UpdateDeviceAsync(Device device);
+        Task<Device> GetDeviceAsync(string deviceId);
     }
 }

@@ -65,7 +65,7 @@ namespace Lithnet.AccessManager.Api
             return identity;
         }
 
-        public void ToCommandParameters(SqlCommand command)
+        public void ToCreateCommandParameters(SqlCommand command)
         {
             command.Parameters.AddWithValue("@ObjectID", this.ObjectId);
             command.Parameters.AddWithValue("@ComputerName", this.ComputerName);
@@ -74,6 +74,16 @@ namespace Lithnet.AccessManager.Api
             command.Parameters.AddWithValue("@AuthorityType", (int)this.AuthorityType);
             command.Parameters.AddWithValue("@Authority", this.Authority);
             command.Parameters.AddWithValue("@AuthorityDeviceId", this.AuthorityDeviceId);
+            command.Parameters.AddWithValue("@AgentVersion", this.AgentVersion);
+            command.Parameters.AddWithValue("@OSFamily", this.OperatingSystemFamily);
+            command.Parameters.AddWithValue("@OSVersion", this.OperatingSystemVersion);
+        }
+
+        public void ToUpdateCommandParameters(SqlCommand command)
+        {
+            command.Parameters.AddWithValue("@ObjectID", this.ObjectId);
+            command.Parameters.AddWithValue("@ComputerName", this.ComputerName);
+            command.Parameters.AddWithValue("@DnsName", this.DnsName);
             command.Parameters.AddWithValue("@AgentVersion", this.AgentVersion);
             command.Parameters.AddWithValue("@OSFamily", this.OperatingSystemFamily);
             command.Parameters.AddWithValue("@OSVersion", this.OperatingSystemVersion);

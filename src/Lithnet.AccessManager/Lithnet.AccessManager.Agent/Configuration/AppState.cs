@@ -6,7 +6,7 @@ namespace Lithnet.AccessManager.Agent.Configuration
 {
     public class AppState
     {
-        public bool IsRegistered { get; set; }
+        public string AuthCertificate { get; set; }
 
         public string RegistrationKey { get; set; }
 
@@ -15,5 +15,7 @@ namespace Lithnet.AccessManager.Agent.Configuration
         public string CheckRegistrationUrl { get; set; }
 
         public RegistrationState RegistrationState { get; set; }
+
+        public DateTime LastCheckIn { get; set; }
     }
 }
