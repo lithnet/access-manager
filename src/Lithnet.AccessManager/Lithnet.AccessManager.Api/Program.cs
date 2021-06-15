@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using NLog.Web;
 
 namespace Lithnet.AccessManager.Api
 {
@@ -11,18 +13,27 @@ namespace Lithnet.AccessManager.Api
         }
 
         public static IHostBuilder CreateDefaultHost(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+            Host
+                .CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.ConfigureAppSettings();
+
+                    if (args != null)
+                    {
+                        config.AddCommandLine(args);
+                    }
+                })
+                .UseNLog()
+                .ConfigureAccessManagerLogging()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    var config = new ConfigurationBuilder().ConfigureAppSettings().Build();
+
                     webBuilder
-                    .UseUrls("https://localhost:44385/api/v1.0", "https://carbon.dev.lithnet.local:44385/api/v1.0")
-                    .UseHttpSys(x =>
-                    {
-                        x.Authentication.Schemes = Microsoft.AspNetCore.Server.HttpSys.AuthenticationSchemes.Negotiate | Microsoft.AspNetCore.Server.HttpSys.AuthenticationSchemes.NTLM;
-                        x.Authentication.AllowAnonymous = true;
-                        x.ClientCertificateMethod = Microsoft.AspNetCore.Server.HttpSys.ClientCertificateMethod.AllowRenegotation;
-                    })
+                        .UseHttpSys(config)
                         .UseStartup<ApiCoreStartup>();
-                });
+                })
+                .UseWindowsService();
     }
 }

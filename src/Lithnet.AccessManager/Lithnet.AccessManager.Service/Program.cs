@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Service.Internal;
 using Microsoft.AspNetCore.Hosting;
@@ -15,7 +16,7 @@ namespace Lithnet.AccessManager.Service
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             if (args != null && args.Length > 0 && args[0] == "setup")
             {
@@ -25,24 +26,34 @@ namespace Lithnet.AccessManager.Service
             {
                 RegistryProvider registryProvider = new RegistryProvider(false);
                 SetupNLog(registryProvider);
-                CreateHostBuilder(args, registryProvider).Build().Run();
+
+                bool safeStart = args?.Any(t => string.Equals(t, "/safeStart", StringComparison.OrdinalIgnoreCase)) ?? false;
+
+                if (safeStart || !registryProvider.IsConfigured)
+                {
+                    await Program.BuildUnconfiguredHost().Build().RunAsync();
+                }
+                else
+                {
+                    await Task.WhenAll(
+                        Program.CreateHostBuilder(args).Build().RunAsync(),
+                        Api.Program.CreateDefaultHost(args).Build().RunAsync());
+                }
             }
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args, RegistryProvider registryProvider)
+        private static IHostBuilder BuildUnconfiguredHost()
         {
-            bool safeStart = args.Any(t => string.Equals(t, "/safeStart", StringComparison.OrdinalIgnoreCase));
-
-            if (safeStart || !registryProvider.IsConfigured)
-            {
-                return Host.CreateDefaultBuilder().ConfigureServices((hostContext, services) =>
+            return Host.CreateDefaultBuilder().ConfigureServices((hostContext, services) =>
                 {
                     services.AddHostedService<UnconfiguredHost>();
                 })
-                    .UseWindowsService()
-                    .ConfigureAccessManagerLogging();
-            }
+                .UseWindowsService()
+                .ConfigureAccessManagerLogging();
+        }
 
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
             var host = new HostBuilder();
 
             host.UseContentRoot(Directory.GetCurrentDirectory());

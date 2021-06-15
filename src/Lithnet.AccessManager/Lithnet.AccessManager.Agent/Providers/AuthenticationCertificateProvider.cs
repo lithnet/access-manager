@@ -1,5 +1,6 @@
 ﻿using Lithnet.AccessManager.Agent.Providers;
 using System;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -120,6 +121,61 @@ namespace Lithnet.AccessManager.Agent
             store.Close();
 
             return f;
+        }
+
+        private X509Certificate2 CreateSelfSignedCertInTpm()
+        {
+            RSA rsa;
+
+            // We might need to do something like this to get around the internal error bug with the platform provider
+            // https://github.com/glueckkanja-pki/TPMImport
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                CngKeyCreationParameters creationParameters = new CngKeyCreationParameters()
+                {
+                    KeyCreationOptions = CngKeyCreationOptions.MachineKey,
+                    KeyUsage = CngKeyUsages.AllUsages,
+                    Provider = new CngProvider("Microsoft Platform Crypto Provider"),
+                    ExportPolicy = CngExportPolicies.None,
+                    UIPolicy = new CngUIPolicy(CngUIProtectionLevels.None),
+                };
+
+                // creationParameters.Parameters.Add(new CngProperty("Length", BitConverter.GetBytes(1024 * 3), CngPropertyOptions.None));
+
+                CngKey key = CngKey.Create(CngAlgorithm.Rsa, Guid.NewGuid().ToString(), creationParameters);
+                rsa = new RSACng(key);
+            }
+            else
+            {
+                rsa = RSA.Create(3 * 1024);
+            }
+
+            using (rsa)
+            {
+                CertificateRequest request = new CertificateRequest($"CN={Environment.MachineName},OU=Agent,OU=Access Manager,O=Lithnet", rsa, HashAlgorithmName.SHA384, RSASignaturePadding.Pss);
+
+                request.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(new OidCollection
+                {
+                    new Oid("1.3.6.1.5.5.7.3.2", "Client authentication"),
+                    new Oid(Constants.AgentAuthenticationCertificateOid, "Access Manager Agent Authentication")
+                }, true));
+                request.CertificateExtensions.Add(new X509KeyUsageExtension(
+                    X509KeyUsageFlags.KeyEncipherment |
+                    X509KeyUsageFlags.DigitalSignature |
+                    X509KeyUsageFlags.NonRepudiation
+                    , true));
+                request.CertificateExtensions.Add(new X509BasicConstraintsExtension(false, false, 0, true));
+
+                X509Certificate2 cert = request.CreateSelfSigned(DateTimeOffset.UtcNow, DateTime.UtcNow.AddYears(10));
+
+                X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+                store.Open(OpenFlags.ReadWrite);
+                store.Add(cert);
+                store.Close();
+
+                return cert;
+            }
         }
 
         private X509Certificate2 GetCertificateFromStoreByOid(string oid, StoreLocation storeLocation)

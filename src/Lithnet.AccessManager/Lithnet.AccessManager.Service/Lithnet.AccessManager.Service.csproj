@@ -89,19 +89,20 @@
     <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7770.30380" />
     <PackageReference Include="lithnet.EventLogMessages" Version="1.0.0.4" />
     <PackageReference Include="microsoft.aspnetcore.authentication.cookies" Version="2.2.0" />
-    <PackageReference Include="microsoft.aspnetcore.authentication.jwtbearer" Version="3.1.6" />
+    <PackageReference Include="microsoft.aspnetcore.authentication.jwtbearer" Version="3.1.16" />
     <PackageReference Include="microsoft.aspnetcore.authentication.openidconnect" Version="3.1.6" />
     <PackageReference Include="microsoft.aspnetcore.authentication.WsFederation" Version="3.1.6" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="3.1.6" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.9" />
-    <PackageReference Include="nlog" Version="4.7.5" />
-    <PackageReference Include="NLog.Web.AspNetCore" Version="4.9.2" />
-    <PackageReference Include="system.directoryservices" Version="4.7.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
+    <PackageReference Include="nlog" Version="4.7.9" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="4.12.0" />
+    <PackageReference Include="system.directoryservices" Version="5.0.0" />
     <PackageReference Include="system.security.Cryptography.Cng" Version="4.7.0" />
-    <PackageReference Include="Vanara.Security" Version="3.3.0" />
+    <PackageReference Include="Vanara.Security" Version="3.3.10" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Lithnet.AccessManager.Api\Lithnet.AccessManager.Api.csproj" />
     <ProjectReference Include="..\Lithnet.AccessManager.Server\Lithnet.AccessManager.Server.csproj" />
     <ProjectReference Include="..\Lithnet.AccessManager\Lithnet.AccessManager.csproj" />
   </ItemGroup>

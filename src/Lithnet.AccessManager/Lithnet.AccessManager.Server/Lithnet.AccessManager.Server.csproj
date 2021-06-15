@@ -81,7 +81,7 @@
     <PackageReference Include="Quartz.Serialization.Json" Version="3.2.3" />
     <PackageReference Include="sslcertbinding.net" Version="1.0.7486" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="4.7.0" />
-    <PackageReference Include="Vanara.Security" Version="3.3.0" />
+    <PackageReference Include="Vanara.Security" Version="3.3.10" />
     <PackageReference Include="WindowsFirewallHelper" Version="1.6.3.40" />
   </ItemGroup>
 
