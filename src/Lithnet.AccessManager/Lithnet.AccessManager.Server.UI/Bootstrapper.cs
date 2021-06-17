@@ -179,7 +179,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<INotifyModelChangedEventPublisher>().To<NotifyModelChangedEventPublisher>();
                 builder.Bind<IShellExecuteProvider>().To<ShellExecuteProvider>();
                 builder.Bind<IDomainTrustProvider>().To<DomainTrustProvider>();
-                builder.Bind<IComputerTargetProvider>().To<ComputerTargetProvider>();
+                builder.Bind<IComputerTargetProvider>().To<ComputerTargetProviderLegacy>();
                 builder.Bind<IObjectSelectionProvider>().To<ObjectSelectionProvider>();
                 builder.Bind<ITargetDataProvider>().To<TargetDataProvider>();
                 builder.Bind<ITargetDataCache>().To<TargetDataCache>();

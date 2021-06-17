@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using Lithnet.AccessManager.Server;
 
 namespace Lithnet.AccessManager.Api
 {

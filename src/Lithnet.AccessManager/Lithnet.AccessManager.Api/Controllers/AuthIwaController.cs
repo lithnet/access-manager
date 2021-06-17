@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server;
 
 namespace Lithnet.AccessManager.Api.Controllers
 {
@@ -63,7 +64,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                     throw new BadRequestException("The primary SID was missing from the token");
                 }
 
-                if (!this.directory.TryGetComputer(sid, out IComputer computer))
+                if (!this.directory.TryGetComputer(sid, out IActiveDirectoryComputer computer))
                 {
                     throw new DeviceNotFoundException($"The object with SID {sid} was either not a computer, or could not be found in the domain");
                 }

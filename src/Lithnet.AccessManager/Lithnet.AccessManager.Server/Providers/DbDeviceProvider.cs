@@ -1,11 +1,12 @@
 ﻿using Lithnet.AccessManager.Server;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace Lithnet.AccessManager.Api.Providers
+namespace Lithnet.AccessManager.Server
 {
     public class DbDeviceProvider : IDeviceProvider
     {
@@ -16,6 +17,28 @@ namespace Lithnet.AccessManager.Api.Providers
         {
             this.dbProvider = dbProvider;
             this.logger = logger;
+        }
+
+        public async Task<IList<Device>> FindDevices(string name)
+        {
+            name.ThrowIfNull(nameof(name));
+
+            await using SqlConnection con = this.dbProvider.GetConnection();
+
+            SqlCommand command = new SqlCommand("spGetDevicesByNames", con);
+            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@ComputerNameOrDnsName", name);
+
+            await using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+            List<Device> devices = new List<Device>();
+
+            while (await reader.ReadAsync())
+            {
+                devices.Add(new Device(reader));
+            }
+
+            return devices;
         }
 
         public async Task<Device> GetOrCreateDeviceAsync(Microsoft.Graph.Device aadDevice, string authority)
@@ -37,7 +60,7 @@ namespace Lithnet.AccessManager.Api.Providers
             return await this.CreateDeviceAsync(aadDevice, authority);
         }
 
-        public async Task<Device> GetOrCreateDeviceAsync(IComputer principal, string authority)
+        public async Task<Device> GetOrCreateDeviceAsync(IActiveDirectoryComputer principal, string authority)
         {
             authority.ThrowIfNull(nameof(authority));
             principal.ThrowIfNull(nameof(principal));
@@ -82,7 +105,7 @@ namespace Lithnet.AccessManager.Api.Providers
         public async Task<Device> GetDeviceAsync(string deviceId)
         {
             deviceId.ThrowIfNull(nameof(deviceId));
-           
+
             await using SqlConnection con = this.dbProvider.GetConnection();
 
             SqlCommand command = new SqlCommand("spGetDevice", con);
@@ -101,7 +124,7 @@ namespace Lithnet.AccessManager.Api.Providers
         public async Task<Device> GetDeviceAsync(X509Certificate2 certificate)
         {
             certificate.ThrowIfNull(nameof(certificate));
-           
+
             await using SqlConnection con = this.dbProvider.GetConnection();
 
             SqlCommand command = new SqlCommand("spGetDeviceByX509Thumbprint", con);
@@ -122,10 +145,11 @@ namespace Lithnet.AccessManager.Api.Providers
             device.ThrowIfNull(nameof(device));
             certificate.ThrowIfNull(nameof(certificate));
 
-            device.ObjectId ??= Guid.NewGuid().ToString();
+            device.ObjectID ??= Guid.NewGuid().ToString();
             device.Authority = "ams";
-            device.AuthorityDeviceId = device.ObjectId;
-            device.AuthorityType = AuthorityType.SelfAsserted;
+            device.AuthorityDeviceId = device.ObjectID;
+            device.AuthorityType = AuthorityType.Ams;
+            device.SecurityIdentifier = new System.Security.Principal.SecurityIdentifier($"{SidUtils.AmsSidPrefix}{SidUtils.GuidStringToSidString(device.ObjectID)}");
 
             await using SqlConnection con = this.dbProvider.GetConnection();
 
@@ -154,12 +178,13 @@ namespace Lithnet.AccessManager.Api.Providers
                 ComputerName = aadDevice.DisplayName,
                 OperatingSystemFamily = aadDevice.OperatingSystem,
                 OperatingSystemVersion = aadDevice.OperatingSystemVersion,
+                SecurityIdentifier = new System.Security.Principal.SecurityIdentifier($"{SidUtils.AadSidPrefix}{SidUtils.GuidStringToSidString(aadDevice.Id)}")
             };
 
             return await this.CreateDeviceAsync(device);
         }
 
-        public async Task<Device> CreateDeviceAsync(IComputer computer, string authority, string deviceId)
+        public async Task<Device> CreateDeviceAsync(IActiveDirectoryComputer computer, string authority, string deviceId)
         {
             computer.ThrowIfNull(nameof(computer));
             authority.ThrowIfNull(nameof(authority));
@@ -172,7 +197,8 @@ namespace Lithnet.AccessManager.Api.Providers
                 AuthorityDeviceId = deviceId,
                 AuthorityType = AuthorityType.ActiveDirectory,
                 ComputerName = computer.SamAccountName.TrimEnd('$'),
-                DnsName = computer.DnsHostName
+                DnsName = computer.DnsHostName,
+                SecurityIdentifier = computer.Sid
             };
 
             return await this.CreateDeviceAsync(device);
@@ -182,7 +208,7 @@ namespace Lithnet.AccessManager.Api.Providers
         {
             device.ThrowIfNull(nameof(device));
 
-            device.ObjectId ??= Guid.NewGuid().ToString();
+            device.ObjectID ??= Guid.NewGuid().ToString();
 
             await using SqlConnection con = this.dbProvider.GetConnection();
 
@@ -199,9 +225,9 @@ namespace Lithnet.AccessManager.Api.Providers
         {
             device.ThrowIfNull(nameof(device));
 
-            if (device.ObjectId == null)
+            if (device.ObjectID == null)
             {
-                throw new BadRequestException("Could not update the device because the device ID was not found");
+                throw new InvalidOperationException("Could not update the device because the device ID was not found");
             }
 
             await using SqlConnection con = this.dbProvider.GetConnection();

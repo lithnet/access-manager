@@ -55,7 +55,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             options.DynamicGroupMappings.Add(new JitDynamicGroupMapping()
             {
@@ -89,7 +89,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             options.DynamicGroupMappings.Add(new JitDynamicGroupMapping()
             {
@@ -122,7 +122,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             options.DynamicGroupMappings.Add(new JitDynamicGroupMapping()
             {
@@ -159,7 +159,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             options.DynamicGroupMappings.Add(new JitDynamicGroupMapping()
             {
@@ -194,7 +194,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
@@ -229,7 +229,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
@@ -263,7 +263,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
@@ -285,7 +285,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 
@@ -304,7 +304,7 @@ namespace Lithnet.AccessManager.Server.Test
             IGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
             IUser user = directory.GetUser(userName);
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
 

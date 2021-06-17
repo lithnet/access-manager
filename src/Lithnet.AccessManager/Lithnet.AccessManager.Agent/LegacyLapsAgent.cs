@@ -29,7 +29,7 @@ namespace Lithnet.AccessManager.Agent
         {
             try
             {
-                IComputer computer = this.directory.GetComputer(this.sam.GetMachineNTAccountName());
+                IActiveDirectoryComputer computer = this.directory.GetComputer(this.sam.GetMachineNTAccountName());
 
                 if (this.HasPasswordExpired(computer))
                 {
@@ -43,7 +43,7 @@ namespace Lithnet.AccessManager.Agent
             }
         }
 
-        public bool HasPasswordExpired(IComputer computer)
+        public bool HasPasswordExpired(IActiveDirectoryComputer computer)
         {
             try
             {
@@ -56,7 +56,7 @@ namespace Lithnet.AccessManager.Agent
             }
         }
 
-        public void ChangePassword(IComputer computer, SecurityIdentifier sid = null)
+        public void ChangePassword(IActiveDirectoryComputer computer, SecurityIdentifier sid = null)
         {
             try
             {

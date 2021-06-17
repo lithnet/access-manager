@@ -28,7 +28,7 @@ namespace Lithnet.AccessManager
             this.certificateProvider = certificateProvider;
         }
 
-        public ProtectedPasswordHistoryItem GetCurrentPassword(IComputer computer, DateTime? newExpiry)
+        public ProtectedPasswordHistoryItem GetCurrentPassword(IActiveDirectoryComputer computer, DateTime? newExpiry)
         {
             DirectoryEntry de = computer.DirectoryEntry;
 
@@ -48,7 +48,7 @@ namespace Lithnet.AccessManager
             return data;
         }
 
-        public IReadOnlyList<ProtectedPasswordHistoryItem> GetPasswordHistory(IComputer computer)
+        public IReadOnlyList<ProtectedPasswordHistoryItem> GetPasswordHistory(IActiveDirectoryComputer computer)
         {
             DirectoryEntry de = computer.DirectoryEntry;
             List<ProtectedPasswordHistoryItem> list = GetPasswordHistory(de);
@@ -69,7 +69,7 @@ namespace Lithnet.AccessManager
             return list;
         }
 
-        public DateTime? GetExpiry(IComputer computer)
+        public DateTime? GetExpiry(IActiveDirectoryComputer computer)
         {
             DirectoryEntry de = computer.DirectoryEntry;
             de.RefreshCache(ActiveDirectoryComputer.PropertiesToGet);
@@ -77,7 +77,7 @@ namespace Lithnet.AccessManager
             return de.GetPropertyDateTimeFromAdsLargeInteger(AttrLithnetAdminPasswordExpiry);
         }
 
-        private DateTime? GetMsMcsAdmPwdExpiry(IComputer computer)
+        private DateTime? GetMsMcsAdmPwdExpiry(IActiveDirectoryComputer computer)
         {
             DirectoryEntry de = computer.DirectoryEntry;
             de.RefreshCache(ActiveDirectoryComputer.PropertiesToGet);
@@ -86,14 +86,14 @@ namespace Lithnet.AccessManager
         }
 
 
-        public void UpdatePasswordExpiry(IComputer computer, DateTime expiry)
+        public void UpdatePasswordExpiry(IActiveDirectoryComputer computer, DateTime expiry)
         {
             DirectoryEntry de = computer.DirectoryEntry;
             de.Properties[AttrLithnetAdminPasswordExpiry].Value = expiry.ToFileTimeUtc().ToString();
             de.CommitChanges();
         }
 
-        public void UpdateCurrentPassword(IComputer computer, string password, DateTime rotationInstant, DateTime expiryDate, int maximumPasswordHistory, PasswordAttributeBehaviour msLapsBehaviour)
+        public void UpdateCurrentPassword(IActiveDirectoryComputer computer, string password, DateTime rotationInstant, DateTime expiryDate, int maximumPasswordHistory, PasswordAttributeBehaviour msLapsBehaviour)
         {
             DirectoryEntry de = computer.DirectoryEntry;
 
@@ -141,7 +141,7 @@ namespace Lithnet.AccessManager
             de.CommitChanges();
         }
 
-        public bool HasPasswordExpired(IComputer computer, bool considerMsMcsAdmPwdExpiry)
+        public bool HasPasswordExpired(IActiveDirectoryComputer computer, bool considerMsMcsAdmPwdExpiry)
         {
             DateTime? lithnetExpiry = this.GetExpiry(computer);
 
@@ -182,7 +182,7 @@ namespace Lithnet.AccessManager
             return null;
         }
 
-        public void ClearPasswordHistory(IComputer computer)
+        public void ClearPasswordHistory(IActiveDirectoryComputer computer)
         {
             DirectoryEntry de = computer.DirectoryEntry;
 
@@ -190,7 +190,7 @@ namespace Lithnet.AccessManager
             de.CommitChanges();
         }
 
-        public void ClearPassword(IComputer computer)
+        public void ClearPassword(IActiveDirectoryComputer computer)
         {
             DirectoryEntry de = computer.DirectoryEntry;
 

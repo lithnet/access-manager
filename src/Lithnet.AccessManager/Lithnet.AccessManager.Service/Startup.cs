@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Threading.Channels;
 using DbUp.Engine.Output;
+using Lithnet.AccessManager.Api;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Auditing;
@@ -63,57 +64,67 @@ namespace Lithnet.AccessManager.Service
                 options.Secure = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
             });
 
-            services.TryAddScoped<IIwaAuthenticationProvider, IwaAuthenticationProvider>();
-            services.TryAddScoped<IOidcAuthenticationProvider, OidcAuthenticationProvider>();
-            services.TryAddScoped<IWsFedAuthenticationProvider, WsFedAuthenticationProvider>();
-            services.TryAddScoped<ICertificateAuthenticationProvider, CertificateAuthenticationProvider>();
+            services.AddScoped<IIwaAuthenticationProvider, IwaAuthenticationProvider>();
+            services.AddScoped<IOidcAuthenticationProvider, OidcAuthenticationProvider>();
+            services.AddScoped<IWsFedAuthenticationProvider, WsFedAuthenticationProvider>();
+            services.AddScoped<ICertificateAuthenticationProvider, CertificateAuthenticationProvider>();
 
-            services.TryAddScoped<IAuthorizationService, SecurityDescriptorAuthorizationService>();
-            services.TryAddScoped<SecurityDescriptorAuthorizationService>();
-            services.TryAddScoped<IPowerShellSecurityDescriptorGenerator, PowerShellSecurityDescriptorGenerator>();
-            services.TryAddScoped<IAuditEventProcessor, AuditEventProcessor>();
-            services.TryAddScoped<ITemplateProvider, TemplateProvider>();
-            services.TryAddScoped<IJitAccessProvider, JitAccessProvider>();
-            services.TryAddScoped<IPhoneticPasswordTextProvider, PhoneticStringProvider>();
-            services.TryAddScoped<IHtmlPasswordProvider, HtmlPasswordProvider>();
-            services.TryAddScoped<ILithnetAdminPasswordProvider, LithnetAdminPasswordProvider>();
-            services.TryAddScoped<IPasswordProvider, PasswordProvider>();
-            services.TryAddScoped<IMsMcsAdmPwdProvider, MsMcsAdmPwdProvider>();
-            services.TryAddScoped<IAuthorizationInformationBuilder, AuthorizationInformationBuilder>();
-            services.TryAddScoped<ITargetDataProvider, TargetDataProvider>();
-            services.TryAddScoped<IBitLockerRecoveryPasswordProvider, BitLockerRecoveryPasswordProvider>();
-            services.TryAddScoped<IComputerTargetProvider, ComputerTargetProvider>();
+            services.AddScoped<IAuthorizationService, SecurityDescriptorAuthorizationService>();
+            services.AddScoped<SecurityDescriptorAuthorizationService>();
+            services.AddScoped<IPowerShellSecurityDescriptorGenerator, PowerShellSecurityDescriptorGenerator>();
+            services.AddScoped<IAuditEventProcessor, AuditEventProcessor>();
+            services.AddScoped<ITemplateProvider, TemplateProvider>();
+            services.AddScoped<IJitAccessProvider, JitAccessProvider>();
+            services.AddScoped<IPhoneticPasswordTextProvider, PhoneticStringProvider>();
+            services.AddScoped<IHtmlPasswordProvider, HtmlPasswordProvider>();
+            services.AddScoped<ILithnetAdminPasswordProvider, LithnetAdminPasswordProvider>();
+            services.AddScoped<IPasswordProvider, PasswordProvider>();
+            services.AddScoped<IMsMcsAdmPwdProvider, MsMcsAdmPwdProvider>();
+            services.AddScoped<IAuthorizationInformationBuilder, AuthorizationInformationBuilder>();
+            services.AddScoped<ITargetDataProvider, TargetDataProvider>();
+            services.AddScoped<IBitLockerRecoveryPasswordProvider, BitLockerRecoveryPasswordProvider>();
 
-            services.TryAddSingleton<ISmtpProvider, SmtpProvider>();
-            services.TryAddSingleton<IApplicationUpgradeProvider, ApplicationUpgradeProvider>();
-            services.TryAddSingleton<IDirectory, ActiveDirectory>();
-            services.TryAddSingleton<IDiscoveryServices, DiscoveryServices>();
-            services.TryAddSingleton<IEncryptionProvider, EncryptionProvider>();
-            services.TryAddSingleton<ICertificateProvider, CertificateProvider>();
-            services.TryAddSingleton<IAppPathProvider, WebAppPathProvider>();
-            services.TryAddSingleton(RandomNumberGenerator.Create());
-            services.TryAddSingleton<IJitAccessGroupResolver, JitAccessGroupResolver>();
-            services.TryAddSingleton<IPowerShellSessionProvider, CachedPowerShellSessionProvider>();
-            services.TryAddSingleton<IAuthorizationInformationMemoryCache, AuthorizationInformationMemoryCache>();
-            services.TryAddSingleton<ITargetDataCache, TargetDataCache>();
-            services.TryAddSingleton<IAuthorizationContextProvider, AuthorizationContextProvider>();
-            services.TryAddSingleton<IClusterProvider, ClusterProvider>();
-            services.TryAddSingleton<IProductSettingsProvider, ProductSettingsProvider>();
-            services.TryAddSingleton<IProtectedSecretProvider, ProtectedSecretProvider>();
-            services.TryAddSingleton<IRegistryProvider>(new RegistryProvider(true));
-            services.TryAddSingleton<ILicenseDataProvider, OptionsMonitorLicenseDataProvider>();
-            services.TryAddSingleton<ICertificateSynchronizationProvider, CertificateSynchronizationProvider>();
-            services.TryAddSingleton<IWindowsServiceProvider, WindowsServiceProvider>();
-            services.TryAddSingleton<ICertificatePermissionProvider, CertificatePermissionProvider>();
-            services.TryAddSingleton<ILocalSam, LocalSam>();
-            services.TryAddSingleton<IUpgradeLog, DbUpgradeLogger>();
-            services.TryAddSingleton<IDbProvider, SqlDbProvider>();
-            services.TryAddSingleton<SqlLocalDbInstanceProvider>();
-            services.TryAddSingleton<SqlServerInstanceProvider>();
-            services.TryAddSingleton<IHttpSysConfigurationProvider, HttpSysConfigurationProvider>();
+            services.AddScoped<IComputerTargetProvider, ActiveDirectoryComputerTargetProvider>();
+            services.AddScoped<IComputerTargetProvider, AzureActiveDirectoryComputerTargetProvider>();
+            services.AddScoped<IComputerTargetProvider, AmsComputerTargetProvider>();
 
-            services.TryAddTransient<NewVersionCheckJob>();
-            services.TryAddTransient<CertificateExpiryCheckJob>();
+            services.AddScoped<IComputerLocator, ComputerLocator>();
+            services.AddScoped<IDeviceProvider, DbDeviceProvider>();
+
+            services.AddScoped<IDeviceProvider, DbDeviceProvider>();
+            services.AddScoped<IAadGraphApiProvider, AadGraphApiProvider>();
+            services.AddScoped<IDbDevicePasswordProvider, DbDevicePasswordProvider>();
+
+            services.AddSingleton<ISmtpProvider, SmtpProvider>();
+            services.AddSingleton<IApplicationUpgradeProvider, ApplicationUpgradeProvider>();
+            services.AddSingleton<IDirectory, ActiveDirectory>();
+            services.AddSingleton<IDiscoveryServices, DiscoveryServices>();
+            services.AddSingleton<IEncryptionProvider, EncryptionProvider>();
+            services.AddSingleton<ICertificateProvider, CertificateProvider>();
+            services.AddSingleton<IAppPathProvider, WebAppPathProvider>();
+            services.AddSingleton(RandomNumberGenerator.Create());
+            services.AddSingleton<IJitAccessGroupResolver, JitAccessGroupResolver>();
+            services.AddSingleton<IPowerShellSessionProvider, CachedPowerShellSessionProvider>();
+            services.AddSingleton<IAuthorizationInformationMemoryCache, AuthorizationInformationMemoryCache>();
+            services.AddSingleton<ITargetDataCache, TargetDataCache>();
+            services.AddSingleton<IAuthorizationContextProvider, AuthorizationContextProvider>();
+            services.AddSingleton<IClusterProvider, ClusterProvider>();
+            services.AddSingleton<IProductSettingsProvider, ProductSettingsProvider>();
+            services.AddSingleton<IProtectedSecretProvider, ProtectedSecretProvider>();
+            services.AddSingleton<IRegistryProvider>(new RegistryProvider(true));
+            services.AddSingleton<ILicenseDataProvider, OptionsMonitorLicenseDataProvider>();
+            services.AddSingleton<ICertificateSynchronizationProvider, CertificateSynchronizationProvider>();
+            services.AddSingleton<IWindowsServiceProvider, WindowsServiceProvider>();
+            services.AddSingleton<ICertificatePermissionProvider, CertificatePermissionProvider>();
+            services.AddSingleton<ILocalSam, LocalSam>();
+            services.AddSingleton<IUpgradeLog, DbUpgradeLogger>();
+            services.AddSingleton<IDbProvider, SqlDbProvider>();
+            services.AddSingleton<SqlLocalDbInstanceProvider>();
+            services.AddSingleton<SqlServerInstanceProvider>();
+            services.AddSingleton<IHttpSysConfigurationProvider, HttpSysConfigurationProvider>();
+
+            services.AddTransient<NewVersionCheckJob>();
+            services.AddTransient<CertificateExpiryCheckJob>();
 
             services.AddOptions<QuartzOptions>()
                 .Configure<IDbProvider>(
@@ -153,11 +164,11 @@ namespace Lithnet.AccessManager.Service
 
             if (registryProvider.CacheMode == 0)
             {
-                services.TryAddScoped<IRateLimiter, SqlCacheRateLimiter>();
+                services.AddScoped<IRateLimiter, SqlCacheRateLimiter>();
             }
             else
             {
-                services.TryAddScoped<IRateLimiter, MemoryCacheRateLimiter>();
+                services.AddScoped<IRateLimiter, MemoryCacheRateLimiter>();
             }
 
             services.Configure<HostOptions>(opts => opts.ShutdownTimeout = TimeSpan.FromSeconds(30));
@@ -180,6 +191,7 @@ namespace Lithnet.AccessManager.Service
             services.Configure<DatabaseConfigurationOptions>(Configuration.GetSection("DatabaseConfiguration"));
             services.Configure<Server.Configuration.DataProtectionOptions>(Configuration.GetSection("DataProtection"));
             services.Configure<AdminNotificationOptions>(Configuration.GetSection("AdminNotifications"));
+            services.Configure<AzureAdOptions>(this.Configuration.GetSection("AzureAd"));
 
             IAmsLicenseManager licenseManager = this.CreateLicenseManager(services);
 

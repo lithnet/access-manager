@@ -39,7 +39,7 @@ namespace Lithnet.AccessManager.PowerShell.Test
         [TestCase(C.EXTDEV_PC2)]
         public void AddToPasswordHistory(string computerName)
         {
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
             provider.ClearPassword(computer);
             provider.ClearPasswordHistory(computer);
             CollectionAssert.IsEmpty(provider.GetPasswordHistory(computer));
@@ -76,7 +76,7 @@ namespace Lithnet.AccessManager.PowerShell.Test
         [TestCase(C.EXTDEV_PC2)]
         public void GetLocalAdminPassword(string computerName)
         {
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             this.provider.ClearPassword(computer);
             this.provider.ClearPasswordHistory(computer);

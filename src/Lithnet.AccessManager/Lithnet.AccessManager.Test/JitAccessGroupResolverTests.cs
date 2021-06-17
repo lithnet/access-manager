@@ -41,7 +41,7 @@ namespace Lithnet.AccessManager.Test
         [TestCase(C.DEV_PC1, "%computerDomain%\\JIT-%computerName%", C.DEV_JIT_PC1)]
         public void GetGroupFromName(string computerName, string template, string expected)
         {
-            IComputer computer = this.directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = this.directory.GetComputer(computerName);
             IGroup group = this.resolver.GetJitGroup(computer, template);
 
             Assert.AreEqual(expected, group.MsDsPrincipalName.ToUpper());
@@ -51,7 +51,7 @@ namespace Lithnet.AccessManager.Test
         public void GetGroupFromSid(string groupName)
         {
             IGroup group = this.directory.GetGroup(groupName);
-            IComputer computer = this.directory.GetComputer(C.DEV_PC1);
+            IActiveDirectoryComputer computer = this.directory.GetComputer(C.DEV_PC1);
 
             IGroup found = this.resolver.GetJitGroup(computer, group.Sid.ToString());
 

@@ -12,6 +12,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server;
 
 namespace Lithnet.AccessManager.Api.Controllers
 {
@@ -76,7 +77,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                     return this.Forbid(JwtBearerDefaults.AuthenticationScheme);
                 }
 
-                Device device = await this.devices.GetDeviceAsync(AuthorityType.SelfAsserted, "ams", requestId);
+                Device device = await this.devices.GetDeviceAsync(AuthorityType.Ams, "ams", requestId);
 
                 return this.GetDeviceApprovalResult(device);
             }
@@ -90,21 +91,21 @@ namespace Lithnet.AccessManager.Api.Controllers
         {
             if (device.ApprovalState == ApprovalState.Approved)
             {
-                return this.Json(new RegistrationResponse { State = "approved", ClientId = device.ObjectId });
+                return this.Json(new RegistrationResponse { State = "approved", ClientId = device.ObjectID });
 
             }
             else if (device.ApprovalState == ApprovalState.Pending)
             {
-                string newPath = this.Request.PathBase.Add(new PathString($"/agent/register/{device.ObjectId}"));
+                string newPath = this.Request.PathBase.Add(new PathString($"/agent/register/{device.ObjectID}"));
                 this.Response.Headers.Add("Location", newPath);
-                JsonResult result = this.Json(new RegistrationResponse { State = "pending", ClientId = device.ObjectId });
+                JsonResult result = this.Json(new RegistrationResponse { State = "pending", ClientId = device.ObjectID });
 
                 result.StatusCode = StatusCodes.Status202Accepted;
                 return result;
             }
             else
             {
-                JsonResult result = this.Json(new RegistrationResponse { State = "rejected", ClientId = device.ObjectId });
+                JsonResult result = this.Json(new RegistrationResponse { State = "rejected", ClientId = device.ObjectID });
                 result.StatusCode = StatusCodes.Status403Forbidden;
                 return result;
             }

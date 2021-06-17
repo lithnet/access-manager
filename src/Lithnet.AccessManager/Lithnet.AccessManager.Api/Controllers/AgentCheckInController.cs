@@ -8,6 +8,7 @@ using System;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server;
 
 namespace Lithnet.AccessManager.Api.Controllers
 {
@@ -75,13 +76,12 @@ namespace Lithnet.AccessManager.Api.Controllers
         {
             if (device.AuthorityType == AuthorityType.ActiveDirectory)
             {
-                IComputer computer = this.directory.GetComputer(new SecurityIdentifier(device.AuthorityDeviceId));
+                IActiveDirectoryComputer computer = this.directory.GetComputer(new SecurityIdentifier(device.AuthorityDeviceId));
                 device.ComputerName = computer.SamAccountName.TrimEnd('$');
-                device.DnsName = computer.DnsHostName;
             }
             else if (device.AuthorityType == AuthorityType.AzureActiveDirectory)
             {
-                var computer = await graph.GetAadDeviceAsync(device.AuthorityDeviceId);
+                var computer = await graph.GetAadDeviceByIdAsync(device.AuthorityDeviceId);
                 device.ComputerName = computer.DisplayName;
             }
         }

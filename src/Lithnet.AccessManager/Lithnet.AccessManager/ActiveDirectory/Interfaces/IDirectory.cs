@@ -11,13 +11,13 @@ namespace Lithnet.AccessManager
     {
         IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, string targetDc, TimeSpan ttl, GroupType groupType, bool removeAccountOperators);
 
-        IComputer GetComputer(string name);
+        IActiveDirectoryComputer GetComputer(string name);
 
-        IComputer GetComputer(SecurityIdentifier sid);
+        IActiveDirectoryComputer GetComputer(SecurityIdentifier sid);
 
-        bool TryGetComputer(string name, out IComputer computer);
+        bool TryGetComputer(string name, out IActiveDirectoryComputer computer);
 
-        bool TryGetComputer(SecurityIdentifier sid, out IComputer computer);
+        bool TryGetComputer(SecurityIdentifier sid, out IActiveDirectoryComputer computer);
         void DeleteGroup(string name);
 
         IGroup GetGroup(string groupName);

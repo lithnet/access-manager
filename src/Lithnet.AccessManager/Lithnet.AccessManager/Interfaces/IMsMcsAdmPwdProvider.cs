@@ -4,12 +4,12 @@ namespace Lithnet.AccessManager
 {
     public interface IMsMcsAdmPwdProvider
     {
-        DateTime? GetExpiry(IComputer computer);
+        DateTime? GetExpiry(IActiveDirectoryComputer computer);
 
-        MsMcsAdmPwdPassword GetPassword(IComputer computer, DateTime? newExpiry);
+        MsMcsAdmPwdPassword GetPassword(IActiveDirectoryComputer computer, DateTime? newExpiry);
         
-        void SetPassword(IComputer computer, string password, DateTime expiryDate);
+        void SetPassword(IActiveDirectoryComputer computer, string password, DateTime expiryDate);
 
-        void ClearPassword(IComputer computer);
+        void ClearPassword(IActiveDirectoryComputer computer);
     }
 }

@@ -33,11 +33,11 @@ namespace Lithnet.AccessManager.Server.Authorization
             {
                 requestedAccess.ValidateAccessMask();
 
-                var info = this.authzBuilder.GetAuthorizationInformation(user, computer);
+                var info = await this.authzBuilder.GetAuthorizationInformation(user, computer);
 
                 if (info.MatchedComputerTargets.Count == 0)
                 {
-                    this.logger.LogTrace($"User {user.MsDsPrincipalName} is denied {requestedAccess} access to the computer {computer.MsDsPrincipalName} because the computer did not match any of the configured targets");
+                    this.logger.LogTrace($"User {user.MsDsPrincipalName} is denied {requestedAccess} access to the computer {computer.FullyQualifiedName} because the computer did not match any of the configured targets");
                     return BuildAuthZResponseFailed(requestedAccess, AuthorizationResponseCode.NoMatchingRuleForComputer);
                 }
 
@@ -68,7 +68,7 @@ namespace Lithnet.AccessManager.Server.Authorization
 
                 if (!info.EffectiveAccess.HasFlag(requestedAccess) || matchedTarget == null)
                 {
-                    this.logger.LogTrace($"User {user.MsDsPrincipalName} is denied {requestedAccess} access for computer {computer.MsDsPrincipalName}");
+                    this.logger.LogTrace($"User {user.MsDsPrincipalName} is denied {requestedAccess} access for computer {computer.FullyQualifiedName}");
 
                     return BuildAuthZResponseFailed(
                         requestedAccess,
@@ -84,7 +84,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                         return BuildAuthZResponseRateLimitExceeded(user, computer, requestedAccess, rateLimitResult, ip, matchedTarget);
                     }
 
-                    this.logger.LogTrace($"User {user.MsDsPrincipalName} is authorized for {requestedAccess} access to computer {computer.MsDsPrincipalName} from target {matchedTarget.Id}");
+                    this.logger.LogTrace($"User {user.MsDsPrincipalName} is authorized for {requestedAccess} access to computer {computer.FullyQualifiedName} from target {matchedTarget.Id}");
                     return BuildAuthZResponseSuccess(requestedAccess, matchedTarget, computer);
                 }
             }
@@ -94,9 +94,9 @@ namespace Lithnet.AccessManager.Server.Authorization
             }
         }
 
-        public AuthorizationResponse GetPreAuthorization(IUser user, IComputer computer)
+        public async Task<AuthorizationResponse> GetPreAuthorization(IUser user, IComputer computer)
         {
-            var info = this.authzBuilder.GetAuthorizationInformation(user, computer);
+            var info = await this.authzBuilder.GetAuthorizationInformation(user, computer);
 
             if (info.MatchedComputerTargets.Count == 0)
             {
@@ -133,7 +133,7 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         private AuthorizationResponse BuildAuthZResponseRateLimitExceeded(IUser user, IComputer computer, AccessMask requestedAccess, RateLimitResult result, IPAddress ip, SecurityDescriptorTarget matchedTarget)
         {
-            this.logger.LogError(result.IsUserRateLimit ? EventIDs.RateLimitExceededUser : EventIDs.RateLimitExceededIP , $"User {user.MsDsPrincipalName} on IP {ip} is denied {requestedAccess} access for computer {computer.MsDsPrincipalName} because they have exceeded the {(result.IsUserRateLimit ? "user" : "IP")} rate limit of {result.Threshold}/{result.Duration.TotalSeconds} seconds");
+            this.logger.LogError(result.IsUserRateLimit ? EventIDs.RateLimitExceededUser : EventIDs.RateLimitExceededIP , $"User {user.MsDsPrincipalName} on IP {ip} is denied {requestedAccess} access for computer {computer.FullyQualifiedName} because they have exceeded the {(result.IsUserRateLimit ? "user" : "IP")} rate limit of {result.Threshold}/{result.Duration.TotalSeconds} seconds");
 
             AuthorizationResponse response = AuthorizationResponse.CreateAuthorizationResponse(requestedAccess);
             response.Code = result.IsUserRateLimit ? AuthorizationResponseCode.UserRateLimitExceeded : AuthorizationResponseCode.IpRateLimitExceeded;

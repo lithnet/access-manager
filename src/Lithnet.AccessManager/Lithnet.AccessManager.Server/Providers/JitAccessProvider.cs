@@ -25,15 +25,20 @@ namespace Lithnet.AccessManager.Server
 
         public TimeSpan GrantJitAccess(IGroup group, IUser user, IComputer computer, bool canExtend, TimeSpan requestedExpiry, out Action undo)
         {
+            if (!(computer is IActiveDirectoryComputer adComputer))
+            {
+                throw new InvalidOperationException("Cannot perform JIT to a non-AD managed computer");
+            }
+
             this.logger.LogTrace("Adding user {user} to JIT group {group}", user.MsDsPrincipalName, group.MsDsPrincipalName);
 
             if (this.directory.IsPamFeatureEnabled(group.Sid, false))
             {
-                return this.GrantJitAccessPam(group, user, this.GetDcLocatorTarget(computer), canExtend, requestedExpiry, out undo);
+                return this.GrantJitAccessPam(group, user, this.GetDcLocatorTarget(adComputer), canExtend, requestedExpiry, out undo);
             }
             else
             {
-                return this.GrantJitAccessDynamicGroup(group, user, this.GetDcLocatorTarget(computer), canExtend, requestedExpiry, out undo);
+                return this.GrantJitAccessDynamicGroup(group, user, this.GetDcLocatorTarget(adComputer), canExtend, requestedExpiry, out undo);
             }
         }
 
@@ -181,7 +186,7 @@ namespace Lithnet.AccessManager.Server
             return this.discoveryServices.GetDomainNameNetBios(group.Sid.AccountDomainSid);
         }
 
-        private string GetDcLocatorTarget(IComputer computer)
+        private string GetDcLocatorTarget(IActiveDirectoryComputer computer)
         {
             return computer.DnsHostName ?? computer.SamAccountName.TrimEnd('$');
         }

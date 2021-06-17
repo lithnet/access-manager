@@ -60,7 +60,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
                             }
                             else
                             {
-                                if (this.directory.TryGetComputer(computerRaw, out IComputer c))
+                                if (this.directory.TryGetComputer(computerRaw, out IActiveDirectoryComputer c))
                                 {
                                     key = c.MsDsPrincipalName.TrimEnd('$');
                                 }

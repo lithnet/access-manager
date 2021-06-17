@@ -74,22 +74,22 @@ namespace Lithnet.AccessManager
             return new ActiveDirectoryUser(this.FindUserInGc(sid.ToString()));
         }
 
-        public IComputer GetComputer(string name)
+        public IActiveDirectoryComputer GetComputer(string name)
         {
             return new ActiveDirectoryComputer(this.FindComputerInGc(name));
         }
 
-        public IComputer GetComputer(SecurityIdentifier sid)
+        public IActiveDirectoryComputer GetComputer(SecurityIdentifier sid)
         {
             return new ActiveDirectoryComputer(this.FindComputerInGc(sid.ToString()));
         }
 
-        public bool TryGetComputer(string name, out IComputer computer)
+        public bool TryGetComputer(string name, out IActiveDirectoryComputer computer)
         {
             return DirectoryExtensions.TryGet(() => this.GetComputer(name), out computer);
         }
 
-        public bool TryGetComputer(SecurityIdentifier sid, out IComputer computer)
+        public bool TryGetComputer(SecurityIdentifier sid, out IActiveDirectoryComputer computer)
         {
             return DirectoryExtensions.TryGet(() => this.GetComputer(sid), out computer);
         }

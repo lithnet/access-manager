@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Lithnet.AccessManager.Server.Configuration;
 
 namespace Lithnet.AccessManager.Server.Authorization
@@ -7,8 +8,8 @@ namespace Lithnet.AccessManager.Server.Authorization
     {
         void ClearCache(IUser user, IComputer computer);
 
-        AuthorizationInformation GetAuthorizationInformation(IUser user, IComputer computer);
+        Task<AuthorizationInformation> GetAuthorizationInformation(IUser user, IComputer computer);
 
-        AuthorizationInformation BuildAuthorizationInformation(IUser user, IComputer computer, IList<SecurityDescriptorTarget> matchedComputerTargets);
+        Task<AuthorizationInformation> BuildAuthorizationInformation(IUser user, IComputer computer, IList<SecurityDescriptorTarget> matchedComputerTargets);
     }
 }

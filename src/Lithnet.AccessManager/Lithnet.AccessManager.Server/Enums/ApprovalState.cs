@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Lithnet.AccessManager.Api
+namespace Lithnet.AccessManager.Server
 {
     public enum ApprovalState
     {

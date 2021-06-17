@@ -33,7 +33,7 @@ namespace Lithnet.AccessManager.Server.Test
         public void TestFailoverToNextHost(string username, string computerName)
         {
             IUser user = directory.GetUser(username);
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
             string dnsDomain = this.discoveryServices.GetDomainNameDns(user.Sid);
             string dc = this.discoveryServices.GetDomainController(dnsDomain);
 
@@ -74,7 +74,7 @@ namespace Lithnet.AccessManager.Server.Test
         public void ExceptionThrownWhenHostListRecycles(string username, string computerName)
         {
             IUser user = directory.GetUser(username);
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
             string dnsDomain = this.discoveryServices.GetDomainNameDns(user.Sid);
 
             var options = new AuthorizationOptions
@@ -115,7 +115,7 @@ namespace Lithnet.AccessManager.Server.Test
         public void TestFailbackToLocalHost(string username, string computerName)
         {
             IUser user = directory.GetUser(username);
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
             string dnsDomain = this.discoveryServices.GetDomainNameDns(user.Sid);
 
             var options = new AuthorizationOptions

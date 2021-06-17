@@ -21,7 +21,12 @@ namespace Lithnet.AccessManager.Server
 
         public IList<BitLockerRecoveryPassword> GetBitLockerRecoveryPasswords(IComputer computer)
         {
-            DirectorySearcher s = new DirectorySearcher(computer.DirectoryEntry)
+            if (!(computer is IActiveDirectoryComputer adComputer))
+            {
+                return new List<BitLockerRecoveryPassword>();
+            }
+
+            DirectorySearcher s = new DirectorySearcher(adComputer.DirectoryEntry)
             {
                 SearchScope = SearchScope.OneLevel, 
                 Filter = "(objectClass=msFVE-RecoveryInformation)"

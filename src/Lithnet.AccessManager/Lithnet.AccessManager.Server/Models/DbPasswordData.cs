@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Lithnet.AccessManager.Api
+namespace Lithnet.AccessManager.Server
 {
     public class DbPasswordData
     {

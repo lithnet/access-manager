@@ -17,7 +17,7 @@ namespace Lithnet.AccessManager
             this.logger = logger;
         }
 
-        public void SetPassword(IComputer computer, string password, DateTime expiryDate)
+        public void SetPassword(IActiveDirectoryComputer computer, string password, DateTime expiryDate)
         {
             DirectoryEntry de = computer.DirectoryEntry;
             de.Properties[AttrMsMcsAdmPwd].Value = password;
@@ -25,7 +25,7 @@ namespace Lithnet.AccessManager
             de.CommitChanges();
         }
 
-        public void ClearPassword(IComputer computer)
+        public void ClearPassword(IActiveDirectoryComputer computer)
         {
             DirectoryEntry de = computer.DirectoryEntry;
 
@@ -37,7 +37,7 @@ namespace Lithnet.AccessManager
             }    
         }
 
-        public MsMcsAdmPwdPassword GetPassword(IComputer computer, DateTime? newExpiry)
+        public MsMcsAdmPwdPassword GetPassword(IActiveDirectoryComputer computer, DateTime? newExpiry)
         {
             DirectoryEntry de = computer.DirectoryEntry;
 
@@ -68,7 +68,7 @@ namespace Lithnet.AccessManager
             return p;
         }
 
-        public DateTime? GetExpiry(IComputer computer)
+        public DateTime? GetExpiry(IActiveDirectoryComputer computer)
         {
             DirectoryEntry de = computer.DirectoryEntry;
 

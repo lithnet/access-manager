@@ -84,32 +84,29 @@ namespace Lithnet.AccessManager.Api
 
         public static IWebHostBuilder UseHttpSys(this IWebHostBuilder builder, IConfiguration config)
         {
-            if (config.GetValueOrDefault("hosting:environment", HostingEnvironment.HttpSys) == HostingEnvironment.HttpSys)
+            HttpSysHostingOptions p = new HttpSysHostingOptions();
+            config.Bind("Hosting:HttpSys", p);
+
+            builder.UseHttpSys(options =>
             {
-                HttpSysHostingOptions p = new HttpSysHostingOptions();
-                config.Bind("Hosting:HttpSys", p);
+                options.Authentication.Schemes =
+                    Microsoft.AspNetCore.Server.HttpSys.AuthenticationSchemes.Negotiate | Microsoft.AspNetCore.Server.HttpSys.AuthenticationSchemes.NTLM;
+                options.Authentication.AllowAnonymous = true;
+                options.ClientCertificateMethod = Microsoft.AspNetCore.Server.HttpSys.ClientCertificateMethod.NoCertificate;
 
-                builder.UseHttpSys(options =>
-                {
-                    options.Authentication.Schemes =
-                        Microsoft.AspNetCore.Server.HttpSys.AuthenticationSchemes.Negotiate | Microsoft.AspNetCore.Server.HttpSys.AuthenticationSchemes.NTLM;
-                    options.Authentication.AllowAnonymous = true;
-                    options.ClientCertificateMethod = Microsoft.AspNetCore.Server.HttpSys.ClientCertificateMethod.NoCertificate;
+                options.AllowSynchronousIO = p.AllowSynchronousIO;
+                options.EnableResponseCaching = p.EnableResponseCaching;
+                options.Http503Verbosity = (Microsoft.AspNetCore.Server.HttpSys.Http503VerbosityLevel)p.Http503Verbosity;
+                options.MaxAccepts = p.MaxAccepts;
+                options.MaxConnections = p.MaxConnections;
+                options.MaxRequestBodySize = p.MaxRequestBodySize;
+                options.RequestQueueLimit = p.RequestQueueLimit;
+                options.ThrowWriteExceptions = p.ThrowWriteExceptions;
 
-                    options.AllowSynchronousIO = p.AllowSynchronousIO;
-                    options.EnableResponseCaching = p.EnableResponseCaching;
-                    options.Http503Verbosity = (Microsoft.AspNetCore.Server.HttpSys.Http503VerbosityLevel)p.Http503Verbosity;
-                    options.MaxAccepts = p.MaxAccepts;
-                    options.MaxConnections = p.MaxConnections;
-                    options.MaxRequestBodySize = p.MaxRequestBodySize;
-                    options.RequestQueueLimit = p.RequestQueueLimit;
-                    options.ThrowWriteExceptions = p.ThrowWriteExceptions;
-
-                    p.Path = "api/v1.0";
-                    options.UrlPrefixes.Clear();
-                    options.UrlPrefixes.Add(p.BuildHttpsUrlPrefix());
-                });
-            }
+                p.Path = "api/v1.0";
+                options.UrlPrefixes.Clear();
+                options.UrlPrefixes.Add(p.BuildHttpsUrlPrefix());
+            });
 
             return builder;
         }

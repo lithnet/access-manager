@@ -90,7 +90,7 @@ namespace Lithnet.AccessManager.Service.Internal
         {
             LapsAuthorizationResponse lapsAuthZResponse = action.AuthzResponse as LapsAuthorizationResponse;
             JitAuthorizationResponse jitAuthZResponse = action.AuthzResponse as JitAuthorizationResponse;
-            
+
             Dictionary<string, string> pairs = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) {
                 { "{user.SamAccountName}", action.User?.SamAccountName},
                 { "{user.MsDsPrincipalName}", action.User?.MsDsPrincipalName},
@@ -103,13 +103,17 @@ namespace Lithnet.AccessManager.Service.Internal
                 { "{user.Guid}", action.User?.Guid?.ToString()},
                 { "{user.GivenName}", action.User?.GivenName},
                 { "{user.Surname}", action.User?.Surname},
-                { "{computer.SamAccountName}", action.Computer?.SamAccountName},
-                { "{computer.MsDsPrincipalName}", action.Computer?.MsDsPrincipalName},
-                { "{computer.DistinguishedName}", action.Computer?.DistinguishedName},
+                { "{computer.DnsHostName}", action.Computer?.DnsHostName},
+                { "{computer.FullyQualifiedName}", action.Computer?.FullyQualifiedName},
+                { "{computer.Name}", action.Computer?.Name},
                 { "{computer.Description}", action.Computer?.Description},
                 { "{computer.DisplayName}", action.Computer?.DisplayName},
-                { "{computer.Guid}", action.Computer?.Guid?.ToString()},
-                { "{computer.Sid}", action.Computer?.Sid?.ToString()},
+                { "{computer.ObjectId}", action.Computer?.ObjectID},
+                { "{computer.Guid}", action.Computer?.ObjectID},
+                { "{computer.Sid}", action.Computer?.SecurityIdentifier?.ToString()},
+                { "{computer.AuthorityType}", action.Computer?.AuthorityType.ToString()},
+                { "{computer.Authority}", action.Computer?.Authority},
+                { "{computer.AuthorityDeviceId}", action.Computer?.AuthorityDeviceId},
                 { "{request.ComputerName}", action.RequestedComputerName},
                 { "{request.Reason}", action.RequestReason ?? "(not provided)"},
                 { "{AuthzResult.NotificationChannels}", string.Join(",", action.AuthzResponse?.NotificationChannels ?? new List<string>())},
@@ -127,6 +131,19 @@ namespace Lithnet.AccessManager.Service.Internal
                 { "{datetimeutc}", DateTime.UtcNow.ToString(CultureInfo.CurrentCulture)},
                 { "{computer.LapsExpiryDate}", action.AccessExpiryDate}, //deprecated
             };
+
+            if (action.Computer != null && action.Computer is IActiveDirectoryComputer adComputer)
+            {
+                pairs.Add("{computer.SamAccountName}", adComputer.SamAccountName);
+                pairs.Add("{computer.MsDsPrincipalName}", adComputer.MsDsPrincipalName);
+                pairs.Add("{computer.DistinguishedName}", adComputer.DistinguishedName);
+            }
+            else
+            {
+                pairs.Add("{computer.SamAccountName}", action.Computer?.Name);
+                pairs.Add("{computer.MsDsPrincipalName}", action.Computer?.FullyQualifiedName);
+                pairs.Add("{computer.DistinguishedName}", string.Empty);
+            }
 
             return pairs;
         }

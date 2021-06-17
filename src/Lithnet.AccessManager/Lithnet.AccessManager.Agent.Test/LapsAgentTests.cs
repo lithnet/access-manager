@@ -18,7 +18,7 @@ namespace Lithnet.AccessManager.Agent.Test
         
         private Mock<ILithnetAdminPasswordProvider> lithnetPwdProvider;
 
-        private Mock<IComputer> computer;
+        private Mock<IActiveDirectoryComputer> computer;
 
         [SetUp()]
         public void TestInitialize()
@@ -28,7 +28,7 @@ namespace Lithnet.AccessManager.Agent.Test
             this.passwordGenerator = new Mock<IPasswordGenerator>();
             this.sam = new Mock<ILocalSam>();
             this.lithnetPwdProvider = new Mock<ILithnetAdminPasswordProvider>();
-            this.computer = new Mock<IComputer>();
+            this.computer = new Mock<IActiveDirectoryComputer>();
         }
 
         [Test]
@@ -50,14 +50,14 @@ namespace Lithnet.AccessManager.Agent.Test
 
             agent.ChangePassword(this.computer.Object);
 
-            lithnetPwdProvider.Verify(v => v.UpdateCurrentPassword(It.IsAny<IComputer>(), It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), PasswordAttributeBehaviour.Ignore), Times.Once);
+            lithnetPwdProvider.Verify(v => v.UpdateCurrentPassword(It.IsAny<IActiveDirectoryComputer>(), It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), PasswordAttributeBehaviour.Ignore), Times.Once);
             sam.Verify(v => v.SetLocalAccountPassword(It.IsAny<SecurityIdentifier>(), It.IsAny<string>()));
         }
 
         [Test]
         public void HasPasswordExpiredAppDataNull()
         {
-            lithnetPwdProvider.Setup(a => a.GetExpiry(It.IsAny<IComputer>())).Returns((DateTime?)null);
+            lithnetPwdProvider.Setup(a => a.GetExpiry(It.IsAny<IActiveDirectoryComputer>())).Returns((DateTime?)null);
             LegacyLapsAgent agent = this.BuildAgent();
 
             Assert.IsFalse(agent.HasPasswordExpired(this.computer.Object));
@@ -66,7 +66,7 @@ namespace Lithnet.AccessManager.Agent.Test
         [Test]
         public void HasPasswordExpiredAppDataExpired()
         {
-            lithnetPwdProvider.Setup(a => a.HasPasswordExpired(It.IsAny<IComputer>(), false)).Returns(true);
+            lithnetPwdProvider.Setup(a => a.HasPasswordExpired(It.IsAny<IActiveDirectoryComputer>(), false)).Returns(true);
 
             LegacyLapsAgent agent = this.BuildAgent();
 
@@ -76,7 +76,7 @@ namespace Lithnet.AccessManager.Agent.Test
         [Test]
         public void HasPasswordExpiredAppDataNotExpired()
         {
-            lithnetPwdProvider.Setup(a => a.GetExpiry(It.IsAny<IComputer>())).Returns(DateTime.UtcNow.AddDays(1));
+            lithnetPwdProvider.Setup(a => a.GetExpiry(It.IsAny<IActiveDirectoryComputer>())).Returns(DateTime.UtcNow.AddDays(1));
 
             LegacyLapsAgent agent = this.BuildAgent();
 

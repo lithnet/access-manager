@@ -194,11 +194,22 @@ namespace Lithnet.AccessManager.Server.Authorization
             PSObject u = new PSObject();
             u.Properties.Add(new PSNoteProperty("Description", computer.Description));
             u.Properties.Add(new PSNoteProperty("DisplayName", computer.DisplayName));
-            u.Properties.Add(new PSNoteProperty("DistinguishedName", computer.DistinguishedName));
-            u.Properties.Add(new PSNoteProperty("Guid", computer.Guid));
-            u.Properties.Add(new PSNoteProperty("MsDsPrincipalName", computer.MsDsPrincipalName));
-            u.Properties.Add(new PSNoteProperty("SamAccountName", computer.SamAccountName));
-            u.Properties.Add(new PSNoteProperty("Sid", computer.Sid.ToString()));
+            u.Properties.Add(new PSNoteProperty("DnsHostName", computer.DnsHostName));
+            u.Properties.Add(new PSNoteProperty("Authority", computer.Authority));
+            u.Properties.Add(new PSNoteProperty("AuthorityDeviceId", computer.AuthorityDeviceId));
+            u.Properties.Add(new PSNoteProperty("AuthorityType", computer.AuthorityType));
+            u.Properties.Add(new PSNoteProperty("FullyQualifiedName", computer.FullyQualifiedName));
+            u.Properties.Add(new PSNoteProperty("Name", computer.Name));
+            u.Properties.Add(new PSNoteProperty("ObjectID", computer.ObjectID));
+
+            if (computer is IActiveDirectoryComputer adComputer)
+            {
+                u.Properties.Add(new PSNoteProperty("DistinguishedName", adComputer.DistinguishedName));
+                u.Properties.Add(new PSNoteProperty("Guid", adComputer.Guid));
+                u.Properties.Add(new PSNoteProperty("MsDsPrincipalName", adComputer.MsDsPrincipalName));
+                u.Properties.Add(new PSNoteProperty("SamAccountName", adComputer.SamAccountName));
+                u.Properties.Add(new PSNoteProperty("Sid", adComputer.Sid.ToString()));
+            }
 
             return u;
         }

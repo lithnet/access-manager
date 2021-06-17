@@ -16,6 +16,16 @@ namespace Lithnet.AccessManager
 
         public IGroup GetJitGroup(IComputer computer, string groupName)
         {
+            if (computer is IActiveDirectoryComputer adComputer)
+            {
+                return this.GetJitGroup(adComputer, groupName);
+            }
+
+            throw new InvalidOperationException("The computer object type supplied is not known");
+        }
+
+        public IGroup GetJitGroup(IActiveDirectoryComputer computer, string groupName)
+        {
             string authorizingGroupName = groupName;
 
             if (authorizingGroupName == null)

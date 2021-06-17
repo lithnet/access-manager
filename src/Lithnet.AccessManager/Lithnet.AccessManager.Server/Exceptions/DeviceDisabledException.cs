@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server;
 
-namespace Lithnet.AccessManager.Api
+namespace Lithnet.AccessManager.Server
 {
     [Serializable]
     public class DeviceDisabledException : DeviceAuthenticationException

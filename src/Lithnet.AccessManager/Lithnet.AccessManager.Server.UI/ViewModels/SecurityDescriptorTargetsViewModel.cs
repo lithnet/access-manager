@@ -137,7 +137,7 @@ namespace Lithnet.AccessManager.Server.UI
                 {
                     try
                     {
-                        IComputer computer = null;
+                        IActiveDirectoryComputer computer = null;
 
                         try
                         {

@@ -1,12 +1,13 @@
-﻿using Lithnet.AccessManager.Server;
+﻿using Lithnet.AccessManager.Api;
+using Lithnet.AccessManager.Api.Shared;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Api.Shared;
-using Microsoft.Extensions.Options;
 
-namespace Lithnet.AccessManager.Api.Providers
+namespace Lithnet.AccessManager.Server
 {
     public class DbDevicePasswordProvider : IDbDevicePasswordProvider
     {
@@ -55,6 +56,106 @@ namespace Lithnet.AccessManager.Api.Providers
             }
         }
 
+        public async Task<DbPasswordData> GetCurrentPassword(string deviceId)
+        {
+            try
+            {
+                await using SqlConnection con = this.dbProvider.GetConnection();
+
+                SqlCommand command = new SqlCommand("spGetCurrentPassword", con);
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@ObjectID", deviceId);
+
+                await using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+                if (!reader.HasRows)
+                {
+                    throw new NoPasswordException();
+                }
+
+                await reader.ReadAsync();
+                return new DbPasswordData(reader);
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 50000)
+                {
+                    throw new DeviceNotFoundException($"The device {deviceId} was not found");
+                }
+
+                throw;
+            }
+        }
+
+        public async Task<IList<DbPasswordData>> GetPasswordHistory(string deviceId)
+        {
+            try
+            {
+                await using SqlConnection con = this.dbProvider.GetConnection();
+
+                SqlCommand command = new SqlCommand("spGetPasswordHistory", con);
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@ObjectID", deviceId);
+
+                await using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+                if (!reader.HasRows)
+                {
+                    throw new NoPasswordException();
+                }
+
+                List<DbPasswordData> passwords = new List<DbPasswordData>();
+
+                while (await reader.ReadAsync())
+                {
+                    passwords.Add(new DbPasswordData(reader));
+                }
+
+                return passwords;
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 50000)
+                {
+                    throw new DeviceNotFoundException($"The device {deviceId} was not found");
+                }
+
+                throw;
+            }
+        }
+
+        public async Task<DbPasswordData> GetCurrentPassword(string deviceId, DateTime newExpiry)
+        {
+            try
+            {
+                await using SqlConnection con = this.dbProvider.GetConnection();
+
+                SqlCommand command = new SqlCommand("spGetCurrentPasswordAndUpdateExpiry", con);
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@ObjectID", deviceId);
+                command.Parameters.AddWithValue("@ExpiryDate", newExpiry);
+
+                await using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+                if (!reader.HasRows)
+                {
+                    throw new NoPasswordException();
+                }
+
+                await reader.ReadAsync();
+                return new DbPasswordData(reader);
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == 50000)
+                {
+                    throw new DeviceNotFoundException($"The device {deviceId} was not found");
+                }
+
+                throw;
+            }
+        }
+
         public async Task<string> UpdateDevicePassword(string deviceId, PasswordUpdateRequest request)
         {
             try
@@ -70,8 +171,6 @@ namespace Lithnet.AccessManager.Api.Providers
                         expiryDate = policyMax;
                     }
                 }
-              
-           
 
                 await using SqlConnection con = this.dbProvider.GetConnection();
 
@@ -153,7 +252,7 @@ namespace Lithnet.AccessManager.Api.Providers
 
         private async Task PurgeOldPasswords(string deviceId)
         {
-            if (this.passwordPolicy.Value.MaxNumberOfPasswords <= 0 ||
+            if (this.passwordPolicy.Value.MaxNumberOfPasswords <= 0 &&
                 this.passwordPolicy.Value.MaximumPasswordHistoryAgeDays <= 0)
             {
                 return;

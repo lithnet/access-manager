@@ -420,7 +420,7 @@ namespace Lithnet.AccessManager.Server.UI
                     return;
                 }
 
-                if (!this.directory.TryGetComputer(sid, out IComputer computer))
+                if (!this.directory.TryGetComputer(sid, out IActiveDirectoryComputer computer))
                 {
                     await this.dialogCoordinator.ShowMessageAsync(this, "Error", "Unable to locate computer in the directory");
                     return;

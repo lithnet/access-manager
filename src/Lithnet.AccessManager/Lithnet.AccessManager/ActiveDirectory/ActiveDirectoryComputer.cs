@@ -5,9 +5,9 @@ using System.Security.Principal;
 
 namespace Lithnet.AccessManager
 {
-    public sealed class ActiveDirectoryComputer : IComputer
+    public sealed class ActiveDirectoryComputer : IActiveDirectoryComputer
     {
-        internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "description", "displayName", "objectGuid", "objectSid", "msDS-PrincipalName", "objectClass" , "dNSHostName"};
+        internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "description", "displayName", "objectGuid", "objectSid", "msDS-PrincipalName", "objectClass", "dNSHostName" };
 
         private readonly DirectoryEntry de;
 
@@ -29,8 +29,22 @@ namespace Lithnet.AccessManager
         public string Description => this.de.GetPropertyString("description");
 
         public string DisplayName => this.de.GetPropertyString("displayName");
-        
+
         public string DnsHostName => this.de.GetPropertyString("dNSHostName");
+
+        public string Name => this.de.GetPropertyString("samAccountName");
+
+        public string FullyQualifiedName => this.de.GetPropertyString("msDS-PrincipalName");
+
+        public string ObjectID => this.de.GetPropertyGuid("objectGuid").ToString();
+
+        public string Authority => this.Sid.AccountDomainSid.ToString();
+
+        public AuthorityType AuthorityType => AuthorityType.ActiveDirectory;
+
+        public string AuthorityDeviceId => this.Sid.ToString();
+
+        public SecurityIdentifier SecurityIdentifier => this.Sid;
 
         public Guid? Guid => this.de.GetPropertyGuid("objectGuid");
 

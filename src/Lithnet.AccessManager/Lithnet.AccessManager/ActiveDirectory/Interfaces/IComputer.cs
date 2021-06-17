@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.DirectoryServices;
+using System.Security.Principal;
+using System.Text;
 
 namespace Lithnet.AccessManager
 {
-    public interface IComputer : ISecurityPrincipal
+    public interface IComputer
     {
         string Description { get; }
 
@@ -12,8 +13,18 @@ namespace Lithnet.AccessManager
 
         string DnsHostName { get; }
 
-        DirectoryEntry DirectoryEntry { get; }
+        string Name { get; }
 
-        IEnumerable<Guid> GetParentGuids();
+        string FullyQualifiedName { get; }
+
+        string ObjectID { get; }
+
+        string Authority { get; }
+
+        AuthorityType AuthorityType { get; }
+
+        string AuthorityDeviceId { get; }
+
+        SecurityIdentifier SecurityIdentifier { get; }
     }
 }

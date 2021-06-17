@@ -32,7 +32,7 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.ExtDev + "\\JIT-PC1", C.EXTDEV_PC1)]
         public void GetGroupByTemplate(string groupName, string computerName)
         {
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
             IGroup group = resolver.GetJitGroup(computer, "%computerDomain%\\JIT-%computerName%");
             Assert.AreEqual(groupName, group.MsDsPrincipalName);
         }
@@ -42,7 +42,7 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.ExtDev + "\\JIT-PC1", C.EXTDEV_PC1)]
         public void GetGroupByName(string groupName, string computerName)
         {
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
             IGroup group = resolver.GetJitGroup(computer, groupName);
 
             Assert.AreEqual(groupName, group.MsDsPrincipalName);
@@ -53,7 +53,7 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.ExtDev + "\\JIT-PC1", C.EXTDEV_PC1)]
         public void GetGroupBySid(string groupName, string computerName)
         {
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
             IGroup sourceGroup = directory.GetGroup(groupName);
             IGroup group = resolver.GetJitGroup(computer, sourceGroup.Sid.ToString());
             

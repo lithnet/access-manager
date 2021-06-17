@@ -8,6 +8,7 @@ using System;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server;
 
 namespace Lithnet.AccessManager.Api.Controllers
 {
@@ -111,7 +112,7 @@ namespace Lithnet.AccessManager.Api.Controllers
 
             this.logger.LogTrace($"Client has presented an Azure AD certificate for authentication of device {deviceId}");
 
-            Microsoft.Graph.Device aadDevice = await this.graphProvider.GetAadDeviceAsync(deviceId);
+            Microsoft.Graph.Device aadDevice = await this.graphProvider.GetAadDeviceByDeviceIdAsync(deviceId);
 
             if (!aadDevice.HasDeviceThumbprint(signingCertificate.Thumbprint))
             {
@@ -143,7 +144,7 @@ namespace Lithnet.AccessManager.Api.Controllers
             Device device = await this.devices.GetOrCreateDeviceAsync(aadDevice, this.azureAdOptions.Value.TenantId);
             ClaimsIdentity identity = device.ToClaimsIdentity();
 
-            this.logger.LogInformation($"Successfully authenticated device {device.ComputerName} ({device.ObjectId}) from AzureAD");
+            this.logger.LogInformation($"Successfully authenticated device {device.ComputerName} ({device.ObjectID}) from AzureAD");
             return this.tokenGenerator.GenerateToken(identity);
         }
 
@@ -152,7 +153,7 @@ namespace Lithnet.AccessManager.Api.Controllers
             Device device = await this.devices.GetDeviceAsync(signingCertificate);
             ClaimsIdentity identity = device.ToClaimsIdentity();
 
-            this.logger.LogInformation($"Successfully authenticated device {device.ComputerName} ({device.ObjectId}) using a self-signed assertion");
+            this.logger.LogInformation($"Successfully authenticated device {device.ComputerName} ({device.ObjectID}) using a self-signed assertion");
             return this.tokenGenerator.GenerateToken(identity);
         }
     }

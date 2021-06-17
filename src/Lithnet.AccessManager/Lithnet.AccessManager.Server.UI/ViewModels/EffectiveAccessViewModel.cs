@@ -99,7 +99,7 @@ namespace Lithnet.AccessManager.Server.UI
                         return;
                     }
 
-                    if (!this.directory.TryGetComputer(this.ComputerName, out IComputer computer))
+                    if (!this.directory.TryGetComputer(this.ComputerName, out IActiveDirectoryComputer computer))
                     {
                         await this.dialogCoordinator.ShowMessageAsync(this, "Could not find computer", "Could not find a matching computer in the directory", MessageDialogStyle.Affirmative, settings);
                         return;

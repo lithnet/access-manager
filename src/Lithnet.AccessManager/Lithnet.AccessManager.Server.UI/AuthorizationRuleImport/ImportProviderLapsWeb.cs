@@ -149,7 +149,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
             {
                 target.Type = TargetType.Computer;
 
-                if (this.directory.TryGetComputer(name, out IComputer computer))
+                if (this.directory.TryGetComputer(name, out IActiveDirectoryComputer computer))
                 {
                     target.Target = computer.Sid.ToString();
                     targetFriendlyName = computer.MsDsPrincipalName;

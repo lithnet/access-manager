@@ -35,7 +35,7 @@ namespace Lithnet.AccessManager.Test
         [TestCase(C.EXTDEV_PC1)]
         public void SetFirstPassword(string computerName)
         {
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             this.provider.ClearPassword(computer);
             this.provider.ClearPasswordHistory(computer);
@@ -64,7 +64,7 @@ namespace Lithnet.AccessManager.Test
         [TestCase(C.EXTDEV_PC2)]
         public void AddToPasswordHistory(string computerName)
         {
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
             provider.ClearPassword(computer);
             provider.ClearPasswordHistory(computer);
             CollectionAssert.IsEmpty(provider.GetPasswordHistory(computer));
@@ -116,7 +116,7 @@ namespace Lithnet.AccessManager.Test
         [TestCase(C.EXTDEV_PC1)]
         public void AgeOutPasswordHistory(string computerName)
         {
-            IComputer computer = directory.GetComputer(computerName);
+            IActiveDirectoryComputer computer = directory.GetComputer(computerName);
             provider.ClearPassword(computer);
             provider.ClearPasswordHistory(computer);
             CollectionAssert.IsEmpty(provider.GetPasswordHistory(computer));

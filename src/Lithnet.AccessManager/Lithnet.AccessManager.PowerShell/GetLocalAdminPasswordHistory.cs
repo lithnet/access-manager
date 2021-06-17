@@ -50,7 +50,7 @@ namespace Lithnet.AccessManager.PowerShell
 
         protected override void ProcessRecord()
         {
-            IComputer computer = this.directory.GetComputer(this.ComputerName);
+            IActiveDirectoryComputer computer = this.directory.GetComputer(this.ComputerName);
 
             var items = this.adminPasswordProvider.GetPasswordHistory(computer);
             

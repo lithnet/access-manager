@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server;
 using Microsoft.Graph;
 
 namespace Lithnet.AccessManager.Api

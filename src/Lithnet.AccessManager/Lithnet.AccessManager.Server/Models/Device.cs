@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Security.Claims;
+using System.Security.Principal;
 
-namespace Lithnet.AccessManager.Api
+namespace Lithnet.AccessManager.Server
 {
-    public class Device
+    public class Device : IComputer
     {
         public long Id { get; set; }
 
-        public string ObjectId { get; set; }
+        public string ObjectID { get; set; }
 
         public string AgentVersion { get; set; }
 
@@ -22,11 +23,42 @@ namespace Lithnet.AccessManager.Api
 
         public AuthorityType AuthorityType { get; set; }
 
+        public string Description => null;
+
+        public string DisplayName => this.ComputerName;
+
+        public string DnsHostName => this.DnsName;
+
+        public string Name => this.ComputerName;
+
+        public string FullyQualifiedName
+        {
+            get
+            {
+                if (this.AuthorityType == AuthorityType.AzureActiveDirectory)
+                {
+                    return $"AzureAD\\{this.ComputerName}";
+                }
+                else if (this.AuthorityType == AuthorityType.Ams)
+                {
+                    return $"AMS\\{this.ComputerName}";
+                }
+                else
+                {
+                    return $"{this.Authority}\\{this.ComputerName}";
+                }
+            }
+        }
+
         public string Authority { get; set; }
 
         public string AuthorityDeviceId { get; set; }
 
+        public SecurityIdentifier SecurityIdentifier { get; set; }
+
         public ApprovalState ApprovalState { get; set; }
+
+        public string Sid => this.SecurityIdentifier.ToString();
 
         public string OperatingSystemFamily { get; set; }
 
@@ -39,7 +71,7 @@ namespace Lithnet.AccessManager.Api
         public Device(SqlDataReader reader)
         {
             this.Id = reader["Id"].CastOrDefault<long>();
-            this.ObjectId = reader["ObjectId"].CastOrDefault<string>();
+            this.ObjectID = reader["ObjectId"].CastOrDefault<string>();
             this.AgentVersion = reader["AgentVersion"].CastOrDefault<string>();
             this.ComputerName = reader["ComputerName"].CastOrDefault<string>();
             this.DnsName = reader["DnsName"].CastOrDefault<string>();
@@ -48,6 +80,7 @@ namespace Lithnet.AccessManager.Api
             this.AuthorityType = (AuthorityType)reader["AuthorityType"].CastOrDefault<int>();
             this.Authority = reader["Authority"].CastOrDefault<string>();
             this.AuthorityDeviceId = reader["AuthorityDeviceId"].CastOrDefault<string>();
+            this.SecurityIdentifier = new SecurityIdentifier(reader["SID"].CastOrDefault<string>());
             this.ApprovalState = (ApprovalState)reader["ApprovalState"].CastOrDefault<int>();
             this.OperatingSystemFamily = reader["OperatingSystemFamily"].CastOrDefault<string>();
             this.OperatingSystemVersion = reader["OperatingSystemVersion"].CastOrDefault<string>();
@@ -56,10 +89,11 @@ namespace Lithnet.AccessManager.Api
         public ClaimsIdentity ToClaimsIdentity()
         {
             ClaimsIdentity identity = new ClaimsIdentity();
-            identity.AddClaim(new Claim("sub", this.ObjectId));
+            identity.AddClaim(new Claim("sub", this.ObjectID));
             identity.AddClaim(new Claim("authority-type", this.AuthorityType.ToString()));
             identity.AddClaim(new Claim("authority", this.Authority));
             identity.AddClaim(new Claim("authority-identifier", this.AuthorityDeviceId));
+            identity.AddClaim(new Claim("sid", this.Sid));
             identity.AddClaim(new Claim("object-type", "Computer"));
 
             return identity;
@@ -67,13 +101,14 @@ namespace Lithnet.AccessManager.Api
 
         public void ToCreateCommandParameters(SqlCommand command)
         {
-            command.Parameters.AddWithValue("@ObjectID", this.ObjectId);
+            command.Parameters.AddWithValue("@ObjectID", this.ObjectID);
             command.Parameters.AddWithValue("@ComputerName", this.ComputerName);
             command.Parameters.AddWithValue("@DnsName", this.DnsName);
             command.Parameters.AddWithValue("@ApprovalState", (int)this.ApprovalState);
             command.Parameters.AddWithValue("@AuthorityType", (int)this.AuthorityType);
             command.Parameters.AddWithValue("@Authority", this.Authority);
             command.Parameters.AddWithValue("@AuthorityDeviceId", this.AuthorityDeviceId);
+            command.Parameters.AddWithValue("@SID", this.Sid);
             command.Parameters.AddWithValue("@AgentVersion", this.AgentVersion);
             command.Parameters.AddWithValue("@OSFamily", this.OperatingSystemFamily);
             command.Parameters.AddWithValue("@OSVersion", this.OperatingSystemVersion);
@@ -81,7 +116,7 @@ namespace Lithnet.AccessManager.Api
 
         public void ToUpdateCommandParameters(SqlCommand command)
         {
-            command.Parameters.AddWithValue("@ObjectID", this.ObjectId);
+            command.Parameters.AddWithValue("@ObjectID", this.ObjectID);
             command.Parameters.AddWithValue("@ComputerName", this.ComputerName);
             command.Parameters.AddWithValue("@DnsName", this.DnsName);
             command.Parameters.AddWithValue("@AgentVersion", this.AgentVersion);

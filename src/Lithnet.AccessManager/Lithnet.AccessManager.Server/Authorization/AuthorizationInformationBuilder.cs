@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.AccessControl;
-using System.Security.Principal;
-using System.Threading.Tasks.Sources;
-using Lithnet.AccessManager.Enterprise;
+﻿using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.Licensing.Core;
 using Lithnet.Security.Authorization;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.AccessControl;
+using System.Security.Principal;
+using System.Threading.Tasks;
 
 namespace Lithnet.AccessManager.Server.Authorization
 {
@@ -20,30 +19,30 @@ namespace Lithnet.AccessManager.Server.Authorization
         private readonly AuthorizationOptions options;
         private readonly IPowerShellSecurityDescriptorGenerator powershell;
         private readonly IAuthorizationInformationMemoryCache authzCache;
-        private readonly IComputerTargetProvider computerTargetProvider;
+        private readonly IEnumerable<IComputerTargetProvider> computerTargetProviders;
         private readonly IAuthorizationContextProvider authorizationContextProvider;
         private readonly IAmsLicenseManager licenseManager;
 
-        public AuthorizationInformationBuilder(IOptionsSnapshot<AuthorizationOptions> options, ILogger<AuthorizationInformationBuilder> logger, IPowerShellSecurityDescriptorGenerator powershell, IAuthorizationInformationMemoryCache authzCache, IComputerTargetProvider computerTargetProvider, IAuthorizationContextProvider authorizationContextProvider, IAmsLicenseManager licenseManager)
+        public AuthorizationInformationBuilder(IOptionsSnapshot<AuthorizationOptions> options, ILogger<AuthorizationInformationBuilder> logger, IPowerShellSecurityDescriptorGenerator powershell, IAuthorizationInformationMemoryCache authzCache, IEnumerable<IComputerTargetProvider> computerTargetProviders, IAuthorizationContextProvider authorizationContextProvider, IAmsLicenseManager licenseManager)
         {
             this.logger = logger;
             this.options = options.Value;
             this.powershell = powershell;
             this.authzCache = authzCache;
-            this.computerTargetProvider = computerTargetProvider;
+            this.computerTargetProviders = computerTargetProviders;
             this.authorizationContextProvider = authorizationContextProvider;
             this.licenseManager = licenseManager;
         }
 
         public void ClearCache(IUser user, IComputer computer)
         {
-            string key = $"{user.Sid}-{computer.Sid}";
+            string key = $"{user.Sid}-{computer.Authority}-{computer.AuthorityDeviceId}-{computer.AuthorityType}";
             authzCache.Remove(key);
         }
 
-        public AuthorizationInformation GetAuthorizationInformation(IUser user, IComputer computer)
+        public async Task<AuthorizationInformation> GetAuthorizationInformation(IUser user, IComputer computer)
         {
-            string key = $"{user.Sid}-{computer.Sid}";
+            string key = $"{user.Sid}-{computer.Authority}-{computer.AuthorityDeviceId}-{computer.AuthorityType}";
 
             if (authzCache.TryGetValue(key, out AuthorizationInformation info))
             {
@@ -52,8 +51,18 @@ namespace Lithnet.AccessManager.Server.Authorization
             }
 
             this.logger.LogTrace($"Building authorization information for {key}");
-            var targets = this.computerTargetProvider.GetMatchingTargetsForComputer(computer, this.options.ComputerTargets);
-            info = this.BuildAuthorizationInformation(user, computer, targets);
+
+            List<SecurityDescriptorTarget> targets = new List<SecurityDescriptorTarget>();
+
+            foreach (var computerTargetProvider in this.computerTargetProviders)
+            {
+                if (computerTargetProvider.CanProcess(computer))
+                {
+                    targets.AddRange(await computerTargetProvider.GetMatchingTargetsForComputer(computer, this.options.ComputerTargets));
+                }
+            }
+
+            info = await this.BuildAuthorizationInformation(user, computer, targets);
 
             if (options.AuthZCacheDuration >= 0)
             {
@@ -63,7 +72,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             return info;
         }
 
-        public AuthorizationInformation BuildAuthorizationInformation(IUser user, IComputer computer, IList<SecurityDescriptorTarget> matchedComputerTargets)
+        public Task<AuthorizationInformation> BuildAuthorizationInformation(IUser user, IComputer computer, IList<SecurityDescriptorTarget> matchedComputerTargets)
         {
             AuthorizationInformation info = new AuthorizationInformation
             {
@@ -75,116 +84,139 @@ namespace Lithnet.AccessManager.Server.Authorization
 
             if (info.MatchedComputerTargets.Count == 0)
             {
-                return info;
+                return Task.FromResult(info);
             }
 
-            using AuthorizationContext c = authorizationContextProvider.GetAuthorizationContext(user, computer.Sid);
+            AuthorizationContext c;
 
-            DiscretionaryAcl masterDacl = new DiscretionaryAcl(false, false, info.MatchedComputerTargets.Count);
-
-            int matchedTargetCount = 0;
-
-            foreach (var target in info.MatchedComputerTargets)
+            if (computer is IActiveDirectoryComputer adComputer)
             {
-                CommonSecurityDescriptor sd;
+                c = authorizationContextProvider.GetAuthorizationContext(user, adComputer.Sid);
+            }
+            else
+            {
+                c = authorizationContextProvider.GetAuthorizationContext(user);
+            }
 
-                if (target.IsInactive())
-                {
-                    continue;
-                }
+            using (c)
+            {
 
-                if (target.AuthorizationMode == AuthorizationMode.PowershellScript)
+                DiscretionaryAcl masterDacl = new DiscretionaryAcl(false, false, info.MatchedComputerTargets.Count);
+
+                int matchedTargetCount = 0;
+
+                foreach (var target in info.MatchedComputerTargets)
                 {
-                    if (!this.licenseManager.IsFeatureEnabled(LicensedFeatures.PowerShellAcl))
+                    CommonSecurityDescriptor sd;
+
+                    if (target.IsInactive())
                     {
                         continue;
                     }
 
-                    sd = this.powershell.GenerateSecurityDescriptor(user, computer, target.Script, 30);
-                }
-                else
-                {
-                    if (string.IsNullOrWhiteSpace(target.SecurityDescriptor))
+                    if (target.AuthorizationMode == AuthorizationMode.PowershellScript)
                     {
-                        this.logger.LogTrace($"Ignoring target {target.Id} with empty security descriptor");
-                        continue;
-                    }
-
-                    sd = new CommonSecurityDescriptor(false, false, new RawSecurityDescriptor(target.SecurityDescriptor));
-                }
-
-                if (sd == null)
-                {
-                    this.logger.LogTrace($"Ignoring target {target.Id} with null security descriptor");
-                    continue;
-                }
-
-                foreach (var ace in sd.DiscretionaryAcl.OfType<CommonAce>())
-                {
-                    AccessMask mask = (AccessMask)ace.AccessMask;
-
-                    if (mask.HasFlag(AccessMask.LocalAdminPasswordHistory) && ace.AceType == AceType.AccessAllowed)
-                    {
-                        if (!this.licenseManager.IsFeatureEnabled(LicensedFeatures.LapsHistory))
+                        if (!this.licenseManager.IsFeatureEnabled(LicensedFeatures.PowerShellAcl))
                         {
-                            mask &= ~AccessMask.LocalAdminPasswordHistory;
+                            continue;
+                        }
+
+                        sd = this.powershell.GenerateSecurityDescriptor(user, computer, target.Script, 30);
+                    }
+                    else
+                    {
+                        if (string.IsNullOrWhiteSpace(target.SecurityDescriptor))
+                        {
+                            this.logger.LogTrace($"Ignoring target {target.Id} with empty security descriptor");
+                            continue;
+                        }
+
+                        sd = new CommonSecurityDescriptor(false, false, new RawSecurityDescriptor(target.SecurityDescriptor));
+                    }
+
+                    if (sd == null)
+                    {
+                        this.logger.LogTrace($"Ignoring target {target.Id} with null security descriptor");
+                        continue;
+                    }
+
+                    foreach (var ace in sd.DiscretionaryAcl.OfType<CommonAce>())
+                    {
+                        AccessMask mask = (AccessMask)ace.AccessMask;
+
+                        if (mask.HasFlag(AccessMask.LocalAdminPasswordHistory) && ace.AceType == AceType.AccessAllowed)
+                        {
+                            if (!this.licenseManager.IsFeatureEnabled(LicensedFeatures.LapsHistory))
+                            {
+                                mask &= ~AccessMask.LocalAdminPasswordHistory;
+                            }
+                        }
+
+                        if (mask.HasFlag(AccessMask.Jit) && (!(computer is IActiveDirectoryComputer)))
+                        {
+                            mask &= ~AccessMask.Jit;
+                        }
+
+                        if (mask.HasFlag(AccessMask.BitLocker) && (!(computer is IActiveDirectoryComputer)))
+                        {
+                            mask &= ~AccessMask.BitLocker;
+                        }
+
+                        if (mask != 0)
+                        {
+                            masterDacl.AddAccess((AccessControlType)ace.AceType, ace.SecurityIdentifier, (int)mask, ace.InheritanceFlags, ace.PropagationFlags);
                         }
                     }
 
-                    if (mask != 0)
+                    int i = matchedTargetCount;
+
+                    if (c.AccessCheck(sd, (int)AccessMask.LocalAdminPassword))
                     {
-                        masterDacl.AddAccess((AccessControlType)ace.AceType, ace.SecurityIdentifier, (int)mask, ace.InheritanceFlags, ace.PropagationFlags);
+                        info.SuccessfulLapsTargets.Add(target);
+                        matchedTargetCount++;
+                    }
+
+                    if (c.AccessCheck(sd, (int)AccessMask.LocalAdminPasswordHistory))
+                    {
+                        info.SuccessfulLapsHistoryTargets.Add(target);
+                        matchedTargetCount++;
+                    }
+
+                    if (c.AccessCheck(sd, (int)AccessMask.Jit))
+                    {
+                        info.SuccessfulJitTargets.Add(target);
+                        matchedTargetCount++;
+                    }
+
+                    if (c.AccessCheck(sd, (int)AccessMask.BitLocker))
+                    {
+                        info.SuccessfulBitLockerTargets.Add(target);
+                        matchedTargetCount++;
+                    }
+
+                    // If the ACE did not grant any permissions to the user, consider it a failure response
+                    if (i == matchedTargetCount)
+                    {
+                        info.FailedTargets.Add(target);
                     }
                 }
 
-                int i = matchedTargetCount;
-
-                if (c.AccessCheck(sd, (int)AccessMask.LocalAdminPassword))
+                if (matchedTargetCount > 0)
                 {
-                    info.SuccessfulLapsTargets.Add(target);
-                    matchedTargetCount++;
+                    info.SecurityDescriptor = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, masterDacl);
+
+                    this.logger.LogTrace($"Resultant security descriptor for computer {computer.FullyQualifiedName}: {info.SecurityDescriptor.GetSddlForm(AccessControlSections.All)}");
+
+                    info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.LocalAdminPassword) ? AccessMask.LocalAdminPassword : 0;
+                    info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.Jit) ? AccessMask.Jit : 0;
+                    info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.LocalAdminPasswordHistory) ? AccessMask.LocalAdminPasswordHistory : 0;
+                    info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.BitLocker) ? AccessMask.BitLocker : 0;
                 }
 
-                if (c.AccessCheck(sd, (int)AccessMask.LocalAdminPasswordHistory))
-                {
-                    info.SuccessfulLapsHistoryTargets.Add(target);
-                    matchedTargetCount++;
-                }
+                this.logger.LogTrace($"User {user.MsDsPrincipalName} has effective access of {info.EffectiveAccess} on computer {computer.FullyQualifiedName}");
 
-                if (c.AccessCheck(sd, (int)AccessMask.Jit))
-                {
-                    info.SuccessfulJitTargets.Add(target);
-                    matchedTargetCount++;
-                }
-
-                if (c.AccessCheck(sd, (int)AccessMask.BitLocker))
-                {
-                    info.SuccessfulBitLockerTargets.Add(target);
-                    matchedTargetCount++;
-                }
-
-                // If the ACE did not grant any permissions to the user, consider it a failure response
-                if (i == matchedTargetCount)
-                {
-                    info.FailedTargets.Add(target);
-                }
+                return Task.FromResult(info);
             }
-
-            if (matchedTargetCount > 0)
-            {
-                info.SecurityDescriptor = new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, masterDacl);
-
-                this.logger.LogTrace($"Resultant security descriptor for computer {computer.MsDsPrincipalName}: {info.SecurityDescriptor.GetSddlForm(AccessControlSections.All)}");
-
-                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.LocalAdminPassword) ? AccessMask.LocalAdminPassword : 0;
-                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.Jit) ? AccessMask.Jit : 0;
-                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.LocalAdminPasswordHistory) ? AccessMask.LocalAdminPasswordHistory : 0;
-                info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.BitLocker) ? AccessMask.BitLocker : 0;
-            }
-
-            this.logger.LogTrace($"User {user.MsDsPrincipalName} has effective access of {info.EffectiveAccess} on computer {computer.MsDsPrincipalName}");
-
-            return info;
         }
     }
 }
