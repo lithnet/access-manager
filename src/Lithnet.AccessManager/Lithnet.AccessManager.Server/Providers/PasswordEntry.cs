@@ -11,5 +11,7 @@ namespace Lithnet.AccessManager.Server
         public DateTime? ExpiryDate { get; set; }
 
         public DateTime? Created { get; set; }
+
+        public string AccountName { get; set; }
     }
 }

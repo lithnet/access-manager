@@ -388,6 +388,7 @@ namespace Lithnet.AccessManager.Service.Controllers
                     ComputerName = computer.FullyQualifiedName,
                     Password = current.Password,
                     ValidUntil = current.ExpiryDate?.ToLocalTime(),
+                    AccountName = current.AccountName
                 });
             }
             catch (NoPasswordException)

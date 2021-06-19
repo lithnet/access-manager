@@ -13,5 +13,8 @@ namespace Lithnet.AccessManager
 
         [JsonProperty("retired")]
         public DateTime? Retired { get; set; }
+
+        [JsonProperty("accountName")]
+        public string AccountName { get; set; }
     }
 }

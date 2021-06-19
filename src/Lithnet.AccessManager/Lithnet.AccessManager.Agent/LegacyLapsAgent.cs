@@ -66,10 +66,11 @@ namespace Lithnet.AccessManager.Agent
                 }
 
                 string newPassword = this.passwordGenerator.Generate();
+                string accountName = this.sam.GetBuiltInAdministratorAccountName();
                 DateTime rotationInstant = DateTime.UtcNow;
                 DateTime expiryDate = DateTime.UtcNow.AddDays(Math.Max(this.settings.MaximumPasswordAgeDays, 1));
 
-                this.lithnetAdminPasswordProvider.UpdateCurrentPassword(computer, newPassword, rotationInstant, expiryDate, this.settings.LithnetLocalAdminPasswordHistoryDaysToKeep, this.settings.MsMcsAdmPwdAttributeBehaviour);
+                this.lithnetAdminPasswordProvider.UpdateCurrentPassword(computer, accountName, newPassword, rotationInstant, expiryDate, this.settings.LithnetLocalAdminPasswordHistoryDaysToKeep, this.settings.MsMcsAdmPwdAttributeBehaviour);
 
                 this.logger.LogTrace(EventIDs.SetPasswordOnAmAttribute, "Set password on Lithnet Access Manager attribute");
 

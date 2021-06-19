@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Enterprise;
 using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server
@@ -13,8 +14,9 @@ namespace Lithnet.AccessManager.Server
         private readonly ICertificateProvider certificateProvider;
         private readonly ILogger logger;
         private readonly IDbDevicePasswordProvider devicePasswordProvider;
+        private readonly IAmsLicenseManager licenseManager;
 
-        public PasswordProvider(IMsMcsAdmPwdProvider msMcsAdmPwdProvider, ILithnetAdminPasswordProvider lithnetProvider, IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider, ILogger<PasswordProvider> logger, IDbDevicePasswordProvider devicePasswordProvider)
+        public PasswordProvider(IMsMcsAdmPwdProvider msMcsAdmPwdProvider, ILithnetAdminPasswordProvider lithnetProvider, IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider, ILogger<PasswordProvider> logger, IDbDevicePasswordProvider devicePasswordProvider, IAmsLicenseManager licenseManager)
         {
             this.msLapsProvider = msMcsAdmPwdProvider;
             this.lithnetProvider = lithnetProvider;
@@ -22,6 +24,7 @@ namespace Lithnet.AccessManager.Server
             this.certificateProvider = certificateProvider;
             this.logger = logger;
             this.devicePasswordProvider = devicePasswordProvider;
+            this.licenseManager = licenseManager;
         }
 
         public async Task<PasswordEntry> GetCurrentPassword(IComputer computer, DateTime? newExpiry, PasswordStorageLocation retrievalLocation)
@@ -63,6 +66,7 @@ namespace Lithnet.AccessManager.Server
             return new PasswordEntry
             {
                 Created = password.EffectiveDate.ToLocalTime(),
+                AccountName = this.licenseManager.IsFeatureEnabled(LicensedFeatures.LapsAccountNameDisplay) ? password.AccountName : null,
                 ExpiryDate = password.ExpiryDate.ToLocalTime(),
                 Password = this.encryptionProvider.Decrypt(password.PasswordData, (thumbprint) => this.certificateProvider.FindDecryptionCertificate(thumbprint))
             };
@@ -70,7 +74,7 @@ namespace Lithnet.AccessManager.Server
 
         private async Task<IList<PasswordEntry>> GetPasswordHistoryFromDatabase(Device device)
         {
-            var passwords =  await this.devicePasswordProvider.GetPasswordHistory(device.ObjectID);
+            var passwords = await this.devicePasswordProvider.GetPasswordHistory(device.ObjectID);
 
             List<PasswordEntry> list = new List<PasswordEntry>();
 
@@ -78,6 +82,7 @@ namespace Lithnet.AccessManager.Server
             {
                 PasswordEntry p = new PasswordEntry()
                 {
+                    AccountName = this.licenseManager.IsFeatureEnabled(LicensedFeatures.LapsAccountNameDisplay) ? item.AccountName : null,
                     Created = item.EffectiveDate.ToLocalTime(),
                     ExpiryDate = item.ExpiryDate.ToLocalTime()
                 };
@@ -157,6 +162,7 @@ namespace Lithnet.AccessManager.Server
 
             PasswordEntry current = new PasswordEntry()
             {
+                AccountName = this.licenseManager.IsFeatureEnabled(LicensedFeatures.LapsAccountNameDisplay) ? item.AccountName : null,
                 Created = item.Created.ToLocalTime(),
                 Password = this.encryptionProvider.Decrypt(item.EncryptedData, (thumbprint) => this.certificateProvider.FindDecryptionCertificate(thumbprint)),
                 ExpiryDate = newExpiry?.ToLocalTime() ?? this.lithnetProvider.GetExpiry(computer)?.ToLocalTime()
@@ -173,6 +179,7 @@ namespace Lithnet.AccessManager.Server
             {
                 PasswordEntry p = new PasswordEntry()
                 {
+                    AccountName = this.licenseManager.IsFeatureEnabled(LicensedFeatures.LapsAccountNameDisplay) ? item.AccountName : null,
                     Created = item.Created.ToLocalTime(),
                     ExpiryDate = item.Retired?.ToLocalTime()
                 };

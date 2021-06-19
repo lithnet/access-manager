@@ -11,5 +11,7 @@ namespace Lithnet.AccessManager.Service.Models
         public string Password { get; set; }
 
         public DateTime? ValidUntil { get; set; }
+
+        public string AccountName { get; set; }
     }
 }

@@ -93,7 +93,7 @@ namespace Lithnet.AccessManager
             de.CommitChanges();
         }
 
-        public void UpdateCurrentPassword(IActiveDirectoryComputer computer, string password, DateTime rotationInstant, DateTime expiryDate, int maximumPasswordHistory, PasswordAttributeBehaviour msLapsBehaviour)
+        public void UpdateCurrentPassword(IActiveDirectoryComputer computer, string accountName, string password, DateTime rotationInstant, DateTime expiryDate, int maximumPasswordHistory, PasswordAttributeBehaviour msLapsBehaviour)
         {
             DirectoryEntry de = computer.DirectoryEntry;
 
@@ -114,7 +114,8 @@ namespace Lithnet.AccessManager
             ProtectedPasswordHistoryItem newPassword = new ProtectedPasswordHistoryItem()
             {
                 Created = rotationInstant,
-                EncryptedData = this.encryptionProvider.Encrypt(this.certificateProvider.FindEncryptionCertificate(), password)
+                EncryptedData = this.encryptionProvider.Encrypt(this.certificateProvider.FindEncryptionCertificate(), password),
+                AccountName = accountName
             };
 
             de.Properties[AttrLithnetAdminPasswordHistory].Clear();

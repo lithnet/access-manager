@@ -60,7 +60,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="9.0.1" />
-    <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7770.30380" />
+    <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7841.17737" />
     <PackageReference Include="mahapps.metro" Version="2.1.1" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="4.6.0" />
     <PackageReference Include="MahApps.Metro.SimpleChildWindow" Version="2.0.0-alpha0043" />
