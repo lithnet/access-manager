@@ -5,10 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Lithnet.AccessManager.Api.Controllers
 {
@@ -24,11 +27,10 @@ namespace Lithnet.AccessManager.Api.Controllers
         private readonly IDeviceProvider devices;
         private readonly ISignedAssertionValidator signedAssertionValidator;
         private readonly IAadGraphApiProvider graphProvider;
-        private readonly IOptions<AgentOptions> agentOptions;
-        private readonly IOptions<AzureAdOptions> azureAdOptions;
+        private readonly IOptionsMonitor<AgentOptions> agentOptions;
         private readonly IApiErrorResponseProvider errorProvider;
 
-        public AuthX509Controller(ISecurityTokenGenerator tokenGenerator, IDeviceProvider devices, ISignedAssertionValidator signedAssertionValidator, IAadGraphApiProvider graphProvider, ILogger<AuthX509Controller> logger, IOptions<AgentOptions> agentOptions, IOptions<AzureAdOptions> azureAdOptions, IApiErrorResponseProvider errorProvider)
+        public AuthX509Controller(ISecurityTokenGenerator tokenGenerator, IDeviceProvider devices, ISignedAssertionValidator signedAssertionValidator, IAadGraphApiProvider graphProvider, ILogger<AuthX509Controller> logger, IOptionsMonitor<AgentOptions> agentOptions, IApiErrorResponseProvider errorProvider)
         {
             this.tokenGenerator = tokenGenerator;
             this.devices = devices;
@@ -36,7 +38,6 @@ namespace Lithnet.AccessManager.Api.Controllers
             this.graphProvider = graphProvider;
             this.logger = logger;
             this.agentOptions = agentOptions;
-            this.azureAdOptions = azureAdOptions;
             this.errorProvider = errorProvider;
         }
 
@@ -45,30 +46,42 @@ namespace Lithnet.AccessManager.Api.Controllers
         {
             try
             {
-                if (!this.agentOptions.Value.AllowAadAuth && !this.agentOptions.Value.AllowSelfSignedAuth)
+                var options = this.agentOptions.CurrentValue;
+
+                if (!options.AllowAadAuth && !options.AllowSelfSignedAuth)
                 {
                     this.logger.LogWarning("A client attempted to authenticate with a signed assertion, but no assertion-enabled authentication methods are enabled");
                     throw new UnsupportedAuthenticationTypeException();
                 }
 
-                this.signedAssertionValidator.Validate(request.Assertion, "auth/x509", out X509Certificate2 signingCertificate);
+                var unvalidatedToken = this.signedAssertionValidator.Validate(request.Assertion, "auth/x509", out X509Certificate2 signingCertificate);
+
+                var authModeClaim = this.GetClaimOrThrowIfMissingOrNull(unvalidatedToken.Claims, "auth-mode");
+
+                if (!Enum.TryParse(authModeClaim, out AgentAuthenticationMode authMode))
+                {
+                    throw new SecurityTokenValidationException($"The value provided for the 'auth-mode' claim was not valid '{authModeClaim}'");
+                }
 
                 TokenResponse token;
 
-                if (this.IsAadCertificate(signingCertificate))
+                if (authMode == AgentAuthenticationMode.Aadj)
                 {
-                    if (this.agentOptions.Value.AllowAadAuth)
+                    if (options.AllowAadAuth)
                     {
-                        token = await this.ValidateAadAssertionAsync(signingCertificate);
+                        var tenantId = this.GetClaimOrThrowIfMissingOrNull(unvalidatedToken.Claims, "aad-tenant-id");
+                        var deviceId = this.GetClaimOrThrowIfMissingOrNull(unvalidatedToken.Claims, "aad-device-id");
+
+                        token = await this.ValidateAadAssertionAsync(signingCertificate, tenantId, deviceId);
                     }
                     else
                     {
                         throw new UnsupportedAuthenticationTypeException($"The device presented an Azure Active Directory certificate ({signingCertificate.Subject}), but AAD authentication is not enabled");
                     }
                 }
-                else
+                else if (authMode == AgentAuthenticationMode.Ssa)
                 {
-                    if (this.agentOptions.Value.AllowSelfSignedAuth)
+                    if (options.AllowSelfSignedAuth)
                     {
                         token = await this.ValidateSelfSignedAssertionAsync(signingCertificate);
                     }
@@ -76,6 +89,10 @@ namespace Lithnet.AccessManager.Api.Controllers
                     {
                         throw new UnsupportedAuthenticationTypeException($"The device presented an self-signed assertion, but self-asserted device authentication is not enabled");
                     }
+                }
+                else
+                {
+                    throw new SecurityTokenValidationException($"The value provided for the 'auth-mode' claim was not supported '{authModeClaim}'");
                 }
 
                 return this.Ok(token);
@@ -86,33 +103,48 @@ namespace Lithnet.AccessManager.Api.Controllers
             }
         }
 
-        private bool IsAadCertificate(X509Certificate2 signingCertificate)
+        private string GetClaimOrThrowIfMissingOrNull(IEnumerable<Claim> claims, string requiredClaim)
         {
-            X500DistinguishedName dn1 = new X500DistinguishedName(signingCertificate.IssuerName.Format(false).Replace('+', ','));
+            var claim = claims.FirstOrDefault(t => t.Type ==requiredClaim) ?? throw new SecurityTokenValidationException($"The token did not contain the expected {requiredClaim} claim");
 
-            foreach (string dn in this.azureAdOptions.Value.AadIssuerDNs)
+            if (string.IsNullOrWhiteSpace(claim.Value))
             {
-                if (dn1.IsDnMatch(dn))
-                {
-                    return true;
-                }
+                throw new SecurityTokenValidationException($"The token contained an empty {requiredClaim} claim");
             }
 
-            return false;
+            return claim.Value;
         }
 
-        private async Task<TokenResponse> ValidateAadAssertionAsync(X509Certificate2 signingCertificate)
+        //private bool IsAadCertificate(X509Certificate2 signingCertificate)
+        //{
+        //    X500DistinguishedName dn1 = new X500DistinguishedName(signingCertificate.IssuerName.Format(false).Replace('+', ','));
+
+        //    foreach (string dn in this.azureAdOptions.Value.AadIssuerDNs)
+        //    {
+        //        if (dn1.IsDnMatch(dn))
+        //        {
+        //            return true;
+        //        }
+        //    }
+
+        //    return false;
+        //}
+
+        private async Task<TokenResponse> ValidateAadAssertionAsync(X509Certificate2 signingCertificate, string tenantId, string deviceId)
         {
-            if (signingCertificate.Subject == null || !signingCertificate.Subject.StartsWith("CN=", StringComparison.OrdinalIgnoreCase))
+            this.logger.LogTrace($"Client has presented an Azure AD certificate for authentication of device {deviceId} in tenant {tenantId}");
+
+            if (!Guid.TryParse(tenantId, out _))
             {
-                throw new BadRequestException("The certificate subject was invalid");
+                throw new SecurityTokenValidationException("The tenant ID provided in the token was not in the correct format");
             }
 
-            string deviceId = signingCertificate.Subject.Remove(0, 3);
+            if (!Guid.TryParse(deviceId, out _))
+            {
+                throw new SecurityTokenValidationException("The device ID provided in the token was not in the correct format");
+            }
 
-            this.logger.LogTrace($"Client has presented an Azure AD certificate for authentication of device {deviceId}");
-
-            Microsoft.Graph.Device aadDevice = await this.graphProvider.GetAadDeviceByDeviceIdAsync(deviceId);
+            Microsoft.Graph.Device aadDevice = await this.graphProvider.GetAadDeviceByDeviceIdAsync(tenantId, deviceId);
 
             if (!aadDevice.HasDeviceThumbprint(signingCertificate.Thumbprint))
             {
@@ -124,14 +156,14 @@ namespace Lithnet.AccessManager.Api.Controllers
             switch (aadDevice.TrustType.ToLowerInvariant())
             {
                 case "azuread":
-                    if (!this.agentOptions.Value.AllowAzureAdJoinedDevices)
+                    if (!this.agentOptions.CurrentValue.AllowAzureAdJoinedDevices)
                     {
                         throw new UnsupportedAuthenticationTypeException("The device is Azure AD joined, but Azure AD-joined devices are not permitted to authenticate to the system");
                     }
                     break;
 
                 case "workplace":
-                    if (!this.agentOptions.Value.AllowAzureAdRegisteredDevices)
+                    if (!this.agentOptions.CurrentValue.AllowAzureAdRegisteredDevices)
                     {
                         throw new UnsupportedAuthenticationTypeException("The device is Azure AD registered, but Azure AD-registered devices are not permitted to authenticate to the system");
                     }
@@ -141,7 +173,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                     throw new UnsupportedAuthenticationTypeException($"The AAD device has an unknown trust type '{aadDevice.TrustType}'");
             }
 
-            Device device = await this.devices.GetOrCreateDeviceAsync(aadDevice, this.azureAdOptions.Value.TenantId);
+            Device device = await this.devices.GetOrCreateDeviceAsync(aadDevice, tenantId);
             ClaimsIdentity identity = device.ToClaimsIdentity();
 
             this.logger.LogInformation($"Successfully authenticated device {device.ComputerName} ({device.ObjectID}) from AzureAD");

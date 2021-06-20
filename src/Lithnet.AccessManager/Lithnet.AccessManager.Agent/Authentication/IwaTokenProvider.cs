@@ -21,7 +21,7 @@ namespace Lithnet.AccessManager.Agent.Authentication
 
         public async Task<string> GetAccessToken()
         {
-            if (!this.settings.AdvancedAgentEnabled || this.settings.AuthenticationMode != AuthenticationMode.Iwa)
+            if (!this.settings.AdvancedAgentEnabled || this.settings.AuthenticationMode != AgentAuthenticationMode.Iwa)
             {
                 throw new InvalidOperationException("IWA authentication is not enabled");
             }

@@ -17,18 +17,21 @@ namespace Lithnet.AccessManager.Agent.Authentication
         private readonly IHttpClientFactory httpClientFactory;
         private readonly ISettingsProvider settings;
         private readonly IAuthenticationCertificateProvider certProvider;
+        private readonly ITokenClaimProvider claimProvider;
+
         private TokenResponse token;
 
-        public X509TokenProvider(IHttpClientFactory httpClientFactory, ISettingsProvider settings, IAuthenticationCertificateProvider certProvider)
+        public X509TokenProvider(IHttpClientFactory httpClientFactory, ISettingsProvider settings, IAuthenticationCertificateProvider certProvider, ITokenClaimProvider claimProvider)
         {
             this.httpClientFactory = httpClientFactory;
             this.settings = settings;
             this.certProvider = certProvider;
+            this.claimProvider = claimProvider;
         }
 
         public async Task<string> GetAccessToken()
         {
-            if (!this.settings.AdvancedAgentEnabled || (this.settings.AuthenticationMode != AuthenticationMode.Ssa && this.settings.AuthenticationMode != AuthenticationMode.Aadj))
+            if (!this.settings.AdvancedAgentEnabled || (this.settings.AuthenticationMode != AgentAuthenticationMode.Ssa && this.settings.AuthenticationMode != AgentAuthenticationMode.Aadj))
             {
                 throw new InvalidOperationException("X509 authentication is not enabled");
             }
@@ -91,9 +94,11 @@ namespace Lithnet.AccessManager.Agent.Authentication
                 SigningCredentials = new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSha256)
             };
 
+            this.claimProvider.AddClaims(tokenDescriptor);
+
             // Add x5c header parameter containing the signing certificate:
-            JwtSecurityToken jwt = (JwtSecurityToken)tokenHandler.CreateToken(tokenDescriptor);
-            jwt.Header.Add(JwtHeaderParameterNames.X5c, new List<string> { exportedCertificate });
+            JwtSecurityToken jwt = (JwtSecurityToken) tokenHandler.CreateToken(tokenDescriptor);
+            jwt.Header.Add(JwtHeaderParameterNames.X5c, new List<string> {exportedCertificate});
 
             return tokenHandler.WriteToken(jwt);
         }

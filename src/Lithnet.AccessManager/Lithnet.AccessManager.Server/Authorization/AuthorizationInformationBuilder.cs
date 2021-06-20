@@ -36,13 +36,13 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         public void ClearCache(IUser user, IComputer computer)
         {
-            string key = $"{user.Sid}-{computer.Authority}-{computer.AuthorityDeviceId}-{computer.AuthorityType}";
+            string key = $"{user.Sid}-{computer.AuthorityId}-{computer.AuthorityDeviceId}-{computer.AuthorityType}";
             authzCache.Remove(key);
         }
 
         public async Task<AuthorizationInformation> GetAuthorizationInformation(IUser user, IComputer computer)
         {
-            string key = $"{user.Sid}-{computer.Authority}-{computer.AuthorityDeviceId}-{computer.AuthorityType}";
+            string key = $"{user.Sid}-{computer.AuthorityId}-{computer.AuthorityDeviceId}-{computer.AuthorityType}";
 
             if (authzCache.TryGetValue(key, out AuthorizationInformation info))
             {

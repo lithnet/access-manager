@@ -69,6 +69,13 @@ namespace Lithnet.AccessManager.Agent.Providers
             return joinInfo.pszDeviceId;
         }
 
+        public string GetTenantId()
+        {
+            var joinInfo = this.GetJoinInfo();
+
+            return joinInfo.pszTenantId;
+        }
+
         public X509Certificate2 GetAadCertificate()
         {
             if (this.certificate != null)
@@ -243,7 +250,7 @@ namespace Lithnet.AccessManager.Agent.Providers
                 {
                     if (loadedProfile)
                     {
-                          UserEnv.UnloadUserProfile(token.DangerousGetHandle(), profileInfo.hProfile);
+                        UserEnv.UnloadUserProfile(token.DangerousGetHandle(), profileInfo.hProfile);
                     }
                 }
             }

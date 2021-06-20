@@ -9,5 +9,6 @@ namespace Lithnet.AccessManager.Agent.Providers
         X509Certificate2 GetAadCertificate();
 
         string GetDeviceId();
+        string GetTenantId();
     }
 }

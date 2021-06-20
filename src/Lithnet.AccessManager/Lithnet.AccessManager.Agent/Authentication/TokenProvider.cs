@@ -22,7 +22,7 @@ namespace Lithnet.AccessManager.Agent.Authentication
         {
             this.settings = settings;
 
-            if (this.settings.AuthenticationMode == AuthenticationMode.Iwa)
+            if (this.settings.AuthenticationMode == AgentAuthenticationMode.Iwa)
             {
                 this.selectedTokenProvider = iwaProvider;
             }

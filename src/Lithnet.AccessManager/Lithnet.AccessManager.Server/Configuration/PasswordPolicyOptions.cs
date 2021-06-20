@@ -7,9 +7,9 @@ namespace Lithnet.AccessManager.Api
 {
     public class PasswordPolicyOptions
     {
-        public int MaxNumberOfPasswords { get; set; } = 30;
+        public int MinimumNumberOfPasswords { get; set; } = 30;
 
-        public int MaximumPasswordHistoryAgeDays { get; set; } = 0;
+        public int MinimumPasswordHistoryAgeDays { get; set; } = 0;
 
         public int MaximumPasswordAgeDays { get; set; } = 7;
 

@@ -1,50 +1,64 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
+﻿using Lithnet.AccessManager.Api;
+using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.Graph.Auth;
 using Microsoft.Identity.Client;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Api;
-using Lithnet.AccessManager.Server;
-using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Server
 {
     public class AadGraphApiProvider : IAadGraphApiProvider
     {
-        private IGraphServiceClient client;
         private readonly IOptions<AzureAdOptions> azureAdOptions;
+        private readonly Dictionary<string, IGraphServiceClient> clients;
+        private readonly IProtectedSecretProvider protectedSecretProvider;
 
-        public AadGraphApiProvider(IOptions<AzureAdOptions> azureAdOptions)
+        public AadGraphApiProvider(IOptions<AzureAdOptions> azureAdOptions, IProtectedSecretProvider protectedSecretProvider)
         {
             this.azureAdOptions = azureAdOptions;
+            this.protectedSecretProvider = protectedSecretProvider;
+            this.clients = new Dictionary<string, IGraphServiceClient>(StringComparer.OrdinalIgnoreCase);
             this.Initialize();
         }
 
         private void Initialize()
         {
-            IConfidentialClientApplication confidentialClientApplication = ConfidentialClientApplicationBuilder
-                .Create(this.azureAdOptions.Value.ClientId)
-                .WithTenantId(this.azureAdOptions.Value.TenantId)
-                .WithClientSecret(this.azureAdOptions.Value.ClientSecret)
-                .Build();
+            foreach (var tenant in this.azureAdOptions.Value.Tenants)
+            {
+                IConfidentialClientApplication confidentialClientApplication = ConfidentialClientApplicationBuilder
+                    .Create(tenant.ClientId)
+                    .WithTenantId(tenant.TenantId)
+                    .WithClientSecret(this.protectedSecretProvider.UnprotectSecret(tenant.ClientSecret))
+                    .Build();
 
-            ClientCredentialProvider authProvider = new ClientCredentialProvider(confidentialClientApplication);
-            this.client = new GraphServiceClient(authProvider);
+                ClientCredentialProvider authProvider = new ClientCredentialProvider(confidentialClientApplication);
+                this.clients.Add(tenant.TenantId, new GraphServiceClient(authProvider));
+            }
         }
 
-        public async Task<IList<Group>> GetDeviceGroups(string objectId)
+        private IGraphServiceClient GetClient(string tenantId)
         {
-            return await this.GetDeviceGroups(objectId, "displayName,Id");
+            if (!this.clients.TryGetValue(tenantId, out IGraphServiceClient client))
+            {
+                throw new AadTenantNotFoundException($"The Azure AD tenant ID was not found in the configuration ({tenantId})");
+            }
+
+            return client;
         }
 
-        public async Task<IList<Group>> GetDeviceGroups(string objectId, string selection)
+        public async Task<IList<Group>> GetDeviceGroups(string tenant, string objectId)
         {
-            var page = await this.client.Devices[objectId].TransitiveMemberOf
+            return await this.GetDeviceGroups(tenant, objectId, "displayName,Id");
+        }
+
+        public async Task<IList<Group>> GetDeviceGroups(string tenant, string objectId, string selection)
+        {
+            var page = await this.GetClient(tenant).Devices[objectId].TransitiveMemberOf
                 .Request()
                 .Select(selection)
                 .GetAsync();
@@ -65,10 +79,10 @@ namespace Lithnet.AccessManager.Server
             return members;
         }
 
-        public async Task<List<SecurityIdentifier>> GetDeviceGroupSids(string objectId)
+        public async Task<List<SecurityIdentifier>> GetDeviceGroupSids(string tenant, string objectId)
         {
             List<SecurityIdentifier> sids = new List<SecurityIdentifier>();
-            foreach (var group in await this.GetDeviceGroups(objectId, "securityIdentifier"))
+            foreach (var group in await this.GetDeviceGroups(tenant, objectId, "securityIdentifier"))
             {
                 if (!string.IsNullOrWhiteSpace(group.SecurityIdentifier))
                 {
@@ -80,11 +94,11 @@ namespace Lithnet.AccessManager.Server
         }
 
 
-        public async Task<Microsoft.Graph.Device> GetAadDeviceByIdAsync(string objectId)
+        public async Task<Microsoft.Graph.Device> GetAadDeviceByIdAsync(string tenant, string objectId)
         {
             try
             {
-                return await this.client.Devices[objectId].Request().GetAsync();
+                return await this.GetClient(tenant).Devices[objectId].Request().GetAsync();
             }
             catch (ServiceException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
@@ -92,9 +106,9 @@ namespace Lithnet.AccessManager.Server
             }
         }
 
-        public async Task<Microsoft.Graph.Device> GetAadDeviceByDeviceIdAsync(string deviceId)
+        public async Task<Microsoft.Graph.Device> GetAadDeviceByDeviceIdAsync(string tenant, string deviceId)
         {
-            IGraphServiceDevicesCollectionPage aadDevices = await this.client.Devices.Request().Filter($"deviceId eq '{WebUtility.UrlEncode(deviceId)}'").GetAsync();
+            IGraphServiceDevicesCollectionPage aadDevices = await this.GetClient(tenant).Devices.Request().Filter($"deviceId eq '{WebUtility.UrlEncode(deviceId)}'").GetAsync();
 
             if (aadDevices.Count == 0)
             {

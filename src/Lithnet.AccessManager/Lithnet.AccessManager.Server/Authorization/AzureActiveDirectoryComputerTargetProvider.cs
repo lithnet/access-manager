@@ -60,7 +60,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                     {
                         if (computerTokenSids == null)
                         {
-                            computerTokenSids = await this.aadProvider.GetDeviceGroupSids(computer.AuthorityDeviceId);
+                            computerTokenSids = await this.aadProvider.GetDeviceGroupSids(computer.AuthorityId, computer.AuthorityDeviceId);
                         }
 
                         if (computerTokenSids.Any(t => t == targetData.Sid))

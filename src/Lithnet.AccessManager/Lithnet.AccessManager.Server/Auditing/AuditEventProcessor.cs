@@ -112,7 +112,7 @@ namespace Lithnet.AccessManager.Service.Internal
                 { "{computer.Guid}", action.Computer?.ObjectID},
                 { "{computer.Sid}", action.Computer?.SecurityIdentifier?.ToString()},
                 { "{computer.AuthorityType}", action.Computer?.AuthorityType.ToString()},
-                { "{computer.Authority}", action.Computer?.Authority},
+                { "{computer.AuthorityId}", action.Computer?.AuthorityId},
                 { "{computer.AuthorityDeviceId}", action.Computer?.AuthorityDeviceId},
                 { "{request.ComputerName}", action.RequestedComputerName},
                 { "{request.Reason}", action.RequestReason ?? "(not provided)"},

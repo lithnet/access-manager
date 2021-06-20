@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Lithnet.AccessManager.Api.Shared;
 
 namespace Lithnet.AccessManager.Agent.Configuration
 {
@@ -10,6 +11,6 @@ namespace Lithnet.AccessManager.Agent.Configuration
 
         public bool Enabled { get; set; }
 
-        public AuthenticationMode AuthenticationMode { get; set; }
+        public AgentAuthenticationMode AuthenticationMode { get; set; }
     }
 }

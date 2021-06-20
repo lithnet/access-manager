@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using Lithnet.AccessManager.Api.Shared;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace Lithnet.AccessManager.Api.Controllers
 {
@@ -17,18 +18,20 @@ namespace Lithnet.AccessManager.Api.Controllers
     public class MetadataController : Controller
     {
         private readonly IOptions<AgentOptions> agentOptions;
+        private readonly IOptions<AzureAdOptions> azureAdOptions;
         private readonly ICertificateProvider certificateProvider;
         private readonly ILogger<MetadataController> logger;
         private readonly IApiErrorResponseProvider errorProvider;
         private string certData;
         private DateTime certificateLastAccessed;
 
-        public MetadataController(IOptions<AgentOptions> agentOptions, ICertificateProvider certificateProvider, ILogger<MetadataController> logger, IApiErrorResponseProvider errorProvider)
+        public MetadataController(IOptions<AgentOptions> agentOptions, ICertificateProvider certificateProvider, ILogger<MetadataController> logger, IApiErrorResponseProvider errorProvider, IOptions<AzureAdOptions> azureAdOptions)
         {
             this.agentOptions = agentOptions;
             this.certificateProvider = certificateProvider;
             this.logger = logger;
             this.errorProvider = errorProvider;
+            this.azureAdOptions = azureAdOptions;
         }
 
         public IActionResult Index()
@@ -62,7 +65,11 @@ namespace Lithnet.AccessManager.Api.Controllers
 
                 return this.Json(new MetadataResponse
                 {
-                    AgentAuthentication = new AgentAuthentication { AllowedOptions = allowedOptions },
+                    AgentAuthentication = new AgentAuthentication
+                    {
+                        AllowedOptions = allowedOptions,
+                        AllowedAzureAdTenants = this.azureAdOptions.Value.Tenants?.Select(t => t.TenantId).ToList() ?? new List<string>()
+                    },
                     PasswordManagement = new PasswordManagement { EncryptionCertificate = this.GetCertificateString() }
                 });
 

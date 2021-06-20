@@ -19,7 +19,7 @@ namespace Lithnet.AccessManager
 
         string ObjectID { get; }
 
-        string Authority { get; }
+        string AuthorityId { get; }
 
         AuthorityType AuthorityType { get; }
 

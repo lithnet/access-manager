@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Lithnet.AccessManager.Agent.Configuration;
+using Lithnet.AccessManager.Api.Shared;
 using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Agent.Providers
@@ -28,7 +29,7 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         public bool AdvancedAgentEnabled => this.policySettingsAgent.GetValue<bool>("AdvancedAgent", agentOptions.CurrentValue.AdvancedAgent.Enabled);
 
-        public AuthenticationMode AuthenticationMode => this.policySettingsAgent.GetValue<AuthenticationMode>("AuthenticationMode", agentOptions.CurrentValue.AdvancedAgent.AuthenticationMode);
+        public AgentAuthenticationMode AuthenticationMode => this.policySettingsAgent.GetValue<AgentAuthenticationMode>("AuthenticationMode", agentOptions.CurrentValue.AdvancedAgent.AuthenticationMode);
 
 
         public string Server => this.policySettingsAgent.GetValue<string>("Server", agentOptions.CurrentValue.AdvancedAgent.Server);

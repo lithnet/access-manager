@@ -22,7 +22,7 @@ namespace Lithnet.AccessManager.Server
         public DateTime Modified { get; set; }
 
         public AuthorityType AuthorityType { get; set; }
-
+        
         public string Description => null;
 
         public string DisplayName => this.ComputerName;
@@ -41,16 +41,16 @@ namespace Lithnet.AccessManager.Server
                 }
                 else if (this.AuthorityType == AuthorityType.Ams)
                 {
-                    return $"AMS\\{this.ComputerName}";
+                    return $"AccessManager\\{this.ComputerName}";
                 }
                 else
                 {
-                    return $"{this.Authority}\\{this.ComputerName}";
+                    return $"{this.AuthorityId}\\{this.ComputerName}";
                 }
             }
         }
 
-        public string Authority { get; set; }
+        public string AuthorityId { get; set; }
 
         public string AuthorityDeviceId { get; set; }
 
@@ -78,7 +78,7 @@ namespace Lithnet.AccessManager.Server
             this.Created = reader["Created"].CastOrDefault<DateTime>();
             this.Modified = reader["Modified"].CastOrDefault<DateTime>();
             this.AuthorityType = (AuthorityType)reader["AuthorityType"].CastOrDefault<int>();
-            this.Authority = reader["Authority"].CastOrDefault<string>();
+            this.AuthorityId = reader["AuthorityId"].CastOrDefault<string>();
             this.AuthorityDeviceId = reader["AuthorityDeviceId"].CastOrDefault<string>();
             this.SecurityIdentifier = new SecurityIdentifier(reader["SID"].CastOrDefault<string>());
             this.ApprovalState = (ApprovalState)reader["ApprovalState"].CastOrDefault<int>();
@@ -91,7 +91,7 @@ namespace Lithnet.AccessManager.Server
             ClaimsIdentity identity = new ClaimsIdentity();
             identity.AddClaim(new Claim("sub", this.ObjectID));
             identity.AddClaim(new Claim("authority-type", this.AuthorityType.ToString()));
-            identity.AddClaim(new Claim("authority", this.Authority));
+            identity.AddClaim(new Claim("authority-id", this.AuthorityId));
             identity.AddClaim(new Claim("authority-identifier", this.AuthorityDeviceId));
             identity.AddClaim(new Claim("sid", this.Sid));
             identity.AddClaim(new Claim("object-type", "Computer"));
@@ -105,8 +105,6 @@ namespace Lithnet.AccessManager.Server
             command.Parameters.AddWithValue("@ComputerName", this.ComputerName);
             command.Parameters.AddWithValue("@DnsName", this.DnsName);
             command.Parameters.AddWithValue("@ApprovalState", (int)this.ApprovalState);
-            command.Parameters.AddWithValue("@AuthorityType", (int)this.AuthorityType);
-            command.Parameters.AddWithValue("@Authority", this.Authority);
             command.Parameters.AddWithValue("@AuthorityDeviceId", this.AuthorityDeviceId);
             command.Parameters.AddWithValue("@SID", this.Sid);
             command.Parameters.AddWithValue("@AgentVersion", this.AgentVersion);

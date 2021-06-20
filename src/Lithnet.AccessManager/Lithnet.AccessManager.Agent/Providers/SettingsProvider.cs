@@ -1,5 +1,6 @@
 ﻿using System;
 using Lithnet.AccessManager.Agent.Configuration;
+using Lithnet.AccessManager.Api.Shared;
 using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Agent.Providers
@@ -21,7 +22,7 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         public bool AdvancedAgentEnabled => this.agentOptions.CurrentValue.AdvancedAgent.Enabled;
 
-        public AuthenticationMode AuthenticationMode => this.agentOptions.CurrentValue.AdvancedAgent.AuthenticationMode;
+        public AgentAuthenticationMode AuthenticationMode => this.agentOptions.CurrentValue.AdvancedAgent.AuthenticationMode;
 
         public string Server => this.agentOptions.CurrentValue.AdvancedAgent.Server;
 

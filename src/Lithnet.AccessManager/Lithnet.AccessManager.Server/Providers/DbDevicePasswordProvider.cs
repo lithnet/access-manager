@@ -252,8 +252,8 @@ namespace Lithnet.AccessManager.Server
 
         private async Task PurgeOldPasswords(string deviceId)
         {
-            if (this.passwordPolicy.Value.MaxNumberOfPasswords <= 0 &&
-                this.passwordPolicy.Value.MaximumPasswordHistoryAgeDays <= 0)
+            if (this.passwordPolicy.Value.MinimumNumberOfPasswords <= 0 &&
+                this.passwordPolicy.Value.MinimumPasswordHistoryAgeDays <= 0)
             {
                 return;
             }
@@ -264,14 +264,8 @@ namespace Lithnet.AccessManager.Server
             command.CommandType = System.Data.CommandType.StoredProcedure;
             command.Parameters.AddWithValue("@ObjectID", deviceId);
 
-            if (this.passwordPolicy.Value.MaxNumberOfPasswords >= 1)
-            {
-                command.Parameters.AddWithValue("@MaxEntries", this.passwordPolicy.Value.MaxNumberOfPasswords);
-            }
-            else
-            {
-                command.Parameters.AddWithValue("@OldestDate", DateTime.UtcNow.AddDays(-this.passwordPolicy.Value.MaximumPasswordHistoryAgeDays));
-            }
+            command.Parameters.AddWithValue("@MinEntries", this.passwordPolicy.Value.MinimumNumberOfPasswords);
+            command.Parameters.AddWithValue("@PurgeBefore", DateTime.UtcNow.AddDays(-this.passwordPolicy.Value.MinimumPasswordHistoryAgeDays));
 
             await command.ExecuteNonQueryAsync();
         }

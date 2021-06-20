@@ -81,7 +81,7 @@ namespace Lithnet.AccessManager.Api.Controllers
             }
             else if (device.AuthorityType == AuthorityType.AzureActiveDirectory)
             {
-                var computer = await graph.GetAadDeviceByIdAsync(device.AuthorityDeviceId);
+                var computer = await graph.GetAadDeviceByIdAsync(device.AuthorityId, device.AuthorityDeviceId);
                 device.ComputerName = computer.DisplayName;
             }
         }

@@ -1,10 +1,10 @@
 ﻿using Lithnet.AccessManager.Agent.Providers;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+using Lithnet.AccessManager.Api.Shared;
 
 namespace Lithnet.AccessManager.Agent
 {
@@ -25,7 +25,7 @@ namespace Lithnet.AccessManager.Agent
 
         public X509Certificate2 GetCertificate()
         {
-            if (this.settings.AuthenticationMode == AuthenticationMode.Ssa)
+            if (this.settings.AuthenticationMode == AgentAuthenticationMode.Ssa)
             {
                 if (string.IsNullOrWhiteSpace(this.settings.AuthCertificate))
                 {
@@ -38,7 +38,7 @@ namespace Lithnet.AccessManager.Agent
                 return cert;
             }
 
-            if (this.settings.AuthenticationMode == AuthenticationMode.Aadj)
+            if (this.settings.AuthenticationMode == AgentAuthenticationMode.Aadj)
             {
                 var cert = this.aadProvider.GetAadCertificate();
                 this.logger.LogTrace($"Found AAD certificate with thumbprint {cert.Thumbprint}");
@@ -48,7 +48,6 @@ namespace Lithnet.AccessManager.Agent
 
             throw new InvalidOperationException("The authentication mode is not supported");
         }
-
 
         public X509Certificate2 GetOrCreateAgentCertificate()
         {

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Lithnet.AccessManager.Agent
+namespace Lithnet.AccessManager.Api.Shared
 {
-    public enum AuthenticationMode
+    public enum AgentAuthenticationMode
     {
         Auto = 0,
         Iwa = 1,

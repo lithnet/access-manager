@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Lithnet.AccessManager.Api.Shared;
 
 namespace Lithnet.AccessManager.Agent.Providers
 {
@@ -11,7 +12,7 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         bool AdvancedAgentEnabled { get; }
 
-        AuthenticationMode AuthenticationMode { get; }
+        AgentAuthenticationMode AuthenticationMode { get; }
 
         string Server { get; }
 

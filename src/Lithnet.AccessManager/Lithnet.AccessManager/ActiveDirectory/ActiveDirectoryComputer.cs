@@ -38,7 +38,7 @@ namespace Lithnet.AccessManager
 
         public string ObjectID => this.de.GetPropertyGuid("objectGuid").ToString();
 
-        public string Authority => this.Sid.AccountDomainSid.ToString();
+        public string AuthorityId => this.Sid.AccountDomainSid.ToString();
 
         public AuthorityType AuthorityType => AuthorityType.ActiveDirectory;
 

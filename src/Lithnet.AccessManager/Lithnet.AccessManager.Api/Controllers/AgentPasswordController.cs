@@ -1,15 +1,14 @@
-﻿using Lithnet.AccessManager.Api.Providers;
+﻿using Lithnet.AccessManager.Api.Shared;
+using Lithnet.AccessManager.Server;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Api.Shared;
-using Lithnet.AccessManager.Server;
-using Microsoft.AspNetCore.Http;
 
 namespace Lithnet.AccessManager.Api.Controllers
 {

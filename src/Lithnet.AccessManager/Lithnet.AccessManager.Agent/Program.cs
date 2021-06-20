@@ -126,7 +126,7 @@ namespace Lithnet.AccessManager.Agent
                     services.AddSingleton<X509TokenProvider>();
                     services.AddSingleton<ITokenProvider, TokenProvider>();
                     services.AddTransient<BearerTokenHandler>();
-
+                    services.AddSingleton<ITokenClaimProvider, TokenClaimProvider>();
                     services.AddTransient<IAgentCheckInProvider, AgentCheckInProvider>();
                     services.AddTransient<IPasswordStorageProvider, AmsApiPasswordStorageProvider>();
                     services.AddTransient<IAuthenticationCertificateProvider, AuthenticationCertificateProvider>();

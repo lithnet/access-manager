@@ -195,7 +195,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             u.Properties.Add(new PSNoteProperty("Description", computer.Description));
             u.Properties.Add(new PSNoteProperty("DisplayName", computer.DisplayName));
             u.Properties.Add(new PSNoteProperty("DnsHostName", computer.DnsHostName));
-            u.Properties.Add(new PSNoteProperty("Authority", computer.Authority));
+            u.Properties.Add(new PSNoteProperty("AuthorityId", computer.AuthorityId));
             u.Properties.Add(new PSNoteProperty("AuthorityDeviceId", computer.AuthorityDeviceId));
             u.Properties.Add(new PSNoteProperty("AuthorityType", computer.AuthorityType));
             u.Properties.Add(new PSNoteProperty("FullyQualifiedName", computer.FullyQualifiedName));

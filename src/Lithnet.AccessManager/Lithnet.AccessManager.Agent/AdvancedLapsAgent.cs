@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Api.Shared;
 
 namespace Lithnet.AccessManager.Agent
 {
@@ -28,7 +29,7 @@ namespace Lithnet.AccessManager.Agent
 
         public async Task DoCheckAsync()
         {
-            if (this.settings.AuthenticationMode == AuthenticationMode.Ssa)
+            if (this.settings.AuthenticationMode == AgentAuthenticationMode.Ssa)
             {
                 var state = await this.registrationProvider.GetRegistrationState();
 

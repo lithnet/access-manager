@@ -1,5 +1,4 @@
-﻿using Lithnet.AccessManager.Server;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -41,47 +40,47 @@ namespace Lithnet.AccessManager.Server
             return devices;
         }
 
-        public async Task<Device> GetOrCreateDeviceAsync(Microsoft.Graph.Device aadDevice, string authority)
+        public async Task<Device> GetOrCreateDeviceAsync(Microsoft.Graph.Device aadDevice, string authorityId)
         {
-            authority.ThrowIfNull(nameof(authority));
+            authorityId.ThrowIfNull(nameof(authorityId));
             aadDevice.ThrowIfNull(nameof(aadDevice));
 
             string deviceId = aadDevice.Id;
 
             try
             {
-                return await this.GetDeviceAsync(AuthorityType.AzureActiveDirectory, authority, deviceId);
+                return await this.GetDeviceAsync(AuthorityType.AzureActiveDirectory, authorityId, deviceId);
             }
             catch (DeviceNotFoundException)
             {
                 this.logger.LogTrace($"The AAD-joined computer {aadDevice.DeviceId} was not found in the AMS database and will be created");
             }
 
-            return await this.CreateDeviceAsync(aadDevice, authority);
+            return await this.CreateDeviceAsync(aadDevice, authorityId);
         }
 
-        public async Task<Device> GetOrCreateDeviceAsync(IActiveDirectoryComputer principal, string authority)
+        public async Task<Device> GetOrCreateDeviceAsync(IActiveDirectoryComputer principal, string authorityId)
         {
-            authority.ThrowIfNull(nameof(authority));
+            authorityId.ThrowIfNull(nameof(authorityId));
             principal.ThrowIfNull(nameof(principal));
-
+            
             string deviceId = principal.Sid.ToString();
 
             try
             {
-                return await this.GetDeviceAsync(AuthorityType.ActiveDirectory, authority, deviceId);
+                return await this.GetDeviceAsync(AuthorityType.ActiveDirectory, authorityId, deviceId);
             }
             catch (DeviceNotFoundException)
             {
                 this.logger.LogTrace($"The AD-joined computer {principal.MsDsPrincipalName} was not found in the AMS database and will be created");
             }
 
-            return await this.CreateDeviceAsync(principal, authority, deviceId);
+            return await this.CreateDeviceAsync(principal, authorityId, deviceId);
         }
 
-        public async Task<Device> GetDeviceAsync(AuthorityType authorityType, string authority, string authorityDeviceId)
+        public async Task<Device> GetDeviceAsync(AuthorityType authorityType, string authorityId, string authorityDeviceId)
         {
-            authority.ThrowIfNull(nameof(authority));
+            authorityId.ThrowIfNull(nameof(authorityId));
             authorityDeviceId.ThrowIfNull(nameof(authorityDeviceId));
 
             await using SqlConnection con = this.dbProvider.GetConnection();
@@ -89,7 +88,7 @@ namespace Lithnet.AccessManager.Server
             SqlCommand command = new SqlCommand("spGetDeviceByAuthority", con);
             command.CommandType = System.Data.CommandType.StoredProcedure;
             command.Parameters.AddWithValue("@AuthorityType", (int)authorityType);
-            command.Parameters.AddWithValue("@Authority", authority);
+            command.Parameters.AddWithValue("@AuthorityId", authorityId);
             command.Parameters.AddWithValue("@AuthorityDeviceId", authorityDeviceId);
 
             await using SqlDataReader reader = await command.ExecuteReaderAsync();
@@ -98,8 +97,7 @@ namespace Lithnet.AccessManager.Server
                 return new Device(reader);
             }
 
-            throw new DeviceNotFoundException($"Could not find a device with ID {authorityDeviceId} from authority {authority} ({authorityType})");
-
+            throw new DeviceNotFoundException($"Could not find a device with ID {authorityDeviceId} from authority {authorityId} ({authorityType})");
         }
 
         public async Task<Device> GetDeviceAsync(string deviceId)
@@ -119,6 +117,20 @@ namespace Lithnet.AccessManager.Server
             }
 
             throw new DeviceNotFoundException($"Could not find a device with ID {deviceId}");
+        }
+
+        private async Task<long> GetOrCreateAuthorityKey(string authorityId, AuthorityType type)
+        {
+            authorityId.ThrowIfNull(nameof(authorityId));
+
+            await using SqlConnection con = this.dbProvider.GetConnection();
+
+            SqlCommand command = new SqlCommand("spGetOrCreateAuthority", con);
+            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@AuthorityId", authorityId);
+            command.Parameters.AddWithValue("@AuthorityType", (int)type);
+
+            return (long)await command.ExecuteScalarAsync();
         }
 
         public async Task<Device> GetDeviceAsync(X509Certificate2 certificate)
@@ -146,10 +158,10 @@ namespace Lithnet.AccessManager.Server
             certificate.ThrowIfNull(nameof(certificate));
 
             device.ObjectID ??= Guid.NewGuid().ToString();
-            device.Authority = "ams";
             device.AuthorityDeviceId = device.ObjectID;
-            device.AuthorityType = AuthorityType.Ams;
             device.SecurityIdentifier = new System.Security.Principal.SecurityIdentifier($"{SidUtils.AmsSidPrefix}{SidUtils.GuidStringToSidString(device.ObjectID)}");
+
+            long authorityKey = await this.GetOrCreateAuthorityKey(Constants.AmsAuthorityId, AuthorityType.Ams);
 
             await using SqlConnection con = this.dbProvider.GetConnection();
 
@@ -157,6 +169,7 @@ namespace Lithnet.AccessManager.Server
             command.CommandType = System.Data.CommandType.StoredProcedure;
             command.Parameters.AddWithValue("@X509Certificate", certificate.Export(X509ContentType.Cert));
             command.Parameters.AddWithValue("@X509CertificateThumbprint", certificate.Thumbprint);
+            command.Parameters.AddWithValue("@AuthorityKey", authorityKey);
             device.ToCreateCommandParameters(command);
 
             await using SqlDataReader reader = await command.ExecuteReaderAsync();
@@ -164,14 +177,14 @@ namespace Lithnet.AccessManager.Server
             return new Device(reader);
         }
 
-        public async Task<Device> CreateDeviceAsync(Microsoft.Graph.Device aadDevice, string authority)
+        public async Task<Device> CreateDeviceAsync(Microsoft.Graph.Device aadDevice, string authorityId)
         {
             aadDevice.ThrowIfNull(nameof(aadDevice));
-            authority.ThrowIfNull(nameof(authority));
+            authorityId.ThrowIfNull(nameof(authorityId));
 
             Device device = new Device
             {
-                Authority = authority,
+                AuthorityId = authorityId,
                 AuthorityDeviceId = aadDevice.Id,
                 AuthorityType = AuthorityType.AzureActiveDirectory,
                 ApprovalState = ApprovalState.Approved,
@@ -184,16 +197,16 @@ namespace Lithnet.AccessManager.Server
             return await this.CreateDeviceAsync(device);
         }
 
-        public async Task<Device> CreateDeviceAsync(IActiveDirectoryComputer computer, string authority, string deviceId)
+        public async Task<Device> CreateDeviceAsync(IActiveDirectoryComputer computer, string authorityId, string deviceId)
         {
             computer.ThrowIfNull(nameof(computer));
-            authority.ThrowIfNull(nameof(authority));
+            authorityId.ThrowIfNull(nameof(authorityId));
             deviceId.ThrowIfNull(nameof(deviceId));
 
             Device device = new Device
             {
                 ApprovalState = ApprovalState.Approved,
-                Authority = authority,
+                AuthorityId = authorityId,
                 AuthorityDeviceId = deviceId,
                 AuthorityType = AuthorityType.ActiveDirectory,
                 ComputerName = computer.SamAccountName.TrimEnd('$'),
@@ -208,12 +221,16 @@ namespace Lithnet.AccessManager.Server
         {
             device.ThrowIfNull(nameof(device));
 
+            long authorityKey = await this.GetOrCreateAuthorityKey(device.AuthorityId, device.AuthorityType);
+
             device.ObjectID ??= Guid.NewGuid().ToString();
 
             await using SqlConnection con = this.dbProvider.GetConnection();
 
             SqlCommand command = new SqlCommand("spCreateDevice", con);
             command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@AuthorityKey", authorityKey);
+
             device.ToCreateCommandParameters(command);
 
             await using SqlDataReader reader = await command.ExecuteReaderAsync();

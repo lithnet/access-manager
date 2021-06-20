@@ -5,5 +5,7 @@ namespace Lithnet.AccessManager.Api.Shared
     public class AgentAuthentication
     {
         public List<string> AllowedOptions { get; set; }
+
+        public List<string> AllowedAzureAdTenants { get; set; }
     }
 }
