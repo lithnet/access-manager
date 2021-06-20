@@ -48,6 +48,13 @@ namespace Lithnet.AccessManager.Api
                         StatusCode = StatusCodes.Status403Forbidden
                     };
 
+                case RegistrationKeyValidationException _:
+                    this.logger.LogError(ex, "The registration key could not be validated");
+                    return new JsonResult(new { Error = new ApiError("invalid-registration-key", "The registration key was not accepted") })
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden
+                    };
+
                 default:
                     this.logger.LogError(ex, "The request could not be processed");
                     return new JsonResult(new { Error = new ApiError("internal-error", "An internal error occurred and the request could not be processed") })

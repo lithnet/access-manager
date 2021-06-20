@@ -64,6 +64,9 @@ namespace Lithnet.AccessManager.Api
             services.AddScoped<IDeviceProvider, DbDeviceProvider>();
             services.AddScoped<IAadGraphApiProvider, AadGraphApiProvider>();
             services.AddScoped<IDbDevicePasswordProvider, DbDevicePasswordProvider>();
+
+            services.AddSingleton<IRegistrationKeyProvider, RegistrationKeyProvider>();
+
             services.AddSingleton<IApiErrorResponseProvider, ApiErrorResponseProvider>();
             services.AddSingleton<IAppPathProvider, ApiAppPathProvider>();
             services.AddSingleton<ISecurityTokenGenerator, SecurityTokenGenerator>();

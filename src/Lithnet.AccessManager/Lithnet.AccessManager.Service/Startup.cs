@@ -89,11 +89,11 @@ namespace Lithnet.AccessManager.Service
             services.AddScoped<IComputerTargetProvider, AmsComputerTargetProvider>();
 
             services.AddScoped<IComputerLocator, ComputerLocator>();
-            services.AddScoped<IDeviceProvider, DbDeviceProvider>();
-
-            services.AddScoped<IDeviceProvider, DbDeviceProvider>();
             services.AddScoped<IAadGraphApiProvider, AadGraphApiProvider>();
-            services.AddScoped<IDbDevicePasswordProvider, DbDevicePasswordProvider>();
+
+            services.AddSingleton<IDeviceProvider, DbDeviceProvider>();
+            services.AddSingleton<IDbDevicePasswordProvider, DbDevicePasswordProvider>();
+            services.AddSingleton<IRegistrationKeyProvider, RegistrationKeyProvider>();
 
             services.AddSingleton<ISmtpProvider, SmtpProvider>();
             services.AddSingleton<IApplicationUpgradeProvider, ApplicationUpgradeProvider>();

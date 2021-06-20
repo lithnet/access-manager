@@ -115,7 +115,7 @@ namespace Lithnet.AccessManager.Server
             }
             catch (SqlException ex)
             {
-                if (ex.Number == 50000)
+                if (ex.Number == DbConstants.ErrorDeviceNotFound)
                 {
                     throw new DeviceNotFoundException($"The device {deviceId} was not found");
                 }
@@ -193,7 +193,7 @@ namespace Lithnet.AccessManager.Server
             }
             catch (SqlException ex)
             {
-                if (ex.Number == 50000)
+                if (ex.Number == DbConstants.ErrorDeviceNotFound)
                 {
                     throw new DeviceNotFoundException($"The device {deviceId} was not found");
                 }
@@ -241,7 +241,7 @@ namespace Lithnet.AccessManager.Server
             }
             catch (SqlException ex)
             {
-                if (ex.Number == 50000)
+                if (ex.Number == DbConstants.ErrorDeviceNotFound)
                 {
                     throw new DeviceNotFoundException($"The device {deviceId} was not found");
                 }
