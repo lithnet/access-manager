@@ -4,6 +4,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 using Lithnet.AccessManager.Api.Shared;
 
 namespace Lithnet.AccessManager.Agent
@@ -23,7 +24,7 @@ namespace Lithnet.AccessManager.Agent
             this.logger = logger;
         }
 
-        public X509Certificate2 GetCertificate()
+        public async Task<X509Certificate2> GetCertificate()
         {
             if (this.settings.AuthenticationMode == AgentAuthenticationMode.Ssa)
             {
@@ -40,7 +41,7 @@ namespace Lithnet.AccessManager.Agent
 
             if (this.settings.AuthenticationMode == AgentAuthenticationMode.Aadj)
             {
-                var cert = this.aadProvider.GetAadCertificate();
+                var cert = await this.aadProvider.GetAadCertificate();
                 this.logger.LogTrace($"Found AAD certificate with thumbprint {cert.Thumbprint}");
 
                 return cert;
@@ -49,7 +50,7 @@ namespace Lithnet.AccessManager.Agent
             throw new InvalidOperationException("The authentication mode is not supported");
         }
 
-        public X509Certificate2 GetOrCreateAgentCertificate()
+        public Task<X509Certificate2> GetOrCreateAgentCertificate()
         {
             X509Certificate2 cert;
 
@@ -59,7 +60,7 @@ namespace Lithnet.AccessManager.Agent
                 {
                     if (string.Equals(this.cachedCertificate.Thumbprint, this.settings.AuthCertificate, StringComparison.OrdinalIgnoreCase))
                     {
-                        return this.cachedCertificate;
+                        return Task.FromResult(this.cachedCertificate);
                     }
                 }
 
@@ -67,7 +68,7 @@ namespace Lithnet.AccessManager.Agent
                 {
                     this.cachedCertificate = this.ResolveCertificateFromLocalStore(this.settings.AuthCertificate);
                     this.logger.LogTrace($"Found authentication certificate ({this.settings.AuthCertificate}) in the local store");
-                    return this.cachedCertificate;
+                    return Task.FromResult(this.cachedCertificate);
                 }
                 catch (CertificateNotFoundException)
                 {
@@ -82,7 +83,7 @@ namespace Lithnet.AccessManager.Agent
                 this.cachedCertificate = cert;
                 this.logger.LogTrace($"Found an existing, but unattached certificate ({this.settings.AuthCertificate}) in the local store");
 
-                return this.cachedCertificate;
+                return Task.FromResult(this.cachedCertificate);
             }
 
             cert = this.CreateSelfSignedCert();
@@ -90,7 +91,7 @@ namespace Lithnet.AccessManager.Agent
             this.settings.AuthCertificate = cert.Thumbprint;
 
             this.logger.LogTrace($"Created a new authentication certificate ({this.settings.AuthCertificate})");
-            return cert;
+            return Task.FromResult(cert);
         }
 
         public X509Certificate2 CreateSelfSignedCert()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Lithnet.AccessManager.Api.Shared;
 using Microsoft.IdentityModel.Tokens;
 
@@ -17,15 +18,15 @@ namespace Lithnet.AccessManager.Agent.Providers
             this.aadProvider = aadProvider;
         }
 
-        public void AddClaims(SecurityTokenDescriptor token)
+        public async Task AddClaims(SecurityTokenDescriptor token)
         {
             token.Claims ??= new Dictionary<string, object>();
             token.Claims.Add("auth-mode", this.settings.AuthenticationMode.ToString());
 
             if (this.settings.AuthenticationMode == AgentAuthenticationMode.Aadj)
             {
-                token.Claims.Add("aad-tenant-id", this.aadProvider.GetTenantId());
-                token.Claims.Add("aad-device-id", this.aadProvider.GetDeviceId());
+                token.Claims.Add("aad-tenant-id", await this.aadProvider.GetTenantId());
+                token.Claims.Add("aad-device-id", await this.aadProvider.GetDeviceId());
             }
         }
     }

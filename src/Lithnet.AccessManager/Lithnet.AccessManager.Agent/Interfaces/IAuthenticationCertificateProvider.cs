@@ -8,8 +8,8 @@ namespace Lithnet.AccessManager.Agent
 {
     public interface IAuthenticationCertificateProvider
     {
-        X509Certificate2 GetCertificate();
-        
-        X509Certificate2 GetOrCreateAgentCertificate();
+        Task<X509Certificate2> GetCertificate();
+
+        Task<X509Certificate2> GetOrCreateAgentCertificate();
     }
 }

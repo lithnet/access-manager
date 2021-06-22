@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
+using System.Threading.Tasks;
 using Vanara.Extensions;
 using Vanara.PInvoke;
 using Vanara.Security.AccessControl;
@@ -17,24 +18,26 @@ namespace Lithnet.AccessManager.Agent.Providers
     public class WindowsAadJoinInformationProvider : IAadJoinInformationProvider
     {
         private readonly ILogger<WindowsAadJoinInformationProvider> logger;
+        private readonly IMetadataProvider metadataProvider;
 
         private DSREG_JOIN_INFO joinInfoCache;
 
         private X509Certificate2 certificate;
 
-        public WindowsAadJoinInformationProvider(ILogger<WindowsAadJoinInformationProvider> logger)
+        public WindowsAadJoinInformationProvider(ILogger<WindowsAadJoinInformationProvider> logger, IMetadataProvider metadataProvider)
         {
             this.logger = logger;
+            this.metadataProvider = metadataProvider;
         }
 
-        public DSREG_JOIN_INFO GetJoinInfo()
+        private async Task<DSREG_JOIN_INFO> GetJoinInfo()
         {
             if (this.joinInfoCache != null)
             {
                 return this.joinInfoCache;
             }
 
-            DSREG_JOIN_INFO j = this.GetJoinInfoCurrentUser();
+            DSREG_JOIN_INFO j = await this.GetJoinInfoCurrentUser();
 
             if (j != null && !j.IsNull)
             {
@@ -45,45 +48,53 @@ namespace Lithnet.AccessManager.Agent.Providers
             throw new ComputerNotAadJoinedException();
         }
 
-        private DSREG_JOIN_INFO GetJoinInfoCurrentUser()
+        private async Task<DSREG_JOIN_INFO> GetJoinInfoCurrentUser()
         {
-            NativeMethods.NetGetAadJoinInformation(null, out DSREG_JOIN_INFO joinInfo2).ThrowIfFailed();
+            var metadata = await metadataProvider.GetMetadata();
 
-            if (!joinInfo2.IsNull)
+            foreach (var tenantId in metadata.AgentAuthentication.AllowedAzureAdTenants)
             {
-                this.logger.LogTrace("Got AAD join information");
-                this.logger.LogTrace($"Device ID: {joinInfo2.pszDeviceId}\r\n" +
-                                     $"Domain: {joinInfo2.pszIdpDomain}\r\n" +
-                                     $"Join type: {joinInfo2.joinType} \r\n" +
-                                     $"Tenant Name: {joinInfo2.pszTenantDisplayName}\r\n" +
-                                     $"Tenant ID: {joinInfo2.pszTenantId}\r\n");
+                NativeMethods.NetGetAadJoinInformation(tenantId, out DSREG_JOIN_INFO joinInfo2).ThrowIfFailed();
+
+                if (!joinInfo2.IsNull)
+                {
+                    this.logger.LogTrace("Got AAD join information");
+                    this.logger.LogTrace($"Device ID: {joinInfo2.pszDeviceId}\r\n" +
+                                         $"Domain: {joinInfo2.pszIdpDomain}\r\n" +
+                                         $"Join type: {joinInfo2.joinType} \r\n" +
+                                         $"Tenant Name: {joinInfo2.pszTenantDisplayName}\r\n" +
+                                         $"Tenant ID: {joinInfo2.pszTenantId}\r\n");
+
+                    return joinInfo2;
+                }
             }
 
-            return joinInfo2;
+            this.logger.LogWarning($"Could not find suitable Azure AD tenant join information for the allowed Azure AD tenants. Allowed tenants -> {string.Join(',', metadata.AgentAuthentication.AllowedAzureAdTenants)}");
+            return null;
         }
 
-        public string GetDeviceId()
+        public async Task<string> GetDeviceId()
         {
-            var joinInfo = this.GetJoinInfo();
+            var joinInfo = await this.GetJoinInfo();
 
             return joinInfo.pszDeviceId;
         }
 
-        public string GetTenantId()
+        public async Task<string> GetTenantId()
         {
-            var joinInfo = this.GetJoinInfo();
+            var joinInfo = await this.GetJoinInfo();
 
             return joinInfo.pszTenantId;
         }
 
-        public X509Certificate2 GetAadCertificate()
+        public async Task<X509Certificate2> GetAadCertificate()
         {
             if (this.certificate != null)
             {
                 return this.certificate;
             }
 
-            var joinInfo = this.GetJoinInfo();
+            var joinInfo = await this.GetJoinInfo();
 
             if (joinInfo == null || joinInfo.IsNull)
             {
@@ -100,7 +111,7 @@ namespace Lithnet.AccessManager.Agent.Providers
             return this.certificate;
         }
 
-        private DSREG_JOIN_INFO FindRegistrationInfoFromLocalUsers()
+        private async Task<DSREG_JOIN_INFO> FindRegistrationInfoFromLocalUsers()
         {
             Principal queryFilter = new UserPrincipal(new PrincipalContext(ContextType.Machine));
 
@@ -118,7 +129,7 @@ namespace Lithnet.AccessManager.Agent.Providers
 
                     this.logger.LogInformation($"Searching user profile {principal.SamAccountName} for join information");
 
-                    var info = GetJoinInfoForUser(principal.SamAccountName);
+                    var info = await GetJoinInfoForUser(principal.SamAccountName);
 
                     if (info != null && !info.IsNull)
                     {
@@ -134,7 +145,7 @@ namespace Lithnet.AccessManager.Agent.Providers
             return null;
         }
 
-        private DSREG_JOIN_INFO GetJoinInfoForUser(string username)
+        private async Task<DSREG_JOIN_INFO> GetJoinInfoForUser(string username)
         {
             var currentProcess = Process.GetCurrentProcess();
             currentProcess.EnablePrivilege(SystemPrivilege.TrustedComputerBase);
@@ -226,9 +237,9 @@ namespace Lithnet.AccessManager.Agent.Providers
                     loadedProfile = true;
                     logger.LogInformation("Loaded user profile");
 
-                    Func<DSREG_JOIN_INFO> find = () =>
+                    async Task<DSREG_JOIN_INFO> Find()
                     {
-                        var data = this.GetJoinInfoCurrentUser();
+                        var data = await this.GetJoinInfoCurrentUser();
 
                         if (data != null && !data.IsNull)
                         {
@@ -241,10 +252,11 @@ namespace Lithnet.AccessManager.Agent.Providers
                         }
 
                         return data;
+                    }
 
-                    };
-
-                    return WindowsIdentity.RunImpersonated(new Microsoft.Win32.SafeHandles.SafeAccessTokenHandle(newToken.DangerousGetHandle()), find);
+                    return await WindowsIdentity.RunImpersonatedAsync(
+                        new Microsoft.Win32.SafeHandles.SafeAccessTokenHandle(newToken.DangerousGetHandle()),
+                        Find);
                 }
                 finally
                 {

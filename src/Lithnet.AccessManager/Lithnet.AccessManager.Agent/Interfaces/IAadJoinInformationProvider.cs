@@ -6,9 +6,10 @@ namespace Lithnet.AccessManager.Agent.Providers
 {
     public interface IAadJoinInformationProvider
     {
-        X509Certificate2 GetAadCertificate();
+        Task<X509Certificate2> GetAadCertificate();
 
-        string GetDeviceId();
-        string GetTenantId();
+        Task<string> GetDeviceId();
+
+        Task<string> GetTenantId();
     }
 }

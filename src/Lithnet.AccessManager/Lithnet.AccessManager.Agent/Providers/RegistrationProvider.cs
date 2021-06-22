@@ -122,7 +122,7 @@ namespace Lithnet.AccessManager.Agent
             this.logger.LogInformation("Attempting to register the agent");
             using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthAnonymous);
 
-            var cert = this.authCertProvider.GetOrCreateAgentCertificate();
+            var cert = await this.authCertProvider.GetOrCreateAgentCertificate();
             var assertion = await this.GenerateAssertion(cert, new Uri(client.BaseAddress, "agent/register").ToString());
 
             using var httpResponseMessage = await client.PostAsync($"agent/register", assertion.AsJsonStringContent());

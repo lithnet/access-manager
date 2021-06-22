@@ -51,13 +51,13 @@ namespace Lithnet.AccessManager.Agent.Authentication
 
         private async Task<TokenResponse> RequestAccessToken()
         {
-            return await this.RequestAccessToken(this.certProvider.GetCertificate());
+            return await this.RequestAccessToken(await this.certProvider.GetCertificate());
         }
 
         private async Task<TokenResponse> RequestAccessToken(X509Certificate2 certificate)
         {
             string url = $"https://{this.settings.Server}/api/v1.0/auth/x509";
-            ClientAssertion assertion = new ClientAssertion { Assertion = this.BuildAssertion(certificate, url) };
+            ClientAssertion assertion = new ClientAssertion { Assertion = await this.BuildAssertion(certificate, url) };
 
             using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthAnonymous);
             using var httpResponseMessage = await client.PostAsync("auth/x509", assertion.AsJsonStringContent());
@@ -70,7 +70,7 @@ namespace Lithnet.AccessManager.Agent.Authentication
             return this.token;
         }
 
-        private string BuildAssertion(X509Certificate2 cert, string audience)
+        private async Task<string> BuildAssertion(X509Certificate2 cert, string audience)
         {
             string hostname = Environment.MachineName;
 
@@ -94,7 +94,7 @@ namespace Lithnet.AccessManager.Agent.Authentication
                 SigningCredentials = new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSha256)
             };
 
-            this.claimProvider.AddClaims(tokenDescriptor);
+            await this.claimProvider.AddClaims(tokenDescriptor);
 
             // Add x5c header parameter containing the signing certificate:
             JwtSecurityToken jwt = (JwtSecurityToken) tokenHandler.CreateToken(tokenDescriptor);

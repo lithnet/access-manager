@@ -15,8 +15,9 @@ namespace Lithnet.AccessManager.Agent
         private readonly IPasswordStorageProvider passwordStorageProvider;
         private readonly IRegistrationProvider registrationProvider;
         private readonly IAgentCheckInProvider checkInProvider;
+        private readonly IMetadataProvider metadataProvider;
 
-        public AdvancedLapsAgent(ILogger<AdvancedLapsAgent> logger, ISettingsProvider settings, IPasswordGenerator passwordGenerator, IPasswordChangeProvider passwordChangeProvider, IPasswordStorageProvider passwordStorageProvider, IRegistrationProvider registrationProvider, IAgentCheckInProvider checkInProvider)
+        public AdvancedLapsAgent(ILogger<AdvancedLapsAgent> logger, ISettingsProvider settings, IPasswordGenerator passwordGenerator, IPasswordChangeProvider passwordChangeProvider, IPasswordStorageProvider passwordStorageProvider, IRegistrationProvider registrationProvider, IAgentCheckInProvider checkInProvider, IMetadataProvider metadataProvider)
         {
             this.logger = logger;
             this.settings = settings;
@@ -25,47 +26,49 @@ namespace Lithnet.AccessManager.Agent
             this.passwordStorageProvider = passwordStorageProvider;
             this.registrationProvider = registrationProvider;
             this.checkInProvider = checkInProvider;
+            this.metadataProvider = metadataProvider;
         }
 
         public async Task DoCheckAsync()
         {
+            var metadata = await this.metadataProvider.GetMetadata();
+
+            
+
             if (this.settings.AuthenticationMode == AgentAuthenticationMode.Ssa)
             {
                 var state = await this.registrationProvider.GetRegistrationState();
 
                 switch (state)
                 {
-                    case RegistrationState.Approved:
-                        await this.CheckAndChangePassword();
-                        break;
-
                     case RegistrationState.NotRegistered:
                         if (this.registrationProvider.CanRegisterAgent())
                         {
                             var result = await this.registrationProvider.RegisterAgent();
 
-                            if (result == RegistrationState.Approved)
+                            if (result != RegistrationState.Approved)
                             {
-                                await this.CheckAndChangePassword();
+                                return;
                             }
                         }
                         else
                         {
-                            this.logger.LogWarning("The client is not eligible to register itself. Please ensure the client has an active registration key");
+                            this.logger.LogWarning("The client is not able to register. Please ensure the client has an active registration key");
+                            return;
                         }
                         break;
 
+                    case RegistrationState.Approved:
+                        break;
 
                     case RegistrationState.Pending:
                     case RegistrationState.Rejected:
                         return;
                 }
             }
-            else
-            {
-                await this.checkInProvider.CheckinIfRequired();
-                await this.CheckAndChangePassword();
-            }
+
+            await this.checkInProvider.CheckinIfRequired();
+            await this.CheckAndChangePassword();
         }
 
         private async Task CheckAndChangePassword()

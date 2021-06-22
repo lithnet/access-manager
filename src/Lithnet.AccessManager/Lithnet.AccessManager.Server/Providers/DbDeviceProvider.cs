@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -63,7 +64,7 @@ namespace Lithnet.AccessManager.Server
         {
             authorityId.ThrowIfNull(nameof(authorityId));
             principal.ThrowIfNull(nameof(principal));
-            
+
             string deviceId = principal.Sid.ToString();
 
             try
