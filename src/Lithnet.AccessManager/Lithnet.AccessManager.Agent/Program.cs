@@ -44,12 +44,6 @@ namespace Lithnet.AccessManager.Agent
                         c.DefaultRequestHeaders.Add("User-Agent", $"Lithnet Access Manager Agent {Assembly.GetExecutingAssembly().GetName().Version}");
                         var settings = serviceProvider.GetRequiredService<ISettingsProvider>();
                         c.BaseAddress = new Uri($"https://{settings.Server}/api/v1.0/");
-                    }).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
-                    {
-                        ServerCertificateCustomValidationCallback = (a, b, c, d) =>
-                        {
-                            return true;
-                        }
                     });
 
                     services.AddHttpClient(Constants.HttpClientAuthIwa, (serviceProvider, c) =>
@@ -62,10 +56,6 @@ namespace Lithnet.AccessManager.Agent
                     {
                         AllowAutoRedirect = false,
                         UseDefaultCredentials = true,
-                        ServerCertificateCustomValidationCallback = (a, b, c, d) =>
-                        {
-                            return true;
-                        }
                     });
 
                     services.AddHttpClient(Constants.HttpClientAuthBearer, (serviceProvider, c) =>
@@ -74,12 +64,6 @@ namespace Lithnet.AccessManager.Agent
                         c.DefaultRequestHeaders.Add("User-Agent", $"Lithnet Access Manager Agent {Assembly.GetExecutingAssembly().GetName().Version}");
                         var settings = serviceProvider.GetRequiredService<ISettingsProvider>();
                         c.BaseAddress = new Uri($"https://{settings.Server}/api/v1.0/");
-                    }).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
-                    {
-                        ServerCertificateCustomValidationCallback = (a, b, c, d) =>
-                        {
-                            return true;
-                        }
                     })
                     .AddHttpMessageHandler<BearerTokenHandler>();
 

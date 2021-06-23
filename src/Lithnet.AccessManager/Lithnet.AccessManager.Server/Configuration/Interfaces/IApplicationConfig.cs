@@ -1,4 +1,6 @@
-﻿using Lithnet.AccessManager.Enterprise;
+﻿using Lithnet.AccessManager.Api;
+using Lithnet.AccessManager.Enterprise;
+using Microsoft.Graph;
 
 namespace Lithnet.AccessManager.Server.Configuration
 {
@@ -11,6 +13,8 @@ namespace Lithnet.AccessManager.Server.Configuration
         LicensingOptions Licensing { get; set; }
 
         AuditOptions Auditing { get; set; }
+
+        AzureAdOptions AzureAd { get; set; }
 
         AuthenticationOptions Authentication { get; set; }
 

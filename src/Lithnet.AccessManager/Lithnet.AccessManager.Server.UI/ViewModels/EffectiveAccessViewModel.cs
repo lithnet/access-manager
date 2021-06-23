@@ -20,7 +20,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDirectory directory;
         private readonly SecurityDescriptorTargetsViewModel targets;
         private readonly ILogger logger;
-        private readonly IComputerTargetProvider computerTargetProvider;
+        private readonly IEnumerable<IComputerTargetProvider> computerTargetProviders;
 
         public string ComputerName { get; set; }
 
@@ -50,13 +50,13 @@ namespace Lithnet.AccessManager.Server.UI
 
         public ObservableCollection<MatchedSecurityDescriptorTargetViewModel> MatchedTargets { get; } = new ObservableCollection<MatchedSecurityDescriptorTargetViewModel>();
 
-        public EffectiveAccessViewModel(IAuthorizationInformationBuilder authorizationBuilder, IDialogCoordinator dialogCoordinator, IDirectory directory, SecurityDescriptorTargetsViewModel targets, ILogger<EffectiveAccessViewModel> logger, IComputerTargetProvider computerTargetProvider)
+        public EffectiveAccessViewModel(IAuthorizationInformationBuilder authorizationBuilder, IDialogCoordinator dialogCoordinator, IDirectory directory, SecurityDescriptorTargetsViewModel targets, ILogger<EffectiveAccessViewModel> logger, IEnumerable<IComputerTargetProvider> computerTargetProviders)
         {
             this.authorizationBuilder = authorizationBuilder;
             this.dialogCoordinator = dialogCoordinator;
             this.directory = directory;
             this.targets = targets;
-            this.computerTargetProvider = computerTargetProvider;
+            this.computerTargetProviders = computerTargetProviders;
             this.logger = logger;
         }
 
@@ -107,7 +107,16 @@ namespace Lithnet.AccessManager.Server.UI
 
                     controller.SetMessage($"Evaluating access to computer {computer.MsDsPrincipalName} for user {user.MsDsPrincipalName}");
 
-                    var matchingComputerTargets = this.computerTargetProvider.GetMatchingTargetsForComputer(computer, targets.Model);
+                    List<SecurityDescriptorTarget> matchingComputerTargets = new List<SecurityDescriptorTarget>();
+
+                    foreach (var computerTargetProvider in this.computerTargetProviders)
+                    {
+                        if (computerTargetProvider.CanProcess(computer))
+                        {
+                            matchingComputerTargets.AddRange(await computerTargetProvider.GetMatchingTargetsForComputer(computer, targets.Model));
+                        }
+                    }
+
                     var results = await Task.Run(() => this.authorizationBuilder.BuildAuthorizationInformation(user, computer, matchingComputerTargets));
 
                     this.HasBitLocker = results.EffectiveAccess.HasFlag(AccessMask.BitLocker);

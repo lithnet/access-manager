@@ -78,7 +78,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                     return this.Forbid(JwtBearerDefaults.AuthenticationScheme);
                 }
 
-                Device device = await this.devices.GetDeviceAsync(AuthorityType.Ams, "ams", requestId);
+                Device device = await this.devices.GetDeviceAsync(AuthorityType.Ams, Constants.AmsAuthorityId, requestId);
 
                 return this.GetDeviceApprovalResult(device);
             }

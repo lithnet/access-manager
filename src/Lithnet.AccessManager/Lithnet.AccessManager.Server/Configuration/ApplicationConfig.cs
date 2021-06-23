@@ -2,6 +2,7 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using Lithnet.AccessManager.Api;
 using Newtonsoft.Json;
 
 namespace Lithnet.AccessManager.Server.Configuration
@@ -19,6 +20,8 @@ namespace Lithnet.AccessManager.Server.Configuration
         public LicensingOptions Licensing { get; set; } = new LicensingOptions();
 
         public AuthenticationOptions Authentication { get; set; } = new AuthenticationOptions();
+
+        public AzureAdOptions AzureAd { get; set; } = new AzureAdOptions();
 
         public AuditOptions Auditing { get; set; } = new AuditOptions();
 

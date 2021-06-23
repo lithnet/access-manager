@@ -27,7 +27,7 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         public bool Enabled => this.policySettingsAgent.GetValue<bool>("Enabled", agentOptions.CurrentValue.Enabled);
 
-        public bool AdvancedAgentEnabled => this.policySettingsAgent.GetValue<bool>("AdvancedAgent", agentOptions.CurrentValue.AdvancedAgent.Enabled);
+        public bool AdvancedAgentEnabled => this.policySettingsAgent.GetValue<bool>("AdvancedAgentEnabled", agentOptions.CurrentValue.AdvancedAgent.Enabled);
 
         public AgentAuthenticationMode AuthenticationMode => this.policySettingsAgent.GetValue<AgentAuthenticationMode>("AuthenticationMode", agentOptions.CurrentValue.AdvancedAgent.AuthenticationMode);
 
@@ -87,6 +87,7 @@ namespace Lithnet.AccessManager.Agent.Providers
         }
 
         public int CheckInIntervalHours => this.policySettingsAgent.GetValue<int>("CheckInIntervalHours", agentOptions.CurrentValue.CheckInIntervalHours);
+
         public TimeSpan MetadataCacheDuration => TimeSpan.FromHours(this.policySettingsAgent.GetValue<int>("MetadataCacheDurationHours", (int)agentOptions.CurrentValue.AdvancedAgent.MetadataCacheDuration.TotalHours));
 
         public RegistrationState RegistrationState

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using FluentValidation;
+using Lithnet.AccessManager.Api;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
@@ -144,6 +145,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<DatabaseConfigurationOptions>().ToInstance(appconfig.DatabaseConfiguration);
                 builder.Bind<DataProtectionOptions>().ToInstance(appconfig.DataProtection);
                 builder.Bind<AdminNotificationOptions>().ToInstance(appconfig.AdminNotifications);
+                builder.Bind<AzureAdOptions>().ToInstance(appconfig.AzureAd);
 
                 // ViewModel factories
                 builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
@@ -179,7 +181,9 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<INotifyModelChangedEventPublisher>().To<NotifyModelChangedEventPublisher>();
                 builder.Bind<IShellExecuteProvider>().To<ShellExecuteProvider>();
                 builder.Bind<IDomainTrustProvider>().To<DomainTrustProvider>();
-                builder.Bind<IComputerTargetProvider>().To<ComputerTargetProviderLegacy>();
+                builder.Bind<IComputerTargetProvider>().To<ActiveDirectoryComputerTargetProvider>();
+                builder.Bind<IComputerTargetProvider>().To<AzureActiveDirectoryComputerTargetProvider>();
+                builder.Bind<IComputerTargetProvider>().To<AmsComputerTargetProvider>();
                 builder.Bind<IObjectSelectionProvider>().To<ObjectSelectionProvider>();
                 builder.Bind<ITargetDataProvider>().To<TargetDataProvider>();
                 builder.Bind<ITargetDataCache>().To<TargetDataCache>();
@@ -195,6 +199,9 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IApplicationUpgradeProvider>().To<ApplicationUpgradeProvider>();
                 builder.Bind<IFirewallProvider>().To<FirewallProvider>();
                 builder.Bind<IHttpSysConfigurationProvider>().To<HttpSysConfigurationProvider>();
+                builder.Bind<IAadGraphApiProvider>().To<AadGraphApiProvider>();
+
+
                 builder.Bind<SqlServerInstanceProvider>().ToSelf();
 
                 builder.Bind<IProtectedSecretProvider>().To<ProtectedSecretProvider>().InSingletonScope();

@@ -31,7 +31,9 @@ namespace Lithnet.AccessManager.Agent.Authentication
 
         public async Task<string> GetAccessToken()
         {
-            if (!this.settings.AdvancedAgentEnabled || (this.settings.AuthenticationMode != AgentAuthenticationMode.Ssa && this.settings.AuthenticationMode != AgentAuthenticationMode.Aadj))
+            if (!this.settings.AdvancedAgentEnabled || 
+                (this.settings.AuthenticationMode != AgentAuthenticationMode.Ssa && 
+                 this.settings.AuthenticationMode != AgentAuthenticationMode.Aadj))
             {
                 throw new InvalidOperationException("X509 authentication is not enabled");
             }

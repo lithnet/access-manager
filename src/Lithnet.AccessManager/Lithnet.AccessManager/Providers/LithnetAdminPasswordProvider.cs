@@ -187,17 +187,23 @@ namespace Lithnet.AccessManager
         {
             DirectoryEntry de = computer.DirectoryEntry;
 
-            de.Properties[AttrLithnetAdminPasswordHistory].Clear();
-            de.CommitChanges();
+            if (de.Properties.Contains(AttrLithnetAdminPasswordHistory))
+            {
+                de.Properties[AttrLithnetAdminPasswordHistory].Clear();
+                de.CommitChanges();
+            }
         }
 
         public void ClearPassword(IActiveDirectoryComputer computer)
         {
             DirectoryEntry de = computer.DirectoryEntry;
 
-            de.Properties[AttrLithnetAdminPassword].Clear();
-            de.Properties[AttrLithnetAdminPasswordExpiry].Clear();
-            de.CommitChanges();
+            if (de.Properties.Contains(AttrLithnetAdminPassword) || de.Properties.Contains(AttrLithnetAdminPasswordExpiry))
+            {
+                de.Properties[AttrLithnetAdminPassword].Clear();
+                de.Properties[AttrLithnetAdminPasswordExpiry].Clear();
+                de.CommitChanges();
+            }
         }
 
         internal List<ProtectedPasswordHistoryItem> PruneHistoryItems(IEnumerable<ProtectedPasswordHistoryItem> items, int maximumPasswordHistoryDays)

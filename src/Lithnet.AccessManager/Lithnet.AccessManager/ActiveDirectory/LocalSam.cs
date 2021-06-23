@@ -23,6 +23,12 @@ namespace Lithnet.AccessManager
             this.logger = logger;
         }
 
+        public bool IsDomainJoined()
+        {
+            Vanara.PInvoke.NetApi32.NetGetJoinInformation(null, out string name, out var type).ThrowIfFailed();
+            return type == Vanara.PInvoke.NetApi32.NETSETUP_JOIN_STATUS.NetSetupDomainName;
+        }
+
         public SecurityIdentifier GetWellKnownSid(WellKnownSidType sidType)
         {
             return NativeMethods.CreateWellKnownSid(sidType);

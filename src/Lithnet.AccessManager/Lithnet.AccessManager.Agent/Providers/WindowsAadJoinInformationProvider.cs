@@ -36,40 +36,46 @@ namespace Lithnet.AccessManager.Agent.Providers
             {
                 return this.joinInfoCache;
             }
-
-            DSREG_JOIN_INFO j = await this.GetJoinInfoCurrentUser();
-
-            if (j != null && !j.IsNull)
-            {
-                this.joinInfoCache = j;
-                return j;
-            }
-
-            throw new ComputerNotAadJoinedException();
-        }
-
-        private async Task<DSREG_JOIN_INFO> GetJoinInfoCurrentUser()
-        {
             var metadata = await metadataProvider.GetMetadata();
+            bool aadrAllowed = metadata.AgentAuthentication.AllowedOptions.Contains("aadr");
 
             foreach (var tenantId in metadata.AgentAuthentication.AllowedAzureAdTenants)
             {
-                NativeMethods.NetGetAadJoinInformation(tenantId, out DSREG_JOIN_INFO joinInfo2).ThrowIfFailed();
+                DSREG_JOIN_INFO j = this.GetJoinInfoCurrentUser(tenantId);
 
-                if (!joinInfo2.IsNull)
+                if (j != null && !j.IsNull)
                 {
-                    this.logger.LogTrace("Got AAD join information");
-                    this.logger.LogTrace($"Device ID: {joinInfo2.pszDeviceId}\r\n" +
-                                         $"Domain: {joinInfo2.pszIdpDomain}\r\n" +
-                                         $"Join type: {joinInfo2.joinType} \r\n" +
-                                         $"Tenant Name: {joinInfo2.pszTenantDisplayName}\r\n" +
-                                         $"Tenant ID: {joinInfo2.pszTenantId}\r\n");
+                    if (!aadrAllowed && j.joinType != NetApi32.DSREG_JOIN_TYPE.DSREG_DEVICE_JOIN)
+                    {
+                        continue;
+                    }
 
-                    return joinInfo2;
+                    this.joinInfoCache = j;
+                    return j;
                 }
             }
 
             this.logger.LogWarning($"Could not find suitable Azure AD tenant join information for the allowed Azure AD tenants. Allowed tenants -> {string.Join(',', metadata.AgentAuthentication.AllowedAzureAdTenants)}");
+
+            throw new ComputerNotAadJoinedException();
+        }
+
+        private DSREG_JOIN_INFO GetJoinInfoCurrentUser(string tenantId)
+        {
+            NativeMethods.NetGetAadJoinInformation(tenantId, out DSREG_JOIN_INFO joinInfo2).ThrowIfFailed();
+
+            if (!joinInfo2.IsNull)
+            {
+                this.logger.LogTrace("Got AAD join information");
+                this.logger.LogTrace($"Device ID: {joinInfo2.pszDeviceId}\r\n" +
+                                     $"Domain: {joinInfo2.pszIdpDomain}\r\n" +
+                                     $"Join type: {joinInfo2.joinType} \r\n" +
+                                     $"Tenant Name: {joinInfo2.pszTenantDisplayName}\r\n" +
+                                     $"Tenant ID: {joinInfo2.pszTenantId}\r\n");
+
+                return joinInfo2;
+            }
+
             return null;
         }
 
@@ -225,6 +231,8 @@ namespace Lithnet.AccessManager.Agent.Providers
                 profileInfo.lpUserName = username;
                 profileInfo.dwSize = (uint)Marshal.SizeOf(profileInfo);
 
+                var metadata = await metadataProvider.GetMetadata();
+
                 try
                 {
                     logger.LogInformation($"My username is {Environment.UserName}");
@@ -237,9 +245,9 @@ namespace Lithnet.AccessManager.Agent.Providers
                     loadedProfile = true;
                     logger.LogInformation("Loaded user profile");
 
-                    async Task<DSREG_JOIN_INFO> Find()
+                    DSREG_JOIN_INFO Find()
                     {
-                        var data = await this.GetJoinInfoCurrentUser();
+                        var data = this.GetJoinInfoCurrentUser(null);
 
                         if (data != null && !data.IsNull)
                         {
@@ -254,7 +262,7 @@ namespace Lithnet.AccessManager.Agent.Providers
                         return data;
                     }
 
-                    return await WindowsIdentity.RunImpersonatedAsync(
+                    return WindowsIdentity.RunImpersonated(
                         new Microsoft.Win32.SafeHandles.SafeAccessTokenHandle(newToken.DangerousGetHandle()),
                         Find);
                 }

@@ -11,7 +11,24 @@ schemaVersion="1.0" xmlns="http://www.microsoft.com/GroupPolicy/PolicyDefinition
       <string id="pol_enableAgent">Enable the Lithnet Access Manager Agent</string>
       <string id="pol_enableAgent_help">When enabled, the agent will run at the interval specified below to check for required local admin password changes. Note that the local admin password settings must be enabled independently of this setting</string>
 
+      <string id="pol_enableAdvancedAgent">Enable advanced mode</string>
+      <string id="pol_enableAdvancedAgent_help">When enabled, the agent will be able to manage passwords on non-domain joined machines and AAD-managed devices.
+        
+Specify the fully qualified server name of the AMS server (eg ams.lithnet.local)
+
+The agent can authenticate with the AMS server using one of the following authentication types
+        
+Active Directory - Uses Integrated Windows Authentication to authenticate to the AMS server. This can only be used on domain-joined hosts. If the AMS server is in a forest that the host cannot authenticate to (eg a one-way trust), then this method of authentication is not supported
+Azure Active Directory - Azure AD joined devices can authenticate to the AMS server using their Azure AD identity
+Access Manager - The AMS server authenticates clients that have registered using a registration key
+      </string>
+
+      <string id="pol_iwa">Active Directory</string>
+      <string id="pol_aadj">Azure Active Directory</string>
+      <string id="pol_ssa">Access Manager</string>
+
       <string id="TS_SUPPORTED_OS">At least Microsoft Windows 8.1 or Windows Server 2012</string>
+      <string id="TS_SUPPORTED_OS_10">At least Microsoft Windows 10 or Windows Server 2016</string>
     </stringTable>
 
     <presentationTable>
@@ -20,6 +37,13 @@ schemaVersion="1.0" xmlns="http://www.microsoft.com/GroupPolicy/PolicyDefinition
         <decimalTextBox refId="dtxt_interval" defaultValue="60">Agent check interval (minutes)</decimalTextBox>
       </presentation>
 
+
+      <presentation id="pol_enableAdvancedAgent">
+        <textBox refId="txt_server">
+          <label>AMS server hostname</label>
+        </textBox>
+        <dropdownList refId="enum_authOptions" noSort="true" defaultItem="1">Authentication provider</dropdownList>
+      </presentation>
     </presentationTable>
   </resources>
 </policyDefinitionResources>

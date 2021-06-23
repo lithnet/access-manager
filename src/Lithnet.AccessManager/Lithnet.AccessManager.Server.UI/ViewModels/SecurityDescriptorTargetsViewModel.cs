@@ -26,7 +26,7 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private const int childWindowHeight = 586;
         private const int childWindowWidth = 862;
-        private readonly IComputerTargetProvider computerTargetProvider;
+        private readonly IEnumerable<IComputerTargetProvider> computerTargetProviders;
         private readonly SecurityDescriptorTargetViewModelComparer customComparer;
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IDirectory directory;
@@ -44,14 +44,14 @@ namespace Lithnet.AccessManager.Server.UI
 
         public Task Initialization { get; private set; }
 
-        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, ISecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IComputerTargetProvider computerTargetProvider, IEffectiveAccessViewModelFactory effectiveAccessFactory, IShellExecuteProvider shellExecuteProvider)
+        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, ISecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IEnumerable<IComputerTargetProvider> computerTargetProviders, IEffectiveAccessViewModelFactory effectiveAccessFactory, IShellExecuteProvider shellExecuteProvider)
         {
             this.factory = factory;
             this.Model = model;
             this.dialogCoordinator = dialogCoordinator;
             this.logger = logger;
             this.directory = directory;
-            this.computerTargetProvider = computerTargetProvider;
+            this.computerTargetProviders = computerTargetProviders;
             this.effectiveAccessFactory = effectiveAccessFactory;
             this.shellExecuteProvider = shellExecuteProvider;
             this.customComparer = new SecurityDescriptorTargetViewModelComparer();
@@ -162,7 +162,17 @@ namespace Lithnet.AccessManager.Server.UI
 
                             this.matchedComputerViewModels = new HashSet<string>();
 
-                            foreach (var item in this.computerTargetProvider.GetMatchingTargetsForComputer(computer, this.Model))
+                            List<SecurityDescriptorTarget> targets = new List<SecurityDescriptorTarget>();
+
+                            foreach (var computerTargetProvider in this.computerTargetProviders)
+                            {
+                                if (computerTargetProvider.CanProcess(computer))
+                                {
+                                    targets.AddRange(await computerTargetProvider.GetMatchingTargetsForComputer(computer, this.Model));
+                                }
+                            }
+
+                            foreach (var item in targets)
                             {
                                 this.matchedComputerViewModels.Add(item.Id);
                             }

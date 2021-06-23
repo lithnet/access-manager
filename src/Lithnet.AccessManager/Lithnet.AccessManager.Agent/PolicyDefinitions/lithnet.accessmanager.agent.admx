@@ -38,5 +38,44 @@
         <decimal id="dtxt_interval" key="Software\Policies\Lithnet\Access Manager Agent" valueName="Interval" required="true" minValue="5" maxValue="1440"/>
       </elements>
     </policy>
+
+    <policy name="pol_enableAdvancedAgent"
+            class="Machine"
+            displayName="$(string.pol_enableAdvancedAgent)"
+            presentation="$(presentation.pol_enableAdvancedAgent)"
+            explainText="$(string.pol_enableAdvancedAgent_help)"
+            key="Software\Policies\Lithnet\Access Manager Agent"
+            valueName="AdvangedAgentEnabled">
+      <parentCategory ref="cat_lithnet_accessManagerAgent" />
+      <supportedOn ref="TS_SUPPORTED_OS_10" />
+      <enabledValue>
+        <decimal value="1" />
+      </enabledValue>
+      <disabledValue>
+        <decimal value="0" />
+      </disabledValue>
+      <elements>
+        <text id="txt_server" key="Software\Policies\Lithnet\Access Manager Agent" required="true" valueName="Server"/>
+        <enum id="enum_authOptions" key="Software\Policies\Lithnet\Access Manager Agent" required="true" valueName="AuthenticationMode"     >
+          <item displayName="$(string.pol_iwa)">
+            <value>
+              <decimal value="1"/>
+            </value>
+          </item>
+          <item displayName="$(string.pol_aadj)">
+            <value>
+              <decimal value="2"/>
+            </value>
+          </item>
+          <item displayName="$(string.pol_ssa)">
+            <value>
+              <decimal value="4"/>
+            </value>
+          </item>
+        </enum>
+      </elements>
+    </policy>
+
+
   </policies>
 </policyDefinitions>
