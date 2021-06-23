@@ -87,6 +87,7 @@ namespace Lithnet.AccessManager.Agent.Providers
         }
 
         public int CheckInIntervalHours => this.policySettingsAgent.GetValue<int>("CheckInIntervalHours", agentOptions.CurrentValue.CheckInIntervalHours);
+        public TimeSpan MetadataCacheDuration => TimeSpan.FromHours(this.policySettingsAgent.GetValue<int>("MetadataCacheDurationHours", (int)agentOptions.CurrentValue.AdvancedAgent.MetadataCacheDuration.TotalHours));
 
         public RegistrationState RegistrationState
         {

@@ -13,6 +13,8 @@ namespace Lithnet.AccessManager.Agent
         private readonly IHttpClientFactory httpClientFactory;
         private readonly ISettingsProvider settingsProvider;
         private X509Certificate2 cachedCertificate;
+        private DateTime lastMetadataRetrieval;
+        private MetadataResponse cachedMetadata;
 
         public MetadataProvider(IHttpClientFactory httpClientFactory,  ISettingsProvider settingsProvider)
         {
@@ -20,7 +22,20 @@ namespace Lithnet.AccessManager.Agent
             this.settingsProvider = settingsProvider;
         }
 
+
         public async Task<MetadataResponse> GetMetadata()
+        {
+            if (this.cachedMetadata == null || lastMetadataRetrieval.Add(this.settingsProvider.MetadataCacheDuration) < DateTime.UtcNow)
+            {
+                this.cachedMetadata = await RetrieveMetadata();
+                this.lastMetadataRetrieval = DateTime.UtcNow;
+            }
+
+            return this.cachedMetadata;
+        }
+
+
+        private async Task<MetadataResponse> RetrieveMetadata()
         {
             using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthAnonymous);
             using var httpResponseMessage = await client.GetAsync($"agent/metadata");

@@ -51,5 +51,7 @@ namespace Lithnet.AccessManager.Agent.Providers
         DateTime LastCheckIn { get; set; }
 
         int CheckInIntervalHours { get; }
+
+        TimeSpan MetadataCacheDuration { get; }
     }
 }

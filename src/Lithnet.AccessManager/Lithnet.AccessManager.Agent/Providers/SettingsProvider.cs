@@ -97,6 +97,8 @@ namespace Lithnet.AccessManager.Agent.Providers
         }
 
         public int CheckInIntervalHours => this.agentOptions.CurrentValue.CheckInIntervalHours;
+        
+        public TimeSpan MetadataCacheDuration => this.agentOptions.CurrentValue.AdvancedAgent.MetadataCacheDuration;
 
         public int LithnetLocalAdminPasswordHistoryDaysToKeep => this.agentOptions.CurrentValue.PasswordManagement.ActiveDirectorySettings.LithnetLocalAdminPasswordHistoryDaysToKeep;
 
