@@ -38,10 +38,16 @@ namespace Lithnet.AccessManager.Agent
 
             try
             {
-                if (typeof(T) == typeof(bool))
+                Type ttype = typeof(T);
+
+                if (ttype == typeof(bool))
                 {
                     int val = (int)Convert.ChangeType(rawvalue, typeof(int));
                     return (T)(object)(val != 0);
+                }
+                else if (ttype.IsEnum)
+                {
+                    return (T)rawvalue;
                 }
                 else
                 {
