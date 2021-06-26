@@ -15,6 +15,7 @@
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <RuntimeIdentifiers>win-x64;win-x86</RuntimeIdentifiers>
     <ApplicationIcon>access-manager.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>

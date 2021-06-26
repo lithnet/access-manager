@@ -36,6 +36,13 @@ namespace Lithnet.AccessManager.Agent.Providers
             {
                 return this.joinInfoCache;
             }
+
+            
+            if (Environment.OSVersion.Version.Major < 10)
+            {
+                throw new ComputerNotAadJoinedException();
+            }
+
             var metadata = await metadataProvider.GetMetadata();
             bool aadrAllowed = metadata.AgentAuthentication.AllowedOptions.Contains("aadr");
 

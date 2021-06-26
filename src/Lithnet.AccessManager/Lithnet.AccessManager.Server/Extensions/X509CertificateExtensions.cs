@@ -12,7 +12,7 @@ namespace Lithnet.AccessManager.Server
         public static FileSecurity GetPrivateKeySecurity(this X509Certificate2 cert)
         {
             string location = GetPrivateKeyPath(cert);
-
+            
             if (location == null)
             {
                 throw new CertificateNotFoundException("The certificate private key was not found");
