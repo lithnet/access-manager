@@ -162,6 +162,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IEffectiveAccessViewModelFactory>().To<EffectiveAccessViewModelFactory>();
                 builder.Bind<IImportProviderFactory>().To<ImportProviderFactory>();
                 builder.Bind<IImportResultsViewModelFactory>().To<ImportResultsViewModelFactory>();
+                builder.Bind<IAzureAdTenantDetailsViewModelFactory>().To<AzureAdTenantDetailsViewModelFactory>();
 
                 // Services
                 builder.Bind<RandomNumberGenerator>().ToInstance(RandomNumberGenerator.Create());
@@ -218,6 +219,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind(typeof(IOptions<>)).To(typeof(OptionsWrapper<>)).InSingletonScope();
                 builder.Bind(typeof(IOptionsSnapshot<>)).To(typeof(OptionsManager<>));
                 builder.Bind(typeof(IOptionsFactory<>)).To(typeof(OptionsFactory<>));
+                builder.Bind(typeof(IOptionsMonitor<>)).To(typeof(OptionsMonitor<>));
                 builder.Bind(typeof(IOptionsMonitorCache<>)).To(typeof(OptionsCache<>)).InSingletonScope();
 
                 base.ConfigureIoC(builder);

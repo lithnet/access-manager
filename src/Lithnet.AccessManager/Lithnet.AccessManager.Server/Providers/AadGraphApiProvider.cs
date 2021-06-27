@@ -5,40 +5,52 @@ using Microsoft.Graph.Auth;
 using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.Configuration;
 
 namespace Lithnet.AccessManager.Server
 {
     public class AadGraphApiProvider : IAadGraphApiProvider
     {
-        private readonly IOptions<AzureAdOptions> azureAdOptions;
+        private readonly IOptionsMonitor<AzureAdOptions> azureAdOptions;
         private readonly Dictionary<string, IGraphServiceClient> clients;
         private readonly IProtectedSecretProvider protectedSecretProvider;
 
-        public AadGraphApiProvider(IOptions<AzureAdOptions> azureAdOptions, IProtectedSecretProvider protectedSecretProvider)
+        public AadGraphApiProvider(IOptionsMonitor<AzureAdOptions> azureAdOptions, IProtectedSecretProvider protectedSecretProvider)
         {
-            this.azureAdOptions = azureAdOptions;
-            this.protectedSecretProvider = protectedSecretProvider;
             this.clients = new Dictionary<string, IGraphServiceClient>(StringComparer.OrdinalIgnoreCase);
+
+            this.azureAdOptions = azureAdOptions;
+            this.azureAdOptions.OnChange(x => this.Initialize());
+            this.protectedSecretProvider = protectedSecretProvider;
             this.Initialize();
         }
 
         private void Initialize()
         {
-            foreach (var tenant in this.azureAdOptions.Value.Tenants)
-            {
-                IConfidentialClientApplication confidentialClientApplication = ConfidentialClientApplicationBuilder
-                    .Create(tenant.ClientId)
-                    .WithTenantId(tenant.TenantId)
-                    .WithClientSecret(this.protectedSecretProvider.UnprotectSecret(tenant.ClientSecret))
-                    .Build();
+            this.clients.Clear();
 
+            foreach (var tenant in this.azureAdOptions.CurrentValue.Tenants)
+            {
+                IConfidentialClientApplication confidentialClientApplication = this.BuildConfidentialClientApplication(tenant.TenantId, tenant.ClientId, tenant.ClientSecret);
                 ClientCredentialProvider authProvider = new ClientCredentialProvider(confidentialClientApplication);
                 this.clients.Add(tenant.TenantId, new GraphServiceClient(authProvider));
             }
+        }
+
+        private IConfidentialClientApplication BuildConfidentialClientApplication(string tenantId, string clientId, ProtectedSecret clientSecret)
+        {
+            IConfidentialClientApplication confidentialClientApplication = ConfidentialClientApplicationBuilder
+                .Create(clientId)
+                .WithTenantId(tenantId)
+                .WithClientSecret(this.protectedSecretProvider.UnprotectSecret(clientSecret))
+                .Build();
+
+            return confidentialClientApplication;
         }
 
         private IGraphServiceClient GetClient(string tenantId)
@@ -49,6 +61,72 @@ namespace Lithnet.AccessManager.Server
             }
 
             return client;
+        }
+
+        public void AddOrUpdateClientCredentials(string tenantId, string clientId, ProtectedSecret secret)
+        {
+            if (this.clients.ContainsKey(tenantId))
+            {
+                this.clients.Remove(tenantId);
+            }
+
+            IConfidentialClientApplication confidentialClientApplication = this.BuildConfidentialClientApplication(tenantId, clientId, secret);
+            ClientCredentialProvider authProvider = new ClientCredentialProvider(confidentialClientApplication);
+            this.clients.Add(tenantId, new GraphServiceClient(authProvider));
+        }
+
+        public async Task ValidateCredentials(string tenantId, string clientId, ProtectedSecret secret)
+        {
+            await this.ValidateCredentials(tenantId, clientId, secret, new string[] { "Device.Read.All", "Group.Read.All", "Organization.Read.All" });
+        }
+
+        public async Task<string> GetTenantOrgName(string tenantId)
+        {
+            var org = await this.GetClient(tenantId).Organization.Request().GetAsync();
+            if (org.Count == 0)
+            {
+                return null;
+            }
+
+            return org[0].DisplayName;
+        }
+
+        public async Task ValidateCredentials(string tenantId, string clientId, ProtectedSecret secret, string[] requiredRoles)
+        {
+            IConfidentialClientApplication confidentialClientApplication = this.BuildConfidentialClientApplication(tenantId, clientId, secret);
+
+            var token = await confidentialClientApplication.AcquireTokenForClient(new string[] { "https://graph.microsoft.com/.default" }).WithForceRefresh(true).ExecuteAsync();
+
+            if (requiredRoles == null)
+            {
+                return;
+            }
+
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            var securityToken = tokenHandler.ReadToken(token.AccessToken) as JwtSecurityToken;
+            List<string> missingRoles = new List<string>();
+
+            var claims = securityToken?.Claims.Where(t => string.Equals(t.Type, "roles", StringComparison.OrdinalIgnoreCase))?.ToList();
+
+            if (claims == null || claims.Count == 0)
+            {
+                missingRoles.AddRange(requiredRoles);
+            }
+            else
+            {
+                foreach (var requiredRole in requiredRoles)
+                {
+                    if (!claims.Any(t => string.Equals(t.Value, requiredRole, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        missingRoles.Add(requiredRole);
+                    }
+                }
+            }
+
+            if (missingRoles.Count > 0)
+            {
+                throw new AadMissingPermissionException($"The application was missing the following API permissions - {string.Join(',', missingRoles)}", missingRoles);
+            }
         }
 
         public async Task<IList<Group>> GetDeviceGroups(string tenant, string objectId)

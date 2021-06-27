@@ -9,5 +9,7 @@ namespace Lithnet.AccessManager.Api
         public ProtectedSecret ClientSecret { get; set; }
 
         public string TenantId { get; set; }
+
+        public string TenantName { get; set; }
     }
 }
