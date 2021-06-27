@@ -22,51 +22,57 @@
             <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Azure Active Directory tenant setup" />
         </DockPanel>
 
+        <local:EnterpriseEditionBadge Visibility="{Binding ShowEnterpriseEditionBanner, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                      ToolTipText="Managing Azure Active Directory devices is an enterprise edition feature. Click to learn more"
+                                      Click="{s:Action LinkHaLearnMore}"
+                                      Margin="2 2 5 2" />
+
         <TextBlock Margin="10 5 5 5"
                    TextWrapping="Wrap">In order to manage Azure Active Directory-managed devices, AMS requires access to your Azure tenant. Create a new enterprise application, and assign it the appropriate API permissions.
         </TextBlock>
 
-        <ListView BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
+        <StackPanel IsEnabled="{Binding IsEnterpriseEdition}">
+            <ListView BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
                   ItemsSource="{Binding Tenants}"
                   SelectedItem="{Binding SelectedTenant}"
                   ScrollViewer.VerticalScrollBarVisibility="Auto" 
                   Height="200"
                   MouseDoubleClick="{s:Action Edit}"
                   Margin="10 5 5 5">
-            <b:Interaction.Behaviors>
-                <local:ListViewScrollBarBehavior />
-            </b:Interaction.Behaviors>
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Tenant name" 
+                <b:Interaction.Behaviors>
+                    <local:ListViewScrollBarBehavior />
+                </b:Interaction.Behaviors>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Tenant name" 
                                             DisplayMemberBinding="{Binding TenantName}" 
                                             Width="Auto"/>
-                    <GridViewColumn Header="Tenant ID"
+                        <GridViewColumn Header="Tenant ID"
                                             DisplayMemberBinding="{Binding TenantId}" 
                                             Width="Auto"/>
-                    <GridViewColumn Header="Client ID"
+                        <GridViewColumn Header="Client ID"
                                             DisplayMemberBinding="{Binding ClientId}" 
                                             Width="Auto"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
+                    </GridView>
+                </ListView.View>
+            </ListView>
 
-        <StackPanel Orientation="Horizontal"
+            <StackPanel Orientation="Horizontal"
                     Margin="10 5 5 5">
-            <Button Command="{s:Action Add}" 
+                <Button Command="{s:Action Add}" 
                     Content="Add..." 
                     Margin="5"/>
-            <Button Command="{s:Action Delete}"
+                <Button Command="{s:Action Delete}"
                     Content="Delete selected..."
                     Margin="5"/>
-            <Button Command="{s:Action Edit}"
+                <Button Command="{s:Action Edit}"
                     Content="Edit selected..."
                     Margin="5"/>
-            <Button Command="{s:Action Test}"
+                <Button Command="{s:Action Test}"
                     Margin="5"  
                     VerticalContentAlignment="Center"
                     Content="Test..."/>
+            </StackPanel>
         </StackPanel>
-
     </StackPanel>
 </UserControl>

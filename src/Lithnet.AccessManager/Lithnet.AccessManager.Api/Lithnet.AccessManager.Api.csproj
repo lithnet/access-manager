@@ -3,6 +3,19 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>04688640-df86-471c-95f1-bab9d3a1c0c4</UserSecretsId>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <Company>Lithnet</Company>
+    <Product>Access Manager</Product>
+    <Authors>Lithnet</Authors>
+    <Description>Lithnet Access Manager</Description>
+    <Copyright>(c) 2020 Lithnet</Copyright>
+    <PackageProjectUrl>https://github.com/lithnet/access-manager</PackageProjectUrl>
+    <Deterministic>false</Deterministic>
+    <Platforms>AnyCPU</Platforms>
+    <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
+
+    <!--PowerShell fails without a version-specific identifier https://stackoverflow.com/a/56756599/3274702 -->
+    <RuntimeIdentifier>win8-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>

@@ -7,6 +7,7 @@ using Stylet;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Enterprise;
 using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -20,18 +21,26 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IAadGraphApiProvider graphApiProvider;
         private readonly ILogger<AzureAdConfigurationViewModel> logger;
+        private readonly IAmsLicenseManager licenseManager;
 
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.DirectionsSolid;
 
-        public AzureAdConfigurationViewModel(AzureAdOptions aadOptions, IDialogCoordinator dialogCoordinator, IAzureAdTenantDetailsViewModelFactory tenantFactory, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IAadGraphApiProvider graphApiProvider, ILogger<AzureAdConfigurationViewModel> logger)
+        public AzureAdConfigurationViewModel(AzureAdOptions aadOptions, IDialogCoordinator dialogCoordinator, IAzureAdTenantDetailsViewModelFactory tenantFactory, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IAadGraphApiProvider graphApiProvider, ILogger<AzureAdConfigurationViewModel> logger, IAmsLicenseManager licenseManager)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.graphApiProvider = graphApiProvider;
             this.logger = logger;
+            this.licenseManager = licenseManager;
             this.dialogCoordinator = dialogCoordinator;
             this.aadOptions = aadOptions;
             this.tenantFactory = tenantFactory;
             this.eventPublisher = eventPublisher;
+
+            this.licenseManager.OnLicenseDataChanged += delegate
+            {
+                this.NotifyOfPropertyChange(nameof(this.IsEnterpriseEdition));
+                this.NotifyOfPropertyChange(nameof(this.ShowEnterpriseEditionBanner));
+            };
 
             this.DisplayName = "Azure Active Directory";
             this.Tenants = new BindableCollection<AzureAdTenantDetailsViewModel>();
@@ -49,6 +58,15 @@ namespace Lithnet.AccessManager.Server.UI
                 this.eventPublisher.Register(this);
             });
         }
+
+        public async Task LinkHaLearnMore()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.EnterpriseEditionLearnMoreLinkHa);
+        }
+
+        public bool IsEnterpriseEdition => this.licenseManager.IsEnterpriseEdition();
+
+        public bool ShowEnterpriseEditionBanner => this.licenseManager.IsEvaluatingOrBuiltIn() || !this.licenseManager.IsEnterpriseEdition();
 
         [NotifyModelChangedCollection]
         public BindableCollection<AzureAdTenantDetailsViewModel> Tenants { get; }
