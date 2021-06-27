@@ -97,30 +97,6 @@
     <Compile Update="UIComponents\EnterpriseEditionBadge - Copy.xaml.cs">
       <DependentUpon>EnterpriseEditionBadge.xaml.cs</DependentUpon>
     </Compile>
-    <Compile Update="Views\JitConfigurationView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\LapsConfigurationView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\ActiveDirectoryConfigurationView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\JitGroupMappingView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\HelpView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\ScriptContentView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\SelectForestView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Update="Views\SelectTargetTypeView.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Update="Windows\ImportWizardWindowView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
