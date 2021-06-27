@@ -1,5 +1,6 @@
 using DbUp.Engine.Output;
 using Lithnet.AccessManager.Api.Providers;
+using Lithnet.AccessManager.Api.Shared;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Configuration;
@@ -8,6 +9,7 @@ using Lithnet.Licensing.Core;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -17,6 +19,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 
 namespace Lithnet.AccessManager.Api
 {
@@ -31,12 +34,16 @@ namespace Lithnet.AccessManager.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            if (!this.InitializeLicenseManager(services))
+            {
+                return;
+            }
+
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = null;
                     options.JsonSerializerOptions.IgnoreNullValues = true;
-                    options.JsonSerializerOptions.PropertyNamingPolicy = null;
                 });
 
             // Dependencies
@@ -52,7 +59,6 @@ namespace Lithnet.AccessManager.Api
             services.AddSingleton<IDiscoveryServices, DiscoveryServices>();
             services.AddSingleton<IWindowsServiceProvider, WindowsServiceProvider>();
             services.AddSingleton<IRegistryProvider>(new RegistryProvider(true));
-            services.AddSingleton<ILicenseDataProvider, OptionsMonitorLicenseDataProvider>();
             services.AddSingleton<IProtectedSecretProvider, ProtectedSecretProvider>();
             services.AddSingleton<IEncryptionProvider, EncryptionProvider>();
             services.AddSingleton<IWindowsServiceProvider, WindowsServiceProvider>();
@@ -74,7 +80,6 @@ namespace Lithnet.AccessManager.Api
             services.AddSingleton<RandomStringGenerator>();
 
             services.Configure<DatabaseConfigurationOptions>(this.Configuration.GetSection("DatabaseConfiguration"));
-            services.Configure<LicensingOptions>(this.Configuration.GetSection("Licensing"));
             services.Configure<AzureAdOptions>(this.Configuration.GetSection("AzureAd"));
             services.Configure<PasswordPolicyOptions>(this.Configuration.GetSection("PasswordPolicy"));
             services.Configure<AgentOptions>(this.Configuration.GetSection("Agent"));
@@ -82,10 +87,7 @@ namespace Lithnet.AccessManager.Api
             services.Configure<SignedAssertionValidationOptions>(this.Configuration.GetSection("TokenValidation"));
             services.Configure<DataProtectionOptions>(this.Configuration.GetSection("DataProtection"));
             services.Configure<ApiOptions>(this.Configuration.GetSection("Api"));
-
-
-            IAmsLicenseManager licenseManager = this.CreateLicenseManager(services);
-            services.AddSingleton(licenseManager);
+            services.Configure<HostingOptions>(Configuration.GetSection("Hosting"));
 
             this.ConfigureAuthentication(services);
         }
@@ -94,8 +96,8 @@ namespace Lithnet.AccessManager.Api
         {
             var serviceProvider = services.BuildServiceProvider();
             var tokenIssuerOptions = serviceProvider.GetRequiredService<IOptions<TokenIssuerOptions>>().Value;
-            var apiOptions = serviceProvider.GetRequiredService<IOptions<ApiOptions>>().Value;
             var secretProvider = serviceProvider.GetRequiredService<IProtectedSecretProvider>();
+            var hostingOptions = serviceProvider.GetRequiredService<IOptions<HostingOptions>>();
 
             SymmetricSecurityKey sharedKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretProvider.UnprotectSecret(tokenIssuerOptions.SigningKey)));
 
@@ -110,10 +112,10 @@ namespace Lithnet.AccessManager.Api
                         RequireExpirationTime = true,
                         ValidateLifetime = true,
                         ValidateAudience = true,
-                        ValidAudiences = apiOptions.BuildValidAudiences(),
+                        ValidAudience = hostingOptions.Value.HttpSys.BuildApiHostUrl(),
                         RequireAudience = true,
                         ValidateIssuer = true,
-                        ValidIssuer = tokenIssuerOptions.Issuer,
+                        ValidIssuer = hostingOptions.Value.HttpSys.BuildApiHostUrl(),
                         ValidAlgorithms = new[] { tokenIssuerOptions.SigningAlgorithm }
                     };
                 });
@@ -124,41 +126,35 @@ namespace Lithnet.AccessManager.Api
             });
         }
 
-        private IAmsLicenseManager CreateLicenseManager(IServiceCollection services)
+        private bool InitializeLicenseManager(IServiceCollection services)
         {
+            services.AddSingleton<ILicenseDataProvider, OptionsMonitorLicenseDataProvider>();
+            services.Configure<LicensingOptions>(this.Configuration.GetSection("Licensing"));
+
             ServiceProvider provider = services.BuildServiceProvider();
             ILicenseDataProvider licenseDataProvider = provider.GetService<ILicenseDataProvider>();
             ILogger<AmsLicenseManager> licenseLogger = provider.GetService<ILogger<AmsLicenseManager>>();
-            ILogger<ApiCoreStartup> logger = provider.GetService<ILogger<ApiCoreStartup>>();
             AmsLicenseManager licenseManager = new AmsLicenseManager(licenseLogger, licenseDataProvider);
 
-            try
-            {
-                ILicenseData license = licenseManager.GetLicense();
-                if (license != null)
-                {
-                    logger.LogTrace("License information\r\n{licenseData}", license.ToString());
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "An error occurred performing the license check. Enterprise edition features will not be available");
-            }
+            services.AddSingleton<IAmsLicenseManager>(licenseManager);
 
-            if (licenseManager.IsEnterpriseEdition())
-            {
-                logger.LogInformation("Starting Lithnet Access Manager Enterprise Edition");
-            }
-            else
-            {
-                logger.LogInformation("Starting Lithnet Access Manager Standard Edition");
-            }
-
-            return licenseManager;
+            return licenseManager.IsEnterpriseEdition();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IAmsLicenseManager licenseManager)
         {
+            if (!licenseManager.IsEnterpriseEdition())
+            {
+                app.Run(async context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+                    context.Response.ContentType = "application/json";
+
+                    await context.Response.WriteAsync(JsonSerializer.Serialize(new ApiError("not-licensed", "The AMS server does not have a license to allow API use")));
+                });
+                return;
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

@@ -1,20 +1,22 @@
-﻿using System;
-using System.Diagnostics;
-using System.Security.Cryptography.X509Certificates;
-using System.Security.Principal;
-using System.ServiceProcess;
-using System.Threading;
-using System.Threading.Tasks;
-using Lithnet.AccessManager.Enterprise;
+﻿using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using Lithnet.AccessManager.Server.UI.Providers;
-using Lithnet.Licensing.Core;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Stylet;
+using System;
+using System.Diagnostics;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Principal;
+using System.ServiceProcess;
+using System.Threading;
+using System.Threading.Tasks;
+using Lithnet.AccessManager.Api;
+using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -35,13 +37,15 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IRegistryProvider registryProvider;
         private readonly ISecretRekeyProvider rekeyProvider;
         private readonly IObjectSelectionProvider objectSelectionProvider;
-        private readonly IDiscoveryServices discoveryServices;
         private readonly IAmsLicenseManager licenseManager;
         private readonly IApplicationUpgradeProvider appUpgradeProvider;
         private readonly IHttpSysConfigurationProvider certificateBindingProvider;
         private readonly IFirewallProvider firewallProvider;
+        private readonly TokenIssuerOptions tokenIssuerOptions;
+        private readonly IProtectedSecretProvider protectedSecretProvider;
+        private readonly RandomNumberGenerator csp;
 
-        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, ISecretRekeyProvider rekeyProvider, IObjectSelectionProvider objectSelectionProvider, IDiscoveryServices discoveryServices, IAmsLicenseManager licenseManager, IApplicationUpgradeProvider appUpgradeProvider, IHttpSysConfigurationProvider certificateBindingProvider, IFirewallProvider firewallProvider)
+        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, ISecretRekeyProvider rekeyProvider, IObjectSelectionProvider objectSelectionProvider, IAmsLicenseManager licenseManager, IApplicationUpgradeProvider appUpgradeProvider, IHttpSysConfigurationProvider certificateBindingProvider, IFirewallProvider firewallProvider, TokenIssuerOptions tokenIssuerOptions, IProtectedSecretProvider protectedSecretProvider, RandomNumberGenerator csp)
         {
             this.logger = logger;
             this.pathProvider = pathProvider;
@@ -58,17 +62,20 @@ namespace Lithnet.AccessManager.Server.UI
             this.registryProvider = registryProvider;
             this.rekeyProvider = rekeyProvider;
             this.objectSelectionProvider = objectSelectionProvider;
-            this.discoveryServices = discoveryServices;
             this.licenseManager = licenseManager;
             this.appUpgradeProvider = appUpgradeProvider;
             this.certificateBindingProvider = certificateBindingProvider;
             this.firewallProvider = firewallProvider;
+            this.tokenIssuerOptions = tokenIssuerOptions;
+            this.protectedSecretProvider = protectedSecretProvider;
+            this.csp = csp;
 
             this.WorkingModel = this.CloneModel(model);
             this.Certificate = this.certificateBindingProvider.GetCertificate();
             this.OriginalCertificate = this.Certificate;
             this.ServiceAccount = this.windowsServiceProvider.GetServiceAccountSid();
             this.ServiceStatus = this.windowsServiceProvider.Status.ToString();
+            this.ApiEnabled = this.registryProvider.ApiEnabled;
             this.DisplayName = "Web hosting";
 
             this.licenseManager.OnLicenseDataChanged += delegate
@@ -131,6 +138,12 @@ namespace Lithnet.AccessManager.Server.UI
 
         [NotifyModelChangedProperty]
         public int HttpsPort { get => this.WorkingModel.HttpSys.HttpsPort; set => this.WorkingModel.HttpSys.HttpsPort = value; }
+
+        [NotifyModelChangedProperty]
+        public bool ApiEnabled { get; set; }
+
+        [NotifyModelChangedProperty]
+        public string ApiHostname { get => this.WorkingModel.HttpSys.ApiHostname; set => this.WorkingModel.HttpSys.ApiHostname = value; }
 
         public PackIconMaterialKind Icon => PackIconMaterialKind.Web;
 
@@ -262,9 +275,9 @@ namespace Lithnet.AccessManager.Server.UI
 
         private HostingOptions WorkingModel { get; set; }
 
-        private string workingServiceAccountPassword { get; set; }
+        private string workingServiceAccountPassword;
 
-        private string workingServiceAccountUserName { get; set; }
+        private string workingServiceAccountUserName;
 
         private void UpdateIsConfigured()
         {
@@ -281,6 +294,12 @@ namespace Lithnet.AccessManager.Server.UI
                 return false;
             }
 
+            if (this.ApiEnabled && string.IsNullOrWhiteSpace(this.WorkingModel.HttpSys.ApiHostname))
+            {
+                await this.dialogCoordinator.ShowMessageAsync(dialogContext, "Error", "You must specify the fully qualified DNS hostname that clients will use to connect to the API");
+                return false;
+            }
+
             this.UpdateIsConfigured();
 
             bool currentlyUnconfigured = this.IsUnconfigured;
@@ -291,7 +310,11 @@ namespace Lithnet.AccessManager.Server.UI
                 this.WorkingModel.HttpSys.HttpsPort != this.OriginalModel.HttpSys.HttpsPort ||
                 currentlyUnconfigured;
 
-            bool updateConfigFile = updateHttpReservations;
+            bool updateApi =
+                this.WorkingModel.HttpSys.ApiHostname != this.OriginalModel.HttpSys.ApiHostname ||
+                this.ApiEnabled != this.registryProvider.ApiEnabled;
+
+            bool updateConfigFile = updateHttpReservations || updateApi;
 
             bool updateFirewallRules = updateHttpReservations;
 
@@ -363,6 +386,31 @@ namespace Lithnet.AccessManager.Server.UI
 
             try
             {
+                if (updateApi)
+                {
+                    this.registryProvider.ApiEnabled = this.ApiEnabled;
+
+                    if (this.ApiEnabled)
+                    {
+                        if (this.tokenIssuerOptions.SigningKey == null)
+                        {
+                            byte[] buffer = new byte[128];
+                            this.csp.GetBytes(buffer);
+                            this.tokenIssuerOptions.SigningKey = this.protectedSecretProvider.ProtectSecret(Convert.ToBase64String(buffer));
+                            this.tokenIssuerOptions.SigningAlgorithm = "HS512";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIConfigurationSaveError, ex, "Could not change the API enabled state");
+                rollbackContext.Rollback(this.logger);
+                return false;
+            }
+
+            try
+            {
                 if (updateConfigFile)
                 {
                     this.SaveHostingConfigFile(rollbackContext);
@@ -422,7 +470,7 @@ namespace Lithnet.AccessManager.Server.UI
                 this.UpdateIsConfigured();
             }
 
-            if (updateCertificateBinding || updateHttpReservations || updateServiceAccount || updateConfigFile || updateFirewallRules)
+            if (updateCertificateBinding || updateHttpReservations || updateServiceAccount || updateConfigFile || updateFirewallRules || updateApi)
             {
                 this.OriginalModel = this.CloneModel(this.WorkingModel);
                 this.OriginalCertificate = this.Certificate;

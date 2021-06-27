@@ -55,6 +55,11 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Label Grid.Row="0"
@@ -331,7 +336,7 @@
                        TextWrapping="Wrap"
                        Margin="5 0 5 0" />
 
-            <Label Grid.Row="19"
+            <!--<Label Grid.Row="19"
                    Grid.Column="0"
                    Content="Hostname"
                    Margin="5" />
@@ -342,6 +347,48 @@
             <TextBlock Grid.Row="20"
                        Grid.Column="1"
                        Text="Optionally, enter a specific hostname to listen on. Leave this field blank to listen on all hostnames"
+                       TextWrapping="Wrap"
+                       Margin="5 0 5 0" />-->
+
+            <Label Grid.Row="21"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2"
+                   Style="{DynamicResource DescriptionHeaderStyle}"
+                   Content="API host" />
+
+
+
+
+            <StackPanel Orientation="Horizontal"
+                        Grid.Row="22"
+                        Grid.Column="1">
+                <CheckBox 
+                      Margin="5"
+                      Content="Enable the Access Manager API"
+                      IsEnabled="{Binding IsEnterpriseEdition, UpdateSourceTrigger=PropertyChanged}"
+                      IsChecked="{Binding ApiEnabled, UpdateSourceTrigger=PropertyChanged}"/>
+                <local:EnterpriseEditionBadge 
+                                           Visibility="{Binding ShowEnterpriseEditionBanner, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                           ToolTipText="Access Manager API is an enterprise edition feature. Click to learn more"
+                                           Click="{s:Action LinkHaLearnMore}"
+                                           VerticalAlignment="Center"
+                                           Margin="10 2 5 2" />
+            </StackPanel>
+
+            <TextBlock Grid.Row="24"
+                       Grid.Column="0"
+                       TextWrapping="Wrap"
+                       Text="API host name"
+                       Margin="5" />
+            <TextBox Grid.Row="24"
+                     Grid.Column="1"
+                     VerticalAlignment="Center"
+                     IsEnabled="{Binding IsEnterpriseEdition, UpdateSourceTrigger=PropertyChanged}"
+                     Text="{Binding ApiHostname, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="5 5 5 0" />
+            <TextBlock Grid.Row="25"
+                       Grid.Column="1"
+                       Text="Specify the fully qualified DNS name that API clients will connect to. The TLS certificate specified above must be valid for this host name for clients to be able to connect"
                        TextWrapping="Wrap"
                        Margin="5 0 5 0" />
         </Grid>

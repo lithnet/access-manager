@@ -146,6 +146,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<DataProtectionOptions>().ToInstance(appconfig.DataProtection);
                 builder.Bind<AdminNotificationOptions>().ToInstance(appconfig.AdminNotifications);
                 builder.Bind<AzureAdOptions>().ToInstance(appconfig.AzureAd);
+                builder.Bind<TokenIssuerOptions>().ToInstance(appconfig.TokenIssuer);
 
                 // ViewModel factories
                 builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();

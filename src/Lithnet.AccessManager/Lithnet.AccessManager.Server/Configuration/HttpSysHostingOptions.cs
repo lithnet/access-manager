@@ -14,6 +14,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public string Hostname { get; set; }
 
+        public string ApiHostname { get; set; }
+
         public string Path { get; set; }
 
         public int MaxAccepts { get; set; }
@@ -32,7 +34,20 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         [JsonConverter(typeof(StringEnumConverter))]
         public Http503VerbosityLevel Http503Verbosity { get; set; }
-      
+
+        public string BuildApiHostUrl(string audiencePath = null)
+        {
+            if (string.IsNullOrWhiteSpace(this.ApiHostname))
+            {
+                throw new ConfigurationException("The API hostname is not set in the application configuration");
+            }
+
+            string host = this.ApiHostname;
+            string port = this.HttpsPort == 443 ? string.Empty : ":" + this.HttpsPort.ToString();
+
+            return $"https://{host}{port}/{audiencePath}";
+        }
+
         public string BuildHttpUrlPrefix()
         {
             string host = "+";

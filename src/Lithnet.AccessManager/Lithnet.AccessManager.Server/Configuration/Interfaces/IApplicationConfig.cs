@@ -36,6 +36,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         JitConfigurationOptions JitConfiguration { get; set; }
 
+        TokenIssuerOptions TokenIssuer { get; set; }
+
         void Save(string file, bool forceOverwrite);
 
         bool HasFileBeenModified();

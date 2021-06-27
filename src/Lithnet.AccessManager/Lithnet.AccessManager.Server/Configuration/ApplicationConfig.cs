@@ -41,6 +41,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public JitConfigurationOptions JitConfiguration { get; set; } = new JitConfigurationOptions();
 
+        public TokenIssuerOptions TokenIssuer { get; set; } = new TokenIssuerOptions();
+
         [JsonExtensionData]
         public IDictionary<string, object> OtherData { get; set; }
 

@@ -54,7 +54,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                     throw new UnsupportedAuthenticationTypeException();
                 }
 
-                var unvalidatedToken = this.signedAssertionValidator.Validate(request.Assertion, "auth/x509", out X509Certificate2 signingCertificate);
+                var unvalidatedToken = this.signedAssertionValidator.Validate(request.Assertion, "api/v1.0/auth/x509", out X509Certificate2 signingCertificate);
 
                 var authModeClaim = this.GetClaimOrThrowIfMissingOrNull(unvalidatedToken.Claims, "auth-mode");
 

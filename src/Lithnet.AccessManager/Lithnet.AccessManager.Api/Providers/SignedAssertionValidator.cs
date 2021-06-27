@@ -4,18 +4,19 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography.X509Certificates;
+using Lithnet.AccessManager.Server.Configuration;
 
 namespace Lithnet.AccessManager.Api.Providers
 {
     public class SignedAssertionValidator : ISignedAssertionValidator
     {
         private readonly IOptions<SignedAssertionValidationOptions> validatorOptions;
-        private readonly IOptions<ApiOptions> apiOptions;
+        private readonly IOptions<HostingOptions> httpSysOptions;
 
-        public SignedAssertionValidator(IOptions<SignedAssertionValidationOptions> validatorOptions, IOptions<ApiOptions> apiOptions)
+        public SignedAssertionValidator(IOptions<SignedAssertionValidationOptions> validatorOptions, IOptions<HostingOptions> httpSysOptions)
         {
             this.validatorOptions = validatorOptions;
-            this.apiOptions = apiOptions;
+            this.httpSysOptions = httpSysOptions;
         }
 
         public JwtSecurityToken Validate(string assertion, string audiencePath, out X509Certificate2 signingCertificate)
@@ -34,7 +35,7 @@ namespace Lithnet.AccessManager.Api.Providers
                 ValidateTokenReplay = true,
                 ValidateIssuerSigningKey = false,
                 ValidAlgorithms = this.validatorOptions.Value.AllowedSigningAlgorithms,
-                ValidAudiences = this.apiOptions.Value.BuildValidAudiences(audiencePath),
+                ValidAudience = this.httpSysOptions.Value.HttpSys.BuildApiHostUrl(audiencePath),
                 IssuerSigningKey = new RsaSecurityKey(signingCertificate.GetRSAPublicKey())
             }, out SecurityToken validatedToken);
 

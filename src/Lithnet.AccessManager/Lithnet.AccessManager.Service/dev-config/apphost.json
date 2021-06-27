@@ -5,6 +5,7 @@
       "HttpPort": 80,
       "HttpsPort": 443,
       "Hostname": null,
+      "ApiHostname": "carbon.dev.lithnet.local",
       "Path": null,
       "MaxAccepts": 100,
       "EnableResponseCaching": false,

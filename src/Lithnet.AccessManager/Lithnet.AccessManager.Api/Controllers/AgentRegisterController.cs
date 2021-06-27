@@ -53,7 +53,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                     return this.Forbid(JwtBearerDefaults.AuthenticationScheme);
                 }
 
-                JwtSecurityToken token = this.assertionValidator.Validate(request.Assertion, "agent/register", out X509Certificate2 signingCertificate);
+                JwtSecurityToken token = this.assertionValidator.Validate(request.Assertion, "api/v1.0/agent/register", out X509Certificate2 signingCertificate);
 
                 Device device = await this.ValidateRegistrationClaims(token);
 

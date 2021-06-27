@@ -73,6 +73,22 @@ namespace Lithnet.AccessManager.Server
             }
         }
 
+        public bool ApiEnabled
+        {
+            get => (paramsKey?.GetValue("ApiEnabled", 0) is int value) && value == 1;
+            set
+            {
+                if (!value)
+                {
+                    paramsKey.DeleteValue("ApiEnabled", false);
+                }
+                else
+                {
+                    paramsKey.SetValue("ApiEnabled", 1);
+                }
+            }
+        }
+
         public bool ResetMaintenanceTaskSchedules
         {
             get => (paramsKey?.GetValue("ResetMaintenanceTaskSchedules", 0) is int value) && value == 1;

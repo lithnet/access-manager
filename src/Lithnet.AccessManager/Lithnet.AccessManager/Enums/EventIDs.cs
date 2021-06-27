@@ -91,6 +91,7 @@
         public const int DbDeleted = 5047;
         public const int NewVersionCheckJobFailed = 5048;
         public const int CertificateExpiryCheckJobFailed = 5049;
+        public const int ApiNotEnabled = 5050;
 
         // 6000 range - Reserved 
 

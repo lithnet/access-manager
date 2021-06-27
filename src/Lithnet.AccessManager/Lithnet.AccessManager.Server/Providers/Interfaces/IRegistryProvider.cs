@@ -29,5 +29,6 @@
         bool ResetScheduler { get; set; }
 
         bool ResetMaintenanceTaskSchedules { get; set; }
+        bool ApiEnabled { get; set; }
     }
 }
