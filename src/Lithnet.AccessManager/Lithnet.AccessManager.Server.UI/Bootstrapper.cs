@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Threading;
 using FluentValidation;
 using Lithnet.AccessManager.Api;
+using Lithnet.AccessManager.Api.Configuration;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
@@ -147,6 +148,10 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<AdminNotificationOptions>().ToInstance(appconfig.AdminNotifications);
                 builder.Bind<AzureAdOptions>().ToInstance(appconfig.AzureAd);
                 builder.Bind<TokenIssuerOptions>().ToInstance(appconfig.TokenIssuer);
+                builder.Bind<PasswordPolicyOptions>().ToInstance(appconfig.PasswordPolicy);
+                builder.Bind<ApiAuthenticationOptions>().ToInstance(appconfig.ApiAuthentication);
+                builder.Bind<AmsManagedDeviceRegistrationOptions>().ToInstance(appconfig.AmsManagedDevices);
+
 
                 // ViewModel factories
                 builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();

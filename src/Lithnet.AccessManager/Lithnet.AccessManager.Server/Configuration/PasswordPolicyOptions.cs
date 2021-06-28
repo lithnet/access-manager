@@ -14,5 +14,7 @@ namespace Lithnet.AccessManager.Api
         public int MaximumPasswordAgeDays { get; set; } = 7;
 
         public int RollbackWindowMinutes { get; set; } = 1;
+
+        public string EncryptionCertificateThumbprint { get; set; }
     }
 }

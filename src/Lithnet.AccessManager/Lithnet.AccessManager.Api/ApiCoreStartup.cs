@@ -20,6 +20,8 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
+using Lithnet.AccessManager.Api.Configuration;
 
 namespace Lithnet.AccessManager.Api
 {
@@ -82,12 +84,12 @@ namespace Lithnet.AccessManager.Api
             services.Configure<DatabaseConfigurationOptions>(this.Configuration.GetSection("DatabaseConfiguration"));
             services.Configure<AzureAdOptions>(this.Configuration.GetSection("AzureAd"));
             services.Configure<PasswordPolicyOptions>(this.Configuration.GetSection("PasswordPolicy"));
-            services.Configure<AgentOptions>(this.Configuration.GetSection("Agent"));
+            services.Configure<ApiAuthenticationOptions>(this.Configuration.GetSection("ApiAuthentication"));
             services.Configure<TokenIssuerOptions>(this.Configuration.GetSection("TokenIssuer"));
             services.Configure<SignedAssertionValidationOptions>(this.Configuration.GetSection("TokenValidation"));
             services.Configure<DataProtectionOptions>(this.Configuration.GetSection("DataProtection"));
-            services.Configure<ApiOptions>(this.Configuration.GetSection("Api"));
             services.Configure<HostingOptions>(Configuration.GetSection("Hosting"));
+            services.Configure<AmsManagedDeviceRegistrationOptions>(Configuration.GetSection("AmsManagedDevices"));
 
             this.ConfigureAuthentication(services);
         }
@@ -116,14 +118,11 @@ namespace Lithnet.AccessManager.Api
                         RequireAudience = true,
                         ValidateIssuer = true,
                         ValidIssuer = hostingOptions.Value.HttpSys.BuildApiHostUrl(),
-                        ValidAlgorithms = new[] { tokenIssuerOptions.SigningAlgorithm }
+                        ValidAlgorithms = new[] {tokenIssuerOptions.SigningAlgorithm}
                     };
                 });
 
-            services.AddAuthorization(o =>
-            {
-                o.AddPolicy("ComputersOnly", policy => policy.RequireClaim("object-type", "Computer"));
-            });
+            services.AddAuthorization(o => { o.AddPolicy("ComputersOnly", policy => policy.RequireClaim("object-type", "Computer")); });
         }
 
         private bool InitializeLicenseManager(IServiceCollection services)
@@ -141,7 +140,7 @@ namespace Lithnet.AccessManager.Api
             return licenseManager.IsEnterpriseEdition();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IAmsLicenseManager licenseManager)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IAmsLicenseManager licenseManager, IOptions<ApiAuthenticationOptions> agentAuthOptions)
         {
             if (!licenseManager.IsEnterpriseEdition())
             {
@@ -162,16 +161,33 @@ namespace Lithnet.AccessManager.Api
 
             app.UseHttpsRedirection();
 
+            app.MapWhen(context => context.Request.Path.StartsWithSegments("/auth/iwa") && !agentAuthOptions.Value.AllowWindowsAuth,
+                (IApplicationBuilder appBuilder) =>
+                {
+                    appBuilder.Run(async context =>
+                    {
+                        await Task.FromResult(context.Response.StatusCode = StatusCodes.Status403Forbidden);
+                    });
+                });
+
+            app.MapWhen(context => context.Request.Path.StartsWithSegments("/auth/x509") && !agentAuthOptions.Value.AllowX509Auth,
+                (IApplicationBuilder appBuilder) =>
+                {
+                    appBuilder.Run(async context =>
+                    {
+                        await Task.FromResult(context.Response.StatusCode = StatusCodes.Status403Forbidden);
+                    });
+                });
+
             app.UseRouting();
 
             app.UseAuthentication();
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+
+       
         }
     }
 }

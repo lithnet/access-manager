@@ -9,10 +9,10 @@
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="ARPPRODUCTICON" Value="accessmanager.exe" Type="8"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
-    <ROW Property="ProductCode" Value="1033:{1F6AFC03-DBD6-4635-91EC-4A609724CD6F} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{531D7FC4-8FD2-42AA-B807-3F3C1D69A981} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Agent"/>
-    <ROW Property="ProductVersion" Value="1.0.7937.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7938.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
     <ROW Property="SETUPEXEDIR" Value="1"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{EEDECF4C-BABB-4AE0-9CB9-DC051FF1AE75}"/>
@@ -372,7 +372,7 @@
     <ROW Component="lithnet.accessmanager.agent.admx" ComponentId="{4A2EA2A4-4ACD-4051-A1FA-9594018B22D7}" Directory_="PolicyDefinitions_Dir" Attributes="0" KeyPath="lithnet.accessmanager.agent.admx" Type="0"/>
     <ROW Component="lithnet.accessmanager.agent.password.adml" ComponentId="{309D43E2-7CCB-43E7-8CF7-FF4F25AFCCBC}" Directory_="enUS_Dir" Attributes="0" KeyPath="lithnet.accessmanager.agent.password.adml" Type="0"/>
     <ROW Component="mscordaccore.dll" ComponentId="{9722679F-CCB2-4AE8-8852-FFDDC1508BDB}" Directory_="APPDIR" Attributes="256" KeyPath="mscordaccore.dll"/>
-    <ROW Component="mscordaccore_amd64_amd64_4.700.21.16201.dll" ComponentId="{4D86A1E2-0408-47F4-A309-143992DFB07C}" Directory_="APPDIR" Attributes="256" KeyPath="mscordaccore_amd64_amd64_4.700.21.16201.dll"/>
+    <ROW Component="mscordaccore_amd64_amd64_4.700.21.26205.dll" ComponentId="{DC750365-B386-4FAD-9009-33836E33453B}" Directory_="APPDIR" Attributes="256" KeyPath="mscordaccore_amd64_amd64_4.700.21.26205.dll"/>
     <ROW Component="mscordbi.dll" ComponentId="{307C4559-3614-46E7-BCDD-6033758DD0A0}" Directory_="APPDIR" Attributes="256" KeyPath="mscordbi.dll"/>
     <ROW Component="mscorlib.dll" ComponentId="{FB18AC1B-1D3E-4705-9693-33855B907E04}" Directory_="APPDIR" Attributes="0" KeyPath="mscorlib.dll"/>
     <ROW Component="mscorrc.debug.dll" ComponentId="{73D31FC8-EAB3-4546-9B6C-07BF018B105F}" Directory_="APPDIR" Attributes="256" KeyPath="mscorrc.debug.dll"/>
@@ -520,7 +520,6 @@
     <ROW File="Microsoft.Win32.Primitives.dll" Component_="Microsoft.Win32.Primitives.dll" FileName="MICRO~38.DLL|Microsoft.Win32.Primitives.dll" Attributes="0" SourcePath="output-x64\Microsoft.Win32.Primitives.dll" SelfReg="false"/>
     <ROW File="Microsoft.Win32.SystemEvents.dll" Component_="Microsoft.Win32.SystemEvents.dll" FileName="MICRO~39.DLL|Microsoft.Win32.SystemEvents.dll" Attributes="0" SourcePath="output-x64\Microsoft.Win32.SystemEvents.dll" SelfReg="false"/>
     <ROW File="mscordaccore.dll" Component_="mscordaccore.dll" FileName="MSCORD~1.DLL|mscordaccore.dll" Attributes="0" SourcePath="output-x64\mscordaccore.dll" SelfReg="false"/>
-    <ROW File="mscordaccore_amd64_amd64_4.700.21.16201.dll" Component_="mscordaccore_amd64_amd64_4.700.21.16201.dll" FileName="MSCORD~2.DLL|mscordaccore_amd64_amd64_4.700.21.16201.dll" Attributes="0" SourcePath="output-x64\mscordaccore_amd64_amd64_4.700.21.16201.dll" SelfReg="false"/>
     <ROW File="mscordbi.dll" Component_="mscordbi.dll" FileName="mscordbi.dll" Attributes="0" SourcePath="output-x64\mscordbi.dll" SelfReg="false"/>
     <ROW File="mscorlib.dll" Component_="mscorlib.dll" FileName="mscorlib.dll" Attributes="0" SourcePath="output-x64\mscorlib.dll" SelfReg="false"/>
     <ROW File="mscorrc.debug.dll" Component_="mscorrc.debug.dll" FileName="MSCORR~1.DLL|mscorrc.debug.dll" Attributes="0" SourcePath="output-x64\mscorrc.debug.dll" SelfReg="false"/>
@@ -743,6 +742,7 @@
     <ROW File="vcruntime140_cor3.dll" Component_="vcruntime140_cor3.dll" FileName="VCRUNT~1.DLL|vcruntime140_cor3.dll" Attributes="0" SourcePath="output-x64\vcruntime140_cor3.dll" SelfReg="false"/>
     <ROW File="WindowsFormsIntegration.dll" Component_="WindowsFormsIntegration.dll" FileName="WINDOW~2.DLL|WindowsFormsIntegration.dll" Attributes="0" SourcePath="output-x64\WindowsFormsIntegration.dll" SelfReg="false"/>
     <ROW File="wpfgfx_cor3.dll" Component_="wpfgfx_cor3.dll" FileName="WPFGFX~1.DLL|wpfgfx_cor3.dll" Attributes="0" SourcePath="output-x64\wpfgfx_cor3.dll" SelfReg="false"/>
+    <ROW File="mscordaccore_amd64_amd64_4.700.21.26205.dll" Component_="mscordaccore_amd64_amd64_4.700.21.26205.dll" FileName="MSCORD~3.DLL|mscordaccore_amd64_amd64_4.700.21.26205.dll" Attributes="0" SourcePath="output-x64\mscordaccore_amd64_amd64_4.700.21.26205.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" GeneralOptions="o" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites"/>
@@ -953,7 +953,6 @@
     <ROW Feature_="MainFeature" Component_="Microsoft.Win32.Primitives.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.Win32.SystemEvents.dll"/>
     <ROW Feature_="MainFeature" Component_="mscordaccore.dll"/>
-    <ROW Feature_="MainFeature" Component_="mscordaccore_amd64_amd64_4.700.21.16201.dll"/>
     <ROW Feature_="MainFeature" Component_="mscordbi.dll"/>
     <ROW Feature_="MainFeature" Component_="mscorlib.dll"/>
     <ROW Feature_="MainFeature" Component_="mscorrc.debug.dll"/>
@@ -1175,6 +1174,7 @@
     <ROW Feature_="MainFeature" Component_="vcruntime140_cor3.dll"/>
     <ROW Feature_="MainFeature" Component_="WindowsFormsIntegration.dll"/>
     <ROW Feature_="MainFeature" Component_="wpfgfx_cor3.dll"/>
+    <ROW Feature_="MainFeature" Component_="mscordaccore_amd64_amd64_4.700.21.26205.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>

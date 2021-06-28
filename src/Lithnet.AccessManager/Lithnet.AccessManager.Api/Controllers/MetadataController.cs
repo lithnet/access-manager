@@ -17,18 +17,14 @@ namespace Lithnet.AccessManager.Api.Controllers
     [ResponseCache(NoStore = true)]
     public class MetadataController : Controller
     {
-        private readonly IOptions<AgentOptions> agentOptions;
+        private readonly IOptions<ApiAuthenticationOptions> agentOptions;
         private readonly IOptions<AzureAdOptions> azureAdOptions;
-        private readonly ICertificateProvider certificateProvider;
         private readonly ILogger<MetadataController> logger;
         private readonly IApiErrorResponseProvider errorProvider;
-        private string certData;
-        private DateTime certificateLastAccessed;
 
-        public MetadataController(IOptions<AgentOptions> agentOptions, ICertificateProvider certificateProvider, ILogger<MetadataController> logger, IApiErrorResponseProvider errorProvider, IOptions<AzureAdOptions> azureAdOptions)
+        public MetadataController(IOptions<ApiAuthenticationOptions> agentOptions, ILogger<MetadataController> logger, IApiErrorResponseProvider errorProvider, IOptions<AzureAdOptions> azureAdOptions)
         {
             this.agentOptions = agentOptions;
-            this.certificateProvider = certificateProvider;
             this.logger = logger;
             this.errorProvider = errorProvider;
             this.azureAdOptions = azureAdOptions;
@@ -40,17 +36,14 @@ namespace Lithnet.AccessManager.Api.Controllers
             {
                 List<string> allowedOptions = new List<string>();
 
-                if (this.agentOptions.Value.AllowAadAuth)
+                if (this.agentOptions.Value.AllowAzureAdJoinedDeviceAuth)
                 {
-                    if (this.agentOptions.Value.AllowAzureAdJoinedDevices)
-                    {
-                        allowedOptions.Add("aadj");
-                    }
+                    allowedOptions.Add("aadj");
+                }
 
-                    if (this.agentOptions.Value.AllowAzureAdRegisteredDevices)
-                    {
-                        allowedOptions.Add("aadr");
-                    }
+                if (this.agentOptions.Value.AllowAzureAdRegisteredDeviceAuth)
+                {
+                    allowedOptions.Add("aadr");
                 }
 
                 if (this.agentOptions.Value.AllowWindowsAuth)
@@ -58,7 +51,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                     allowedOptions.Add("iwa");
                 }
 
-                if (this.agentOptions.Value.AllowSelfSignedAuth)
+                if (this.agentOptions.Value.AllowAmsManagedDeviceAuth)
                 {
                     allowedOptions.Add("ssa");
                 }
@@ -70,7 +63,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                         AllowedOptions = allowedOptions,
                         AllowedAzureAdTenants = this.azureAdOptions.Value.Tenants?.Select(t => t.TenantId).ToList() ?? new List<string>()
                     },
-                    PasswordManagement = new PasswordManagement { EncryptionCertificate = this.GetCertificateString() }
+                    PasswordManagement = new PasswordManagement { }
                 });
 
             }
@@ -78,28 +71,6 @@ namespace Lithnet.AccessManager.Api.Controllers
             {
                 return this.errorProvider.GetErrorResult(ex);
             }
-        }
-
-        private string GetCertificateString()
-        {
-            if (this.certData == null || (this.certificateLastAccessed.AddMinutes(this.agentOptions.Value.EncryptionCertificateCacheDurationMinutes) < DateTime.UtcNow))
-            {
-                try
-                {
-                    X509Certificate2 cert = this.certificateProvider.FindEncryptionCertificate();
-                    if (cert != null)
-                    {
-                        certData = Convert.ToBase64String(cert.Export(X509ContentType.Cert));
-                        certificateLastAccessed = DateTime.UtcNow;
-                    }
-                }
-                catch (CertificateNotFoundException)
-                {
-                    this.logger.LogWarning("The encryption certificate requested by the metadata agent could not be found");
-                }
-            }
-
-            return certData;
         }
     }
 }

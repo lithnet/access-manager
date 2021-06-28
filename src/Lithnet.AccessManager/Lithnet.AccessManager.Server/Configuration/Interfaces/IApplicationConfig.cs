@@ -1,4 +1,5 @@
 ﻿using Lithnet.AccessManager.Api;
+using Lithnet.AccessManager.Api.Configuration;
 using Lithnet.AccessManager.Enterprise;
 using Microsoft.Graph;
 
@@ -38,6 +39,12 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         TokenIssuerOptions TokenIssuer { get; set; }
 
+        PasswordPolicyOptions PasswordPolicy{ get; set; }
+
+        ApiAuthenticationOptions ApiAuthentication { get; set; }
+
+        AmsManagedDeviceRegistrationOptions AmsManagedDevices { get; set; }
+      
         void Save(string file, bool forceOverwrite);
 
         bool HasFileBeenModified();

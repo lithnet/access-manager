@@ -3,6 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using Lithnet.AccessManager.Api;
+using Lithnet.AccessManager.Api.Configuration;
 using Newtonsoft.Json;
 
 namespace Lithnet.AccessManager.Server.Configuration
@@ -42,6 +43,12 @@ namespace Lithnet.AccessManager.Server.Configuration
         public JitConfigurationOptions JitConfiguration { get; set; } = new JitConfigurationOptions();
 
         public TokenIssuerOptions TokenIssuer { get; set; } = new TokenIssuerOptions();
+
+        public PasswordPolicyOptions PasswordPolicy { get; set; } = new PasswordPolicyOptions();
+
+        public ApiAuthenticationOptions ApiAuthentication { get; set; } = new ApiAuthenticationOptions();
+
+        public AmsManagedDeviceRegistrationOptions AmsManagedDevices { get; set; } = new AmsManagedDeviceRegistrationOptions();
 
         [JsonExtensionData]
         public IDictionary<string, object> OtherData { get; set; }

@@ -82,7 +82,11 @@ namespace Lithnet.AccessManager
 
             if (cert == null)
             {
-                this.TryGetCertificateFromDirectory(out cert, Domain.GetComputerDomain().Name);
+                this.TryGetCertificateFromDirectory(out X509Certificate2 directoryCert, Domain.GetComputerDomain().Name);
+                if (thumbprint == null || directoryCert.Thumbprint == thumbprint)
+                {
+                    cert = directoryCert;
+                }
             }
 
             if (cert == null)

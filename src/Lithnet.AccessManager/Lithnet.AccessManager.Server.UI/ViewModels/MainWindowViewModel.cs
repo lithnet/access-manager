@@ -31,7 +31,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public MainWindowViewModel(IApplicationConfig model, AuthenticationViewModel authentication, AuthorizationViewModel authorization, UserInterfaceViewModel ui, RateLimitsViewModel rate, IpDetectionViewModel ip,
             AuditingViewModel audit, EmailViewModel mail, HostingViewModel hosting, ActiveDirectoryConfigurationViewModel ad,
-            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, LicensingViewModel lic, HighAvailabilityViewModel havm, AzureAdConfigurationViewModel azuread, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider, ICertificateSynchronizationProvider certSyncProvider, IAmsLicenseManager licenseManager, IClusterProvider clusterProvider)
+            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, LicensingViewModel lic, HighAvailabilityViewModel havm, AzureAdConfigurationViewModel azuread, AdvancedPasswordManagementViewModel pmgmt, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider, ICertificateSynchronizationProvider certSyncProvider, IAmsLicenseManager licenseManager, IClusterProvider clusterProvider)
         {
             this.model = model;
             this.shellExecuteProvider = shellExecuteProvider;
@@ -60,6 +60,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.Items.Add(azuread);
             this.Items.Add(audit);
             this.Items.Add(laps);
+            this.Items.Add(pmgmt);
             this.Items.Add(jit);
             this.Items.Add(bitLocker);
             this.Items.Add(authorization);

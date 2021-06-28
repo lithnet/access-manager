@@ -27,10 +27,10 @@ namespace Lithnet.AccessManager.Api.Controllers
         private readonly IDeviceProvider devices;
         private readonly ISignedAssertionValidator signedAssertionValidator;
         private readonly IAadGraphApiProvider graphProvider;
-        private readonly IOptionsMonitor<AgentOptions> agentOptions;
+        private readonly IOptionsMonitor<ApiAuthenticationOptions> agentOptions;
         private readonly IApiErrorResponseProvider errorProvider;
 
-        public AuthX509Controller(ISecurityTokenGenerator tokenGenerator, IDeviceProvider devices, ISignedAssertionValidator signedAssertionValidator, IAadGraphApiProvider graphProvider, ILogger<AuthX509Controller> logger, IOptionsMonitor<AgentOptions> agentOptions, IApiErrorResponseProvider errorProvider)
+        public AuthX509Controller(ISecurityTokenGenerator tokenGenerator, IDeviceProvider devices, ISignedAssertionValidator signedAssertionValidator, IAadGraphApiProvider graphProvider, ILogger<AuthX509Controller> logger, IOptionsMonitor<ApiAuthenticationOptions> agentOptions, IApiErrorResponseProvider errorProvider)
         {
             this.tokenGenerator = tokenGenerator;
             this.devices = devices;
@@ -48,7 +48,7 @@ namespace Lithnet.AccessManager.Api.Controllers
             {
                 var options = this.agentOptions.CurrentValue;
 
-                if (!options.AllowAadAuth && !options.AllowSelfSignedAuth)
+                if (!options.AllowAadAuth && !options.AllowAmsManagedDeviceAuth)
                 {
                     this.logger.LogWarning("A client attempted to authenticate with a signed assertion, but no assertion-enabled authentication methods are enabled");
                     throw new UnsupportedAuthenticationTypeException();
@@ -81,7 +81,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                 }
                 else if (authMode == AgentAuthenticationMode.Ssa)
                 {
-                    if (options.AllowSelfSignedAuth)
+                    if (options.AllowAmsManagedDeviceAuth)
                     {
                         token = await this.ValidateSelfSignedAssertionAsync(signingCertificate);
                     }
@@ -156,14 +156,14 @@ namespace Lithnet.AccessManager.Api.Controllers
             switch (aadDevice.TrustType.ToLowerInvariant())
             {
                 case "azuread":
-                    if (!this.agentOptions.CurrentValue.AllowAzureAdJoinedDevices)
+                    if (!this.agentOptions.CurrentValue.AllowAzureAdJoinedDeviceAuth)
                     {
                         throw new UnsupportedAuthenticationTypeException("The device is Azure AD joined, but Azure AD-joined devices are not permitted to authenticate to the system");
                     }
                     break;
 
                 case "workplace":
-                    if (!this.agentOptions.CurrentValue.AllowAzureAdRegisteredDevices)
+                    if (!this.agentOptions.CurrentValue.AllowAzureAdRegisteredDeviceAuth)
                     {
                         throw new UnsupportedAuthenticationTypeException("The device is Azure AD registered, but Azure AD-registered devices are not permitted to authenticate to the system");
                     }

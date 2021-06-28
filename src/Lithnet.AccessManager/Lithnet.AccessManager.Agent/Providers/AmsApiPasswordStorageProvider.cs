@@ -1,10 +1,10 @@
-﻿using Lithnet.AccessManager.Agent.Providers;
-using Lithnet.AccessManager.Api.Shared;
+﻿using Lithnet.AccessManager.Api.Shared;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Agent
 {
@@ -13,26 +13,23 @@ namespace Lithnet.AccessManager.Agent
         private readonly IHttpClientFactory httpClientFactory;
         private readonly JsonSerializerOptions jsonOptions;
         private readonly IEncryptionProvider encryptionProvider;
-        private readonly IMetadataProvider metadataProvider;
-        private readonly ISettingsProvider settingsProvider;
         private readonly ILogger<AmsApiPasswordStorageProvider> logger;
 
         private string passwordId;
-        private string lastEncryptionThumbprint;
+        private X509Certificate2 encryptionCertificate;
 
-        public AmsApiPasswordStorageProvider(IHttpClientFactory httpClientFactory, JsonSerializerOptions jsonOptions, IEncryptionProvider encryptionProvider, IMetadataProvider metadataProvider, ISettingsProvider settingsProvider, ILogger<AmsApiPasswordStorageProvider> logger)
+        public AmsApiPasswordStorageProvider(IHttpClientFactory httpClientFactory, JsonSerializerOptions jsonOptions, IEncryptionProvider encryptionProvider, ILogger<AmsApiPasswordStorageProvider> logger)
         {
             this.httpClientFactory = httpClientFactory;
             this.jsonOptions = jsonOptions;
             this.encryptionProvider = encryptionProvider;
-            this.metadataProvider = metadataProvider;
-            this.settingsProvider = settingsProvider;
             this.logger = logger;
         }
 
         public async Task<bool> IsPasswordChangeRequired()
         {
-            this.lastEncryptionThumbprint = null;
+            this.ResetState();
+
             this.logger.LogTrace("Checking to see if a password change is required");
 
             using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthBearer);
@@ -52,12 +49,19 @@ namespace Lithnet.AccessManager.Agent
                     this.logger.LogInformation("A password change is required");
 
                     var response = JsonSerializer.Deserialize<PasswordGetResponse>(responseString, this.jsonOptions);
-                    this.lastEncryptionThumbprint = response.EncryptionCertificateThumbprint;
 
-                    if (string.IsNullOrWhiteSpace (this.lastEncryptionThumbprint))
+                    if (response == null)
                     {
-                        throw new UnexpectedResponseException("The API requested a password change, but did not supply an encryption certificate thumbprint to use");
+                        throw new UnexpectedResponseException("The server returned an unexpected response");
                     }
+
+                    if (string.IsNullOrWhiteSpace(response.EncryptionCertificate))
+                    {
+                        throw new UnexpectedResponseException("The API requested a password change, but did not supply an encryption certificate to use");
+                    }
+
+                    this.encryptionCertificate = new X509Certificate2(Convert.FromBase64String(response.EncryptionCertificate));
+
                     return true;
                 }
 
@@ -75,11 +79,16 @@ namespace Lithnet.AccessManager.Agent
 
             this.logger.LogTrace("Attempting to submit the new password details to the AMS API");
 
+            if (this.encryptionCertificate == null)
+            {
+                throw new NotSupportedException("There was no certificate present to perform the password encryption operation");
+            }
+
             PasswordUpdateRequest request = new PasswordUpdateRequest
             {
                 AccountName = accountName,
                 ExpiryDate = expiry,
-                PasswordData = this.encryptionProvider.Encrypt(await this.metadataProvider.GetEncryptionCertificate(this.lastEncryptionThumbprint), password)
+                PasswordData = this.encryptionProvider.Encrypt(this.encryptionCertificate, password)
             };
 
             using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthBearer);
@@ -89,6 +98,11 @@ namespace Lithnet.AccessManager.Agent
             httpResponseMessage.EnsureSuccessStatusCode(responseString);
 
             var response = JsonSerializer.Deserialize<PasswordUpdateResponse>(responseString, this.jsonOptions);
+
+            if (response == null)
+            {
+                throw new UnexpectedResponseException("The server returned an unexpected response");
+            }
 
             this.logger.LogTrace("The password details were successfully submitted to the AMS API");
 
@@ -110,15 +124,21 @@ namespace Lithnet.AccessManager.Agent
             var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
             httpResponseMessage.EnsureSuccessStatusCode(responseString);
 
-            this.logger.LogTrace("The rollback was completed successfully");
+            this.ResetState();
 
+            this.logger.LogTrace("The rollback was completed successfully");
         }
 
         public Task Commit()
         {
-            this.passwordId = null;
-            this.lastEncryptionThumbprint = null;
+            this.ResetState();
             return Task.CompletedTask;
+        }
+
+        private void ResetState()
+        {
+            this.passwordId = null;
+            this.encryptionCertificate = null;
         }
     }
 }

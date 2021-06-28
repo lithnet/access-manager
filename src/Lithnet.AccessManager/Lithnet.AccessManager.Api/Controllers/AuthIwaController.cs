@@ -22,10 +22,10 @@ namespace Lithnet.AccessManager.Api.Controllers
         private readonly IDeviceProvider devices;
         private readonly IDiscoveryServices discoveryServices;
         private readonly ILogger<AuthIwaController> logger;
-        private readonly IOptions<AgentOptions> agentOptions;
+        private readonly IOptions<ApiAuthenticationOptions> agentOptions;
         private readonly IApiErrorResponseProvider errorProvider;
 
-        public AuthIwaController(ISecurityTokenGenerator tokenGenerator, IDirectory directory, IDeviceProvider devices, IDiscoveryServices discoveryServices, ILogger<AuthIwaController> logger, IOptions<AgentOptions> agentOptions, IApiErrorResponseProvider errorProvider)
+        public AuthIwaController(ISecurityTokenGenerator tokenGenerator, IDirectory directory, IDeviceProvider devices, IDiscoveryServices discoveryServices, ILogger<AuthIwaController> logger, IOptions<ApiAuthenticationOptions> agentOptions, IApiErrorResponseProvider errorProvider)
         {
             this.tokenGenerator = tokenGenerator;
             this.directory = directory;

@@ -12,6 +12,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Api.Configuration;
 using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Providers;
 
@@ -26,12 +27,13 @@ namespace Lithnet.AccessManager.Api.Controllers
         private readonly ILogger<AgentRegisterController> logger;
         private readonly ISignedAssertionValidator assertionValidator;
         private readonly IDeviceProvider devices;
-        private readonly IOptions<AgentOptions> agentOptions;
+        private readonly IOptions<ApiAuthenticationOptions> agentOptions;
         private readonly IApiErrorResponseProvider errorProvider;
         private readonly ICheckInDataValidator checkInDataValidator;
         private readonly IRegistrationKeyProvider regKeyProvider;
+        private readonly IOptions<AmsManagedDeviceRegistrationOptions> amsManagedDeviceOptions;
 
-        public AgentRegisterController(ILogger<AgentRegisterController> logger, ISignedAssertionValidator assertionValidator, IDeviceProvider devices, IOptions<AgentOptions> agentOptions, IApiErrorResponseProvider errorProvider, ICheckInDataValidator checkInDataValidator, IRegistrationKeyProvider regKeyProvider)
+        public AgentRegisterController(ILogger<AgentRegisterController> logger, ISignedAssertionValidator assertionValidator, IDeviceProvider devices, IOptions<ApiAuthenticationOptions> agentOptions, IApiErrorResponseProvider errorProvider, ICheckInDataValidator checkInDataValidator, IRegistrationKeyProvider regKeyProvider, IOptions<AmsManagedDeviceRegistrationOptions> amsManagedDeviceOptions)
         {
             this.logger = logger;
             this.assertionValidator = assertionValidator;
@@ -40,6 +42,7 @@ namespace Lithnet.AccessManager.Api.Controllers
             this.errorProvider = errorProvider;
             this.checkInDataValidator = checkInDataValidator;
             this.regKeyProvider = regKeyProvider;
+            this.amsManagedDeviceOptions = amsManagedDeviceOptions;
         }
 
         [HttpPost()]
@@ -47,7 +50,7 @@ namespace Lithnet.AccessManager.Api.Controllers
         {
             try
             {
-                if (!this.agentOptions.Value.AllowSelfSignedAuth)
+                if (!this.agentOptions.Value.AllowAmsManagedDeviceAuth)
                 {
                     this.logger.LogWarning("A client attempted to register, but registration is disabled");
                     return this.Forbid(JwtBearerDefaults.AuthenticationScheme);
@@ -72,7 +75,7 @@ namespace Lithnet.AccessManager.Api.Controllers
         {
             try
             {
-                if (!this.agentOptions.Value.AllowSelfSignedAuth)
+                if (!this.agentOptions.Value.AllowAmsManagedDeviceAuth)
                 {
                     this.logger.LogWarning("A client attempted to validate its registration status, but registration is disabled");
                     return this.Forbid(JwtBearerDefaults.AuthenticationScheme);
@@ -144,7 +147,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                 OperatingSystemVersion = checkInData.OperationSystemVersion,
             };
 
-            if (this.agentOptions.Value.AutoApproveSelfSignedAuth)
+            if (this.amsManagedDeviceOptions.Value.AutoApproveNewDevices)
             {
                 device.ApprovalState = ApprovalState.Approved;
             }

@@ -9,6 +9,7 @@ using System;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Api.Controllers
 {
@@ -23,16 +24,18 @@ namespace Lithnet.AccessManager.Api.Controllers
         private readonly ICertificateProvider certificateProvider;
         private readonly IApiErrorResponseProvider errorProvider;
         private readonly IEncryptionProvider encryptionProvider;
+        private readonly IOptionsMonitor<PasswordPolicyOptions> passwordOptions;
 
         private X509Certificate2 encryptionCertificate;
 
-        public AgentPasswordController(ILogger<AgentPasswordController> logger, IDbDevicePasswordProvider passwordProvider, ICertificateProvider certificateProvider, IApiErrorResponseProvider errorProvider, IEncryptionProvider encryptionProvider)
+        public AgentPasswordController(ILogger<AgentPasswordController> logger, IDbDevicePasswordProvider passwordProvider, ICertificateProvider certificateProvider, IApiErrorResponseProvider errorProvider, IEncryptionProvider encryptionProvider, IOptionsMonitor<PasswordPolicyOptions> passwordOptions)
         {
             this.logger = logger;
             this.passwordProvider = passwordProvider;
             this.certificateProvider = certificateProvider;
             this.errorProvider = errorProvider;
             this.encryptionProvider = encryptionProvider;
+            this.passwordOptions = passwordOptions;
         }
 
         [HttpGet()]
@@ -55,7 +58,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                     return this.StatusCode(StatusCodes.Status205ResetContent,
                         new PasswordGetResponse
                         {
-                            EncryptionCertificateThumbprint = this.EncryptionCertificate.Thumbprint
+                            EncryptionCertificate = Convert.ToBase64String(this.EncryptionCertificate.Export(X509ContentType.Cert))
                         });
                 }
                 else
@@ -160,14 +163,18 @@ namespace Lithnet.AccessManager.Api.Controllers
         {
             get
             {
-                if (this.encryptionCertificate == null)
+                if (string.IsNullOrWhiteSpace(this.passwordOptions.CurrentValue.EncryptionCertificateThumbprint))
                 {
-                    this.encryptionCertificate = this.certificateProvider.FindEncryptionCertificate();
+                    throw new ConfigurationException("The was no encryption certificate specified in the app configuration. Password management is not available until this is resolved");
+                }
+
+                if (this.encryptionCertificate == null || this.encryptionCertificate.Thumbprint != this.passwordOptions.CurrentValue.EncryptionCertificateThumbprint)
+                {
+                    this.encryptionCertificate = this.certificateProvider.FindEncryptionCertificate(this.passwordOptions.CurrentValue.EncryptionCertificateThumbprint);
                 }
 
                 return this.encryptionCertificate;
             }
         }
-
     }
 }
