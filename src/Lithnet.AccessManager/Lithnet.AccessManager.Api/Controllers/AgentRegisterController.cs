@@ -58,7 +58,7 @@ namespace Lithnet.AccessManager.Api.Controllers
 
                 JwtSecurityToken token = this.assertionValidator.Validate(request.Assertion, "api/v1.0/agent/register", out X509Certificate2 signingCertificate);
 
-                Device device = await this.ValidateRegistrationClaims(token);
+                IDevice device = await this.ValidateRegistrationClaims(token);
 
                 device = await this.devices.CreateDeviceAsync(device, signingCertificate);
 
@@ -81,7 +81,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                     return this.Forbid(JwtBearerDefaults.AuthenticationScheme);
                 }
 
-                Device device = await this.devices.GetDeviceAsync(AuthorityType.Ams, Constants.AmsAuthorityId, requestId);
+                IDevice device = await this.devices.GetDeviceAsync(AuthorityType.Ams, Constants.AmsAuthorityId, requestId);
 
                 return this.GetDeviceApprovalResult(device);
             }
@@ -91,7 +91,7 @@ namespace Lithnet.AccessManager.Api.Controllers
             }
         }
 
-        private IActionResult GetDeviceApprovalResult(Device device)
+        private IActionResult GetDeviceApprovalResult(IDevice device)
         {
             if (device.ApprovalState == ApprovalState.Approved)
             {
@@ -115,7 +115,7 @@ namespace Lithnet.AccessManager.Api.Controllers
             }
         }
 
-        private async Task<Device> ValidateRegistrationClaims(JwtSecurityToken token)
+        private async Task<IDevice> ValidateRegistrationClaims(JwtSecurityToken token)
         {
             string registrationKey = token.Claims.FirstOrDefault(t => t.Type == "registration-key")?.Value;
             if (string.IsNullOrWhiteSpace(registrationKey))
@@ -138,7 +138,7 @@ namespace Lithnet.AccessManager.Api.Controllers
 
             this.checkInDataValidator.ValidateCheckInData(checkInData);
 
-            Device device = new Device()
+            IDevice device = new DbDevice()
             {
                 ComputerName = checkInData.Hostname,
                 DnsName = checkInData.DnsName,

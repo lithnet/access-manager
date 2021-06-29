@@ -54,7 +54,6 @@ namespace Lithnet.AccessManager.Api
             services.AddSingleton<IDbProvider, SqlDbProvider>();
             services.AddSingleton<SqlLocalDbInstanceProvider>();
             services.AddSingleton<SqlServerInstanceProvider>();
-            services.AddSingleton<RNGCryptoServiceProvider>();
             services.AddSingleton<IDirectory, ActiveDirectory>();
             services.AddSingleton<ICertificateProvider, CertificateProvider>();
             services.AddSingleton<IClusterProvider, ClusterProvider>();
@@ -65,21 +64,21 @@ namespace Lithnet.AccessManager.Api
             services.AddSingleton<IEncryptionProvider, EncryptionProvider>();
             services.AddSingleton<IWindowsServiceProvider, WindowsServiceProvider>();
             services.AddSingleton(RandomNumberGenerator.Create());
+            services.AddSingleton<IRandomValueGenerator, RandomValueGenerator>();
 
             // Our services
 
             services.AddSingleton<ICheckInDataValidator, CheckInDataValidator>();
             services.AddScoped<IDeviceProvider, DbDeviceProvider>();
             services.AddScoped<IAadGraphApiProvider, AadGraphApiProvider>();
-            services.AddScoped<IDbDevicePasswordProvider, DbDevicePasswordProvider>();
+            services.AddScoped<IDevicePasswordProvider, DbDevicePasswordProvider>();
 
-            services.AddSingleton<IRegistrationKeyProvider, RegistrationKeyProvider>();
+            services.AddSingleton<IRegistrationKeyProvider, DbRegistrationKeyProvider>();
 
             services.AddSingleton<IApiErrorResponseProvider, ApiErrorResponseProvider>();
             services.AddSingleton<IAppPathProvider, ApiAppPathProvider>();
             services.AddSingleton<ISecurityTokenGenerator, SecurityTokenGenerator>();
             services.AddSingleton<ISignedAssertionValidator, SignedAssertionValidator>();
-            services.AddSingleton<RandomStringGenerator>();
 
             services.Configure<DatabaseConfigurationOptions>(this.Configuration.GetSection("DatabaseConfiguration"));
             services.Configure<AzureAdOptions>(this.Configuration.GetSection("AzureAd"));

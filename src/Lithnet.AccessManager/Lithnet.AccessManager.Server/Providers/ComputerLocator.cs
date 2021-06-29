@@ -38,7 +38,7 @@ namespace Lithnet.AccessManager.Server.Providers
 
             foreach (var device in await this.dbDeviceProvider.FindDevices(searchText))
             {
-                foundComputers.Add(device);
+                foundComputers.Add((IComputer)device);
             }
 
             if (this.TryFindComputerInAd(searchText, out IComputer computer))
@@ -52,14 +52,14 @@ namespace Lithnet.AccessManager.Server.Providers
             return foundComputers;
         }
 
-        private IComputer GetFromActiveDirectory(Device device)
+        private IComputer GetFromActiveDirectory(IDevice device)
         {
             if (device.AuthorityType == AuthorityType.ActiveDirectory)
             {
                 return this.directory.GetComputer(device.Sid);
             }
 
-            return device;
+            return device as IComputer;
         }
 
         private bool TryFindComputerInAd(string searchText, out IComputer computer)

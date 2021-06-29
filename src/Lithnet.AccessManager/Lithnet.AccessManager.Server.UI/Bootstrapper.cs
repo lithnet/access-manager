@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using DbUp.Engine.Output;
 using FluentValidation;
 using Lithnet.AccessManager.Api;
 using Lithnet.AccessManager.Api.Configuration;
@@ -15,6 +17,7 @@ using Lithnet.AccessManager.Server.UI.AuthorizationRuleImport;
 using Lithnet.AccessManager.Server.UI.Providers;
 using Lithnet.Licensing.Core;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
 using Microsoft.Extensions.Options;
@@ -169,9 +172,12 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IImportProviderFactory>().To<ImportProviderFactory>();
                 builder.Bind<IImportResultsViewModelFactory>().To<ImportResultsViewModelFactory>();
                 builder.Bind<IAzureAdTenantDetailsViewModelFactory>().To<AzureAdTenantDetailsViewModelFactory>();
+                builder.Bind<IRegistrationKeyViewModelFactory>().To<RegistrationKeyViewModelFactory>();
 
                 // Services
                 builder.Bind<RandomNumberGenerator>().ToInstance(RandomNumberGenerator.Create());
+                builder.Bind<IRandomValueGenerator>().To<RandomValueGenerator>();
+
                 builder.Bind<IDialogCoordinator>().To<DialogCoordinator>();
                 builder.Bind<IDirectory>().To<ActiveDirectory>();
                 builder.Bind<ILocalSam>().To<LocalSam>();
@@ -207,9 +213,12 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IFirewallProvider>().To<FirewallProvider>();
                 builder.Bind<IHttpSysConfigurationProvider>().To<HttpSysConfigurationProvider>();
                 builder.Bind<IAadGraphApiProvider>().To<AadGraphApiProvider>();
-
-
+                builder.Bind<IRegistrationKeyProvider>().To<DbRegistrationKeyProvider>();
+                builder.Bind<IDbProvider>().To<SqlDbProvider>();
+                builder.Bind<SqlLocalDbInstanceProvider>().ToSelf();
                 builder.Bind<SqlServerInstanceProvider>().ToSelf();
+                builder.Bind<IUpgradeLog>().To<DbUpgradeLogger>();
+                builder.Bind<IHostApplicationLifetime>().To<DummyHostLifetime>();
 
                 builder.Bind<IProtectedSecretProvider>().To<ProtectedSecretProvider>().InSingletonScope();
                 builder.Bind<IClusterProvider>().To<ClusterProvider>().InSingletonScope();
@@ -284,5 +293,16 @@ namespace Lithnet.AccessManager.Server.UI
 
             Environment.Exit(1);
         }
+    }
+
+    public class DummyHostLifetime : IHostApplicationLifetime
+    {
+        public void StopApplication()
+        {
+        }
+
+        public CancellationToken ApplicationStarted { get; }
+        public CancellationToken ApplicationStopping { get; }
+        public CancellationToken ApplicationStopped { get; }
     }
 }

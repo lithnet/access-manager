@@ -5,6 +5,6 @@ namespace Lithnet.AccessManager.Server.Authorization
 {
     public interface IAmsComputerTargetProvider
     {
-        List<SecurityDescriptorTarget> GetMatchingTargetsForComputer(Device computer, IEnumerable<SecurityDescriptorTarget> targets);
+        List<SecurityDescriptorTarget> GetMatchingTargetsForComputer(IDevice computer, IEnumerable<SecurityDescriptorTarget> targets);
     }
 }

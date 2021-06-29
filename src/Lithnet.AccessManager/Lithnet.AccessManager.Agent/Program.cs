@@ -120,10 +120,11 @@ namespace Lithnet.AccessManager.Agent
                     services.AddTransient<AdvancedLapsAgent>();
                     services.AddTransient<ILapsAgent, LapsAgent>();
                     services.AddTransient<IPasswordGenerator, RandomPasswordGenerator>();
-                    services.AddSingleton<RNGCryptoServiceProvider>();
+                    services.AddSingleton(RandomNumberGenerator.Create());
+                    services.AddSingleton<IRandomValueGenerator, RandomValueGenerator>();
+
                     services.AddTransient<IEncryptionProvider, EncryptionProvider>();
                     services.AddSingleton<IMetadataProvider, MetadataProvider>();
-
                     // config
 
                     services.ConfigureWritable<AppState>(configuration.GetSection("State"), "appstate.json");

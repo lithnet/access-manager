@@ -13,10 +13,10 @@ namespace Lithnet.AccessManager.Server
         private readonly IEncryptionProvider encryptionProvider;
         private readonly ICertificateProvider certificateProvider;
         private readonly ILogger logger;
-        private readonly IDbDevicePasswordProvider devicePasswordProvider;
+        private readonly IDevicePasswordProvider devicePasswordProvider;
         private readonly IAmsLicenseManager licenseManager;
 
-        public PasswordProvider(IMsMcsAdmPwdProvider msMcsAdmPwdProvider, ILithnetAdminPasswordProvider lithnetProvider, IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider, ILogger<PasswordProvider> logger, IDbDevicePasswordProvider devicePasswordProvider, IAmsLicenseManager licenseManager)
+        public PasswordProvider(IMsMcsAdmPwdProvider msMcsAdmPwdProvider, ILithnetAdminPasswordProvider lithnetProvider, IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider, ILogger<PasswordProvider> logger, IDevicePasswordProvider devicePasswordProvider, IAmsLicenseManager licenseManager)
         {
             this.msLapsProvider = msMcsAdmPwdProvider;
             this.lithnetProvider = lithnetProvider;
@@ -34,7 +34,7 @@ namespace Lithnet.AccessManager.Server
                 case IActiveDirectoryComputer adComputer:
                     return this.GetCurrentPasswordFromActiveDirectory(adComputer, newExpiry, retrievalLocation);
 
-                case Device device:
+                case IDevice device:
                     return await this.GetCurrentPasswordFromDatabase(device, newExpiry);
 
                 default:
@@ -49,7 +49,7 @@ namespace Lithnet.AccessManager.Server
                 case IActiveDirectoryComputer adComputer:
                     return this.GetPasswordHistoryFromActiveDirectory(adComputer);
 
-                case Device device:
+                case IDevice device:
                     return await this.GetPasswordHistoryFromDatabase(device);
 
                 default:
@@ -57,7 +57,7 @@ namespace Lithnet.AccessManager.Server
             }
         }
 
-        private async Task<PasswordEntry> GetCurrentPasswordFromDatabase(Device device, DateTime? newExpiry)
+        private async Task<PasswordEntry> GetCurrentPasswordFromDatabase(IDevice device, DateTime? newExpiry)
         {
             var password = newExpiry == null ?
                 await this.devicePasswordProvider.GetCurrentPassword(device.ObjectID) :
@@ -72,7 +72,7 @@ namespace Lithnet.AccessManager.Server
             };
         }
 
-        private async Task<IList<PasswordEntry>> GetPasswordHistoryFromDatabase(Device device)
+        private async Task<IList<PasswordEntry>> GetPasswordHistoryFromDatabase(IDevice device)
         {
             var passwords = await this.devicePasswordProvider.GetPasswordHistory(device.ObjectID);
 

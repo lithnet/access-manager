@@ -105,7 +105,7 @@ namespace Lithnet.AccessManager.Api.Controllers
 
         private string GetClaimOrThrowIfMissingOrNull(IEnumerable<Claim> claims, string requiredClaim)
         {
-            var claim = claims.FirstOrDefault(t => t.Type ==requiredClaim) ?? throw new SecurityTokenValidationException($"The token did not contain the expected {requiredClaim} claim");
+            var claim = claims.FirstOrDefault(t => t.Type == requiredClaim) ?? throw new SecurityTokenValidationException($"The token did not contain the expected {requiredClaim} claim");
 
             if (string.IsNullOrWhiteSpace(claim.Value))
             {
@@ -173,7 +173,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                     throw new UnsupportedAuthenticationTypeException($"The AAD device has an unknown trust type '{aadDevice.TrustType}'");
             }
 
-            Device device = await this.devices.GetOrCreateDeviceAsync(aadDevice, tenantId);
+            IDevice device = await this.devices.GetOrCreateDeviceAsync(aadDevice, tenantId);
             ClaimsIdentity identity = device.ToClaimsIdentity();
 
             this.logger.LogInformation($"Successfully authenticated device {device.ComputerName} ({device.ObjectID}) from AzureAD");
@@ -182,7 +182,7 @@ namespace Lithnet.AccessManager.Api.Controllers
 
         private async Task<TokenResponse> ValidateSelfSignedAssertionAsync(X509Certificate2 signingCertificate)
         {
-            Device device = await this.devices.GetDeviceAsync(signingCertificate);
+            IDevice device = await this.devices.GetDeviceAsync(signingCertificate);
             ClaimsIdentity identity = device.ToClaimsIdentity();
 
             this.logger.LogInformation($"Successfully authenticated device {device.ComputerName} ({device.ObjectID}) using a self-signed assertion");

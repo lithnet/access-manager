@@ -6,21 +6,24 @@ namespace Lithnet.AccessManager.Server
 {
     public interface IDeviceProvider
     {
-        Task<Device> GetOrCreateDeviceAsync(Microsoft.Graph.Device device, string authority);
+        Task<IDevice> GetOrCreateDeviceAsync(Microsoft.Graph.Device device, string authority);
 
-        Task<Device> GetOrCreateDeviceAsync(IActiveDirectoryComputer principal, string authority);
+        Task<IDevice> GetOrCreateDeviceAsync(IActiveDirectoryComputer principal, string authority);
 
-        Task<Device> CreateDeviceAsync(IActiveDirectoryComputer computer, string authority, string deviceId);
+        Task<IDevice> CreateDeviceAsync(IActiveDirectoryComputer computer, string authority, string deviceId);
 
-        Task<Device> GetDeviceAsync(AuthorityType authorityType, string authority, string authorityDeviceId);
+        Task<IDevice> GetDeviceAsync(AuthorityType authorityType, string authority, string authorityDeviceId);
 
-        Task<Device> GetDeviceAsync(X509Certificate2 certificate);
+        Task<IDevice> GetDeviceAsync(X509Certificate2 certificate);
 
-        Task<Device> CreateDeviceAsync(Device device, X509Certificate2 certificate);
+        Task<IDevice> CreateDeviceAsync(IDevice device, X509Certificate2 certificate);
 
-        Task<Device> CreateDeviceAsync(Device device);
-        Task<Device> UpdateDeviceAsync(Device device);
-        Task<Device> GetDeviceAsync(string deviceId);
-        Task<IList<Device>> FindDevices(string name);
+        Task<IDevice> CreateDeviceAsync(IDevice device);
+        
+        Task<IDevice> UpdateDeviceAsync(IDevice device);
+        
+        Task<IDevice> GetDeviceAsync(string deviceId);
+
+        Task<IList<IDevice>> FindDevices(string name);
     }
 }

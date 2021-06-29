@@ -5,7 +5,7 @@ using System.Security.Principal;
 
 namespace Lithnet.AccessManager.Server
 {
-    public class Device : IComputer
+    public class DbDevice : IComputer, IDevice
     {
         public long Id { get; set; }
 
@@ -64,11 +64,11 @@ namespace Lithnet.AccessManager.Server
 
         public string OperatingSystemVersion { get; set; }
 
-        public Device()
+        public DbDevice()
         {
         }
 
-        public Device(SqlDataReader reader)
+        public DbDevice(SqlDataReader reader)
         {
             this.Id = reader["Id"].CastOrDefault<long>();
             this.ObjectID = reader["ObjectId"].CastOrDefault<string>();
@@ -84,42 +84,6 @@ namespace Lithnet.AccessManager.Server
             this.ApprovalState = (ApprovalState)reader["ApprovalState"].CastOrDefault<int>();
             this.OperatingSystemFamily = reader["OperatingSystemFamily"].CastOrDefault<string>();
             this.OperatingSystemVersion = reader["OperatingSystemVersion"].CastOrDefault<string>();
-        }
-
-        public ClaimsIdentity ToClaimsIdentity()
-        {
-            ClaimsIdentity identity = new ClaimsIdentity();
-            identity.AddClaim(new Claim("sub", this.ObjectID));
-            identity.AddClaim(new Claim("authority-type", this.AuthorityType.ToString()));
-            identity.AddClaim(new Claim("authority-id", this.AuthorityId));
-            identity.AddClaim(new Claim("authority-identifier", this.AuthorityDeviceId));
-            identity.AddClaim(new Claim("sid", this.Sid));
-            identity.AddClaim(new Claim("object-type", "Computer"));
-
-            return identity;
-        }
-
-        public void ToCreateCommandParameters(SqlCommand command)
-        {
-            command.Parameters.AddWithValue("@ObjectID", this.ObjectID);
-            command.Parameters.AddWithValue("@ComputerName", this.ComputerName);
-            command.Parameters.AddWithValue("@DnsName", this.DnsName);
-            command.Parameters.AddWithValue("@ApprovalState", (int)this.ApprovalState);
-            command.Parameters.AddWithValue("@AuthorityDeviceId", this.AuthorityDeviceId);
-            command.Parameters.AddWithValue("@SID", this.Sid);
-            command.Parameters.AddWithValue("@AgentVersion", this.AgentVersion);
-            command.Parameters.AddWithValue("@OSFamily", this.OperatingSystemFamily);
-            command.Parameters.AddWithValue("@OSVersion", this.OperatingSystemVersion);
-        }
-
-        public void ToUpdateCommandParameters(SqlCommand command)
-        {
-            command.Parameters.AddWithValue("@ObjectID", this.ObjectID);
-            command.Parameters.AddWithValue("@ComputerName", this.ComputerName);
-            command.Parameters.AddWithValue("@DnsName", this.DnsName);
-            command.Parameters.AddWithValue("@AgentVersion", this.AgentVersion);
-            command.Parameters.AddWithValue("@OSFamily", this.OperatingSystemFamily);
-            command.Parameters.AddWithValue("@OSVersion", this.OperatingSystemVersion);
         }
     }
 }

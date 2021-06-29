@@ -19,7 +19,7 @@ namespace Lithnet.AccessManager.Server
             this.logger = logger;
         }
 
-        public async Task<IList<Device>> FindDevices(string name)
+        public async Task<IList<IDevice>> FindDevices(string name)
         {
             name.ThrowIfNull(nameof(name));
 
@@ -31,17 +31,17 @@ namespace Lithnet.AccessManager.Server
 
             await using SqlDataReader reader = await command.ExecuteReaderAsync();
 
-            List<Device> devices = new List<Device>();
+            List<IDevice> devices = new List<IDevice>();
 
             while (await reader.ReadAsync())
             {
-                devices.Add(new Device(reader));
+                devices.Add(new DbDevice(reader));
             }
 
             return devices;
         }
 
-        public async Task<Device> GetOrCreateDeviceAsync(Microsoft.Graph.Device aadDevice, string authorityId)
+        public async Task<IDevice> GetOrCreateDeviceAsync(Microsoft.Graph.Device aadDevice, string authorityId)
         {
             authorityId.ThrowIfNull(nameof(authorityId));
             aadDevice.ThrowIfNull(nameof(aadDevice));
@@ -60,7 +60,7 @@ namespace Lithnet.AccessManager.Server
             return await this.CreateDeviceAsync(aadDevice, authorityId);
         }
 
-        public async Task<Device> GetOrCreateDeviceAsync(IActiveDirectoryComputer principal, string authorityId)
+        public async Task<IDevice> GetOrCreateDeviceAsync(IActiveDirectoryComputer principal, string authorityId)
         {
             authorityId.ThrowIfNull(nameof(authorityId));
             principal.ThrowIfNull(nameof(principal));
@@ -79,7 +79,7 @@ namespace Lithnet.AccessManager.Server
             return await this.CreateDeviceAsync(principal, authorityId, deviceId);
         }
 
-        public async Task<Device> GetDeviceAsync(AuthorityType authorityType, string authorityId, string authorityDeviceId)
+        public async Task<IDevice> GetDeviceAsync(AuthorityType authorityType, string authorityId, string authorityDeviceId)
         {
             authorityId.ThrowIfNull(nameof(authorityId));
             authorityDeviceId.ThrowIfNull(nameof(authorityDeviceId));
@@ -95,13 +95,13 @@ namespace Lithnet.AccessManager.Server
             await using SqlDataReader reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                return new Device(reader);
+                return new DbDevice(reader);
             }
 
             throw new DeviceNotFoundException($"Could not find a device with ID {authorityDeviceId} from authority {authorityId} ({authorityType})");
         }
 
-        public async Task<Device> GetDeviceAsync(string deviceId)
+        public async Task<IDevice> GetDeviceAsync(string deviceId)
         {
             deviceId.ThrowIfNull(nameof(deviceId));
 
@@ -114,7 +114,7 @@ namespace Lithnet.AccessManager.Server
             await using SqlDataReader reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                return new Device(reader);
+                return new DbDevice(reader);
             }
 
             throw new DeviceNotFoundException($"Could not find a device with ID {deviceId}");
@@ -134,7 +134,7 @@ namespace Lithnet.AccessManager.Server
             return (long)await command.ExecuteScalarAsync();
         }
 
-        public async Task<Device> GetDeviceAsync(X509Certificate2 certificate)
+        public async Task<IDevice> GetDeviceAsync(X509Certificate2 certificate)
         {
             certificate.ThrowIfNull(nameof(certificate));
 
@@ -147,13 +147,13 @@ namespace Lithnet.AccessManager.Server
             await using SqlDataReader reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
             {
-                return new Device(reader);
+                return new DbDevice(reader);
             }
 
             throw new DeviceNotFoundException($"Could not find a device with credentials for the certificate issued to '{certificate.Subject}' with thumbprint {certificate.Thumbprint}");
         }
 
-        public async Task<Device> CreateDeviceAsync(Device device, X509Certificate2 certificate)
+        public async Task<IDevice> CreateDeviceAsync(IDevice device, X509Certificate2 certificate)
         {
             device.ThrowIfNull(nameof(device));
             certificate.ThrowIfNull(nameof(certificate));
@@ -175,15 +175,15 @@ namespace Lithnet.AccessManager.Server
 
             await using SqlDataReader reader = await command.ExecuteReaderAsync();
             await reader.ReadAsync();
-            return new Device(reader);
+            return new DbDevice(reader);
         }
 
-        public async Task<Device> CreateDeviceAsync(Microsoft.Graph.Device aadDevice, string authorityId)
+        public async Task<IDevice> CreateDeviceAsync(Microsoft.Graph.Device aadDevice, string authorityId)
         {
             aadDevice.ThrowIfNull(nameof(aadDevice));
             authorityId.ThrowIfNull(nameof(authorityId));
 
-            Device device = new Device
+            DbDevice device = new DbDevice
             {
                 AuthorityId = authorityId,
                 AuthorityDeviceId = aadDevice.Id,
@@ -198,13 +198,13 @@ namespace Lithnet.AccessManager.Server
             return await this.CreateDeviceAsync(device);
         }
 
-        public async Task<Device> CreateDeviceAsync(IActiveDirectoryComputer computer, string authorityId, string deviceId)
+        public async Task<IDevice> CreateDeviceAsync(IActiveDirectoryComputer computer, string authorityId, string deviceId)
         {
             computer.ThrowIfNull(nameof(computer));
             authorityId.ThrowIfNull(nameof(authorityId));
             deviceId.ThrowIfNull(nameof(deviceId));
 
-            Device device = new Device
+            DbDevice device = new DbDevice
             {
                 ApprovalState = ApprovalState.Approved,
                 AuthorityId = authorityId,
@@ -218,7 +218,7 @@ namespace Lithnet.AccessManager.Server
             return await this.CreateDeviceAsync(device);
         }
 
-        public async Task<Device> CreateDeviceAsync(Device device)
+        public async Task<IDevice> CreateDeviceAsync(IDevice device)
         {
             device.ThrowIfNull(nameof(device));
 
@@ -236,10 +236,10 @@ namespace Lithnet.AccessManager.Server
 
             await using SqlDataReader reader = await command.ExecuteReaderAsync();
             await reader.ReadAsync();
-            return new Device(reader);
+            return new DbDevice(reader);
         }
 
-        public async Task<Device> UpdateDeviceAsync(Device device)
+        public async Task<IDevice> UpdateDeviceAsync(IDevice device)
         {
             device.ThrowIfNull(nameof(device));
 
@@ -256,7 +256,7 @@ namespace Lithnet.AccessManager.Server
 
             await using SqlDataReader reader = await command.ExecuteReaderAsync();
             await reader.ReadAsync();
-            return new Device(reader);
+            return new DbDevice(reader);
         }
     }
 }

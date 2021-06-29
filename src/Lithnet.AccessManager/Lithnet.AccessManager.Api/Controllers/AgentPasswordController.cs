@@ -20,7 +20,7 @@ namespace Lithnet.AccessManager.Api.Controllers
     public class AgentPasswordController : Controller
     {
         private readonly ILogger<AgentPasswordController> logger;
-        private readonly IDbDevicePasswordProvider passwordProvider;
+        private readonly IDevicePasswordProvider passwordProvider;
         private readonly ICertificateProvider certificateProvider;
         private readonly IApiErrorResponseProvider errorProvider;
         private readonly IEncryptionProvider encryptionProvider;
@@ -28,7 +28,7 @@ namespace Lithnet.AccessManager.Api.Controllers
 
         private X509Certificate2 encryptionCertificate;
 
-        public AgentPasswordController(ILogger<AgentPasswordController> logger, IDbDevicePasswordProvider passwordProvider, ICertificateProvider certificateProvider, IApiErrorResponseProvider errorProvider, IEncryptionProvider encryptionProvider, IOptionsMonitor<PasswordPolicyOptions> passwordOptions)
+        public AgentPasswordController(ILogger<AgentPasswordController> logger, IDevicePasswordProvider passwordProvider, ICertificateProvider certificateProvider, IApiErrorResponseProvider errorProvider, IEncryptionProvider encryptionProvider, IOptionsMonitor<PasswordPolicyOptions> passwordOptions)
         {
             this.logger = logger;
             this.passwordProvider = passwordProvider;

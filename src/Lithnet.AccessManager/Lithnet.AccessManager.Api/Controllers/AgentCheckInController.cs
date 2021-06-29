@@ -72,7 +72,7 @@ namespace Lithnet.AccessManager.Api.Controllers
             }
         }
 
-        private async Task OverlayAuthorityData(Device device)
+        private async Task OverlayAuthorityData(IDevice device)
         {
             if (device.AuthorityType == AuthorityType.ActiveDirectory)
             {

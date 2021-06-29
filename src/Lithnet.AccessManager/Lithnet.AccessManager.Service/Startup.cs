@@ -92,8 +92,8 @@ namespace Lithnet.AccessManager.Service
             services.AddScoped<IAadGraphApiProvider, AadGraphApiProvider>();
 
             services.AddSingleton<IDeviceProvider, DbDeviceProvider>();
-            services.AddSingleton<IDbDevicePasswordProvider, DbDevicePasswordProvider>();
-            services.AddSingleton<IRegistrationKeyProvider, RegistrationKeyProvider>();
+            services.AddSingleton<IDevicePasswordProvider, DbDevicePasswordProvider>();
+            services.AddSingleton<IRegistrationKeyProvider, DbRegistrationKeyProvider>();
 
             services.AddSingleton<ISmtpProvider, SmtpProvider>();
             services.AddSingleton<IApplicationUpgradeProvider, ApplicationUpgradeProvider>();
@@ -103,6 +103,7 @@ namespace Lithnet.AccessManager.Service
             services.AddSingleton<ICertificateProvider, CertificateProvider>();
             services.AddSingleton<IAppPathProvider, WebAppPathProvider>();
             services.AddSingleton(RandomNumberGenerator.Create());
+            services.AddSingleton<IRandomValueGenerator, RandomValueGenerator>();
             services.AddSingleton<IJitAccessGroupResolver, JitAccessGroupResolver>();
             services.AddSingleton<IPowerShellSessionProvider, CachedPowerShellSessionProvider>();
             services.AddSingleton<IAuthorizationInformationMemoryCache, AuthorizationInformationMemoryCache>();

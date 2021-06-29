@@ -23,12 +23,12 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         public bool CanProcess(IComputer computer)
         {
-            return computer is Device d && d.AuthorityType == AuthorityType.AzureActiveDirectory;
+            return computer is IDevice d && d.AuthorityType == AuthorityType.AzureActiveDirectory;
         }
 
         public async Task<IList<SecurityDescriptorTarget>> GetMatchingTargetsForComputer(IComputer computer, IEnumerable<SecurityDescriptorTarget> targets)
         {
-            if (!(computer is Device d) || (d.AuthorityType != AuthorityType.AzureActiveDirectory))
+            if (!(computer is IDevice d) || (d.AuthorityType != AuthorityType.AzureActiveDirectory))
             {
                 throw new InvalidOperationException("The object passed to the method was of an incorrect type");
             }

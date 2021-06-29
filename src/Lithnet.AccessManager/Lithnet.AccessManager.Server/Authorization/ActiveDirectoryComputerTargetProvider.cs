@@ -22,14 +22,14 @@ namespace Lithnet.AccessManager.Server.Authorization
         }
         public bool CanProcess(IComputer computer)
         {
-            return computer is IActiveDirectoryComputer || (computer is Device d && d.AuthorityType == AuthorityType.ActiveDirectory);
+            return computer is IActiveDirectoryComputer || (computer is IDevice d && d.AuthorityType == AuthorityType.ActiveDirectory);
         }
 
         public Task<IList<SecurityDescriptorTarget>> GetMatchingTargetsForComputer(IComputer computer, IEnumerable<SecurityDescriptorTarget> targets)
         {
             if (!(computer is IActiveDirectoryComputer adComputer))
             {
-                if (computer is Device d && d.AuthorityType == AuthorityType.ActiveDirectory)
+                if (computer is IDevice d && d.AuthorityType == AuthorityType.ActiveDirectory)
                 {
                     adComputer = this.directory.GetComputer(d.SecurityIdentifier);
                     return Task.FromResult(this.GetMatchingTargetsForComputer(adComputer, targets));

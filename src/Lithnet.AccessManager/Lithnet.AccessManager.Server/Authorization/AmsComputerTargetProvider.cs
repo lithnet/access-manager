@@ -21,12 +21,12 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         public bool CanProcess(IComputer computer)
         {
-            return computer is Device d && d.AuthorityType == AuthorityType.Ams;
+            return computer is IDevice d && d.AuthorityType == AuthorityType.Ams;
         }
 
         public Task<IList<SecurityDescriptorTarget>> GetMatchingTargetsForComputer(IComputer computer, IEnumerable<SecurityDescriptorTarget> targets)
         {
-            if (!(computer is Device d) || (d.AuthorityType != AuthorityType.Ams))
+            if (!(computer is IDevice d) || (d.AuthorityType != AuthorityType.Ams))
             {
                 throw new InvalidOperationException("The object passed to the method was of an incorrect type");
             }

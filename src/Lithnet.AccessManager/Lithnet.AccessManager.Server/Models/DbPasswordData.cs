@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Lithnet.AccessManager.Server
 {
-    public class DbPasswordData
+    public class DbPasswordData : IPasswordData
     {
         public long Id { get; set; }
 

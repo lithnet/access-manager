@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Lithnet.AccessManager.Server
 {
-    public class DbDevicePasswordProvider : IDbDevicePasswordProvider
+    public class DbDevicePasswordProvider : IDevicePasswordProvider
     {
         private readonly IDbProvider dbProvider;
         private readonly ILogger<DbDeviceProvider> logger;
@@ -56,7 +56,7 @@ namespace Lithnet.AccessManager.Server
             }
         }
 
-        public async Task<DbPasswordData> GetCurrentPassword(string deviceId)
+        public async Task<IPasswordData> GetCurrentPassword(string deviceId)
         {
             try
             {
@@ -87,7 +87,7 @@ namespace Lithnet.AccessManager.Server
             }
         }
 
-        public async Task<IList<DbPasswordData>> GetPasswordHistory(string deviceId)
+        public async Task<IList<IPasswordData>> GetPasswordHistory(string deviceId)
         {
             try
             {
@@ -104,7 +104,7 @@ namespace Lithnet.AccessManager.Server
                     throw new NoPasswordException();
                 }
 
-                List<DbPasswordData> passwords = new List<DbPasswordData>();
+                List<IPasswordData> passwords = new List<IPasswordData>();
 
                 while (await reader.ReadAsync())
                 {
@@ -124,7 +124,7 @@ namespace Lithnet.AccessManager.Server
             }
         }
 
-        public async Task<DbPasswordData> GetCurrentPassword(string deviceId, DateTime newExpiry)
+        public async Task<IPasswordData> GetCurrentPassword(string deviceId, DateTime newExpiry)
         {
             try
             {
