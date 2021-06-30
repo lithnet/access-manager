@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class AzureAdConfigurationViewModel : Screen, IHelpLink
+    public class AzureAdConfigurationViewModel : Conductor<PropertyChangedBase>.Collection.OneActive, IHelpLink
     {
         private readonly AzureAdOptions aadOptions;
         private readonly IDialogCoordinator dialogCoordinator;
@@ -25,7 +25,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.DirectionsSolid;
 
-        public AzureAdConfigurationViewModel(AzureAdOptions aadOptions, IDialogCoordinator dialogCoordinator, IAzureAdTenantDetailsViewModelFactory tenantFactory, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IAadGraphApiProvider graphApiProvider, ILogger<AzureAdConfigurationViewModel> logger, IAmsLicenseManager licenseManager)
+        public AzureAdConfigurationViewModel(AzureAdLithnetLapsConfigurationViewModel lithnetLapsVm, AzureAdOptions aadOptions, IDialogCoordinator dialogCoordinator, IAzureAdTenantDetailsViewModelFactory tenantFactory, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IAadGraphApiProvider graphApiProvider, ILogger<AzureAdConfigurationViewModel> logger, IAmsLicenseManager licenseManager)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.graphApiProvider = graphApiProvider;
@@ -43,6 +43,9 @@ namespace Lithnet.AccessManager.Server.UI
             };
 
             this.DisplayName = "Azure Active Directory";
+
+            this.Items.Add(lithnetLapsVm);
+
             this.Tenants = new BindableCollection<AzureAdTenantDetailsViewModel>();
         }
 

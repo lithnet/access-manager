@@ -10,18 +10,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class RegistrationKeysViewModel : Screen, IHelpLink
+    public class AmsDirectoryRegistrationKeysViewModel : Screen, IHelpLink
     {
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly INotifyModelChangedEventPublisher eventPublisher;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IRegistrationKeyProvider keyProvider;
         private readonly IRegistrationKeyViewModelFactory keyViewModelFactory;
-        private readonly ILogger<RegistrationKeysViewModel> logger;
+        private readonly ILogger<AmsDirectoryRegistrationKeysViewModel> logger;
 
-        public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.KeySolid;
+      //  public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.KeySolid;
 
-        public RegistrationKeysViewModel(IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IRegistrationKeyProvider keyProvider, IRegistrationKeyViewModelFactory keyViewModelFactory, ILogger<RegistrationKeysViewModel> logger)
+        public AmsDirectoryRegistrationKeysViewModel(IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IRegistrationKeyProvider keyProvider, IRegistrationKeyViewModelFactory keyViewModelFactory, ILogger<AmsDirectoryRegistrationKeysViewModel> logger)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.eventPublisher = eventPublisher;

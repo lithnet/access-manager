@@ -24,7 +24,7 @@
             </Button>
             <Label DockPanel.Dock="Left"
                    Style="{DynamicResource DescriptionHeaderStyle}"
-                   Content="Service" />
+                   Content="Service account" />
         </DockPanel>
 
         <Grid>
@@ -64,7 +64,7 @@
 
             <Label Grid.Row="0"
                    Grid.Column="0"
-                   Content="Service Account"
+                   Content="Account name"
                    Margin="5" />
             <TextBox Grid.Row="0"
                      Grid.Column="1"
@@ -152,81 +152,6 @@
                     Content="Change account..."
                     Margin="5" />
 
-            <Label Grid.Row="4"
-                   Grid.Column="0"
-                   Content="Service Status"
-                   Margin="5" />
-
-            <StackPanel Grid.Row="4"
-                        Grid.Column="1"
-                        Orientation="Horizontal">
-                <Label Content="{Binding ServiceStatus}"
-                       Margin="5" />
-                <mah:ProgressRing Height="15"
-                                  Width="15"
-                                  Margin="5"
-                                  Visibility="{Binding ServicePending, Converter={StaticResource BooleanToVisibilityConverter}}" />
-            </StackPanel>
-
-            <StackPanel  Grid.Row="5"
-                         Grid.Column="1"
-                         Orientation="Horizontal">
-                <Button Command="{s:Action StartService}"
-                        Content="Start Service"
-                        Height="Auto"
-                        Margin="5" />
-                <Button Command="{s:Action StopService}"
-                        Content="Stop Service"
-                        Height="Auto"
-                        Margin="5" />
-            </StackPanel>
-
-            <Label Grid.Row="7"
-                   Grid.Column="0"
-                   Content="Version"
-                   Margin="5" />
-
-            <StackPanel Grid.Row="7"
-                        Grid.Column="1"
-                        Orientation="Horizontal"
-                        VerticalAlignment="Center"
-                        Margin="5">
-                <iconPacks:PackIconFontAwesome Kind="CheckCircleRegular"
-                                               Margin="0 0 5 0"
-                                               Visibility="{Binding IsUpToDate, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                               Foreground="Green" />
-                <iconPacks:PackIconFontAwesome Kind="ArrowAltCircleUpRegular"
-                                               Margin="0 0 5 0"
-                                               Visibility="{Binding UpdateAvailable, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                               Foreground="DarkOrange" />
-                <TextBlock Margin="0 0 5 0"
-                           Text="{Binding CurrentVersion, FallbackValue='1.0.0.0'}" />
-
-                <TextBlock Margin="0 0 5 0"
-                           Visibility="{Binding IsUpToDate, Converter={StaticResource BooleanToVisibilityConverter}}"
-                           Text="Up to date" />
-
-                <TextBlock Margin="0 0 5 0"
-                           Visibility="{Binding UpdateAvailable, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <Hyperlink Click="{s:Action DownloadUpdate}"><TextBlock VerticalAlignment="Center">Update available v</TextBlock><TextBlock Text="{Binding AvailableVersion}" /></Hyperlink>
-                    </TextBlock>
-
-            </StackPanel>
-
-            <local:EnterpriseEditionBadge Grid.Row="8"
-                                          Grid.Column="1"
-                                          IsSolid="True"
-                                          Visibility="{Binding IsEnterpriseEdition, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                          ToolTipText="Enterprise edition license active"
-                                          Margin="2 2 5 2" />
-
-            <local:StandardEditionBadge Grid.Row="8"
-                                        IsSolid="True"
-                                        Grid.Column="1"
-                                        Visibility="{Binding IsStandardEdition, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                        ToolTipText="Standard edition"
-                                        Margin="2 2 5 2" />
-
             <Label Grid.Row="9"
                    Grid.Column="0"
                    Grid.ColumnSpan="2"
@@ -292,7 +217,7 @@
                    Grid.Column="0"
                    Grid.ColumnSpan="2"
                    Style="{DynamicResource DescriptionHeaderStyle}"
-                   Content="Web host" />
+                   Content="HTTP configuration" />
 
             <Label Grid.Row="15"
                    Grid.Column="0"
@@ -354,9 +279,7 @@
                    Grid.Column="0"
                    Grid.ColumnSpan="2"
                    Style="{DynamicResource DescriptionHeaderStyle}"
-                   Content="API host" />
-
-
+                   Content="API configuration" />
 
 
             <StackPanel Orientation="Horizontal"

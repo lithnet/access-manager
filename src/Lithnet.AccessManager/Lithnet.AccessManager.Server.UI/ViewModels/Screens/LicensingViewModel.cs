@@ -33,7 +33,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.licenseDataProvider = licenseDataProvider;
             this.eventAggregator = eventAggregator;
             this.dialogCoordinator = dialogCoordinator;
-            this.DisplayName = "License";
+            this.DisplayName = "AMS License";
             this.ValidationResult = licenseManager.ValidateLicense(licenseDataProvider.GetRawLicenseData());
             eventPublisher.Register(this);
         }

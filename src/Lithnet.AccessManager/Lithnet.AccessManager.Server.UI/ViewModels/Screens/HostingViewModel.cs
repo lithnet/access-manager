@@ -1,4 +1,4 @@
-﻿using Lithnet.AccessManager.Enterprise;
+﻿using Lithnet.AccessManager.Api;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using Lithnet.AccessManager.Server.UI.Providers;
@@ -8,22 +8,15 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Stylet;
 using System;
-using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
-using System.ServiceProcess;
-using System.Threading;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Api;
-using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Server.UI
 {
     public sealed class HostingViewModel : Screen, IHelpLink
     {
-        private CancellationTokenSource servicePollCts;
-
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly ILogger<HostingViewModel> logger;
         private readonly IAppPathProvider pathProvider;
@@ -37,15 +30,13 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IRegistryProvider registryProvider;
         private readonly ISecretRekeyProvider rekeyProvider;
         private readonly IObjectSelectionProvider objectSelectionProvider;
-        private readonly IAmsLicenseManager licenseManager;
-        private readonly IApplicationUpgradeProvider appUpgradeProvider;
         private readonly IHttpSysConfigurationProvider certificateBindingProvider;
         private readonly IFirewallProvider firewallProvider;
         private readonly TokenIssuerOptions tokenIssuerOptions;
         private readonly IProtectedSecretProvider protectedSecretProvider;
         private readonly RandomNumberGenerator csp;
 
-        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, ISecretRekeyProvider rekeyProvider, IObjectSelectionProvider objectSelectionProvider, IAmsLicenseManager licenseManager, IApplicationUpgradeProvider appUpgradeProvider, IHttpSysConfigurationProvider certificateBindingProvider, IFirewallProvider firewallProvider, TokenIssuerOptions tokenIssuerOptions, IProtectedSecretProvider protectedSecretProvider, RandomNumberGenerator csp)
+        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, ISecretRekeyProvider rekeyProvider, IObjectSelectionProvider objectSelectionProvider, IHttpSysConfigurationProvider certificateBindingProvider, IFirewallProvider firewallProvider, TokenIssuerOptions tokenIssuerOptions, IProtectedSecretProvider protectedSecretProvider, RandomNumberGenerator csp)
         {
             this.logger = logger;
             this.pathProvider = pathProvider;
@@ -62,8 +53,6 @@ namespace Lithnet.AccessManager.Server.UI
             this.registryProvider = registryProvider;
             this.rekeyProvider = rekeyProvider;
             this.objectSelectionProvider = objectSelectionProvider;
-            this.licenseManager = licenseManager;
-            this.appUpgradeProvider = appUpgradeProvider;
             this.certificateBindingProvider = certificateBindingProvider;
             this.firewallProvider = firewallProvider;
             this.tokenIssuerOptions = tokenIssuerOptions;
@@ -74,15 +63,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.Certificate = this.certificateBindingProvider.GetCertificate();
             this.OriginalCertificate = this.Certificate;
             this.ServiceAccount = this.windowsServiceProvider.GetServiceAccountSid();
-            this.ServiceStatus = this.windowsServiceProvider.Status.ToString();
             this.ApiEnabled = this.registryProvider.ApiEnabled;
-            this.DisplayName = "Web hosting";
-
-            this.licenseManager.OnLicenseDataChanged += delegate
-            {
-                this.NotifyOfPropertyChange(nameof(this.IsEnterpriseEdition));
-                this.NotifyOfPropertyChange(nameof(this.IsStandardEdition));
-            };
+            this.DisplayName = "Service host";
 
             eventPublisher.Register(this);
         }
@@ -91,35 +73,11 @@ namespace Lithnet.AccessManager.Server.UI
 
         protected override void OnInitialActivate()
         {
-            _ = this.TryGetVersion();
             this.PopulateCanDelegate();
             this.PopulateIsNotGmsa();
         }
 
-        protected override void OnActivate()
-        {
-            this.servicePollCts = new CancellationTokenSource();
-            _ = this.PollServiceStatus(this.servicePollCts.Token);
-            base.OnActivate();
-        }
-
-        protected override void OnDeactivate()
-        {
-            this.servicePollCts.Cancel();
-            base.OnDeactivate();
-        }
-
-        public bool IsEnterpriseEdition => this.licenseManager.IsEnterpriseEdition();
-
-        public bool IsStandardEdition => !this.IsEnterpriseEdition;
-
-        public string AvailableVersion { get; set; }
-
         public bool CanShowCertificateDialog => this.Certificate != null;
-
-        public bool CanStartService => this.ServiceStatus == ServiceControllerStatus.Stopped.ToString();
-
-        public bool CanStopService => this.ServiceStatus == ServiceControllerStatus.Running.ToString();
 
         [NotifyModelChangedProperty]
         public X509Certificate2 Certificate { get; set; }
@@ -127,8 +85,6 @@ namespace Lithnet.AccessManager.Server.UI
         public string CertificateDisplayName => this.Certificate.ToDisplayName();
 
         public string CertificateExpiryText { get; set; }
-
-        public string CurrentVersion { get; set; }
 
         [NotifyModelChangedProperty]
         public string Hostname { get => this.WorkingModel.HttpSys.Hostname; set => this.WorkingModel.HttpSys.Hostname = value; }
@@ -145,19 +101,14 @@ namespace Lithnet.AccessManager.Server.UI
         [NotifyModelChangedProperty]
         public string ApiHostname { get => this.WorkingModel.HttpSys.ApiHostname; set => this.WorkingModel.HttpSys.ApiHostname = value; }
 
-        public PackIconMaterialKind Icon => PackIconMaterialKind.Web;
+        //public PackIconMaterialKind Icon => PackIconMaterialKind.Web;
+        public object Icon => null;
 
         public bool IsCertificateCurrent { get; set; }
 
         public bool IsCertificateExpired { get; set; }
 
         public bool IsCertificateExpiring { get; set; }
-
-        public bool IsUpToDate { get; set; }
-
-        public bool IsConfigured { get; set; }
-
-        public bool IsUnconfigured => !this.IsConfigured;
 
         [NotifyModelChangedProperty]
         public SecurityIdentifier ServiceAccount { get; set; }
@@ -177,9 +128,6 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public bool ServicePending { get; set; }
-
-        public string ServiceStatus { get; set; }
 
         public bool CanBeDelegated { get; set; }
 
@@ -265,10 +213,6 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool ShowCertificateExpiryWarning => this.Certificate != null && this.Certificate.NotAfter.AddDays(-30) >= DateTime.Now;
 
-        public bool UpdateAvailable { get; set; }
-
-        public string UpdateLink { get; set; }
-
         private X509Certificate2 OriginalCertificate { get; set; }
 
         private HostingOptions OriginalModel { get; set; }
@@ -278,11 +222,6 @@ namespace Lithnet.AccessManager.Server.UI
         private string workingServiceAccountPassword;
 
         private string workingServiceAccountUserName;
-
-        private void UpdateIsConfigured()
-        {
-            this.IsConfigured = registryProvider.IsConfigured;
-        }
 
         public async Task<bool> CommitSettings(object dialogContext = null)
         {
@@ -300,9 +239,7 @@ namespace Lithnet.AccessManager.Server.UI
                 return false;
             }
 
-            this.UpdateIsConfigured();
-
-            bool currentlyUnconfigured = this.IsUnconfigured;
+            bool currentlyUnconfigured = !this.registryProvider.IsConfigured;
 
             bool updateHttpReservations =
                 this.WorkingModel.HttpSys.Hostname != this.OriginalModel.HttpSys.Hostname ||
@@ -467,7 +404,6 @@ namespace Lithnet.AccessManager.Server.UI
             if (currentlyUnconfigured)
             {
                 this.registryProvider.IsConfigured = true;
-                this.UpdateIsConfigured();
             }
 
             if (updateCertificateBinding || updateHttpReservations || updateServiceAccount || updateConfigFile || updateFirewallRules || updateApi)
@@ -491,16 +427,6 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.WorkingModel.Save(pathProvider.HostingConfigFile);
             rollback.RollbackActions.Add(() => originalSettings.Save(pathProvider.HostingConfigFile));
-        }
-
-        public async Task DownloadUpdate()
-        {
-            if (this.UpdateLink == null)
-            {
-                return;
-            }
-
-            await this.shellExecuteProvider.OpenWithShellExecute(this.UpdateLink);
         }
 
         public void OnCertificateChanged()
@@ -667,195 +593,21 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public async Task StartService()
-        {
-            ProgressDialogController progress = null;
-
-            try
-            {
-                if (this.CanStartService)
-                {
-                    progress = await this.dialogCoordinator.ShowProgressAsync(this, "Starting service", "Waiting for service to start", false, new MetroDialogSettings { AnimateHide = false, AnimateShow = false });
-                    progress.SetIndeterminate();
-                    await Task.Delay(500);
-
-                    await this.windowsServiceProvider.StartServiceAsync();
-                }
-            }
-            catch (System.ServiceProcess.TimeoutException)
-            {
-                if (progress?.IsOpen ?? false)
-                {
-                    await progress?.CloseAsync();
-                }
-
-                await dialogCoordinator.ShowMessageAsync(this, "Service control", "The service did not start in the requested time");
-            }
-            catch (Exception ex)
-            {
-                if (progress?.IsOpen ?? false)
-                {
-                    await progress?.CloseAsync();
-                }
-
-                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not start service");
-                await dialogCoordinator.ShowMessageAsync(this, "Service control", $"Could not start service\r\n{ex.Message}");
-            }
-            finally
-            {
-                if (progress?.IsOpen ?? false)
-                {
-                    await progress?.CloseAsync();
-                }
-            }
-        }
-
-        public async Task StopService()
-        {
-            ProgressDialogController progress = null;
-
-            try
-            {
-                if (this.CanStopService)
-                {
-                    progress = await this.dialogCoordinator.ShowProgressAsync(this, "Stopping service", "Waiting for service to stop", false, new MetroDialogSettings { AnimateHide = false, AnimateShow = false });
-                    progress.SetIndeterminate();
-                    await Task.Delay(500);
-
-                    await this.windowsServiceProvider.StopServiceAsync();
-                }
-            }
-            catch (System.ServiceProcess.TimeoutException)
-            {
-                if (progress?.IsOpen ?? false)
-                {
-                    await progress?.CloseAsync();
-                }
-
-                await dialogCoordinator.ShowMessageAsync(this, "Service control", "The service did not stop in the requested time");
-            }
-            catch (Exception ex)
-            {
-                if (progress?.IsOpen ?? false)
-                {
-                    await progress?.CloseAsync();
-                }
-
-                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not stop service");
-                await dialogCoordinator.ShowMessageAsync(this, "Service control", $"Could not stop service\r\n{ex.Message}");
-            }
-            finally
-            {
-                if (progress?.IsOpen ?? false)
-                {
-                    await progress?.CloseAsync();
-                }
-            }
-        }
-
-        public async Task TryGetVersion()
-        {
-            this.UpdateAvailable = false;
-            this.IsUpToDate = false;
-            this.UpdateLink = null;
-            this.AvailableVersion = null;
-
-            try
-            {
-                var versionInfo = await this.appUpgradeProvider.GetVersionInfo();
-                this.CurrentVersion = versionInfo.CurrentVersion?.ToString() ?? "Could not determine version";
-
-                if (versionInfo.Status == VersionInfoStatus.Failed || versionInfo.Status == VersionInfoStatus.Unknown)
-                {
-                    this.AvailableVersion = "Unable to determine latest application version";
-                }
-
-                this.AvailableVersion = versionInfo.AvailableVersion?.ToString();
-                this.UpdateLink = versionInfo.UpdateUrl;
-                this.IsUpToDate = versionInfo.Status == VersionInfoStatus.Current;
-                this.UpdateAvailable = versionInfo.Status == VersionInfoStatus.UpdateAvailable;
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not get version update");
-                this.AvailableVersion = "Unable to determine latest application version";
-            }
-        }
-
         private T CloneModel<T>(T model)
         {
             return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(model));
         }
 
-        private bool IsReservationInUse(bool currentlyUnconfigured, string oldurl, string newurl, out string user)
+        private bool IsReservationInUse(bool currentlyUnconfigured, string oldUrl, string newUrl, out string user)
         {
             user = null;
 
-            if (!currentlyUnconfigured && oldurl == newurl)
+            if (!currentlyUnconfigured && oldUrl == newUrl)
             {
                 return false;
             }
 
-            return this.certificateBindingProvider.IsReservationInUse(newurl, out user);
-        }
-
-        private async Task PollServiceStatus(CancellationToken token)
-        {
-            try
-            {
-                Debug.WriteLine("Poll started");
-                ServiceControllerStatus lastStatus = 0;
-
-                while (!token.IsCancellationRequested)
-                {
-                    await Task.Delay(500, CancellationToken.None).ConfigureAwait(false);
-
-                    if (lastStatus == this.windowsServiceProvider.Status)
-                    {
-                        continue;
-                    }
-
-                    ServiceControllerStatus currentStatus = this.windowsServiceProvider.Status;
-
-                    switch (currentStatus)
-                    {
-                        case ServiceControllerStatus.StartPending:
-                            this.ServiceStatus = "Starting";
-                            break;
-
-                        case ServiceControllerStatus.StopPending:
-                            this.ServiceStatus = "Stopping";
-                            break;
-
-                        case ServiceControllerStatus.ContinuePending:
-                            this.ServiceStatus = "Continue pending";
-
-                            break;
-
-                        case ServiceControllerStatus.PausePending:
-                            this.ServiceStatus = "Pausing";
-                            break;
-
-                        default:
-                            this.ServiceStatus = currentStatus.ToString();
-                            break;
-                    }
-
-                    this.ServicePending = currentStatus == ServiceControllerStatus.ContinuePending ||
-                                          currentStatus == ServiceControllerStatus.PausePending ||
-                                          currentStatus == ServiceControllerStatus.StartPending ||
-                                          currentStatus == ServiceControllerStatus.StopPending;
-
-                    lastStatus = currentStatus;
-                }
-            }
-            catch
-            {
-                this.ServicePending = false;
-                this.ServiceStatus = "Unknown";
-            }
-
-            Debug.WriteLine("Poll stopped");
+            return this.certificateBindingProvider.IsReservationInUse(newUrl, out user);
         }
 
         public async Task Help()

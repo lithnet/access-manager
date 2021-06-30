@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Lithnet.AccessManager.Api;
-using Lithnet.AccessManager.Api.Configuration;
 using MahApps.Metro.IconPacks;
 using Stylet;
 using System.Threading.Tasks;
@@ -14,26 +13,20 @@ using PropertyChanged;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class AdvancedPasswordManagementViewModel : Screen, IHelpLink
+    public class EncryptionCertificateComponentViewModel : Screen
     {
-        private readonly ApiAuthenticationOptions agentOptions;
-        private readonly AmsManagedDeviceRegistrationOptions amsManagedDeviceOptions;
-        private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly ICertificateProvider certificateProvider;
         private readonly IX509Certificate2ViewModelFactory certificate2ViewModelFactory;
         private readonly IDialogCoordinator dialogCoordinator;
-        private readonly ILogger<LapsConfigurationViewModel> logger;
+        private readonly ILogger<EncryptionCertificateComponentViewModel> logger;
         private readonly ICertificatePermissionProvider certPermissionProvider;
         private readonly DataProtectionOptions dataProtectionOptions;
         private readonly INotifyModelChangedEventPublisher eventPublisher;
         private readonly PasswordPolicyOptions passwordOptions;
 
-        public AdvancedPasswordManagementViewModel(INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, ApiAuthenticationOptions agentOptions, AmsManagedDeviceRegistrationOptions amsManagedDeviceOptions, ICertificateProvider certificateProvider, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IDialogCoordinator dialogCoordinator, ILogger<LapsConfigurationViewModel> logger, ICertificatePermissionProvider certPermissionProvider, DataProtectionOptions dataProtectionOptions, PasswordPolicyOptions passwordOptions)
+        public EncryptionCertificateComponentViewModel(INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certificateProvider, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IDialogCoordinator dialogCoordinator, ILogger<EncryptionCertificateComponentViewModel> logger, ICertificatePermissionProvider certPermissionProvider, DataProtectionOptions dataProtectionOptions, PasswordPolicyOptions passwordOptions)
         {
             this.eventPublisher = eventPublisher;
-            this.shellExecuteProvider = shellExecuteProvider;
-            this.agentOptions = agentOptions;
-            this.amsManagedDeviceOptions = amsManagedDeviceOptions;
             this.certificateProvider = certificateProvider;
             this.certificate2ViewModelFactory = certificate2ViewModelFactory;
             this.dialogCoordinator = dialogCoordinator;
@@ -43,8 +36,15 @@ namespace Lithnet.AccessManager.Server.UI
             this.passwordOptions = passwordOptions;
 
             this.AvailableCertificates = new BindableCollection<X509Certificate2ViewModel>();
-            this.DisplayName = "API";
             eventPublisher.Register(this);
+        }
+
+        protected override void OnViewLoaded()
+        {
+            Task.Run(async () =>
+            {
+                await this.RefreshAvailableCertificates();
+            });
         }
 
         protected override void OnInitialActivate()
@@ -59,32 +59,11 @@ namespace Lithnet.AccessManager.Server.UI
 
         public BindableCollection<X509Certificate2ViewModel> AvailableCertificates { get; }
 
-        public string HelpLink => Constants.HelpLinkPageEmail;
-
-        [NotifyModelChangedProperty]
-        public bool AllowAzureAdJoinedDevices { get => this.agentOptions.AllowAzureAdJoinedDeviceAuth; set => this.agentOptions.AllowAzureAdJoinedDeviceAuth = value; }
-
-        [NotifyModelChangedProperty]
-        public bool AllowAzureAdRegisteredDevices { get => this.agentOptions.AllowAzureAdRegisteredDeviceAuth; set => this.agentOptions.AllowAzureAdRegisteredDeviceAuth = value; }
-
-        [NotifyModelChangedProperty]
-        public bool AllowAmsManagedDeviceAuth { get => this.agentOptions.AllowAmsManagedDeviceAuth; set => this.agentOptions.AllowAmsManagedDeviceAuth = value; }
-
-        [NotifyModelChangedProperty]
-        public bool AutoApproveNewDevices { get => this.amsManagedDeviceOptions.AutoApproveNewDevices; set => this.amsManagedDeviceOptions.AutoApproveNewDevices = value; }
-
         [NotifyModelChangedProperty]
         [AlsoNotifyFor(nameof(CanSetActiveCertificate))]
         public string ActiveCertificateThumbprint
         {
             get => this.passwordOptions.EncryptionCertificateThumbprint; set => this.passwordOptions.EncryptionCertificateThumbprint = value;
-        }
-
-        public PackIconUniconsKind Icon => PackIconUniconsKind.ServerConnection;
-
-        public async Task Help()
-        {
-            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
         }
 
         public bool CanSetActiveCertificate => !this.SelectedCertificate?.IsPublished ?? false;

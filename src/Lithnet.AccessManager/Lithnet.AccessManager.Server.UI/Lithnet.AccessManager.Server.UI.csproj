@@ -115,90 +115,114 @@
     <Page Update="UIComponents\EnterpriseEditionBadge.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\AzureAdConfigurationView.xaml">
+    <Page Update="Views\Components\EncryptionCertificateComponentView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\AzureAdTenantDetailsView.xaml">
+    <Page Update="Views\Screens\AzureAdLithnetLapsConfigurationView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\AdvancedPasswordManagementView.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-    </Page>
-    <Page Update="Views\RegistrationKeysView.xaml">
+    <Page Update="Views\Screens\ActiveDirectoryMicrosoftLapsConfigurationView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\RegistrationKeyView.xaml">
+    <Page Update="Views\Screens\AzureAdConfigurationView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\LicenseKeyView.xaml">
+    <Page Update="Views\Screens\AmsDirectoryDevicesView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\HighAvailabilityView.xaml">
+    <Page Update="Views\WindowContent\AzureAdTenantDetailsView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\LicensingView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\EffectiveAccessView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\ImportWizardImportReadyView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\ImportWizardLapsWebSettingsView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\ImportWizardRuleSettingsView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\ImportWizardImportContainerView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\ImportWizardCsvSettingsView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\ImportWizardImportTypeView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\JitConfigurationView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\LapsConfigurationView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\ActiveDirectoryConfigurationView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\JitGroupMappingView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\HelpView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\ScriptContentView.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Views\AzureAdObjectSelectorView.xaml">
+    <Page Update="Views\Screens\AmsDirectoryLithnetLapsConfigurationView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
-    <Page Update="Views\SecurityDescriptorTargetView.xaml">
+    <Page Update="Views\Screens\AmsDirectoryRegistrationKeysView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-    </Page>
-    <Page Update="Views\SelectForestView.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\SelectTargetTypeView.xaml">
+    <Page Update="Views\WindowContent\RegistrationKeyView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Views\AboutView.xaml">
+    <Page Update="Views\WindowContent\LicenseKeyView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Screens\HighAvailabilityView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Screens\LicensingView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\WindowContent\EffectiveAccessView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\WindowContent\ImportWizard\ImportWizardImportReadyView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\WindowContent\ImportWizard\ImportWizardLapsWebSettingsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\WindowContent\ImportWizard\ImportWizardRuleSettingsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\WindowContent\ImportWizard\ImportWizardImportContainerView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\WindowContent\ImportWizard\ImportWizardCsvSettingsView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\WindowContent\ImportWizard\ImportWizardImportTypeView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Screens\ActiveDirectoryJitConfigurationView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Screens\ActiveDirectoryLithnetLapsConfigurationView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Screens\ActiveDirectoryConfigurationView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Screens\AmsDirectoryConfigurationView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\WindowContent\JitGroupMappingView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Screens\HelpView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Screens\DirectoryConfigurationView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Screens\ServerConfigurationView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
-    <Page Update="Views\MenuItemView.xaml">
+    <Page Update="Views\WindowContent\ScriptContentView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\WindowContent\AzureAdObjectSelectorView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
+    <Page Update="Views\WindowContent\SecurityDescriptorTargetView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
+    <Page Update="Views\WindowContent\SelectForestView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\WindowContent\SelectTargetTypeView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\WindowContent\AboutView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
     <Page Update="Windows\ImportWizardWindowView.xaml">
@@ -206,9 +230,6 @@
     </Page>
     <Page Update="Windows\ExternalDialogWindow.xaml">
       <SubType>Designer</SubType>
-    </Page>
-    <Page Update="Windows\MainWindow2View.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
   </ItemGroup>
 

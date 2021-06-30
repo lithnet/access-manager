@@ -13,7 +13,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class JitConfigurationViewModel : Screen, IHelpLink
+    public class ActiveDirectoryJitConfigurationViewModel : Screen, IHelpLink
     {
         private readonly JitConfigurationOptions jitOptions;
         private readonly IDialogCoordinator dialogCoordinator;
@@ -27,9 +27,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
 
-        public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.UserClockSolid;
+        // public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.UserClockSolid;
 
-        public JitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IJitGroupMappingViewModelFactory groupMappingFactory, INotifyModelChangedEventPublisher eventPublisher, IJitDomainStatusViewModelFactory jitDomainStatusFactory, IWindowsServiceProvider windowsServiceProvider, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IObjectSelectionProvider objectSelectionProvider, IScriptTemplateProvider scriptTemplateProvider)
+        public ActiveDirectoryJitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IJitGroupMappingViewModelFactory groupMappingFactory, INotifyModelChangedEventPublisher eventPublisher, IJitDomainStatusViewModelFactory jitDomainStatusFactory, IWindowsServiceProvider windowsServiceProvider, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IObjectSelectionProvider objectSelectionProvider, IScriptTemplateProvider scriptTemplateProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.dialogCoordinator = dialogCoordinator;
@@ -119,6 +119,13 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 this.jitOptions.JitGroupMappings.Add(m);
                 this.GroupMappings.Add(vm);
+
+                this.SelectedGroupMapping = vm;
+
+                if (await this.dialogCoordinator.ShowMessageAsync(this, "Delegate access", "Would you like to show the script to delegate AMS permissions for this OU now?", MessageDialogStyle.AffirmativeAndNegative) == MessageDialogResult.Affirmative)
+                {
+                    this.DelegateJitGroupPermission();
+                }
             }
         }
 
@@ -239,7 +246,6 @@ namespace Lithnet.AccessManager.Server.UI
         }
 
         public bool CanDelegateDynamicGroupPermission => !string.IsNullOrWhiteSpace(this.SelectedDomain?.DynamicGroupOU) && !this.SelectedDomain.IsPamEnabled;
-
 
         public void DelegateDynamicGroupPermission()
         {

@@ -20,109 +20,13 @@
             <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Active Directory" />
         </DockPanel>
 
-        <StackPanel>
-
-            <Label Style="{DynamicResource DescriptionHeaderStyle}" 
-                   Content="Schema"/>
-
-            <TextBlock Text="If you plan to use this tool with the Microsoft LAPS agent, then you'll need to deploy the Microsoft LAPS schema"
-                       TextWrapping="WrapWithOverflow"
-                       Margin="5"/>
-
-            <TextBlock Text="If you plan to deploy the Lithnet Access Manager agent to allow the encrypted local admin password and password history features, you'll need to deploy the Lithnet Access Manager schema"
-                       TextWrapping="WrapWithOverflow"
-                       Margin="5"/>
-
-            <ListView BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
-                      ItemsSource="{Binding Forests}"
-                      SelectedItem="{Binding SelectedForest}"
-                      ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                      Height="200"
-                      Margin="5">
-                <b:Interaction.Behaviors>
-                    <local:ListViewScrollBarBehavior />
-                </b:Interaction.Behaviors>
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Forest" 
-                                    DisplayMemberBinding="{Binding Name}" 
-                                    Width="Auto"/>
-                        <GridViewColumn Header="Microsoft LAPS Schema"
-                                        Width="Auto">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <mah:ProgressRing Height="15" Width="15"
-                                                          Visibility="{Binding MsLapsSchemaLookupInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                        <iconPacks:PackIconFontAwesome Kind="CheckCircleRegular" 
-                                                                       Visibility="{Binding IsMsLapsSchemaPresent, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                                       Foreground="Green"
-                                                                       VerticalAlignment="Center"/>
-
-                                        <iconPacks:PackIconBoxIcons Kind="RegularInfoCircle" 
-                                                                    Foreground="Gray" 
-                                                                    Visibility="{Binding IsNotMsLapsSchemaPresent, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                                    VerticalAlignment="Center"/>
-                                        <Label
-                                            VerticalAlignment="Center"
-                                            Content="{Binding MsLapsSchemaPresentText, Mode=OneWay,FallbackValue='Status unknown'}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Lithnet Access Manager Schema"
-                                    Width="Auto">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <mah:ProgressRing Height="15" Width="15"
-                                                          Visibility="{Binding LithnetSchemaLookupInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                        <iconPacks:PackIconFontAwesome Kind="CheckCircleRegular"
-                                                                       Foreground="Green" 
-                                                                       Visibility="{Binding IsLithnetSchemaPresent, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                                       VerticalAlignment="Center"/>
-
-                                        <iconPacks:PackIconBoxIcons Kind="RegularInfoCircle" 
-                                                                       Foreground="Gray" 
-                                                                       Visibility="{Binding IsNotLithnetSchemaPresent, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                                       VerticalAlignment="Center"/>
-                                        <Label
-                                            VerticalAlignment="Center"
-                                            Content="{Binding LithnetAccessManagerSchemaPresentText, Mode=OneWay,FallbackValue='Status unknown'}"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-
-                    </GridView>
-                </ListView.View>
-            </ListView>
-
-            <StackPanel DataContext="{Binding SelectedForest}"  Orientation="Horizontal">
-                <Button Command="{s:Action RefreshSchemaStatusAsync}"
-                        Margin="5" 
-                        Content="Refresh Status"/>
-                <Button Command="{s:Action ExtendSchemaLithnetAccessManager}"
-                        Margin="5" 
-                        HorizontalAlignment="Left"
-                        VerticalContentAlignment="Center">
-                    <StackPanel Orientation="Horizontal" 
-                                VerticalAlignment="Center">
-                        <iconPacks:PackIconMaterial Kind="ScriptOutline" Margin="0 0 2 0"/>
-                        <TextBlock Text="DEPLOY SCHEMA..." VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-            </StackPanel>
-
-        </StackPanel>
-
-        <Label Style="{DynamicResource DescriptionHeaderStyle}" 
+        <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
                Content="Domain permissions"/>
 
         <TextBlock Margin="5"
-                   TextWrapping="Wrap">The built-in group "Windows Authorization Access Group" grants permissions that are required for the service account to calculate group membership of users within a domain.</TextBlock>
+                   TextWrapping="Wrap">In order for Access Manager to correctly evaluate Active Directory permissions, you'll need to add the AMS service account to the following two groups in each domain. You can use the 'Grant Permission...' script below, to add the service account to the required groups, or you can do this manually.</TextBlock>
         <TextBlock Margin="5"
-                   TextWrapping="Wrap">The built-in group "Access Control Assistance Operators" grants permissions that are required to calculate authorization information for users in the domain</TextBlock>
+                   TextWrapping="Wrap">The built-in group "Windows Authorization Access Group" allows AMS to calculate group membership of users within a domain. The built-in group "Access Control Assistance Operators" allows AMS to calculate authorization information for users in the domain</TextBlock>
 
         <ListView BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
                       ItemsSource="{Binding Domains}"

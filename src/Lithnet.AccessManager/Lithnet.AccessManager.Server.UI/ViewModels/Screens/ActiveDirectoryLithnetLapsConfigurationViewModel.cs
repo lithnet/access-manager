@@ -15,13 +15,15 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class LapsConfigurationViewModel : Screen, IHelpLink
+    public class ActiveDirectoryLithnetLapsConfigurationViewModel : Screen, IHelpLink
     {
         private readonly ICertificateProvider certificateProvider;
         private readonly IX509Certificate2ViewModelFactory certificate2ViewModelFactory;
+        private readonly IActiveDirectoryForestSchemaViewModelFactory forestFactory;
+
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IWindowsServiceProvider windowsServiceProvider;
-        private readonly ILogger<LapsConfigurationViewModel> logger;
+        private readonly ILogger<ActiveDirectoryLithnetLapsConfigurationViewModel> logger;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IDiscoveryServices discoveryServices;
@@ -30,7 +32,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly DataProtectionOptions dataProtectionOptions;
         private readonly INotifyModelChangedEventPublisher eventPublisher;
 
-        public LapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IWindowsServiceProvider windowsServiceProvider, ILogger<LapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, DataProtectionOptions dataProtectionOptions, INotifyModelChangedEventPublisher eventPublisher)
+        public ActiveDirectoryLithnetLapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IWindowsServiceProvider windowsServiceProvider, ILogger<ActiveDirectoryLithnetLapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, DataProtectionOptions dataProtectionOptions, INotifyModelChangedEventPublisher eventPublisher, IActiveDirectoryForestSchemaViewModelFactory forestFactory)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.certificateProvider = certificateProvider;
@@ -43,44 +45,91 @@ namespace Lithnet.AccessManager.Server.UI
             this.scriptTemplateProvider = scriptTemplateProvider;
             this.dataProtectionOptions = dataProtectionOptions;
             this.eventPublisher = eventPublisher;
+            this.forestFactory = forestFactory;
 
-            this.Forests = new List<Forest>();
+            this.Forests = new BindableCollection<ActiveDirectoryForestSchemaViewModel>();
+
             this.AvailableCertificates = new BindableCollection<X509Certificate2ViewModel>();
-            this.DisplayName = "Local admin passwords";
+            this.DisplayName = "Lithnet LAPS";
             this.certPermissionProvider = certPermissionProvider;
         }
 
         public string HelpLink => Constants.HelpLinkPageLocalAdminPasswords;
 
+        private Task initialize;
+
         protected override void OnInitialActivate()
         {
-            Task.Run(async () =>
+            this.initialize = Task.Run(async () =>
             {
-                this.BuildForests();
+                await this.PopulateForestsAndDomains();
                 this.SelectedForest = this.Forests.FirstOrDefault();
                 await this.RefreshAvailableCertificates();
             });
         }
 
-        private void BuildForests()
+        private async Task PopulateForestsAndDomains()
         {
             try
             {
-                foreach (var forest in this.domainTrustProvider.GetForests())
+                foreach (Forest forest in this.domainTrustProvider.GetForests())
                 {
-                    this.Forests.Add(forest);
+                    this.Forests.Add(forestFactory.CreateViewModel(forest));
                 }
+
+                await this.RefreshData();
             }
             catch (Exception ex)
             {
-                logger.LogError(EventIDs.UIGenericError, ex, "Could not build forest list");
-                this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not build the forest list\r\n{ex.Message}").ConfigureAwait(false).GetAwaiter().GetResult();
+                this.logger.LogWarning(ex, "Unable to populate forest list");
             }
         }
 
-        public List<Forest> Forests { get; }
+        private async Task RefreshData()
+        {
+            foreach (var forest in this.Forests)
+            {
+                await forest.RefreshSchemaStatusAsync();
+            }
+        }
 
-        public Forest SelectedForest { get; set; }
+        public BindableCollection<ActiveDirectoryForestSchemaViewModel> Forests { get; }
+
+        public ActiveDirectoryForestSchemaViewModel SelectedForest { get; set; }
+
+        public bool CanExtendSchemaLithnetAccessManager => this.SelectedForest?.IsNotLithnetSchemaPresent == true;
+
+        public async Task ExtendSchemaLithnetAccessManager()
+        {
+            ActiveDirectoryForestSchemaViewModel current = this.SelectedForest;
+
+            var vm = new ScriptContentViewModel(this.dialogCoordinator)
+            {
+                HelpText = "Run the following script as an account that is a member of the 'Schema Admins' group",
+                ScriptText = this.scriptTemplateProvider.UpdateAdSchema
+                    .Replace("{forest}", current.Name)
+            };
+
+            ExternalDialogWindow w = new ExternalDialogWindow
+            {
+                Title = "Script",
+                DataContext = vm,
+                SaveButtonVisible = false,
+                CancelButtonName = "Close"
+            };
+
+            w.ShowDialog();
+
+            await Task.Run(() => current.RefreshSchemaStatus()).ConfigureAwait(false);
+        }
+
+        public async Task RefreshSchemaStatusAsync()
+        {
+            foreach (var vm in this.Forests)
+            {
+                await vm.RefreshSchemaStatusAsync();
+            }
+        }
 
         private void OnSelectedForestChanged()
         {
@@ -96,7 +145,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public void PublishSelectedCertificate()
         {
-            var de = this.discoveryServices.GetConfigurationNamingContext(this.SelectedForest.RootDomain.Name);
+            var de = this.discoveryServices.GetConfigurationNamingContext(this.SelectedForest.Forest.RootDomain.Name);
             var certData = Convert.ToBase64String(this.SelectedCertificate.Model.RawData, Base64FormattingOptions.InsertLineBreaks);
 
             var vm = new ScriptContentViewModel(this.dialogCoordinator)
@@ -121,7 +170,7 @@ namespace Lithnet.AccessManager.Server.UI
             try
             {
                 if (this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert,
-                    this.SelectedForest.RootDomain.Name))
+                    this.SelectedForest.Forest.RootDomain.Name))
                 {
                     if (publishedCert.Thumbprint == this.SelectedCertificate.Model.Thumbprint)
                     {
@@ -299,30 +348,6 @@ namespace Lithnet.AccessManager.Server.UI
             await this.shellExecuteProvider.OpenWithShellExecute(Constants.LinkDownloadAccessManagerAgent);
         }
 
-        public async Task OpenMsLapsDownload()
-        {
-            await this.shellExecuteProvider.OpenWithShellExecute(Constants.LinkDownloadMsLaps);
-        }
-
-        public void DelegateMsLapsPermission()
-        {
-            var vm = new ScriptContentViewModel(this.dialogCoordinator)
-            {
-                HelpText = "Modify the OU variable in this script, and run it with domain admin rights to assign permissions for the service account to be able to read Microsoft LAPS passwords from the directory",
-                ScriptText = this.scriptTemplateProvider.GrantMsLapsPermissions.Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceAccountSid().ToString(), StringComparison.OrdinalIgnoreCase)
-            };
-
-            ExternalDialogWindow w = new ExternalDialogWindow
-            {
-                Title = "Script",
-                DataContext = vm,
-                SaveButtonVisible = false,
-                CancelButtonName = "Close"
-            };
-
-            w.ShowDialog();
-        }
-
         private void NotifyCertificateListChanged()
         {
             if (this.dataProtectionOptions.EnableCertificateSynchronization)
@@ -348,7 +373,7 @@ namespace Lithnet.AccessManager.Server.UI
                 }
 
                 var allCertificates = certificateProvider.GetEligiblePasswordEncryptionCertificates(false).OfType<X509Certificate2>();
-                this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert, this.SelectedForest.RootDomain.Name);
+                this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert, this.SelectedForest.Forest.RootDomain.Name);
 
                 bool foundPublished = false;
 
@@ -362,7 +387,7 @@ namespace Lithnet.AccessManager.Server.UI
                         foundPublished = true;
                     }
 
-                    if (certificate.Subject.StartsWith($"CN={this.SelectedForest.RootDomain.Name}",
+                    if (certificate.Subject.StartsWith($"CN={this.SelectedForest.Forest.RootDomain.Name}",
                         StringComparison.OrdinalIgnoreCase))
                     {
                         this.AvailableCertificates.Add(vm);
@@ -384,7 +409,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public PackIconUniconsKind Icon => PackIconUniconsKind.Asterisk;
+      //  public PackIconUniconsKind Icon => PackIconUniconsKind.Asterisk;
 
         public async Task Help()
         {

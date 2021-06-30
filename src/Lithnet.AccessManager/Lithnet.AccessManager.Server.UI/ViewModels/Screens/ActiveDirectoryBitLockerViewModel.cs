@@ -8,14 +8,14 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class BitLockerViewModel : Screen, IHelpLink
+    public class ActiveDirectoryBitLockerViewModel : Screen, IHelpLink
     {
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
         
-            public BitLockerViewModel(IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, IShellExecuteProvider shellExecuteProvider, IScriptTemplateProvider scriptTemplateProvider)
+            public ActiveDirectoryBitLockerViewModel(IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, IShellExecuteProvider shellExecuteProvider, IScriptTemplateProvider scriptTemplateProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.scriptTemplateProvider = scriptTemplateProvider;
@@ -26,7 +26,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string HelpLink => Constants.HelpLinkPageBitLocker;
 
-        public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.HddRegular;
+      //  public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.HddRegular;
 
         public void DelegateServicePermission()
         {

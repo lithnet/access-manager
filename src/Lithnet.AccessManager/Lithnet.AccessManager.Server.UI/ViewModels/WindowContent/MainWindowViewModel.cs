@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.ServiceProcess;
 using System.Threading;
@@ -6,7 +7,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.Licensing.Core;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Stylet;
@@ -23,15 +23,14 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly IRegistryProvider registryProvider;
         private readonly ICertificateSynchronizationProvider certSyncProvider;
-        private readonly IAmsLicenseManager licenseManager;
         private readonly IClusterProvider clusterProvider;
+        private readonly HostingViewModel hosting;
 
         private SemaphoreSlim clusterWaitSemaphore;
         private int isUiLocked;
 
-        public MainWindowViewModel(IApplicationConfig model, AuthenticationViewModel authentication, AuthorizationViewModel authorization, UserInterfaceViewModel ui, RateLimitsViewModel rate, IpDetectionViewModel ip,
-            AuditingViewModel audit, EmailViewModel mail, HostingViewModel hosting, ActiveDirectoryConfigurationViewModel ad,
-            JitConfigurationViewModel jit, LapsConfigurationViewModel laps, HelpViewModel help, BitLockerViewModel bitLocker, LicensingViewModel lic, HighAvailabilityViewModel havm, AzureAdConfigurationViewModel azuread, AdvancedPasswordManagementViewModel pmgmt, RegistrationKeysViewModel rk, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider, ICertificateSynchronizationProvider certSyncProvider, IAmsLicenseManager licenseManager, IClusterProvider clusterProvider)
+        public MainWindowViewModel(IApplicationConfig model, AuthorizationViewModel authorization, HostingViewModel hosting, 
+           HelpViewModel help,  IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider, ICertificateSynchronizationProvider certSyncProvider, IClusterProvider clusterProvider, ServerConfigurationViewModel serverConfigurationVm, DirectoryConfigurationViewModel directoryVm)
         {
             this.model = model;
             this.shellExecuteProvider = shellExecuteProvider;
@@ -43,30 +42,21 @@ namespace Lithnet.AccessManager.Server.UI
             this.eventAggregator = eventAggregator;
             this.certSyncProvider = certSyncProvider;
             this.dialogCoordinator = dialogCoordinator;
-            this.licenseManager = licenseManager;
             this.clusterProvider = clusterProvider;
             this.clusterWaitSemaphore = new SemaphoreSlim(0, 1);
 
             this.eventAggregator.Subscribe(this);
             this.DisplayName = Constants.AppName;
 
-            this.Items.Add(hosting);
-            this.Items.Add(authentication);
-            this.Items.Add(ui);
-            this.Items.Add(mail);
-            this.Items.Add(rate);
-            this.Items.Add(ip);
-            this.Items.Add(ad);
-            this.Items.Add(azuread);
-            this.Items.Add(audit);
-            this.Items.Add(laps);
-            this.Items.Add(pmgmt);
-            this.Items.Add(rk);
-            this.Items.Add(jit);
-            this.Items.Add(bitLocker);
+            this.Items.Add(serverConfigurationVm);
+            this.Items.Add(directoryVm);
+            //this.Items.Add(new MenuItemViewModel(laps.Icon, "Password management", new List<object> { laps, pmgmt }));
+
+            //this.Items.Add(regKeys);
+           // this.Items.Add(jit);
+           // this.Items.Add(bitLocker);
             this.Items.Add(authorization);
-            this.Items.Add(lic);
-            this.Items.Add(havm);
+
 
             this.OptionItems = new BindableCollection<PropertyChangedBase> { help };
 
@@ -75,6 +65,21 @@ namespace Lithnet.AccessManager.Server.UI
             this.UpdateIsConfigured();
             this.SetupClusterMonitor();
 
+        }
+
+        private object ai;
+
+        public object Item
+        {
+            get => this.ai;
+            set
+            {
+                this.ai = value;
+                if (value is IScreenState s)
+                {
+                    s.Activate();
+                }
+            }
         }
 
         private void SetupClusterMonitor()
@@ -108,8 +113,6 @@ namespace Lithnet.AccessManager.Server.UI
 
         public BindableCollection<PropertyChangedBase> OptionItems { get; }
 
-        private HostingViewModel hosting { get; }
-
         public PropertyChangedBase ActiveOptionsItem { get; set; }
 
         public string HelpLink => (this.ActiveItem as IHelpLink)?.HelpLink ?? (this.ActiveOptionsItem as IHelpLink)?.HelpLink;
@@ -126,7 +129,7 @@ namespace Lithnet.AccessManager.Server.UI
             try
             {
                 controller = await this.dialogCoordinator.ShowProgressAsync(this, "Cluster node no longer active", "This server is no longer hosting the clustered service. Configuration is currently disabled. You can wait for the service to return to this node, or close the app without saving any configuration changes. ", true, new MetroDialogSettings() { NegativeButtonText = "Close app without saving" });
-                
+
                 controller.Canceled += (sender, args) =>
                 {
                     this.clusterWaitSemaphore.Release();
@@ -138,10 +141,13 @@ namespace Lithnet.AccessManager.Server.UI
             finally
             {
                 isUiLocked = 0;
-                await controller?.CloseAsync();
+
+                if (controller != null)
+                {
+                    await controller.CloseAsync();
+                }
             }
         }
-
 
         public async Task<bool> Save()
         {
@@ -335,7 +341,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                 await this.windowsServiceProvider.StopServiceAsync();
 
-                progress.SetMessage("Wating for the service to start");
+                progress.SetMessage("Waiting for the service to start");
 
                 await this.windowsServiceProvider.StartServiceAsync();
             }
