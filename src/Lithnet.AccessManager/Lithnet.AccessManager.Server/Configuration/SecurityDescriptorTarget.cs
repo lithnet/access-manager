@@ -16,10 +16,16 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public string Target { get; set; }
 
+        public string CachedTargetName { get; set; }
+
+        public string TargetObjectId { get; set; }
+
+        public string TargetAuthorityId { get; set; }
+
         public string Description { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public TargetType Type { get; set; } = TargetType.Container;
+        public TargetType Type { get; set; } = TargetType.AdContainer;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public AuthorizationMode AuthorizationMode { get; set; } = AuthorizationMode.SecurityDescriptor;

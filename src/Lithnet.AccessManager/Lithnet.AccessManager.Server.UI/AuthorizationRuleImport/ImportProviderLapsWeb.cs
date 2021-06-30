@@ -141,13 +141,13 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 
             if (string.Equals(type, "container", StringComparison.OrdinalIgnoreCase))
             {
-                target.Type = TargetType.Container;
+                target.Type = TargetType.AdContainer;
                 target.Target = name;
                 targetFriendlyName = name;
             }
             else if (string.Equals(type, "computer", StringComparison.OrdinalIgnoreCase))
             {
-                target.Type = TargetType.Computer;
+                target.Type = TargetType.AdComputer;
 
                 if (this.directory.TryGetComputer(name, out IActiveDirectoryComputer computer))
                 {
@@ -162,7 +162,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
             }
             else if (string.Equals(type, "group", StringComparison.OrdinalIgnoreCase))
             {
-                target.Type = TargetType.Group;
+                target.Type = TargetType.AdGroup;
 
                 if (this.directory.TryGetGroup(name, out IGroup group))
                 {

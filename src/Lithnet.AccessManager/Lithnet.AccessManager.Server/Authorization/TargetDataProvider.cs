@@ -44,7 +44,7 @@ namespace Lithnet.AccessManager.Server.Authorization
         {
             try
             {
-                if (target.Type == TargetType.Container)
+                if (target.Type == TargetType.AdContainer)
                 {
                     DirectoryEntry de = new DirectoryEntry($"LDAP://{target.Target}");
                     return de.Guid;
@@ -63,7 +63,7 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         private SecurityIdentifier GetSid(SecurityDescriptorTarget target)
         {
-            if (target.Type == TargetType.Container)
+            if (target.Type == TargetType.AdContainer)
             {
                 return null;
             }
@@ -85,7 +85,7 @@ namespace Lithnet.AccessManager.Server.Authorization
         {
             try
             {
-                if (target.Type == TargetType.Container && !string.IsNullOrWhiteSpace(target.Target))
+                if (target.Type == TargetType.AdContainer && !string.IsNullOrWhiteSpace(target.Target))
                 {
                     X500DistinguishedName x500 = new X500DistinguishedName(target.Target);
                     return x500.Decode(X500DistinguishedNameFlags.UseNewLines)?.Split("\r\n")?.Length ?? 0;

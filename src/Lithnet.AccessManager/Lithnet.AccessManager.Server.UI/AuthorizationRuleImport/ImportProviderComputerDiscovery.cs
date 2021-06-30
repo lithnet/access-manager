@@ -174,7 +174,7 @@ string.Join(", ", computer.PrincipalsUniqueToThisLevel)
                 AuthorizationMode = AuthorizationMode.SecurityDescriptor,
                 Description = settings.RuleDescription?.Replace("{targetName}", computer.PrincipalName, StringComparison.OrdinalIgnoreCase),
                 Target = computer.Sid.ToString(),
-                Type = TargetType.Computer,
+                Type = TargetType.AdComputer,
                 Id = Guid.NewGuid().ToString(),
                 Notifications = settings.Notifications,
                 Jit = new SecurityDescriptorTargetJitDetails()
@@ -217,7 +217,7 @@ string.Join(", ", computer.PrincipalsUniqueToThisLevel)
                 AuthorizationMode = AuthorizationMode.SecurityDescriptor,
                 Description = settings.RuleDescription?.Replace("{targetName}", entry.OUName, StringComparison.OrdinalIgnoreCase),
                 Target = entry.OUName,
-                Type = TargetType.Container,
+                Type = TargetType.AdContainer,
                 Id = Guid.NewGuid().ToString(),
                 Notifications = settings.Notifications,
                 Jit = new SecurityDescriptorTargetJitDetails()

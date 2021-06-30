@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.Configuration;
 using Microsoft.Graph;
 
 namespace Lithnet.AccessManager.Server
@@ -28,14 +29,44 @@ namespace Lithnet.AccessManager.Server
             return guid.ToSidString();
         }
 
-        public static string GetSidString(this Group group)
+        public static string GetSidString(this Group g)
         {
-            return $"{AadSidPrefix}{SidUtils.GuidStringToSidString(group.Id)}";
+            if (g.SecurityIdentifier != null)
+            {
+                return g.SecurityIdentifier;
+            }
+
+            return $"{AadSidPrefix}{SidUtils.GuidStringToSidString(g.Id)}";
         }
 
-        public static SecurityIdentifier GetSid(this Group group)
+        public static SecurityIdentifier GetSid(this Group g)
         {
-            return new SecurityIdentifier(group.GetSidString());
+            return new SecurityIdentifier(g.GetSidString());
+        }
+
+        public static string GetSidString(this Device d)
+        {
+            return $"{AadSidPrefix}{SidUtils.GuidStringToSidString(d.Id)}";
+        }
+
+        public static SecurityIdentifier GetSid(this Device d)
+        {
+            return new SecurityIdentifier(d.GetSidString());
+        }
+
+        public static bool IsAmsAuthority(this SecurityIdentifier s)
+        {
+            return s.Value.StartsWith(AmsSidPrefix);
+        }
+
+        public static bool IsAadAuthority(this SecurityIdentifier s)
+        {
+            return s.Value.StartsWith(AadSidPrefix);
+        }
+
+        public static bool IsWindowsAuthority(this SecurityIdentifier s)
+        {
+            return !s.IsAadAuthority() && !s.IsAmsAuthority();
         }
     }
 }

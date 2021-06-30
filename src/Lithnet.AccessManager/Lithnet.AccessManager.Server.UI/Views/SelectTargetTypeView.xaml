@@ -15,7 +15,7 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="*" MinWidth="500"/>
         </Grid.ColumnDefinitions>
         <Label Grid.Row="0" Grid.Column="0" 
                            Content="Target type"
@@ -23,7 +23,6 @@
         <ComboBox Grid.Row="0" Grid.Column="1" 
                               ItemsSource="{Binding TargetTypeValues, Mode=OneWay}"
                               SelectedItem="{Binding TargetType}"
-                              Width="200"
                               Margin="5">
             <ComboBox.Resources>
                 <local:EnumToDisplayConverter x:Key="enumconv"/>
@@ -42,8 +41,17 @@
                               ItemsSource="{Binding AvailableForests, Mode=OneWay}"
                               SelectedItem="{Binding SelectedForest}"
                               Visibility="{Binding ShowForest, Converter={StaticResource BooleanToVisibilityConverter}}"
-                              Width="200"
                               Margin="5"/>
 
+        <Label Grid.Row="1" Grid.Column="0"
+               Content="Azure AD tenant"
+               Margin="5"
+               Visibility="{Binding ShowAad, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+        <ComboBox Grid.Row="1" Grid.Column="1" 
+                  ItemsSource="{Binding AvailableAads, Mode=OneWay}"
+                  SelectedItem="{Binding SelectedAad}"
+                  DisplayMemberPath="TenantName"
+                  Visibility="{Binding ShowAad, Converter={StaticResource BooleanToVisibilityConverter}}"
+                  Margin="5"/>
     </Grid>
 </UserControl>

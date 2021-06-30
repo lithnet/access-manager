@@ -1,23 +1,22 @@
-﻿using System;
+﻿using Lithnet.AccessManager.Enterprise;
+using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.AccessManager.Server.UI.Interop;
+using Lithnet.AccessManager.Server.UI.Providers;
+using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.SimpleChildWindow;
+using Microsoft.Extensions.Logging;
+using PropertyChanged;
+using Stylet;
+using System;
 using System.Collections.Generic;
 using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
-using Lithnet.AccessManager.Enterprise;
-using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.UI.Interop;
-using Lithnet.AccessManager.Server.UI.Providers;
-using Lithnet.Licensing.Core;
-using MahApps.Metro.Controls.Dialogs;
-using MahApps.Metro.SimpleChildWindow;
-using Microsoft.Extensions.Logging;
-using Microsoft.Net.Http.Headers;
-using PropertyChanged;
-using Stylet;
+using Microsoft.Graph;
+using Domain = System.DirectoryServices.ActiveDirectory.Domain;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -35,6 +34,10 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ScriptTemplateProvider scriptTemplateProvider;
         private readonly IAmsLicenseManager licenseManager;
         private readonly IShellExecuteProvider shellExecuteProvider;
+        private readonly ISelectTargetTypeViewModelFactory targetTypeFactory;
+        private readonly IAzureAdObjectSelectorViewModelFactory aadSelectorFactory;
+        private readonly IAadGraphApiProvider graphProvider;
+        private readonly IDeviceProvider deviceProvider;
 
         private string jitGroupDisplayName;
 
@@ -42,7 +45,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, INotificationChannelSelectionViewModelFactory notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, ISelectTargetTypeViewModelFactory targetTypeFactory, IAzureAdObjectSelectorViewModelFactory aadSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider)
         {
             this.directory = directory;
             this.Model = model;
@@ -58,6 +61,10 @@ namespace Lithnet.AccessManager.Server.UI
             this.scriptTemplateProvider = scriptTemplateProvider;
             this.licenseManager = licenseManager;
             this.shellExecuteProvider = shellExecuteProvider;
+            this.targetTypeFactory = targetTypeFactory;
+            this.aadSelectorFactory = aadSelectorFactory;
+            this.graphProvider = graphProvider;
+            this.deviceProvider = deviceProvider;
 
             this.Script = fileSelectionViewModelFactory.CreateViewModel(model, () => model.Script, appPathProvider.ScriptsPath);
             this.Script.DefaultFileExtension = "ps1";
@@ -68,17 +75,16 @@ namespace Lithnet.AccessManager.Server.UI
             this.Initialization = this.Initialize();
         }
 
-
         private async Task Initialize()
         {
             this.Notifications = notificationChannelFactory.CreateViewModel(this.Model.Notifications);
-            this.DisplayName = this.Target;
+            this.DisplayName = this.CachedTargetName ?? this.Target;
             this.jitGroupDisplayName = this.JitAuthorizingGroup;
-            await this.UpdateDisplayName();
+            await this.UpdateDisplayName(false);
             await this.UpdateJitGroupDisplayName();
             await this.ValidateAsync();
-            this.LastModifiedBy = await this.GetNameFromSidOrDefaultAsync(this.Model.LastModifiedBy);
-            this.CreatedBy = await this.GetNameFromSidOrDefaultAsync(this.Model.CreatedBy);
+            this.LastModifiedBy = await this.GetNameFromActiveDirectorySidOrDefaultAsync(this.Model.LastModifiedBy) ?? this.Model.LastModifiedBy;
+            this.CreatedBy = await this.GetNameFromActiveDirectorySidOrDefaultAsync(this.Model.CreatedBy) ?? this.Model.CreatedBy;
         }
 
         private void Script_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -144,6 +150,10 @@ namespace Lithnet.AccessManager.Server.UI
             set => this.Model.Notes = value;
         }
 
+        public string TargetObjectId { get => this.Model.TargetObjectId; set => this.Model.TargetObjectId = value; }
+
+        public string TargetAuthorityId { get => this.Model.TargetAuthorityId; set => this.Model.TargetAuthorityId = value; }
+
         public string CreatedBy { get; private set; }
 
         public string LastModifiedBy { get; private set; }
@@ -162,29 +172,48 @@ namespace Lithnet.AccessManager.Server.UI
             set
             {
                 this.Model.Target = value;
-                _ = this.UpdateDisplayName();
+                _ = this.UpdateDisplayName(true);
             }
         }
 
-        private async Task UpdateDisplayName()
+        public async Task UpdateDisplayName(bool force)
         {
             if (this.Target == null)
             {
                 this.DisplayName = null;
+                this.CachedTargetName = null;
             }
-            else if (this.Type == TargetType.Container)
+            else if (this.Type == TargetType.AdContainer)
             {
                 this.DisplayName = this.Target;
             }
             else
             {
-                this.DisplayName = $"{await this.GetNameFromSidOrDefaultAsync(this.Target)} ({this.Type})";
+                if (force || this.CachedTargetName == null)
+                {
+                    var resolvedName = await this.GetTargetNameFromSidOrDefaultAsync(this.Target);
+
+                    if (resolvedName == null)
+                    {
+                        this.DisplayName = this.Target;
+                        this.CachedTargetName = null;
+                    }
+                    else
+                    {
+                        this.CachedTargetName = resolvedName;
+                        this.DisplayName = resolvedName;
+                    }
+                }
+                else
+                {
+                    this.DisplayName = this.CachedTargetName;
+                }
             }
         }
 
         private async Task UpdateJitGroupDisplayName()
         {
-            this.jitGroupDisplayName = await this.GetNameFromSidOrDefaultAsync(this.JitAuthorizingGroup);
+            this.jitGroupDisplayName = await this.GetNameFromActiveDirectorySidOrDefaultAsync(this.JitAuthorizingGroup) ?? this.JitAuthorizingGroup;
             this.NotifyOfPropertyChange(nameof(JitGroupDisplayName));
         }
 
@@ -261,9 +290,11 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string DisplayName { get; private set; }
 
+        public string CachedTargetName { get => this.Model.CachedTargetName; set => this.Model.CachedTargetName = value; }
+
         public bool ShowLapsOptions => this.IsModeScript || SdHasMask(this.SecurityDescriptor, AccessMask.LocalAdminPassword);
 
-        public bool ShowJitOptions => this.IsModeScript || SdHasMask(this.SecurityDescriptor, AccessMask.Jit);
+        public bool ShowJitOptions => this.IsModeScript || (this.Type.IsAdTarget() && SdHasMask(this.SecurityDescriptor, AccessMask.Jit));
 
         public bool CanEdit => this.Target != null;
 
@@ -274,6 +305,8 @@ namespace Lithnet.AccessManager.Server.UI
         public bool ShowPowerShellEnterpriseEditionBadge => this.IsScriptVisible && !this.licenseManager.IsFeatureCoveredByFullLicense(LicensedFeatures.PowerShellAcl);
 
         public bool ShowLapsHistoryEnterpriseEditionBadge => !this.licenseManager.IsFeatureCoveredByFullLicense(LicensedFeatures.PowerShellAcl) && SdHasMask(this.SecurityDescriptor, AccessMask.LocalAdminPasswordHistory);
+
+        public bool ShowTargetTypeEnterpriseEditionBadge => this.Type.IsAadTarget() || this.Type.IsAmsTarget();
 
         public bool CanEditPermissions => this.CanEdit && this.AuthorizationMode == AuthorizationMode.SecurityDescriptor && this.Target != null;
 
@@ -292,11 +325,15 @@ namespace Lithnet.AccessManager.Server.UI
                 {
                     new SiAccess((uint)AccessMask.LocalAdminPassword, "Local admin password", InheritFlags.SiAccessGeneral),
                     new SiAccess((uint)AccessMask.LocalAdminPasswordHistory, "Local admin password history", InheritFlags.SiAccessGeneral),
-                    new SiAccess((uint)AccessMask.Jit, "Just-in-time access", InheritFlags.SiAccessGeneral),
-                    new SiAccess((uint)AccessMask.BitLocker, "BitLocker recovery passwords", InheritFlags.SiAccessGeneral),
                 };
 
-                RawSecurityDescriptor sd = new RawSecurityDescriptor(startingSd);
+                if (this.Type.IsAdTarget())
+                {
+                    rights.Add(new SiAccess((uint)AccessMask.Jit, "Just-in-time access", InheritFlags.SiAccessGeneral));
+                    rights.Add(new SiAccess((uint)AccessMask.BitLocker, "BitLocker recovery passwords", InheritFlags.SiAccessGeneral));
+                }
+
+                GenericSecurityDescriptor sd = this.GetSecurityDescriptorForEditing(startingSd);
 
                 string targetServer = this.GetDcForTargetOrDefault();
 
@@ -332,6 +369,25 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
+        private GenericSecurityDescriptor GetSecurityDescriptorForEditing(string sd)
+        {
+            var rawSd = new RawSecurityDescriptor(sd);
+            if (this.Type.IsAdTarget())
+            {
+                return rawSd;
+            }
+
+            var csd = new CommonSecurityDescriptor(false, false, rawSd);
+
+            foreach (var ace in csd.DiscretionaryAcl.OfType<CommonAce>())
+            {
+                csd.DiscretionaryAcl.RemoveAccess((AccessControlType)ace.AceType, ace.SecurityIdentifier, (int) AccessMask.Jit, InheritanceFlags.None, PropagationFlags.None);
+                csd.DiscretionaryAcl.RemoveAccess((AccessControlType)ace.AceType, ace.SecurityIdentifier, (int) AccessMask.BitLocker, InheritanceFlags.None, PropagationFlags.None);
+            }
+
+            return csd;
+        }
+
         public bool CanSelectJitGroup => this.CanEdit;
 
         private string GetDcForTargetOrDefault()
@@ -343,9 +399,14 @@ namespace Lithnet.AccessManager.Server.UI
 
             string domain = null;
 
+            if (!this.Type.IsAdTarget())
+            {
+                return this.discoveryServices.GetDomainController(this.discoveryServices.GetDomainNameDns());
+            }
+
             try
             {
-                if (this.Type == TargetType.Container)
+                if (this.Type == TargetType.AdContainer)
                 {
                     domain = this.discoveryServices.GetDomainNameDns(this.Target);
                 }
@@ -369,10 +430,15 @@ namespace Lithnet.AccessManager.Server.UI
                 return this.discoveryServices.GetForestNameDns();
             }
 
+            if (!this.Type.IsAdTarget())
+            {
+                return this.discoveryServices.GetForestNameDns();
+            }
+
             string forest = null;
             try
             {
-                if (this.Type == TargetType.Container)
+                if (this.Type == TargetType.AdContainer)
                 {
                     forest = discoveryServices.GetForestNameDns(this.Target);
                 }
@@ -492,11 +558,8 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                SelectTargetTypeViewModel vm = new SelectTargetTypeViewModel
-                {
-                    TargetType = this.Type,
-                    AvailableForests = this.domainTrustProvider.GetForests().Select(t => t.Name).ToList()
-                };
+                SelectTargetTypeViewModel vm = this.targetTypeFactory.CreateViewModel();
+                vm.TargetType = this.Type;
 
                 DialogWindow w = new DialogWindow
                 {
@@ -515,30 +578,21 @@ namespace Lithnet.AccessManager.Server.UI
                     return;
                 }
 
-                this.Type = vm.TargetType;
-
-                if (vm.TargetType == TargetType.Container)
+                if (vm.TargetType == TargetType.AdContainer)
                 {
-                    ShowContainerDialog();
+                    ShowContainerDialog(vm.TargetType);
+                }
+                else if (vm.TargetType.IsAdTarget())
+                {
+                    this.ShowAdObjectSelector(vm.TargetType, vm.SelectedForest);
+                }
+                else if (vm.TargetType.IsAadTarget())
+                {
+                    this.ShowAadObjectSelector(vm.TargetType, vm.SelectedAad.TenantId);
                 }
                 else
                 {
-                    string targetServer = this.discoveryServices.GetDomainController(vm.SelectedForest ?? this.discoveryServices.GetForestNameDns());
-
-                    if (vm.TargetType == TargetType.Group)
-                    {
-                        if (this.objectSelectionProvider.GetGroup(this, targetServer, out SecurityIdentifier sid))
-                        {
-                            this.Target = sid.ToString();
-                        }
-                    }
-                    else
-                    {
-                        if (this.objectSelectionProvider.GetComputer(this, targetServer, out SecurityIdentifier sid))
-                        {
-                            this.Target = sid.ToString();
-                        }
-                    }
+                    await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Not yet implemented");
                 }
             }
             catch (Exception ex)
@@ -548,7 +602,81 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        private void ShowContainerDialog()
+        private void ShowAadObjectSelector(TargetType type, string selectedTenant)
+        {
+            var selectorVm = this.aadSelectorFactory.CreateViewModel();
+            selectorVm.Type = type;
+            selectorVm.TenantId = selectedTenant;
+
+            ExternalDialogWindow w = new ExternalDialogWindow()
+            {
+                Title = "Select Azure AD " + (type == TargetType.AadComputer ? "managed computer" : "group"),
+                DataContext = selectorVm,
+                SaveButtonName = "Select...",
+                SaveButtonIsDefault = true,
+                Owner = this.GetWindow()
+            };
+
+            if (!w.ShowDialog() ?? false)
+            {
+                return;
+            }
+
+            if (selectorVm.SelectedItem is Device d)
+            {
+                this.Target = d.GetSidString();
+                this.TargetObjectId = d.Id;
+                this.CachedTargetName = d.DisplayName;
+                this.TargetAuthorityId = selectedTenant;
+                this.Type = type;
+                this.DisplayName = d.DisplayName;
+            }
+            else if (selectorVm.SelectedItem is Group g)
+            {
+                this.Target = g.GetSidString();
+                this.Type = type;
+                this.TargetObjectId = g.Id;
+                this.CachedTargetName = g.DisplayName;
+                this.TargetAuthorityId = selectedTenant;
+                this.DisplayName = g.DisplayName;
+            }
+        }
+
+        private void ShowAdObjectSelector(TargetType type, string selectedForest)
+        {
+            string targetServer = this.discoveryServices.GetDomainController(selectedForest ?? this.discoveryServices.GetForestNameDns());
+
+            if (type == TargetType.AdGroup)
+            {
+                if (this.objectSelectionProvider.GetGroup(this, targetServer, out SecurityIdentifier sid))
+                {
+                    this.Target = sid.ToString();
+                    this.Type = type;
+
+                    var group = this.directory.GetGroup(sid);
+                    this.TargetObjectId = group.Guid.ToString();
+                    this.TargetAuthorityId = this.discoveryServices.GetDomainNameDns(sid);
+                    this.CachedTargetName = group.MsDsPrincipalName;
+                    this.DisplayName = group.MsDsPrincipalName;
+
+                }
+            }
+            else if (type == TargetType.AdComputer)
+            {
+                if (this.objectSelectionProvider.GetComputer(this, targetServer, out SecurityIdentifier sid))
+                {
+                    this.Target = sid.ToString();
+                    this.Type = type;
+                    var computer = this.directory.GetComputer(sid);
+                    this.TargetObjectId = computer.Guid.ToString();
+                    this.TargetAuthorityId = this.discoveryServices.GetDomainNameDns(sid);
+                    this.CachedTargetName = computer.MsDsPrincipalName;
+                    this.DisplayName = computer.MsDsPrincipalName;
+                }
+            }
+        }
+
+        private void ShowContainerDialog(TargetType type)
         {
             string path = this.Target ?? Domain.GetComputerDomain().GetDirectoryEntry().GetPropertyString("distinguishedName");
 
@@ -558,17 +686,17 @@ namespace Lithnet.AccessManager.Server.UI
             if (this.objectSelectionProvider.SelectContainer(this, "Select container", "Select container", basePath, initialPath, out string container))
             {
                 this.Target = container;
+                this.Type = type;
+                this.TargetObjectId = null;
+                this.CachedTargetName = null;
+                this.DisplayName = container;
+                this.TargetAuthorityId = this.discoveryServices.GetDomainNameDns(container);
             }
         }
 
         public UIElement View { get; set; }
 
-        private async Task<string> GetNameFromSidOrDefaultAsync(string sid)
-        {
-            return await Task.Run(() => GetNameFromSidOrDefault(sid));
-        }
-
-        private string GetNameFromSidOrDefault(string sid)
+        private async Task<string> GetTargetNameFromSidOrDefaultAsync(string sid)
         {
             if (string.IsNullOrWhiteSpace(sid))
             {
@@ -578,11 +706,84 @@ namespace Lithnet.AccessManager.Server.UI
             try
             {
                 SecurityIdentifier s = new SecurityIdentifier(sid);
-                return this.directory.TryGetPrincipal(s, out ISecurityPrincipal principal) ? principal.MsDsPrincipalName : sid;
+
+                if (s.IsAmsAuthority())
+                {
+                    if (this.Type == TargetType.AmsComputer)
+                    {
+                        var device = await this.deviceProvider.GetDeviceAsync(this.TargetObjectId);
+                        return device.Name;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                else if (s.IsAadAuthority())
+                {
+                    if (this.Type == TargetType.AadGroup)
+                    {
+                        var device = await this.graphProvider.GetAadGroupByIdAsync(this.TargetAuthorityId, this.TargetObjectId);
+                        return device.DisplayName;
+                    }
+                    else if (this.Type == TargetType.AadComputer)
+                    {
+                        var group = await this.graphProvider.GetAadDeviceByIdAsync(this.TargetAuthorityId, this.TargetObjectId);
+                        return group.DisplayName;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    return await this.GetNameFromActiveDirectorySidOrDefaultAsync(s);
+                }
             }
             catch (Exception)
             {
-                return sid;
+                return null;
+            }
+        }
+
+        private async Task<string> GetNameFromActiveDirectorySidOrDefaultAsync(string sid)
+        {
+            return await Task.Run(() => this.GetNameFromActiveDirectorySidOrDefault(sid));
+        }
+
+        private async Task<string> GetNameFromActiveDirectorySidOrDefaultAsync(SecurityIdentifier sid)
+        {
+            return await Task.Run(() => this.GetNameFromActiveDirectorySidOrDefault(sid));
+        }
+
+        private string GetNameFromActiveDirectorySidOrDefault(string sid)
+        {
+            if (string.IsNullOrWhiteSpace(sid))
+            {
+                return null;
+            }
+
+            try
+            {
+                SecurityIdentifier s = new SecurityIdentifier(sid);
+                return this.GetNameFromActiveDirectorySidOrDefault(s);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private string GetNameFromActiveDirectorySidOrDefault(SecurityIdentifier sid)
+        {
+            try
+            {
+                return this.directory.TryGetPrincipal(sid, out ISecurityPrincipal principal) ? principal.MsDsPrincipalName : null;
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
 

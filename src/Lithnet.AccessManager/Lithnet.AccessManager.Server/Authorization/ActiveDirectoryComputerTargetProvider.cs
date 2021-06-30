@@ -61,7 +61,7 @@ namespace Lithnet.AccessManager.Server.Authorization
 
                     switch (target.Type)
                     {
-                        case TargetType.Container:
+                        case TargetType.AdContainer:
                             {
                                 if (computerParents.Value.Any(t => t == targetData.ContainerGuid))
                                 {
@@ -72,7 +72,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                                 break;
                             }
 
-                        case TargetType.Computer:
+                        case TargetType.AdComputer:
                             {
                                 if (targetData.Sid == computer.SecurityIdentifier)
                                 {
@@ -83,7 +83,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                                 break;
                             }
 
-                        case TargetType.Group:
+                        case TargetType.AdGroup:
                             {
                                 if (this.directory.IsSidInPrincipalToken(targetData.Sid, computerTokenSids.Value))
                                 {

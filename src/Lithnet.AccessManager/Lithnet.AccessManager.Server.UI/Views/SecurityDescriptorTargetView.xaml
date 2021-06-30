@@ -11,7 +11,9 @@
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d"
              Margin="5">
-
+    <UserControl.Resources>
+        <local:EnumToDisplayConverter x:Key="enumconv"/>
+    </UserControl.Resources>
     <AdornerDecorator>
         <StackPanel>
             <Expander Expanded="HandleExpanderExpanded"
@@ -32,6 +34,7 @@
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -55,29 +58,44 @@
 
                     <Label Grid.Row="1"
                            Grid.Column="0"
+                           Content="Type" />
+                    <StackPanel Orientation="Horizontal"
+                                Grid.Row="1" Grid.Column="1">
+                        <Label Content="{Binding Type, Converter={StaticResource enumconv}, Mode=OneWay}"
+                           Margin="2" />
+
+                        <local:EnterpriseEditionBadge VerticalAlignment="Center"
+                                                      Visibility="{Binding ShowTargetTypeEnterpriseEditionBadge, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+                                                      ToolTipText="This type of target is an enterprise edition feature. Click to learn more"
+                                                      Click="{s:Action LearnMoreLinkLapsHistory}"
+                                                      ShowText="True"
+                                                      Margin="2 0 5 0" />
+                    </StackPanel>
+                    <Label Grid.Row="2"
+                           Grid.Column="0"
                            Content="Description" />
-                    <TextBox Grid.Row="1"
+                    <TextBox Grid.Row="2"
                              Grid.Column="1"
                              Text="{Binding Description}"
                              Margin="2" />
 
-                    <Label Grid.Row="2"
+                    <Label Grid.Row="3"
                            Grid.Column="0"
                            Content="Notes" />
-                    <TextBox Grid.Row="2"
+                    <TextBox Grid.Row="3"
                              Grid.Column="1"
                              Text="{Binding Notes}"
                              Height="100"
                              AcceptsReturn="True"
                              Margin="2" />
 
-                    <CheckBox Grid.Row="3"
+                    <CheckBox Grid.Row="4"
                               Grid.Column="1"
                               Content="Disable rule"
                               Margin="2 5 5 5"
                               IsChecked="{Binding IsDisabled}" />
 
-                    <StackPanel Grid.Row="4"
+                    <StackPanel Grid.Row="5"
                                 Grid.Column="1"
                                 Orientation="Horizontal">
                         <CheckBox Content="Expire rule"

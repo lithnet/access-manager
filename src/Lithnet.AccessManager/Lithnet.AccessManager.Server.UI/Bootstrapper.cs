@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Security.Cryptography;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -98,7 +97,7 @@ namespace Lithnet.AccessManager.Server.UI
         protected override void ConfigureIoC(IStyletIoCBuilder builder)
         {
             IAppPathProvider pathProvider = new AppPathProvider(registryProvider);
-
+            
             try
             {
                 try
@@ -173,6 +172,8 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IImportResultsViewModelFactory>().To<ImportResultsViewModelFactory>();
                 builder.Bind<IAzureAdTenantDetailsViewModelFactory>().To<AzureAdTenantDetailsViewModelFactory>();
                 builder.Bind<IRegistrationKeyViewModelFactory>().To<RegistrationKeyViewModelFactory>();
+                builder.Bind<ISelectTargetTypeViewModelFactory>().To<SelectTargetTypeViewModelFactory>();
+                builder.Bind<IAzureAdObjectSelectorViewModelFactory>().To<AzureAdObjectSelectorViewModelFactory>();
 
                 // Services
                 builder.Bind<RandomNumberGenerator>().ToInstance(RandomNumberGenerator.Create());
@@ -218,7 +219,8 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<SqlLocalDbInstanceProvider>().ToSelf();
                 builder.Bind<SqlServerInstanceProvider>().ToSelf();
                 builder.Bind<IUpgradeLog>().To<DbUpgradeLogger>();
-                builder.Bind<IHostApplicationLifetime>().To<DummyHostLifetime>();
+                builder.Bind<IHostApplicationLifetime>().To<WpfHostLifetime>();
+                builder.Bind<IDeviceProvider>().To<DbDeviceProvider>();
 
                 builder.Bind<IProtectedSecretProvider>().To<ProtectedSecretProvider>().InSingletonScope();
                 builder.Bind<IClusterProvider>().To<ClusterProvider>().InSingletonScope();
@@ -234,9 +236,8 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind(typeof(IOptions<>)).To(typeof(OptionsWrapper<>)).InSingletonScope();
                 builder.Bind(typeof(IOptionsSnapshot<>)).To(typeof(OptionsManager<>));
                 builder.Bind(typeof(IOptionsFactory<>)).To(typeof(OptionsFactory<>));
-                builder.Bind(typeof(IOptionsMonitor<>)).To(typeof(OptionsMonitor<>));
+                builder.Bind(typeof(IOptionsMonitor<>)).To(typeof(OptionsMonitorWrapper<>));
                 builder.Bind(typeof(IOptionsMonitorCache<>)).To(typeof(OptionsCache<>)).InSingletonScope();
-
                 base.ConfigureIoC(builder);
             }
             catch (ApplicationInitializationException ex)
@@ -293,16 +294,5 @@ namespace Lithnet.AccessManager.Server.UI
 
             Environment.Exit(1);
         }
-    }
-
-    public class DummyHostLifetime : IHostApplicationLifetime
-    {
-        public void StopApplication()
-        {
-        }
-
-        public CancellationToken ApplicationStarted { get; }
-        public CancellationToken ApplicationStopping { get; }
-        public CancellationToken ApplicationStopped { get; }
     }
 }

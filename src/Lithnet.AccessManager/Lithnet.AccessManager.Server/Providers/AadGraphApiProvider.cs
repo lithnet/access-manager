@@ -171,8 +171,67 @@ namespace Lithnet.AccessManager.Server
             return sids;
         }
 
+        public async IAsyncEnumerable<Group> FindGroups(string tenant, string searchText)
+        {
+            var pages = await this.GetClient(tenant).Groups
+                .Request()
+                .Filter($"startswith(displayName,'{searchText}')")
+                .Select("id,displayName,securityIdentifier,description")
+                .GetAsync();
 
-        public async Task<Microsoft.Graph.Device> GetAadDeviceByIdAsync(string tenant, string objectId)
+            foreach (var item in pages.CurrentPage)
+            {
+                yield return item;
+            }
+
+            while (pages.NextPageRequest != null)
+            {
+                pages = await pages.NextPageRequest.GetAsync();
+
+                foreach (var item in pages.CurrentPage)
+                {
+                    yield return item;
+                }
+            }
+        }
+
+        public async IAsyncEnumerable<Device> FindDevices(string tenant, string searchText)
+        {
+            var pages = await this.GetClient(tenant).Devices
+                .Request()
+                .Filter($"startswith(displayName,'{searchText}')")
+                .Select("id,displayName,securityIdentifier,description")
+                .GetAsync();
+
+            foreach (var item in pages.CurrentPage)
+            {
+                yield return item;
+            }
+
+            while (pages.NextPageRequest != null)
+            {
+                pages = await pages.NextPageRequest.GetAsync();
+
+                foreach (var item in pages.CurrentPage)
+                {
+                    yield return item;
+                }
+            }
+        }
+
+        public async Task<Group> GetAadGroupByIdAsync(string tenant, string objectId)
+        {
+            try
+            {
+                return await this.GetClient(tenant).Groups[objectId].Request().GetAsync();
+            }
+            catch (ServiceException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                throw new AadObjectNotFoundException($"Group with object ID {objectId} was not found in the directory", ex);
+            }
+        }
+
+        public async Task<Device> GetAadDeviceByIdAsync(string tenant, string objectId)
         {
             try
             {
@@ -180,17 +239,17 @@ namespace Lithnet.AccessManager.Server
             }
             catch (ServiceException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
-                throw new AadDeviceNotFoundException($"Object with object ID {objectId} was not found in the directory", ex);
+                throw new AadObjectNotFoundException($"Device with object ID {objectId} was not found in the directory", ex);
             }
         }
 
-        public async Task<Microsoft.Graph.Device> GetAadDeviceByDeviceIdAsync(string tenant, string deviceId)
+        public async Task<Device> GetAadDeviceByDeviceIdAsync(string tenant, string deviceId)
         {
             IGraphServiceDevicesCollectionPage aadDevices = await this.GetClient(tenant).Devices.Request().Filter($"deviceId eq '{WebUtility.UrlEncode(deviceId)}'").GetAsync();
 
             if (aadDevices.Count == 0)
             {
-                throw new AadDeviceNotFoundException($"Object with device ID {deviceId} was not found in the directory");
+                throw new AadObjectNotFoundException($"Device with device ID {deviceId} was not found in the directory");
             }
 
             if (aadDevices.Count > 1)

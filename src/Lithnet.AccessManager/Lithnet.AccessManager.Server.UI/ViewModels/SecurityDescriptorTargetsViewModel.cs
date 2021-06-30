@@ -294,6 +294,7 @@ namespace Lithnet.AccessManager.Server.UI
                 vm.IsEditing = true;
 
                 w.DataContext = vm;
+                await vm.UpdateDisplayName(true);
 
                 if (w.ShowDialog() == true)
                 {

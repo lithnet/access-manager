@@ -32,7 +32,7 @@ namespace Lithnet.AccessManager.Server.UI
                 return this.SortDirection == ListSortDirection.Descending ? (int) x.Type - (int) y.Type : (int) y.Type - (int) x.Type;
             }
 
-            if (x.Type != Configuration.TargetType.Container)
+            if (x.Type != Configuration.TargetType.AdContainer)
             {
                 return this.SortDirection == ListSortDirection.Descending ? string.Compare(y.DisplayName, x.DisplayName, StringComparison.OrdinalIgnoreCase) : string.Compare(x.DisplayName, y.DisplayName, StringComparison.OrdinalIgnoreCase);
             }

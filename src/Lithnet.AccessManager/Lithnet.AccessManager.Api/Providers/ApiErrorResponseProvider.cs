@@ -33,7 +33,7 @@ namespace Lithnet.AccessManager.Api
                     this.logger.LogError(ex, "The device could not be found in the AMS database");
                     return new UnauthorizedObjectResult(new { Error = new ApiError("not-registered", "The device is not registered") });
 
-                case AadDeviceNotFoundException _:
+                case AadObjectNotFoundException _:
                     this.logger.LogError(ex, "The device or a record of its certificate could not be found in AAD");
                     return new UnauthorizedObjectResult(new { Error = new ApiError("not-registered-aad", "The device is not registered in AAD") });
 

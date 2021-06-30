@@ -148,7 +148,7 @@ namespace Lithnet.AccessManager.Api.Controllers
 
             if (!aadDevice.HasDeviceThumbprint(signingCertificate.Thumbprint))
             {
-                throw new AadDeviceNotFoundException($"The certificate thumbprint '{signingCertificate.Thumbprint}' could not be found on device {deviceId} in the Azure Active Directory");
+                throw new AadObjectNotFoundException($"The certificate thumbprint '{signingCertificate.Thumbprint}' could not be found on device {deviceId} in the Azure Active Directory");
             }
 
             aadDevice.ThrowOnDeviceDisabled();

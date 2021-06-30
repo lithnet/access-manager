@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Lithnet.AccessManager.Server.Configuration;
 using Microsoft.Extensions.Configuration;
 
 namespace Lithnet.AccessManager.Server
@@ -93,6 +94,20 @@ namespace Lithnet.AccessManager.Server
             }
 
             return defaultValue;
+        }
+        public static bool IsAdTarget(this TargetType t)
+        {
+            return t == TargetType.AdComputer || t == TargetType.AdContainer || t == TargetType.AdGroup;
+        }
+
+        public static bool IsAadTarget(this TargetType t)
+        {
+            return t == TargetType.AadComputer || t == TargetType.AadGroup;
+        }
+
+        public static bool IsAmsTarget(this TargetType t)
+        {
+            return t == TargetType.AmsComputer || t == TargetType.AmsGroup;
         }
     }
 }
