@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using System.Windows;
 using Microsoft.Extensions.Hosting;
 
 namespace Lithnet.AccessManager.Server.UI
@@ -8,12 +9,11 @@ namespace Lithnet.AccessManager.Server.UI
         private CancellationTokenSource appStarted = new CancellationTokenSource();
         private CancellationTokenSource appStopping = new CancellationTokenSource();
         private CancellationTokenSource appStopped = new CancellationTokenSource();
-        private App app;
-        public WpfHostLifetime(App app)
+
+        public WpfHostLifetime()
         {
-            this.app = app;
-            app.Exit += this.App_Exit;
-            app.Startup += this.App_Startup;
+            Application.Current.Exit += this.App_Exit;
+            Application.Current.Startup += this.App_Startup;
         }
 
         private void App_Startup(object sender, System.Windows.StartupEventArgs e)
@@ -29,7 +29,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public void StopApplication()
         {
-            app.Shutdown();
+            Application.Current.Shutdown();
         }
 
         public CancellationToken ApplicationStarted => this.appStarted.Token;
