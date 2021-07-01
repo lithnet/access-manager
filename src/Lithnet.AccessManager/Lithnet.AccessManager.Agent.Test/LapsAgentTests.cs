@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Principal;
+using Lithnet.AccessManager.Agent.Providers;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -9,22 +10,17 @@ namespace Lithnet.AccessManager.Agent.Test
     public class LapsAgentTests
     {
         private Mock<IDirectory> directory;
-
-        private Mock<ILapsSettings> settings;
-
+        private Mock<ISettingsProvider> settings;
         private Mock<IPasswordGenerator> passwordGenerator;
-
         private Mock<ILocalSam> sam;
-        
         private Mock<ILithnetAdminPasswordProvider> lithnetPwdProvider;
-
         private Mock<IActiveDirectoryComputer> computer;
 
         [SetUp()]
         public void TestInitialize()
         {
             this.directory = new Mock<IDirectory>();
-            this.settings = new Mock<ILapsSettings>();
+            this.settings = new Mock<ISettingsProvider>();
             this.passwordGenerator = new Mock<IPasswordGenerator>();
             this.sam = new Mock<ILocalSam>();
             this.lithnetPwdProvider = new Mock<ILithnetAdminPasswordProvider>();
@@ -32,25 +28,13 @@ namespace Lithnet.AccessManager.Agent.Test
         }
 
         [Test]
-        public void TestExitOnAgentDisabled()
-        {
-            this.settings.SetupGet(a => a.Enabled).Returns(false);
-
-            LegacyLapsAgent agent = this.BuildAgent();
-
-            agent.DoCheck();
-            settings.VerifyGet(t => t.Enabled);
-            settings.VerifyGet(t => t.MsMcsAdmPwdBehaviour, Times.Never);
-        }
-
-        [Test]
         public void TestPasswordChangeAppData()
         {
-            LegacyLapsAgent agent = this.BuildAgent();
+            ActiveDirectoryLapsAgent agent = this.BuildAgent();
 
             agent.ChangePassword(this.computer.Object);
 
-            lithnetPwdProvider.Verify(v => v.UpdateCurrentPassword(It.IsAny<IActiveDirectoryComputer>(), It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), PasswordAttributeBehaviour.Ignore), Times.Once);
+            lithnetPwdProvider.Verify(v => v.UpdateCurrentPassword(It.IsAny<IActiveDirectoryComputer>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), PasswordAttributeBehaviour.Ignore), Times.Once);
             sam.Verify(v => v.SetLocalAccountPassword(It.IsAny<SecurityIdentifier>(), It.IsAny<string>()));
         }
 
@@ -58,7 +42,7 @@ namespace Lithnet.AccessManager.Agent.Test
         public void HasPasswordExpiredAppDataNull()
         {
             lithnetPwdProvider.Setup(a => a.GetExpiry(It.IsAny<IActiveDirectoryComputer>())).Returns((DateTime?)null);
-            LegacyLapsAgent agent = this.BuildAgent();
+            ActiveDirectoryLapsAgent agent = this.BuildAgent();
 
             Assert.IsFalse(agent.HasPasswordExpired(this.computer.Object));
         }
@@ -68,7 +52,7 @@ namespace Lithnet.AccessManager.Agent.Test
         {
             lithnetPwdProvider.Setup(a => a.HasPasswordExpired(It.IsAny<IActiveDirectoryComputer>(), false)).Returns(true);
 
-            LegacyLapsAgent agent = this.BuildAgent();
+            ActiveDirectoryLapsAgent agent = this.BuildAgent();
 
             Assert.IsTrue(agent.HasPasswordExpired(this.computer.Object));
         }
@@ -78,15 +62,15 @@ namespace Lithnet.AccessManager.Agent.Test
         {
             lithnetPwdProvider.Setup(a => a.GetExpiry(It.IsAny<IActiveDirectoryComputer>())).Returns(DateTime.UtcNow.AddDays(1));
 
-            LegacyLapsAgent agent = this.BuildAgent();
+            ActiveDirectoryLapsAgent agent = this.BuildAgent();
 
             Assert.IsFalse(agent.HasPasswordExpired(this.computer.Object));
         }
 
-        private LegacyLapsAgent BuildAgent(ILapsSettings settings = null, IDirectory directory = null, IPasswordGenerator passwordGenerator = null, ILocalSam sam = null, ILithnetAdminPasswordProvider lithnetProvider = null)
+        private ActiveDirectoryLapsAgent BuildAgent(ISettingsProvider settings = null, IDirectory directory = null, IPasswordGenerator passwordGenerator = null, ILocalSam sam = null, ILithnetAdminPasswordProvider lithnetProvider = null)
         {
-            return new LegacyLapsAgent(
-                Mock.Of<ILogger<LegacyLapsAgent>>(),
+            return new ActiveDirectoryLapsAgent(
+                Mock.Of<ILogger<ActiveDirectoryLapsAgent>>(),
                 directory ?? this.directory.Object,
                 settings ?? this.settings.Object,
                 passwordGenerator ?? this.passwordGenerator.Object,

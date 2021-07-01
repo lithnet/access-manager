@@ -6,9 +6,9 @@ namespace Lithnet.AccessManager.Api.Shared
 {
     public enum AgentAuthenticationMode
     {
-        Auto = 0,
+        None = 0,
         Iwa = 1,
-        Aadj = 2,
-        Ssa = 4,
+        Aad = 2,
+        Ams = 4,
     }
 }

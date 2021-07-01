@@ -59,7 +59,8 @@ namespace Lithnet.AccessManager.Agent
 
             if (httpResponseMessage.IsSuccessStatusCode || httpResponseMessage.StatusCode == HttpStatusCode.Forbidden)
             {
-                var response = JsonSerializer.Deserialize<RegistrationResponse>(responseString, this.jsonOptions);
+                var response = JsonSerializer.Deserialize<RegistrationResponse>(responseString, this.jsonOptions) ?? throw new UnexpectedResponseException("There response body returned by the server was invalid");
+
                 this.settingsProvider.ClientId = response.ClientId;
 
                 if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
@@ -102,7 +103,7 @@ namespace Lithnet.AccessManager.Agent
                 this.settingsProvider.ClientId = null;
                 this.settingsProvider.CheckRegistrationUrl = null;
 
-                this.logger.LogError("The agent was pending registration, but the server no longer has a record of the registration request. The agent will reset the registration data, and try again on the next internal");
+                this.logger.LogError("The agent was pending registration, but the server no longer has a record of the registration request. The agent will reset the registration data, and try again on the next run");
                 return RegistrationState.NotRegistered;
             }
 
@@ -111,10 +112,9 @@ namespace Lithnet.AccessManager.Agent
 
         public bool CanRegisterAgent()
         {
-            var state = this.settingsProvider;
-            return !string.IsNullOrWhiteSpace(state.RegistrationKey) &&
-                   state.RegistrationState != RegistrationState.Approved &&
-                   state.RegistrationState != RegistrationState.Pending;
+            return !string.IsNullOrWhiteSpace(this.settingsProvider.RegistrationKey) &&
+                   this.settingsProvider.RegistrationState != RegistrationState.Approved &&
+                   this.settingsProvider.RegistrationState != RegistrationState.Pending;
         }
 
         public async Task<RegistrationState> RegisterAgent()
@@ -123,13 +123,40 @@ namespace Lithnet.AccessManager.Agent
             using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthAnonymous);
 
             var cert = await this.authCertProvider.GetOrCreateAgentCertificate();
-            var assertion = await this.GenerateAssertion(cert, new Uri(client.BaseAddress, "agent/register").ToString());
+
+            List<Claim> additionalClaims = new List<Claim>
+            {
+                new Claim("data", JsonSerializer.Serialize(await this.agentCheckinProvider.GenerateCheckInData())),
+                new Claim("registration-key", this.settingsProvider.RegistrationKey),
+            };
+
+            var assertion = this.GenerateAssertion(cert, new Uri(client.BaseAddress, "agent/register").ToString(), additionalClaims.ToArray());
 
             using var httpResponseMessage = await client.PostAsync($"agent/register", assertion.AsJsonStringContent());
             return await this.GetRegistrationStateFromHttpResponse(httpResponseMessage);
         }
 
-        private async Task<ClientAssertion> GenerateAssertion(X509Certificate2 cert, string audience)
+        public async Task RegisterSecondaryCredentials()
+        {
+            if (this.settingsProvider.AuthenticationMode != AgentAuthenticationMode.Aad)
+            {
+                throw new NotSupportedException("Secondary credentials can only be registered for AAD managed devices");
+            }
+
+            this.logger.LogInformation("Attempting to register the agent secondary credentials");
+            using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthBearer);
+
+            var cert = await this.authCertProvider.GetOrCreateAgentCertificate();
+            var assertion = this.GenerateAssertion(cert, new Uri(client.BaseAddress, "agent/register/credential").ToString());
+
+            using var httpResponseMessage = await client.PostAsync($"agent/register/credential", assertion.AsJsonStringContent());
+            httpResponseMessage.EnsureSuccessStatusCode();
+
+            this.logger.LogInformation($"Successfully registered certificate thumbprint {cert.Thumbprint} with the AMS server");
+            this.settingsProvider.HasRegisteredSecondaryCredentials = true;
+        }
+
+        private ClientAssertion GenerateAssertion(X509Certificate2 cert, string audience, params Claim[] additionalClaims)
         {
             RsaSecurityKey rsaSecurityKey = new RsaSecurityKey(cert.GetRSAPrivateKey());
             string exportedCertificate = Convert.ToBase64String(cert.Export(X509ContentType.Cert));
@@ -142,14 +169,17 @@ namespace Lithnet.AccessManager.Agent
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim("jti", Guid.NewGuid().ToString()),
-                    new Claim("data",  JsonSerializer.Serialize(await this.agentCheckinProvider.GenerateCheckInData())),
-                    new Claim("registration-key", this.settingsProvider.RegistrationKey),
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(4),
                 Issuer = issuer,
                 Audience = audience,
                 SigningCredentials = new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSsaPssSha384)
             };
+
+            if (additionalClaims != null)
+            {
+                tokenDescriptor.Subject.AddClaims(additionalClaims);
+            }
 
             // Add x5c header parameter containing the signing certificate:
             JwtSecurityToken token = (JwtSecurityToken)tokenHandler.CreateToken(tokenDescriptor);
@@ -164,9 +194,3 @@ namespace Lithnet.AccessManager.Agent
         }
     }
 }
-
-// AgentVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.0.0.0",
-//DnsName = (await Dns.GetHostEntryAsync("LocalHost")).HostName,
-//Hostname = Environment.MachineName,
-//OperatingSystem = RuntimeInformation.OSDescription,
-//OperationSystemVersion = Environment.OSVersion.Version.ToString()

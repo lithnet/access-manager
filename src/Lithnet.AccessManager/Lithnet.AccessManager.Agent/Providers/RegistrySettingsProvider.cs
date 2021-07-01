@@ -8,22 +8,47 @@ namespace Lithnet.AccessManager.Agent
     {
         private readonly string qualifiedKeyName;
         private readonly string keyName;
+        private readonly RegistryHive hive;
 
-        public RegistrySettingsProvider(string keyBaseName)
+        public RegistrySettingsProvider(string keyName)
         {
-            this.qualifiedKeyName = $"HKEY_LOCAL_MACHINE\\SOFTWARE\\{keyBaseName}";
-            this.keyName = $"SOFTWARE\\{keyBaseName}";
+            this.qualifiedKeyName = keyName;
+
+            if (keyName.StartsWith("HKEY_LOCAL_MACHINE", StringComparison.OrdinalIgnoreCase))
+            {
+                this.hive = RegistryHive.LocalMachine;
+            }
+            else if (keyName.StartsWith("HKEY_CURRENT_USER", StringComparison.OrdinalIgnoreCase))
+            {
+                this.hive = RegistryHive.CurrentUser;
+            }
+            else
+            {
+                throw new NotSupportedException("Invalid registry hive");
+            }
+
+            int index = this.qualifiedKeyName.IndexOf('\\');
+
+            this.keyName = this.qualifiedKeyName.Remove(0, index + 1);
         }
+
 
         public void SetValue<T>(string valueName, T value)
         {
             if (value == null)
             {
-                RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Default).OpenSubKey(this.keyName, true)?.DeleteValue(valueName, false);
+                RegistryKey.OpenBaseKey(hive, RegistryView.Default).OpenSubKey(this.keyName, true)?.DeleteValue(valueName, false);
             }
             else
             {
-                Registry.SetValue(this.qualifiedKeyName, valueName, value);
+                if (value is bool b)
+                {
+                    Registry.SetValue(this.qualifiedKeyName, valueName, b ? 1 : 0);
+                }
+                else
+                {
+                    Registry.SetValue(this.qualifiedKeyName, valueName, value);
+                }
             }
         }
 

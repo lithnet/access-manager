@@ -17,5 +17,7 @@ namespace Lithnet.AccessManager.Agent.Configuration
         public RegistrationState RegistrationState { get; set; }
 
         public DateTime LastCheckIn { get; set; }
+
+        public bool HasRegisteredSecondaryCredentials { get; set; }
     }
 }

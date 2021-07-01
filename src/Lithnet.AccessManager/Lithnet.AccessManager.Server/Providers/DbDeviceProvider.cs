@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
@@ -26,7 +27,7 @@ namespace Lithnet.AccessManager.Server
             await using SqlConnection con = this.dbProvider.GetConnection();
 
             SqlCommand command = new SqlCommand("spGetDevicesByNames", con);
-            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.CommandType = CommandType.StoredProcedure;
             command.Parameters.AddWithValue("@ComputerNameOrDnsName", name);
 
             await using SqlDataReader reader = await command.ExecuteReaderAsync();
@@ -87,7 +88,7 @@ namespace Lithnet.AccessManager.Server
             await using SqlConnection con = this.dbProvider.GetConnection();
 
             SqlCommand command = new SqlCommand("spGetDeviceByAuthority", con);
-            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.CommandType = CommandType.StoredProcedure;
             command.Parameters.AddWithValue("@AuthorityType", (int)authorityType);
             command.Parameters.AddWithValue("@AuthorityId", authorityId);
             command.Parameters.AddWithValue("@AuthorityDeviceId", authorityDeviceId);
@@ -108,7 +109,7 @@ namespace Lithnet.AccessManager.Server
             await using SqlConnection con = this.dbProvider.GetConnection();
 
             SqlCommand command = new SqlCommand("spGetDevice", con);
-            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.CommandType = CommandType.StoredProcedure;
             command.Parameters.AddWithValue("@ObjectID", deviceId);
 
             await using SqlDataReader reader = await command.ExecuteReaderAsync();
@@ -127,7 +128,7 @@ namespace Lithnet.AccessManager.Server
             await using SqlConnection con = this.dbProvider.GetConnection();
 
             SqlCommand command = new SqlCommand("spGetOrCreateAuthority", con);
-            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.CommandType = CommandType.StoredProcedure;
             command.Parameters.AddWithValue("@AuthorityId", authorityId);
             command.Parameters.AddWithValue("@AuthorityType", (int)type);
 
@@ -140,9 +141,11 @@ namespace Lithnet.AccessManager.Server
 
             await using SqlConnection con = this.dbProvider.GetConnection();
 
+            string thumbprint = certificate.GetCertHashString(HashAlgorithmName.SHA256);
+
             SqlCommand command = new SqlCommand("spGetDeviceByX509Thumbprint", con);
-            command.CommandType = System.Data.CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@Thumbprint", certificate.Thumbprint);
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@Thumbprint", thumbprint);
 
             await using SqlDataReader reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
@@ -150,7 +153,7 @@ namespace Lithnet.AccessManager.Server
                 return new DbDevice(reader);
             }
 
-            throw new DeviceNotFoundException($"Could not find a device with credentials for the certificate issued to '{certificate.Subject}' with thumbprint {certificate.Thumbprint}");
+            throw new DeviceCredentialsNotFoundException($"Could not find a device with credentials for the certificate issued to '{certificate.Subject}' with thumbprint {certificate.Thumbprint}");
         }
 
         public async Task<IDevice> CreateDeviceAsync(IDevice device, X509Certificate2 certificate)
@@ -167,15 +170,31 @@ namespace Lithnet.AccessManager.Server
             await using SqlConnection con = this.dbProvider.GetConnection();
 
             SqlCommand command = new SqlCommand("spCreateDeviceWithCredentials", con);
-            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.CommandType = CommandType.StoredProcedure;
             command.Parameters.AddWithValue("@X509Certificate", certificate.Export(X509ContentType.Cert));
-            command.Parameters.AddWithValue("@X509CertificateThumbprint", certificate.Thumbprint);
+            command.Parameters.AddWithValue("@X509CertificateThumbprint", certificate.GetCertHashString(HashAlgorithmName.SHA256));
             command.Parameters.AddWithValue("@AuthorityKey", authorityKey);
             device.ToCreateCommandParameters(command);
 
             await using SqlDataReader reader = await command.ExecuteReaderAsync();
             await reader.ReadAsync();
             return new DbDevice(reader);
+        }
+
+        public async Task AddDeviceCredentialsAsync(IDevice device, X509Certificate2 certificate)
+        {
+            device.ThrowIfNull(nameof(device));
+            certificate.ThrowIfNull(nameof(certificate));
+
+            await using SqlConnection con = this.dbProvider.GetConnection();
+
+            SqlCommand command = new SqlCommand("spAddDeviceCredentials", con);
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@X509Certificate", certificate.Export(X509ContentType.Cert));
+            command.Parameters.AddWithValue("@X509CertificateThumbprint", certificate.GetCertHashString(HashAlgorithmName.SHA256));
+            command.Parameters.AddWithValue("@ID", device.Id);
+
+            await command.ExecuteNonQueryAsync();
         }
 
         public async Task<IDevice> CreateDeviceAsync(Microsoft.Graph.Device aadDevice, string authorityId)
@@ -229,7 +248,7 @@ namespace Lithnet.AccessManager.Server
             await using SqlConnection con = this.dbProvider.GetConnection();
 
             SqlCommand command = new SqlCommand("spCreateDevice", con);
-            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.CommandType = CommandType.StoredProcedure;
             command.Parameters.AddWithValue("@AuthorityKey", authorityKey);
 
             device.ToCreateCommandParameters(command);
@@ -251,7 +270,7 @@ namespace Lithnet.AccessManager.Server
             await using SqlConnection con = this.dbProvider.GetConnection();
 
             SqlCommand command = new SqlCommand("spUpdateDevice", con);
-            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.CommandType = CommandType.StoredProcedure;
             device.ToUpdateCommandParameters(command);
 
             await using SqlDataReader reader = await command.ExecuteReaderAsync();

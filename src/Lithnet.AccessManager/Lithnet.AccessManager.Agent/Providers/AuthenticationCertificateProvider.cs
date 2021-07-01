@@ -24,9 +24,9 @@ namespace Lithnet.AccessManager.Agent
             this.logger = logger;
         }
 
-        public async Task<X509Certificate2> GetCertificate()
+        public T DelegateCertificateOperation<T>(Func<X509Certificate2, T> certificateOperation)
         {
-            if (this.settings.AuthenticationMode == AgentAuthenticationMode.Ssa)
+            if (this.settings.AuthenticationMode == AgentAuthenticationMode.Ams || this.settings.HasRegisteredSecondaryCredentials)
             {
                 if (string.IsNullOrWhiteSpace(this.settings.AuthCertificate))
                 {
@@ -35,16 +35,12 @@ namespace Lithnet.AccessManager.Agent
 
                 var cert = this.ResolveCertificateFromLocalStore(this.settings.AuthCertificate);
 
-                this.logger.LogTrace($"Found SSA certificate with thumbprint {cert.Thumbprint}");
-                return cert;
+                this.logger.LogTrace($"Found AMS certificate with thumbprint {cert.Thumbprint}");
+                return certificateOperation(cert);
             }
-
-            if (this.settings.AuthenticationMode == AgentAuthenticationMode.Aadj)
+            else if (this.settings.AuthenticationMode == AgentAuthenticationMode.Aad)
             {
-                var cert = await this.aadProvider.GetAadCertificate();
-                this.logger.LogTrace($"Found AAD certificate with thumbprint {cert.Thumbprint}");
-
-                return cert;
+                return this.aadProvider.DelegateCertificateOperation(certificateOperation);
             }
 
             throw new InvalidOperationException("The authentication mode is not supported");

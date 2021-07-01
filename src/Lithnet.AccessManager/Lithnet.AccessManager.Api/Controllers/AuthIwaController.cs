@@ -42,7 +42,7 @@ namespace Lithnet.AccessManager.Api.Controllers
             {
                 if (!this.agentOptions.Value.AllowWindowsAuth)
                 {
-                    this.logger.LogWarning("A client attempted to authenticate with Windows Authentication, but it is disabled");
+                    this.logger.LogWarning("A client attempted to authenticate with Windows Authentication, but IWA is currently disabled");
                     throw new UnsupportedAuthenticationTypeException();
                 }
 

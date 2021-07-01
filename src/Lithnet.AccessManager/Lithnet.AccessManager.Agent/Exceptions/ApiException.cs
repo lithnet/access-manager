@@ -11,6 +11,12 @@ namespace Lithnet.AccessManager.Agent
     [Serializable]
     public class ApiException : HttpRequestException
     {
+        public string ApiErrorCode { get; set; }
+
+        public object ApiErrorDetails { get; set; }
+
+        public string ApiErrorMessage { get; set; }
+
         public ApiException()
         {
         }
@@ -18,6 +24,9 @@ namespace Lithnet.AccessManager.Agent
         public ApiException(ApiError error, HttpResponseMessage message)
             : base(string.Format($"The API call failed with HTTP status {message.StatusCode}:{message.ReasonPhrase}. The API returned error code '{error.Code}': {error.Message}\r\n{error.Details}"))
         {
+            this.ApiErrorCode = error.Code;
+            this.ApiErrorDetails = error.Details;
+            this.ApiErrorMessage = error.Message;
         }
 
         public ApiException(string message)

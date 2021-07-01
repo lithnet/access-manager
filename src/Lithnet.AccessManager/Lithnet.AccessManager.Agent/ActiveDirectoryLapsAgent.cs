@@ -2,20 +2,19 @@
 using System.Security.Principal;
 using Lithnet.AccessManager.Agent.Providers;
 using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
 
 namespace Lithnet.AccessManager.Agent
 {
-    public class LegacyLapsAgent
+    public class ActiveDirectoryLapsAgent
     {
-        private readonly ILogger<LegacyLapsAgent> logger;
+        private readonly ILogger<ActiveDirectoryLapsAgent> logger;
         private readonly IDirectory directory;
         private readonly ISettingsProvider settings;
         private readonly IPasswordGenerator passwordGenerator;
         private readonly ILocalSam sam;
         private readonly ILithnetAdminPasswordProvider lithnetAdminPasswordProvider;
 
-        public LegacyLapsAgent(ILogger<LegacyLapsAgent> logger, IDirectory directory, ISettingsProvider settings, IPasswordGenerator passwordGenerator, ILocalSam sam, ILithnetAdminPasswordProvider lithnetAdminPasswordProvider)
+        public ActiveDirectoryLapsAgent(ILogger<ActiveDirectoryLapsAgent> logger, IDirectory directory, ISettingsProvider settings, IPasswordGenerator passwordGenerator, ILocalSam sam, ILithnetAdminPasswordProvider lithnetAdminPasswordProvider)
         {
             this.logger = logger;
             this.directory = directory;

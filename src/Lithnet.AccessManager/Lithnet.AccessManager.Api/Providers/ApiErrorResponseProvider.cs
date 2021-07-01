@@ -23,41 +23,45 @@ namespace Lithnet.AccessManager.Api
             {
                 case BadRequestException _:
                     this.logger.LogError(ex, "The request could not be processed due to an input error");
-                    return new BadRequestObjectResult(new { Error = new ApiError("bad-request", "The request was invalid or incorrectly constructed") });
+                    return new BadRequestObjectResult(new { Error = new ApiError(ApiConstants.BadRequest, "The request was invalid or incorrectly constructed") });
 
                 case SecurityTokenValidationException _:
                     this.logger.LogError(ex, "The security token failed the validation process");
-                    return new UnauthorizedObjectResult(new { Error = new ApiError("token-validation-failed", "The security token failed to validate") });
+                    return new UnauthorizedObjectResult(new { Error = new ApiError(ApiConstants.TokenValidationFailed, "The security token failed to validate") });
+
+                case DeviceCredentialsNotFoundException _:
+                    this.logger.LogError(ex, "The device credentials could not be found in the AMS database");
+                    return new UnauthorizedObjectResult(new { Error = new ApiError(ApiConstants.DeviceCredentialsNotFound, "The device credentials are not valid") });
 
                 case DeviceNotFoundException _:
                     this.logger.LogError(ex, "The device could not be found in the AMS database");
-                    return new UnauthorizedObjectResult(new { Error = new ApiError("not-registered", "The device is not registered") });
+                    return new UnauthorizedObjectResult(new { Error = new ApiError(ApiConstants.DeviceNotFound, "The device is not registered") });
 
                 case AadObjectNotFoundException _:
                     this.logger.LogError(ex, "The device or a record of its certificate could not be found in AAD");
-                    return new UnauthorizedObjectResult(new { Error = new ApiError("not-registered-aad", "The device is not registered in AAD") });
+                    return new UnauthorizedObjectResult(new { Error = new ApiError(ApiConstants.AadDeviceNotFound, "The device is not registered in AAD") });
 
                 case UnsupportedAuthenticationTypeException _:
                     this.logger.LogError(ex, "The device requested an unsupported authentication type");
-                    return new UnauthorizedObjectResult(new { Error = new ApiError("unsupported-auth-type", "The request authentication type is not supported") });
+                    return new UnauthorizedObjectResult(new { Error = new ApiError(ApiConstants.UnsupportedAuthType, "The request authentication type is not supported") });
 
                 case PasswordRollbackDeniedException _:
                     this.logger.LogError(ex, "The request to rollback password a password was denied");
-                    return new JsonResult(new { Error = new ApiError("rollback-denied", "The request to rollback the password was denied") })
+                    return new JsonResult(new { Error = new ApiError(ApiConstants.RollbackDenied, "The request to rollback the password was denied") })
                     {
                         StatusCode = StatusCodes.Status403Forbidden
                     };
 
                 case RegistrationKeyValidationException _:
                     this.logger.LogError(ex, "The registration key could not be validated");
-                    return new JsonResult(new { Error = new ApiError("invalid-registration-key", "The registration key was not accepted") })
+                    return new JsonResult(new { Error = new ApiError(ApiConstants.InvalidRegistrationKey, "The registration key was not accepted") })
                     {
                         StatusCode = StatusCodes.Status403Forbidden
                     };
 
                 default:
                     this.logger.LogError(ex, "The request could not be processed");
-                    return new JsonResult(new { Error = new ApiError("internal-error", "An internal error occurred and the request could not be processed") })
+                    return new JsonResult(new { Error = new ApiError(ApiConstants.InternalError, "An internal error occurred and the request could not be processed") })
                     {
                         StatusCode = StatusCodes.Status500InternalServerError
                     };

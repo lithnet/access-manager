@@ -16,16 +16,19 @@ namespace Lithnet.AccessManager.Agent
         private readonly IHostApplicationLifetime appLifetime;
         private readonly ILapsAgent lapsAgent;
         private readonly ILocalSam sam;
-        private readonly IPasswordStorageProvider passwordStorage;
 
-        public Worker(ILogger<Worker> logger, ISettingsProvider settings, IHostApplicationLifetime appLifetime, ILapsAgent lapsWorker, ILocalSam sam, IPasswordStorageProvider passwordStorage)
+        public Worker(ILogger<Worker> logger, ISettingsProvider settings, IHostApplicationLifetime appLifetime, ILapsAgent lapsWorker)
         {
             this.logger = logger;
             this.settings = settings;
             this.appLifetime = appLifetime;
             this.lapsAgent = lapsWorker;
+        }
+
+        public Worker(ILogger<Worker> logger, ISettingsProvider settings, IHostApplicationLifetime appLifetime, ILapsAgent lapsWorker, ILocalSam sam)
+        :this(logger, settings, appLifetime, lapsWorker)
+        {
             this.sam = sam;
-            this.passwordStorage = passwordStorage;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

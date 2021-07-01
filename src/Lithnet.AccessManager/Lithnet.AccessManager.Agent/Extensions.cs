@@ -77,9 +77,9 @@ namespace Lithnet.AccessManager.Agent
             try
             {
                 JsonDocument j = JsonDocument.Parse(content);
-                if (j.RootElement.TryGetProperty("Error", out _))
+                if (j.RootElement.TryGetProperty("Error", out var details))
                 {
-                    ApiError error = JsonSerializer.Deserialize<ApiError>(content);
+                    ApiError error = JsonSerializer.Deserialize<ApiError>(details.GetRawText());
                     return new ApiException(error, message);
                 }
             }

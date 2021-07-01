@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Lithnet.AccessManager.Agent.Configuration;
+﻿using Lithnet.AccessManager.Agent.Configuration;
 using Lithnet.AccessManager.Api.Shared;
 using Microsoft.Extensions.Options;
+using System;
 
 namespace Lithnet.AccessManager.Agent.Providers
 {
@@ -15,12 +12,12 @@ namespace Lithnet.AccessManager.Agent.Providers
         private readonly RegistrySettingsProvider registrySettingsAgent;
         private readonly IOptionsMonitor<AgentOptions> agentOptions;
 
-        public WindowsSettingsProvider(IOptionsMonitor<AgentOptions> agentOptions)
+        public WindowsSettingsProvider(IOptionsMonitor<AgentOptions> agentOptions, IRegistryPathProvider pathProvider)
         {
             this.agentOptions = agentOptions;
-            this.policySettingsAgent = new RegistrySettingsProvider("Policies\\Lithnet\\Access Manager Agent");
-            this.policySettingsPassword = new RegistrySettingsProvider("Policies\\Lithnet\\Access Manager Agent\\Password");
-            this.registrySettingsAgent = new RegistrySettingsProvider("Lithnet\\Access Manager Agent");
+            this.policySettingsAgent = new RegistrySettingsProvider(pathProvider.PolicySettingsAgentPath);
+            this.policySettingsPassword = new RegistrySettingsProvider(pathProvider.PolicySettingsPasswordPath);
+            this.registrySettingsAgent = new RegistrySettingsProvider(pathProvider.RegistrySettingsAgentPath);
         }
 
         public int Interval => this.policySettingsAgent.GetValue<int>("Interval", agentOptions.CurrentValue.Interval);
@@ -88,7 +85,17 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         public int CheckInIntervalHours => this.policySettingsAgent.GetValue<int>("CheckInIntervalHours", agentOptions.CurrentValue.CheckInIntervalHours);
 
+        public bool RegisterSecondaryCredentialsForAadj => this.policySettingsAgent.GetValue<bool>("RegisterSecondaryCredentialsForAadj", agentOptions.CurrentValue.AdvancedAgent.RegisterSecondaryCredentialsForAadj);
+
+        public bool RegisterSecondaryCredentialsForAadr => this.policySettingsAgent.GetValue<bool>("RegisterSecondaryCredentialsForAadr", agentOptions.CurrentValue.AdvancedAgent.RegisterSecondaryCredentialsForAadr);
+
         public TimeSpan MetadataCacheDuration => TimeSpan.FromHours(this.policySettingsAgent.GetValue<int>("MetadataCacheDurationHours", (int)agentOptions.CurrentValue.AdvancedAgent.MetadataCacheDuration.TotalHours));
+
+        public bool HasRegisteredSecondaryCredentials
+        {
+            get => this.registrySettingsAgent.GetValue<bool>("HasRegisteredSecondaryCredentials", false);
+            set => this.registrySettingsAgent.SetValue("HasRegisteredSecondaryCredentials", value);
+        }
 
         public RegistrationState RegistrationState
         {

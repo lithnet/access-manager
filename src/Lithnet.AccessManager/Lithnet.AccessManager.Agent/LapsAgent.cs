@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Agent.Providers;
 using Microsoft.Extensions.Logging;
@@ -12,25 +11,25 @@ namespace Lithnet.AccessManager.Agent
     {
         private readonly ILogger<LapsAgent> logger;
         private readonly ISettingsProvider settings;
-        private readonly LegacyLapsAgent legacyAgent;
-        private readonly AdvancedLapsAgent advancedLapsAgent;
+        private readonly ActiveDirectoryLapsAgent activeDirectoryLapsAgent;
+        private readonly AmsLapsAgent amsLapsAgent;
 
         private bool msLapsInstalled;
         private bool isDisabledLogged;
 
-        public LapsAgent(ILogger<LapsAgent> logger, ISettingsProvider settings, AdvancedLapsAgent advancedLapsAgent)
+        public LapsAgent(ILogger<LapsAgent> logger, ISettingsProvider settings, AmsLapsAgent advancedLapsAgent)
         {
             this.logger = logger;
             this.settings = settings;
-            this.advancedLapsAgent = advancedLapsAgent;
+            this.amsLapsAgent = advancedLapsAgent;
         }
 
-        public LapsAgent(ILogger<LapsAgent> logger, ISettingsProvider settings, LegacyLapsAgent legacyAgent, AdvancedLapsAgent advancedLapsAgent)
+        public LapsAgent(ILogger<LapsAgent> logger, ISettingsProvider settings, ActiveDirectoryLapsAgent legacyAgent, AmsLapsAgent advancedLapsAgent)
         {
             this.logger = logger;
             this.settings = settings;
-            this.legacyAgent = legacyAgent;
-            this.advancedLapsAgent = advancedLapsAgent;
+            this.activeDirectoryLapsAgent = legacyAgent;
+            this.amsLapsAgent = advancedLapsAgent;
         }
 
         public async Task DoCheck()
@@ -78,11 +77,11 @@ namespace Lithnet.AccessManager.Agent
 
                 if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) || this.settings.AdvancedAgentEnabled)
                 {
-                    await this.advancedLapsAgent.DoCheckAsync();
+                    await this.amsLapsAgent.DoCheckAsync();
                 }
                 else
                 {
-                    this.legacyAgent.DoCheck();
+                    this.activeDirectoryLapsAgent.DoCheck();
                 }
 
             }

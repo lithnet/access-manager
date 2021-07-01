@@ -25,5 +25,6 @@ namespace Lithnet.AccessManager.Server
         Task<IDevice> GetDeviceAsync(string deviceId);
 
         Task<IList<IDevice>> FindDevices(string name);
+        Task AddDeviceCredentialsAsync(IDevice device, X509Certificate2 certificate);
     }
 }

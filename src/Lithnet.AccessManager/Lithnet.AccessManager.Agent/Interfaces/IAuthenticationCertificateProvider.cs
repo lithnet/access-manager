@@ -8,7 +8,9 @@ namespace Lithnet.AccessManager.Agent
 {
     public interface IAuthenticationCertificateProvider
     {
-        Task<X509Certificate2> GetCertificate();
+        T DelegateCertificateOperation<T>(Func<X509Certificate2, T> certificateOperation);
+
+      //  Task<X509Certificate2> GetCertificate();
 
         Task<X509Certificate2> GetOrCreateAgentCertificate();
     }

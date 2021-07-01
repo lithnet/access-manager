@@ -14,5 +14,10 @@ namespace Lithnet.AccessManager.Agent.Configuration
         public AgentAuthenticationMode AuthenticationMode { get; set; }
 
         public TimeSpan MetadataCacheDuration { get; set; } = TimeSpan.FromDays(1);
+
+        public bool RegisterSecondaryCredentialsForAadj { get; set; } = false;
+
+        public bool RegisterSecondaryCredentialsForAadr { get; set; } = true;
+
     }
 }

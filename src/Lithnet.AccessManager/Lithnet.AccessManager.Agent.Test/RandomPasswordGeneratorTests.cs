@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Security.Cryptography;
+using Lithnet.AccessManager.Agent.Providers;
 using Moq;
 using NUnit.Framework;
 
@@ -7,14 +8,13 @@ namespace Lithnet.AccessManager.Agent.Test
 {
     public class RandomPasswordGeneratorTests
     {
-        private RNGCryptoServiceProvider csp = new RNGCryptoServiceProvider();
-
-        private Mock<ILapsSettings> settings;
+        private IRandomValueGenerator rvg = new RandomValueGenerator(RandomNumberGenerator.Create());
+        private Mock<ISettingsProvider> settings;
 
         [SetUp()]
         public void TestInitialize()
         {
-            settings = new Mock<ILapsSettings>();
+            settings = new Mock<ISettingsProvider>();
         }
 
         [Test]
@@ -22,7 +22,7 @@ namespace Lithnet.AccessManager.Agent.Test
         {
             settings.SetupGet(t => t.PasswordLength).Returns(12);
 
-            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.csp);
+            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.rvg);
 
             Assert.AreEqual(12, g.Generate().Length);
         }
@@ -32,7 +32,7 @@ namespace Lithnet.AccessManager.Agent.Test
         {
             settings.SetupGet(t => t.UseLower).Returns(true);
 
-            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.csp);
+            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.rvg);
 
             string password = g.Generate();
 
@@ -47,7 +47,7 @@ namespace Lithnet.AccessManager.Agent.Test
         {
             settings.SetupGet(t => t.UseUpper).Returns(true);
 
-            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.csp);
+            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.rvg);
 
             string password = g.Generate();
 
@@ -63,7 +63,7 @@ namespace Lithnet.AccessManager.Agent.Test
         {
             settings.SetupGet(t => t.UseNumeric).Returns(true);
 
-            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.csp);
+            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.rvg);
 
             string password = g.Generate();
 
@@ -79,7 +79,7 @@ namespace Lithnet.AccessManager.Agent.Test
         {
             settings.SetupGet(t => t.UseSymbol).Returns(true);
 
-            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.csp);
+            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.rvg);
 
             string password = g.Generate();
 
@@ -95,7 +95,7 @@ namespace Lithnet.AccessManager.Agent.Test
             settings.SetupGet(t => t.UseUpper).Returns(true);
             settings.SetupGet(t => t.UseLower).Returns(true);
 
-            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.csp);
+            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.rvg);
 
             string password = g.Generate();
 
@@ -110,7 +110,7 @@ namespace Lithnet.AccessManager.Agent.Test
         {
             settings.SetupGet(t => t.PasswordCharacters).Returns("a");
 
-            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.csp);
+            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.rvg);
 
             string password = g.Generate();
 
@@ -118,25 +118,6 @@ namespace Lithnet.AccessManager.Agent.Test
             {
                 Assert.AreEqual('a', c);
             }
-        }
-
-        [Test]
-        public void TestPasswordUseReadibilitySeparator()
-        {
-            settings.SetupGet(t => t.UseReadabilitySeparator).Returns(true);
-            settings.SetupGet(t => t.ReadabilitySeparatorInterval).Returns(3);
-            settings.SetupGet(t => t.ReadabilitySeparator).Returns("_");
-            settings.SetupGet(t => t.PasswordLength).Returns(12);
-
-            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.csp);
-
-            string password = g.Generate();
-
-            Assert.AreEqual(15, password.Length);
-            Assert.AreEqual(3, password.Where(t => t == '_').Count());
-            Assert.AreEqual('_', password[3]);
-            Assert.AreEqual('_', password[7]);
-            Assert.AreEqual('_', password[11]);
         }
     }
 }

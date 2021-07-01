@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -43,6 +44,31 @@ namespace Lithnet.AccessManager.Api.Controllers
             this.checkInDataValidator = checkInDataValidator;
             this.regKeyProvider = regKeyProvider;
             this.amsManagedDeviceOptions = amsManagedDeviceOptions;
+        }
+
+        [HttpPost("credential")]
+        [Authorize("ComputersOnly", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> RegisterAdditionalCredentials([FromBody] ClientAssertion request)
+        {
+            try
+            {
+                JwtSecurityToken token = this.assertionValidator.Validate(request.Assertion, "api/v1.0/agent/register/credential", out X509Certificate2 signingCertificate);
+                string deviceId = this.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                this.logger.LogTrace($"Device {deviceId} is attempting to register a set of secondary credentials");
+
+                IDevice device = await this.devices.GetDeviceAsync(deviceId);
+
+                await this.devices.AddDeviceCredentialsAsync(device, signingCertificate);
+
+                this.logger.LogInformation($"Device {device.ObjectID} with authority information {device.AuthorityType}-{device.AuthorityId}-{device.AuthorityDeviceId} has successfully added a secondary credential set with thumbprint {signingCertificate.Thumbprint}");
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return this.errorProvider.GetErrorResult(ex);
+            }
         }
 
         [HttpPost()]

@@ -85,12 +85,13 @@ namespace Lithnet.AccessManager.Agent
                         services.AddTransient<IMsMcsAdmPwdProvider, MsMcsAdmPwdProvider>();
                         services.AddTransient<ILithnetAdminPasswordProvider, LithnetAdminPasswordProvider>();
                         services.AddTransient<ICertificateProvider, CertificateProvider>();
-                        services.AddTransient<LegacyLapsAgent>();
+                        services.AddTransient<ActiveDirectoryLapsAgent>();
 
 
                         // Advanced agent services
                         services.AddSingleton<IwaTokenProvider>();
                         services.AddSingleton<ISettingsProvider, WindowsSettingsProvider>();
+                        services.AddSingleton<IRegistryPathProvider, RegistryPathProvider>();
                         services.AddSingleton<IAadJoinInformationProvider, WindowsAadJoinInformationProvider>();
                     }
                     else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -117,7 +118,7 @@ namespace Lithnet.AccessManager.Agent
                     services.AddSingleton<IMetadataProvider, MetadataProvider>();
                     services.AddTransient<IRegistrationProvider, RegistrationProvider>();
 
-                    services.AddTransient<AdvancedLapsAgent>();
+                    services.AddTransient<AmsLapsAgent>();
                     services.AddTransient<ILapsAgent, LapsAgent>();
                     services.AddTransient<IPasswordGenerator, RandomPasswordGenerator>();
                     services.AddSingleton(RandomNumberGenerator.Create());

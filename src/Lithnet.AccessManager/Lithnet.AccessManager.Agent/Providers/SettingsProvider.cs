@@ -97,7 +97,7 @@ namespace Lithnet.AccessManager.Agent.Providers
         }
 
         public int CheckInIntervalHours => this.agentOptions.CurrentValue.CheckInIntervalHours;
-        
+
         public TimeSpan MetadataCacheDuration => this.agentOptions.CurrentValue.AdvancedAgent.MetadataCacheDuration;
 
         public int LithnetLocalAdminPasswordHistoryDaysToKeep => this.agentOptions.CurrentValue.PasswordManagement.ActiveDirectorySettings.LithnetLocalAdminPasswordHistoryDaysToKeep;
@@ -105,5 +105,18 @@ namespace Lithnet.AccessManager.Agent.Providers
         public PasswordAttributeBehaviour LithnetLocalAdminPasswordAttributeBehaviour => this.agentOptions.CurrentValue.PasswordManagement.ActiveDirectorySettings.LithnetLocalAdminPasswordAttributeBehaviour;
 
         public PasswordAttributeBehaviour MsMcsAdmPwdAttributeBehaviour => this.agentOptions.CurrentValue.PasswordManagement.ActiveDirectorySettings.MsMcsAdmPwdAttributeBehaviour;
+
+        public bool HasRegisteredSecondaryCredentials
+        {
+            get => this.appState.Value.HasRegisteredSecondaryCredentials;
+            set
+            {
+                this.appState.Update(t => t.HasRegisteredSecondaryCredentials = value);
+            }
+        }
+
+        public bool RegisterSecondaryCredentialsForAadr => this.agentOptions.CurrentValue.AdvancedAgent.RegisterSecondaryCredentialsForAadr;
+
+        public bool RegisterSecondaryCredentialsForAadj => this.agentOptions.CurrentValue.AdvancedAgent.RegisterSecondaryCredentialsForAadj;
     }
 }

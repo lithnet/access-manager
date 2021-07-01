@@ -7,5 +7,6 @@ namespace Lithnet.AccessManager.Agent
         Task<RegistrationState> GetRegistrationState();
         bool CanRegisterAgent();
         Task<RegistrationState> RegisterAgent();
+        Task RegisterSecondaryCredentials();
     }
 }

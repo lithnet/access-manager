@@ -1,56 +1,88 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using Vanara.Extensions;
 using Vanara.InteropServices;
 using Vanara.PInvoke;
 
 namespace Lithnet.AccessManager.Agent.Interop
 {
-    public class DSREG_JOIN_INFO : SafeHANDLE
+    public class DsRegJoinInfo : SafeHANDLE
     {
+        private X509Certificate2 certificate;
+
         /// <summary>An enumeration value that specifies the type of the join.</summary>
-        public NetApi32.DSREG_JOIN_TYPE joinType => this.Value.joinType;
+        public NetApi32.DSREG_JOIN_TYPE JoinType => this.Value.joinType;
 
         /// <summary>
         /// Representations of the certification for the join. This is a pointer to <c>CERT_CONTEXT</c> structure which can be found in <c>Vanara.PInvoke.Cryptography</c>.
         /// </summary>
-        public Crypt32.CERT_CONTEXT? pJoinCertificate => this.Value.pJoinCertificate.ToNullableStructure<Crypt32.CERT_CONTEXT>();
+        public Crypt32.CERT_CONTEXT? JoinCertificateContext => this.Value.pJoinCertificate.ToNullableStructure<Crypt32.CERT_CONTEXT>();
 
-        /// <summary>The PSZ device identifier</summary>
-        public string pszDeviceId => this.Value.pszDeviceId;
+        public X509Certificate2 Certificate
+        {
+            get
+            {
+                if (this.certificate == null && this.JoinCertificateContext.HasValue)
+                {
+                    this.certificate = new X509Certificate2(this.Value.pJoinCertificate);
+                }
+
+                return this.certificate;
+            }
+        }
+
+        public bool IsPrivateKeyAvailable
+        {
+            get
+            {
+                try
+                {
+                    if (this.Certificate.HasPrivateKey)
+                    {
+                        _ = this.Certificate.PrivateKey;
+                        return true;
+                    }
+                }
+                catch
+                {
+                    // ignore
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>The device identifier</summary>
+        public string DeviceId => this.Value.pszDeviceId;
 
         /// <summary>A string that represents Azure Active Directory (Azure AD).</summary>
-        public string pszIdpDomain => this.Value.pszIdpDomain;
+        public string IdpDomain => this.Value.pszIdpDomain;
 
         /// <summary>The identifier of the joined Azure AD tenant.</summary>
-        public string pszTenantId => this.Value.pszTenantId;
+        public string TenantId => this.Value.pszTenantId;
 
         /// <summary>The email address for the joined account.</summary>
-        public string pszJoinUserEmail => this.Value.pszJoinUserEmail;
+        public string JoinUserEmail => this.Value.pszJoinUserEmail;
 
         /// <summary>The display name for the joined account.</summary>
-        public string pszTenantDisplayName => this.Value.pszTenantDisplayName;
+        public string TenantDisplayName => this.Value.pszTenantDisplayName;
 
         /// <summary>The URL to use to enroll in the Mobile Device Management (MDM) service.</summary>
-        public string pszMdmEnrollmentUrl => this.Value.pszMdmEnrollmentUrl;
+        public string MdmEnrollmentUrl => this.Value.pszMdmEnrollmentUrl;
 
         /// <summary>The URL that provides information about the terms of use for the MDM service.</summary>
-        public string pszMdmTermsOfUseUrl => this.Value.pszMdmTermsOfUseUrl;
+        public string MdmTermsOfUseUrl => this.Value.pszMdmTermsOfUseUrl;
 
         /// <summary>The URL that provides information about compliance for the MDM service.</summary>
-        public string pszMdmComplianceUrl => this.Value.pszMdmComplianceUrl;
+        public string MdmComplianceUrl => this.Value.pszMdmComplianceUrl;
 
         /// <summary>The URL for synchronizing user settings.</summary>
-        public string pszUserSettingSyncUrl => this.Value.pszUserSettingSyncUrl;
+        public string UserSettingSyncUrl => this.Value.pszUserSettingSyncUrl;
 
         /// <summary>Information about the user account that was used to join a device to Azure AD.</summary>
-        public NetApi32.DSREG_USER_INFO? pUserInfo => this.Value.pUserInfo.ToNullableStructure<NetApi32.DSREG_USER_INFO>();
-
-        public X509Certificate2 GetCertificate()
-        {
-            return new X509Certificate2(this.Value.pJoinCertificate);
-        }
+        public NetApi32.DSREG_USER_INFO? UserInfo => this.Value.pUserInfo.ToNullableStructure<NetApi32.DSREG_USER_INFO>();
 
         /// <summary>
         /// Internal method that actually releases the handle. This is called by <see cref="M:Vanara.PInvoke.SafeHANDLE.ReleaseHandle"/>
@@ -61,6 +93,18 @@ namespace Lithnet.AccessManager.Agent.Interop
         {
             NativeMethods.NetFreeAadJoinInformation(this.handle);
             return true;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine($"Join type: {this.JoinType}");
+            builder.AppendLine($"Tenant ID: {this.TenantId}");
+            builder.AppendLine($"Tenant Name: {this.TenantDisplayName}");
+            builder.AppendLine($"IDP domain: {this.IdpDomain}");
+            builder.AppendLine($"Join user: {this.JoinUserEmail}");
+            builder.AppendLine($"Certificate thumbprint: {this.Certificate?.Thumbprint}");
+            return builder.ToString();
         }
 
         private _DSREG_JOIN_INFO Value => this.handle.ToStructure<_DSREG_JOIN_INFO>();

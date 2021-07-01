@@ -76,5 +76,10 @@ namespace Lithnet.AccessManager.Server
 
             return null;
         }
+
+        public static string Sha256Thumbprint(this X509Certificate2 cert)
+        {
+            return cert.GetCertHashString(HashAlgorithmName.SHA256);
+        }
     }
 }
