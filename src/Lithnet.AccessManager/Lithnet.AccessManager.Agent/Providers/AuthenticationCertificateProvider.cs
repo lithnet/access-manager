@@ -63,7 +63,7 @@ namespace Lithnet.AccessManager.Agent
                 try
                 {
                     this.cachedCertificate = this.ResolveCertificateFromLocalStore(this.settings.AuthCertificate);
-                    this.logger.LogTrace($"Found authentication certificate ({this.settings.AuthCertificate}) in the local store");
+                    this.logger.LogTrace($"Found authentication certificate {this.settings.AuthCertificate} in the local store");
                     return Task.FromResult(this.cachedCertificate);
                 }
                 catch (CertificateNotFoundException)
@@ -77,7 +77,7 @@ namespace Lithnet.AccessManager.Agent
             {
                 this.settings.AuthCertificate = cert.Thumbprint;
                 this.cachedCertificate = cert;
-                this.logger.LogTrace($"Found an existing, but unattached certificate ({this.settings.AuthCertificate}) in the local store");
+                this.logger.LogTrace($"Found an existing, but unattached certificate {this.settings.AuthCertificate} in the local store");
 
                 return Task.FromResult(this.cachedCertificate);
             }
@@ -86,7 +86,7 @@ namespace Lithnet.AccessManager.Agent
             this.cachedCertificate = cert;
             this.settings.AuthCertificate = cert.Thumbprint;
 
-            this.logger.LogTrace($"Created a new authentication certificate ({this.settings.AuthCertificate})");
+            this.logger.LogTrace($"Created a new authentication certificate {this.settings.AuthCertificate}");
             return Task.FromResult(cert);
         }
 

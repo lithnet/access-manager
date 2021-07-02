@@ -51,17 +51,17 @@ namespace Lithnet.AccessManager.Agent
             }
             catch (HttpRequestException ex) when (ex.InnerException is SocketException s)
             {
-                this.logger.LogError($"Unable to connect to the server {this.agentSettings.Server} due to error {s.SocketErrorCode}: {s.Message}");
+                this.logger.LogError(EventIDs.ServerConnectionError, $"Unable to connect to the server {this.agentSettings.Server} due to error {s.SocketErrorCode}: {s.Message}");
                 this.logger.LogTrace(ex, "Unable to connect to server");
             }
             catch (HttpRequestException ex)
             {
-                this.logger.LogError($"Unable to connect to the server {this.agentSettings.Server}. {ex.Message}");
+                this.logger.LogError(EventIDs.ServerConnectionError, $"Unable to connect to the server {this.agentSettings.Server}. {ex.Message}");
                 this.logger.LogTrace(ex, "Unable to connect to server");
             }
             catch (SocketException s)
             {
-                this.logger.LogError($"Unable to connect to the server {this.agentSettings.Server} due to error {s.SocketErrorCode}: {s.Message}");
+                this.logger.LogError(EventIDs.ServerConnectionError, $"Unable to connect to the server {this.agentSettings.Server} due to error {s.SocketErrorCode}: {s.Message}");
                 this.logger.LogTrace(s, "Unable to connect to server");
             }
         }
@@ -73,13 +73,13 @@ namespace Lithnet.AccessManager.Agent
                 if (this.agentSettings.AuthenticationMode == AgentAuthenticationMode.Aad)
                 {
                     this.agentSettings.HasRegisteredSecondaryCredentials = false;
-                    this.logger.LogError("The server indicated that it no longer recognizes this agent. The agent will attempt to re-set up the relationship with the server on the next run");
+                    this.logger.LogError(EventIDs.ServerCredentialsNotRecognized, "The server indicated that it no longer recognizes this agent. The agent will attempt to re-set up the relationship with the server on the next run");
                 }
                 else if (this.agentSettings.AuthenticationMode == AgentAuthenticationMode.Ams)
                 {
                     if (this.agentSettings.RegistrationState == RegistrationState.Approved && !string.IsNullOrWhiteSpace(this.agentSettings.RegistrationKey))
                     {
-                        this.logger.LogError("The server indicated that it no longer recognizes this agent. The agent will attempt to re-register the device with the current registration key on the next run");
+                        this.logger.LogError(EventIDs.ServerCredentialsNotRecognized, "The server indicated that it no longer recognizes this agent. The agent will attempt to re-register the device with the current registration key on the next run");
                         this.agentSettings.RegistrationState = RegistrationState.NotRegistered;
                     }
                 }
@@ -92,7 +92,7 @@ namespace Lithnet.AccessManager.Agent
         {
             if (string.IsNullOrWhiteSpace(this.agentSettings.Server))
             {
-                this.logger.LogError("No AMS server was configured");
+                this.logger.LogError(EventIDs.NoServerConfigured, "No AMS server was configured");
                 return false;
             }
 
@@ -140,7 +140,7 @@ namespace Lithnet.AccessManager.Agent
 
             if (!this.agentSettings.RegisterSecondaryCredentialsForAadr)
             {
-                this.logger.LogWarning("Cannot perform AAD authentication because the device is not AAD joined, and the current agent settings do not permit registering AADR credentials");
+                this.logger.LogWarning(EventIDs.AadrRegistrationNotAllowed, "Cannot perform AAD authentication because the device is not AAD joined, and the current agent settings do not permit registering AADR credentials. Enable the 'RegisterSecondaryCredentialsForAadr' setting to allow this device to be registered");
                 return false;
             }
 
@@ -168,21 +168,23 @@ namespace Lithnet.AccessManager.Agent
                 case RegistrationState.NotRegistered:
                     if (this.registrationProvider.CanRegisterAgent())
                     {
+                        this.logger.LogInformation(EventIDs.AmsRegistrationStarting, "Attempting to register the agent with the AMS server");
+
                         var result = await this.registrationProvider.RegisterAgent();
 
-                        if (result != RegistrationState.Approved)
+                        if (result == RegistrationState.Pending)
                         {
-                            this.logger.LogWarning("The client has registered and is pending approval. Registration state will be checked on the next agent cycle");
+                            this.logger.LogInformation(EventIDs.AmsRegistrationPending, "The client has registered and is pending approval. Registration state will be checked on the next agent cycle");
                             return false;
                         }
+
+                        return result == RegistrationState.Approved;
                     }
                     else
                     {
-                        this.logger.LogWarning("The client is not able to register. Please ensure the client has an active registration key");
+                        this.logger.LogWarning(EventIDs.RegistrationNotReady, "The client is not able to register. Please ensure the client has an active registration key");
                         return false;
                     }
-
-                    break;
 
                 case RegistrationState.Approved:
                     break;

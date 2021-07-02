@@ -57,15 +57,6 @@ namespace Lithnet.AccessManager.Agent.Providers
             }
         }
 
-        public string CheckRegistrationUrl
-        {
-            get => this.appState.Value.CheckRegistrationUrl;
-            set
-            {
-                this.appState.Update(t => t.CheckRegistrationUrl = value);
-            }
-        }
-
         public RegistrationState RegistrationState
         {
             get => this.appState.Value.RegistrationState;

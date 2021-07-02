@@ -72,6 +72,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                 this.logger.LogTrace($"Attempting to authenticate {computer.MsDsPrincipalName} using IWA");
 
                 IDevice device = await this.devices.GetOrCreateDeviceAsync(computer, this.discoveryServices.GetDomainNameDns(computer.Sid));
+                device.ThrowOnInvalidStateForAuthentication();
 
                 ClaimsIdentity identity = device.ToClaimsIdentity();
 

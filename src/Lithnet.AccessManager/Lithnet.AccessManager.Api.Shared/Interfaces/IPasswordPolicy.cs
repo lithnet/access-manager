@@ -1,4 +1,4 @@
-﻿namespace Lithnet.AccessManager.Agent
+﻿namespace Lithnet.AccessManager
 {
     public interface IPasswordPolicy
     {
@@ -15,5 +15,9 @@
         public bool UseNumeric { get; }
 
         public int MaximumPasswordAgeDays { get; }
+
+        public int MinimumNumberOfPasswords { get; }
+
+        public int MinimumPasswordHistoryAgeDays { get; }
     }
 }

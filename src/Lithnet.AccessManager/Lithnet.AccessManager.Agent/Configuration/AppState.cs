@@ -12,8 +12,6 @@ namespace Lithnet.AccessManager.Agent.Configuration
 
         public string ClientId { get; set; }
 
-        public string CheckRegistrationUrl { get; set; }
-
         public RegistrationState RegistrationState { get; set; }
 
         public DateTime LastCheckIn { get; set; }

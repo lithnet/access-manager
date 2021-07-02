@@ -32,8 +32,6 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         string ClientId { get; set; }
 
-        string CheckRegistrationUrl { get; set; }
-
         RegistrationState RegistrationState { get; set; }
 
         string AuthCertificate { get; set; }

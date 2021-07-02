@@ -18,5 +18,6 @@ namespace Lithnet.AccessManager.Server
         Task<IPasswordData> GetCurrentPassword(string deviceId, DateTime newExpiry);
 
         Task<IList<IPasswordData>> GetPasswordHistory(string deviceId);
+        Task PurgeOldPasswords(string deviceId, int minimumNumberOfPasswords, int minimumPasswordHistoryAgeDays);
     }
 }

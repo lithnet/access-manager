@@ -77,23 +77,23 @@ namespace Lithnet.AccessManager.Api.Controllers
                     }
                     else
                     {
-                        throw new UnsupportedAuthenticationTypeException($"The device presented an Azure Active Directory certificate ({signingCertificate.Subject}), but AAD authentication is not enabled");
+                        throw new UnsupportedAuthenticationTypeException($"The device presented an assertion signed with an Azure Active Directory certificate ({signingCertificate.Subject}), but AAD authentication is not enabled");
                     }
                 }
                 else if (authMode == AgentAuthenticationMode.Ams)
                 {
                     if (options.AllowAmsManagedDeviceAuth)
                     {
-                        token = await this.ValidateSelfSignedAssertionAsync(signingCertificate);
+                        token = await this.ValidateAmsAssertionAsync(signingCertificate);
                     }
                     else
                     {
-                        throw new UnsupportedAuthenticationTypeException($"The device presented an self-signed assertion, but self-asserted device authentication is not enabled");
+                        throw new UnsupportedAuthenticationTypeException($"The device presented an assertion for an AMS-managed device, but AMS device authentication is not enabled");
                     }
                 }
                 else
                 {
-                    throw new SecurityTokenValidationException($"The value provided for the 'auth-mode' claim was not supported '{authModeClaim}'");
+                    throw new SecurityTokenValidationException($"The value provided for the 'auth-mode' claim was not supported -> '{authModeClaim}'");
                 }
 
                 return this.Ok(token);
@@ -140,6 +140,8 @@ namespace Lithnet.AccessManager.Api.Controllers
             this.ValidateAadDeviceState(aadDevice);
 
             IDevice device = await this.devices.GetOrCreateDeviceAsync(aadDevice, tenantId);
+            device.ThrowOnInvalidStateForAuthentication();
+
             ClaimsIdentity identity = device.ToClaimsIdentity();
 
             this.logger.LogInformation($"Successfully authenticated device {device.ComputerName} ({device.ObjectID}) from AzureAD");
@@ -173,13 +175,14 @@ namespace Lithnet.AccessManager.Api.Controllers
             }
         }
 
-        private async Task<TokenResponse> ValidateSelfSignedAssertionAsync(X509Certificate2 signingCertificate)
+        private async Task<TokenResponse> ValidateAmsAssertionAsync(X509Certificate2 signingCertificate)
         {
             IDevice device = await this.devices.GetDeviceAsync(signingCertificate);
+            device.ThrowOnInvalidStateForAuthentication();
 
             if (device.AuthorityType == AuthorityType.AzureActiveDirectory)
             {
-                this.logger.LogTrace("Validating AAD device using secondary credentials");
+                this.logger.LogTrace("Validating AzureAD device using AMS credentials");
                 Device aadDevice = await this.graphProvider.GetAadDeviceByIdAsync(device.AuthorityId, device.AuthorityDeviceId);
                 this.ValidateAadDeviceState(aadDevice);
             }
@@ -190,7 +193,7 @@ namespace Lithnet.AccessManager.Api.Controllers
 
             ClaimsIdentity identity = device.ToClaimsIdentity();
 
-            this.logger.LogInformation($"Successfully authenticated device {device.ComputerName} ({device.ObjectID}) using a self-signed assertion");
+            this.logger.LogInformation($"Successfully authenticated device {device.ComputerName} ({device.ObjectID}) using a signed assertion");
             return this.tokenGenerator.GenerateToken(identity);
         }
     }

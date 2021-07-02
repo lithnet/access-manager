@@ -7,14 +7,14 @@ namespace Lithnet.AccessManager.Api
 {
     public class PasswordPolicyOptions
     {
-        public int MinimumNumberOfPasswords { get; set; } = 30;
-
-        public int MinimumPasswordHistoryAgeDays { get; set; } = 0;
-
-        public int MaximumPasswordAgeDays { get; set; } = 7;
-
         public int RollbackWindowMinutes { get; set; } = 1;
 
         public string EncryptionCertificateThumbprint { get; set; }
+
+        public int PolicyCacheDurationSeconds { get; set; } = 60;
+
+        public PasswordPolicyEntry DefaultPolicy { get; set; } = new PasswordPolicyEntry();
+
+        public List<PasswordPolicyEntry> Policies { get; set; } = new List<PasswordPolicyEntry>();
     }
 }

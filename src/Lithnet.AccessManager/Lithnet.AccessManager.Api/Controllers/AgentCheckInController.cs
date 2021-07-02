@@ -15,7 +15,9 @@ namespace Lithnet.AccessManager.Api.Controllers
     [ApiController]
     [Route("agent/checkin")]
     [Produces("application/json")]
-    [Authorize("ComputersOnly", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(Constants.AuthZPolicyComputers)]
+    [Authorize(Constants.AuthZPolicyApprovedClient)]
     public class AgentCheckInController : Controller
     {
         private readonly ILogger<AgentCheckInController> logger;
@@ -49,10 +51,9 @@ namespace Lithnet.AccessManager.Api.Controllers
 
                 this.logger.LogTrace($"Processing agent update request for {deviceId}");
 
-                this.checkinDataValidator.ValidateCheckInData(data);
-
                 var device = await this.deviceProvider.GetDeviceAsync(deviceId);
 
+                this.checkinDataValidator.ValidateCheckInData(data);
                 device.AgentVersion = data.AgentVersion;
                 device.ComputerName = data.Hostname;
                 device.DnsName = data.DnsName;

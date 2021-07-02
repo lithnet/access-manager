@@ -49,14 +49,25 @@ namespace Lithnet.AccessManager.Api
                     this.logger.LogError(ex, "The request to rollback password a password was denied");
                     return new JsonResult(new { Error = new ApiError(ApiConstants.RollbackDenied, "The request to rollback the password was denied") })
                     {
-                        StatusCode = StatusCodes.Status403Forbidden
+                        StatusCode = StatusCodes.Status410Gone
+                    };
+
+                case DeviceNotApprovedException _:
+                    this.logger.LogError(ex, "The device was not approved");
+                    return new UnauthorizedObjectResult(new { Error = new ApiError(ApiConstants.DeviceNotApproved, "The device is not approved") });
+
+                case RegistrationDisabledException _:
+                    this.logger.LogError(ex, "A client requested registration, but registration was disabled on this server");
+                    return new JsonResult(new { Error = new ApiError(ApiConstants.RegistrationDisabled, "Registration is disabled") })
+                    {
+                        StatusCode = StatusCodes.Status406NotAcceptable
                     };
 
                 case RegistrationKeyValidationException _:
                     this.logger.LogError(ex, "The registration key could not be validated");
                     return new JsonResult(new { Error = new ApiError(ApiConstants.InvalidRegistrationKey, "The registration key was not accepted") })
                     {
-                        StatusCode = StatusCodes.Status403Forbidden
+                        StatusCode = StatusCodes.Status412PreconditionFailed
                     };
 
                 default:

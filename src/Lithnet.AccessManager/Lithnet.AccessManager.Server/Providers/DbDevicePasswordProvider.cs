@@ -13,13 +13,13 @@ namespace Lithnet.AccessManager.Server
     {
         private readonly IDbProvider dbProvider;
         private readonly ILogger<DbDeviceProvider> logger;
-        private IOptions<PasswordPolicyOptions> passwordPolicy;
+        private readonly IOptionsMonitor<PasswordPolicyOptions> policyOptions;
 
-        public DbDevicePasswordProvider(IDbProvider dbProvider, ILogger<DbDeviceProvider> logger, IOptions<PasswordPolicyOptions> passwordPolicy)
+        public DbDevicePasswordProvider(IDbProvider dbProvider, ILogger<DbDeviceProvider> logger, IOptionsMonitor<PasswordPolicyOptions> policyOptions)
         {
             this.dbProvider = dbProvider;
             this.logger = logger;
-            this.passwordPolicy = passwordPolicy;
+            this.policyOptions = policyOptions;
         }
 
         public async Task<bool> HasPasswordExpired(string deviceId)
@@ -41,9 +41,8 @@ namespace Lithnet.AccessManager.Server
 
                 await reader.ReadAsync();
                 DbPasswordData data = new DbPasswordData(reader);
-                return (data.EffectiveDate.AddDays(this.passwordPolicy.Value.MaximumPasswordAgeDays) < DateTime.UtcNow ||
-                        data.ExpiryDate < DateTime.UtcNow);
 
+                return DateTime.UtcNow > data.ExpiryDate;
             }
             catch (SqlException ex)
             {
@@ -160,18 +159,6 @@ namespace Lithnet.AccessManager.Server
         {
             try
             {
-                DateTime expiryDate = request.ExpiryDate;
-
-                if (passwordPolicy.Value.MaximumPasswordAgeDays > 0)
-                {
-                    DateTime policyMax = DateTime.UtcNow.AddDays(this.passwordPolicy.Value.MaximumPasswordAgeDays);
-
-                    if (expiryDate > policyMax)
-                    {
-                        expiryDate = policyMax;
-                    }
-                }
-
                 await using SqlConnection con = this.dbProvider.GetConnection();
 
                 string requestId = Guid.NewGuid().ToString();
@@ -183,11 +170,9 @@ namespace Lithnet.AccessManager.Server
                 command.Parameters.AddWithValue("@RequestId", requestId);
                 command.Parameters.AddWithValue("@AccountName", request.AccountName);
                 command.Parameters.AddWithValue("@EffectiveDate", DateTime.UtcNow);
-                command.Parameters.AddWithValue("@ExpiryDate", expiryDate);
+                command.Parameters.AddWithValue("@ExpiryDate", request.ExpiryDate);
 
                 await command.ExecuteNonQueryAsync();
-
-                await this.PurgeOldPasswords(deviceId);
 
                 return requestId;
             }
@@ -227,7 +212,7 @@ namespace Lithnet.AccessManager.Server
                         throw new PasswordRollbackDeniedException($"The password change cannot be reverted for device {deviceId} because the supplied request ID did not match the most recent password for the device");
                     }
 
-                    if (data.EffectiveDate.AddMinutes(this.passwordPolicy.Value.RollbackWindowMinutes) < DateTime.UtcNow)
+                    if (data.EffectiveDate.AddMinutes(this.policyOptions.CurrentValue.RollbackWindowMinutes) < DateTime.UtcNow)
                     {
                         throw new PasswordRollbackDeniedException($"The password change cannot be reverted for device {deviceId} because the rollback window has expired");
                     }
@@ -250,10 +235,10 @@ namespace Lithnet.AccessManager.Server
             }
         }
 
-        private async Task PurgeOldPasswords(string deviceId)
+        public async Task PurgeOldPasswords(string deviceId, int minimumNumberOfPasswords, int minimumPasswordHistoryAgeDays)
         {
-            if (this.passwordPolicy.Value.MinimumNumberOfPasswords <= 0 &&
-                this.passwordPolicy.Value.MinimumPasswordHistoryAgeDays <= 0)
+            if (minimumNumberOfPasswords <= 0 &&
+                minimumPasswordHistoryAgeDays <= 0)
             {
                 return;
             }
@@ -263,9 +248,8 @@ namespace Lithnet.AccessManager.Server
             SqlCommand command = new SqlCommand("spPurgePasswordHistory", con);
             command.CommandType = System.Data.CommandType.StoredProcedure;
             command.Parameters.AddWithValue("@ObjectID", deviceId);
-
-            command.Parameters.AddWithValue("@MinEntries", this.passwordPolicy.Value.MinimumNumberOfPasswords);
-            command.Parameters.AddWithValue("@PurgeBefore", DateTime.UtcNow.AddDays(-this.passwordPolicy.Value.MinimumPasswordHistoryAgeDays));
+            command.Parameters.AddWithValue("@MinEntries", minimumNumberOfPasswords);
+            command.Parameters.AddWithValue("@PurgeBefore", DateTime.UtcNow.AddDays(-minimumPasswordHistoryAgeDays));
 
             await command.ExecuteNonQueryAsync();
         }

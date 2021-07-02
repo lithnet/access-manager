@@ -5,12 +5,9 @@
         public const int AgentStarted = 1000;
         public const int AgentDisabled = 1001;
         public const int LapsAgentDisabled = 1002;
-        public const int JitAgentDisabled = 1003;
-        public const int JitAgentEnabled = 1019;
         public const int LapsAgentEnabled = 1020;
 
         public const int RunningOnDC = 1004;
-        public const int JitUnexpectedException = 1005;
         public const int LapsUnexpectedException = 1006;
         public const int AgentUnexpectedException = 1007;
 
@@ -29,6 +26,29 @@
         public const int LapsConflictResolved = 1017;
 
         public const int PasswordChangeNotRequired = 1018;
+
+
+        // Errors
+        public const int ServerConnectionError = 2001;
+        public const int ServerCredentialsNotRecognized = 2002;
+        public const int NoServerConfigured = 2003;
+        public const int AadrRegistrationNotAllowed = 2004;
+        public const int AmsRegistrationRejected = 2005;
+        public const int AmsRegistrationMissing = 2006;
+        public const int AdCertificatePrivateKeyNotAvailable = 2007;
+        public const int ImpersonationFailure = 2008;
+        public const int AmsRegistrationInvalidRegistrationKey = 2009;
+
+        // Warning
+        public const int RegistrationNotReady = 3001;
+        public const int NoSuitableAadTenantFound = 3002;
+
+        // Informational
+        public const int AmsRegistrationPending = 4001;
+        public const int AmsRegistrationApproved = 4002;
+        public const int AmsRegistrationStarting = 4003;
+        public const int RegisteredSecondaryCredentials = 4004;
+
 
     }
 }

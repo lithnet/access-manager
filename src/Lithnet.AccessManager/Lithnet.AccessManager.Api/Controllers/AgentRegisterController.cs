@@ -47,7 +47,10 @@ namespace Lithnet.AccessManager.Api.Controllers
         }
 
         [HttpPost("credential")]
-        [Authorize("ComputersOnly", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(Constants.AuthZPolicyComputers)]
+        [Authorize(Constants.AuthZPolicyApprovedClient)]
+        [Authorize(Constants.AuthZPolicyAuthorityAzureAd)]
         public async Task<IActionResult> RegisterAdditionalCredentials([FromBody] ClientAssertion request)
         {
             try
@@ -61,9 +64,9 @@ namespace Lithnet.AccessManager.Api.Controllers
 
                 await this.devices.AddDeviceCredentialsAsync(device, signingCertificate);
 
-                this.logger.LogInformation($"Device {device.ObjectID} with authority information {device.AuthorityType}-{device.AuthorityId}-{device.AuthorityDeviceId} has successfully added a secondary credential set with thumbprint {signingCertificate.Thumbprint}");
+                this.logger.LogInformation($"Device {device.ObjectID} from authority {device.AuthorityType}/{device.AuthorityId}/{device.AuthorityDeviceId} has successfully added a secondary credential set with thumbprint {signingCertificate.Thumbprint}");
 
-                return Ok();
+                return this.Ok();
             }
             catch (Exception ex)
             {
@@ -78,36 +81,26 @@ namespace Lithnet.AccessManager.Api.Controllers
             {
                 if (!this.agentOptions.Value.AllowAmsManagedDeviceAuth)
                 {
-                    this.logger.LogWarning("A client attempted to register, but registration is disabled");
-                    return this.Forbid(JwtBearerDefaults.AuthenticationScheme);
+                    throw new RegistrationDisabledException("A client attempted to register, but registration is disabled");
                 }
 
                 JwtSecurityToken token = this.assertionValidator.Validate(request.Assertion, "api/v1.0/agent/register", out X509Certificate2 signingCertificate);
 
-                IDevice device = await this.ValidateRegistrationClaims(token);
-
-                device = await this.devices.CreateDeviceAsync(device, signingCertificate);
-
-                return this.GetDeviceApprovalResult(device);
-            }
-            catch (Exception ex)
-            {
-                return this.errorProvider.GetErrorResult(ex);
-            }
-        }
-
-        [HttpGet("{requestId}")]
-        public async Task<IActionResult> GetRegistrationStatusAsync([FromRoute] string requestId)
-        {
-            try
-            {
-                if (!this.agentOptions.Value.AllowAmsManagedDeviceAuth)
+                try
                 {
-                    this.logger.LogWarning("A client attempted to validate its registration status, but registration is disabled");
-                    return this.Forbid(JwtBearerDefaults.AuthenticationScheme);
+                    IDevice existingDevice = await this.devices.GetDeviceAsync(signingCertificate);
+                    this.logger.LogInformation($"An agent requested registration, and its certificate {signingCertificate.Thumbprint} was found in the database with device ID {existingDevice.Id}");
+                    return this.GetDeviceApprovalResult(existingDevice);
+                }
+                catch (DeviceCredentialsNotFoundException)
+                {
+                    this.logger.LogInformation($"A new agent requested registration with certificate {signingCertificate.Thumbprint}");
                 }
 
-                IDevice device = await this.devices.GetDeviceAsync(AuthorityType.Ams, Constants.AmsAuthorityId, requestId);
+                IDevice device = await this.ValidateRegistrationClaims(token);
+                device = await this.devices.CreateDeviceAsync(device, signingCertificate);
+
+                this.logger.LogInformation($"Created new device {device.ObjectID} associated with the credentials {signingCertificate.Thumbprint}");
 
                 return this.GetDeviceApprovalResult(device);
             }
@@ -121,22 +114,22 @@ namespace Lithnet.AccessManager.Api.Controllers
         {
             if (device.ApprovalState == ApprovalState.Approved)
             {
+                this.logger.LogInformation($"The device {device.Id} has been approved");
                 return this.Json(new RegistrationResponse { State = "approved", ClientId = device.ObjectID });
 
             }
             else if (device.ApprovalState == ApprovalState.Pending)
             {
-                string newPath = this.Request.PathBase.Add(new PathString($"/agent/register/{device.ObjectID}"));
-                this.Response.Headers.Add("Location", newPath);
+                this.logger.LogInformation($"The device {device.Id} is pending approval");
                 JsonResult result = this.Json(new RegistrationResponse { State = "pending", ClientId = device.ObjectID });
-
                 result.StatusCode = StatusCodes.Status202Accepted;
                 return result;
             }
             else
             {
+                this.logger.LogInformation($"The device {device.Id} has been rejected");
                 JsonResult result = this.Json(new RegistrationResponse { State = "rejected", ClientId = device.ObjectID });
-                result.StatusCode = StatusCodes.Status403Forbidden;
+                result.StatusCode = StatusCodes.Status410Gone;
                 return result;
             }
         }
@@ -146,7 +139,7 @@ namespace Lithnet.AccessManager.Api.Controllers
             string registrationKey = token.Claims.FirstOrDefault(t => t.Type == "registration-key")?.Value;
             if (string.IsNullOrWhiteSpace(registrationKey))
             {
-                throw new BadRequestException("The registration information did not include a registration key");
+                throw new RegistrationKeyValidationException("The registration information did not include a registration key");
             }
 
             if (!await this.regKeyProvider.ValidateRegistrationKey(registrationKey))

@@ -9,6 +9,7 @@ using System;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Api.Providers;
 using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Api.Controllers
@@ -16,7 +17,9 @@ namespace Lithnet.AccessManager.Api.Controllers
     [ApiController]
     [Route("agent/password")]
     [Produces("application/json")]
-    [Authorize("ComputersOnly", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(Constants.AuthZPolicyComputers)]
+    [Authorize(Constants.AuthZPolicyApprovedClient)]
     public class AgentPasswordController : Controller
     {
         private readonly ILogger<AgentPasswordController> logger;
@@ -25,10 +28,11 @@ namespace Lithnet.AccessManager.Api.Controllers
         private readonly IApiErrorResponseProvider errorProvider;
         private readonly IEncryptionProvider encryptionProvider;
         private readonly IOptionsMonitor<PasswordPolicyOptions> passwordOptions;
+        private readonly IPasswordPolicyProvider policyProvider;
 
         private X509Certificate2 encryptionCertificate;
 
-        public AgentPasswordController(ILogger<AgentPasswordController> logger, IDevicePasswordProvider passwordProvider, ICertificateProvider certificateProvider, IApiErrorResponseProvider errorProvider, IEncryptionProvider encryptionProvider, IOptionsMonitor<PasswordPolicyOptions> passwordOptions)
+        public AgentPasswordController(ILogger<AgentPasswordController> logger, IDevicePasswordProvider passwordProvider, ICertificateProvider certificateProvider, IApiErrorResponseProvider errorProvider, IEncryptionProvider encryptionProvider, IOptionsMonitor<PasswordPolicyOptions> passwordOptions, IPasswordPolicyProvider policyProvider)
         {
             this.logger = logger;
             this.passwordProvider = passwordProvider;
@@ -36,6 +40,7 @@ namespace Lithnet.AccessManager.Api.Controllers
             this.errorProvider = errorProvider;
             this.encryptionProvider = encryptionProvider;
             this.passwordOptions = passwordOptions;
+            this.policyProvider = policyProvider;
         }
 
         [HttpGet()]
@@ -58,7 +63,8 @@ namespace Lithnet.AccessManager.Api.Controllers
                     return this.StatusCode(StatusCodes.Status205ResetContent,
                         new PasswordGetResponse
                         {
-                            EncryptionCertificate = Convert.ToBase64String(this.EncryptionCertificate.Export(X509ContentType.Cert))
+                            EncryptionCertificate = Convert.ToBase64String(this.EncryptionCertificate.Export(X509ContentType.Cert)),
+                            Policy = await this.policyProvider.GetPolicy(deviceId)
                         });
                 }
                 else
@@ -78,8 +84,6 @@ namespace Lithnet.AccessManager.Api.Controllers
         {
             try
             {
-                this.ValidatePasswordUpdateRequest(request);
-
                 string deviceId = this.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 if (deviceId == null)
@@ -87,9 +91,16 @@ namespace Lithnet.AccessManager.Api.Controllers
                     throw new BadRequestException("The device ID was not found in the claim");
                 }
 
-                this.logger.LogTrace($"Attempting update for device {deviceId} ");
+                this.ValidatePasswordUpdateRequest(request);
+
+                var policy = await this.policyProvider.GetPolicy(deviceId);
+
+                request.ExpiryDate = DateTime.UtcNow.AddDays(policy.MaximumPasswordAgeDays);
+
+                this.logger.LogTrace($"Attempting update for device {deviceId}");
 
                 string passwordId = await this.passwordProvider.UpdateDevicePassword(deviceId, request);
+                await this.passwordProvider.PurgeOldPasswords(deviceId, policy.MinimumNumberOfPasswords, policy.MinimumPasswordHistoryAgeDays);
 
                 this.logger.LogInformation($"Successfully updated password for device {deviceId}. Password ID {passwordId}");
 

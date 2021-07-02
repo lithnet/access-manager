@@ -79,6 +79,10 @@ namespace Lithnet.AccessManager.Agent
 
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                     {
+                        // Windows specific services
+
+                        services.AddSingleton<IRegistryPathProvider, RegistryPathProvider>();
+
                         // Legacy LAPS provider services
                         services.AddTransient<ILocalSam, LocalSam>();
                         services.AddTransient<IDirectory, ActiveDirectory>();
@@ -93,7 +97,6 @@ namespace Lithnet.AccessManager.Agent
                         // Advanced agent services
                         services.AddSingleton<IwaTokenProvider>();
                         services.AddSingleton<IAgentSettings, WindowsAgentSettingsProvider>();
-                        services.AddSingleton<IRegistryPathProvider, RegistryPathProvider>();
                         services.AddSingleton<IAadJoinInformationProvider, WindowsAadJoinInformationProvider>();
                     }
                     else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -128,7 +131,6 @@ namespace Lithnet.AccessManager.Agent
 
                     services.AddTransient<IEncryptionProvider, EncryptionProvider>();
                     services.AddSingleton<IMetadataProvider, MetadataProvider>();
-                    // config
 
                     services.ConfigureWritable<AppState>(configuration.GetSection("State"), "appstate.json");
                     services.Configure<AgentOptions>(configuration.GetSection("Agent"));

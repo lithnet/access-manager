@@ -53,12 +53,6 @@ namespace Lithnet.AccessManager.Agent.Providers
             set => this.registryState.SetValue("ClientId", value);
         }
 
-        public string CheckRegistrationUrl
-        {
-            get => this.registryState.GetValue<string>("CheckRegistrationUrl", null);
-            set => this.registryState.SetValue("CheckRegistrationUrl", value);
-        }
-
         public string AuthCertificate
         {
             get => this.registryState.GetValue<string>("AuthCertificate", null);

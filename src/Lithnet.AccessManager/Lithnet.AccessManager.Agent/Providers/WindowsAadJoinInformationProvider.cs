@@ -59,7 +59,8 @@ namespace Lithnet.AccessManager.Agent.Providers
 
                 this.joinInfo = j;
                 this.certificate = this.joinInfo.Certificate;
-                this.logger.LogTrace("Found AAD join information");
+                this.logger.LogTrace("Found AAD device join information");
+                this.logger.LogTrace(joinInfo.ToString());
                 return true;
             }
 
@@ -70,12 +71,11 @@ namespace Lithnet.AccessManager.Agent.Providers
                     this.logger.LogTrace("Found AAD registration information");
                     this.logger.LogTrace($"Found information in session {context.SessionId} for user {context.Identity.Name}");
                     this.logger.LogTrace(context.JoinInfo.ToString());
-
-                    this.logger.LogInformation($"Had private key while impersonating {context.HadKey}");
+                    this.logger.LogTrace($"Had private key while impersonating {context.HadKey}");
 
                     if (!context.JoinInfo.IsPrivateKeyAvailable)
                     {
-                        this.logger.LogError("The certificate private key for the registration is not available, the registration information will be ignored");
+                        this.logger.LogError(EventIDs.AdCertificatePrivateKeyNotAvailable, "The certificate private key for the registration is not available, the registration information will be ignored");
                         continue;
                     }
 
@@ -86,7 +86,7 @@ namespace Lithnet.AccessManager.Agent.Providers
                 }
             }
 
-            this.logger.LogWarning($"Could not find suitable Azure AD tenant join information for the allowed Azure AD tenants. Allowed tenants -> {string.Join(',', agentSettings.AzureAdTenantIDs)}");
+            this.logger.LogWarning(EventIDs.NoSuitableAadTenantFound, $"Could not find suitable Azure AD tenant join information for the allowed Azure AD tenants. Allowed tenants -> {string.Join(',', agentSettings.AzureAdTenantIDs)}");
 
             return false;
         }
@@ -117,9 +117,6 @@ namespace Lithnet.AccessManager.Agent.Providers
 
             if (!joinInfo2.IsNull)
             {
-                this.logger.LogTrace("Got AAD join information");
-                this.logger.LogTrace(joinInfo2.ToString());
-
                 return joinInfo2;
             }
 
@@ -168,14 +165,7 @@ namespace Lithnet.AccessManager.Agent.Providers
                         if (!NativeMethods.WTSQueryUserToken(sessionInfo.SessionId, out IntPtr token))
                         {
                             int error = Marshal.GetLastWin32Error();
-                            if (error == 1008) //ERROR_NO_TOKEN
-                            {
-                                this.logger.LogTrace(new Win32Exception(error), $"Unable to query session {sessionInfo.SessionId}");
-                            }
-                            else
-                            {
-                                this.logger.LogError(new Win32Exception(error), $"Unable to query session {sessionInfo.SessionId}");
-                            }
+                            this.logger.LogTrace(new Win32Exception(error), $"Unable to query session {sessionInfo.SessionId}");
                         }
                         else
                         {
@@ -210,7 +200,7 @@ namespace Lithnet.AccessManager.Agent.Providers
                             }
                             catch (Exception ex)
                             {
-                                this.logger.LogError(ex, $"An error occurred performing the impersonation event in session {sessionInfo.SessionId}");
+                                this.logger.LogError(EventIDs.ImpersonationFailure, ex, $"An error occurred performing the impersonation event in session {sessionInfo.SessionId}");
                             }
                         }
                     }

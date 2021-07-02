@@ -1,6 +1,7 @@
 ﻿using Lithnet.AccessManager.Api.Shared;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
@@ -14,7 +15,7 @@ namespace Lithnet.AccessManager.Agent
         private readonly JsonSerializerOptions jsonOptions;
         private readonly IEncryptionProvider encryptionProvider;
         private readonly ILogger<AmsApiPasswordStorageProvider> logger;
-
+        private IPasswordPolicy policy;
         private string passwordId;
         private X509Certificate2 encryptionCertificate;
 
@@ -46,21 +47,14 @@ namespace Lithnet.AccessManager.Agent
 
                 if (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.ResetContent)
                 {
-                    this.logger.LogInformation("A password change is required");
+                    this.logger.LogTrace("The server indicated that a password change is required");
 
                     var response = JsonSerializer.Deserialize<PasswordGetResponse>(responseString, this.jsonOptions);
 
-                    if (response == null)
-                    {
-                        throw new UnexpectedResponseException("The server returned an unexpected response");
-                    }
-
-                    if (string.IsNullOrWhiteSpace(response.EncryptionCertificate))
-                    {
-                        throw new UnexpectedResponseException("The API requested a password change, but did not supply an encryption certificate to use");
-                    }
+                    this.ValidatePasswordGetResponse(response);
 
                     this.encryptionCertificate = new X509Certificate2(Convert.FromBase64String(response.EncryptionCertificate));
+                    this.policy = response.Policy;
 
                     return true;
                 }
@@ -71,6 +65,24 @@ namespace Lithnet.AccessManager.Agent
             httpResponseMessage.EnsureSuccessStatusCode(responseString);
 
             return false;
+        }
+
+        private void ValidatePasswordGetResponse(PasswordGetResponse response)
+        {
+            if (response == null)
+            {
+                throw new UnexpectedResponseException("The server returned an unexpected response");
+            }
+
+            if (string.IsNullOrWhiteSpace(response.EncryptionCertificate))
+            {
+                throw new UnexpectedResponseException("The API requested a password change, but did not supply an encryption certificate to use");
+            }
+
+            if (response.Policy == null)
+            {
+                throw new UnexpectedResponseException("The API did not return a password policy");
+            }
         }
 
         public async Task UpdatePassword(string accountName, string password, DateTime expiry)
@@ -135,10 +147,16 @@ namespace Lithnet.AccessManager.Agent
             return Task.CompletedTask;
         }
 
+        public IPasswordPolicy GetPolicy()
+        {
+            return this.policy ?? throw new InvalidOperationException("The was no password policy present");
+        }
+
         private void ResetState()
         {
             this.passwordId = null;
             this.encryptionCertificate = null;
+            this.policy = null;
         }
     }
 }

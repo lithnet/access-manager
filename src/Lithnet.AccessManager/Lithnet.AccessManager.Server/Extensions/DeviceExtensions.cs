@@ -16,6 +16,7 @@ namespace Lithnet.AccessManager.Server
             identity.AddClaim(new Claim("authority-id", device.AuthorityId));
             identity.AddClaim(new Claim("authority-identifier", device.AuthorityDeviceId));
             identity.AddClaim(new Claim("sid", device.Sid));
+            identity.AddClaim(new Claim("approval-state", device.ApprovalState.ToString()));
             identity.AddClaim(new Claim("object-type", "Computer"));
 
             return identity;
@@ -42,6 +43,14 @@ namespace Lithnet.AccessManager.Server
             command.Parameters.AddWithValue("@AgentVersion", device.AgentVersion);
             command.Parameters.AddWithValue("@OSFamily", device.OperatingSystemFamily);
             command.Parameters.AddWithValue("@OSVersion", device.OperatingSystemVersion);
+        }
+
+        public static void ThrowOnInvalidStateForAuthentication(this IDevice device)
+        {
+            if (device.ApprovalState != ApprovalState.Approved)
+            {
+                throw new DeviceNotApprovedException("The device attempted to authenticate but it was not in an approved state");
+            }
         }
     }
 }

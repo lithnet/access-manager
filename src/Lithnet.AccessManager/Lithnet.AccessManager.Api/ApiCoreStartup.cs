@@ -22,6 +22,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Api.Configuration;
+using Lithnet.AccessManager.Server.Authorization;
 
 namespace Lithnet.AccessManager.Api
 {
@@ -65,16 +66,16 @@ namespace Lithnet.AccessManager.Api
             services.AddSingleton<IWindowsServiceProvider, WindowsServiceProvider>();
             services.AddSingleton(RandomNumberGenerator.Create());
             services.AddSingleton<IRandomValueGenerator, RandomValueGenerator>();
-
+            services.AddSingleton<IPasswordPolicyMemoryCache, PasswordPolicyMemoryCache>();
             // Our services
 
-            services.AddSingleton<ICheckInDataValidator, CheckInDataValidator>();
             services.AddScoped<IDeviceProvider, DbDeviceProvider>();
             services.AddScoped<IAadGraphApiProvider, AadGraphApiProvider>();
             services.AddScoped<IDevicePasswordProvider, DbDevicePasswordProvider>();
+            services.AddScoped<IPasswordPolicyProvider, PasswordPolicyProvider>();
 
             services.AddSingleton<IRegistrationKeyProvider, DbRegistrationKeyProvider>();
-
+            services.AddSingleton<ICheckInDataValidator, CheckInDataValidator>();
             services.AddSingleton<IApiErrorResponseProvider, ApiErrorResponseProvider>();
             services.AddSingleton<IAppPathProvider, ApiAppPathProvider>();
             services.AddSingleton<ISecurityTokenGenerator, SecurityTokenGenerator>();
@@ -117,11 +118,18 @@ namespace Lithnet.AccessManager.Api
                         RequireAudience = true,
                         ValidateIssuer = true,
                         ValidIssuer = hostingOptions.Value.HttpSys.BuildApiHostUrl(),
-                        ValidAlgorithms = new[] {tokenIssuerOptions.SigningAlgorithm}
+                        ValidAlgorithms = new[] { tokenIssuerOptions.SigningAlgorithm }
                     };
                 });
 
-            services.AddAuthorization(o => { o.AddPolicy("ComputersOnly", policy => policy.RequireClaim("object-type", "Computer")); });
+            services.AddAuthorization(o =>
+            {
+                o.AddPolicy(Constants.AuthZPolicyComputers, policy => policy.RequireClaim("object-type", "Computer"));
+                o.AddPolicy(Constants.AuthZPolicyAuthorityAzureAd, policy => policy.RequireClaim("authority-type", AuthorityType.AzureActiveDirectory.ToString()));
+                o.AddPolicy(Constants.AuthZPolicyAuthorityAms, policy => policy.RequireClaim("authority-type", AuthorityType.Ams.ToString()));
+                o.AddPolicy(Constants.AuthZPolicyAuthorityAd, policy => policy.RequireClaim("authority-type", AuthorityType.ActiveDirectory.ToString()));
+                o.AddPolicy(Constants.AuthZPolicyApprovedClient, policy => policy.RequireClaim("approval-state", ApprovalState.Approved.ToString()));
+            });
         }
 
         private bool InitializeLicenseManager(IServiceCollection services)
@@ -186,7 +194,7 @@ namespace Lithnet.AccessManager.Api
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
-       
+
         }
     }
 }

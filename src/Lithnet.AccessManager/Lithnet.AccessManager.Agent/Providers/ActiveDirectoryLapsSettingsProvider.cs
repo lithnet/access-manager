@@ -33,5 +33,9 @@ namespace Lithnet.AccessManager.Agent.Providers
         public PasswordAttributeBehaviour MsMcsAdmPwdBehaviour => this.policyPassword.GetValue<PasswordAttributeBehaviour>("MsMcsAdmPwdBehaviour", PasswordAttributeBehaviour.Ignore);
 
         public int MaximumPasswordAgeDays => this.policyPassword.GetValue<int>("MaximumPasswordAge", 7);
+
+        public int MinimumNumberOfPasswords { get; } = 0;
+
+        public int MinimumPasswordHistoryAgeDays { get; } = 0;
     }
 }
