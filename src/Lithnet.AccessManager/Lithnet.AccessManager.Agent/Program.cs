@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
 using System;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -25,6 +26,7 @@ namespace Lithnet.AccessManager.Agent
             CreateHostBuilder(args).Build().Run();
         }
 
+        [DebuggerStepThrough]
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
@@ -42,16 +44,16 @@ namespace Lithnet.AccessManager.Agent
                     {
                         c.DefaultRequestHeaders.Add("Accept", "application/json");
                         c.DefaultRequestHeaders.Add("User-Agent", $"Lithnet Access Manager Agent {Assembly.GetExecutingAssembly().GetName().Version}");
-                        var settings = serviceProvider.GetRequiredService<ISettingsProvider>();
-                        c.BaseAddress = new Uri($"https://{settings.Server}/api/v1.0/");
+                        var settings = serviceProvider.GetRequiredService<IAgentSettings>();
+                        c.BaseAddress = new Uri($"https://{settings.Server.Trim()}/api/v1.0/");
                     });
 
                     services.AddHttpClient(Constants.HttpClientAuthIwa, (serviceProvider, c) =>
                     {
                         c.DefaultRequestHeaders.Add("Accept", "application/json");
                         c.DefaultRequestHeaders.Add("User-Agent", $"Lithnet Access Manager Agent {Assembly.GetExecutingAssembly().GetName().Version}");
-                        var settings = serviceProvider.GetRequiredService<ISettingsProvider>();
-                        c.BaseAddress = new Uri($"https://{settings.Server}/api/v1.0/");
+                        var settings = serviceProvider.GetRequiredService<IAgentSettings>();
+                        c.BaseAddress = new Uri($"https://{settings.Server.Trim()}/api/v1.0/");
                     }).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
                     {
                         AllowAutoRedirect = false,
@@ -62,8 +64,8 @@ namespace Lithnet.AccessManager.Agent
                     {
                         c.DefaultRequestHeaders.Add("Accept", "application/json");
                         c.DefaultRequestHeaders.Add("User-Agent", $"Lithnet Access Manager Agent {Assembly.GetExecutingAssembly().GetName().Version}");
-                        var settings = serviceProvider.GetRequiredService<ISettingsProvider>();
-                        c.BaseAddress = new Uri($"https://{settings.Server}/api/v1.0/");
+                        var settings = serviceProvider.GetRequiredService<IAgentSettings>();
+                        c.BaseAddress = new Uri($"https://{settings.Server.Trim()}/api/v1.0/");
                     })
                     .AddHttpMessageHandler<BearerTokenHandler>();
 
@@ -86,22 +88,22 @@ namespace Lithnet.AccessManager.Agent
                         services.AddTransient<ILithnetAdminPasswordProvider, LithnetAdminPasswordProvider>();
                         services.AddTransient<ICertificateProvider, CertificateProvider>();
                         services.AddTransient<ActiveDirectoryLapsAgent>();
-
+                        services.AddSingleton<IActiveDirectoryLapsSettingsProvider, ActiveDirectoryLapsSettingsProvider>();
 
                         // Advanced agent services
                         services.AddSingleton<IwaTokenProvider>();
-                        services.AddSingleton<ISettingsProvider, WindowsSettingsProvider>();
+                        services.AddSingleton<IAgentSettings, WindowsAgentSettingsProvider>();
                         services.AddSingleton<IRegistryPathProvider, RegistryPathProvider>();
                         services.AddSingleton<IAadJoinInformationProvider, WindowsAadJoinInformationProvider>();
                     }
                     else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                     {
-                        services.AddSingleton<ISettingsProvider, SettingsProvider>();
+                        services.AddSingleton<IAgentSettings, JsonFileSettingsProvider>();
 
                     }
                     else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                     {
-                        services.AddSingleton<ISettingsProvider, SettingsProvider>();
+                        services.AddSingleton<IAgentSettings, JsonFileSettingsProvider>();
                     }
                     else
                     {

@@ -1,20 +1,18 @@
-﻿using System.Linq;
-using System.Security.Cryptography;
-using Lithnet.AccessManager.Agent.Providers;
-using Moq;
+﻿using Moq;
 using NUnit.Framework;
+using System.Security.Cryptography;
 
 namespace Lithnet.AccessManager.Agent.Test
 {
     public class RandomPasswordGeneratorTests
     {
-        private IRandomValueGenerator rvg = new RandomValueGenerator(RandomNumberGenerator.Create());
-        private Mock<ISettingsProvider> settings;
+        private Mock<IPasswordPolicy> settings;
+        private RandomPasswordGenerator passwordGenerator = new RandomPasswordGenerator(new RandomValueGenerator(RandomNumberGenerator.Create()));
 
         [SetUp()]
         public void TestInitialize()
         {
-            settings = new Mock<ISettingsProvider>();
+            settings = new Mock<IPasswordPolicy>();
         }
 
         [Test]
@@ -22,9 +20,7 @@ namespace Lithnet.AccessManager.Agent.Test
         {
             settings.SetupGet(t => t.PasswordLength).Returns(12);
 
-            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.rvg);
-
-            Assert.AreEqual(12, g.Generate().Length);
+            Assert.AreEqual(12, passwordGenerator.Generate(settings.Object).Length);
         }
 
         [Test]
@@ -32,9 +28,7 @@ namespace Lithnet.AccessManager.Agent.Test
         {
             settings.SetupGet(t => t.UseLower).Returns(true);
 
-            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.rvg);
-
-            string password = g.Generate();
+            string password = passwordGenerator.Generate(settings.Object);
 
             foreach(char c in password)
             {
@@ -47,9 +41,7 @@ namespace Lithnet.AccessManager.Agent.Test
         {
             settings.SetupGet(t => t.UseUpper).Returns(true);
 
-            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.rvg);
-
-            string password = g.Generate();
+            string password = passwordGenerator.Generate(settings.Object);
 
             foreach (char c in password)
             {
@@ -63,9 +55,7 @@ namespace Lithnet.AccessManager.Agent.Test
         {
             settings.SetupGet(t => t.UseNumeric).Returns(true);
 
-            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.rvg);
-
-            string password = g.Generate();
+            string password = passwordGenerator.Generate(settings.Object);
 
             foreach (char c in password)
             {
@@ -79,9 +69,7 @@ namespace Lithnet.AccessManager.Agent.Test
         {
             settings.SetupGet(t => t.UseSymbol).Returns(true);
 
-            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.rvg);
-
-            string password = g.Generate();
+            string password = passwordGenerator.Generate(settings.Object);
 
             foreach (char c in password)
             {
@@ -95,9 +83,7 @@ namespace Lithnet.AccessManager.Agent.Test
             settings.SetupGet(t => t.UseUpper).Returns(true);
             settings.SetupGet(t => t.UseLower).Returns(true);
 
-            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.rvg);
-
-            string password = g.Generate();
+            string password = passwordGenerator.Generate(settings.Object);
 
             foreach (char c in password)
             {
@@ -110,9 +96,7 @@ namespace Lithnet.AccessManager.Agent.Test
         {
             settings.SetupGet(t => t.PasswordCharacters).Returns("a");
 
-            RandomPasswordGenerator g = new RandomPasswordGenerator(settings.Object, this.rvg);
-
-            string password = g.Generate();
+            string password = passwordGenerator.Generate(settings.Object);
 
             foreach (char c in password)
             {

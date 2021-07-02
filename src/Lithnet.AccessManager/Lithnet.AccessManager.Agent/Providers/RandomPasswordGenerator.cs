@@ -1,28 +1,25 @@
-﻿using Lithnet.AccessManager.Agent.Providers;
-using System;
+﻿using System;
 
 namespace Lithnet.AccessManager.Agent
 {
     public class RandomPasswordGenerator : IPasswordGenerator
     {
-        private readonly ISettingsProvider settings;
         private readonly IRandomValueGenerator randomValueGenerator;
 
-        public RandomPasswordGenerator(ISettingsProvider settings, IRandomValueGenerator rvg)
+        public RandomPasswordGenerator(IRandomValueGenerator rvg)
         {
-            this.settings = settings;
             this.randomValueGenerator = rvg;
         }
 
-        public string Generate()
+        public string Generate(IPasswordPolicy policy)
         {
-            if (string.IsNullOrWhiteSpace(this.settings.PasswordCharacters))
+            if (string.IsNullOrWhiteSpace(policy.PasswordCharacters))
             {
-                return this.randomValueGenerator.GenerateRandomString(Math.Max(this.settings.PasswordLength, 8), this.settings.UseLower, this.settings.UseUpper, this.settings.UseNumeric, this.settings.UseSymbol);
+                return this.randomValueGenerator.GenerateRandomString(Math.Max(policy.PasswordLength, 8), policy.UseLower, policy.UseUpper, policy.UseNumeric, policy.UseSymbol);
             }
             else
             {
-                return this.randomValueGenerator.GenerateRandomString(Math.Max(this.settings.PasswordLength, 8), this.settings.PasswordCharacters);
+                return this.randomValueGenerator.GenerateRandomString(Math.Max(policy.PasswordLength, 8), policy.PasswordCharacters);
 
             }
         }

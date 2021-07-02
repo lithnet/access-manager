@@ -13,5 +13,7 @@ namespace Lithnet.AccessManager.Agent
         Task RollbackPasswordUpdate();
 
         Task Commit();
+
+        IPasswordPolicy GetPolicy();
     }
 }

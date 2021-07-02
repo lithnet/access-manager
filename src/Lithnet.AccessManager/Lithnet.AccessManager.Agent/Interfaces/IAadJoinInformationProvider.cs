@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
-using Lithnet.AccessManager.Agent.Models;
 
 namespace Lithnet.AccessManager.Agent.Providers
 {
     public interface IAadJoinInformationProvider
     {
-        Task<bool> InitializeJoinInformation();
-        
-        bool IsAadJoined { get; }
+        bool InitializeJoinInformation();
         
         bool IsWorkplaceJoined { get; }
         

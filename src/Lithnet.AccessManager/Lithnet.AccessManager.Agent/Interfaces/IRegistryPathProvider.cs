@@ -2,8 +2,12 @@
 {
     public interface IRegistryPathProvider
     {
-        string PolicySettingsAgentPath { get; }
-        string PolicySettingsPasswordPath { get; }
-        string RegistrySettingsAgentPath { get; }
+        string PolicyAgentPath { get; }
+        
+        string SettingsAgentPath { get; }
+
+        string PolicyPasswordPath { get; }
+
+        string StatePath { get; }
     }
 }

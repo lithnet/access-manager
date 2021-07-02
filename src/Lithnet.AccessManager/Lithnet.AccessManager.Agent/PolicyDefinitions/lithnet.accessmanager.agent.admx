@@ -39,15 +39,15 @@
       </elements>
     </policy>
 
-    <policy name="pol_enableAdvancedAgent"
+    <policy name="pol_enableAgent_advanced"
             class="Machine"
-            displayName="$(string.pol_enableAdvancedAgent)"
-            presentation="$(presentation.pol_enableAdvancedAgent)"
-            explainText="$(string.pol_enableAdvancedAgent_help)"
+            displayName="$(string.pol_enableAgent_advanced)"
+            explainText="$(string.pol_enableAgent_advanced_help)"
             key="Software\Policies\Lithnet\Access Manager Agent"
-            valueName="AdvangedAgentEnabled">
+            valueName="AmsServerManagementEnabled"
+            presentation="$(presentation.pol_enableAgent_advanced)">
       <parentCategory ref="cat_lithnet_accessManagerAgent" />
-      <supportedOn ref="TS_SUPPORTED_OS_10" />
+      <supportedOn ref="TS_SUPPORTED_OS" />
       <enabledValue>
         <decimal value="1" />
       </enabledValue>
@@ -55,27 +55,21 @@
         <decimal value="0" />
       </disabledValue>
       <elements>
-        <text id="txt_server" key="Software\Policies\Lithnet\Access Manager Agent" required="true" valueName="Server"/>
-        <enum id="enum_authOptions" key="Software\Policies\Lithnet\Access Manager Agent" required="true" valueName="AuthenticationMode"     >
-          <item displayName="$(string.pol_iwa)">
-            <value>
-              <decimal value="1"/>
-            </value>
-          </item>
-          <item displayName="$(string.pol_aadj)">
+        <text id="txt_serverName"  valueName="Server" required="true"/>
+        <enum id="enum_authmode" required="true" valueName="AuthenticationMode">
+          <item displayName="$(string.enum_authmode_aad)">
             <value>
               <decimal value="2"/>
             </value>
           </item>
-          <item displayName="$(string.pol_ssa)">
+          <item displayName="$(string.enum_authmode_ams)">
             <value>
               <decimal value="4"/>
             </value>
           </item>
         </enum>
+        <text id="txt_tenantId"  valueName="AzureAdTenantId" required="false"/>
       </elements>
     </policy>
-
-
   </policies>
 </policyDefinitions>

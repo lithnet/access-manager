@@ -11,13 +11,13 @@ namespace Lithnet.AccessManager.Agent
 {
     public class AuthenticationCertificateProvider : IAuthenticationCertificateProvider
     {
-        private readonly ISettingsProvider settings;
+        private readonly IAgentSettings settings;
         private readonly IAadJoinInformationProvider aadProvider;
         private readonly ILogger<AuthenticationCertificateProvider> logger;
 
         private X509Certificate2 cachedCertificate;
 
-        public AuthenticationCertificateProvider(ISettingsProvider settings, IAadJoinInformationProvider aadProvider, ILogger<AuthenticationCertificateProvider> logger)
+        public AuthenticationCertificateProvider(IAgentSettings settings, IAadJoinInformationProvider aadProvider, ILogger<AuthenticationCertificateProvider> logger)
         {
             this.settings = settings;
             this.aadProvider = aadProvider;

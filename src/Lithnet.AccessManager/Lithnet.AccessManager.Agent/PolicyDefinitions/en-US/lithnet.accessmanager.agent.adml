@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <policyDefinitionResources xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" revision="1.0"
-schemaVersion="1.0" xmlns="http://www.microsoft.com/GroupPolicy/PolicyDefinitions">
+                           schemaVersion="1.0" xmlns="http://www.microsoft.com/GroupPolicy/PolicyDefinitions">
   <displayName>
   </displayName>
   <description>
@@ -11,24 +11,19 @@ schemaVersion="1.0" xmlns="http://www.microsoft.com/GroupPolicy/PolicyDefinition
       <string id="pol_enableAgent">Enable the Lithnet Access Manager Agent</string>
       <string id="pol_enableAgent_help">When enabled, the agent will run at the interval specified below to check for required local admin password changes. Note that the local admin password settings must be enabled independently of this setting</string>
 
-      <string id="pol_enableAdvancedAgent">Enable advanced mode</string>
-      <string id="pol_enableAdvancedAgent_help">When enabled, the agent will be able to manage passwords on non-domain joined machines and AAD-managed devices.
-        
-Specify the fully qualified server name of the AMS server (eg ams.lithnet.local)
+      <string id="TS_SUPPORTED_OS">At least Microsoft Windows 8.1 or Windows Server 2012</string>
 
-The agent can authenticate with the AMS server using one of the following authentication types
-        
-Active Directory - Uses Integrated Windows Authentication to authenticate to the AMS server. This can only be used on domain-joined hosts. If the AMS server is in a forest that the host cannot authenticate to (eg a one-way trust), then this method of authentication is not supported
-Azure Active Directory - Azure AD joined devices can authenticate to the AMS server using their Azure AD identity
-Access Manager - The AMS server authenticates clients that have registered using a registration key
+
+      <string id="pol_enableAgent_advanced">Enable advanced agent</string>
+      <string id="pol_enableAgent_advanced_help">When this policy is enabled, the Access Manager Agent will be able to communicate directly with the Access Manager server, which enables advanced functionality, such as password storage in the Access Manager server, rather than AD.
+
+If this policy is disabled or not configured, the agent will not be able to communicate with the Access Manager server for advanced functionality.
       </string>
 
-      <string id="pol_iwa">Active Directory</string>
-      <string id="pol_aadj">Azure Active Directory</string>
-      <string id="pol_ssa">Access Manager</string>
+      <string id="enum_authmode_aad">Azure Active Directory</string>
+      <string id="enum_authmode_ams">Access Manager</string>
 
-      <string id="TS_SUPPORTED_OS">At least Microsoft Windows 8.1 or Windows Server 2012</string>
-      <string id="TS_SUPPORTED_OS_10">At least Microsoft Windows 10 or Windows Server 2016</string>
+
     </stringTable>
 
     <presentationTable>
@@ -37,13 +32,19 @@ Access Manager - The AMS server authenticates clients that have registered using
         <decimalTextBox refId="dtxt_interval" defaultValue="60">Agent check interval (minutes)</decimalTextBox>
       </presentation>
 
-
-      <presentation id="pol_enableAdvancedAgent">
-        <textBox refId="txt_server">
-          <label>AMS server hostname</label>
+      <presentation id="pol_enableAgent_advanced">
+        <textBox refId="txt_serverName" >
+          <label>Fully-qualified server DNS name</label>
         </textBox>
-        <dropdownList refId="enum_authOptions" noSort="true" defaultItem="1">Authentication provider</dropdownList>
+        <text></text>
+        <dropdownList refId="enum_authmode" defaultItem="0" noSort="true">Device authentication provider</dropdownList>
+        <text></text>
+        <text>If you are using Azure AD authentication, provide the Azure AD tenant ID where these devices are registered</text>
+        <textBox refId="txt_tenantId" >
+          <label>Azure AD tenant ID</label>
+        </textBox>
       </presentation>
+
     </presentationTable>
   </resources>
 </policyDefinitionResources>

@@ -7,7 +7,5 @@ namespace Lithnet.AccessManager.Agent
     public interface IMetadataProvider
     {
         Task<MetadataResponse> GetMetadata();
-
-        Task<X509Certificate2> GetEncryptionCertificate(string thumbprint);
     }
 }

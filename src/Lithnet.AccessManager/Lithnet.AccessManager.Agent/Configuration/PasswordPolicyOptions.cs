@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Lithnet.AccessManager.Agent.Configuration
 {
-    public class PasswordPolicyOptions
+    public class PasswordPolicyOptions : IPasswordPolicy
     {
         public int PasswordLength { get; set; } = 16;
 

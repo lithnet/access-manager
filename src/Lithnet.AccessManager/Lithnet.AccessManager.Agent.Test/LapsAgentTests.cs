@@ -10,7 +10,7 @@ namespace Lithnet.AccessManager.Agent.Test
     public class LapsAgentTests
     {
         private Mock<IDirectory> directory;
-        private Mock<ISettingsProvider> settings;
+        private Mock<IActiveDirectoryLapsSettingsProvider> settings;
         private Mock<IPasswordGenerator> passwordGenerator;
         private Mock<ILocalSam> sam;
         private Mock<ILithnetAdminPasswordProvider> lithnetPwdProvider;
@@ -20,7 +20,7 @@ namespace Lithnet.AccessManager.Agent.Test
         public void TestInitialize()
         {
             this.directory = new Mock<IDirectory>();
-            this.settings = new Mock<ISettingsProvider>();
+            this.settings = new Mock<IActiveDirectoryLapsSettingsProvider>();
             this.passwordGenerator = new Mock<IPasswordGenerator>();
             this.sam = new Mock<ILocalSam>();
             this.lithnetPwdProvider = new Mock<ILithnetAdminPasswordProvider>();
@@ -67,7 +67,7 @@ namespace Lithnet.AccessManager.Agent.Test
             Assert.IsFalse(agent.HasPasswordExpired(this.computer.Object));
         }
 
-        private ActiveDirectoryLapsAgent BuildAgent(ISettingsProvider settings = null, IDirectory directory = null, IPasswordGenerator passwordGenerator = null, ILocalSam sam = null, ILithnetAdminPasswordProvider lithnetProvider = null)
+        private ActiveDirectoryLapsAgent BuildAgent(IActiveDirectoryLapsSettingsProvider settings = null, IDirectory directory = null, IPasswordGenerator passwordGenerator = null, ILocalSam sam = null, ILithnetAdminPasswordProvider lithnetProvider = null)
         {
             return new ActiveDirectoryLapsAgent(
                 Mock.Of<ILogger<ActiveDirectoryLapsAgent>>(),

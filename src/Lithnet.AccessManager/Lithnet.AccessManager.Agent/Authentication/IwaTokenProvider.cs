@@ -10,10 +10,10 @@ namespace Lithnet.AccessManager.Agent.Authentication
     public class IwaTokenProvider : ITokenProvider
     {
         private readonly IHttpClientFactory httpClientFactory;
-        private readonly ISettingsProvider settings;
+        private readonly IAgentSettings settings;
         private TokenResponse token;
 
-        public IwaTokenProvider(IHttpClientFactory httpClientFactory, ISettingsProvider settings)
+        public IwaTokenProvider(IHttpClientFactory httpClientFactory, IAgentSettings settings)
         {
             this.httpClientFactory = httpClientFactory;
             this.settings = settings;
@@ -21,7 +21,7 @@ namespace Lithnet.AccessManager.Agent.Authentication
 
         public async Task<string> GetAccessToken()
         {
-            if (!this.settings.AdvancedAgentEnabled || this.settings.AuthenticationMode != AgentAuthenticationMode.Iwa)
+            if (!this.settings.AmsServerManagementEnabled|| this.settings.AuthenticationMode != AgentAuthenticationMode.Iwa)
             {
                 throw new InvalidOperationException("IWA authentication is not enabled");
             }

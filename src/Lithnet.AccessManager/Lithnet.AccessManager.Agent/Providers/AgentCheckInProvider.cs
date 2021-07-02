@@ -12,9 +12,9 @@ namespace Lithnet.AccessManager.Agent
     public class AgentCheckInProvider : IAgentCheckInProvider
     {
         private readonly IHttpClientFactory httpClientFactory;
-        private readonly ISettingsProvider settingsProvider;
+        private readonly IAgentSettings settingsProvider;
 
-        public AgentCheckInProvider(IHttpClientFactory httpClientFactory, ISettingsProvider settingsProvider)
+        public AgentCheckInProvider(IHttpClientFactory httpClientFactory, IAgentSettings settingsProvider)
         {
             this.httpClientFactory = httpClientFactory;
             this.settingsProvider = settingsProvider;

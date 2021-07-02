@@ -15,13 +15,13 @@ namespace Lithnet.AccessManager.Agent.Authentication
     public class X509TokenProvider : ITokenProvider
     {
         private readonly IHttpClientFactory httpClientFactory;
-        private readonly ISettingsProvider settings;
+        private readonly IAgentSettings settings;
         private readonly IAuthenticationCertificateProvider certProvider;
         private readonly ITokenClaimProvider claimProvider;
 
         private TokenResponse token;
 
-        public X509TokenProvider(IHttpClientFactory httpClientFactory, ISettingsProvider settings, IAuthenticationCertificateProvider certProvider, ITokenClaimProvider claimProvider)
+        public X509TokenProvider(IHttpClientFactory httpClientFactory, IAgentSettings settings, IAuthenticationCertificateProvider certProvider, ITokenClaimProvider claimProvider)
         {
             this.httpClientFactory = httpClientFactory;
             this.settings = settings;
@@ -31,7 +31,7 @@ namespace Lithnet.AccessManager.Agent.Authentication
 
         public async Task<string> GetAccessToken()
         {
-            if (!this.settings.AdvancedAgentEnabled || 
+            if (!this.settings.AmsServerManagementEnabled || 
                 (this.settings.AuthenticationMode != AgentAuthenticationMode.Ams && 
                  this.settings.AuthenticationMode != AgentAuthenticationMode.Aad))
             {
@@ -53,14 +53,18 @@ namespace Lithnet.AccessManager.Agent.Authentication
 
         private async Task<TokenResponse> RequestAccessToken()
         {
-            return await this.certProvider.DelegateCertificateOperation(this.RequestAccessToken);
+            ClientAssertion assertion = await this.certProvider.DelegateCertificateOperation(this.BuildAssertion);
+            return await this.RequestAccessToken(assertion);
         }
 
-        private async Task<TokenResponse> RequestAccessToken(X509Certificate2 certificate)
+        private async Task<ClientAssertion> BuildAssertion(X509Certificate2 certificate)
         {
-            string url = $"https://{this.settings.Server}/api/v1.0/auth/x509";
-            ClientAssertion assertion = new ClientAssertion { Assertion = await this.BuildAssertion(certificate, url) };
+            string url = $"https://{this.settings.Server.Trim()}/api/v1.0/auth/x509";
+            return new ClientAssertion { Assertion = await this.BuildAssertion(certificate, url) };
+        }
 
+        private async Task<TokenResponse> RequestAccessToken(ClientAssertion assertion)
+        {
             using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthAnonymous);
             using var httpResponseMessage = await client.PostAsync("auth/x509", assertion.AsJsonStringContent());
 

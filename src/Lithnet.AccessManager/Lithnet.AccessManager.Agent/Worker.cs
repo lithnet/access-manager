@@ -12,12 +12,12 @@ namespace Lithnet.AccessManager.Agent
     public class Worker : BackgroundService
     {
         private readonly ILogger<Worker> logger;
-        private readonly ISettingsProvider settings;
+        private readonly IAgentSettings settings;
         private readonly IHostApplicationLifetime appLifetime;
         private readonly ILapsAgent lapsAgent;
         private readonly ILocalSam sam;
 
-        public Worker(ILogger<Worker> logger, ISettingsProvider settings, IHostApplicationLifetime appLifetime, ILapsAgent lapsWorker)
+        public Worker(ILogger<Worker> logger, IAgentSettings settings, IHostApplicationLifetime appLifetime, ILapsAgent lapsWorker)
         {
             this.logger = logger;
             this.settings = settings;
@@ -25,7 +25,7 @@ namespace Lithnet.AccessManager.Agent
             this.lapsAgent = lapsWorker;
         }
 
-        public Worker(ILogger<Worker> logger, ISettingsProvider settings, IHostApplicationLifetime appLifetime, ILapsAgent lapsWorker, ILocalSam sam)
+        public Worker(ILogger<Worker> logger, IAgentSettings settings, IHostApplicationLifetime appLifetime, ILapsAgent lapsWorker, ILocalSam sam)
         :this(logger, settings, appLifetime, lapsWorker)
         {
             this.sam = sam;

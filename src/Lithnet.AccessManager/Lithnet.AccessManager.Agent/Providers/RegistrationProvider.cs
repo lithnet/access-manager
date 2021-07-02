@@ -19,12 +19,12 @@ namespace Lithnet.AccessManager.Agent
     {
         private readonly IHttpClientFactory httpClientFactory;
         private readonly JsonSerializerOptions jsonOptions;
-        private readonly ISettingsProvider settingsProvider;
+        private readonly IAgentSettings settingsProvider;
         private readonly IAuthenticationCertificateProvider authCertProvider;
         private readonly ILogger<RegistrationProvider> logger;
         private readonly IAgentCheckInProvider agentCheckinProvider;
 
-        public RegistrationProvider(IHttpClientFactory httpClientFactory, JsonSerializerOptions jsonOptions, ISettingsProvider settingsProvider, IAuthenticationCertificateProvider authCertProvider, ILogger<RegistrationProvider> logger, IAgentCheckInProvider agentCheckinProvider)
+        public RegistrationProvider(IHttpClientFactory httpClientFactory, JsonSerializerOptions jsonOptions, IAgentSettings settingsProvider, IAuthenticationCertificateProvider authCertProvider, ILogger<RegistrationProvider> logger, IAgentCheckInProvider agentCheckinProvider)
         {
             this.httpClientFactory = httpClientFactory;
             this.jsonOptions = jsonOptions;

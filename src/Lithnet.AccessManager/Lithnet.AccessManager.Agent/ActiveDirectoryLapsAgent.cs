@@ -9,12 +9,12 @@ namespace Lithnet.AccessManager.Agent
     {
         private readonly ILogger<ActiveDirectoryLapsAgent> logger;
         private readonly IDirectory directory;
-        private readonly ISettingsProvider settings;
+        private readonly IActiveDirectoryLapsSettingsProvider settings;
         private readonly IPasswordGenerator passwordGenerator;
         private readonly ILocalSam sam;
         private readonly ILithnetAdminPasswordProvider lithnetAdminPasswordProvider;
 
-        public ActiveDirectoryLapsAgent(ILogger<ActiveDirectoryLapsAgent> logger, IDirectory directory, ISettingsProvider settings, IPasswordGenerator passwordGenerator, ILocalSam sam, ILithnetAdminPasswordProvider lithnetAdminPasswordProvider)
+        public ActiveDirectoryLapsAgent(ILogger<ActiveDirectoryLapsAgent> logger, IDirectory directory, IActiveDirectoryLapsSettingsProvider settings, IPasswordGenerator passwordGenerator, ILocalSam sam, ILithnetAdminPasswordProvider lithnetAdminPasswordProvider)
         {
             this.logger = logger;
             this.directory = directory;
@@ -46,7 +46,7 @@ namespace Lithnet.AccessManager.Agent
         {
             try
             {
-                return this.lithnetAdminPasswordProvider.HasPasswordExpired(computer, this.settings.MsMcsAdmPwdAttributeBehaviour == PasswordAttributeBehaviour.Populate);
+                return this.lithnetAdminPasswordProvider.HasPasswordExpired(computer, this.settings.MsMcsAdmPwdBehaviour == PasswordAttributeBehaviour.Populate);
             }
             catch (Exception ex)
             {
@@ -64,16 +64,16 @@ namespace Lithnet.AccessManager.Agent
                     sid = this.sam.GetWellKnownSid(WellKnownSidType.AccountAdministratorSid);
                 }
 
-                string newPassword = this.passwordGenerator.Generate();
+                string newPassword = this.passwordGenerator.Generate(this.settings);
                 string accountName = this.sam.GetBuiltInAdministratorAccountName();
                 DateTime rotationInstant = DateTime.UtcNow;
                 DateTime expiryDate = DateTime.UtcNow.AddDays(Math.Max(this.settings.MaximumPasswordAgeDays, 1));
 
-                this.lithnetAdminPasswordProvider.UpdateCurrentPassword(computer, accountName, newPassword, rotationInstant, expiryDate, this.settings.LithnetLocalAdminPasswordHistoryDaysToKeep, this.settings.MsMcsAdmPwdAttributeBehaviour);
+                this.lithnetAdminPasswordProvider.UpdateCurrentPassword(computer, accountName, newPassword, rotationInstant, expiryDate, this.settings.PasswordHistoryDaysToKeep, this.settings.MsMcsAdmPwdBehaviour);
 
                 this.logger.LogTrace(EventIDs.SetPasswordOnAmAttribute, "Set password on Lithnet Access Manager attribute");
 
-                if (this.settings.MsMcsAdmPwdAttributeBehaviour == PasswordAttributeBehaviour.Populate)
+                if (this.settings.MsMcsAdmPwdBehaviour == PasswordAttributeBehaviour.Populate)
                 {
                     this.logger.LogTrace(EventIDs.SetPasswordOnLapsAttribute, "Set password on Microsoft LAPS attribute");
                 }

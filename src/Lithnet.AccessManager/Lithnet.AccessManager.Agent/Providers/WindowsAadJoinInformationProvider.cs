@@ -1,16 +1,15 @@
 ﻿using Lithnet.AccessManager.Agent.Interop;
+using Lithnet.AccessManager.Agent.Models;
 using Microsoft.Extensions.Logging;
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
-using System.Threading.Tasks;
-using Lithnet.AccessManager.Agent.Models;
-using Lithnet.AccessManager.Api.Shared;
-using Microsoft.Win32.SafeHandles;
 using Vanara.Extensions;
 using Vanara.PInvoke;
 using Vanara.Security.AccessControl;
@@ -20,28 +19,31 @@ namespace Lithnet.AccessManager.Agent.Providers
     public class WindowsAadJoinInformationProvider : IAadJoinInformationProvider
     {
         private readonly ILogger<WindowsAadJoinInformationProvider> logger;
-        private readonly IMetadataProvider metadataProvider;
-
+        private readonly IAgentSettings agentSettings;
         private DsRegJoinInfo joinInfo;
         private X509Certificate2 certificate;
         private SafeAccessTokenHandle impersonationContextHandle;
 
-        public WindowsAadJoinInformationProvider(ILogger<WindowsAadJoinInformationProvider> logger, IMetadataProvider metadataProvider)
+        public WindowsAadJoinInformationProvider(ILogger<WindowsAadJoinInformationProvider> logger, IAgentSettings agentSettings)
         {
             this.logger = logger;
-            this.metadataProvider = metadataProvider;
+            this.agentSettings = agentSettings;
         }
 
-        public async Task<bool> InitializeJoinInformation()
+        public bool InitializeJoinInformation()
         {
             if (Environment.OSVersion.Version.Major < 10)
             {
                 return false;
             }
 
-            MetadataResponse metadata = await metadataProvider.GetMetadata();
+            if (!agentSettings.AzureAdTenantIDs.Any())
+            {
+                this.logger.LogTrace("No AAD tenant ID was configured");
+                return false;
+            }
 
-            foreach (string tenantId in metadata.AgentAuthentication.AllowedAzureAdTenants)
+            foreach (string tenantId in agentSettings.AzureAdTenantIDs)
             {
                 DsRegJoinInfo j = this.GetJoinInfoCurrentUser(tenantId);
 
@@ -61,7 +63,7 @@ namespace Lithnet.AccessManager.Agent.Providers
                 return true;
             }
 
-            foreach (var context in this.GetNetJoinInfoFromLoggedOnUsers(metadata.AgentAuthentication.AllowedAzureAdTenants))
+            foreach (var context in this.GetNetJoinInfoFromLoggedOnUsers(agentSettings.AzureAdTenantIDs))
             {
                 if (context.JoinInfo.JoinType == NetApi32.DSREG_JOIN_TYPE.DSREG_WORKPLACE_JOIN)
                 {
@@ -84,7 +86,7 @@ namespace Lithnet.AccessManager.Agent.Providers
                 }
             }
 
-            this.logger.LogWarning($"Could not find suitable Azure AD tenant join information for the allowed Azure AD tenants. Allowed tenants -> {string.Join(',', metadata.AgentAuthentication.AllowedAzureAdTenants)}");
+            this.logger.LogWarning($"Could not find suitable Azure AD tenant join information for the allowed Azure AD tenants. Allowed tenants -> {string.Join(',', agentSettings.AzureAdTenantIDs)}");
 
             return false;
         }

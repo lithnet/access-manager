@@ -9,10 +9,10 @@ namespace Lithnet.AccessManager.Agent.Providers
 {
     public class TokenClaimProvider : ITokenClaimProvider
     {
-        private readonly ISettingsProvider settings;
+        private readonly IAgentSettings settings;
         private readonly IAadJoinInformationProvider aadProvider;
 
-        public TokenClaimProvider(ISettingsProvider settings, IAadJoinInformationProvider aadProvider)
+        public TokenClaimProvider(IAgentSettings settings, IAadJoinInformationProvider aadProvider)
         {
             this.settings = settings;
             this.aadProvider = aadProvider;

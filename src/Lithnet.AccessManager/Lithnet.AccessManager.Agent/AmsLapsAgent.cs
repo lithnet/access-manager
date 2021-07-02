@@ -11,7 +11,7 @@ namespace Lithnet.AccessManager.Agent
     public class AmsLapsAgent
     {
         private readonly ILogger<AmsLapsAgent> logger;
-        private readonly ISettingsProvider settings;
+        private readonly IAgentSettings agentSettings;
         private readonly IPasswordGenerator passwordGenerator;
         private readonly IPasswordChangeProvider passwordChangeProvider;
         private readonly IPasswordStorageProvider passwordStorageProvider;
@@ -19,16 +19,16 @@ namespace Lithnet.AccessManager.Agent
         private readonly IAgentCheckInProvider checkInProvider;
         private readonly IAadJoinInformationProvider aadJoinInformationProvider;
 
-        public AmsLapsAgent(ILogger<AmsLapsAgent> logger, ISettingsProvider settings, IPasswordGenerator passwordGenerator, IPasswordChangeProvider passwordChangeProvider, IPasswordStorageProvider passwordStorageProvider, IRegistrationProvider registrationProvider, IAgentCheckInProvider checkInProvider, IAadJoinInformationProvider aadJoinInformationProvider)
+        public AmsLapsAgent(ILogger<AmsLapsAgent> logger, IPasswordGenerator passwordGenerator, IPasswordChangeProvider passwordChangeProvider, IPasswordStorageProvider passwordStorageProvider, IRegistrationProvider registrationProvider, IAgentCheckInProvider checkInProvider, IAadJoinInformationProvider aadJoinInformationProvider, IAgentSettings agentSettings)
         {
             this.logger = logger;
-            this.settings = settings;
             this.passwordGenerator = passwordGenerator;
             this.passwordChangeProvider = passwordChangeProvider;
             this.passwordStorageProvider = passwordStorageProvider;
             this.registrationProvider = registrationProvider;
             this.checkInProvider = checkInProvider;
             this.aadJoinInformationProvider = aadJoinInformationProvider;
+            this.agentSettings = agentSettings;
         }
 
         public async Task DoCheckAsync()
@@ -51,17 +51,17 @@ namespace Lithnet.AccessManager.Agent
             }
             catch (HttpRequestException ex) when (ex.InnerException is SocketException s)
             {
-                this.logger.LogError($"Unable to connect to the server {this.settings.Server} due to error {s.SocketErrorCode}: {s.Message}");
+                this.logger.LogError($"Unable to connect to the server {this.agentSettings.Server} due to error {s.SocketErrorCode}: {s.Message}");
                 this.logger.LogTrace(ex, "Unable to connect to server");
             }
             catch (HttpRequestException ex)
             {
-                this.logger.LogError($"Unable to connect to the server {this.settings.Server}. {ex.Message}");
+                this.logger.LogError($"Unable to connect to the server {this.agentSettings.Server}. {ex.Message}");
                 this.logger.LogTrace(ex, "Unable to connect to server");
             }
             catch (SocketException s)
             {
-                this.logger.LogError($"Unable to connect to the server {this.settings.Server} due to error {s.SocketErrorCode}: {s.Message}");
+                this.logger.LogError($"Unable to connect to the server {this.agentSettings.Server} due to error {s.SocketErrorCode}: {s.Message}");
                 this.logger.LogTrace(s, "Unable to connect to server");
             }
         }
@@ -70,17 +70,17 @@ namespace Lithnet.AccessManager.Agent
         {
             if (ex.ApiErrorCode == ApiConstants.DeviceCredentialsNotFound)
             {
-                if (this.settings.AuthenticationMode == AgentAuthenticationMode.Aad)
+                if (this.agentSettings.AuthenticationMode == AgentAuthenticationMode.Aad)
                 {
-                    this.settings.HasRegisteredSecondaryCredentials = false;
+                    this.agentSettings.HasRegisteredSecondaryCredentials = false;
                     this.logger.LogError("The server indicated that it no longer recognizes this agent. The agent will attempt to re-set up the relationship with the server on the next run");
                 }
-                else if (this.settings.AuthenticationMode == AgentAuthenticationMode.Ams)
+                else if (this.agentSettings.AuthenticationMode == AgentAuthenticationMode.Ams)
                 {
-                    if (this.settings.RegistrationState == RegistrationState.Approved && !string.IsNullOrWhiteSpace(this.settings.RegistrationKey))
+                    if (this.agentSettings.RegistrationState == RegistrationState.Approved && !string.IsNullOrWhiteSpace(this.agentSettings.RegistrationKey))
                     {
                         this.logger.LogError("The server indicated that it no longer recognizes this agent. The agent will attempt to re-register the device with the current registration key on the next run");
-                        this.settings.RegistrationState = RegistrationState.NotRegistered;
+                        this.agentSettings.RegistrationState = RegistrationState.NotRegistered;
                     }
                 }
             }
@@ -90,47 +90,55 @@ namespace Lithnet.AccessManager.Agent
 
         private async Task<bool> CanContinue()
         {
-            if (this.settings.AuthenticationMode == AgentAuthenticationMode.Ams)
+            if (string.IsNullOrWhiteSpace(this.agentSettings.Server))
+            {
+                this.logger.LogError("No AMS server was configured");
+                return false;
+            }
+
+            if (this.agentSettings.AuthenticationMode == AgentAuthenticationMode.Ams)
             {
                 return await this.CanContinueAms();
             }
 
-            if (this.settings.AuthenticationMode == AgentAuthenticationMode.Aad)
+            if (this.agentSettings.AuthenticationMode == AgentAuthenticationMode.Aad)
             {
                 return await this.CanContinueAad();
             }
 
-            return true;
+            this.logger.LogTrace("Cannot continue because an unsupported auth mode is configured");
+
+            return false;
         }
 
         private async Task<bool> CanContinueAad()
         {
-            if (this.settings.HasRegisteredSecondaryCredentials)
+            if (this.agentSettings.HasRegisteredSecondaryCredentials)
             {
                 this.logger.LogTrace("Device has registered secondary credentials");
                 return true;
             }
 
-            if (!await this.aadJoinInformationProvider.InitializeJoinInformation())
+            if (!this.aadJoinInformationProvider.InitializeJoinInformation())
             {
                 this.logger.LogTrace("AAD join information was not found");
                 return false;
             }
 
-            if (this.aadJoinInformationProvider.IsDeviceJoined && !this.settings.RegisterSecondaryCredentialsForAadj)
+            if (this.aadJoinInformationProvider.IsDeviceJoined && !this.agentSettings.RegisterSecondaryCredentialsForAadj)
             {
                 this.logger.LogTrace("Device is AAD joined and secondary credentials are not required");
                 return true;
             }
 
-            if (this.aadJoinInformationProvider.IsDeviceJoined && this.settings.RegisterSecondaryCredentialsForAadj)
+            if (this.aadJoinInformationProvider.IsDeviceJoined && this.agentSettings.RegisterSecondaryCredentialsForAadj)
             {
                 this.logger.LogTrace("Device is AAD joined and secondary credentials are required, but not yet registered");
                 await this.registrationProvider.RegisterSecondaryCredentials();
                 return true;
             }
 
-            if (!this.settings.RegisterSecondaryCredentialsForAadr)
+            if (!this.agentSettings.RegisterSecondaryCredentialsForAadr)
             {
                 this.logger.LogWarning("Cannot perform AAD authentication because the device is not AAD joined, and the current agent settings do not permit registering AADR credentials");
                 return false;
@@ -138,13 +146,14 @@ namespace Lithnet.AccessManager.Agent
 
             if (this.aadJoinInformationProvider.IsWorkplaceJoined)
             {
-                if (!this.settings.HasRegisteredSecondaryCredentials)
+                if (!this.agentSettings.HasRegisteredSecondaryCredentials)
                 {
                     await this.registrationProvider.RegisterSecondaryCredentials();
                     return true;
                 }
             }
 
+            this.logger.LogTrace("Cannot continue because AAD state is unknown");
             return false;
         }
 
@@ -180,6 +189,7 @@ namespace Lithnet.AccessManager.Agent
 
                 case RegistrationState.Pending:
                 case RegistrationState.Rejected:
+                    this.logger.LogTrace($"Cannot continue because AMS state is {state}");
                     return false;
             }
 
@@ -188,7 +198,6 @@ namespace Lithnet.AccessManager.Agent
 
         private async Task CheckAndChangePassword()
         {
-
             if (await this.passwordStorageProvider.IsPasswordChangeRequired())
             {
                 this.logger.LogTrace(EventIDs.PasswordExpired, "Password has expired and needs to be changed");
@@ -204,8 +213,10 @@ namespace Lithnet.AccessManager.Agent
         {
             try
             {
-                string newPassword = this.passwordGenerator.Generate();
-                DateTime expiryDate = DateTime.UtcNow.AddDays(Math.Max(this.settings.MaximumPasswordAgeDays, 1));
+                var policy = this.passwordStorageProvider.GetPolicy();
+
+                string newPassword = this.passwordGenerator.Generate(policy);
+                DateTime expiryDate = DateTime.UtcNow.AddDays(Math.Max(policy.MaximumPasswordAgeDays, 1));
                 string accountName = this.passwordChangeProvider.GetAccountName();
 
                 await this.passwordStorageProvider.UpdatePassword(accountName, newPassword, expiryDate);
