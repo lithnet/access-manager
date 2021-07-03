@@ -2,22 +2,22 @@
 {
     public interface IPasswordPolicy
     {
-        public int PasswordLength { get; }
+        int PasswordLength { get; }
 
-        public string PasswordCharacters { get; }
+        string PasswordCharacters { get; }
 
-        public bool UseUpper { get; }
+        bool UseUpper { get; }
 
-        public bool UseLower { get; }
+        bool UseLower { get; }
 
-        public bool UseSymbol { get; }
+        bool UseSymbol { get; }
 
-        public bool UseNumeric { get; }
+        bool UseNumeric { get; }
 
-        public int MaximumPasswordAgeDays { get; }
+        int MaximumPasswordAgeDays { get; }
 
-        public int MinimumNumberOfPasswords { get; }
+        int MinimumNumberOfPasswords { get; }
 
-        public int MinimumPasswordHistoryAgeDays { get; }
+        int MinimumPasswordHistoryAgeDays { get; }
     }
 }

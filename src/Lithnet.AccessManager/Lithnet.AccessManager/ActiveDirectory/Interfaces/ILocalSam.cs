@@ -40,5 +40,6 @@ namespace Lithnet.AccessManager
         void SetLocalAccountPassword(SecurityIdentifier sid, string password);
         string GetBuiltInAdministratorAccountName();
         bool IsDomainJoined();
+        void EnableLocalAccount(SecurityIdentifier sid);
     }
 }

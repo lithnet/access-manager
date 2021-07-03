@@ -31,8 +31,8 @@ namespace Lithnet.AccessManager.Agent.Authentication
 
         public async Task<string> GetAccessToken()
         {
-            if (!this.settings.AmsServerManagementEnabled || 
-                (this.settings.AuthenticationMode != AgentAuthenticationMode.Ams && 
+            if (!this.settings.AmsServerManagementEnabled ||
+                (this.settings.AuthenticationMode != AgentAuthenticationMode.Ams &&
                  this.settings.AuthenticationMode != AgentAuthenticationMode.Aad))
             {
                 throw new InvalidOperationException("X509 authentication is not enabled");
@@ -65,22 +65,23 @@ namespace Lithnet.AccessManager.Agent.Authentication
 
         private async Task<TokenResponse> RequestAccessToken(ClientAssertion assertion)
         {
-            using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthAnonymous);
-            using var httpResponseMessage = await client.PostAsync("auth/x509", assertion.AsJsonStringContent());
+            using (var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthAnonymous))
+            {
+                using (var httpResponseMessage = await client.PostAsync("auth/x509", assertion.AsJsonStringContent()))
+                {
+                    var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
+                    httpResponseMessage.EnsureSuccessStatusCode(responseString);
 
-            var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
-            httpResponseMessage.EnsureSuccessStatusCode(responseString);
+                    this.token = JsonSerializer.Deserialize<TokenResponse>(responseString);
 
-            this.token = JsonSerializer.Deserialize<TokenResponse>(responseString);
-
-            return this.token;
+                    return this.token;
+                }
+            }
         }
 
         private async Task<string> BuildAssertion(X509Certificate2 cert, string audience)
         {
             string hostname = Environment.MachineName;
-
-            RsaSecurityKey rsaSecurityKey = new RsaSecurityKey(cert.GetRSAPrivateKey());
 
             string exportedCertificate = Convert.ToBase64String(cert.Export(X509ContentType.Cert));
 
@@ -97,14 +98,14 @@ namespace Lithnet.AccessManager.Agent.Authentication
                 Expires = DateTime.UtcNow.AddMinutes(4),
                 Issuer = myIssuer,
                 Audience = audience,
-                SigningCredentials = new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSha256)
+                SigningCredentials = new SigningCredentials(new X509SecurityKey(cert), SecurityAlgorithms.RsaSha256)
             };
 
             await this.claimProvider.AddClaims(tokenDescriptor);
 
             // Add x5c header parameter containing the signing certificate:
-            JwtSecurityToken jwt = (JwtSecurityToken) tokenHandler.CreateToken(tokenDescriptor);
-            jwt.Header.Add(JwtHeaderParameterNames.X5c, new List<string> {exportedCertificate});
+            JwtSecurityToken jwt = (JwtSecurityToken)tokenHandler.CreateToken(tokenDescriptor);
+            jwt.Header.Add(JwtHeaderParameterNames.X5c, new List<string> { exportedCertificate });
 
             return tokenHandler.WriteToken(jwt);
         }

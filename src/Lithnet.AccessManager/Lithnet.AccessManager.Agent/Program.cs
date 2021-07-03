@@ -147,8 +147,8 @@ namespace Lithnet.AccessManager.Agent
                     });
                 }
               )
-                .UseWindowsService()
-                .UseSystemd();
+                .UseWindowsService();
+           //     .UseSystemd();
         }
     }
 }

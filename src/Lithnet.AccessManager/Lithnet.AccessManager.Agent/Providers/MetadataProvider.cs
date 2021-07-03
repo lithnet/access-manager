@@ -34,13 +34,17 @@ namespace Lithnet.AccessManager.Agent
 
         private async Task<MetadataResponse> RetrieveMetadata()
         {
-            using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthAnonymous);
-            using var httpResponseMessage = await client.GetAsync($"agent/metadata");
+            using (var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthAnonymous))
+            {
+                using (var httpResponseMessage = await client.GetAsync($"agent/metadata"))
+                {
 
-            var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
-            httpResponseMessage.EnsureSuccessStatusCode(responseString);
+                    var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
+                    httpResponseMessage.EnsureSuccessStatusCode(responseString);
 
-            return JsonSerializer.Deserialize<MetadataResponse>(responseString);
+                    return JsonSerializer.Deserialize<MetadataResponse>(responseString);
+                }
+            }
         }
     }
 }

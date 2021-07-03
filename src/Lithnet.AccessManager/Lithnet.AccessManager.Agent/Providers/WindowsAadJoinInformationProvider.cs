@@ -73,12 +73,12 @@ namespace Lithnet.AccessManager.Agent.Providers
                     this.logger.LogTrace(context.JoinInfo.ToString());
                     this.logger.LogTrace($"Had private key while impersonating {context.HadKey}");
 
-                    if (!context.JoinInfo.IsPrivateKeyAvailable)
+                    if (!context.HadKey)
                     {
                         this.logger.LogError(EventIDs.AdCertificatePrivateKeyNotAvailable, "The certificate private key for the registration is not available, the registration information will be ignored");
                         continue;
                     }
-
+                    
                     this.joinInfo = context.JoinInfo;
                     this.certificate = context.Certificate;
                     this.impersonationContextHandle = context.TokenHandle;
@@ -86,7 +86,7 @@ namespace Lithnet.AccessManager.Agent.Providers
                 }
             }
 
-            this.logger.LogWarning(EventIDs.NoSuitableAadTenantFound, $"Could not find suitable Azure AD tenant join information for the allowed Azure AD tenants. Allowed tenants -> {string.Join(',', agentSettings.AzureAdTenantIDs)}");
+            this.logger.LogWarning(EventIDs.NoSuitableAadTenantFound, $"Could not find suitable Azure AD tenant join information for the allowed Azure AD tenants. Allowed tenants -> {string.Join(",", agentSettings.AzureAdTenantIDs)}");
 
             return false;
         }

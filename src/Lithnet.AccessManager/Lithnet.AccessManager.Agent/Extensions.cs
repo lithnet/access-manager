@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using Lithnet.AccessManager.Api.Shared;
+﻿using Lithnet.AccessManager.Api.Shared;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 
 namespace Lithnet.AccessManager.Agent
 {
@@ -51,7 +51,7 @@ namespace Lithnet.AccessManager.Agent
             return rawvalue;
         }
 
-        public static void ConfigureWritable<T>(this IServiceCollection services, IConfigurationSection section,  string file = "appsettings.json") where T : class, new()
+        public static void ConfigureWritable<T>(this IServiceCollection services, IConfigurationSection section, string file = "appsettings.json") where T : class, new()
         {
             services.Configure<T>(section);
             services.AddTransient<IWritableOptions<T>>(provider =>
@@ -100,6 +100,5 @@ namespace Lithnet.AccessManager.Agent
         }
 
         public static StringContent AsJsonStringContent(this object o) => new StringContent(JsonSerializer.Serialize(o), Encoding.UTF8, "application/json");
-
     }
 }

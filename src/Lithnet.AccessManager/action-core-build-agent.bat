@@ -14,7 +14,7 @@ IF EXIST "%outputdirx64%" powershell -Command "& Remove-Item '%outputdirx64%\*' 
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
 ECHO [92mBuilding 64-bit agent project[0m
-dotnet publish "%agentProject%" --runtime win-x64 --output "%outputdirx64%" --framework  netcoreapp3.1 --self-contained true /property:Version=%version% /property:FileVersion=%version%  /p:TreatWarningsAsErrors=true /warnaserror
+dotnet publish "%agentProject%" --runtime win-x64 --output "%outputdirx64%" --framework net472 --self-contained false /property:Version=%version% /property:FileVersion=%version%  /p:TreatWarningsAsErrors=true /warnaserror 
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
 ECHO [92mSigning 64-bit Lithnet EXEs[0m
@@ -34,7 +34,7 @@ IF EXIST "%outputdirx86%" powershell -Command "& Remove-Item '%outputdirx86%\*' 
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
 ECHO [92mBuilding 32-bit agent project[0m
-dotnet publish "%agentProject%" --runtime win-x86 --output "%outputdirx86%" --framework  netcoreapp3.1 --self-contained true  /property:Version=%version% /property:FileVersion=%version%
+dotnet publish "%agentProject%" --runtime win-x86 --output "%outputdirx86%" --framework net472 --self-contained false  /property:Version=%version% /property:FileVersion=%version%
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
 ECHO [92mSigning 32-bit Lithnet EXEs[0m

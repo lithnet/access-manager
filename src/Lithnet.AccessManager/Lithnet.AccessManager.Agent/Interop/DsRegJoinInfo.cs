@@ -41,8 +41,7 @@ namespace Lithnet.AccessManager.Agent.Interop
                 {
                     if (this.Certificate.HasPrivateKey)
                     {
-                        _ = this.Certificate.PrivateKey;
-                        return true;
+                        return this.Certificate.GetRSAPrivateKey() != null;
                     }
                 }
                 catch

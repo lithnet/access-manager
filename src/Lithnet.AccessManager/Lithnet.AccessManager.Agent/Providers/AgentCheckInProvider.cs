@@ -45,11 +45,14 @@ namespace Lithnet.AccessManager.Agent
         {
             AgentCheckIn data = await this.GenerateCheckInData();
 
-            using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthBearer);
-            using var httpResponseMessage = await client.PostAsync($"agent/checkin", data.AsJsonStringContent());
-
-            var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
-            httpResponseMessage.EnsureSuccessStatusCode(responseString);
+            using (var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthBearer))
+            {
+                using (var httpResponseMessage = await client.PostAsync($"agent/checkin", data.AsJsonStringContent()))
+                {
+                    var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
+                    httpResponseMessage.EnsureSuccessStatusCode(responseString);
+                }
+            }
         }
     }
 }

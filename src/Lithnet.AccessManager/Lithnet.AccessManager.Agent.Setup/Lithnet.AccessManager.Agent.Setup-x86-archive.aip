@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="17.3" version="18.4" Modules="enterprise" RootPath="." Language="en" Id="{6231D1B4-23AF-4C6E-998C-070D74534FAD}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="17.3" version="18.4" Modules="professional" RootPath="." Language="en" Id="{6231D1B4-23AF-4C6E-998C-070D74534FAD}">
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
     <ROW Property="AI_CURRENT_YEAR" Value="2021" ValueLocId="-"/>
     <ROW Property="AI_PREDEF_LCONDS_PROPS" Value="AI_DETECTED_DOTNET_VERSION"/>
     <ROW Property="AI_REQUIRED_DOTNET_DISPLAY" MultiBuildValue="MSIOnlyBuild_1_2:4.7.2" ValueLocId="-"/>
     <ROW Property="AI_REQUIRED_DOTNET_VERSION" MultiBuildValue="MSIOnlyBuild_1_2:4.7.2" ValueLocId="-"/>
-    <ROW Property="AI_ThemeStyle" Value="aero" MsiKey="AI_ThemeStyle"/>
     <ROW Property="ALLUSERS" Value="1"/>
-    <ROW Property="AMSSERVERENABLED" Value="0" Type="4"/>
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="ARPPRODUCTICON" Value="accessmanager.exe" Type="8"/>
-    <ROW Property="AUTHMODE" Value="2"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
-    <ROW Property="ProductCode" Value="1033:{9DA79483-B58C-4A85-BBEA-497C8E1C26FB} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{103D6101-03D3-45FB-83F3-241475B6705A} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Agent"/>
-    <ROW Property="ProductVersion" Value="1.12.7990.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
-    <ROW Property="REGISTRATIONKEY" Options="1" Comments="key"/>
+    <ROW Property="ProductVersion" Value="1.0.7977.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
     <ROW Property="SETUPEXEDIR" Value="1"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{EEDECF4C-BABB-4AE0-9CB9-DC051FF1AE75}"/>
@@ -41,17 +37,12 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
     <ROW Component="APPDIR" ComponentId="{EAB761F8-6670-4FCD-BA74-C8A0A6728E79}" Directory_="APPDIR" Attributes="0"/>
-    <ROW Component="AmsServerManagementEnabled" ComponentId="{88FC9471-7015-4499-9FE1-9DD16A96453D}" Directory_="APPDIR" Attributes="260" KeyPath="AmsServerManagementEnabled"/>
-    <ROW Component="AmsStorageEnabled" ComponentId="{42852AF9-2646-4AA1-B8B1-3FB7268DAFDE}" Directory_="APPDIR" Attributes="260" KeyPath="AmsStorageEnabled"/>
-    <ROW Component="AuthenticationMode" ComponentId="{17A9A4DD-4B45-43CF-8107-01EBE89B28F4}" Directory_="APPDIR" Attributes="260" KeyPath="AuthenticationMode"/>
-    <ROW Component="AzureAdTenantId" ComponentId="{2506B8CB-9FC4-4D6B-8636-C3D0E267140F}" Directory_="APPDIR" Attributes="260" KeyPath="AzureAdTenantId"/>
-    <ROW Component="CsvHelper.dll" ComponentId="{58C961DF-36AD-4251-B93F-F4D7788ECBC5}" Directory_="APPDIR" Attributes="0" KeyPath="CsvHelper.dll"/>
-    <ROW Component="Enable" ComponentId="{A01DAE3C-26DD-47C5-B8FE-7BF49F1DDC67}" Directory_="APPDIR" Attributes="260" KeyPath="Enable"/>
+    <ROW Component="CsvHelper.dll" ComponentId="{996438E0-24F7-4B18-A216-99FA990B8438}" Directory_="APPDIR" Attributes="0" KeyPath="CsvHelper.dll"/>
     <ROW Component="Lithnet.AccessManager.Agent.exe" ComponentId="{FC28B581-C649-40ED-8567-583F066D6BED}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Agent.exe"/>
-    <ROW Component="Lithnet.AccessManager.Api.Shared.dll" ComponentId="{EC149915-E03E-4DD0-B1DB-188D2D25A657}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Api.Shared.dll"/>
+    <ROW Component="Lithnet.AccessManager.Api.Shared.dll" ComponentId="{FD5DAA61-8B24-4002-8A08-692E0A488C53}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Api.Shared.dll"/>
     <ROW Component="Lithnet.AccessManager.dll" ComponentId="{4179A33C-62B0-42B7-9D04-6136929D0B19}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.dll"/>
     <ROW Component="Lithnet.Security.Authorization.dll" ComponentId="{AEFC29AF-0317-4898-8716-5856F34209CC}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.Security.Authorization.dll"/>
-    <ROW Component="Microsoft.Bcl.AsyncInterfaces.dll" ComponentId="{EF56720A-0D92-464A-A19A-F5D75C301B23}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Bcl.AsyncInterfaces.dll"/>
+    <ROW Component="Microsoft.Bcl.AsyncInterfaces.dll" ComponentId="{A98ECE81-8390-4DE4-BCA9-0AF149715A0B}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Bcl.AsyncInterfaces.dll"/>
     <ROW Component="Microsoft.Extensions.Configuration.Abstractions.dll" ComponentId="{DCEF3CA3-9C0D-44E7-855C-42321901B92F}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.Abstractions.dll"/>
     <ROW Component="Microsoft.Extensions.Configuration.Binder.dll" ComponentId="{CFC6BD79-5054-44BD-8B63-F6A06B7D9E7C}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.Binder.dll"/>
     <ROW Component="Microsoft.Extensions.Configuration.CommandLine.dll" ComponentId="{A80A8B46-B5A0-462F-9F2F-6BDB89139DB6}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.CommandLine.dll"/>
@@ -68,7 +59,7 @@
     <ROW Component="Microsoft.Extensions.Hosting.Abstractions.dll" ComponentId="{5FC4EF54-3AC5-4485-A876-469FBE5FB084}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Hosting.Abstractions.dll"/>
     <ROW Component="Microsoft.Extensions.Hosting.WindowsServices.dll" ComponentId="{6C2F184B-6638-4456-B318-11F478B3E6BE}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Hosting.WindowsServices.dll"/>
     <ROW Component="Microsoft.Extensions.Hosting.dll" ComponentId="{C5174A96-AAD4-452B-A208-5FE0C76AAAAA}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Hosting.dll"/>
-    <ROW Component="Microsoft.Extensions.Http.dll" ComponentId="{9762FC9E-A9CD-486F-B289-83236DE0D95F}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Http.dll"/>
+    <ROW Component="Microsoft.Extensions.Http.dll" ComponentId="{2869A82F-B558-4A06-93AC-5241F75D82D0}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Http.dll"/>
     <ROW Component="Microsoft.Extensions.Logging.Abstractions.dll" ComponentId="{F9E91B19-B231-4FB2-A38A-4413DCF099CD}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.Abstractions.dll"/>
     <ROW Component="Microsoft.Extensions.Logging.Configuration.dll" ComponentId="{A0B63BC1-3BA7-45E5-BA5F-4AE8DEF60C2A}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.Configuration.dll"/>
     <ROW Component="Microsoft.Extensions.Logging.Console.dll" ComponentId="{C004FC1E-CF7E-4ADC-B07E-6A6B0D28CFB4}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.Console.dll"/>
@@ -79,60 +70,57 @@
     <ROW Component="Microsoft.Extensions.Options.ConfigurationExtensions.dll" ComponentId="{DAF618D4-2BAE-45C2-B282-C00CF7F498F8}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Options.ConfigurationExtensions.dll"/>
     <ROW Component="Microsoft.Extensions.Options.dll" ComponentId="{2FEB6197-0A0D-46BD-A522-36460672E516}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Options.dll"/>
     <ROW Component="Microsoft.Extensions.Primitives.dll" ComponentId="{5023B089-9F35-411D-991A-0615BF16430D}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Primitives.dll"/>
-    <ROW Component="Microsoft.IdentityModel.JsonWebTokens.dll" ComponentId="{5ED97D5E-E17C-469D-ADE1-AF1AB22C7ED4}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.JsonWebTokens.dll"/>
-    <ROW Component="Microsoft.IdentityModel.Logging.dll" ComponentId="{F3660D66-2091-4A14-98B2-9F65C87B7AF2}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.Logging.dll"/>
-    <ROW Component="Microsoft.IdentityModel.Tokens.dll" ComponentId="{0C1633BE-8C18-47CE-AAE3-1D57A41E7D90}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.Tokens.dll"/>
+    <ROW Component="Microsoft.IdentityModel.JsonWebTokens.dll" ComponentId="{33C0C069-4883-46EE-A38D-E35D7278C0EE}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.JsonWebTokens.dll"/>
+    <ROW Component="Microsoft.IdentityModel.Logging.dll" ComponentId="{A548413F-4B60-4695-93C2-2971591B3C39}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.Logging.dll"/>
+    <ROW Component="Microsoft.IdentityModel.Tokens.dll" ComponentId="{DB84F5FB-EF7D-4A33-ABE1-F97199996F53}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.Tokens.dll"/>
     <ROW Component="Microsoft.Win32.Registry.dll" ComponentId="{F4CFDCF6-88C9-4A1B-B6DC-414D0E9BD3DD}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Win32.Registry.dll"/>
     <ROW Component="NLog.Extensions.Logging.dll" ComponentId="{32ABBCCF-AF6D-452D-A65E-26E74DF72439}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.Extensions.Logging.dll"/>
     <ROW Component="NLog.dll" ComponentId="{880FD980-B098-47D2-80F5-8382441DABB4}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.dll"/>
     <ROW Component="Newtonsoft.Json.dll" ComponentId="{AD7BF8EE-81E7-44A4-A6EC-A824C5673CC4}" Directory_="APPDIR" Attributes="0" KeyPath="Newtonsoft.Json.dll"/>
-    <ROW Component="ProductInformation" ComponentId="{851A7A97-4DEA-4B4C-956B-FE073CF208B1}" Directory_="APPDIR" Attributes="260" KeyPath="Path"/>
-    <ROW Component="RegistrationKey" ComponentId="{9F29148A-45F3-4730-8DE8-D132D61F44F8}" Directory_="APPDIR" Attributes="260" KeyPath="RegistrationKey"/>
-    <ROW Component="Server" ComponentId="{8A906D60-4287-4546-A26D-572EE3F1B465}" Directory_="APPDIR" Attributes="260" KeyPath="Server"/>
-    <ROW Component="System.Buffers.dll" ComponentId="{668444E0-2F77-440D-9767-C061DFE50D5E}" Directory_="APPDIR" Attributes="0" KeyPath="System.Buffers.dll"/>
-    <ROW Component="System.Diagnostics.DiagnosticSource.dll" ComponentId="{60AD54D2-4320-4BAC-A20A-88107B81C891}" Directory_="APPDIR" Attributes="0" KeyPath="System.Diagnostics.DiagnosticSource.dll"/>
+    <ROW Component="PolicyDefinitions" ComponentId="{E76F67D8-C9F2-4989-8210-E51497B9E9EB}" Directory_="PolicyDefinitions_Dir" Attributes="0"/>
+    <ROW Component="ProductInformation" ComponentId="{851A7A97-4DEA-4B4C-956B-FE073CF208B1}" Directory_="APPDIR" Attributes="4" KeyPath="Version"/>
+    <ROW Component="System.Buffers.dll" ComponentId="{5FE9B4DA-E16B-4F27-8E07-BCB206C59631}" Directory_="APPDIR" Attributes="0" KeyPath="System.Buffers.dll"/>
+    <ROW Component="System.Diagnostics.DiagnosticSource.dll" ComponentId="{EE417506-38C7-4570-BD8B-6C7FA0FC07AF}" Directory_="APPDIR" Attributes="0" KeyPath="System.Diagnostics.DiagnosticSource.dll"/>
     <ROW Component="System.Diagnostics.EventLog.dll" ComponentId="{423C9884-DB38-4DB0-ACD6-1143CA2D0114}" Directory_="APPDIR" Attributes="0" KeyPath="System.Diagnostics.EventLog.dll"/>
-    <ROW Component="System.IdentityModel.Tokens.Jwt.dll" ComponentId="{7F722B07-307E-4427-85EB-4F9C4CE96539}" Directory_="APPDIR" Attributes="0" KeyPath="System.IdentityModel.Tokens.Jwt.dll"/>
-    <ROW Component="System.Memory.dll" ComponentId="{55D88EE8-926D-4B80-8923-D94D60AF0EAC}" Directory_="APPDIR" Attributes="0" KeyPath="System.Memory.dll"/>
-    <ROW Component="System.Numerics.Vectors.dll" ComponentId="{5DEDA8E1-D01B-46A5-8C12-DC8B896AF4DD}" Directory_="APPDIR" Attributes="0" KeyPath="System.Numerics.Vectors.dll"/>
+    <ROW Component="System.IdentityModel.Tokens.Jwt.dll" ComponentId="{1CE5E8F9-D4A0-4D89-A2D0-8B18154E4841}" Directory_="APPDIR" Attributes="0" KeyPath="System.IdentityModel.Tokens.Jwt.dll"/>
+    <ROW Component="System.Memory.dll" ComponentId="{ED0301FC-0F5B-42A6-88E7-B70B8009E7C8}" Directory_="APPDIR" Attributes="0" KeyPath="System.Memory.dll"/>
+    <ROW Component="System.Numerics.Vectors.dll" ComponentId="{F900B662-AA61-4B23-86C3-EB7B31D294FD}" Directory_="APPDIR" Attributes="0" KeyPath="System.Numerics.Vectors.dll"/>
     <ROW Component="System.Runtime.CompilerServices.Unsafe.dll" ComponentId="{5C9842A0-3EE1-4EDB-A428-7B3D43169532}" Directory_="APPDIR" Attributes="0" KeyPath="System.Runtime.CompilerServices.Unsafe.dll"/>
     <ROW Component="System.Security.AccessControl.dll" ComponentId="{CC73C49C-C728-4BFE-993E-1EA30AB02BD5}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.AccessControl.dll"/>
-    <ROW Component="System.Security.Cryptography.Cng.dll" ComponentId="{EF2471EC-E196-4D26-BC21-E91B5911AB86}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Cryptography.Cng.dll"/>
-    <ROW Component="System.Security.Cryptography.ProtectedData.dll" ComponentId="{CD59D39E-0E4A-4994-8729-0D07DC6A935B}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Cryptography.ProtectedData.dll"/>
+    <ROW Component="System.Security.Cryptography.Cng.dll" ComponentId="{237F76C5-1EA0-4096-B37D-0DE3236428D2}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Cryptography.Cng.dll"/>
+    <ROW Component="System.Security.Cryptography.ProtectedData.dll" ComponentId="{D20EDFDB-6D43-4ADC-A925-435219332333}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Cryptography.ProtectedData.dll"/>
     <ROW Component="System.Security.Principal.Windows.dll" ComponentId="{961270E7-A746-46F9-877E-4BE66CAC9EDA}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Principal.Windows.dll"/>
     <ROW Component="System.ServiceProcess.ServiceController.dll" ComponentId="{B6FAB8BE-D34A-47CB-B3C7-569C0CFCB3FC}" Directory_="APPDIR" Attributes="0" KeyPath="System.ServiceProcess.ServiceController.dll"/>
     <ROW Component="System.Text.Encodings.Web.dll" ComponentId="{C12FA5FE-7C79-4D62-B422-A873354FF938}" Directory_="APPDIR" Attributes="0" KeyPath="System.Text.Encodings.Web.dll"/>
     <ROW Component="System.Text.Json.dll" ComponentId="{591B9EA1-18C3-4BA5-AC36-6224B4FCF8D9}" Directory_="APPDIR" Attributes="0" KeyPath="System.Text.Json.dll"/>
-    <ROW Component="System.Threading.Tasks.Extensions.dll" ComponentId="{FFD8BD64-1CA5-4727-A580-FE87BD413633}" Directory_="APPDIR" Attributes="0" KeyPath="System.Threading.Tasks.Extensions.dll"/>
-    <ROW Component="System.ValueTuple.dll" ComponentId="{7A6AF7E6-A368-4B55-80D2-66082DDDFBF1}" Directory_="APPDIR" Attributes="0" KeyPath="System.ValueTuple.dll"/>
+    <ROW Component="System.Threading.Tasks.Extensions.dll" ComponentId="{FC516246-EAAB-4098-8E4A-A5BF3D871E42}" Directory_="APPDIR" Attributes="0" KeyPath="System.Threading.Tasks.Extensions.dll"/>
+    <ROW Component="System.ValueTuple.dll" ComponentId="{F696B69F-F3F7-43E8-AD58-06750A498805}" Directory_="APPDIR" Attributes="0" KeyPath="System.ValueTuple.dll"/>
     <ROW Component="Vanara.Core.dll" ComponentId="{CFCD86A9-2EDB-4BF7-8F09-5862F7EA4104}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.Core.dll"/>
     <ROW Component="Vanara.PInvoke.Cryptography.dll" ComponentId="{81C8D0F0-7585-4142-B90D-BCF12246985D}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Cryptography.dll"/>
-    <ROW Component="Vanara.PInvoke.Gdi32.dll" ComponentId="{F4CB5A3D-7533-4E56-8F2F-39C16814EC5D}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Gdi32.dll"/>
-    <ROW Component="Vanara.PInvoke.IpHlpApi.dll" ComponentId="{45901875-E601-4B1D-A220-3D5F2AE108E3}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.IpHlpApi.dll"/>
-    <ROW Component="Vanara.PInvoke.Kernel32.dll" ComponentId="{C230CE3D-3FDD-41FB-8E9F-95D98B715A2E}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Kernel32.dll"/>
-    <ROW Component="Vanara.PInvoke.Mpr.dll" ComponentId="{CC4902F3-C716-4F72-8003-23A088BB53F5}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Mpr.dll"/>
-    <ROW Component="Vanara.PInvoke.NTDSApi.dll" ComponentId="{CF3DF313-DF41-4FB9-9B16-97226527D8E1}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.NTDSApi.dll"/>
-    <ROW Component="Vanara.PInvoke.NetApi32.dll" ComponentId="{8BE9E015-5EBC-47CE-AACB-F094D76A5093}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.NetApi32.dll"/>
-    <ROW Component="Vanara.PInvoke.NetListMgr.dll" ComponentId="{AFFEEE65-7088-4BAC-B0A9-6909AB89AD0A}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.NetListMgr.dll"/>
-    <ROW Component="Vanara.PInvoke.Ole.dll" ComponentId="{3C8918EA-9745-468C-B2E5-D154E04B4018}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Ole.dll"/>
-    <ROW Component="Vanara.PInvoke.PowrProf.dll" ComponentId="{E2D90980-E186-4D58-AC8C-D44492C43BFF}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.PowrProf.dll"/>
-    <ROW Component="Vanara.PInvoke.Rpc.dll" ComponentId="{A4FD8E69-5E06-468D-8557-F04B220820B9}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Rpc.dll"/>
-    <ROW Component="Vanara.PInvoke.Security.dll" ComponentId="{01A6902D-5D05-43BF-A6E7-4F8147C13732}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Security.dll"/>
-    <ROW Component="Vanara.PInvoke.SetupAPI.dll" ComponentId="{FE100664-B8CF-4E1E-B508-95BC8DD25C0C}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.SetupAPI.dll"/>
+    <ROW Component="Vanara.PInvoke.Gdi32.dll" ComponentId="{BE792BD7-6938-4059-8304-6BE4EC16ABAE}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Gdi32.dll"/>
+    <ROW Component="Vanara.PInvoke.IpHlpApi.dll" ComponentId="{7786C70A-E5CD-4387-8476-CDF03A1C1F5D}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.IpHlpApi.dll"/>
+    <ROW Component="Vanara.PInvoke.Kernel32.dll" ComponentId="{F9AE4B3F-3141-40FB-9FEA-EFF075BBFF6B}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Kernel32.dll"/>
+    <ROW Component="Vanara.PInvoke.Mpr.dll" ComponentId="{21BC47E0-FF73-4712-944F-D02DB9B0BF60}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Mpr.dll"/>
+    <ROW Component="Vanara.PInvoke.NTDSApi.dll" ComponentId="{36CCE31B-722C-4DEB-AB3E-5A4543AFD37F}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.NTDSApi.dll"/>
+    <ROW Component="Vanara.PInvoke.NetApi32.dll" ComponentId="{C3FC6D2B-735C-4049-A402-B060928F9DAA}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.NetApi32.dll"/>
+    <ROW Component="Vanara.PInvoke.NetListMgr.dll" ComponentId="{E4A5FF17-D146-4A6E-95C0-D0A477B61EE8}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.NetListMgr.dll"/>
+    <ROW Component="Vanara.PInvoke.Ole.dll" ComponentId="{B03EE06C-4171-4213-90D5-89B55773AFE3}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Ole.dll"/>
+    <ROW Component="Vanara.PInvoke.PowrProf.dll" ComponentId="{F22DB1C5-3008-480B-93BD-AC426DBAF981}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.PowrProf.dll"/>
+    <ROW Component="Vanara.PInvoke.Rpc.dll" ComponentId="{533D1EE6-25AA-409E-95CB-2444A13B2CF6}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Rpc.dll"/>
+    <ROW Component="Vanara.PInvoke.Security.dll" ComponentId="{E8D703C9-015F-41D5-95CC-8DDDCA9D8D07}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Security.dll"/>
+    <ROW Component="Vanara.PInvoke.SetupAPI.dll" ComponentId="{BFC2D17A-4FB5-4309-986B-5ACB9C05557A}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.SetupAPI.dll"/>
     <ROW Component="Vanara.PInvoke.Shared.dll" ComponentId="{2C3FFC0D-466F-447E-857E-1F22D2759AB9}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Shared.dll"/>
-    <ROW Component="Vanara.PInvoke.ShlwApi.dll" ComponentId="{CE9788F3-7BDE-4B7B-B654-F653BBC9433A}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.ShlwApi.dll"/>
-    <ROW Component="Vanara.PInvoke.User32.dll" ComponentId="{8ECA8A44-20F3-4D5E-BC53-11C06B348AD7}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.User32.dll"/>
-    <ROW Component="Vanara.PInvoke.UserEnv.dll" ComponentId="{C168AE85-6762-43A0-8857-4BD6A061444F}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.UserEnv.dll"/>
-    <ROW Component="Vanara.PInvoke.WinINet.dll" ComponentId="{FC069A13-DBC0-475F-8AD1-915615839E2E}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.WinINet.dll"/>
-    <ROW Component="Vanara.PInvoke.WlanApi.dll" ComponentId="{3C715544-3364-476C-9DDC-8BD11E93F661}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.WlanApi.dll"/>
-    <ROW Component="Vanara.PInvoke.Ws2_32.dll" ComponentId="{371C689F-75C7-400C-B76A-A815FAECDDFD}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Ws2_32.dll"/>
-    <ROW Component="Vanara.Security.dll" ComponentId="{F225B705-5D56-42AD-A9C2-EEC7ED7BACD4}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.Security.dll"/>
-    <ROW Component="Vanara.SystemServices.dll" ComponentId="{0ADB66AF-2B9E-4E99-B3EC-F42320F2D622}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.SystemServices.dll"/>
-    <ROW Component="Version" ComponentId="{5E6BFD52-23FB-46D2-B0B6-A3A806E70C44}" Directory_="APPDIR" Attributes="260" KeyPath="Version"/>
+    <ROW Component="Vanara.PInvoke.ShlwApi.dll" ComponentId="{46934621-6494-4DAD-BCAC-57CB3B559A59}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.ShlwApi.dll"/>
+    <ROW Component="Vanara.PInvoke.User32.dll" ComponentId="{D250C019-FCE7-4571-8F0E-84BBDAB70D80}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.User32.dll"/>
+    <ROW Component="Vanara.PInvoke.UserEnv.dll" ComponentId="{FB83DC64-4C80-4EE8-8F4F-833AD61D6402}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.UserEnv.dll"/>
+    <ROW Component="Vanara.PInvoke.WinINet.dll" ComponentId="{D6CF1392-D3EA-4200-BF65-D990EE26DC5F}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.WinINet.dll"/>
+    <ROW Component="Vanara.PInvoke.WlanApi.dll" ComponentId="{59166C3B-1221-4A0D-B3C3-2E66FD25EBD9}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.WlanApi.dll"/>
+    <ROW Component="Vanara.PInvoke.Ws2_32.dll" ComponentId="{F0F0C08D-0BA0-428E-B2CC-DEB961D2565D}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Ws2_32.dll"/>
+    <ROW Component="Vanara.Security.dll" ComponentId="{C7800831-10EE-4E8F-9633-C22BAB48A8E7}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.Security.dll"/>
+    <ROW Component="Vanara.SystemServices.dll" ComponentId="{176565BE-D92D-4502-B6D3-47ED0E7461EF}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.SystemServices.dll"/>
     <ROW Component="appsettings.json" ComponentId="{9522F0E5-24DE-424A-9BEE-59B7F462F9E6}" Directory_="APPDIR" Attributes="0" KeyPath="appsettings.json" Type="0"/>
-    <ROW Component="lithnet.accessmanager.agent.adml" ComponentId="{26248AAD-5537-4D99-A826-1379B0A4FCBA}" Directory_="enUS_Dir" Attributes="0" KeyPath="lithnet.accessmanager.agent.adml" Type="0"/>
-    <ROW Component="lithnet.accessmanager.agent.admx" ComponentId="{4A2EA2A4-4ACD-4051-A1FA-9594018B22D7}" Directory_="PolicyDefinitions_Dir" Attributes="0" KeyPath="lithnet.accessmanager.agent.admx" Type="0"/>
-    <ROW Component="lithnet.accessmanager.agent.password.adml" ComponentId="{309D43E2-7CCB-43E7-8CF7-FF4F25AFCCBC}" Directory_="enUS_Dir" Attributes="0" KeyPath="lithnet.accessmanager.agent.password.adml" Type="0"/>
+    <ROW Component="lithnet.accessmanager.agent.adml" ComponentId="{B81989B2-FC6E-4105-BE6D-099AC6A5689B}" Directory_="enUS_Dir" Attributes="0" KeyPath="lithnet.accessmanager.agent.adml" Type="0"/>
+    <ROW Component="lithnet.accessmanager.agent.admx" ComponentId="{6FB02E4A-36CF-44C6-B44E-F21B194BDA1B}" Directory_="PolicyDefinitions_Dir" Attributes="0" KeyPath="lithnet.accessmanager.agent.admx" Type="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
     <ROW Feature="AI32BitFiles" Title="32-bit" Description="32-bit Executables and Libraries" Display="3" Level="1" Directory_="APPDIR" Attributes="0"/>
@@ -142,10 +130,6 @@
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
     <ROW File="Lithnet.AccessManager.Agent.exe" Component_="Lithnet.AccessManager.Agent.exe" FileName="LITHNE~1.EXE|Lithnet.AccessManager.Agent.exe" Attributes="0" SourcePath="output-x86\Lithnet.AccessManager.Agent.exe" SelfReg="false" DigSign="true"/>
-    <ROW File="lithnet.accessmanager.agent.adml" Component_="lithnet.accessmanager.agent.adml" FileName="LITHNE~1.ADM|lithnet.accessmanager.agent.adml" Attributes="0" SourcePath="output-x86\PolicyDefinitions\en-US\lithnet.accessmanager.agent.adml" SelfReg="false"/>
-    <ROW File="lithnet.accessmanager.agent.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~1.ADM|lithnet.accessmanager.agent.admx" Attributes="0" SourcePath="output-x86\PolicyDefinitions\lithnet.accessmanager.agent.admx" SelfReg="false"/>
-    <ROW File="lithnet.accessmanager.agent.password.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~3.ADM|lithnet.accessmanager.agent.password.admx" Attributes="0" SourcePath="output-x86\PolicyDefinitions\lithnet.accessmanager.agent.password.admx" SelfReg="false"/>
-    <ROW File="lithnet.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~4.ADM|lithnet.admx" Attributes="0" SourcePath="output-x86\PolicyDefinitions\lithnet.admx" SelfReg="false"/>
     <ROW File="appsettings.json" Component_="appsettings.json" FileName="APPSET~1.JSO|appsettings.json" Attributes="0" SourcePath="output-x86\appsettings.json" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Agent.deps.json" Component_="appsettings.json" FileName="LITHNE~1.JSO|Lithnet.AccessManager.Agent.deps.json" Attributes="0" SourcePath="output-x86\Lithnet.AccessManager.Agent.deps.json" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Agent.pdb" Component_="Lithnet.AccessManager.Agent.exe" FileName="LITHNE~1.PDB|Lithnet.AccessManager.Agent.pdb" Attributes="0" SourcePath="output-x86\Lithnet.AccessManager.Agent.pdb" SelfReg="false"/>
@@ -183,23 +167,34 @@
     <ROW File="NLog.config" Component_="appsettings.json" FileName="NLOG~1.CON|NLog.config" Attributes="0" SourcePath="output-x86\NLog.config" SelfReg="false"/>
     <ROW File="NLog.dll" Component_="NLog.dll" FileName="NLog.dll" Attributes="0" SourcePath="output-x86\NLog.dll" SelfReg="false"/>
     <ROW File="NLog.Extensions.Logging.dll" Component_="NLog.Extensions.Logging.dll" FileName="NLOGEX~1.DLL|NLog.Extensions.Logging.dll" Attributes="0" SourcePath="output-x86\NLog.Extensions.Logging.dll" SelfReg="false"/>
+    <ROW File="System.Buffers.dll" Component_="System.Buffers.dll" FileName="SYSTEM~1.DLL|System.Buffers.dll" Attributes="0" SourcePath="output-x86\System.Buffers.dll" SelfReg="false"/>
     <ROW File="System.Diagnostics.EventLog.dll" Component_="System.Diagnostics.EventLog.dll" FileName="SYSTEM~3.DLL|System.Diagnostics.EventLog.dll" Attributes="0" SourcePath="output-x86\System.Diagnostics.EventLog.dll" SelfReg="false"/>
+    <ROW File="System.Memory.dll" Component_="System.Memory.dll" FileName="SYSTEM~4.DLL|System.Memory.dll" Attributes="0" SourcePath="output-x86\System.Memory.dll" SelfReg="false"/>
+    <ROW File="System.Numerics.Vectors.dll" Component_="System.Numerics.Vectors.dll" FileName="SYSTEM~5.DLL|System.Numerics.Vectors.dll" Attributes="0" SourcePath="output-x86\System.Numerics.Vectors.dll" SelfReg="false"/>
     <ROW File="System.Runtime.CompilerServices.Unsafe.dll" Component_="System.Runtime.CompilerServices.Unsafe.dll" FileName="SYSTEM~6.DLL|System.Runtime.CompilerServices.Unsafe.dll" Attributes="0" SourcePath="output-x86\System.Runtime.CompilerServices.Unsafe.dll" SelfReg="false"/>
     <ROW File="System.Security.AccessControl.dll" Component_="System.Security.AccessControl.dll" FileName="SYSTEM~7.DLL|System.Security.AccessControl.dll" Attributes="0" SourcePath="output-x86\System.Security.AccessControl.dll" SelfReg="false"/>
+    <ROW File="System.Security.Cryptography.Cng.dll" Component_="System.Security.Cryptography.Cng.dll" FileName="SYSTEM~8.DLL|System.Security.Cryptography.Cng.dll" Attributes="0" SourcePath="output-x86\System.Security.Cryptography.Cng.dll" SelfReg="false"/>
     <ROW File="System.Security.Principal.Windows.dll" Component_="System.Security.Principal.Windows.dll" FileName="SYSTEM~9.DLL|System.Security.Principal.Windows.dll" Attributes="0" SourcePath="output-x86\System.Security.Principal.Windows.dll" SelfReg="false"/>
     <ROW File="System.ServiceProcess.ServiceController.dll" Component_="System.ServiceProcess.ServiceController.dll" FileName="SYSTE~10.DLL|System.ServiceProcess.ServiceController.dll" Attributes="0" SourcePath="output-x86\System.ServiceProcess.ServiceController.dll" SelfReg="false"/>
     <ROW File="System.Text.Encodings.Web.dll" Component_="System.Text.Encodings.Web.dll" FileName="SYSTE~11.DLL|System.Text.Encodings.Web.dll" Attributes="0" SourcePath="output-x86\System.Text.Encodings.Web.dll" SelfReg="false"/>
     <ROW File="System.Text.Json.dll" Component_="System.Text.Json.dll" FileName="SYSTE~12.DLL|System.Text.Json.dll" Attributes="0" SourcePath="output-x86\System.Text.Json.dll" SelfReg="false"/>
+    <ROW File="System.Threading.Tasks.Extensions.dll" Component_="System.Threading.Tasks.Extensions.dll" FileName="SYSTE~13.DLL|System.Threading.Tasks.Extensions.dll" Attributes="0" SourcePath="output-x86\System.Threading.Tasks.Extensions.dll" SelfReg="false"/>
+    <ROW File="System.ValueTuple.dll" Component_="System.ValueTuple.dll" FileName="SYSTE~14.DLL|System.ValueTuple.dll" Attributes="0" SourcePath="output-x86\System.ValueTuple.dll" SelfReg="false"/>
     <ROW File="Vanara.Core.dll" Component_="Vanara.Core.dll" FileName="VANARA~1.DLL|Vanara.Core.dll" Attributes="0" SourcePath="output-x86\Vanara.Core.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.Cryptography.dll" Component_="Vanara.PInvoke.Cryptography.dll" FileName="VANARA~2.DLL|Vanara.PInvoke.Cryptography.dll" Attributes="0" SourcePath="output-x86\Vanara.PInvoke.Cryptography.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.Shared.dll" Component_="Vanara.PInvoke.Shared.dll" FileName="VANARA~3.DLL|Vanara.PInvoke.Shared.dll" Attributes="0" SourcePath="output-x86\Vanara.PInvoke.Shared.dll" SelfReg="false"/>
-    <ROW File="lithnet.accessmanager.agent.password.adml" Component_="lithnet.accessmanager.agent.password.adml" FileName="LITHNE~3.ADM|lithnet.accessmanager.agent.password.adml" Attributes="0" SourcePath="output-x86\PolicyDefinitions\en-US\lithnet.accessmanager.agent.password.adml" SelfReg="false"/>
-    <ROW File="lithnet.adml" Component_="lithnet.accessmanager.agent.password.adml" FileName="LITHNE~4.ADM|lithnet.adml" Attributes="0" SourcePath="output-x86\PolicyDefinitions\en-US\lithnet.adml" SelfReg="false"/>
+    <ROW File="lithnet.accessmanager.agent.adml" Component_="lithnet.accessmanager.agent.adml" FileName="LITHNE~1.ADM|lithnet.accessmanager.agent.adml" Attributes="0" SourcePath="output-x86\PolicyDefinitions\en-US\lithnet.accessmanager.agent.adml" SelfReg="false"/>
+    <ROW File="lithnet.accessmanager.agent.password.adml" Component_="lithnet.accessmanager.agent.adml" FileName="LITHNE~3.ADM|lithnet.accessmanager.agent.password.adml" Attributes="0" SourcePath="output-x86\PolicyDefinitions\en-US\lithnet.accessmanager.agent.password.adml" SelfReg="false"/>
+    <ROW File="lithnet.adml" Component_="lithnet.accessmanager.agent.adml" FileName="LITHNE~4.ADM|lithnet.adml" Attributes="0" SourcePath="output-x86\PolicyDefinitions\en-US\lithnet.adml" SelfReg="false"/>
+    <ROW File="lithnet.accessmanager.agent.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~1.ADM|lithnet.accessmanager.agent.admx" Attributes="0" SourcePath="output-x86\PolicyDefinitions\lithnet.accessmanager.agent.admx" SelfReg="false"/>
+    <ROW File="lithnet.accessmanager.agent.password.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~3.ADM|lithnet.accessmanager.agent.password.admx" Attributes="0" SourcePath="output-x86\PolicyDefinitions\lithnet.accessmanager.agent.password.admx" SelfReg="false"/>
+    <ROW File="lithnet.admx" Component_="lithnet.accessmanager.agent.admx" FileName="LITHNE~4.ADM|lithnet.admx" Attributes="0" SourcePath="output-x86\PolicyDefinitions\lithnet.admx" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.Kernel32.dll" Component_="Vanara.PInvoke.Kernel32.dll" FileName="VANARA~4.DLL|Vanara.PInvoke.Kernel32.dll" Attributes="0" SourcePath="output-x86\Vanara.PInvoke.Kernel32.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.NetApi32.dll" Component_="Vanara.PInvoke.NetApi32.dll" FileName="VANARA~5.DLL|Vanara.PInvoke.NetApi32.dll" Attributes="0" SourcePath="output-x86\Vanara.PInvoke.NetApi32.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.Security.dll" Component_="Vanara.PInvoke.Security.dll" FileName="VANARA~6.DLL|Vanara.PInvoke.Security.dll" Attributes="0" SourcePath="output-x86\Vanara.PInvoke.Security.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.Ws2_32.dll" Component_="Vanara.PInvoke.Ws2_32.dll" FileName="VANARA~7.DLL|Vanara.PInvoke.Ws2_32.dll" Attributes="0" SourcePath="output-x86\Vanara.PInvoke.Ws2_32.dll" SelfReg="false"/>
     <ROW File="CsvHelper.dll" Component_="CsvHelper.dll" FileName="CSVHEL~1.DLL|CsvHelper.dll" Attributes="0" SourcePath="output-x86\CsvHelper.dll" SelfReg="false"/>
+    <ROW File="System.Security.Cryptography.ProtectedData.dll" Component_="System.Security.Cryptography.ProtectedData.dll" FileName="SYSTE~15.DLL|System.Security.Cryptography.ProtectedData.dll" Attributes="0" SourcePath="output-x86\System.Security.Cryptography.ProtectedData.dll" SelfReg="false"/>
     <ROW File="appstate.json" Component_="appsettings.json" FileName="APPSTA~1.JSO|appstate.json" Attributes="0" SourcePath="output-x86\appstate.json" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Api.Shared.dll" Component_="Lithnet.AccessManager.Api.Shared.dll" FileName="LITHNE~4.DLL|Lithnet.AccessManager.Api.Shared.dll" Attributes="0" SourcePath="output-x86\Lithnet.AccessManager.Api.Shared.dll" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Api.Shared.pdb" Component_="Lithnet.AccessManager.Api.Shared.dll" FileName="LITHNE~3.PDB|Lithnet.AccessManager.Api.Shared.pdb" Attributes="0" SourcePath="output-x86\Lithnet.AccessManager.Api.Shared.pdb" SelfReg="false"/>
@@ -226,14 +221,7 @@
     <ROW File="Vanara.Security.dll" Component_="Vanara.Security.dll" FileName="VANAR~22.DLL|Vanara.Security.dll" Attributes="0" SourcePath="output-x86\Vanara.Security.dll" SelfReg="false"/>
     <ROW File="Vanara.SystemServices.dll" Component_="Vanara.SystemServices.dll" FileName="VANAR~23.DLL|Vanara.SystemServices.dll" Attributes="0" SourcePath="output-x86\Vanara.SystemServices.dll" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Agent.exe.config" Component_="appsettings.json" FileName="LITHNE~1.CON|Lithnet.AccessManager.Agent.exe.config" Attributes="0" SourcePath="output-x86\Lithnet.AccessManager.Agent.exe.config" SelfReg="false"/>
-    <ROW File="Microsoft.Bcl.AsyncInterfaces.dll" Component_="Microsoft.Bcl.AsyncInterfaces.dll" FileName="MICRO~29.DLL|Microsoft.Bcl.AsyncInterfaces.dll" Attributes="0" SourcePath="output-x86\Microsoft.Bcl.AsyncInterfaces.dll" SelfReg="false"/>
-    <ROW File="System.Buffers.dll" Component_="System.Buffers.dll" FileName="SYSTEM~1.DLL|System.Buffers.dll" Attributes="0" SourcePath="output-x86\System.Buffers.dll" SelfReg="false"/>
-    <ROW File="System.Memory.dll" Component_="System.Memory.dll" FileName="SYSTEM~2.DLL|System.Memory.dll" Attributes="0" SourcePath="output-x86\System.Memory.dll" SelfReg="false"/>
-    <ROW File="System.Numerics.Vectors.dll" Component_="System.Numerics.Vectors.dll" FileName="SYSTEM~4.DLL|System.Numerics.Vectors.dll" Attributes="0" SourcePath="output-x86\System.Numerics.Vectors.dll" SelfReg="false"/>
-    <ROW File="System.Security.Cryptography.Cng.dll" Component_="System.Security.Cryptography.Cng.dll" FileName="SYSTEM~5.DLL|System.Security.Cryptography.Cng.dll" Attributes="0" SourcePath="output-x86\System.Security.Cryptography.Cng.dll" SelfReg="false"/>
-    <ROW File="System.Security.Cryptography.ProtectedData.dll" Component_="System.Security.Cryptography.ProtectedData.dll" FileName="SYSTEM~8.DLL|System.Security.Cryptography.ProtectedData.dll" Attributes="0" SourcePath="output-x86\System.Security.Cryptography.ProtectedData.dll" SelfReg="false"/>
-    <ROW File="System.Threading.Tasks.Extensions.dll" Component_="System.Threading.Tasks.Extensions.dll" FileName="SYSTE~13.DLL|System.Threading.Tasks.Extensions.dll" Attributes="0" SourcePath="output-x86\System.Threading.Tasks.Extensions.dll" SelfReg="false"/>
-    <ROW File="System.ValueTuple.dll" Component_="System.ValueTuple.dll" FileName="SYSTE~15.DLL|System.ValueTuple.dll" Attributes="0" SourcePath="output-x86\System.ValueTuple.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Bcl.AsyncInterfaces.dll" Component_="Microsoft.Bcl.AsyncInterfaces.dll" FileName="MICRO~31.DLL|Microsoft.Bcl.AsyncInterfaces.dll" Attributes="0" SourcePath="output-x86\Microsoft.Bcl.AsyncInterfaces.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" GeneralOptions="o" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites"/>
@@ -267,80 +255,22 @@
     <ROW Fragment="VerifyRepairDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\VerifyRepairDlg.aip"/>
     <ROW Fragment="WelcomeDlg.aip" Path="&lt;AI_THEMES&gt;classic\fragments\WelcomeDlg.aip"/>
   </COMPONENT>
-  <COMPONENT cid="caphyon.advinst.msicomp.MsiAppSearchComponent">
-    <ROW Property="AGENTENABLED" Signature_="AppSearchSign"/>
-    <ROW Property="INTERVAL" Signature_="AppSearchSign_1"/>
-    <ROW Property="AMSSTORAGEENABLED" Signature_="AppSearchSign_2"/>
-    <ROW Property="AMSSERVERENABLED" Signature_="AppSearchSign_3"/>
-    <ROW Property="SERVER" Signature_="AppSearchSign_4"/>
-    <ROW Property="AUTHMODE" Signature_="AppSearchSign_5"/>
-    <ROW Property="AZUREADTENANTID" Signature_="AppSearchSign_6"/>
-    <ROW Property="RESET" Signature_="AppSearchSign_7"/>
-    <ROW Property="REGISTRATIONKEY" Signature_="AppSearchSign_8"/>
-    <ROW Property="REGISTRATIONSTATE" Signature_="AppSearchSign_9"/>
-  </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiBinaryComponent">
     <ROW Name="SoftwareDetector.dll" SourcePath="&lt;AI_CUSTACTS&gt;SoftwareDetector.dll"/>
     <ROW Name="aicustact.dll" SourcePath="&lt;AI_CUSTACTS&gt;aicustact.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiControlComponent">
-    <ROW Dialog_="FolderDlg" Control="FolderLabel" Type="Text" X="18" Y="109" Width="348" Height="12" Attributes="3" Text="&amp;Folder:" Help="|" Order="200" TextLocId="Control.Text.FolderDlg#FolderLabel" HelpLocId="Control.Help.FolderDlg#FolderLabel" MsiKey="FolderDlg#FolderLabel"/>
     <ROW Dialog_="LicenseAgreementDlg" Control="AgreementText" Type="ScrollableText" X="20" Y="60" Width="330" Height="120" Attributes="7" Text="License.rtf" Order="400" TextLocId="Control.Text.LicenseAgreementDlg#AgreementText" MsiKey="LicenseAgreementDlg#AgreementText"/>
-    <ROW Dialog_="NewSeqDialog" Control="NewSeqDialogDialogInitializer" Type="DialogInitializer" X="0" Y="0" Width="0" Height="0" Attributes="0" Order="-1" TextLocId="-" HelpLocId="-" ExtDataLocId="-"/>
-    <ROW Dialog_="NewSeqDialog" Control="FolderLabel" Type="Text" X="15" Y="147" Width="72" Height="12" Attributes="2" Text="Server name:" Help="|" Order="100" HelpLocId="Control.Help.FolderDlg#FolderLabel"/>
-    <ROW Dialog_="NewSeqDialog" Control="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Next]" Order="200" Options="1"/>
-    <ROW Dialog_="NewSeqDialog" Control="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Cancel]" Order="300" Options="1"/>
-    <ROW Dialog_="NewSeqDialog" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="1" Text="[ButtonText_Back]" Order="400" Options="1"/>
-    <ROW Dialog_="NewSeqDialog" Control="BottomLine" Type="Line" X="2" Y="234" Width="368" Height="0" Attributes="1" Order="500"/>
-    <ROW Dialog_="NewSeqDialog" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Advanced Installer" Order="600" TextLocId="Control.Text.FolderDlg#Logo"/>
-    <ROW Dialog_="NewSeqDialog" Control="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Attributes="1048577" Text="[BannerBitmap]" Help="|" Order="700" HelpLocId="Control.Help.FolderDlg#BannerBitmap"/>
-    <ROW Dialog_="NewSeqDialog" Control="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Attributes="196611" Text="Configure the agent" TextStyle="[DlgTitleFont]" Order="800"/>
-    <ROW Dialog_="NewSeqDialog" Control="Text" Type="Text" X="15" Y="57" Width="344" Height="32" Attributes="3" Text="The Lithnet Access Manager agent can store local administrator passwords in Active Directory, or it can send them directly to the AMS server itself." Order="900"/>
-    <ROW Dialog_="NewSeqDialog" Control="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Attributes="196611" Text="Set the mode that the agent will operate in" Order="1000"/>
-    <ROW Dialog_="NewSeqDialog" Control="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" Attributes="1" Order="1100"/>
-    <ROW Dialog_="NewSeqDialog" Control="RadioButtonGroup_1" Type="RadioButtonGroup" X="101" Y="94" Width="180" Height="40" Attributes="19" Property="AMSSERVERENABLED" Text="RadioButtonGroup" Order="1200"/>
-    <ROW Dialog_="NewSeqDialog" Control="Text_1" Type="Text" X="15" Y="100" Width="72" Height="12" Attributes="3" Text="Mode:" Help="|" Order="1300" HelpLocId="Control.Help.FolderDlg#FolderLabel"/>
-    <ROW Dialog_="NewSeqDialog" Control="Edit_1" Type="Edit" X="101" Y="147" Width="259" Height="14" Attributes="2" Property="SERVER" Order="1400" ExtData="server.domain.com"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="NewSeqDialog_1DialogInitializer" Type="DialogInitializer" X="0" Y="0" Width="0" Height="0" Attributes="0" Order="-1" TextLocId="-" HelpLocId="-" ExtDataLocId="-"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="FolderLabel" Type="Text" X="15" Y="161" Width="72" Height="12" Attributes="3" Text="Tenant ID:" Help="|" Order="100" HelpLocId="Control.Help.FolderDlg#FolderLabel"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Next]" Order="200"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Cancel]" Order="300"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="1" Text="[ButtonText_Back]" Order="400"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="BottomLine" Type="Line" X="2" Y="234" Width="368" Height="0" Attributes="1" Order="500"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="Logo" Type="Text" X="4" Y="228" Width="70" Height="12" Attributes="1" Text="Advanced Installer" Order="600" TextLocId="Control.Text.FolderDlg#Logo"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Attributes="1048577" Text="[BannerBitmap]" Help="|" Order="700" HelpLocId="Control.Help.FolderDlg#BannerBitmap"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Attributes="196611" Text="Configure the agent" TextStyle="[DlgTitleFont]" Order="800"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="Text" Type="Text" X="15" Y="57" Width="344" Height="44" Attributes="3" Text="The agent can authenticate to the AMS server using Azure Active Directory, or native Access Manager authentication. If using Azure AD authentication, provide the tenant ID of the Azure instance that contains this device. If using AMS authentication, you must have a registration key issued by the AMS server." Order="900"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Attributes="196611" Text="Set the authentication mode for the agent" Order="1000"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" Attributes="1" Order="1100"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="RadioButtonGroup_1" Type="RadioButtonGroup" X="101" Y="107" Width="180" Height="40" Attributes="3" Property="AUTHMODE" Text="RadioButtonGroup" Order="1200"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="Text_1" Type="Text" X="15" Y="113" Width="72" Height="22" Attributes="3" Text="Authentication mode:" Help="|" Order="1300" HelpLocId="Control.Help.FolderDlg#FolderLabel"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="Edit_1" Type="Edit" X="101" Y="161" Width="259" Height="14" Attributes="2" Property="AZUREADTENANTID" Order="1400"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="Text_2" Type="Text" X="15" Y="161" Width="72" Height="12" Attributes="3" Text="Registration key:" Help="|" Order="1500" HelpLocId="Control.Help.FolderDlg#FolderLabel"/>
-    <ROW Dialog_="NewSeqDialog_1" Control="Edit_2" Type="Edit" X="101" Y="161" Width="259" Height="14" Attributes="2" Property="REGISTRATIONKEY" Order="1600"/>
-  </COMPONENT>
-  <COMPONENT cid="caphyon.advinst.msicomp.MsiControlConditionComponent">
-    <ROW Dialog_="NewSeqDialog" Control_="Edit_1" Action="Show" Condition="AMSSERVERENABLED = &quot;1&quot;"/>
-    <ROW Dialog_="NewSeqDialog" Control_="Edit_1" Action="Hide" Condition="NOT AMSSERVERENABLED OR AMSSERVERENABLED=&quot;0&quot;"/>
-    <ROW Dialog_="NewSeqDialog" Control_="FolderLabel" Action="Hide" Condition="NOT AMSSERVERENABLED OR AMSSERVERENABLED=&quot;0&quot;"/>
-    <ROW Dialog_="NewSeqDialog" Control_="FolderLabel" Action="Show" Condition="AMSSERVERENABLED = &quot;1&quot;"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="FolderLabel" Action="Hide" Condition="NOT (AUTHMODE=&quot;2&quot;)"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="FolderLabel" Action="Show" Condition="AUTHMODE = &quot;2&quot;"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="Edit_1" Action="Show" Condition="AUTHMODE = &quot;2&quot;"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="Edit_1" Action="Hide" Condition="NOT (AUTHMODE = &quot;2&quot;)"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="Text_2" Action="Hide" Condition="(NOT (AUTHMODE=&quot;4&quot;)) OR REGKEYNOTREQUIRED"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="Text_2" Action="Show" Condition="AUTHMODE=&quot;4&quot; AND NOT (REGKEYNOTREQUIRED)"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="Edit_2" Action="Show" Condition="AUTHMODE=&quot;4&quot; AND NOT (REGKEYNOTREQUIRED)"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="Edit_2" Action="Hide" Condition="(NOT (AUTHMODE=&quot;4&quot;)) OR REGKEYNOTREQUIRED"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiControlEventComponent">
     <ROW Dialog_="WelcomeDlg" Control_="Next" Event="NewDialog" Argument="LicenseAgreementDlg" Condition="AI_INSTALL" Ordering="1"/>
+    <ROW Dialog_="FolderDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_INSTALL" Ordering="201"/>
     <ROW Dialog_="FolderDlg" Control_="Back" Event="NewDialog" Argument="LicenseAgreementDlg" Condition="AI_INSTALL" Ordering="1"/>
     <ROW Dialog_="MaintenanceWelcomeDlg" Control_="Next" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="99"/>
     <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_MAINT" Ordering="198"/>
     <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="CustomizeDlg" Condition="AI_MAINT" Ordering="202"/>
     <ROW Dialog_="VerifyReadyDlg" Control_="Install" Event="EndDialog" Argument="Return" Condition="AI_INSTALL" Ordering="197"/>
-    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="NewSeqDialog" Condition="AI_INSTALL" Ordering="201"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="201"/>
     <ROW Dialog_="CustomizeDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_MAINT" Ordering="101"/>
     <ROW Dialog_="CustomizeDlg" Control_="Back" Event="NewDialog" Argument="MaintenanceTypeDlg" Condition="AI_MAINT" Ordering="1"/>
     <ROW Dialog_="MaintenanceTypeDlg" Control_="ChangeButton" Event="NewDialog" Argument="CustomizeDlg" Condition="AI_MAINT" Ordering="501"/>
@@ -357,34 +287,13 @@
     <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="PatchWelcomeDlg" Condition="AI_PATCH" Ordering="203"/>
     <ROW Dialog_="LicenseAgreementDlg" Control_="Next" Event="NewDialog" Argument="FolderDlg" Condition="AI_INSTALL" Ordering="1"/>
     <ROW Dialog_="LicenseAgreementDlg" Control_="Back" Event="NewDialog" Argument="WelcomeDlg" Condition="AI_INSTALL" Ordering="1"/>
-    <ROW Dialog_="NewSeqDialog" Control_="Cancel" Event="SpawnDialog" Argument="CancelDlg" Condition="1" Ordering="100"/>
-    <ROW Dialog_="FolderDlg" Control_="Next" Event="NewDialog" Argument="NewSeqDialog" Condition="AI_INSTALL" Ordering="201"/>
-    <ROW Dialog_="NewSeqDialog" Control_="Next" Event="NewDialog" Argument="NewSeqDialog_1" Condition="AI_INSTALL AND ( AMSSERVERENABLED=&quot;1&quot; AND SERVER )" Ordering="5"/>
-    <ROW Dialog_="NewSeqDialog" Control_="Back" Event="NewDialog" Argument="BrowseDlg" Condition="1" Ordering="1"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="Cancel" Event="SpawnDialog" Argument="CancelDlg" Condition="1" Ordering="1"/>
-    <ROW Dialog_="NewSeqDialog" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="( NOT (AMSSERVERENABLED=&quot;1&quot;) AND AI_INSTALL )" Ordering="6"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="Back" Event="NewDialog" Argument="NewSeqDialog" Condition="AI_INSTALL AND ( AI_INSTALL )" Ordering="1"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_INSTALL AND ( (AUTHMODE=&quot;4&quot; AND (REGISTRATIONKEY OR REGKEYNOTREQUIRED)) OR (AUTHMODE=&quot;2&quot; AND AZUREADTENANTID AND ((VersionNT64 &gt;= 1000) OR (VersionNT &gt;= 1000))) )" Ordering="10"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="Next" Event="DoAction" Argument="ShowTenantRequiredMessage" Condition="AI_INSTALL AND ( (AUTHMODE=&quot;2&quot;) AND ((VersionNT64 &gt;= 1000) OR (VersionNT &gt;= 1000)) AND (NOT AZUREADTENANTID) )" Ordering="9"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="Next" Event="DoAction" Argument="AI_DATA_SETTER" Condition="AI_INSTALL AND ( (AUTHMODE=&quot;2&quot;) AND ((VersionNT64 &gt;= 1000) OR (VersionNT &gt;= 1000)) AND (NOT AZUREADTENANTID) )" Ordering="8"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="Next" Event="DoAction" Argument="ShowRegistrationKeyRequiredMessage" Condition="AI_INSTALL AND ( AUTHMODE=&quot;4&quot; AND NOT REGISTRATIONKEY AND NOT REGKEYNOTREQUIRED )" Ordering="7"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="Next" Event="DoAction" Argument="AI_DATA_SETTER_1" Condition="AI_INSTALL AND ( AUTHMODE=&quot;4&quot; AND NOT REGISTRATIONKEY AND NOT REGKEYNOTREQUIRED )" Ordering="6"/>
-    <ROW Dialog_="NewSeqDialog" Control_="Next" Event="DoAction" Argument="ShowServerRequiredMessage" Condition="AI_INSTALL AND ( AMSSERVERENABLED = &quot;1&quot; AND NOT SERVER )" Ordering="3"/>
-    <ROW Dialog_="NewSeqDialog" Control_="Next" Event="DoAction" Argument="AI_DATA_SETTER_2" Condition="AI_INSTALL AND ( AMSSERVERENABLED = &quot;1&quot; AND NOT SERVER )" Ordering="2"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="NewSeqDialog_1DialogInitializer" Event="[AUTHMODE]" Argument="[AUTHMODE]" Condition="AI_INSTALL" Ordering="0"/>
-    <ROW Dialog_="NewSeqDialog" Control_="NewSeqDialogDialogInitializer" Event="[AMSSERVERENABLED]" Argument="[AMSSERVERENABLED]" Condition="AI_INSTALL" Ordering="0"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="Next" Event="DoAction" Argument="MessageBox" Condition="AI_INSTALL AND ( AUTHMODE = &quot;2&quot; AND NOT ((VersionNT64 &gt;= 1000) OR (VersionNT &gt;= 1000)) )" Ordering="5"/>
-    <ROW Dialog_="NewSeqDialog_1" Control_="Next" Event="DoAction" Argument="AI_DATA_SETTER_3" Condition="AI_INSTALL AND ( AUTHMODE = &quot;2&quot; AND NOT ((VersionNT64 &gt;= 1000) OR (VersionNT &gt;= 1000)) )" Ordering="4"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
     <ROW Directory_="APPDIR" Component_="APPDIR" ManualDelete="true"/>
+    <ROW Directory_="PolicyDefinitions_Dir" Component_="PolicyDefinitions" ManualDelete="true"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCustActComponent">
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Type="51" Source="AI_SETUPEXEPATH_ORIGINAL" Target="[AI_SETUPEXEPATH]"/>
-    <ROW Action="AI_DATA_SETTER" Type="51" Source="CustomActionData" Target="Please specify the Azure tenant ID. From an Azure AD joined or registered machine, you can run dsregcmd /status to obtain the tenant ID |Tenant required |MB_OK,MB_ICONWARNING,MB_DEFBUTTON1|BTN_PRESSED|[CLIENTPROCESSID]"/>
-    <ROW Action="AI_DATA_SETTER_1" Type="51" Source="CustomActionData" Target="Please specify the registration key, which is required to acitvate the agent against the server |Registration key required |MB_OK,MB_ICONWARNING,MB_DEFBUTTON1|BTN_PRESSED|[CLIENTPROCESSID]"/>
-    <ROW Action="AI_DATA_SETTER_2" Type="51" Source="CustomActionData" Target="Please specify the fully-qualified DNS name of the Access Manger Server |Server name required |MB_OK,MB_ICONWARNING,MB_DEFBUTTON1|BTN_PRESSED|[CLIENTPROCESSID]"/>
-    <ROW Action="AI_DATA_SETTER_3" Type="51" Source="CustomActionData" Target="Azure Active Directory integration is support for Windows 10 and higher clients only |Operating system not supported |MB_OK,MB_ICONWARNING,MB_DEFBUTTON1|BTN_PRESSED|[CLIENTPROCESSID]"/>
     <ROW Action="AI_DOWNGRADE" Type="19" Target="4010"/>
     <ROW Action="AI_DetectSoftware" Type="257" Source="SoftwareDetector.dll" Target="OnDetectSoftware"/>
     <ROW Action="AI_DpiContentScale" Type="1" Source="aicustact.dll" Target="DpiContentScale"/>
@@ -395,25 +304,13 @@
     <ROW Action="AI_ResolveKnownFolders" Type="1" Source="aicustact.dll" Target="AI_ResolveKnownFolders"/>
     <ROW Action="AI_SHOW_LOG" Type="65" Source="aicustact.dll" Target="LaunchLogFile" WithoutSeq="true"/>
     <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
-    <ROW Action="FixRegistryProperties" Type="38" Target="Script Text" TargetUnformatted="Session.Property(&quot;AGENTENABLED&quot;) = replace(Session.Property(&quot;AGENTENABLED&quot;),&quot;#&quot;,&quot;&quot;)&#13;&#10;Session.Property(&quot;INTERVAL&quot;) = replace(Session.Property(&quot;INTERVAL&quot;),&quot;#&quot;,&quot;&quot;)&#13;&#10;Session.Property(&quot;AMSSTORAGEENABLED&quot;) = replace(Session.Property(&quot;AMSSTORAGEENABLED&quot;),&quot;#&quot;,&quot;&quot;)&#13;&#10;Session.Property(&quot;REGISTRATIONSTATE&quot;) = replace(Session.Property(&quot;REGISTRATIONSTATE&quot;),&quot;#&quot;,&quot;&quot;)&#13;&#10;Session.Property(&quot;AUTHMODE&quot;) = replace(Session.Property(&quot;AUTHMODE&quot;),&quot;#&quot;,&quot;&quot;)&#13;&#10;Session.Property(&quot;AMSSERVERENABLED&quot;) = replace(Session.Property(&quot;AMSSERVERENABLED&quot;),&quot;#&quot;,&quot;&quot;)&#13;&#10;&#13;&#10;Session.Property(&quot;AZUREADTENANTID&quot;) = GetTenantId(Session.Property(&quot;AZUREADTENANTID&quot;))&#13;&#10;&#13;&#10;Function GetTenantId(tenantId)&#13;&#10;    Const HKEY_CURRENT_USER=&amp;H80000001&#13;&#10;    Const HKEY_LOCAL_MACHINE=&amp;H80000002&#13;&#10;    &#13;&#10;    if len(tenantId) &gt; 0 Then&#13;&#10;        GetTenantId = tenantId&#13;&#10;        Exit Function&#13;&#10;    END IF &#13;&#10;&#13;&#10;    Set oReg = GetObject(&quot;winmgmts:{impersonationLevel=impersonate}!\\.\root\default:StdRegProv&quot;)&#13;&#10;    oReg.EnumKey HKEY_LOCAL_MACHINE, &quot;System\CurrentControlSet\Control\CloudDomainJoin\TenantInfo&quot;, arrSubKeys&#13;&#10;&#13;&#10;    If Not IsNull(arrSubKeys) Then&#13;&#10;        for each subkey in arrSubKeys&#13;&#10;            GetTenantId = subkey&#13;&#10;            Exit Function&#13;&#10;        next&#13;&#10;    end if&#13;&#10;&#13;&#10;    oReg.EnumKey HKEY_CURRENT_USER, &quot;Software\Microsoft\Windows NT\CurrentVersion\WorkplaceJoin\TenantInfo&quot;, arrSubKeys&#13;&#10;&#13;&#10;    If Not IsNull(arrSubKeys) Then&#13;&#10;        for each subkey in arrSubKeys&#13;&#10;            GetTenantId = subkey&#13;&#10;            Exit Function&#13;&#10;        next&#13;&#10;    end if&#13;&#10;End Function&#13;&#10;"/>
-    <ROW Action="MessageBox" Type="65" Source="aicustact.dll" Target="MsgBox" WithoutSeq="true" Options="1" AdditionalSeq="AI_DATA_SETTER_3"/>
     <ROW Action="SET_APPDIR" Type="307" Source="APPDIR" Target="[ProgramFilesFolder][Manufacturer]\[ProductName]" MultiBuildTarget="MSIOnlyBuild_1_2:[ProgramFilesFolder][Manufacturer]\Access Manager Agent"/>
     <ROW Action="SET_SHORTCUTDIR" Type="307" Source="SHORTCUTDIR" Target="[ProgramMenuFolder][ProductName]"/>
     <ROW Action="SET_TARGETDIR_TO_APPDIR" Type="51" Source="TARGETDIR" Target="[APPDIR]"/>
-    <ROW Action="SetRegKeyNotRequiredProperty" Type="51" Source="REGKEYNOTREQUIRED" Target="1"/>
-    <ROW Action="ShowRegistrationKeyRequiredMessage" Type="65" Source="aicustact.dll" Target="MsgBox" WithoutSeq="true" Options="1" AdditionalSeq="AI_DATA_SETTER_1"/>
-    <ROW Action="ShowServerRequiredMessage" Type="65" Source="aicustact.dll" Target="MsgBox" WithoutSeq="true" Options="1" AdditionalSeq="AI_DATA_SETTER_2"/>
-    <ROW Action="ShowTenantRequiredMessage" Type="65" Source="aicustact.dll" Target="MsgBox" WithoutSeq="true" Options="1" AdditionalSeq="AI_DATA_SETTER"/>
-  </COMPONENT>
-  <COMPONENT cid="caphyon.advinst.msicomp.MsiDialogComponent">
-    <ROW Dialog="NewSeqDialog" HCentering="50" VCentering="50" Width="370" Height="270" Attributes="3" Title="[ProductName] [Setup]" Control_Default="Next" Control_Cancel="Cancel"/>
-    <ROW Dialog="NewSeqDialog_1" HCentering="50" VCentering="50" Width="370" Height="270" Attributes="3" Title="[ProductName] [Setup]" Control_Default="Next" Control_Cancel="Cancel"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatCompsComponent">
     <ROW Feature_="MainFeature" Component_="APPDIR"/>
     <ROW Feature_="MainFeature" Component_="ProductInformation"/>
-    <ROW Feature_="AIOtherFiles" Component_="lithnet.accessmanager.agent.admx"/>
-    <ROW Feature_="AIOtherFiles" Component_="lithnet.accessmanager.agent.adml"/>
     <ROW Feature_="MainFeature" Component_="appsettings.json"/>
     <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.dll"/>
     <ROW Feature_="MainFeature" Component_="Lithnet.Security.Authorization.dll"/>
@@ -448,23 +345,31 @@
     <ROW Feature_="MainFeature" Component_="Newtonsoft.Json.dll"/>
     <ROW Feature_="MainFeature" Component_="NLog.dll"/>
     <ROW Feature_="MainFeature" Component_="NLog.Extensions.Logging.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Buffers.dll"/>
     <ROW Feature_="MainFeature" Component_="System.Diagnostics.EventLog.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Memory.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Numerics.Vectors.dll"/>
     <ROW Feature_="MainFeature" Component_="System.Runtime.CompilerServices.Unsafe.dll"/>
     <ROW Feature_="MainFeature" Component_="System.Security.AccessControl.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Security.Cryptography.Cng.dll"/>
     <ROW Feature_="MainFeature" Component_="System.Security.Principal.Windows.dll"/>
     <ROW Feature_="MainFeature" Component_="System.ServiceProcess.ServiceController.dll"/>
     <ROW Feature_="MainFeature" Component_="System.Text.Encodings.Web.dll"/>
     <ROW Feature_="MainFeature" Component_="System.Text.Json.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Threading.Tasks.Extensions.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.ValueTuple.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.Core.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Cryptography.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Shared.dll"/>
-    <ROW Feature_="MainFeature" Component_="Version"/>
-    <ROW Feature_="MainFeature" Component_="lithnet.accessmanager.agent.password.adml"/>
+    <ROW Feature_="MainFeature" Component_="PolicyDefinitions"/>
+    <ROW Feature_="MainFeature" Component_="lithnet.accessmanager.agent.adml"/>
+    <ROW Feature_="MainFeature" Component_="lithnet.accessmanager.agent.admx"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Kernel32.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.NetApi32.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Security.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.Ws2_32.dll"/>
     <ROW Feature_="MainFeature" Component_="CsvHelper.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Security.Cryptography.ProtectedData.dll"/>
     <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Api.Shared.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Http.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.IdentityModel.JsonWebTokens.dll"/>
@@ -488,21 +393,7 @@
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.WlanApi.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.Security.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.SystemServices.dll"/>
-    <ROW Feature_="MainFeature" Component_="RegistrationKey"/>
-    <ROW Feature_="MainFeature" Component_="AmsStorageEnabled"/>
-    <ROW Feature_="MainFeature" Component_="AmsServerManagementEnabled"/>
-    <ROW Feature_="MainFeature" Component_="AuthenticationMode"/>
-    <ROW Feature_="MainFeature" Component_="AzureAdTenantId"/>
-    <ROW Feature_="MainFeature" Component_="Enable"/>
-    <ROW Feature_="MainFeature" Component_="Server"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.Bcl.AsyncInterfaces.dll"/>
-    <ROW Feature_="MainFeature" Component_="System.Buffers.dll"/>
-    <ROW Feature_="MainFeature" Component_="System.Memory.dll"/>
-    <ROW Feature_="MainFeature" Component_="System.Numerics.Vectors.dll"/>
-    <ROW Feature_="MainFeature" Component_="System.Security.Cryptography.Cng.dll"/>
-    <ROW Feature_="MainFeature" Component_="System.Security.Cryptography.ProtectedData.dll"/>
-    <ROW Feature_="MainFeature" Component_="System.Threading.Tasks.Extensions.dll"/>
-    <ROW Feature_="MainFeature" Component_="System.ValueTuple.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>
@@ -522,8 +413,6 @@
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="99"/>
     <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="102"/>
     <ROW Action="AI_DetectSoftware" Sequence="101"/>
-    <ROW Action="SetRegKeyNotRequiredProperty" Condition="REGISTRATIONSTATE = &quot;1&quot; OR REGISTRATIONSTATE = &quot;2&quot;" Sequence="202"/>
-    <ROW Action="FixRegistryProperties" Condition="( ( NOT Installed ) OR ( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) ) ) AND ( 1 )" Sequence="201"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiLaunchConditionsComponent">
     <ROW Condition="( Version9X OR (VersionNT AND (NOT VersionNT64)) )" Description="[ProductName] cannot be installed on [WindowsTypeNT64Display]." DescriptionLocId="AI.LaunchCondition.NoNT64" IsPredefined="true" Builds="MSIOnlyBuild_1_2"/>
@@ -533,34 +422,9 @@
     <ROW Condition="AI_DETECTED_DOTNET_VERSION &gt;= AI_REQUIRED_DOTNET_VERSION" Description="[ProductName] cannot be installed on systems with .NET Framework version lower than [AI_REQUIRED_DOTNET_DISPLAY]." DescriptionLocId="AI.LaunchCondition.DotNET" IsPredefined="true" Builds="MSIOnlyBuild_1_2"/>
     <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]." DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="MSIOnlyBuild_1_2"/>
   </COMPONENT>
-  <COMPONENT cid="caphyon.advinst.msicomp.MsiRadioButtonComponent">
-    <ROW Property="AMSSERVERENABLED" Order="1" Value="0" X="0" Y="1" Width="168" Height="18" Text="Active Directory"/>
-    <ROW Property="AMSSERVERENABLED" Order="2" Value="1" X="0" Y="19" Width="168" Height="18" Text="Access Manager Server"/>
-    <ROW Property="AUTHMODE" Order="1" Value="2" X="0" Y="1" Width="168" Height="18" Text="Azure Active Directory"/>
-    <ROW Property="AUTHMODE" Order="2" Value="4" X="0" Y="19" Width="168" Height="18" Text="Access Manager Authentication"/>
-  </COMPONENT>
-  <COMPONENT cid="caphyon.advinst.msicomp.MsiRegLocatorComponent">
-    <ROW Signature_="AppSearchSign" Root="2" Key="Software\Lithnet\Access Manager Agent" Name="Enabled" Type="2"/>
-    <ROW Signature_="AppSearchSign_1" Root="2" Key="Software\Lithnet\Access Manager Agent" Name="Interval" Type="2"/>
-    <ROW Signature_="AppSearchSign_2" Root="2" Key="Software\Lithnet\Access Manager Agent" Name="AmsPasswordStorageEnabled" Type="2"/>
-    <ROW Signature_="AppSearchSign_3" Root="2" Key="Software\Lithnet\Access Manager Agent" Name="AmsServerManagementEnabled" Type="2"/>
-    <ROW Signature_="AppSearchSign_4" Root="2" Key="Software\Lithnet\Access Manager Agent" Name="Server" Type="2"/>
-    <ROW Signature_="AppSearchSign_5" Root="2" Key="Software\Lithnet\Access Manager Agent" Name="AuthenticationMode" Type="2"/>
-    <ROW Signature_="AppSearchSign_6" Root="2" Key="Software\Lithnet\Access Manager Agent" Name="AzureAdTenantId" Type="2"/>
-    <ROW Signature_="AppSearchSign_7" Root="2" Key="Software\Lithnet\Access Manager Agent" Name="Reset" Type="2"/>
-    <ROW Signature_="AppSearchSign_8" Root="2" Key="Software\Lithnet\Access Manager Agent\State" Name="RegistrationKey" Type="2"/>
-    <ROW Signature_="AppSearchSign_9" Root="2" Key="Software\Lithnet\Access Manager Agent\State" Name="RegistrationState" Type="2"/>
-  </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
-    <ROW Registry="AmsServerManagementEnabled" Root="-1" Key="Software\[Manufacturer]\Access Manager Agent" Name="AmsServerManagementEnabled" Value="#[AMSSERVERENABLED]" Component_="AmsServerManagementEnabled" VirtualValue="#"/>
-    <ROW Registry="AmsStorageEnabled" Root="-1" Key="Software\[Manufacturer]\Access Manager Agent" Name="AmsPasswordStorageEnabled" Value="#[AMSSERVERENABLED]" Component_="AmsStorageEnabled" VirtualValue="#"/>
-    <ROW Registry="AuthenticationMode" Root="-1" Key="Software\[Manufacturer]\Access Manager Agent" Name="AuthenticationMode" Value="#[AUTHMODE]" Component_="AuthenticationMode" VirtualValue="#"/>
-    <ROW Registry="AzureAdTenantId" Root="-1" Key="Software\[Manufacturer]\Access Manager Agent" Name="AzureAdTenantId" Value="[AZUREADTENANTID]" Component_="AzureAdTenantId"/>
-    <ROW Registry="Enable" Root="-1" Key="Software\[Manufacturer]\Access Manager Agent" Name="Enabled" Value="#1" Component_="Enable" VirtualValue="#"/>
     <ROW Registry="Path" Root="-1" Key="Software\[Manufacturer]\Access Manager Agent" Name="Path" Value="[APPDIR]" Component_="ProductInformation"/>
-    <ROW Registry="RegistrationKey" Root="-1" Key="Software\[Manufacturer]\Access Manager Agent\State" Name="RegistrationKey" Value="[REGISTRATIONKEY]" Component_="RegistrationKey"/>
-    <ROW Registry="Server" Root="-1" Key="Software\[Manufacturer]\Access Manager Agent" Name="Server" Value="[SERVER]" Component_="Server"/>
-    <ROW Registry="Version" Root="-1" Key="Software\[Manufacturer]\Access Manager Agent" Name="Version" Value="[ProductVersion]" Component_="Version"/>
+    <ROW Registry="Version" Root="-1" Key="Software\[Manufacturer]\Access Manager Agent" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiServCtrlComponent">
     <ROW ServiceControl="Lithnet.AccessManager.Agent.exe" Name="lithnetama" Event="161" Wait="1" Component_="Lithnet.AccessManager.Agent.exe"/>

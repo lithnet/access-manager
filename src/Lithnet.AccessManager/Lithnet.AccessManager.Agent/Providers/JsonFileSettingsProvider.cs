@@ -38,6 +38,8 @@ namespace Lithnet.AccessManager.Agent.Providers
         public int CheckInIntervalHours => this.agentOptions.CurrentValue.CheckInIntervalHours;
 
         public TimeSpan MetadataCacheDuration => this.agentOptions.CurrentValue.MetadataCacheDuration;
+
+        public bool EnableAdminAccount => this.agentOptions.CurrentValue.EnableAdminAccount;
         
         public string RegistrationKey
         {

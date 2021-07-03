@@ -239,6 +239,18 @@ namespace Lithnet.AccessManager.Agent
                 {
                     await this.passwordStorageProvider.Commit();
                 }
+
+                try
+                {
+                    if (this.agentSettings.EnableAdminAccount)
+                    {
+                        this.passwordChangeProvider.EnsureEnabled();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(EventIDs.EnableAccountFailed, ex, "Failed to enable the local admin account");
+                }
             }
             catch (Exception ex)
             {

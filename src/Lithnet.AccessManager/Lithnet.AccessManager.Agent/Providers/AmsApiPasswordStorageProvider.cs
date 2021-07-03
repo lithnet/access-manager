@@ -33,38 +33,42 @@ namespace Lithnet.AccessManager.Agent
 
             this.logger.LogTrace("Checking to see if a password change is required");
 
-            using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthBearer);
-            using var httpResponseMessage = await client.GetAsync($"agent/password");
-            var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
-
-            if (httpResponseMessage.IsSuccessStatusCode)
+            using (var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthBearer))
             {
-                if (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.NoContent)
+                using (var httpResponseMessage = await client.GetAsync($"agent/password"))
                 {
-                    this.logger.LogTrace("A password change is not currently required");
+                    var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
+
+                    if (httpResponseMessage.IsSuccessStatusCode)
+                    {
+                        if (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.NoContent)
+                        {
+                            this.logger.LogTrace("A password change is not currently required");
+                            return false;
+                        }
+
+                        if (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.ResetContent)
+                        {
+                            this.logger.LogTrace("The server indicated that a password change is required");
+
+                            var response = JsonSerializer.Deserialize<PasswordGetResponse>(responseString, this.jsonOptions);
+
+                            this.ValidatePasswordGetResponse(response);
+
+                            this.encryptionCertificate = new X509Certificate2(Convert.FromBase64String(response.EncryptionCertificate));
+                            this.policy = response.Policy;
+
+                            return true;
+                        }
+
+                        throw new UnexpectedResponseException($"The API returned an unexpected status code of {httpResponseMessage.StatusCode}");
+                    }
+
+                    httpResponseMessage.EnsureSuccessStatusCode(responseString);
+
                     return false;
                 }
-
-                if (httpResponseMessage.StatusCode == System.Net.HttpStatusCode.ResetContent)
-                {
-                    this.logger.LogTrace("The server indicated that a password change is required");
-
-                    var response = JsonSerializer.Deserialize<PasswordGetResponse>(responseString, this.jsonOptions);
-
-                    this.ValidatePasswordGetResponse(response);
-
-                    this.encryptionCertificate = new X509Certificate2(Convert.FromBase64String(response.EncryptionCertificate));
-                    this.policy = response.Policy;
-
-                    return true;
-                }
-
-                throw new UnexpectedResponseException($"The API returned an unexpected status code of {httpResponseMessage.StatusCode}");
             }
-
-            httpResponseMessage.EnsureSuccessStatusCode(responseString);
-
-            return false;
         }
 
         private void ValidatePasswordGetResponse(PasswordGetResponse response)
@@ -103,22 +107,26 @@ namespace Lithnet.AccessManager.Agent
                 PasswordData = this.encryptionProvider.Encrypt(this.encryptionCertificate, password)
             };
 
-            using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthBearer);
-            using var httpResponseMessage = await client.PostAsync($"agent/password", request.AsJsonStringContent());
-
-            var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
-            httpResponseMessage.EnsureSuccessStatusCode(responseString);
-
-            var response = JsonSerializer.Deserialize<PasswordUpdateResponse>(responseString, this.jsonOptions);
-
-            if (response == null)
+            using (var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthBearer))
             {
-                throw new UnexpectedResponseException("The server returned an unexpected response");
+                using (var httpResponseMessage = await client.PostAsync($"agent/password", request.AsJsonStringContent()))
+                {
+
+                    var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
+                    httpResponseMessage.EnsureSuccessStatusCode(responseString);
+
+                    var response = JsonSerializer.Deserialize<PasswordUpdateResponse>(responseString, this.jsonOptions);
+
+                    if (response == null)
+                    {
+                        throw new UnexpectedResponseException("The server returned an unexpected response");
+                    }
+
+                    this.logger.LogTrace("The password details were successfully submitted to the AMS API");
+
+                    this.passwordId = response.PasswordId;
+                }
             }
-
-            this.logger.LogTrace("The password details were successfully submitted to the AMS API");
-
-            this.passwordId = response.PasswordId;
         }
 
         public async Task RollbackPasswordUpdate()
@@ -130,15 +138,19 @@ namespace Lithnet.AccessManager.Agent
                 throw new InvalidOperationException("The rollback operation could not be completed because there was recent password change operation");
             }
 
-            using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthBearer);
-            using var httpResponseMessage = await client.DeleteAsync($"agent/password/{this.passwordId}");
+            using (var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthBearer))
+            {
+                using (var httpResponseMessage = await client.DeleteAsync($"agent/password/{this.passwordId}"))
+                {
 
-            var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
-            httpResponseMessage.EnsureSuccessStatusCode(responseString);
+                    var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
+                    httpResponseMessage.EnsureSuccessStatusCode(responseString);
 
-            this.ResetState();
+                    this.ResetState();
 
-            this.logger.LogTrace("The rollback was completed successfully");
+                    this.logger.LogTrace("The rollback was completed successfully");
+                }
+            }
         }
 
         public Task Commit()

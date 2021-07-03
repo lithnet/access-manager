@@ -22,7 +22,6 @@
         public const int PasswordExpiryCheckFailure = 1014;
         public const int PasswordChangeFailure = 1015;
 
-        public const int JitGroupFound = 1016;
         public const int LapsConflictResolved = 1017;
 
         public const int PasswordChangeNotRequired = 1018;
@@ -38,6 +37,7 @@
         public const int AdCertificatePrivateKeyNotAvailable = 2007;
         public const int ImpersonationFailure = 2008;
         public const int AmsRegistrationInvalidRegistrationKey = 2009;
+        public const int EnableAccountFailed = 2010;
 
         // Warning
         public const int RegistrationNotReady = 3001;

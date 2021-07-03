@@ -24,5 +24,11 @@ namespace Lithnet.AccessManager.Agent
             var sid = this.sam.GetWellKnownSid(WellKnownSidType.AccountAdministratorSid);
             this.sam.SetLocalAccountPassword(sid, password);
         }
+
+        public void EnsureEnabled()
+        {
+            var sid = this.sam.GetWellKnownSid(WellKnownSidType.AccountAdministratorSid);
+            this.sam.EnableLocalAccount(sid);
+        }
     }
 }

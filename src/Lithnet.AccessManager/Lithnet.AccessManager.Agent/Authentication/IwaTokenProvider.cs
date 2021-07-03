@@ -21,7 +21,7 @@ namespace Lithnet.AccessManager.Agent.Authentication
 
         public async Task<string> GetAccessToken()
         {
-            if (!this.settings.AmsServerManagementEnabled|| this.settings.AuthenticationMode != AgentAuthenticationMode.Iwa)
+            if (!this.settings.AmsServerManagementEnabled || this.settings.AuthenticationMode != AgentAuthenticationMode.Iwa)
             {
                 throw new InvalidOperationException("IWA authentication is not enabled");
             }
@@ -41,16 +41,20 @@ namespace Lithnet.AccessManager.Agent.Authentication
 
         private async Task<TokenResponse> RequestAccessToken()
         {
-            using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthIwa);
-            using var httpResponseMessage = await client.GetAsync("auth/iwa");
+            using (var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthIwa))
+            {
+                using (var httpResponseMessage = await client.GetAsync("auth/iwa"))
+                {
 
 
-            var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
-            httpResponseMessage.EnsureSuccessStatusCode(responseString);
+                    var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
+                    httpResponseMessage.EnsureSuccessStatusCode(responseString);
 
-            this.token  = JsonSerializer.Deserialize<TokenResponse>(responseString);
+                    this.token = JsonSerializer.Deserialize<TokenResponse>(responseString);
 
-            return this.token;
+                    return this.token;
+                }
+            }
         }
     }
 }

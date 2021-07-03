@@ -20,7 +20,7 @@ namespace Lithnet.AccessManager.Agent.Providers
         public int Interval => this.policyAgent.GetValue<int>("Interval", this.settingsAgent.GetValue<int>("Interval", 60));
 
         public bool AmsServerManagementEnabled => this.policyAgent.GetValue<bool>("AmsServerManagementEnabled", this.settingsAgent.GetValue<bool>("AmsServerManagementEnabled", false));
-        
+
         public bool Enabled => this.policyAgent.GetValue<bool>("Enabled", this.settingsAgent.GetValue<bool>("Enabled", false));
 
         public bool AmsPasswordStorageEnabled => this.policyAgent.GetValue<bool>("AmsPasswordStorageEnabled", this.settingsAgent.GetValue<bool>("AmsPasswordStorageEnabled", false));
@@ -39,7 +39,9 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         public TimeSpan MetadataCacheDuration => TimeSpan.FromHours(this.policyAgent.GetValue<int>("MetadataCacheDurationHours", this.settingsAgent.GetValue<int>("MetadataCacheDurationHours", 1)));
 
-        public IEnumerable<string> AzureAdTenantIDs => this.AzureAdTenantId?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? new string[0];
+        public bool EnableAdminAccount => this.policyAgent.GetValue<bool>("EnableAdminAccount", this.settingsAgent.GetValue<bool>("EnableAdminAccount", true));
+
+        public IEnumerable<string> AzureAdTenantIDs => this.AzureAdTenantId?.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries) ?? new string[0];
 
         public string RegistrationKey
         {

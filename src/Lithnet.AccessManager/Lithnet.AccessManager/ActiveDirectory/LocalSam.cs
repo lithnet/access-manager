@@ -201,10 +201,30 @@ namespace Lithnet.AccessManager
                 {
                     if (user == null)
                     {
-                        throw new ObjectNotFoundException("The local administrator account could not be found");
+                        throw new ObjectNotFoundException("The account could not be found");
                     }
 
                     user.SetPassword(password);
+                }
+            }
+        }
+
+        public void EnableLocalAccount(SecurityIdentifier sid)
+        {
+            using (var context = new PrincipalContext(ContextType.Machine))
+            {
+                using (var user = UserPrincipal.FindByIdentity(context, IdentityType.Sid, sid.ToString()))
+                {
+                    if (user == null)
+                    {
+                        throw new ObjectNotFoundException("The account could not be found");
+                    }
+
+                    if (!(user.Enabled ?? false))
+                    {
+                        user.Enabled = true;
+                        user.Save();
+                    }
                 }
             }
         }

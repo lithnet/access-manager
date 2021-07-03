@@ -16,6 +16,8 @@ namespace Lithnet.AccessManager.Agent.Configuration
         [JsonIgnore]
         public bool AmsServerManagementEnabled => true;
 
+        public bool EnableAdminAccount { get; set; } = true;
+
         public bool AmsPasswordStorageEnabled { get; set; } = true;
 
         public AgentAuthenticationMode AuthenticationMode { get; set; } = AgentAuthenticationMode.None;

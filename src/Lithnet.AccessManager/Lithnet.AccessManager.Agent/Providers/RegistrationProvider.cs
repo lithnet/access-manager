@@ -42,24 +42,28 @@ namespace Lithnet.AccessManager.Agent
             }
 
             this.logger.LogTrace("Attempting to get the registration status for this agent");
-            using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthAnonymous);
+            using (var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthAnonymous))
+            {
 
-            var cert = await this.authCertProvider.GetOrCreateAgentCertificate();
+                var cert = await this.authCertProvider.GetOrCreateAgentCertificate();
 
-            List<Claim> additionalClaims = new List<Claim>
+                List<Claim> additionalClaims = new List<Claim>
             {
                 new Claim("data", JsonSerializer.Serialize(await this.agentCheckinProvider.GenerateCheckInData())),
             };
 
-            if (!string.IsNullOrWhiteSpace( this.settingsProvider.RegistrationKey))
-            {
-                additionalClaims.Add(new Claim("registration-key", this.settingsProvider.RegistrationKey));
+                if (!string.IsNullOrWhiteSpace(this.settingsProvider.RegistrationKey))
+                {
+                    additionalClaims.Add(new Claim("registration-key", this.settingsProvider.RegistrationKey));
+                }
+
+                var assertion = this.GenerateAssertion(cert, new Uri(client.BaseAddress, "agent/register").ToString(), additionalClaims.ToArray());
+
+                using (var httpResponseMessage = await client.PostAsync($"agent/register", assertion.AsJsonStringContent()))
+                {
+                    return await this.GetRegistrationStateFromHttpResponse(httpResponseMessage);
+                }
             }
-
-            var assertion = this.GenerateAssertion(cert, new Uri(client.BaseAddress, "agent/register").ToString(), additionalClaims.ToArray());
-
-            using var httpResponseMessage = await client.PostAsync($"agent/register", assertion.AsJsonStringContent());
-            return await this.GetRegistrationStateFromHttpResponse(httpResponseMessage);
         }
 
         private async Task<RegistrationState> GetRegistrationStateFromHttpResponse(HttpResponseMessage httpResponseMessage)
@@ -100,7 +104,7 @@ namespace Lithnet.AccessManager.Agent
             {
                 this.logger.LogError(EventIDs.AmsRegistrationInvalidRegistrationKey, "The agent registration request failed because the registration key provided was not accepted");
                 this.settingsProvider.RegistrationState = RegistrationState.Rejected;
-                this.settingsProvider.RegistrationKey = null; 
+                this.settingsProvider.RegistrationKey = null;
                 return this.settingsProvider.RegistrationState;
             }
             else if (httpResponseMessage.StatusCode == HttpStatusCode.NotFound)
@@ -126,20 +130,23 @@ namespace Lithnet.AccessManager.Agent
         public async Task<RegistrationState> RegisterAgent()
         {
             this.logger.LogTrace("Attempting to register the agent");
-            using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthAnonymous);
+            using (var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthAnonymous))
+            {
+                var cert = await this.authCertProvider.GetOrCreateAgentCertificate();
 
-            var cert = await this.authCertProvider.GetOrCreateAgentCertificate();
-
-            List<Claim> additionalClaims = new List<Claim>
+                List<Claim> additionalClaims = new List<Claim>
             {
                 new Claim("data", JsonSerializer.Serialize(await this.agentCheckinProvider.GenerateCheckInData())),
                 new Claim("registration-key", this.settingsProvider.RegistrationKey),
             };
 
-            var assertion = this.GenerateAssertion(cert, new Uri(client.BaseAddress, "agent/register").ToString(), additionalClaims.ToArray());
+                var assertion = this.GenerateAssertion(cert, new Uri(client.BaseAddress, "agent/register").ToString(), additionalClaims.ToArray());
 
-            using var httpResponseMessage = await client.PostAsync($"agent/register", assertion.AsJsonStringContent());
-            return await this.GetRegistrationStateFromHttpResponse(httpResponseMessage);
+                using (var httpResponseMessage = await client.PostAsync($"agent/register", assertion.AsJsonStringContent()))
+                {
+                    return await this.GetRegistrationStateFromHttpResponse(httpResponseMessage);
+                }
+            }
         }
 
         public async Task RegisterSecondaryCredentials()
@@ -150,21 +157,24 @@ namespace Lithnet.AccessManager.Agent
             }
 
             this.logger.LogTrace("Attempting to register the agent secondary credentials");
-            using var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthBearer);
+            using (var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthBearer))
+            {
 
-            var cert = await this.authCertProvider.GetOrCreateAgentCertificate();
-            var assertion = this.GenerateAssertion(cert, new Uri(client.BaseAddress, "agent/register/credential").ToString());
+                var cert = await this.authCertProvider.GetOrCreateAgentCertificate();
+                var assertion = this.GenerateAssertion(cert, new Uri(client.BaseAddress, "agent/register/credential").ToString());
 
-            using var httpResponseMessage = await client.PostAsync($"agent/register/credential", assertion.AsJsonStringContent());
-            httpResponseMessage.EnsureSuccessStatusCode();
+                using (var httpResponseMessage = await client.PostAsync($"agent/register/credential", assertion.AsJsonStringContent()))
+                {
+                    httpResponseMessage.EnsureSuccessStatusCode();
+                }
 
-            this.logger.LogInformation(EventIDs.RegisteredSecondaryCredentials, $"Successfully registered certificate thumbprint {cert.Thumbprint} with the AMS server");
-            this.settingsProvider.HasRegisteredSecondaryCredentials = true;
+                this.logger.LogInformation(EventIDs.RegisteredSecondaryCredentials, $"Successfully registered certificate thumbprint {cert.Thumbprint} with the AMS server");
+                this.settingsProvider.HasRegisteredSecondaryCredentials = true;
+            }
         }
 
         private ClientAssertion GenerateAssertion(X509Certificate2 cert, string audience, params Claim[] additionalClaims)
         {
-            RsaSecurityKey rsaSecurityKey = new RsaSecurityKey(cert.GetRSAPrivateKey());
             string exportedCertificate = Convert.ToBase64String(cert.Export(X509ContentType.Cert));
 
             string issuer = Environment.MachineName;
@@ -179,7 +189,7 @@ namespace Lithnet.AccessManager.Agent
                 Expires = DateTime.UtcNow.AddMinutes(4),
                 Issuer = issuer,
                 Audience = audience,
-                SigningCredentials = new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSsaPssSha384)
+                SigningCredentials = new SigningCredentials(new X509SecurityKey(cert), SecurityAlgorithms.RsaSsaPssSha384)
             };
 
             if (additionalClaims != null)

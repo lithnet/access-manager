@@ -20,7 +20,10 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         public Task AddClaims(SecurityTokenDescriptor token)
         {
-            token.Claims ??= new Dictionary<string, object>();
+            if (token.Claims == null)
+            {
+                token.Claims = new Dictionary<string, object>();
+            }
 
             if (this.settings.AuthenticationMode == AgentAuthenticationMode.Aad)
             {
