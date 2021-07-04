@@ -118,7 +118,7 @@ namespace Lithnet.AccessManager.Api.Controllers
 
         private async Task<TokenResponse> ValidateAadAssertionAsync(X509Certificate2 signingCertificate, string tenantId, string deviceId)
         {
-            this.logger.LogTrace($"Client has presented an Azure AD certificate for authentication of device {deviceId} in tenant {tenantId}");
+            this.logger.LogTrace("Client has presented an Azure AD certificate for authentication of device {deviceId} in tenant {tenantId}", deviceId, tenantId);
 
             if (!Guid.TryParse(tenantId, out _))
             {
@@ -144,7 +144,8 @@ namespace Lithnet.AccessManager.Api.Controllers
 
             ClaimsIdentity identity = device.ToClaimsIdentity();
 
-            this.logger.LogInformation($"Successfully authenticated device {device.ComputerName} ({device.ObjectID}) from AzureAD");
+            this.logger.LogInformation("Authenticated device {device} ({deviceName}) from IP {ip} using AzureAD certificate authentication", device.ObjectID, device.ComputerName, this.Request.HttpContext.Connection.RemoteIpAddress);
+
             return this.tokenGenerator.GenerateToken(identity);
         }
 
@@ -193,7 +194,7 @@ namespace Lithnet.AccessManager.Api.Controllers
 
             ClaimsIdentity identity = device.ToClaimsIdentity();
 
-            this.logger.LogInformation($"Successfully authenticated device {device.ComputerName} ({device.ObjectID}) using a signed assertion");
+            this.logger.LogInformation("Authenticated device {device} ({deviceName}) from IP {ip} using AMS certificate authentication", device.ObjectID, device.ComputerName, this.Request.HttpContext.Connection.RemoteIpAddress);
             return this.tokenGenerator.GenerateToken(identity);
         }
     }

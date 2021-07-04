@@ -69,14 +69,16 @@ namespace Lithnet.AccessManager.Api.Controllers
                     throw new DeviceNotFoundException($"The object with SID {sid} was either not a computer, or could not be found in the domain");
                 }
 
-                this.logger.LogTrace($"Attempting to authenticate {computer.MsDsPrincipalName} using IWA");
+                this.logger.LogTrace("Attempting to authenticate {computerName} using IWA", computer.MsDsPrincipalName);
 
                 IDevice device = await this.devices.GetOrCreateDeviceAsync(computer, this.discoveryServices.GetDomainNameDns(computer.Sid));
                 device.ThrowOnInvalidStateForAuthentication();
 
                 ClaimsIdentity identity = device.ToClaimsIdentity();
+                var token = this.tokenGenerator.GenerateToken(identity);
 
-                return this.Ok(this.tokenGenerator.GenerateToken(identity));
+                this.logger.LogInformation("Authenticated device {device} from IP {ip} using IWA", device.ObjectID, this.Request.HttpContext.Connection.RemoteIpAddress);
+                return this.Ok(token);
             }
             catch (Exception ex)
             {

@@ -34,6 +34,8 @@ namespace Lithnet.AccessManager.Api.Controllers
         {
             try
             {
+                return NotFound();
+
                 List<string> allowedOptions = new List<string>();
 
                 if (this.agentOptions.Value.AllowAzureAdJoinedDeviceAuth)

@@ -18,15 +18,17 @@ namespace Lithnet.AccessManager.Agent.Authentication
         private readonly IAgentSettings settings;
         private readonly IAuthenticationCertificateProvider certProvider;
         private readonly ITokenClaimProvider claimProvider;
+        private readonly IRandomValueGenerator rvg;
 
         private TokenResponse token;
 
-        public X509TokenProvider(IHttpClientFactory httpClientFactory, IAgentSettings settings, IAuthenticationCertificateProvider certProvider, ITokenClaimProvider claimProvider)
+        public X509TokenProvider(IHttpClientFactory httpClientFactory, IAgentSettings settings, IAuthenticationCertificateProvider certProvider, ITokenClaimProvider claimProvider, IRandomValueGenerator rvg)
         {
             this.httpClientFactory = httpClientFactory;
             this.settings = settings;
             this.certProvider = certProvider;
             this.claimProvider = claimProvider;
+            this.rvg = rvg;
         }
 
         public async Task<string> GetAccessToken()
@@ -92,7 +94,7 @@ namespace Lithnet.AccessManager.Agent.Authentication
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim("jti", Guid.NewGuid().ToString()),
+                    new Claim("jti",this.rvg.GenerateRandomString(32)),
                 }),
                 IssuedAt = DateTime.UtcNow,
                 Expires = DateTime.UtcNow.AddMinutes(4),

@@ -48,14 +48,9 @@ namespace Lithnet.AccessManager.Api.Controllers
         {
             try
             {
-                string deviceId = this.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                string deviceId = this.HttpContext.GetDeviceIdOrThrow();
 
-                if (deviceId == null)
-                {
-                    throw new BadRequestException("The device ID was not found in the claim");
-                }
-
-                this.logger.LogTrace($"Checking to see if device {deviceId} requires a password change");
+                this.logger.LogTrace("Checking to see if device {deviceId} requires a password change", deviceId);
                 if (await this.passwordProvider.HasPasswordExpired(deviceId))
                 {
                     this.logger.LogTrace($"Device {deviceId} requires a password change");
@@ -69,7 +64,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                 }
                 else
                 {
-                    this.logger.LogTrace($"Device {deviceId} does not require a password change");
+                    this.logger.LogTrace("Device {deviceId} does not require a password change", deviceId);
                     return this.NoContent();
                 }
             }
@@ -84,12 +79,7 @@ namespace Lithnet.AccessManager.Api.Controllers
         {
             try
             {
-                string deviceId = this.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                if (deviceId == null)
-                {
-                    throw new BadRequestException("The device ID was not found in the claim");
-                }
+                string deviceId = this.HttpContext.GetDeviceIdOrThrow();
 
                 this.ValidatePasswordUpdateRequest(request);
 
@@ -97,12 +87,12 @@ namespace Lithnet.AccessManager.Api.Controllers
 
                 request.ExpiryDate = DateTime.UtcNow.AddDays(policy.MaximumPasswordAgeDays);
 
-                this.logger.LogTrace($"Attempting update for device {deviceId}");
+                this.logger.LogTrace("Attempting update for device {deviceId}", deviceId);
 
                 string passwordId = await this.passwordProvider.UpdateDevicePassword(deviceId, request);
                 await this.passwordProvider.PurgeOldPasswords(deviceId, policy.MinimumNumberOfPasswords, policy.MinimumPasswordHistoryAgeDays);
 
-                this.logger.LogInformation($"Successfully updated password for device {deviceId}. Password ID {passwordId}");
+                this.logger.LogInformation("Successfully updated password for device {deviceId}. Password ID {passwordId}", deviceId, passwordId);
 
                 return this.Json(new PasswordUpdateResponse { PasswordId = passwordId });
             }
@@ -117,18 +107,13 @@ namespace Lithnet.AccessManager.Api.Controllers
         {
             try
             {
-                string deviceId = this.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                string deviceId = this.HttpContext.GetDeviceIdOrThrow();
 
-                if (deviceId == null)
-                {
-                    throw new BadRequestException("The device ID was not found in the claim");
-                }
-
-                this.logger.LogTrace($"Attempting to rollback password ID {requestId} for device {deviceId} ");
+                this.logger.LogTrace("Attempting to rollback password ID {requestId} for device {deviceId}", requestId, deviceId);
 
                 await this.passwordProvider.RevertLastPasswordChange(deviceId, requestId);
 
-                this.logger.LogInformation($"Successfully rolled-back password ID {requestId} for device {deviceId} ");
+                this.logger.LogInformation("Successfully rolled-back password ID {requestId} for device {deviceId}", requestId, deviceId);
 
                 return this.Ok();
             }

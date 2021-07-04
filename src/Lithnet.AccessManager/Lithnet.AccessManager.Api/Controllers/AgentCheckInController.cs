@@ -42,14 +42,8 @@ namespace Lithnet.AccessManager.Api.Controllers
         {
             try
             {
-                string deviceId = this.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                if (deviceId == null)
-                {
-                    throw new BadRequestException("The device ID was not found in the claim");
-                }
-
-                this.logger.LogTrace($"Processing agent update request for {deviceId}");
+                string deviceId = this.HttpContext.GetDeviceIdOrThrow();
+                this.logger.LogTrace("Processing agent update request for {deviceId}", deviceId);
 
                 var device = await this.deviceProvider.GetDeviceAsync(deviceId);
 
@@ -63,8 +57,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                 await this.OverlayAuthorityData(device);
                 await this.deviceProvider.UpdateDeviceAsync(device);
 
-                this.logger.LogTrace($"Agent data updated for {deviceId}");
-
+                this.logger.LogInformation("Agent check-in data updated for {deviceId}", deviceId);
                 return this.NoContent();
             }
             catch (Exception ex)

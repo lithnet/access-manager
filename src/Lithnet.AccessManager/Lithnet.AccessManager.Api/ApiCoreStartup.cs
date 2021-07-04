@@ -17,6 +17,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -73,7 +74,7 @@ namespace Lithnet.AccessManager.Api
             services.AddScoped<IAadGraphApiProvider, AadGraphApiProvider>();
             services.AddScoped<IDevicePasswordProvider, DbDevicePasswordProvider>();
             services.AddScoped<IPasswordPolicyProvider, PasswordPolicyProvider>();
-
+            
             services.AddSingleton<IRegistrationKeyProvider, DbRegistrationKeyProvider>();
             services.AddSingleton<ICheckInDataValidator, CheckInDataValidator>();
             services.AddSingleton<IApiErrorResponseProvider, ApiErrorResponseProvider>();
@@ -124,11 +125,36 @@ namespace Lithnet.AccessManager.Api
 
             services.AddAuthorization(o =>
             {
-                o.AddPolicy(Constants.AuthZPolicyComputers, policy => policy.RequireClaim("object-type", "Computer"));
-                o.AddPolicy(Constants.AuthZPolicyAuthorityAzureAd, policy => policy.RequireClaim("authority-type", AuthorityType.AzureActiveDirectory.ToString()));
-                o.AddPolicy(Constants.AuthZPolicyAuthorityAms, policy => policy.RequireClaim("authority-type", AuthorityType.Ams.ToString()));
-                o.AddPolicy(Constants.AuthZPolicyAuthorityAd, policy => policy.RequireClaim("authority-type", AuthorityType.ActiveDirectory.ToString()));
-                o.AddPolicy(Constants.AuthZPolicyApprovedClient, policy => policy.RequireClaim("approval-state", ApprovalState.Approved.ToString()));
+                o.AddPolicy(Constants.AuthZPolicyComputers, policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireClaim("object-type", "Computer");
+                    policy.RequireClaim(ClaimTypes.NameIdentifier);
+                });
+
+                o.AddPolicy(Constants.AuthZPolicyAuthorityAzureAd, policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireClaim("authority-type", AuthorityType.AzureActiveDirectory.ToString());
+                });
+
+                o.AddPolicy(Constants.AuthZPolicyAuthorityAms, policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireClaim("authority-type", AuthorityType.Ams.ToString());
+                });
+
+                o.AddPolicy(Constants.AuthZPolicyAuthorityAd, policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireClaim("authority-type", AuthorityType.ActiveDirectory.ToString());
+                });
+
+                o.AddPolicy(Constants.AuthZPolicyApprovedClient, policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireClaim("approval-state", ApprovalState.Approved.ToString());
+                });
             });
         }
 
@@ -157,6 +183,18 @@ namespace Lithnet.AccessManager.Api
                     context.Response.ContentType = "application/json";
 
                     await context.Response.WriteAsync(JsonSerializer.Serialize(new ApiError("not-licensed", "The AMS server does not have a license to allow API use")));
+                });
+                return;
+            }
+
+            if (!(agentAuthOptions.Value.AllowAadAuth || agentAuthOptions.Value.AllowX509Auth))
+            {
+                app.Run(async context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+                    context.Response.ContentType = "application/json";
+
+                    await context.Response.WriteAsync(JsonSerializer.Serialize(new ApiError("no-auth", "The AMS server does not have any authentication modes enabled")));
                 });
                 return;
             }

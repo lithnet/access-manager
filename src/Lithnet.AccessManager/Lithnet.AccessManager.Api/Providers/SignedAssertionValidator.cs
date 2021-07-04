@@ -29,7 +29,7 @@ namespace Lithnet.AccessManager.Api.Providers
             handler.ValidateToken(assertion, new TokenValidationParameters()
             {
                 ValidateAudience = true,
-                ValidateLifetime = true, 
+                ValidateLifetime = true,
                 ValidateActor = false,
                 ValidateIssuer = false,
                 ValidateTokenReplay = true,

@@ -20,20 +20,21 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly AmsManagedDeviceRegistrationOptions amsManagedDeviceOptions;
         private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public AmsDirectoryLithnetLapsConfigurationViewModel(IShellExecuteProvider shellExecuteProvider, ApiAuthenticationOptions agentOptions, AmsManagedDeviceRegistrationOptions amsManagedDeviceOptions, EncryptionCertificateComponentViewModel encryptionCertVm)
+        public AmsDirectoryLithnetLapsConfigurationViewModel(IShellExecuteProvider shellExecuteProvider, INotifyModelChangedEventPublisher eventPublisher, ApiAuthenticationOptions agentOptions, AmsManagedDeviceRegistrationOptions amsManagedDeviceOptions, EncryptionCertificateComponentViewModel encryptionCertVm)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.agentOptions = agentOptions;
             this.amsManagedDeviceOptions = amsManagedDeviceOptions;
             this.PasswordEncryption = encryptionCertVm;
             this.DisplayName = "Lithnet LAPS";
+            eventPublisher.Register(this);
         }
 
         public EncryptionCertificateComponentViewModel PasswordEncryption { get; set; }
 
         public string HelpLink => Constants.HelpLinkPageEmail;
 
-        [NotifyModelChangedProperty]
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
         public bool AllowAmsManagedDeviceAuth { get => this.agentOptions.AllowAmsManagedDeviceAuth; set => this.agentOptions.AllowAmsManagedDeviceAuth = value; }
 
         [NotifyModelChangedProperty]

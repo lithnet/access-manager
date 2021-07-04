@@ -120,7 +120,7 @@ namespace Lithnet.AccessManager.Service
                 ArchiveEvery = NLog.Targets.FileArchivePeriod.Day,
                 ArchiveNumbering = NLog.Targets.ArchiveNumberingMode.Date,
                 MaxArchiveFiles = registryProvider.RetentionDays,
-                Layout = "${longdate}|${level:uppercase=true:padding=5}|${logger}|${message}${onexception:inner=${newline}${exception:format=ToString}}"
+                Layout = "${longdate}|${level:uppercase=true:padding=5}|${logger}|${aspnet-request-ip}|${message}${onexception:inner=${newline}${exception:format=ToString}}"
             };
 
             configuration.AddRule(NLog.LogLevel.Trace, NLog.LogLevel.Fatal, jitWorkerLog, "Lithnet.AccessManager.Server.Workers.JitGroupWorker", true);

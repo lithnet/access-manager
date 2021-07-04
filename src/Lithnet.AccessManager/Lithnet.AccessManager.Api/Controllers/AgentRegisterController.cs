@@ -56,9 +56,9 @@ namespace Lithnet.AccessManager.Api.Controllers
             try
             {
                 JwtSecurityToken token = this.assertionValidator.Validate(request.Assertion, "api/v1.0/agent/register/credential", out X509Certificate2 signingCertificate);
-                string deviceId = this.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                string deviceId = this.HttpContext.GetDeviceIdOrThrow();
 
-                this.logger.LogTrace($"Device {deviceId} is attempting to register a set of secondary credentials");
+                this.logger.LogTrace("Device {deviceId} is attempting to register a set of secondary credentials", deviceId);
 
                 IDevice device = await this.devices.GetDeviceAsync(deviceId);
 
@@ -68,12 +68,12 @@ namespace Lithnet.AccessManager.Api.Controllers
 
                     if (existingDevice.ObjectID == device.ObjectID)
                     {
-                        this.logger.LogInformation($"Device {deviceId} requested to add additional credentials with thumbprint {signingCertificate.Thumbprint} but they were already known to the server");
+                        this.logger.LogInformation("Device {deviceId} requested to add additional credentials with thumbprint {thumbprint} but they were already known to the server", deviceId, signingCertificate.Thumbprint);
                         return this.Ok();
                     }
                     else
                     {
-                        this.logger.LogError($"Device {deviceId} requested to add additional credentials with thumbprint {signingCertificate.Thumbprint} but they were already known to the server for a different device {existingDevice.Id}");
+                        this.logger.LogError("Device {deviceId} requested to add additional credentials with thumbprint {thumbprint} but they were already known to the server for a different device {existingDeviceId}", deviceId, signingCertificate.Thumbprint, existingDevice.Id);
                         return this.Conflict();
                     }
                 }
@@ -83,7 +83,7 @@ namespace Lithnet.AccessManager.Api.Controllers
 
                 await this.devices.AddDeviceCredentialsAsync(device, signingCertificate);
 
-                this.logger.LogInformation($"Device {device.ObjectID} from authority {device.AuthorityType}/{device.AuthorityId}/{device.AuthorityDeviceId} has successfully added a secondary credential set with thumbprint {signingCertificate.Thumbprint}");
+                this.logger.LogInformation("Device {deviceId} from authority {authorityType}/{authorityId}/{authorityDeviceId} has successfully added a secondary credential set with thumbprint {thumbprint}", device.ObjectID, device.AuthorityType, device.AuthorityId, device.AuthorityDeviceId, signingCertificate.Thumbprint);
 
                 return this.Ok();
             }
@@ -108,18 +108,18 @@ namespace Lithnet.AccessManager.Api.Controllers
                 try
                 {
                     IDevice existingDevice = await this.devices.GetDeviceAsync(signingCertificate);
-                    this.logger.LogInformation($"An agent requested registration, and its certificate {signingCertificate.Thumbprint} was found in the database with device ID {existingDevice.Id}");
+                    this.logger.LogInformation("An agent requested registration, and its certificate {thumbprint} was found in the database with device ID {deviceId}", signingCertificate.Thumbprint, existingDevice.ObjectID);
                     return this.GetDeviceApprovalResult(existingDevice);
                 }
                 catch (DeviceCredentialsNotFoundException)
                 {
-                    this.logger.LogInformation($"A new agent requested registration with certificate {signingCertificate.Thumbprint}");
+                    this.logger.LogInformation("A new agent requested registration with certificate {thumbprint} from IP {ip}", signingCertificate.Thumbprint, this.HttpContext.Connection.RemoteIpAddress);
                 }
 
                 IDevice device = await this.ValidateRegistrationClaims(token);
                 device = await this.devices.CreateDeviceAsync(device, signingCertificate);
 
-                this.logger.LogInformation($"Created new device {device.ObjectID} associated with the credentials {signingCertificate.Thumbprint}");
+                this.logger.LogInformation("Created new device {deviceId} associated with the credentials {thumbprint}", device.ObjectID, signingCertificate.Thumbprint);
 
                 return this.GetDeviceApprovalResult(device);
             }
@@ -133,20 +133,20 @@ namespace Lithnet.AccessManager.Api.Controllers
         {
             if (device.ApprovalState == ApprovalState.Approved)
             {
-                this.logger.LogInformation($"The device {device.Id} has been approved");
+                this.logger.LogInformation("The device {deviceId} has been approved", device.ObjectID);
                 return this.Json(new RegistrationResponse { State = "approved", ClientId = device.ObjectID });
 
             }
             else if (device.ApprovalState == ApprovalState.Pending)
             {
-                this.logger.LogInformation($"The device {device.Id} is pending approval");
+                this.logger.LogInformation("The device {deviceId} is pending approval", device.ObjectID);
                 JsonResult result = this.Json(new RegistrationResponse { State = "pending", ClientId = device.ObjectID });
                 result.StatusCode = StatusCodes.Status202Accepted;
                 return result;
             }
             else
             {
-                this.logger.LogInformation($"The device {device.Id} has been rejected");
+                this.logger.LogInformation("The device {deviceId} has been rejected", device.ObjectID);
                 JsonResult result = this.Json(new RegistrationResponse { State = "rejected", ClientId = device.ObjectID });
                 result.StatusCode = StatusCodes.Status410Gone;
                 return result;

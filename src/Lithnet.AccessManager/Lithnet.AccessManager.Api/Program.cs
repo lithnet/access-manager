@@ -1,3 +1,4 @@
+using System.IO;
 using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Service;
 using Microsoft.AspNetCore.Hosting;
@@ -19,6 +20,7 @@ namespace Lithnet.AccessManager.Api
             }
             else
             {
+                SetupNLog(registryProvider);
                 CreateDefaultHost(args).Build().Run();
             }
         }
@@ -34,29 +36,49 @@ namespace Lithnet.AccessManager.Api
                 .ConfigureAccessManagerLogging();
         }
 
-        public static IHostBuilder CreateDefaultHost(string[] args) =>
+        public static IHostBuilder CreateDefaultHost(string[] args)
+        {
 
-            Host
-                .CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((hostingContext, config) =>
-                {
-                    config.ConfigureAppSettings();
+            return Host
+                 .CreateDefaultBuilder(args)
+                 .ConfigureAppConfiguration((hostingContext, config) =>
+                 {
+                     config.ConfigureAppSettings();
 
-                    if (args != null)
-                    {
-                        config.AddCommandLine(args);
-                    }
-                })
-                .UseNLog()
-                .ConfigureAccessManagerLogging()
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    var config = new ConfigurationBuilder().ConfigureAppSettings().Build();
+                     if (args != null)
+                     {
+                         config.AddCommandLine(args);
+                     }
+                 })
+                 .UseNLog()
+                 .ConfigureAccessManagerLogging()
+                 .ConfigureWebHostDefaults(webBuilder =>
+                 {
+                     var config = new ConfigurationBuilder().ConfigureAppSettings().Build();
 
-                    webBuilder
-                        .UseHttpSys(config)
-                        .UseStartup<ApiCoreStartup>();
-                })
-                .UseWindowsService();
+                     webBuilder
+                         .UseHttpSys(config)
+                         .UseStartup<ApiCoreStartup>();
+                 })
+                 .UseWindowsService();
+        }
+
+        private static void SetupNLog(RegistryProvider registryProvider)
+        {
+            var configuration = new NLog.Config.LoggingConfiguration();
+
+            var apiLog = new NLog.Targets.FileTarget("access-manager-api")
+            {
+                FileName = Path.Combine(registryProvider.LogPath, "access-manager-api.log"),
+                ArchiveEvery = NLog.Targets.FileArchivePeriod.Day,
+                ArchiveNumbering = NLog.Targets.ArchiveNumberingMode.Date,
+                MaxArchiveFiles = registryProvider.RetentionDays,
+                Layout = "${longdate}|${level:uppercase=true:padding=5}|${logger}|${aspnet-request-ip}|${message}${onexception:inner=${newline}${exception:format=ToString}}"
+            };
+
+            configuration.AddRule(NLog.LogLevel.Trace, NLog.LogLevel.Fatal, apiLog);
+
+            NLog.LogManager.Configuration = configuration;
+        }
     }
 }

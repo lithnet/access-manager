@@ -18,27 +18,28 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ApiAuthenticationOptions agentOptions;
         private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public AzureAdLithnetLapsConfigurationViewModel(IShellExecuteProvider shellExecuteProvider, ApiAuthenticationOptions agentOptions, EncryptionCertificateComponentViewModel encryptionVm)
+        public AzureAdLithnetLapsConfigurationViewModel(IShellExecuteProvider shellExecuteProvider, INotifyModelChangedEventPublisher eventPublisher, ApiAuthenticationOptions agentOptions, EncryptionCertificateComponentViewModel encryptionVm)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.agentOptions = agentOptions;
             this.PasswordEncryption = encryptionVm;
 
             this.DisplayName = "Lithnet LAPS";
+            eventPublisher.Register(this);
         }
 
         public EncryptionCertificateComponentViewModel PasswordEncryption { get; set; }
 
         public string HelpLink => Constants.HelpLinkPageEmail;
 
-        [NotifyModelChangedProperty]
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
         public bool AllowAzureAdJoinedDevices
         {
             get => this.agentOptions.AllowAzureAdJoinedDeviceAuth;
             set => this.agentOptions.AllowAzureAdJoinedDeviceAuth = value;
         }
 
-        [NotifyModelChangedProperty]
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
         public bool AllowAzureAdRegisteredDevices
         {
             get => this.agentOptions.AllowAzureAdRegisteredDeviceAuth;
