@@ -1,6 +1,7 @@
 ﻿using Lithnet.AccessManager.Agent.Providers;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -96,7 +97,6 @@ namespace Lithnet.AccessManager.Agent
 
             request.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(new OidCollection
             {
-                new Oid("1.3.6.1.5.5.7.3.2", "Client authentication"),
                 new Oid(Constants.AgentAuthenticationCertificateOid, "Access Manager Agent Authentication")
             }, true));
             request.CertificateExtensions.Add(new X509KeyUsageExtension(
@@ -153,7 +153,6 @@ namespace Lithnet.AccessManager.Agent
 
                 request.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(new OidCollection
                 {
-                    new Oid("1.3.6.1.5.5.7.3.2", "Client authentication"),
                     new Oid(Constants.AgentAuthenticationCertificateOid, "Access Manager Agent Authentication")
                 }, true));
                 request.CertificateExtensions.Add(new X509KeyUsageExtension(
@@ -180,9 +179,18 @@ namespace Lithnet.AccessManager.Agent
             {
                 store.Open(OpenFlags.ReadOnly);
 
-                foreach (var item in store.Certificates.Find(X509FindType.FindByExtension, oid, false))
+                foreach (var item in store.Certificates.Find(X509FindType.FindByApplicationPolicy, oid, false))
                 {
-                    return item;
+                    foreach (var extension in item.Extensions.OfType<X509EnhancedKeyUsageExtension>())
+                    {
+                        foreach (Oid o in extension.EnhancedKeyUsages)
+                        {
+                            if (o.Value == oid)
+                            {
+                                return item;
+                            }
+                        }
+                    }
                 }
 
                 return null;

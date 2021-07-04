@@ -62,6 +62,25 @@ namespace Lithnet.AccessManager.Api.Controllers
 
                 IDevice device = await this.devices.GetDeviceAsync(deviceId);
 
+                try
+                {
+                    IDevice existingDevice = await this.devices.GetDeviceAsync(signingCertificate);
+
+                    if (existingDevice.ObjectID == device.ObjectID)
+                    {
+                        this.logger.LogInformation($"Device {deviceId} requested to add additional credentials with thumbprint {signingCertificate.Thumbprint} but they were already known to the server");
+                        return this.Ok();
+                    }
+                    else
+                    {
+                        this.logger.LogError($"Device {deviceId} requested to add additional credentials with thumbprint {signingCertificate.Thumbprint} but they were already known to the server for a different device {existingDevice.Id}");
+                        return this.Conflict();
+                    }
+                }
+                catch (DeviceCredentialsNotFoundException)
+                {
+                }
+
                 await this.devices.AddDeviceCredentialsAsync(device, signingCertificate);
 
                 this.logger.LogInformation($"Device {device.ObjectID} from authority {device.AuthorityType}/{device.AuthorityId}/{device.AuthorityDeviceId} has successfully added a secondary credential set with thumbprint {signingCertificate.Thumbprint}");
