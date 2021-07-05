@@ -13,7 +13,6 @@ using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Api.Configuration;
 using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Providers;
 
@@ -32,9 +31,8 @@ namespace Lithnet.AccessManager.Api.Controllers
         private readonly IApiErrorResponseProvider errorProvider;
         private readonly ICheckInDataValidator checkInDataValidator;
         private readonly IRegistrationKeyProvider regKeyProvider;
-        private readonly IOptions<AmsManagedDeviceRegistrationOptions> amsManagedDeviceOptions;
 
-        public AgentRegisterController(ILogger<AgentRegisterController> logger, ISignedAssertionValidator assertionValidator, IDeviceProvider devices, IOptions<ApiAuthenticationOptions> agentOptions, IApiErrorResponseProvider errorProvider, ICheckInDataValidator checkInDataValidator, IRegistrationKeyProvider regKeyProvider, IOptions<AmsManagedDeviceRegistrationOptions> amsManagedDeviceOptions)
+        public AgentRegisterController(ILogger<AgentRegisterController> logger, ISignedAssertionValidator assertionValidator, IDeviceProvider devices, IOptions<ApiAuthenticationOptions> agentOptions, IApiErrorResponseProvider errorProvider, ICheckInDataValidator checkInDataValidator, IRegistrationKeyProvider regKeyProvider)
         {
             this.logger = logger;
             this.assertionValidator = assertionValidator;
@@ -43,7 +41,6 @@ namespace Lithnet.AccessManager.Api.Controllers
             this.errorProvider = errorProvider;
             this.checkInDataValidator = checkInDataValidator;
             this.regKeyProvider = regKeyProvider;
-            this.amsManagedDeviceOptions = amsManagedDeviceOptions;
         }
 
         [HttpPost("credential")]
@@ -161,7 +158,9 @@ namespace Lithnet.AccessManager.Api.Controllers
                 throw new RegistrationKeyValidationException("The registration information did not include a registration key");
             }
 
-            if (!await this.regKeyProvider.ValidateRegistrationKey(registrationKey))
+            var keyDetails = await this.regKeyProvider.ValidateRegistrationKey(registrationKey);
+
+            if (keyDetails == null)
             {
                 throw new RegistrationKeyValidationException("The registration key validation failed");
             }
@@ -185,10 +184,9 @@ namespace Lithnet.AccessManager.Api.Controllers
                 OperatingSystemVersion = checkInData.OperationSystemVersion,
             };
 
-            if (this.amsManagedDeviceOptions.Value.AutoApproveNewDevices)
-            {
-                device.ApprovalState = ApprovalState.Approved;
-            }
+            device.ApprovalState = keyDetails.ApprovalRequired ? ApprovalState.Pending : ApprovalState.Approved;
+
+            this.logger.LogInformation("Validated registration key '{registrationKeyName}' provided by device {deviceName}. Device approval state is {approvalState}", keyDetails.Name, device.Name, device.ApprovalState);
 
             return device;
         }

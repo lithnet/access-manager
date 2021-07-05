@@ -41,6 +41,23 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         public bool EnableAdminAccount => this.policyAgent.GetValue<bool>("EnableAdminAccount", this.settingsAgent.GetValue<bool>("EnableAdminAccount", true));
 
+        public bool Reset
+        {
+            get => this.settingsAgent.GetValue("Reset", false);
+            set => this.settingsAgent.SetValue("Reset", value);
+        }
+
+        public void Clear()
+        {
+            //this.RegistrationKey = null;
+            this.ClientId = null;
+            this.AuthCertificate = null;
+            this.LastCheckIn = new DateTime(0);
+            this.HasRegisteredSecondaryCredentials = false;
+            this.RegistrationState = RegistrationState.NotRegistered;
+        }
+
+
         public IEnumerable<string> AzureAdTenantIDs => this.AzureAdTenantId?.Split(",".ToCharArray(), StringSplitOptions.RemoveEmptyEntries) ?? new string[0];
 
         public string RegistrationKey

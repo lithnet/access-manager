@@ -22,7 +22,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Api.Configuration;
 using Lithnet.AccessManager.Server.Authorization;
 
 namespace Lithnet.AccessManager.Api
@@ -90,7 +89,6 @@ namespace Lithnet.AccessManager.Api
             services.Configure<SignedAssertionValidationOptions>(this.Configuration.GetSection("TokenValidation"));
             services.Configure<DataProtectionOptions>(this.Configuration.GetSection("DataProtection"));
             services.Configure<HostingOptions>(Configuration.GetSection("Hosting"));
-            services.Configure<AmsManagedDeviceRegistrationOptions>(Configuration.GetSection("AmsManagedDevices"));
 
             this.ConfigureAuthentication(services);
         }

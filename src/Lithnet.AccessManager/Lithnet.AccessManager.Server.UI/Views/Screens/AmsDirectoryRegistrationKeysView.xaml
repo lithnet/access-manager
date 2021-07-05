@@ -59,6 +59,9 @@
                         <GridViewColumn Header="Enabled" 
                                     DisplayMemberBinding="{Binding Enabled}" 
                                     Width="Auto"/>
+                        <GridViewColumn Header="Approval Required" 
+                                        DisplayMemberBinding="{Binding ApprovalRequired}" 
+                                        Width="Auto"/>
                         <GridViewColumn Header="Activation limit"
                                             DisplayMemberBinding="{Binding ActivationLimitDescription}" 
                                             Width="Auto"/>

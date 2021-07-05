@@ -1,6 +1,7 @@
 ﻿using Lithnet.AccessManager.Agent.Providers;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -89,6 +90,11 @@ namespace Lithnet.AccessManager.Agent
 
             this.logger.LogTrace($"Created a new authentication certificate {this.settings.AuthCertificate}");
             return Task.FromResult(cert);
+        }
+
+        public void DeleteAgentCertificates()
+        {
+            this.RemoveCertificatesFromStoreByOid(Constants.AgentAuthenticationCertificateOid, StoreLocation.LocalMachine);
         }
 
         public X509Certificate2 CreateSelfSignedCert()
@@ -194,6 +200,28 @@ namespace Lithnet.AccessManager.Agent
                 }
 
                 return null;
+            }
+        }
+
+        private void RemoveCertificatesFromStoreByOid(string oid, StoreLocation storeLocation)
+        {
+            using (X509Store store = new X509Store(StoreName.My, storeLocation))
+            {
+                store.Open(OpenFlags.ReadWrite);
+
+                foreach (var item in store.Certificates.Find(X509FindType.FindByApplicationPolicy, oid, false))
+                {
+                    foreach (var extension in item.Extensions.OfType<X509EnhancedKeyUsageExtension>())
+                    {
+                        foreach (Oid o in extension.EnhancedKeyUsages)
+                        {
+                            if (o.Value == oid)
+                            {
+                                store.Remove(item);
+                            }
+                        }
+                    }
+                }
             }
         }
 

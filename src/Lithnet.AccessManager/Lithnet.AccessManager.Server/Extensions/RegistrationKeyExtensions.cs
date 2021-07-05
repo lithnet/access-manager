@@ -15,11 +15,7 @@ namespace Lithnet.AccessManager.Server
                 command.Parameters.AddWithValue("@ID", key.Id);
             }
 
-            command.Parameters.AddWithValue("@RegistrationKey", key.Key);
-            command.Parameters.AddWithValue("@ActivationLimit", key.ActivationLimit);
-            command.Parameters.AddWithValue("@ActivationCount", key.ActivationCount);
-            command.Parameters.AddWithValue("@Enabled", key.Enabled);
-            command.Parameters.AddWithValue("@RegistrationKeyName", key.Name);
+            key.ToCreateCommandParameters(command);
         }
 
         public static void ToCreateCommandParameters(this IRegistrationKey key, SqlCommand command)
@@ -27,6 +23,7 @@ namespace Lithnet.AccessManager.Server
             command.Parameters.AddWithValue("@RegistrationKey", key.Key);
             command.Parameters.AddWithValue("@ActivationLimit", key.ActivationLimit);
             command.Parameters.AddWithValue("@ActivationCount", key.ActivationCount);
+            command.Parameters.AddWithValue("@ApprovalRequired", key.ApprovalRequired);
             command.Parameters.AddWithValue("@Enabled", key.Enabled);
             command.Parameters.AddWithValue("@RegistrationKeyName", key.Name);
         }

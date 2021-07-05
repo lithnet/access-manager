@@ -18,8 +18,9 @@ namespace Lithnet.AccessManager.Agent
         private readonly IRegistrationProvider registrationProvider;
         private readonly IAgentCheckInProvider checkInProvider;
         private readonly IAadJoinInformationProvider aadJoinInformationProvider;
+        private readonly IAuthenticationCertificateProvider certProvider;
 
-        public AmsLapsAgent(ILogger<AmsLapsAgent> logger, IPasswordGenerator passwordGenerator, IPasswordChangeProvider passwordChangeProvider, IPasswordStorageProvider passwordStorageProvider, IRegistrationProvider registrationProvider, IAgentCheckInProvider checkInProvider, IAadJoinInformationProvider aadJoinInformationProvider, IAgentSettings agentSettings)
+        public AmsLapsAgent(ILogger<AmsLapsAgent> logger, IPasswordGenerator passwordGenerator, IPasswordChangeProvider passwordChangeProvider, IPasswordStorageProvider passwordStorageProvider, IRegistrationProvider registrationProvider, IAgentCheckInProvider checkInProvider, IAadJoinInformationProvider aadJoinInformationProvider, IAgentSettings agentSettings, IAuthenticationCertificateProvider certProvider)
         {
             this.logger = logger;
             this.passwordGenerator = passwordGenerator;
@@ -29,12 +30,18 @@ namespace Lithnet.AccessManager.Agent
             this.checkInProvider = checkInProvider;
             this.aadJoinInformationProvider = aadJoinInformationProvider;
             this.agentSettings = agentSettings;
+            this.certProvider = certProvider;
         }
 
         public async Task DoCheckAsync()
         {
             try
             {
+                if (this.agentSettings.Reset)
+                {
+                    this.Reset();
+                }
+
                 if (await CanContinue())
                 {
                     await this.checkInProvider.CheckinIfRequired();
@@ -63,6 +70,39 @@ namespace Lithnet.AccessManager.Agent
             {
                 this.logger.LogError(EventIDs.ServerConnectionError, $"Unable to connect to the server {this.agentSettings.Server} due to error {s.SocketErrorCode}: {s.Message}");
                 this.logger.LogTrace(s, "Unable to connect to server");
+            }
+        }
+
+        private void Reset()
+        {
+            try
+            {
+                this.agentSettings.Reset = false;
+                this.logger.LogTrace("Agent reset is requested");
+
+                try
+                {
+                    this.agentSettings.Clear();
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(EventIDs.AgentResetFailed, ex, "Reset operation failed. Failed to clear to agent state");
+                }
+
+                try
+                {
+                    this.certProvider.DeleteAgentCertificates();
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogError(EventIDs.AgentResetFailed, ex, "Reset operation failed. Failed to delete AMS certificates");
+                }
+
+                this.logger.LogInformation(EventIDs.AgentResetCompleted, "Agent reset operation completed");
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.AgentResetFailed, ex, "Reset operation failed");
             }
         }
 

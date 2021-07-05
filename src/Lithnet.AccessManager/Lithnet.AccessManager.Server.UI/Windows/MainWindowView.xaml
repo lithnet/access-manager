@@ -107,10 +107,14 @@
                                    IsPaneOpen="True" 
                                    SelectedItem="{Binding Item}"
                                    DisplayMemberPath="DisplayName"
-                                   DisplayMode="Compact"
+                                   DisplayMode="Expanded"
                                    PaneToggleButtonVisibility="Visible"  
                                    ExpandedPaneWidth="300"
+                                   AllowMultipleExpandedItems="True" 
+                                   PaneBackground="{DynamicResource MahApps.HamburgerMenu.Pane.Background}"
+                                   PaneHeaderBackground="{DynamicResource MahApps.HamburgerMenu.Pane.Background}"
                                    
+
         >
 
 
@@ -132,11 +136,11 @@
             </telerik:RadNavigationView.Triggers>-->
             <telerik:RadNavigationView.Resources>
 
-                <Style TargetType="telerik:RadNavigationView" >
+                <!--<Style TargetType="telerik:RadNavigationView" >
                     <Setter Property="PaneBackground" Value="{DynamicResource MahApps.HamburgerMenu.Pane.Background}"/>
                     <Setter Property="PaneHeaderBackground" Value="{DynamicResource MahApps.HamburgerMenu.Pane.Background}"/>
 
-                </Style>
+                </Style>-->
                 <Style TargetType="telerik:RadNavigationViewItem" >
                     <Setter Property="Background" Value="{DynamicResource MahApps.HamburgerMenu.Pane.Background}"/>
                     <Setter Property="BorderThickness" Value="0" />

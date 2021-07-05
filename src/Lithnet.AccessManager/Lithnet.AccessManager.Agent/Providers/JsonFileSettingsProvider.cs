@@ -40,7 +40,19 @@ namespace Lithnet.AccessManager.Agent.Providers
         public TimeSpan MetadataCacheDuration => this.agentOptions.CurrentValue.MetadataCacheDuration;
 
         public bool EnableAdminAccount => this.agentOptions.CurrentValue.EnableAdminAccount;
-        
+
+        public bool Reset { get; set; } = false;
+
+        public void Clear()
+        {
+           // this.RegistrationKey = null;
+            this.ClientId = null;
+            this.RegistrationState = 0;
+            this.AuthCertificate = null;
+            this.LastCheckIn = new DateTime(0);
+            this.HasRegisteredSecondaryCredentials = false;
+        }
+
         public string RegistrationKey
         {
             get => this.appState.Value.RegistrationKey;

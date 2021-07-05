@@ -62,10 +62,16 @@
                                    />
             </StackPanel>
 
-            <Label Grid.Row="4" Grid.Column="0"
+
+            <CheckBox Grid.Row="4" Grid.Column="1" 
+                      Margin="5"
+                      Content="Require manual device approval after registration"
+                      IsChecked="{Binding ApprovalRequired}"/>
+
+            <Label Grid.Row="5" Grid.Column="0"
                    Content="Activation count"
                    Margin="5"/>
-            <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+            <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal">
                 <Label Content="{Binding ActivationCount, Mode=OneWay, FallbackValue=0}"
                          Margin="5"/>
                 <Button Margin="5"

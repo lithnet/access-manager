@@ -24,8 +24,36 @@
             </Button>
             <Label DockPanel.Dock="Left"
                    Style="{DynamicResource DescriptionHeaderStyle}"
-                   Content="Directory configuration" />
+                   Content="Access Manager Directory configuration" />
         </DockPanel>
 
+        <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
+               Content="General settings" />
+
+        <Grid Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="2"
+                       Margin="5"
+                       TextWrapping="Wrap">Enabling support for the Access Manager directory allows support for devices that are not joined to an Active Directory, or Azure Active Directory domain. Standalone Windows devices, as well as MacOS and Linux machines can register with the Access Manager directory using a registration key.</TextBlock>
+
+            <CheckBox Grid.Row="1"
+                      Grid.Column="1"
+                      IsChecked="{Binding AllowAmsManagedDeviceAuth}"
+                      Content="Allow devices to register with AMS"
+                      Margin="5" />
+
+        </Grid>
     </StackPanel>
 </UserControl>

@@ -41,5 +41,9 @@ namespace Lithnet.AccessManager.Agent.Providers
         bool HasRegisteredSecondaryCredentials { get; set; }
 
         bool EnableAdminAccount { get; }
+
+        bool Reset { get; set; }
+
+        void Clear();
     }
 }

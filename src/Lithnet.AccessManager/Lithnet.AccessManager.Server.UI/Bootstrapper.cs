@@ -7,7 +7,6 @@ using System.Windows.Threading;
 using DbUp.Engine.Output;
 using FluentValidation;
 using Lithnet.AccessManager.Api;
-using Lithnet.AccessManager.Api.Configuration;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
@@ -152,7 +151,6 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<TokenIssuerOptions>().ToInstance(appconfig.TokenIssuer);
                 builder.Bind<PasswordPolicyOptions>().ToInstance(appconfig.PasswordPolicy);
                 builder.Bind<ApiAuthenticationOptions>().ToInstance(appconfig.ApiAuthentication);
-                builder.Bind<AmsManagedDeviceRegistrationOptions>().ToInstance(appconfig.AmsManagedDevices);
 
 
                 // ViewModel factories

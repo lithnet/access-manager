@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace Lithnet.AccessManager.Server.Providers
@@ -20,7 +19,7 @@ namespace Lithnet.AccessManager.Server.Providers
             this.rvg = rvg;
         }
 
-        public async Task<bool> ValidateRegistrationKey(string key)
+        public async Task<IRegistrationKey> ValidateRegistrationKey(string key)
         {
             try
             {
@@ -30,7 +29,13 @@ namespace Lithnet.AccessManager.Server.Providers
                 command.CommandType = System.Data.CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@RegistrationKey", key);
 
-                return (int)await command.ExecuteScalarAsync() == 1;
+                await using SqlDataReader reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    return new DbRegistrationKey(reader);
+                }
+
+                throw new InvalidOperationException("The database did not return the record as expected");
             }
             catch (SqlException ex)
             {
@@ -73,7 +78,8 @@ namespace Lithnet.AccessManager.Server.Providers
                 Enabled = key.Enabled,
                 Id = key.Id,
                 Key = key.Key,
-                Name = key.Name
+                Name = key.Name,
+                ApprovalRequired = key.ApprovalRequired
             });
         }
 
@@ -85,6 +91,7 @@ namespace Lithnet.AccessManager.Server.Providers
                 ActivationLimit = 0,
                 ActivationCount = 0,
                 Enabled = true,
+                ApprovalRequired = false
             });
         }
 

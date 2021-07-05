@@ -13,5 +13,7 @@
         bool Enabled { get; set; }
 
         string Name { get; set; }
+
+        public bool ApprovalRequired { get; set; }
     }
 }

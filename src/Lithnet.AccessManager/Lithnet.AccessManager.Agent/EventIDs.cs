@@ -38,6 +38,7 @@
         public const int ImpersonationFailure = 2008;
         public const int AmsRegistrationInvalidRegistrationKey = 2009;
         public const int EnableAccountFailed = 2010;
+        public const int AgentResetFailed = 2011;
 
         // Warning
         public const int RegistrationNotReady = 3001;
@@ -48,6 +49,7 @@
         public const int AmsRegistrationApproved = 4002;
         public const int AmsRegistrationStarting = 4003;
         public const int RegisteredSecondaryCredentials = 4004;
+        public const int AgentResetCompleted = 4005;
 
 
     }

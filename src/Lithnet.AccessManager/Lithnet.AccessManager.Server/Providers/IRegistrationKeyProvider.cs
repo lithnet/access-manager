@@ -5,7 +5,7 @@ namespace Lithnet.AccessManager.Server.Providers
 {
     public interface IRegistrationKeyProvider
     {
-        Task<bool> ValidateRegistrationKey(string key);
+        Task<IRegistrationKey> ValidateRegistrationKey(string key);
 
         IAsyncEnumerable<IRegistrationKey> GetRegistrationKeys();
 

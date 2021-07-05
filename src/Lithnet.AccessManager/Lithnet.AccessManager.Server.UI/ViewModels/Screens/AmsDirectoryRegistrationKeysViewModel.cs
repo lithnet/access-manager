@@ -111,6 +111,7 @@ namespace Lithnet.AccessManager.Server.UI
                 selectedKey.Enabled = vm.Enabled;
                 selectedKey.Key = vm.Key;
                 selectedKey.Name = vm.Name;
+                selectedKey.ApprovalRequired = vm.ApprovalRequired;
                 await this.keyProvider.UpdateRegistrationKey(selectedKey.Model);
             }
         }

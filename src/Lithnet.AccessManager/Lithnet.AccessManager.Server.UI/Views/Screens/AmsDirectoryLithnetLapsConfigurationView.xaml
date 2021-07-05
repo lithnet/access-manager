@@ -26,41 +26,7 @@
                    Style="{DynamicResource DescriptionHeaderStyle}"
                    Content="Lithnet LAPS" />
         </DockPanel>
-
-        <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
-               Content="General settings" />
-
-        <Grid Margin="5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-
-            <TextBlock Grid.Row="2"
-           Grid.Column="0"
-           Grid.ColumnSpan="2"
-           Margin="5"
-           TextWrapping="Wrap">The Lithnet Access Manager Agent allows you to manage the local admin password on standalone devices that are not managed by an Active Directory or Azure Active Directory. These devices must be issued with a registration key to allow them to connect to the AMS server</TextBlock>
-
-            <CheckBox Grid.Row="5"
-                      Grid.Column="1"
-                      IsChecked="{Binding AllowAmsManagedDeviceAuth}"
-                      Content="Allow devices to register with AMS"
-                      Margin="5" />
-
-        </Grid>
-
+   
         <ContentControl s:View.Model="{Binding PasswordEncryption, Mode=OneWay}"  
                         IsTabStop="False"/>
     </StackPanel>

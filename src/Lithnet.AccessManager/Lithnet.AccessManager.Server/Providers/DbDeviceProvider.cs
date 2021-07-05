@@ -158,27 +158,49 @@ namespace Lithnet.AccessManager.Server
 
         public async Task<IDevice> CreateDeviceAsync(IDevice device, X509Certificate2 certificate)
         {
-            device.ThrowIfNull(nameof(device));
-            certificate.ThrowIfNull(nameof(certificate));
+            try
+            {
+                device.ThrowIfNull(nameof(device));
+                certificate.ThrowIfNull(nameof(certificate));
 
-            device.ObjectID ??= Guid.NewGuid().ToString();
-            device.AuthorityDeviceId = device.ObjectID;
-            device.SecurityIdentifier = new System.Security.Principal.SecurityIdentifier($"{SidUtils.AmsSidPrefix}{SidUtils.GuidStringToSidString(device.ObjectID)}");
+                device.ObjectID ??= Guid.NewGuid().ToString();
+                device.AuthorityDeviceId = device.ObjectID;
+                device.SecurityIdentifier = new System.Security.Principal.SecurityIdentifier($"{SidUtils.AmsSidPrefix}{SidUtils.GuidStringToSidString(device.ObjectID)}");
 
-            long authorityKey = await this.GetOrCreateAuthorityKey(Constants.AmsAuthorityId, AuthorityType.Ams);
+                long authorityKey = await this.GetOrCreateAuthorityKey(Constants.AmsAuthorityId, AuthorityType.Ams);
 
-            await using SqlConnection con = this.dbProvider.GetConnection();
+                await using SqlConnection con = this.dbProvider.GetConnection();
 
-            SqlCommand command = new SqlCommand("spCreateDeviceWithCredentials", con);
-            command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@X509Certificate", certificate.Export(X509ContentType.Cert));
-            command.Parameters.AddWithValue("@X509CertificateThumbprint", certificate.GetCertHashString(HashAlgorithmName.SHA256));
-            command.Parameters.AddWithValue("@AuthorityKey", authorityKey);
-            device.ToCreateCommandParameters(command);
+                SqlCommand command = new SqlCommand("spCreateDeviceWithCredentials", con);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@X509Certificate", certificate.Export(X509ContentType.Cert));
+                command.Parameters.AddWithValue("@X509CertificateThumbprint", certificate.GetCertHashString(HashAlgorithmName.SHA256));
+                command.Parameters.AddWithValue("@AuthorityKey", authorityKey);
+                device.ToCreateCommandParameters(command);
 
-            await using SqlDataReader reader = await command.ExecuteReaderAsync();
-            await reader.ReadAsync();
-            return new DbDevice(reader);
+                await using SqlDataReader reader = await command.ExecuteReaderAsync();
+                await reader.ReadAsync();
+                return new DbDevice(reader);
+            }
+            catch (SqlException ex)
+            {
+                if (ex.Number == DbConstants.ErrorRegistrationKeyDisabled)
+                {
+                    throw new RegistrationKeyValidationException($"The registration key provided has been disabled", ex);
+                }
+
+                if (ex.Number == DbConstants.ErrorRegistrationKeyActivationLimitExceeded)
+                {
+                    throw new RegistrationKeyValidationException("The registration key has exceeded the maximum allowed activations", ex);
+                }
+
+                if (ex.Number == DbConstants.ErrorRegistrationKeyNotFound)
+                {
+                    throw new RegistrationKeyValidationException("The registration key provided was not found", ex);
+                }
+
+                throw;
+            }
         }
 
         public async Task AddDeviceCredentialsAsync(IDevice device, X509Certificate2 certificate)

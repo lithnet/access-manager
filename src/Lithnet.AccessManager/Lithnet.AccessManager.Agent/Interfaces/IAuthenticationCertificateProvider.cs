@@ -13,5 +13,6 @@ namespace Lithnet.AccessManager.Agent
       //  Task<X509Certificate2> GetCertificate();
 
         Task<X509Certificate2> GetOrCreateAgentCertificate();
+        void DeleteAgentCertificates();
     }
 }

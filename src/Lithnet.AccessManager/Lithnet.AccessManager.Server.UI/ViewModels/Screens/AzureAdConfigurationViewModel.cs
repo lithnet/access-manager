@@ -22,15 +22,17 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IAadGraphApiProvider graphApiProvider;
         private readonly ILogger<AzureAdConfigurationViewModel> logger;
         private readonly IAmsLicenseManager licenseManager;
+        private readonly ApiAuthenticationOptions agentOptions;
 
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.DirectionsSolid;
 
-        public AzureAdConfigurationViewModel(AzureAdLithnetLapsConfigurationViewModel lithnetLapsVm, AzureAdOptions aadOptions, IDialogCoordinator dialogCoordinator, IAzureAdTenantDetailsViewModelFactory tenantFactory, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IAadGraphApiProvider graphApiProvider, ILogger<AzureAdConfigurationViewModel> logger, IAmsLicenseManager licenseManager)
+        public AzureAdConfigurationViewModel(AzureAdLithnetLapsConfigurationViewModel lithnetLapsVm, AzureAdOptions aadOptions, IDialogCoordinator dialogCoordinator, IAzureAdTenantDetailsViewModelFactory tenantFactory, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IAadGraphApiProvider graphApiProvider, ILogger<AzureAdConfigurationViewModel> logger, IAmsLicenseManager licenseManager, ApiAuthenticationOptions agentOptions)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.graphApiProvider = graphApiProvider;
             this.logger = logger;
             this.licenseManager = licenseManager;
+            this.agentOptions = agentOptions;
             this.dialogCoordinator = dialogCoordinator;
             this.aadOptions = aadOptions;
             this.tenantFactory = tenantFactory;
@@ -48,6 +50,22 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.Tenants = new BindableCollection<AzureAdTenantDetailsViewModel>();
         }
+
+
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
+        public bool AllowAzureAdJoinedDevices
+        {
+            get => this.agentOptions.AllowAzureAdJoinedDeviceAuth;
+            set => this.agentOptions.AllowAzureAdJoinedDeviceAuth = value;
+        }
+
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
+        public bool AllowAzureAdRegisteredDevices
+        {
+            get => this.agentOptions.AllowAzureAdRegisteredDeviceAuth;
+            set => this.agentOptions.AllowAzureAdRegisteredDeviceAuth = value;
+        }
+
 
         protected override void OnInitialActivate()
         {

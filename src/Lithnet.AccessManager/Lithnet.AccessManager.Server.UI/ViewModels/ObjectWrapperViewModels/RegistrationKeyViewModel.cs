@@ -64,6 +64,12 @@ namespace Lithnet.AccessManager.Server.UI
             set => this.Model.Name = value;
         }
 
+        public bool ApprovalRequired
+        {
+            get => this.Model.ApprovalRequired;
+            set => this.Model.ApprovalRequired = value;
+        }
+        
         public void ResetActivationCount()
         {
             this.ActivationCount = 0;

@@ -29,8 +29,8 @@ namespace Lithnet.AccessManager.Server.UI
         private SemaphoreSlim clusterWaitSemaphore;
         private int isUiLocked;
 
-        public MainWindowViewModel(IApplicationConfig model, AuthorizationViewModel authorization, HostingViewModel hosting, 
-           HelpViewModel help,  IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider, ICertificateSynchronizationProvider certSyncProvider, IClusterProvider clusterProvider, ServerConfigurationViewModel serverConfigurationVm, DirectoryConfigurationViewModel directoryVm)
+        public MainWindowViewModel(IApplicationConfig model, AuthorizationViewModel authorization, HostingViewModel hosting,
+           HelpViewModel help, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider, ICertificateSynchronizationProvider certSyncProvider, IClusterProvider clusterProvider, ServerConfigurationViewModel serverConfigurationVm, DirectoryConfigurationViewModel directoryVm)
         {
             this.model = model;
             this.shellExecuteProvider = shellExecuteProvider;
@@ -48,13 +48,9 @@ namespace Lithnet.AccessManager.Server.UI
             this.eventAggregator.Subscribe(this);
             this.DisplayName = Constants.AppName;
 
+
             this.Items.Add(serverConfigurationVm);
             this.Items.Add(directoryVm);
-            //this.Items.Add(new MenuItemViewModel(laps.Icon, "Password management", new List<object> { laps, pmgmt }));
-
-            //this.Items.Add(regKeys);
-           // this.Items.Add(jit);
-           // this.Items.Add(bitLocker);
             this.Items.Add(authorization);
 
 

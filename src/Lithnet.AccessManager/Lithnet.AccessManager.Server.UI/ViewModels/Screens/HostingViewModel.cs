@@ -101,8 +101,7 @@ namespace Lithnet.AccessManager.Server.UI
         [NotifyModelChangedProperty]
         public string ApiHostname { get => this.WorkingModel.HttpSys.ApiHostname; set => this.WorkingModel.HttpSys.ApiHostname = value; }
 
-        //public PackIconMaterialKind Icon => PackIconMaterialKind.Web;
-        public object Icon => null;
+        public PackIconMaterialKind Icon => PackIconMaterialKind.Web;
 
         public bool IsCertificateCurrent { get; set; }
 
