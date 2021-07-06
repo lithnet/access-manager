@@ -2,7 +2,11 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
-             xmlns:s="https://github.com/canton7/Stylet">
+             xmlns:s="https://github.com/canton7/Stylet"
+    xmlns:themes="http://schemas.telerik.com/2008/xaml/presentation"
+    xmlns:telerik1="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls"
+    xmlns:helpers="clr-namespace:Telerik.Windows.Controls.Theming.Helpers;assembly=Telerik.Windows.Controls"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime">
     <Application.Resources>
         <s:ApplicationLoader>
             <s:ApplicationLoader.Bootstrapper>
@@ -14,9 +18,10 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.TabControl.xaml" />
+                <ResourceDictionary Source="ResourceDictionaries/NavigationViewItemStyle.xaml"/>
                 <ResourceDictionary>
                     <Style x:Key="DescriptionHeaderStyle"
-                               BasedOn="{StaticResource {x:Type Label}}"
+                               BasedOn="{StaticResource {x:Type Label}}" 
                                TargetType="{x:Type Label}">
                         <Setter Property="FontSize" Value="22" />
                         <Setter Property="HorizontalAlignment" Value="Left" />
@@ -35,8 +40,5 @@
                 </ResourceDictionary>
             </s:ApplicationLoader.MergedDictionaries>
         </s:ApplicationLoader>
-
-
-
     </Application.Resources>
 </Application>

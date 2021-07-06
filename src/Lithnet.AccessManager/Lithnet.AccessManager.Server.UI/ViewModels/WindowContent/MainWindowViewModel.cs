@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.ServiceProcess;
 using System.Threading;
@@ -16,7 +15,6 @@ namespace Lithnet.AccessManager.Server.UI
     public class MainWindowViewModel : Conductor<PropertyChangedBase>.Collection.OneActive, IHandle<ModelChangedEvent>
     {
         private readonly IApplicationConfig model;
-        private readonly IEventAggregator eventAggregator;
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly ILogger<MainWindowViewModel> logger;
         private readonly IShellExecuteProvider shellExecuteProvider;
@@ -39,22 +37,21 @@ namespace Lithnet.AccessManager.Server.UI
             this.windowsServiceProvider = windowsServiceProvider;
             this.hosting = hosting;
             this.registryProvider = registryProvider;
-            this.eventAggregator = eventAggregator;
             this.certSyncProvider = certSyncProvider;
             this.dialogCoordinator = dialogCoordinator;
             this.clusterProvider = clusterProvider;
             this.clusterWaitSemaphore = new SemaphoreSlim(0, 1);
 
-            this.eventAggregator.Subscribe(this);
+            eventAggregator.Subscribe(this);
             this.DisplayName = Constants.AppName;
 
 
             this.Items.Add(serverConfigurationVm);
             this.Items.Add(directoryVm);
-            this.Items.Add(authorization);
+            this.Items.Add(authorization); 
+            this.Items.Add(help);
 
-
-            this.OptionItems = new BindableCollection<PropertyChangedBase> { help };
+            this.Item = this.Items.First();
 
             this.ActiveItem = this.Items.First();
 
