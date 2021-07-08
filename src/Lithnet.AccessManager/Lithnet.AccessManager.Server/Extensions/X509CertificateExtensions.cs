@@ -12,7 +12,7 @@ namespace Lithnet.AccessManager.Server
         public static FileSecurity GetPrivateKeySecurity(this X509Certificate2 cert)
         {
             string location = GetPrivateKeyPath(cert);
-            
+
             if (location == null)
             {
                 throw new CertificateNotFoundException("The certificate private key was not found");
@@ -50,10 +50,10 @@ namespace Lithnet.AccessManager.Server
 
         public static string GetPrivateKeyPath(X509Certificate2 cert)
         {
-            RSACng cng = cert.PrivateKey as RSACng;
-            RSACryptoServiceProvider crypto = cert.PrivateKey as RSACryptoServiceProvider;
+            CngKey cng = GetPrivateKey(cert);
+            RSACryptoServiceProvider crypto = GetLegacyPrivateKey(cert);
 
-            string name = cng?.Key?.UniqueName ?? crypto?.CspKeyContainerInfo?.UniqueKeyContainerName;
+            string name = cng?.UniqueName ?? crypto?.CspKeyContainerInfo?.UniqueKeyContainerName;
 
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -80,6 +80,36 @@ namespace Lithnet.AccessManager.Server
         public static string Sha256Thumbprint(this X509Certificate2 cert)
         {
             return cert.GetCertHashString(HashAlgorithmName.SHA256);
+        }
+
+        private static RSACryptoServiceProvider GetLegacyPrivateKey(X509Certificate2 cert)
+        {
+            try
+            {
+                return cert.PrivateKey as RSACryptoServiceProvider;
+            }
+            catch
+            {
+                //ignore
+            }
+
+            return null;
+        }
+
+        public static CngKey GetPrivateKey(X509Certificate2 cert)
+        {
+            if (cert.PublicKey.Oid.Value == "1.2.840.10045.2.1")
+            {
+                return ((ECDsaCng)cert.GetECDsaPrivateKey()).Key;
+            }
+
+            if (cert.PublicKey.Oid.Value == "1.2.840.113549.1.1.1")
+
+            {
+                return ((RSACng)cert.GetRSAPrivateKey()).Key;
+            }
+
+            return null;
         }
     }
 }
