@@ -19,6 +19,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Light.Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.TabControl.xaml" />
                 <ResourceDictionary Source="ResourceDictionaries/NavigationViewItemStyle.xaml"/>
+                <ResourceDictionary Source="ResourceDictionaries/Icons.xaml"/>
                 <ResourceDictionary>
                     <Style x:Key="DescriptionHeaderStyle"
                                BasedOn="{StaticResource {x:Type Label}}" 

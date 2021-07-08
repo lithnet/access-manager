@@ -18,7 +18,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
 
-        public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.SitemapSolid;
+        public PackIconBoxIconsKind Icon => PackIconBoxIconsKind.RegularBookContent;
 
         public ActiveDirectoryConfigurationViewModel(ActiveDirectoryMicrosoftLapsConfigurationViewModel msLapsVm, ActiveDirectoryLithnetLapsConfigurationViewModel lithnetLapsVm, ActiveDirectoryBitLockerViewModel bitLockerVm, ActiveDirectoryJitConfigurationViewModel jitVm, IActiveDirectoryDomainPermissionViewModelFactory domainFactory, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<ActiveDirectoryConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IScriptTemplateProvider scriptTemplateProvider)
         {

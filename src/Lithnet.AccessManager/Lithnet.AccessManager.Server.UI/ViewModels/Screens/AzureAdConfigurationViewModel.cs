@@ -7,6 +7,8 @@ using Stylet;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
 using Lithnet.AccessManager.Enterprise;
 using Microsoft.Extensions.Logging;
 
@@ -24,7 +26,12 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IAmsLicenseManager licenseManager;
         private readonly ApiAuthenticationOptions agentOptions;
 
-        public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.DirectionsSolid;
+        private ImageSource ResourcePathToImageSource(string resourcesName)
+        {
+            return (DrawingImage)Application.Current.TryFindResource(resourcesName);
+        }
+
+        public object Icon => PackIconMaterialKind.Triangle;
 
         public AzureAdConfigurationViewModel(AzureAdLithnetLapsConfigurationViewModel lithnetLapsVm, AzureAdOptions aadOptions, IDialogCoordinator dialogCoordinator, IAzureAdTenantDetailsViewModelFactory tenantFactory, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IAadGraphApiProvider graphApiProvider, ILogger<AzureAdConfigurationViewModel> logger, IAmsLicenseManager licenseManager, ApiAuthenticationOptions agentOptions)
         {

@@ -25,6 +25,6 @@ namespace Lithnet.AccessManager.Server.UI
         [NotifyModelChangedProperty(RequiresServiceRestart = true)]
         public bool AllowAmsManagedDeviceAuth { get => this.agentOptions.AllowAmsManagedDeviceAuth; set => this.agentOptions.AllowAmsManagedDeviceAuth = value; }
 
-        public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.SitemapSolid;
+        public PackIconMaterialKind Icon => PackIconMaterialKind.ShieldLock;
     }
 }

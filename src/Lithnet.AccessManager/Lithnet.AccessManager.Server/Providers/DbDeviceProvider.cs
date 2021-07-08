@@ -42,6 +42,56 @@ namespace Lithnet.AccessManager.Server
             return devices;
         }
 
+        public async IAsyncEnumerable<IDevice> GetDevices(int startIndex, int count)
+        {
+            await using SqlConnection con = this.dbProvider.GetConnection();
+
+            SqlCommand command = new SqlCommand("spGetDevicesByPage", con);
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@startIndex", startIndex);
+            command.Parameters.AddWithValue("@rows", count);
+
+            await using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                yield return new DbDevice(reader);
+            }
+        }
+
+        public async Task ApproveDevice(string deviceId)
+        {
+            await using SqlConnection con = this.dbProvider.GetConnection();
+
+            SqlCommand command = new SqlCommand("spApproveDevice", con);
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@ObjectId", deviceId);
+
+            await command.ExecuteNonQueryAsync();
+        }
+
+        public async Task DeleteDevice(string deviceId)
+        {
+            await using SqlConnection con = this.dbProvider.GetConnection();
+
+            SqlCommand command = new SqlCommand("spDeleteDevice", con);
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@ObjectId", deviceId);
+
+            await command.ExecuteNonQueryAsync();
+        }
+
+        public async Task RejectDevice(string deviceId)
+        {
+            await using SqlConnection con = this.dbProvider.GetConnection();
+
+            SqlCommand command = new SqlCommand("spRejectDevice", con);
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@ObjectId", deviceId);
+
+            await command.ExecuteNonQueryAsync();
+        }
+
         public async Task<IDevice> GetOrCreateDeviceAsync(Microsoft.Graph.Device aadDevice, string authorityId)
         {
             authorityId.ThrowIfNull(nameof(authorityId));

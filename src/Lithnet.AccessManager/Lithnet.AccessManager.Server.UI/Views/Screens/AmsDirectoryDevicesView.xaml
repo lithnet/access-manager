@@ -8,24 +8,119 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:views="clr-namespace:Lithnet.AccessManager.Server.UI.Views"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
              dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d"
              d:DesignWidth="800"
+             d:DesignHeight="400"
              Margin="5">
-    <StackPanel>
-        <DockPanel>
-            <Button DockPanel.Dock="Right"
-                    Margin="5"
-                    Click="{s:Action Help}"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Focusable="False">
-                <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
-            </Button>
-            <Label DockPanel.Dock="Left"
-                   Style="{DynamicResource DescriptionHeaderStyle}"
-                   Content="Directory configuration" />
-        </DockPanel>
 
-    </StackPanel>
+    <views:CanvasEx>
+        <Grid Height="{Binding Path=BindableActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}"
+              Width="{Binding Path=BindableActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <DockPanel Grid.Row="0">
+                <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
+                    <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
+                </Button>
+                <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Devices" />
+            </DockPanel>
+
+            <TextBlock Grid.Row="1"
+                       Margin="10 5 5 5"
+                       TextWrapping="Wrap">
+            </TextBlock>
+
+            <telerik:RadGridView  Grid.Row="2"
+                                  Margin="10 5 5 5"
+                                  ItemsSource="{Binding Devices}"
+                                  SelectedItem="{Binding SelectedItem}" 
+                                  SelectionUnit="FullRow"
+                                  AutoGenerateColumns="False"
+                                  ShowGroupPanel="False"
+                                  ShowSearchPanel="True"
+                                  CanUserDeleteRows="False"
+                                  CanUserInsertRows="False"
+                                  IsReadOnly="True"
+                                  EnableRowVirtualization="True"
+                                  LeftFrozenColumnCount="1"
+                                  FrozenColumnsSplitterVisibility="Hidden"
+                                  SelectionMode="Extended"
+                                  >
+                <b:Interaction.Behaviors>
+                    <local:SelectedItemsBehavior SelectedItems="{Binding SelectedItems}" />
+                </b:Interaction.Behaviors>
+
+                <telerik:RadGridView.Resources>
+                    <ResourceDictionary Source="pack://application:,,,/Telerik.Windows.Themes.Office2019;component/Themes/Telerik.Windows.Controls.GridView.xaml"/>
+                </telerik:RadGridView.Resources>
+                <telerik:RadGridView.Columns>
+                    <telerik:GridViewDataColumn DataMemberBinding="{Binding DisplayName}" Header="NAME" />
+                    <telerik:GridViewDataColumn DataMemberBinding="{Binding AgentVersion}" Header="AGENT VERSION"/>
+                    <telerik:GridViewDataColumn DataMemberBinding="{Binding Modified}" Header="LAST CHECK-IN"/>
+                    <telerik:GridViewDataColumn DataMemberBinding="{Binding ApprovalState}" Header="APPROVAL STATE"/>
+                    <telerik:GridViewDataColumn DataMemberBinding="{Binding OperatingSystemFamily}" Header="OS"/>
+                    <telerik:GridViewDataColumn DataMemberBinding="{Binding OperatingSystemVersion}" Header="OS VERSION"/>
+                </telerik:RadGridView.Columns>
+            </telerik:RadGridView>
+            <!--<ListView Grid.Row="3"
+                BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
+                  ItemsSource="{Binding Devices}"
+                  SelectedItem="{Binding SelectedItem}"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                  Height="Auto"
+                  VerticalAlignment="Stretch"
+                  MouseDoubleClick="{s:Action ViewDevice}"
+                  Margin="10 5 5 5">
+                <b:Interaction.Behaviors>
+                    <local:ListViewScrollBarBehavior />
+                </b:Interaction.Behaviors>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Device name" 
+                                            DisplayMemberBinding="{Binding DisplayName}" 
+                                            Width="Auto"/>
+                        <GridViewColumn Header="Agent Version"
+                                            DisplayMemberBinding="{Binding AgentVersion}" 
+                                            Width="Auto"/>
+                        <GridViewColumn Header="Last check-in"
+                                            DisplayMemberBinding="{Binding Modified}" 
+                                            Width="Auto"/>
+                        <GridViewColumn Header="Approval state"
+                                    DisplayMemberBinding="{Binding ApprovalState}" 
+                                    Width="Auto"/>
+                        <GridViewColumn Header="OS"
+                                    DisplayMemberBinding="{Binding OperatingSystemFamily}" 
+                                    Width="Auto"/>
+                        <GridViewColumn Header="OS Version"
+                                    DisplayMemberBinding="{Binding OperatingSystemVersion}" 
+                                    Width="Auto"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>-->
+
+            <StackPanel Grid.Row="3"
+                Orientation="Horizontal"
+                    Margin="10 5 5 5">
+                <Button Command="{s:Action ApproveDevice}" 
+                    Content="Approve" 
+                    Margin="5"/>
+                <Button Command="{s:Action RejectDevice}" 
+                    Content="Reject" 
+                    Margin="5"/>
+                <Button Command="{s:Action DeleteDevice}"
+                    Content="Delete..."
+                    Margin="5"/>
+
+            </StackPanel>
+        </Grid>
+    </views:CanvasEx>
 </UserControl>

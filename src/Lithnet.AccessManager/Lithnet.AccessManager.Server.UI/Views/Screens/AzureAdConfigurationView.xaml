@@ -29,6 +29,7 @@
 
         <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
                Content="General settings" />
+<Image Source="{StaticResource ams }" Height="26" Width="26"/>
 
         <Grid Margin="5">
             <Grid.ColumnDefinitions>
