@@ -6,14 +6,14 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class SelectTargetTypeViewModelFactory : ISelectTargetTypeViewModelFactory
+    public class SelectTargetTypeViewModelFactory : IViewModelFactory<SelectTargetTypeViewModel>
     {
         private readonly AzureAdOptions azureAdOptions;
         private readonly ApiAuthenticationOptions apiOptions;
         private readonly IDomainTrustProvider domainTrustProvider;
-        private readonly IAzureAdTenantDetailsViewModelFactory aadTenantViewModelFactory;
+        private readonly IViewModelFactory<AzureAdTenantDetailsViewModel, AzureAdTenantDetails> aadTenantViewModelFactory;
 
-        public SelectTargetTypeViewModelFactory(AzureAdOptions azureAdOptions, ApiAuthenticationOptions apiOptions, IAzureAdTenantDetailsViewModelFactory aadTenantViewModelFactory, IDomainTrustProvider domainTrustProvider)
+        public SelectTargetTypeViewModelFactory(AzureAdOptions azureAdOptions, ApiAuthenticationOptions apiOptions, IViewModelFactory<AzureAdTenantDetailsViewModel, AzureAdTenantDetails> aadTenantViewModelFactory, IDomainTrustProvider domainTrustProvider)
         {
             this.azureAdOptions = azureAdOptions;
             this.apiOptions = apiOptions;

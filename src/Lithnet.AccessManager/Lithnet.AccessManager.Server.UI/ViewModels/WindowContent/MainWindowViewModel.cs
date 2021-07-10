@@ -51,7 +51,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.Items.Add(authorization); 
             this.Items.Add(help);
 
-            this.Item = this.Items.First();
+            this.CurrentItem = this.Items.First();
 
             this.ActiveItem = this.Items.First();
 
@@ -62,7 +62,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         private object ai;
 
-        public object Item
+        public object CurrentItem
         {
             get => this.ai;
             set

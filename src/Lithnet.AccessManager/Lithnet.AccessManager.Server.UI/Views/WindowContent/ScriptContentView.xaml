@@ -11,19 +11,28 @@
              mc:Ignorable="d" 
              d:DesignWidth="600">
     <AdornerDecorator>
-        <StackPanel>
-            <TextBlock TextWrapping="Wrap"
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       TextWrapping="Wrap"
                        Text="{Binding HelpText, Mode=OneWay}"
                        Margin="5"/>
-            <TextBox Margin="5"
+            <TextBox Grid.Row="1"
+                Margin="5"
                      Text="{Binding ScriptText, Mode=OneWay}"
-                     Height="300"
+                     
                      HorizontalScrollBarVisibility="Auto"
                      VerticalScrollBarVisibility="Auto"
                      FontFamily="Consolas,Courier New"
                      IsReadOnly="True"/>
 
-            <StackPanel Orientation="Horizontal"
+            <StackPanel Grid.Row="2"
+                Orientation="Horizontal"
                         HorizontalAlignment="Right">
                 <Button Command="{s:Action Save}"
                         Content="Save script as..."
@@ -34,6 +43,6 @@
                         Margin="5"
                         VerticalAlignment="Top"/>
             </StackPanel>
-        </StackPanel>
+        </Grid>
     </AdornerDecorator>
 </UserControl>

@@ -190,28 +190,29 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task ApplyNewLicense()
         {
-            LicenseKeyViewModel vm = new LicenseKeyViewModel();
-            ExternalDialogWindow window = new ExternalDialogWindow
-            {
-                DataContext = vm,
-                Height = 600,
-                SaveButtonName = "OK"
-            };
-
-            if (window.ShowDialog() == false)
-            {
-                return;
-            }
-
-            string data = vm.LicenseKeyData;
-
-            if (string.IsNullOrWhiteSpace(data))
-            {
-                return;
-            }
-
             try
             {
+                LicenseKeyViewModel vm = new LicenseKeyViewModel();
+                ExternalDialogWindow window = new ExternalDialogWindow
+                {
+                    DataContext = vm,
+                    Height = 600,
+                    SaveButtonName = "OK"
+                };
+
+                if (window.ShowDialog() == false)
+                {
+                    return;
+                }
+
+                string data = vm.LicenseKeyData;
+
+                if (string.IsNullOrWhiteSpace(data))
+                {
+                    return;
+                }
+
+
                 data = data.Trim().Replace("\r", "").Replace("\n", "").Replace(" ", "").Replace("\t", "");
 
                 var validationResult = this.licenseManager.ValidateLicense(data);

@@ -6,7 +6,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class JitGroupMappingViewModelFactory : IJitGroupMappingViewModelFactory
+    public class JitGroupMappingViewModelFactory : IViewModelFactory<JitGroupMappingViewModel, JitGroupMapping>
     {
         private readonly Func<IModelValidator<JitGroupMappingViewModel>> validator;
         private readonly ILogger<JitGroupMappingViewModel> logger;

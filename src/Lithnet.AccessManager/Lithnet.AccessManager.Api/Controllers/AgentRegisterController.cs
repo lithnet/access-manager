@@ -58,6 +58,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                 this.logger.LogTrace("Device {deviceId} is attempting to register a set of secondary credentials", deviceId);
 
                 IDevice device = await this.devices.GetDeviceAsync(deviceId);
+                device.ThrowOnDeviceDisabled();
 
                 try
                 {
@@ -105,6 +106,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                 try
                 {
                     IDevice existingDevice = await this.devices.GetDeviceAsync(signingCertificate);
+                    existingDevice.ThrowOnDeviceDisabled();
                     this.logger.LogInformation("An agent requested registration, and its certificate {thumbprint} was found in the database with device ID {deviceId}", signingCertificate.Thumbprint, existingDevice.ObjectID);
                     return this.GetDeviceApprovalResult(existingDevice);
                 }

@@ -5,6 +5,7 @@ using Lithnet.AccessManager.Api;
 using MahApps.Metro.IconPacks;
 using Stylet;
 using System.Threading.Tasks;
+using System.Windows;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using MahApps.Metro.Controls.Dialogs;
@@ -16,7 +17,7 @@ namespace Lithnet.AccessManager.Server.UI
     public class EncryptionCertificateComponentViewModel : Screen
     {
         private readonly ICertificateProvider certificateProvider;
-        private readonly IX509Certificate2ViewModelFactory certificate2ViewModelFactory;
+        private readonly IViewModelFactory<X509Certificate2ViewModel, X509Certificate2> certificate2ViewModelFactory;
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly ILogger<EncryptionCertificateComponentViewModel> logger;
         private readonly ICertificatePermissionProvider certPermissionProvider;
@@ -24,7 +25,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly INotifyModelChangedEventPublisher eventPublisher;
         private readonly PasswordPolicyOptions passwordOptions;
 
-        public EncryptionCertificateComponentViewModel(INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certificateProvider, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IDialogCoordinator dialogCoordinator, ILogger<EncryptionCertificateComponentViewModel> logger, ICertificatePermissionProvider certPermissionProvider, DataProtectionOptions dataProtectionOptions, PasswordPolicyOptions passwordOptions)
+        public EncryptionCertificateComponentViewModel(INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certificateProvider, IViewModelFactory<X509Certificate2ViewModel, X509Certificate2> certificate2ViewModelFactory, IDialogCoordinator dialogCoordinator, ILogger<EncryptionCertificateComponentViewModel> logger, ICertificatePermissionProvider certPermissionProvider, DataProtectionOptions dataProtectionOptions, PasswordPolicyOptions passwordOptions)
         {
             this.eventPublisher = eventPublisher;
             this.certificateProvider = certificateProvider;
@@ -68,29 +69,37 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool CanSetActiveCertificate => !this.SelectedCertificate?.IsPublished ?? false;
 
-        public void SetActiveCertificate()
+        public async Task SetActiveCertificate()
         {
-            var selectedCertificate = this.SelectedCertificate;
-
-            if (selectedCertificate == null)
+            try
             {
-                return;
+                var selectedCertificate = this.SelectedCertificate;
+
+                if (selectedCertificate == null)
+                {
+                    return;
+                }
+
+                selectedCertificate.IsPublished = true;
+                this.ActiveCertificateThumbprint = selectedCertificate.Model.Thumbprint;
+
+                foreach (var c in this.AvailableCertificates.ToList())
+                {
+                    if (selectedCertificate != c)
+                    {
+                        c.IsPublished = false;
+                    }
+
+                    if (c.IsOrphaned)
+                    {
+                        this.AvailableCertificates.Remove(c);
+                    }
+                }
             }
-
-            selectedCertificate.IsPublished = true;
-            this.ActiveCertificateThumbprint = selectedCertificate.Model.Thumbprint;
-
-            foreach (var c in this.AvailableCertificates.ToList())
+            catch (Exception ex)
             {
-                if (selectedCertificate != c)
-                {
-                    c.IsPublished = false;
-                }
-
-                if (c.IsOrphaned)
-                {
-                    this.AvailableCertificates.Remove(c);
-                }
+                logger.LogError(EventIDs.UIGenericError, ex, "Could not set active certificate");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not set active certificate\r\n{ex.Message}");
             }
         }
 
@@ -116,7 +125,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                 if (await this.dialogCoordinator.ShowMessageAsync(this, "Encryption certificate created", "A new certificate has been generated. Set this certificate to active to allow clients to encrypt passwords with this certificate.\r\n\r\n Note, that if you lose this certificate, passwords encrypted with it will not be recoverable.\r\n\r\n Do you want to backup the encryption certificate now?", MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings { AffirmativeButtonText = "Yes", NegativeButtonText = "No" }) == MessageDialogResult.Affirmative)
                 {
-                    this.ExportCertificate();
+                   await this.ExportCertificate();
                 }
             }
             catch (Exception ex)
@@ -128,34 +137,75 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool CanRepermission => this.SelectedCertificate?.CanRepermission == true;
 
-        public void Repermission()
+        public async Task Repermission()
         {
-            var cert = this.SelectedCertificate;
-
-            if (cert == null)
+            try
             {
-                return;
-            }
+                var cert = this.SelectedCertificate;
 
-            cert.Repermission();
+                if (cert == null)
+                {
+                    return;
+                }
+
+                cert.Repermission();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(EventIDs.UIGenericError, ex, "Could not repermission certificate");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not repermission the certificate\r\n{ex.Message}");
+            }
         }
 
         public bool CanShowCertificateDialog => this.SelectedCertificate != null;
 
-        public void ShowCertificateDialog()
+        public async Task ShowCertificateDialog()
         {
-            X509Certificate2UI.DisplayCertificate(this.SelectedCertificate.Model, this.GetHandle());
+            try
+            {
+                var cert = this.SelectedCertificate?.Model;
+
+                if (cert != null)
+                {
+                    X509Certificate2UI.DisplayCertificate(cert, this.GetHandle());
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(EventIDs.UIGenericError, ex, "Could not show certificate");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not show the certificate\r\n{ex.Message}");
+            }
+        }
+
+
+        public async Task OnListViewDoubleClick(object sender, RoutedEventArgs e)
+        {
+            if (!(((FrameworkElement)(e.OriginalSource)).DataContext is X509Certificate2ViewModel))
+            {
+                return;
+            }
+
+            await this.ShowCertificateDialog();
         }
 
         public bool CanExportCertificate => this.SelectedCertificate != null && this.SelectedCertificate.HasPrivateKey;
 
-        public void ExportCertificate()
+        public async Task ExportCertificate()
         {
-            var cert = this.SelectedCertificate.Model;
-
-            if (cert != null && cert.HasPrivateKey)
+            try
             {
-                NativeMethods.ShowCertificateExportDialog(this.GetHandle(), "Export certificate", cert);
+
+                var cert = this.SelectedCertificate.Model;
+
+                if (cert != null && cert.HasPrivateKey)
+                {
+                    NativeMethods.ShowCertificateExportDialog(this.GetHandle(), "Export certificate", cert);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(EventIDs.UIGenericError, ex, "Could not export certificate");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not export the certificate\r\n{ex.Message}");
             }
         }
 
@@ -280,7 +330,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
-                logger.LogError(EventIDs.UIGenericError, ex, "Could not load certificate list");
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not load certificate list");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not refresh the certificate list\r\n{ex.Message}");
             }
         }

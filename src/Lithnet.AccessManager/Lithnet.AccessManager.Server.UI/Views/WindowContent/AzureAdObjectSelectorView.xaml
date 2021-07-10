@@ -14,64 +14,65 @@
              d:DesignHeight="450"
              d:DesignWidth="800">
     <!--<views:CanvasEx>-->
-        <Grid><!--Height="{Binding Path=BindableActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}"
+    <Grid>
+        <!--Height="{Binding Path=BindableActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}"
               Width="{Binding Path=BindableActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}">-->
 
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0"
+                  Margin="0 5 0 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0"
-                  Margin="0 5 0 0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <TextBox Grid.Column="0"
+            <TextBox Grid.Column="0"
                          Grid.Row="0"
                          Margin="0 2 2 2"
                          mah:TextBoxHelper.Watermark="Object name or search text"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                          ToolTip="Enter an object name to search for"
                          KeyDown="{s:Action SearchTextBoxKeyDown}" />
-                <Button Grid.Column="1"
+            <Button Grid.Column="1"
                         Grid.Row="0"
                         Content="Search"
                         MinWidth="65"
                         Command="{s:Action ApplySearchFilter}"
                         Margin="2" />
-                <Button Grid.Column="2"
+            <Button Grid.Column="2"
                         Grid.Row="0"
                         Content="Clear"
                         MinWidth="65"
                         Command="{s:Action ClearSearchFilter}"
                         Margin="2 2 0 2" />
 
-            </Grid>
+        </Grid>
 
-            <StackPanel Grid.Row="2"
+        <StackPanel Grid.Row="2"
                         Visibility="{Binding IsSearching, Converter={StaticResource  BooleanToVisibilityConverter}}"
                         Orientation="Horizontal"
                         Margin="5">
-                <mah:ProgressRing Height="15"
+            <mah:ProgressRing Height="15"
                                   Width="15" />
-                <TextBlock Margin="5 0 0 0"
+            <TextBlock Margin="5 0 0 0"
                            Text="Searching.." />
 
-            </StackPanel>
+        </StackPanel>
 
-            <ListView Grid.Row="3"
+        <ListView Grid.Row="3"
                       x:Name="listbox"
                       ItemsSource="{Binding Items}"
                       SelectedItem="{Binding SelectedItem}"
@@ -79,29 +80,25 @@
                       BorderThickness="1"
                       Margin="0 5 0 5"
                       GridViewColumnHeader.Click="{s:Action OnGridViewColumnHeaderClick}"
-                      MouseDoubleClick="{s:Action OnListViewDoubleClick}"
                       SelectionChanged="{s:Action SelectionChanged}">
-                <b:Interaction.Behaviors>
-                    <local:ListViewScrollBarBehavior />
-                </b:Interaction.Behaviors>
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Target"
+            <b:Interaction.Behaviors>
+                <local:ListViewScrollBarBehavior />
+            </b:Interaction.Behaviors>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name"
                                         DisplayMemberBinding="{Binding DisplayName}"
                                         Width="Auto" />
-                        <GridViewColumn Header="Type"
-                                        DisplayMemberBinding="{Binding SecurityIdentifier}"
-                                        Width="Auto" />
-                        <GridViewColumn Header="Status"
+                    <GridViewColumn Header="Object ID"
                                         DisplayMemberBinding="{Binding Id}"
                                         Width="Auto" />
-                        <GridViewColumn Header="Description"
+                    <GridViewColumn Header="Description"
                                         DisplayMemberBinding="{Binding Description}"
                                         Width="Auto" />
-                    </GridView>
-                </ListView.View>
-            </ListView>
+                </GridView>
+            </ListView.View>
+        </ListView>
 
-        </Grid>
+    </Grid>
     <!--</views:CanvasEx>-->
 </UserControl>

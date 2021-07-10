@@ -15,14 +15,14 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly INotificationChannelDefinitionsViewModelFactory<PowershellNotificationChannelDefinition, PowershellNotificationChannelDefinitionViewModel> psFactory;
         private readonly INotificationChannelDefinitionsViewModelFactory<SmtpNotificationChannelDefinition, SmtpNotificationChannelDefinitionViewModel> smtpFactory;
         private readonly INotificationChannelDefinitionsViewModelFactory<WebhookNotificationChannelDefinition, WebhookNotificationChannelDefinitionViewModel> whFactory;
-        private readonly INotificationChannelSelectionViewModelFactory notificationChannelSelectionViewModelFactory;
+        private readonly IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelSelectionViewModelFactory;
         private readonly IShellExecuteProvider shellExecuteProvider;
 
         public AuditingViewModel(AuditOptions model, IShellExecuteProvider shellExecuteProvider,
             INotificationChannelDefinitionsViewModelFactory<PowershellNotificationChannelDefinition, PowershellNotificationChannelDefinitionViewModel> psFactory,
             INotificationChannelDefinitionsViewModelFactory<SmtpNotificationChannelDefinition, SmtpNotificationChannelDefinitionViewModel> smtpFactory,
             INotificationChannelDefinitionsViewModelFactory<WebhookNotificationChannelDefinition, WebhookNotificationChannelDefinitionViewModel> whFactory,
-            INotificationChannelSelectionViewModelFactory notificationChannelSelectionViewModelFactory
+            IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelSelectionViewModelFactory
             )
         {
             this.model = model;

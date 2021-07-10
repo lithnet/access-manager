@@ -8,19 +8,19 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public AmsDirectoryLithnetLapsConfigurationViewModel(IShellExecuteProvider shellExecuteProvider, INotifyModelChangedEventPublisher eventPublisher, ApiAuthenticationOptions agentOptions,  EncryptionCertificateComponentViewModel encryptionCertVm)
+        public AmsDirectoryLithnetLapsConfigurationViewModel(IShellExecuteProvider shellExecuteProvider, INotifyModelChangedEventPublisher eventPublisher, EncryptionCertificateComponentViewModel encryptionCertVm, PasswordPoliciesViewModel policiesVm)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.PasswordEncryption = encryptionCertVm;
+            this.PasswordPolicies = policiesVm;
             this.DisplayName = "Lithnet LAPS";
-            eventPublisher.Register(this);
         }
 
         public EncryptionCertificateComponentViewModel PasswordEncryption { get; set; }
 
-        public string HelpLink => Constants.HelpLinkPageEmail;
+        public PasswordPoliciesViewModel PasswordPolicies { get; set; }
 
-        // public PackIconUniconsKind Icon => PackIconUniconsKind.ServerConnection;
+        public string HelpLink => Constants.HelpLinkPageEmail;
 
         public async Task Help()
         {

@@ -39,7 +39,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.Items.Add(ipDetectionVm);
             this.Items.Add(auditingVm);
             this.Items.Add(haVm);
-            this.DisplayName = "Server setup";
+            this.DisplayName = "Server configuration";
             this.ServiceStatus = this.windowsServiceProvider.Status.ToString();
 
             this.licenseManager.OnLicenseDataChanged += delegate

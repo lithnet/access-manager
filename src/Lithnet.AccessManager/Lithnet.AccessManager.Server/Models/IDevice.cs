@@ -44,5 +44,7 @@ namespace Lithnet.AccessManager.Server
         string OperatingSystemFamily { get; set; }
 
         string OperatingSystemVersion { get; set; }
+
+        bool Disabled { get; set; }
     }
 }

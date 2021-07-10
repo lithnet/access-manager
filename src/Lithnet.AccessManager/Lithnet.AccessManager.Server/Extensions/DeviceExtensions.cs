@@ -8,6 +8,14 @@ namespace Lithnet.AccessManager.Server
 {
     public static class DeviceExtensions
     {
+        public static void ThrowOnDeviceDisabled(this IDevice device)
+        {
+            if (device.Disabled)
+            {
+                throw new DeviceDisabledException();
+            }
+        }
+
         public static ClaimsIdentity ToClaimsIdentity(this IDevice device)
         {
             ClaimsIdentity identity = new ClaimsIdentity();
@@ -50,6 +58,11 @@ namespace Lithnet.AccessManager.Server
             if (device.ApprovalState != ApprovalState.Approved)
             {
                 throw new DeviceNotApprovedException("The device attempted to authenticate but it was not in an approved state");
+            }
+
+            if (device.Disabled)
+            {
+                throw new DeviceDisabledException();
             }
         }
     }

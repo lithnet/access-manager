@@ -13,7 +13,7 @@ namespace Lithnet.AccessManager.Api
 
         public int PolicyCacheDurationSeconds { get; set; } = 60;
 
-        public PasswordPolicyEntry DefaultPolicy { get; set; } = new PasswordPolicyEntry();
+        public PasswordPolicyEntry DefaultPolicy { get; set; } = new PasswordPolicyEntry() { Id = "Default", Name = "Default policy" };
 
         public List<PasswordPolicyEntry> Policies { get; set; } = new List<PasswordPolicyEntry>();
     }

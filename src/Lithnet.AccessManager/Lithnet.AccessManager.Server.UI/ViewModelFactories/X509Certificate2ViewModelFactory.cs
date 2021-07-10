@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class X509Certificate2ViewModelFactory : IX509Certificate2ViewModelFactory
+    public class X509Certificate2ViewModelFactory : IViewModelFactory<X509Certificate2ViewModel, X509Certificate2>
     {
         private readonly ILogger<X509Certificate2ViewModel> logger;
         private readonly IDialogCoordinator dialogCoordinator;

@@ -86,24 +86,31 @@ namespace Lithnet.AccessManager.Server.UI
 
         public void BuildPreview()
         {
-            string previewPassword = this.PreviewPassword;
-
-            if (string.IsNullOrWhiteSpace(previewPassword))
+            try
             {
-                this.Preview = null;
-                return;
+                string previewPassword = this.PreviewPassword;
+
+                if (string.IsNullOrWhiteSpace(previewPassword))
+                {
+                    this.Preview = null;
+                    return;
+                }
+
+                PhoneticStringProvider p = new PhoneticStringProvider(this.model.PhoneticSettings);
+
+                StringBuilder builder = new StringBuilder();
+
+                foreach (var segment in p.GetPhoneticTextSections(previewPassword))
+                {
+                    builder.AppendLine(segment);
+                }
+
+                this.Preview = builder.ToString();
             }
-
-            PhoneticStringProvider p = new PhoneticStringProvider(this.model.PhoneticSettings);
-
-            StringBuilder builder = new StringBuilder();
-
-            foreach (var segment in p.GetPhoneticTextSections(previewPassword))
+            catch (Exception ex)
             {
-                builder.AppendLine(segment);
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
             }
-
-            this.Preview = builder.ToString();
         }
 
         private void LoadImage()

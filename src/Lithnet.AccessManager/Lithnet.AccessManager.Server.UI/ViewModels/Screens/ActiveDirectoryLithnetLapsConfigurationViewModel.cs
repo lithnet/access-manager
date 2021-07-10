@@ -18,8 +18,8 @@ namespace Lithnet.AccessManager.Server.UI
     public class ActiveDirectoryLithnetLapsConfigurationViewModel : Screen, IHelpLink
     {
         private readonly ICertificateProvider certificateProvider;
-        private readonly IX509Certificate2ViewModelFactory certificate2ViewModelFactory;
-        private readonly IActiveDirectoryForestSchemaViewModelFactory forestFactory;
+        private readonly IViewModelFactory<X509Certificate2ViewModel, X509Certificate2> certificate2ViewModelFactory;
+        private readonly IViewModelFactory<ActiveDirectoryForestSchemaViewModel, Forest> forestFactory;
 
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IWindowsServiceProvider windowsServiceProvider;
@@ -32,7 +32,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly DataProtectionOptions dataProtectionOptions;
         private readonly INotifyModelChangedEventPublisher eventPublisher;
 
-        public ActiveDirectoryLithnetLapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IX509Certificate2ViewModelFactory certificate2ViewModelFactory, IWindowsServiceProvider windowsServiceProvider, ILogger<ActiveDirectoryLithnetLapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, DataProtectionOptions dataProtectionOptions, INotifyModelChangedEventPublisher eventPublisher, IActiveDirectoryForestSchemaViewModelFactory forestFactory)
+        public ActiveDirectoryLithnetLapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IViewModelFactory<X509Certificate2ViewModel, X509Certificate2> certificate2ViewModelFactory, IWindowsServiceProvider windowsServiceProvider, ILogger<ActiveDirectoryLithnetLapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, DataProtectionOptions dataProtectionOptions, INotifyModelChangedEventPublisher eventPublisher, IViewModelFactory<ActiveDirectoryForestSchemaViewModel, Forest> forestFactory)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.certificateProvider = certificateProvider;
@@ -56,17 +56,30 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string HelpLink => Constants.HelpLinkPageLocalAdminPasswords;
 
-        private Task initialize;
-
         protected override void OnInitialActivate()
         {
-            this.initialize = Task.Run(async () =>
+            Task.Run(async () => await this.Initialize());
+        }
+
+        private async Task Initialize()
+        {
+            try
             {
                 await this.PopulateForestsAndDomains();
                 this.SelectedForest = this.Forests.FirstOrDefault();
                 await this.RefreshAvailableCertificates();
-            });
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Could not initialize the view model");
+                this.ErrorMessageText = ex.ToString();
+                this.ErrorMessageHeaderText = "An initialization error occurred";
+            }
         }
+
+        public string ErrorMessageText { get; set; }
+
+        public string ErrorMessageHeaderText { get; set; }
 
         private async Task PopulateForestsAndDomains()
         {
@@ -101,26 +114,34 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task ExtendSchemaLithnetAccessManager()
         {
-            ActiveDirectoryForestSchemaViewModel current = this.SelectedForest;
-
-            var vm = new ScriptContentViewModel(this.dialogCoordinator)
+            try
             {
-                HelpText = "Run the following script as an account that is a member of the 'Schema Admins' group",
-                ScriptText = this.scriptTemplateProvider.UpdateAdSchema
-                    .Replace("{forest}", current.Name)
-            };
+                ActiveDirectoryForestSchemaViewModel current = this.SelectedForest;
 
-            ExternalDialogWindow w = new ExternalDialogWindow
+                var vm = new ScriptContentViewModel(this.dialogCoordinator)
+                {
+                    HelpText = "Run the following script as an account that is a member of the 'Schema Admins' group",
+                    ScriptText = this.scriptTemplateProvider.UpdateAdSchema
+                        .Replace("{forest}", current.Name)
+                };
+
+                ExternalDialogWindow w = new ExternalDialogWindow
+                {
+                    Title = "Script",
+                    DataContext = vm,
+                    SaveButtonVisible = false,
+                    CancelButtonName = "Close"
+                };
+
+                w.ShowDialog();
+
+                await current.RefreshSchemaStatusAsync();
+            }
+            catch (Exception ex)
             {
-                Title = "Script",
-                DataContext = vm,
-                SaveButtonVisible = false,
-                CancelButtonName = "Close"
-            };
-
-            w.ShowDialog();
-
-            await Task.Run(() => current.RefreshSchemaStatus()).ConfigureAwait(false);
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
+            }
         }
 
         public async Task RefreshSchemaStatusAsync()
@@ -143,57 +164,65 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool CanPublishSelectedCertificate => !this.SelectedCertificate?.IsPublished ?? false;
 
-        public void PublishSelectedCertificate()
+        public async Task PublishSelectedCertificate()
         {
-            var de = this.discoveryServices.GetConfigurationNamingContext(this.SelectedForest.Forest.RootDomain.Name);
-            var certData = Convert.ToBase64String(this.SelectedCertificate.Model.RawData, Base64FormattingOptions.InsertLineBreaks);
-
-            var vm = new ScriptContentViewModel(this.dialogCoordinator)
-            {
-                HelpText = "Run the following script to publish the encryption certificate",
-                ScriptText = this.scriptTemplateProvider.PublishLithnetAccessManagerCertificate
-                    .Replace("{configurationNamingContext}", de.GetPropertyString("distinguishedName"))
-                    .Replace("{certificateData}", certData)
-                    .Replace("{forest}", this.SelectedForest.Name)
-            };
-
-            ExternalDialogWindow w = new ExternalDialogWindow
-            {
-                Title = "Script",
-                DataContext = vm,
-                SaveButtonVisible = false,
-                CancelButtonName = "Close"
-            };
-
-            w.ShowDialog();
-
             try
             {
-                if (this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert,
-                    this.SelectedForest.Forest.RootDomain.Name))
+                var de = this.discoveryServices.GetConfigurationNamingContext(this.SelectedForest.Forest.RootDomain.Name);
+                var certData = Convert.ToBase64String(this.SelectedCertificate.Model.RawData, Base64FormattingOptions.InsertLineBreaks);
+
+                var vm = new ScriptContentViewModel(this.dialogCoordinator)
                 {
-                    if (publishedCert.Thumbprint == this.SelectedCertificate.Model.Thumbprint)
+                    HelpText = "Run the following script to publish the encryption certificate",
+                    ScriptText = this.scriptTemplateProvider.PublishLithnetAccessManagerCertificate
+                        .Replace("{configurationNamingContext}", de.GetPropertyString("distinguishedName"))
+                        .Replace("{certificateData}", certData)
+                        .Replace("{forest}", this.SelectedForest.Name)
+                };
+
+                ExternalDialogWindow w = new ExternalDialogWindow
+                {
+                    Title = "Script",
+                    DataContext = vm,
+                    SaveButtonVisible = false,
+                    CancelButtonName = "Close"
+                };
+
+                w.ShowDialog();
+
+                try
+                {
+                    if (this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert,
+                        this.SelectedForest.Forest.RootDomain.Name))
                     {
-                        this.SelectedCertificate.IsPublished = true;
-
-                        foreach (var c in this.AvailableCertificates.ToList())
+                        if (publishedCert.Thumbprint == this.SelectedCertificate.Model.Thumbprint)
                         {
-                            if (this.SelectedCertificate != c)
-                            {
-                                c.IsPublished = false;
-                            }
+                            this.SelectedCertificate.IsPublished = true;
 
-                            if (c.IsOrphaned)
+                            foreach (var c in this.AvailableCertificates.ToList())
                             {
-                                this.AvailableCertificates.Remove(c);
+                                if (this.SelectedCertificate != c)
+                                {
+                                    c.IsPublished = false;
+                                }
+
+                                if (c.IsOrphaned)
+                                {
+                                    this.AvailableCertificates.Remove(c);
+                                }
                             }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not update certificate publication information");
+                }
             }
             catch (Exception ex)
             {
-                logger.LogWarning(EventIDs.UIGenericWarning, ex, "Could not update certificate publication information");
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
             }
         }
 
@@ -219,7 +248,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                 if (await this.dialogCoordinator.ShowMessageAsync(this, "Encryption certificate created", "A new certificate has been generated. Publish this certificate to the directory to allow clients to encrypt passwords with this certificate.\r\n\r\n Note, that if you lose this certificate, passwords encrypted with it will not be recoverable.\r\n\r\n Do you want to backup the encryption certificate now?", MessageDialogStyle.AffirmativeAndNegative, new MetroDialogSettings { AffirmativeButtonText = "Yes", NegativeButtonText = "No" }) == MessageDialogResult.Affirmative)
                 {
-                    this.ExportCertificate();
+                    await this.ExportCertificate();
                 }
             }
             catch (Exception ex)
@@ -231,34 +260,58 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool CanRepermission => this.SelectedCertificate?.CanRepermission == true;
 
-        public void Repermission()
+        public async Task Repermission()
         {
-            var cert = this.SelectedCertificate;
-
-            if (cert == null)
+            try
             {
-                return;
-            }
+                var cert = this.SelectedCertificate;
 
-            cert.Repermission();
+                if (cert == null)
+                {
+                    return;
+                }
+
+                cert.Repermission();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
+            }
         }
 
         public bool CanShowCertificateDialog => this.SelectedCertificate != null;
 
-        public void ShowCertificateDialog()
+        public async Task ShowCertificateDialog()
         {
-            X509Certificate2UI.DisplayCertificate(this.SelectedCertificate.Model, this.GetHandle());
+            try
+            {
+                X509Certificate2UI.DisplayCertificate(this.SelectedCertificate.Model, this.GetHandle());
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
+            }
         }
 
         public bool CanExportCertificate => this.SelectedCertificate != null && this.SelectedCertificate.HasPrivateKey;
 
-        public void ExportCertificate()
+        public async Task ExportCertificate()
         {
-            var cert = this.SelectedCertificate.Model;
-
-            if (cert != null && cert.HasPrivateKey)
+            try
             {
-                NativeMethods.ShowCertificateExportDialog(this.GetHandle(), "Export certificate", cert);
+                var cert = this.SelectedCertificate.Model;
+
+                if (cert != null && cert.HasPrivateKey)
+                {
+                    NativeMethods.ShowCertificateExportDialog(this.GetHandle(), "Export certificate", cert);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
             }
         }
 
@@ -324,23 +377,31 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public void DelegateServicePermission()
+        public async Task DelegateServicePermission()
         {
-            var vm = new ScriptContentViewModel(this.dialogCoordinator)
+            try
             {
-                HelpText = "Modify the OU variable in this script, and run it with domain admin rights to assign permissions for the service account to be able to read the encrypted local admin passwords and history from the directory",
-                ScriptText = this.scriptTemplateProvider.GrantAccessManagerPermissions.Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceAccountSid().ToString(), StringComparison.OrdinalIgnoreCase)
-            };
+                var vm = new ScriptContentViewModel(this.dialogCoordinator)
+                {
+                    HelpText = "Modify the OU variable in this script, and run it with domain admin rights to assign permissions for the service account to be able to read the encrypted local admin passwords and history from the directory",
+                    ScriptText = this.scriptTemplateProvider.GrantAccessManagerPermissions.Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceAccountSid().ToString(), StringComparison.OrdinalIgnoreCase)
+                };
 
-            ExternalDialogWindow w = new ExternalDialogWindow
+                ExternalDialogWindow w = new ExternalDialogWindow
+                {
+                    Title = "Script",
+                    DataContext = vm,
+                    SaveButtonVisible = false,
+                    CancelButtonName = "Close"
+                };
+
+                w.ShowDialog();
+            }
+            catch (Exception ex)
             {
-                Title = "Script",
-                DataContext = vm,
-                SaveButtonVisible = false,
-                CancelButtonName = "Close"
-            };
-
-            w.ShowDialog();
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
+            }
         }
 
         public async Task OpenAccessManagerAgentDownload()
@@ -408,8 +469,6 @@ namespace Lithnet.AccessManager.Server.UI
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not refresh the certificate list\r\n{ex.Message}");
             }
         }
-
-      //  public PackIconUniconsKind Icon => PackIconUniconsKind.Asterisk;
 
         public async Task Help()
         {

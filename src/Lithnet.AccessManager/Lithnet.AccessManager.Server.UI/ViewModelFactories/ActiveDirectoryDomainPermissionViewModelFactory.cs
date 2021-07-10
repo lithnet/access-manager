@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class ActiveDirectoryDomainPermissionViewModelFactory : IActiveDirectoryDomainPermissionViewModelFactory
+    public class ActiveDirectoryDomainPermissionViewModelFactory : IViewModelFactory<ActiveDirectoryDomainPermissionViewModel, Domain>
     {
         private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly ILogger<ActiveDirectoryDomainPermissionViewModel> logger;

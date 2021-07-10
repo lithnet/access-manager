@@ -46,6 +46,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                 this.logger.LogTrace("Processing agent update request for {deviceId}", deviceId);
 
                 var device = await this.deviceProvider.GetDeviceAsync(deviceId);
+                device.ThrowOnDeviceDisabled();
 
                 this.checkinDataValidator.ValidateCheckInData(data);
                 device.AgentVersion = data.AgentVersion;

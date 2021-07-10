@@ -168,46 +168,62 @@ namespace Lithnet.AccessManager.Server.UI
             await shellExecuteProvider.OpenWithShellExecute(Constants.LinkGmsaInfo);
         }
 
-        public void PreventDelegation()
+        public async Task PreventDelegation()
         {
-            ScriptContentViewModel vm = new ScriptContentViewModel(this.dialogCoordinator)
+            try
             {
-                HelpText = "Run the following script as an account that is a member of the 'Domain admins' group",
-                ScriptText = this.scriptTemplateProvider.PreventDelegation
-                    .Replace("{sid}", this.ServiceAccount.ToString(), StringComparison.OrdinalIgnoreCase)
-            };
+                ScriptContentViewModel vm = new ScriptContentViewModel(this.dialogCoordinator)
+                {
+                    HelpText = "Run the following script as an account that is a member of the 'Domain admins' group",
+                    ScriptText = this.scriptTemplateProvider.PreventDelegation
+                        .Replace("{sid}", this.ServiceAccount.ToString(), StringComparison.OrdinalIgnoreCase)
+                };
 
-            ExternalDialogWindow w = new ExternalDialogWindow
+                ExternalDialogWindow w = new ExternalDialogWindow
+                {
+                    Title = "Script",
+                    DataContext = vm,
+                    SaveButtonVisible = false,
+                    CancelButtonName = "Close"
+                };
+
+                w.ShowDialog();
+
+                this.PopulateCanDelegate();
+            }
+            catch (Exception ex)
             {
-                Title = "Script",
-                DataContext = vm,
-                SaveButtonVisible = false,
-                CancelButtonName = "Close"
-            };
-
-            w.ShowDialog();
-
-            this.PopulateCanDelegate();
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
+            }
         }
 
-        public void CreateGmsa()
+        public async Task CreateGmsa()
         {
-            ScriptContentViewModel vm = new ScriptContentViewModel(this.dialogCoordinator)
+            try
             {
-                HelpText = "Run the following script as an account that is a member of the 'Domain admins' group",
-                ScriptText = this.scriptTemplateProvider.CreateGmsa
-                    .Replace("{serverName}", Environment.MachineName, StringComparison.OrdinalIgnoreCase)
-            };
+                ScriptContentViewModel vm = new ScriptContentViewModel(this.dialogCoordinator)
+                {
+                    HelpText = "Run the following script as an account that is a member of the 'Domain admins' group",
+                    ScriptText = this.scriptTemplateProvider.CreateGmsa
+                        .Replace("{serverName}", Environment.MachineName, StringComparison.OrdinalIgnoreCase)
+                };
 
-            ExternalDialogWindow w = new ExternalDialogWindow
+                ExternalDialogWindow w = new ExternalDialogWindow
+                {
+                    Title = "Script",
+                    DataContext = vm,
+                    SaveButtonVisible = false,
+                    CancelButtonName = "Close"
+                };
+
+                w.ShowDialog();
+            }
+            catch (Exception ex)
             {
-                Title = "Script",
-                DataContext = vm,
-                SaveButtonVisible = false,
-                CancelButtonName = "Close"
-            };
-
-            w.ShowDialog();
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
+            }
         }
 
         public bool ShowCertificateExpiryWarning => this.Certificate != null && this.Certificate.NotAfter.AddDays(-30) >= DateTime.Now;
@@ -379,7 +395,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 if (updateServiceAccount)
                 {
-                    this.UpdateServiceAccount();
+                    await this.UpdateServiceAccount();
 
                     if (!await this.rekeyProvider.TryReKeySecretsAsync(this))
                     {
@@ -415,9 +431,17 @@ namespace Lithnet.AccessManager.Server.UI
             return true;
         }
 
-        private void UpdateServiceAccount()
+        private async Task UpdateServiceAccount()
         {
-            this.windowsServiceProvider.SetServiceAccount(this.workingServiceAccountUserName, this.workingServiceAccountPassword);
+            try
+            {
+                this.windowsServiceProvider.SetServiceAccount(this.workingServiceAccountUserName, this.workingServiceAccountPassword);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
+            }
         }
 
         private void SaveHostingConfigFile(HostingSettingsRollbackContext rollback)
@@ -430,35 +454,42 @@ namespace Lithnet.AccessManager.Server.UI
 
         public void OnCertificateChanged()
         {
-            this.IsCertificateCurrent = false;
-            this.IsCertificateExpired = false;
-            this.IsCertificateExpiring = false;
-
-            if (this.Certificate == null)
+            try
             {
-                this.CertificateExpiryText = "Select a certificate";
-                return;
+                this.IsCertificateCurrent = false;
+                this.IsCertificateExpired = false;
+                this.IsCertificateExpiring = false;
+
+                if (this.Certificate == null)
+                {
+                    this.CertificateExpiryText = "Select a certificate";
+                    return;
+                }
+
+                TimeSpan remainingTime = this.Certificate.NotAfter.Subtract(DateTime.Now);
+
+                if (remainingTime.Ticks <= 0)
+                {
+                    this.IsCertificateExpired = true;
+                    this.CertificateExpiryText = "The certificate has expired";
+                    return;
+                }
+
+                if (remainingTime.TotalDays < 30)
+                {
+                    this.IsCertificateExpiring = true;
+                }
+                else
+                {
+                    this.IsCertificateCurrent = true;
+                }
+
+                this.CertificateExpiryText = $"Certificate expires in {remainingTime:%d} days";
             }
-
-            TimeSpan remainingTime = this.Certificate.NotAfter.Subtract(DateTime.Now);
-
-            if (remainingTime.Ticks <= 0)
+            catch (Exception ex)
             {
-                this.IsCertificateExpired = true;
-                this.CertificateExpiryText = "The certificate has expired";
-                return;
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
             }
-
-            if (remainingTime.TotalDays < 30)
-            {
-                this.IsCertificateExpiring = true;
-            }
-            else
-            {
-                this.IsCertificateCurrent = true;
-            }
-
-            this.CertificateExpiryText = $"Certificate expires in {remainingTime:%d} days";
         }
 
         public async Task SelectServiceAccountUser()
@@ -561,34 +592,59 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (Exception ex)
             {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not change service account");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not change the service account\r\n{ex.Message}");
             }
         }
 
-        public void ShowCertificateDialog()
+        public async Task ShowCertificateDialog()
         {
-            X509Certificate2UI.DisplayCertificate(this.Certificate, this.GetHandle());
-        }
-
-        public void ShowImportDialog()
-        {
-            X509Certificate2 newCert = NativeMethods.ShowCertificateImportDialog(this.GetHandle(), "Import certificate", StoreLocation.LocalMachine, StoreName.My);
-
-            if (newCert != null)
+            try
             {
-                this.Certificate = newCert;
-                this.certPermissionProvider.AddReadPermission(this.Certificate);
+                X509Certificate2UI.DisplayCertificate(this.Certificate, this.GetHandle());
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
             }
         }
 
-        public void ShowSelectCertificateDialog()
+        public async Task ShowImportDialog()
         {
-            X509Certificate2Collection results = X509Certificate2UI.SelectFromCollection(this.certProvider.GetEligibleServerAuthenticationCertificates(), "Select TLS certificate", "Select a certificate to use as the TLS certificate for this web site", X509SelectionFlag.SingleSelection, this.GetHandle());
-
-            if (results.Count == 1)
+            try
             {
-                this.Certificate = results[0];
-                this.certPermissionProvider.AddReadPermission(this.Certificate);
+                X509Certificate2 newCert = NativeMethods.ShowCertificateImportDialog(this.GetHandle(), "Import certificate", StoreLocation.LocalMachine, StoreName.My);
+
+                if (newCert != null)
+                {
+                    this.Certificate = newCert;
+                    this.certPermissionProvider.AddReadPermission(this.Certificate);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
+            }
+        }
+
+        public async Task ShowSelectCertificateDialog()
+        {
+            try
+            {
+                X509Certificate2Collection results = X509Certificate2UI.SelectFromCollection(this.certProvider.GetEligibleServerAuthenticationCertificates(), "Select TLS certificate", "Select a certificate to use as the TLS certificate for this web site", X509SelectionFlag.SingleSelection, this.GetHandle());
+
+                if (results.Count == 1)
+                {
+                    this.Certificate = results[0];
+                    this.certPermissionProvider.AddReadPermission(this.Certificate);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
             }
         }
 

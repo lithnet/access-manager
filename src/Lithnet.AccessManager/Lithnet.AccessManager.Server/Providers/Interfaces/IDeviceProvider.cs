@@ -35,5 +35,7 @@ namespace Lithnet.AccessManager.Server
         Task RejectDevice(string deviceId);
 
         Task AddDeviceCredentialsAsync(IDevice device, X509Certificate2 certificate);
+        Task DisableDevice(string deviceId);
+        Task EnableDevice(string deviceId);
     }
 }

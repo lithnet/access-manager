@@ -26,6 +26,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.secretProvider = secretProvider;
             this.Model = model;
             this.Validator = validator;
+            this.Validate();
         }
 
         public string TenantId

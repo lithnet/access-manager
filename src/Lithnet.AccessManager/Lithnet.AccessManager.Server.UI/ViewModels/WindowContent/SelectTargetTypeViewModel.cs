@@ -13,7 +13,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly AzureAdOptions azureAdOptions;
         private readonly ApiAuthenticationOptions apiOptions;
 
-        public SelectTargetTypeViewModel(AzureAdOptions azureAdOptions, ApiAuthenticationOptions apiOptions, IDomainTrustProvider domainTrustProvider, IAzureAdTenantDetailsViewModelFactory tenantDetailsFactory)
+        public SelectTargetTypeViewModel(AzureAdOptions azureAdOptions, ApiAuthenticationOptions apiOptions, IDomainTrustProvider domainTrustProvider, IViewModelFactory<AzureAdTenantDetailsViewModel, AzureAdTenantDetails> tenantDetailsFactory)
         {
             this.azureAdOptions = azureAdOptions;
             this.apiOptions = apiOptions;
@@ -30,6 +30,20 @@ namespace Lithnet.AccessManager.Server.UI
             this.SelectedAad = this.AvailableAads.FirstOrDefault();
         }
 
+        public bool AllowAzureAdGroup { get; set; } = true;
+
+        public bool AllowAzureAdComputer { get; set; } = true;
+
+        public bool AllowAdComputer { get; set; } = true;
+
+        public bool AllowAdGroup { get; set; } = true;
+
+        public bool AllowAdContainer { get; set; } = true;
+
+        public bool AllowAmsGroup { get; set; } = true;
+
+        public bool AllowAmsComputer { get; set; } = true;
+
         public string SelectedForest { get; set; }
 
         public List<string> AvailableForests { get; set; }
@@ -42,20 +56,45 @@ namespace Lithnet.AccessManager.Server.UI
         {
             get
             {
-                yield return TargetType.AdComputer;
-                yield return TargetType.AdGroup;
-                yield return TargetType.AdContainer;
+                if (this.AllowAdComputer)
+                {
+                    yield return TargetType.AdComputer;
+                }
+
+                if (this.AllowAdGroup)
+                {
+                    yield return TargetType.AdGroup;
+                }
+
+                if (this.AllowAdContainer)
+                {
+                    yield return TargetType.AdContainer;
+                }
 
                 if (azureAdOptions.Tenants.Count > 0)
                 {
-                    yield return TargetType.AadComputer;
-                    yield return TargetType.AadGroup;
+                    if (this.AllowAzureAdComputer)
+                    {
+                        yield return TargetType.AadComputer;
+                    }
+
+                    if (this.AllowAzureAdGroup)
+                    {
+                        yield return TargetType.AadGroup;
+                    }
                 }
 
                 if (apiOptions.AllowAmsManagedDeviceAuth)
                 {
-                    yield return TargetType.AmsComputer;
-                    yield return TargetType.AmsGroup;
+                    if (this.AllowAmsComputer)
+                    {
+                        yield return TargetType.AmsComputer;
+                    }
+
+                    if (this.AllowAmsGroup)
+                    {
+                        yield return TargetType.AmsGroup;
+                    }
                 }
             }
         }

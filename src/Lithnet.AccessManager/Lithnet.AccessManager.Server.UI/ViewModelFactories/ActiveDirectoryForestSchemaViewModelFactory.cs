@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class ActiveDirectoryForestSchemaViewModelFactory : IActiveDirectoryForestSchemaViewModelFactory
+    public class ActiveDirectoryForestSchemaViewModelFactory : IViewModelFactory<ActiveDirectoryForestSchemaViewModel, Forest>
     {
         private readonly ILogger<ActiveDirectoryForestSchemaViewModel> logger;
         private readonly IDiscoveryServices discoveryServices;

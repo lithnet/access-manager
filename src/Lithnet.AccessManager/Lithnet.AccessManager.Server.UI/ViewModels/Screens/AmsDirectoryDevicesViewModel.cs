@@ -1,19 +1,12 @@
-﻿using Lithnet.AccessManager.Enterprise;
+﻿using System;
+using System.Collections.Generic;
 using MahApps.Metro.Controls.Dialogs;
-using MahApps.Metro.IconPacks;
-using Microsoft.Extensions.Logging;
 using Stylet;
-using System;
-using System.Collections;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
-using System.ServiceProcess;
-using System.Threading;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Api;
 using MahApps.Metro.SimpleChildWindow;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -22,12 +15,16 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDeviceProvider deviceProvider;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IDialogCoordinator dialogCoordinator;
+        private readonly IDevicePasswordProvider passwordProvider;
+        private readonly ILogger<AmsDirectoryDevicesViewModel> logger;
 
-        public AmsDirectoryDevicesViewModel(IDeviceProvider deviceProvider, IShellExecuteProvider shellExecuteProvider, IDialogCoordinator dialogCoordinator)
+        public AmsDirectoryDevicesViewModel(IDeviceProvider deviceProvider, IShellExecuteProvider shellExecuteProvider, IDialogCoordinator dialogCoordinator, IDevicePasswordProvider passwordProvider, ILogger<AmsDirectoryDevicesViewModel> logger)
         {
             this.deviceProvider = deviceProvider;
             this.shellExecuteProvider = shellExecuteProvider;
             this.dialogCoordinator = dialogCoordinator;
+            this.passwordProvider = passwordProvider;
+            this.logger = logger;
             this.DisplayName = "Devices";
             this.Devices = new BindableCollection<DeviceViewModel>();
             this.SelectedItems = new ObservableCollection<DeviceViewModel>();
@@ -39,70 +36,230 @@ namespace Lithnet.AccessManager.Server.UI
             this.NotifyOfPropertyChange(() => this.CanRejectDevice);
             this.NotifyOfPropertyChange(() => this.CanApproveDevice);
             this.NotifyOfPropertyChange(() => this.CanDeleteDevice);
+            this.NotifyOfPropertyChange(() => this.CanEnableDevice);
+            this.NotifyOfPropertyChange(() => this.CanDisableDevice);
+            this.NotifyOfPropertyChange(() => this.CanExpirePassword);
         }
 
-        
+
         protected override void OnInitialActivate()
         {
-            Task.Run(async () =>
+            Task.Run(async () => await this.Initialize());
+        }
+
+        private async Task Initialize()
+        {
+            try
             {
                 this.IsLoading = true;
 
-                await foreach (var m in this.deviceProvider.GetDevices(0, 200000))
+                List<DeviceViewModel> list = new List<DeviceViewModel>();
+                await foreach (IDevice m in this.deviceProvider.GetDevices(0, 2000000))
                 {
-                    this.Devices.Add(new DeviceViewModel(m));
+                    list.Add(new DeviceViewModel(m));
                 }
 
+                this.Devices = new BindableCollection<DeviceViewModel>(list);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Could not initialize the view model");
+                this.ErrorMessageText = ex.ToString();
+                this.ErrorMessageHeaderText = "An initialization error occurred";
+            }
+            finally
+            {
                 this.IsLoading = false;
-            });
+            }
         }
+
+        public string ErrorMessageText { get; set; }
+
+        public string ErrorMessageHeaderText { get; set; }
+
 
         public bool IsLoading { get; set; }
 
         [NotifyModelChangedCollection]
-        public BindableCollection<DeviceViewModel> Devices { get; }
+        public BindableCollection<DeviceViewModel> Devices { get; set; }
 
         public DeviceViewModel SelectedItem { get; set; }
 
         public ObservableCollection<DeviceViewModel> SelectedItems { get; }
 
+        public bool CanExpirePassword => this.SelectedItems.Count > 0;
+
+        public async Task ExpirePassword()
+        {
+            try
+            {
+                var selectedItems = this.SelectedItems.ToList();
+
+                if (selectedItems.Count == 0)
+                {
+                    return;
+                }
+
+                MetroDialogSettings s = new MetroDialogSettings
+                {
+                    AnimateShow = false,
+                    AnimateHide = false
+                };
+
+                string message = "this device";
+
+                if (selectedItems.Count > 1)
+                {
+                    message = $"these {selectedItems.Count} devices";
+                }
+
+                if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", $"Are you sure you want to expire the password on {message}?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
+                {
+                    foreach (var item in selectedItems)
+                    {
+                        await this.passwordProvider.ExpireCurrentPassword(item.ObjectID);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not expire the password\r\n{ex.Message}");
+            }
+        }
+
+        public bool CanEnableDevice => this.SelectedItems.All(t => t.Disabled);
+
+        public async Task EnableDevice()
+        {
+            try
+            {
+                var selectedItems = this.SelectedItems.Where(t => t.Disabled).ToList();
+
+                if (selectedItems.Count == 0)
+                {
+                    return;
+                }
+
+                MetroDialogSettings s = new MetroDialogSettings
+                {
+                    AnimateShow = false,
+                    AnimateHide = false
+                };
+
+                string message = "this device";
+
+                if (selectedItems.Count > 1)
+                {
+                    message = $"these {selectedItems.Count} devices";
+                }
+
+                if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", $"Are you sure you want to enable {message}?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
+                {
+                    foreach (var item in selectedItems)
+                    {
+                        await this.deviceProvider.EnableDevice(item.ObjectID);
+                        item.Disabled = false;
+                    }
+
+                    this.NotifyOfPropertyChange(() => this.CanEnableDevice);
+                    this.NotifyOfPropertyChange(() => this.CanDisableDevice);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not enable the device\r\n{ex.Message}");
+            }
+        }
+
+        public bool CanDisableDevice => this.SelectedItems.All(t => t.Enabled);
+
+        public async Task DisableDevice()
+        {
+            try
+            {
+                var selectedItems = this.SelectedItems.Where(t => t.Enabled).ToList();
+
+                if (selectedItems.Count == 0)
+                {
+                    return;
+                }
+
+                MetroDialogSettings s = new MetroDialogSettings
+                {
+                    AnimateShow = false,
+                    AnimateHide = false
+                };
+
+                string message = "this device";
+
+                if (selectedItems.Count > 1)
+                {
+                    message = $"these {selectedItems.Count} devices";
+                }
+
+                if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", $"Are you sure you want to disable {message}?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
+                {
+                    foreach (var item in selectedItems)
+                    {
+                        await this.deviceProvider.DisableDevice(item.ObjectID);
+                        item.Disabled = true;
+                    }
+
+                    this.NotifyOfPropertyChange(() => this.CanEnableDevice);
+                    this.NotifyOfPropertyChange(() => this.CanDisableDevice);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not disable the device\r\n{ex.Message}");
+            }
+        }
+
         public bool CanApproveDevice => this.SelectedItems.All(t => t.IsPending);
 
         public async Task ApproveDevice()
         {
-            var selectedItems = this.SelectedItems.Where(t => t.IsPending).ToList();
-
-            if (selectedItems.Count == 0)
+            try
             {
-                return;
-            }
+                var selectedItems = this.SelectedItems.Where(t => t.IsPending).ToList();
 
-            MetroDialogSettings s = new MetroDialogSettings
-            {
-                AnimateShow = false,
-                AnimateHide = false
-            };
-
-            string message = "this device";
-
-            if (selectedItems.Count > 1)
-            {
-                message = $"these {selectedItems.Count} devices";
-            }
-
-            if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", $"Are you sure you want to approve {message}?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
-            {
-                foreach (var item in selectedItems)
+                if (selectedItems.Count == 0)
                 {
-                    if (item.IsPending)
+                    return;
+                }
+
+                MetroDialogSettings s = new MetroDialogSettings
+                {
+                    AnimateShow = false,
+                    AnimateHide = false
+                };
+
+                string message = "this device";
+
+                if (selectedItems.Count > 1)
+                {
+                    message = $"these {selectedItems.Count} devices";
+                }
+
+                if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", $"Are you sure you want to approve {message}?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
+                {
+                    foreach (var item in selectedItems)
                     {
                         await this.deviceProvider.ApproveDevice(item.ObjectID);
                         item.ApprovalState = ApprovalState.Approved;
                     }
-                }
 
-                this.NotifyOfPropertyChange(() => this.CanRejectDevice);
-                this.NotifyOfPropertyChange(() => this.CanApproveDevice);
+                    this.NotifyOfPropertyChange(() => this.CanRejectDevice);
+                    this.NotifyOfPropertyChange(() => this.CanApproveDevice);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not approve the device\r\n{ex.Message}");
             }
         }
 
@@ -110,82 +267,119 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task RejectDevice()
         {
-            var selectedItems = this.SelectedItems.Where(t => t.IsPending).ToList();
-
-            if (selectedItems.Count == 0)
+            try
             {
-                return;
-            }
+                var selectedItems = this.SelectedItems.Where(t => t.IsPending).ToList();
 
-            MetroDialogSettings s = new MetroDialogSettings
-            {
-                AnimateShow = false,
-                AnimateHide = false
-            };
-
-            string message = "this device";
-
-            if (selectedItems.Count > 1)
-            {
-                message = $"these {selectedItems.Count} devices";
-            }
-
-            if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", $"Are you sure you want to reject {message}?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
-            {
-                foreach (var item in selectedItems)
+                if (selectedItems.Count == 0)
                 {
-                    if (item.IsPending)
+                    return;
+                }
+
+                MetroDialogSettings s = new MetroDialogSettings
+                {
+                    AnimateShow = false,
+                    AnimateHide = false
+                };
+
+                string message = "this device";
+
+                if (selectedItems.Count > 1)
+                {
+                    message = $"these {selectedItems.Count} devices";
+                }
+
+                if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", $"Are you sure you want to reject {message}?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
+                {
+                    foreach (var item in selectedItems)
                     {
                         await this.deviceProvider.RejectDevice(item.ObjectID);
                         item.ApprovalState = ApprovalState.Rejected;
                     }
-                }
 
-                this.NotifyOfPropertyChange(() => this.CanRejectDevice);
-                this.NotifyOfPropertyChange(() => this.CanApproveDevice);
+                    this.NotifyOfPropertyChange(() => this.CanRejectDevice);
+                    this.NotifyOfPropertyChange(() => this.CanApproveDevice);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not reject the device\r\n{ex.Message}");
             }
         }
 
         public bool CanDeleteDevice => !this.IsLoading && this.SelectedItems.Count > 0;
 
-        public async Task ViewDevice()
+        public async Task Edit()
         {
+            try
+            {
+                var selectedItem = this.SelectedItem;
 
+                if (selectedItem == null)
+                {
+                    return;
+                }
+
+                DialogWindow w = new DialogWindow
+                {
+                    Title = "Device details",
+                    SaveButtonIsDefault = true,
+                    ShowCloseButton = false,
+                    SaveButtonName = "Close",
+                    DataContext = selectedItem
+                };
+
+                await this.GetWindow().ShowChildWindowAsync(w);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
+            }
         }
 
         public async Task DeleteDevice()
         {
-            var selectedItems = this.SelectedItems.ToList();
-
-            if (selectedItems.Count == 0)
+            try
             {
-                return;
-            }
+                var selectedItems = this.SelectedItems.ToList();
 
-            MetroDialogSettings s = new MetroDialogSettings
-            {
-                AnimateShow = false,
-                AnimateHide = false
-            };
-
-            string message = "this device";
-
-            if (selectedItems.Count > 1)
-            {
-                message = $"these {selectedItems.Count} devices";
-            }
-
-            if (await this.dialogCoordinator.ShowMessageAsync(this, "Warning", $"Are you sure you want to delete {message}? This will remove ALL stored data, including passwords and device credentials. This operation can not be undone", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
-            {
-                foreach (var item in selectedItems)
+                if (selectedItems.Count == 0)
                 {
-                    await this.deviceProvider.DeleteDevice(item.ObjectID);
-                    this.Devices.Remove(item);
+                    return;
                 }
 
-                this.NotifyOfPropertyChange(() => this.CanRejectDevice);
-                this.NotifyOfPropertyChange(() => this.CanApproveDevice);
-                this.NotifyOfPropertyChange(() => this.CanDeleteDevice);
+                MetroDialogSettings s = new MetroDialogSettings
+                {
+                    AnimateShow = false,
+                    AnimateHide = false
+                };
+
+                string message = "this device";
+
+                if (selectedItems.Count > 1)
+                {
+                    message = $"these {selectedItems.Count} devices";
+                }
+
+                if (await this.dialogCoordinator.ShowMessageAsync(this, "Warning", $"Are you sure you want to delete {message}? This will remove ALL stored data, including passwords and device credentials. This operation can not be undone", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
+                {
+                    foreach (var item in selectedItems)
+                    {
+                        await this.deviceProvider.DeleteDevice(item.ObjectID);
+                        this.Devices.Remove(item);
+                    }
+
+                    this.NotifyOfPropertyChange(() => this.CanRejectDevice);
+                    this.NotifyOfPropertyChange(() => this.CanApproveDevice);
+                    this.NotifyOfPropertyChange(() => this.CanDeleteDevice);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
             }
         }
 

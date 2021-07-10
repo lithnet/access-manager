@@ -30,9 +30,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly SecurityDescriptorTargetViewModelComparer customComparer;
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IDirectory directory;
-        private readonly ISecurityDescriptorTargetViewModelFactory factory;
+        private readonly IAsyncViewModelFactory<SecurityDescriptorTargetViewModel, SecurityDescriptorTarget, SecurityDescriptorTargetViewModelDisplaySettings> factory;
         private readonly ILogger<SecurityDescriptorTargetsViewModel> logger;
-        private readonly IEffectiveAccessViewModelFactory effectiveAccessFactory;
+        private readonly IViewModelFactory<EffectiveAccessViewModel, SecurityDescriptorTargetsViewModel> effectiveAccessFactory;
         private readonly INotifyModelChangedEventPublisher eventPublisher;
         private readonly IShellExecuteProvider shellExecuteProvider;
 
@@ -44,7 +44,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public Task Initialization { get; private set; }
 
-        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, ISecurityDescriptorTargetViewModelFactory factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IEnumerable<IComputerTargetProvider> computerTargetProviders, IEffectiveAccessViewModelFactory effectiveAccessFactory, IShellExecuteProvider shellExecuteProvider)
+        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, IAsyncViewModelFactory<SecurityDescriptorTargetViewModel, SecurityDescriptorTarget, SecurityDescriptorTargetViewModelDisplaySettings> factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IEnumerable<IComputerTargetProvider> computerTargetProviders, IViewModelFactory<EffectiveAccessViewModel, SecurityDescriptorTargetsViewModel> effectiveAccessFactory, IShellExecuteProvider shellExecuteProvider)
         {
             this.factory = factory;
             this.Model = model;
@@ -92,27 +92,35 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task Add()
         {
-            ExternalDialogWindow w = new ExternalDialogWindow
+            try
             {
-                Title = "Add authorization rule",
-                SaveButtonIsDefault = true,
-                Height = childWindowHeight,
-                Width = childWindowWidth,
-            };
+                ExternalDialogWindow w = new ExternalDialogWindow
+                {
+                    Title = "Add authorization rule",
+                    SaveButtonIsDefault = true,
+                    Height = childWindowHeight,
+                    Width = childWindowWidth,
+                };
 
-            var m = new SecurityDescriptorTarget();
-            var vm = await this.factory.CreateViewModelAsync(m, this.ChildDisplaySettings);
-            w.DataContext = vm;
+                var m = new SecurityDescriptorTarget();
+                var vm = await this.factory.CreateViewModelAsync(m, this.ChildDisplaySettings);
+                w.DataContext = vm;
 
-            if (w.ShowDialog() == true)
+                if (w.ShowDialog() == true)
+                {
+                    m.CreatedBy = WindowsIdentity.GetCurrent().User.ToString();
+                    m.Created = DateTime.UtcNow;
+                    m.LastModifiedBy = WindowsIdentity.GetCurrent().User.ToString();
+                    m.LastModified = m.Created;
+
+                    this.Model.Add(m);
+                    this.ViewModels.Add(vm);
+                }
+            }
+            catch (Exception ex)
             {
-                m.CreatedBy = WindowsIdentity.GetCurrent().User.ToString();
-                m.Created = DateTime.UtcNow;
-                m.LastModifiedBy = WindowsIdentity.GetCurrent().User.ToString();
-                m.LastModified = m.Created;
-
-                this.Model.Add(m);
-                this.ViewModels.Add(vm);
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not add target");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not add the target\r\n{ex.Message}");
             }
         }
 
@@ -195,6 +203,11 @@ namespace Lithnet.AccessManager.Server.UI
                 this.Items.Refresh();
                 this.IsFilterApplied = true;
             }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not apply filter");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not apply the filter\r\n{ex.Message}");
+            }
             finally
             {
                 if (controller != null)
@@ -236,32 +249,40 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public async Task Delete(System.Collections.IList items)
+        public async Task Delete(IList items)
         {
-            if (items == null)
+            try
             {
-                return;
-            }
-
-            var itemsToDelete = items.Cast<SecurityDescriptorTargetViewModel>().ToList();
-
-            MetroDialogSettings s = new MetroDialogSettings
-            {
-                AnimateShow = false,
-                AnimateHide = false
-            };
-
-            string message = itemsToDelete.Count == 1 ? "Are you sure you want to delete this rule?" : $"Are you sure you want to delete {itemsToDelete.Count} rules?";
-
-            if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", message, MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
-            {
-                foreach (var deleting in itemsToDelete)
+                if (items == null)
                 {
-                    this.Model.Remove(deleting.Model);
-                    this.ViewModels.Remove(deleting);
+                    return;
                 }
 
-                this.SelectedItem = this.ViewModels.FirstOrDefault();
+                var itemsToDelete = items.Cast<SecurityDescriptorTargetViewModel>().ToList();
+
+                MetroDialogSettings s = new MetroDialogSettings
+                {
+                    AnimateShow = false,
+                    AnimateHide = false
+                };
+
+                string message = itemsToDelete.Count == 1 ? "Are you sure you want to delete this rule?" : $"Are you sure you want to delete {itemsToDelete.Count} rules?";
+
+                if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", message, MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
+                {
+                    foreach (var deleting in itemsToDelete)
+                    {
+                        this.Model.Remove(deleting.Model);
+                        this.ViewModels.Remove(deleting);
+                    }
+
+                    this.SelectedItem = this.ViewModels.FirstOrDefault();
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not delete target");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not delete the target\r\n{ex.Message}");
             }
         }
 

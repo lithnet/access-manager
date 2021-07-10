@@ -16,12 +16,12 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly INotifyModelChangedEventPublisher eventPublisher;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IRegistrationKeyProvider keyProvider;
-        private readonly IRegistrationKeyViewModelFactory keyViewModelFactory;
+        private readonly IViewModelFactory<RegistrationKeyViewModel, IRegistrationKey> keyViewModelFactory;
         private readonly ILogger<AmsDirectoryRegistrationKeysViewModel> logger;
 
-      //  public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.KeySolid;
+        //  public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.KeySolid;
 
-        public AmsDirectoryRegistrationKeysViewModel(IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IRegistrationKeyProvider keyProvider, IRegistrationKeyViewModelFactory keyViewModelFactory, ILogger<AmsDirectoryRegistrationKeysViewModel> logger)
+        public AmsDirectoryRegistrationKeysViewModel(IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IRegistrationKeyProvider keyProvider, IViewModelFactory<RegistrationKeyViewModel, IRegistrationKey> keyViewModelFactory, ILogger<AmsDirectoryRegistrationKeysViewModel> logger)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.eventPublisher = eventPublisher;
@@ -34,25 +34,34 @@ namespace Lithnet.AccessManager.Server.UI
             this.RegistrationKeys = new BindableCollection<RegistrationKeyViewModel>();
         }
 
+
         protected override void OnInitialActivate()
         {
-            Task.Run(async () =>
-            {
-                try
-                {
-                    await foreach (IRegistrationKey m in this.keyProvider.GetRegistrationKeys())
-                    {
-                        this.RegistrationKeys.Add(keyViewModelFactory.CreateViewModel(m));
-                    }
-                }
-                catch (Exception ex)
-                {
-                    this.logger.LogError(ex, "Unable to populate the key list");
-                }
-
-                this.eventPublisher.Register(this);
-            });
+            Task.Run(async () => await this.Initialize());
         }
+
+        private async Task Initialize()
+        {
+            try
+            {
+                await foreach (IRegistrationKey m in this.keyProvider.GetRegistrationKeys())
+                {
+                    this.RegistrationKeys.Add(keyViewModelFactory.CreateViewModel(m));
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Could not initialize the view model");
+                this.ErrorMessageText = ex.ToString();
+                this.ErrorMessageHeaderText = "An initialization error occurred";
+            }
+
+            this.eventPublisher.Register(this);
+        }
+
+        public string ErrorMessageText { get; set; }
+
+        public string ErrorMessageHeaderText { get; set; }
 
         public BindableCollection<RegistrationKeyViewModel> RegistrationKeys { get; }
 
@@ -60,23 +69,31 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task Add()
         {
-            DialogWindow w = new DialogWindow
+            try
             {
-                Title = "Add registration key",
-                SaveButtonIsDefault = true
-            };
+                DialogWindow w = new DialogWindow
+                {
+                    Title = "Add registration key",
+                    SaveButtonIsDefault = true
+                };
 
-            var m = await this.keyProvider.CreateRegistrationKey();
+                var m = await this.keyProvider.CreateRegistrationKey();
 
-            var vm = this.keyViewModelFactory.CreateViewModel(m);
-            w.DataContext = vm;
+                var vm = this.keyViewModelFactory.CreateViewModel(m);
+                w.DataContext = vm;
 
-            await this.GetWindow().ShowChildWindowAsync(w);
+                await this.GetWindow().ShowChildWindowAsync(w);
 
-            if (w.Result == MessageDialogResult.Affirmative)
+                if (w.Result == MessageDialogResult.Affirmative)
+                {
+                    await this.keyProvider.UpdateRegistrationKey(m);
+                    this.RegistrationKeys.Add(vm);
+                }
+            }
+            catch (Exception ex)
             {
-                await this.keyProvider.UpdateRegistrationKey(m);
-                this.RegistrationKeys.Add(vm);
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
             }
         }
 
@@ -84,35 +101,43 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task Edit()
         {
-            var selectedKey = this.SelectedRegistrationKey;
-
-            if (selectedKey == null)
+            try
             {
-                return;
+                var selectedKey = this.SelectedRegistrationKey;
+
+                if (selectedKey == null)
+                {
+                    return;
+                }
+
+                DialogWindow w = new DialogWindow
+                {
+                    Title = "Edit registration key",
+                    SaveButtonIsDefault = true
+                };
+
+                var m = await this.keyProvider.CloneRegistrationKey(selectedKey.Model);
+                var vm = this.keyViewModelFactory.CreateViewModel(m);
+
+                w.DataContext = vm;
+
+                await this.GetWindow().ShowChildWindowAsync(w);
+
+                if (w.Result == MessageDialogResult.Affirmative)
+                {
+                    selectedKey.ActivationCount = vm.ActivationCount;
+                    selectedKey.ActivationLimit = vm.ActivationLimit;
+                    selectedKey.Enabled = vm.Enabled;
+                    selectedKey.Key = vm.Key;
+                    selectedKey.Name = vm.Name;
+                    selectedKey.ApprovalRequired = vm.ApprovalRequired;
+                    await this.keyProvider.UpdateRegistrationKey(selectedKey.Model);
+                }
             }
-
-            DialogWindow w = new DialogWindow
+            catch (Exception ex)
             {
-                Title = "Edit registration key",
-                SaveButtonIsDefault = true
-            };
-
-            var m = await this.keyProvider.CloneRegistrationKey(selectedKey.Model);
-            var vm = this.keyViewModelFactory.CreateViewModel(m);
-
-            w.DataContext = vm;
-
-            await this.GetWindow().ShowChildWindowAsync(w);
-
-            if (w.Result == MessageDialogResult.Affirmative)
-            {
-                selectedKey.ActivationCount = vm.ActivationCount;
-                selectedKey.ActivationLimit = vm.ActivationLimit;
-                selectedKey.Enabled = vm.Enabled;
-                selectedKey.Key = vm.Key;
-                selectedKey.Name = vm.Name;
-                selectedKey.ApprovalRequired = vm.ApprovalRequired;
-                await this.keyProvider.UpdateRegistrationKey(selectedKey.Model);
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
             }
         }
 
@@ -120,18 +145,26 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task Delete()
         {
-            MetroDialogSettings s = new MetroDialogSettings
+            try
             {
-                AnimateShow = false,
-                AnimateHide = false
-            };
+                MetroDialogSettings s = new MetroDialogSettings
+                {
+                    AnimateShow = false,
+                    AnimateHide = false
+                };
 
-            if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", "Are you sure you want to delete this key?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
+                if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", "Are you sure you want to delete this key?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
+                {
+                    var deleting = this.SelectedRegistrationKey;
+                    await this.keyProvider.DeleteRegistrationKey(deleting.Model);
+                    this.RegistrationKeys.Remove(deleting);
+                    this.SelectedRegistrationKey = this.RegistrationKeys.FirstOrDefault();
+                }
+            }
+            catch (Exception ex)
             {
-                var deleting = this.SelectedRegistrationKey;
-                await this.keyProvider.DeleteRegistrationKey(deleting.Model);
-                this.RegistrationKeys.Remove(deleting);
-                this.SelectedRegistrationKey = this.RegistrationKeys.FirstOrDefault();
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
             }
         }
 

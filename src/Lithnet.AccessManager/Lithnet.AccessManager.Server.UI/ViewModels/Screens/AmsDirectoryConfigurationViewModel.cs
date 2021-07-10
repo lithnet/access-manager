@@ -8,12 +8,13 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly ApiAuthenticationOptions agentOptions;
 
-        public AmsDirectoryConfigurationViewModel(AmsDirectoryRegistrationKeysViewModel registrationKeysVm, AmsDirectoryDevicesViewModel devicesVm, AmsDirectoryLithnetLapsConfigurationViewModel lapsVm, ApiAuthenticationOptions agentOptions, INotifyModelChangedEventPublisher eventPublisher)
+        public AmsDirectoryConfigurationViewModel(AmsDirectoryRegistrationKeysViewModel registrationKeysVm, AmsDirectoryDevicesViewModel devicesVm, AmsDirectoryGroupsViewModel groupsVm, AmsDirectoryLithnetLapsConfigurationViewModel lapsVm, ApiAuthenticationOptions agentOptions, INotifyModelChangedEventPublisher eventPublisher)
         {
             this.agentOptions = agentOptions;
 
-            this.Items.Add(registrationKeysVm);
             this.Items.Add(devicesVm);
+            this.Items.Add(groupsVm);
+            this.Items.Add(registrationKeysVm);
             this.Items.Add(lapsVm);
 
             this.DisplayName = "Access Manager Directory";

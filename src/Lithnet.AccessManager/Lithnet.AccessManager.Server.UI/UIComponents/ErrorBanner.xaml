@@ -1,0 +1,26 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.UIComponents.ErrorBanner"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI.UIComponents"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:s="https://github.com/canton7/Stylet"
+             mc:Ignorable="d" 
+             >
+    <Grid Background="LightYellow"
+          DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}"
+          Visibility="{Binding Path=ShowItem}"
+          Margin="5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <iconPacks:PackIconFontAwesome Kind="ExclamationCircleSolid" Margin="5" Foreground="#FFDD2200" VerticalAlignment="Center"/>
+        <TextBlock Grid.Column="1" TextWrapping="Wrap" Margin="5"><TextBlock Text="{Binding HeaderText, FallbackValue='An error occurred initializing the data.'}"></TextBlock><TextBlock Text="  "></TextBlock><Hyperlink s:View.ActionTarget="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}" Command="{s:Action Method=ShowMessage}">Show details...</Hyperlink></TextBlock>
+    </Grid>
+</UserControl>

@@ -8,6 +8,7 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:uiComponents="clr-namespace:Lithnet.AccessManager.Server.UI.UIComponents"
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
@@ -16,19 +17,22 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
 
         </Grid.RowDefinitions>
-
-        <DockPanel Grid.Row="0">
+        <uiComponents:ErrorBanner Grid.Column="0"
+                                  MessageText="{Binding ErrorMessageText}"
+                                  HeaderText="{Binding ErrorMessageHeaderText}"/>
+        <DockPanel Grid.Row="1">
             <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
                 <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
             </Button>
             <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Computer authorization rules" />
         </DockPanel>
 
-        <StackPanel Grid.Row="1" 
+        <StackPanel Grid.Row="2" 
                     Visibility="{Binding IsLoading, Converter={StaticResource  BooleanToVisibilityConverter}}"
                     Orientation="Horizontal"
                     Margin="5">
@@ -37,14 +41,14 @@
                        Text="Loading rules.."/>
 
         </StackPanel>
-        <ContentControl Grid.Row="2"
+        <ContentControl Grid.Row="3"
                         Margin="10 0 10 0"
                         d:Content="View model"
                         s:View.Model="{Binding Targets}" 
                         Visibility="{Binding HasLoaded, Converter={StaticResource BooleanToVisibilityConverter}}"
                         IsTabStop="False"/>
 
-        <Button Grid.Row="3"
+        <Button Grid.Row="4"
                 Content="Import authorization rules..."
                 HorizontalAlignment="Left"
                 Command="{s:Action Import}" 

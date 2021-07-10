@@ -18,7 +18,7 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly AuthenticationOptions model;
         private readonly IDialogCoordinator dialogCoordinator;
-        private readonly IX509Certificate2ViewModelFactory x509ViewModelFactory;
+        private readonly IViewModelFactory<X509Certificate2ViewModel, X509Certificate2> x509ViewModelFactory;
         private readonly ILogger logger;
         private readonly IDirectory directory;
         private readonly INotifyModelChangedEventPublisher eventPublisher;
@@ -26,7 +26,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly IProtectedSecretProvider secretProvider;
 
-        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IX509Certificate2ViewModelFactory x509ViewModelFactory, IDirectory directory, IShellExecuteProvider shellExecuteProvider, IObjectSelectionProvider objectSelectionProvider, IProtectedSecretProvider secretProvider)
+        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IViewModelFactory<X509Certificate2ViewModel, X509Certificate2> x509ViewModelFactory, IDirectory directory, IShellExecuteProvider shellExecuteProvider, IObjectSelectionProvider objectSelectionProvider, IProtectedSecretProvider secretProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.model = model;
@@ -54,16 +54,33 @@ namespace Lithnet.AccessManager.Server.UI
         }
 
         public string HelpLink => Constants.HelpLinkPageAuthentication;
-
         protected override void OnInitialActivate()
         {
-            Task.Run(() =>
+            Task.Run(this.Initialize);
+        }
+
+        private void Initialize()
+        {
+            try
             {
                 this.BuildAllowedToAuthenticateList();
                 this.BuildTrustedIssuers();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Could not initialize the view model");
+                this.ErrorMessageText = ex.ToString();
+                this.ErrorMessageHeaderText = "An initialization error occurred";
+            }
+            finally
+            {
                 this.eventPublisher.Register(this);
-            });
+            }
         }
+
+        public string ErrorMessageText { get; set; }
+
+        public string ErrorMessageHeaderText { get; set; }
 
         private void BuildAllowedToAuthenticateList()
         {
@@ -83,17 +100,25 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool CanRemoveAllowedPrincipal => this.SelectedAllowedPrincipal != null;
 
-        public void RemoveAllowedPrincipal()
+        public async Task RemoveAllowedPrincipal()
         {
-            SecurityIdentifierViewModel selected = this.SelectedAllowedPrincipal;
-
-            if (selected == null)
+            try
             {
-                return;
-            }
+                SecurityIdentifierViewModel selected = this.SelectedAllowedPrincipal;
 
-            this.model.AllowedPrincipals.Remove(selected.Sid);
-            this.AllowedPrincipals.Remove(selected);
+                if (selected == null)
+                {
+                    return;
+                }
+
+                this.model.AllowedPrincipals.Remove(selected.Sid);
+                this.AllowedPrincipals.Remove(selected);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
+            }
         }
 
         public async Task AddAllowedPrincipal()
@@ -294,12 +319,20 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool CanAddIssuer => this.ValidateSpecificIssuer;
 
-        public void RemoveIssuer()
+        public async Task RemoveIssuer()
         {
-            X509Certificate2ViewModel removing = this.SelectedIssuer;
-            int position = this.TrustedIssuers.IndexOf(removing);
-            this.TrustedIssuers.RemoveAt(position);
-            this.model.ClientCert.TrustedIssuers.RemoveAt(position);
+            try
+            {
+                X509Certificate2ViewModel removing = this.SelectedIssuer;
+                int position = this.TrustedIssuers.IndexOf(removing);
+                this.TrustedIssuers.RemoveAt(position);
+                this.model.ClientCert.TrustedIssuers.RemoveAt(position);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
+            }
         }
 
         public bool CanRemoveIssuer => this.ValidateSpecificIssuer && this.SelectedIssuer != null;

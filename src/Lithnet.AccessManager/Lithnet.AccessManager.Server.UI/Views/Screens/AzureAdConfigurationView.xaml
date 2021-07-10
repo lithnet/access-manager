@@ -10,11 +10,14 @@
              xmlns:drawing="clr-namespace:System.Drawing;assembly=System.Drawing.Common"
              xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:uiComponents="clr-namespace:Lithnet.AccessManager.Server.UI.UIComponents"
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
              d:DesignWidth="800"
              Margin="5">
     <StackPanel>
+        <uiComponents:ErrorBanner MessageText="{Binding ErrorMessageText}"
+                                  HeaderText="{Binding ErrorMessageHeaderText}"/>
         <DockPanel>
             <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
                 <icons:PackIconMaterialLight Kind="HelpCircle" />
@@ -29,7 +32,6 @@
 
         <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
                Content="General settings" />
-<Image Source="{StaticResource ams }" Height="26" Width="26"/>
 
         <Grid Margin="5">
             <Grid.ColumnDefinitions>

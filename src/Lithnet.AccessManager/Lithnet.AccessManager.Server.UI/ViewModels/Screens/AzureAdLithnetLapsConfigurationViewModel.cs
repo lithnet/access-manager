@@ -1,15 +1,5 @@
-﻿using System;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using Lithnet.AccessManager.Api;
-using MahApps.Metro.IconPacks;
-using Stylet;
+﻿using Stylet;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.UI.Interop;
-using MahApps.Metro.Controls.Dialogs;
-using Microsoft.Extensions.Logging;
-using PropertyChanged;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -17,10 +7,11 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public AzureAdLithnetLapsConfigurationViewModel(IShellExecuteProvider shellExecuteProvider, INotifyModelChangedEventPublisher eventPublisher, EncryptionCertificateComponentViewModel encryptionVm)
+        public AzureAdLithnetLapsConfigurationViewModel(IShellExecuteProvider shellExecuteProvider, INotifyModelChangedEventPublisher eventPublisher, EncryptionCertificateComponentViewModel encryptionVm, PasswordPoliciesViewModel passwordPolicies)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.PasswordEncryption = encryptionVm;
+            this.PasswordPolicies = passwordPolicies;
 
             this.DisplayName = "Lithnet LAPS";
             eventPublisher.Register(this);
@@ -30,7 +21,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string HelpLink => Constants.HelpLinkPageEmail;
 
-        // public PackIconUniconsKind Icon => PackIconUniconsKind.ServerConnection;
+        public PasswordPoliciesViewModel PasswordPolicies { get; set; }
 
         public async Task Help()
         {

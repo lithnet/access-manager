@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class JitDomainStatusViewModelFactory : IJitDomainStatusViewModelFactory
+    public class JitDomainStatusViewModelFactory : IViewModelFactory<JitDomainStatusViewModel, Domain, JitDynamicGroupMapping>
     {
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IDirectory directory;

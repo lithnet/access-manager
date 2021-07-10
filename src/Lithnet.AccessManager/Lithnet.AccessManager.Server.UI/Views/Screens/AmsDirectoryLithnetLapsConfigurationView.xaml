@@ -24,10 +24,13 @@
             </Button>
             <Label DockPanel.Dock="Left"
                    Style="{DynamicResource DescriptionHeaderStyle}"
-                   Content="Lithnet LAPS" />
+                   Content="Lithnet LAPS for AMS-registered devices" />
         </DockPanel>
    
         <ContentControl s:View.Model="{Binding PasswordEncryption, Mode=OneWay}"  
+                        IsTabStop="False"/>
+
+        <ContentControl s:View.Model="{Binding PasswordPolicies, Mode=OneWay}"  
                         IsTabStop="False"/>
     </StackPanel>
 </UserControl>

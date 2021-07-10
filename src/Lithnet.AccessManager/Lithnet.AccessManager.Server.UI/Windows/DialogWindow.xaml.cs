@@ -1,9 +1,11 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.SimpleChildWindow;
 using PropertyChanged;
+using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -17,6 +19,27 @@ namespace Lithnet.AccessManager.Server.UI
         {
             InitializeComponent();
             this.SaveButton.Focus();
+        }
+
+        protected override void OnInitialized(EventArgs e)
+        {
+            this.IsOpenChanged += this.DialogWindow_IsOpenChanged;
+            base.OnInitialized(e);
+        }
+
+        private void DialogWindow_IsOpenChanged(object sender, RoutedEventArgs e)
+        {
+            if (this.DataContext is IScreenState s)
+            {
+                if (this.IsOpen)
+                {
+                    s.Activate();
+                }
+                else
+                {
+                    s.Deactivate();
+                }
+            }
         }
 
         public bool CancelButtonIsDefault { get; set; } = true;

@@ -159,24 +159,24 @@ namespace Lithnet.AccessManager.Server.UI
         public async Task EditConnectionString()
         {
             ProgressDialogController progress = null;
-
-            MetroDialogSettings settings = new MetroDialogSettings
-            {
-                DefaultText = this.ConnectionString,
-            };
-
-            var connectionString = await this.dialogCoordinator.ShowInputAsync(this, "Enter connection string", "Please provide the connection string to the database server that contains the AccessManager database", settings);
-
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                return;
-            }
-
-            progress = await this.dialogCoordinator.ShowProgressAsync(this, "Testing connection", string.Empty, false);
-            progress.SetIndeterminate();
-
             try
             {
+                MetroDialogSettings settings = new MetroDialogSettings
+                {
+                    DefaultText = this.ConnectionString,
+                };
+
+                var connectionString = await this.dialogCoordinator.ShowInputAsync(this, "Enter connection string", "Please provide the connection string to the database server that contains the AccessManager database", settings);
+
+                if (string.IsNullOrWhiteSpace(connectionString))
+                {
+                    return;
+                }
+
+                progress = await this.dialogCoordinator.ShowProgressAsync(this, "Testing connection", string.Empty, false);
+                progress.SetIndeterminate();
+
+
                 connectionString = sqlInstanceProvider.NormalizeConnectionString(connectionString);
                 await Task.Run(() => sqlInstanceProvider.TestConnectionString(connectionString));
                 this.ConnectionString = connectionString;
@@ -249,26 +249,34 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool CanGetDatabaseCreationScript => this.IsEnterpriseEdition;
 
-        public void GetDatabaseCreationScript()
+        public async Task GetDatabaseCreationScript()
         {
-            var vm = new ScriptContentViewModel(this.dialogCoordinator)
+            try
             {
-                DefaultExt = "sql",
-                Filter = "SQL script (*.sql)|*.sql",
-                HelpText = "Run the following script on the database server to create the SQL database",
-                ScriptText = this.scriptTemplateProvider.CreateDatabase
-                    .Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceNTAccount().Value, StringComparison.OrdinalIgnoreCase)
-            };
+                var vm = new ScriptContentViewModel(this.dialogCoordinator)
+                {
+                    DefaultExt = "sql",
+                    Filter = "SQL script (*.sql)|*.sql",
+                    HelpText = "Run the following script on the database server to create the SQL database",
+                    ScriptText = this.scriptTemplateProvider.CreateDatabase
+                        .Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceNTAccount().Value, StringComparison.OrdinalIgnoreCase)
+                };
 
-            ExternalDialogWindow w = new ExternalDialogWindow
+                ExternalDialogWindow w = new ExternalDialogWindow
+                {
+                    Title = "Script",
+                    DataContext = vm,
+                    SaveButtonVisible = false,
+                    CancelButtonName = "Close"
+                };
+
+                w.ShowDialog();
+            }
+            catch (Exception ex)
             {
-                Title = "Script",
-                DataContext = vm,
-                SaveButtonVisible = false,
-                CancelButtonName = "Close"
-            };
-
-            w.ShowDialog();
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
+            }
         }
         public bool CanTestConnectionString => this.UseSqlServer && !string.IsNullOrWhiteSpace(this.ConnectionString);
 

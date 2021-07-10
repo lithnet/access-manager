@@ -24,7 +24,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         [NotifyModelChangedCollection]
         public BindableCollection<TViewModel> ViewModels { get; }
-        
+
         protected NotificationChannelDefinitionsViewModel(IList<TModel> model, NotificationChannelDefinitionViewModelFactory<TModel, TViewModel> factory, IDialogCoordinator dialogCoordinator, IEventAggregator eventAggregator, INotifyModelChangedEventPublisher eventPublisher)
         {
             this.factory = factory;
@@ -32,7 +32,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.EventAggregator = eventAggregator;
             this.DialogCoordinator = dialogCoordinator;
             this.ViewModels = new BindableCollection<TViewModel>(this.Model.Select(t => this.factory.CreateViewModel(t)));
-            this.eventPublisher = eventPublisher; 
+            this.eventPublisher = eventPublisher;
             this.eventPublisher.Register(this);
             this.EventAggregator.Subscribe(this);
         }
@@ -41,22 +41,29 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task Add()
         {
-            DialogWindow w = new DialogWindow();
-            w.Title = "Add notification channel";
-            w.SaveButtonIsDefault = true;
-            var m = this.factory.CreateModel();
-            var vm = this.factory.CreateViewModel(m);
-            w.DataContext = vm;
-            vm.Enabled = true;
-            vm.Id = Guid.NewGuid().ToString();
-
-            await this.GetWindow().ShowChildWindowAsync(w);
-
-            if (w.Result == MessageDialogResult.Affirmative)
+            try
             {
-                this.Model.Add(m);
-                this.ViewModels.Add(vm);
-                this.EventAggregator.Publish(new NotificationSubscriptionChangedEvent { ModificationType = ModificationType.Added, ModifiedObject = m });
+                DialogWindow w = new DialogWindow();
+                w.Title = "Add notification channel";
+                w.SaveButtonIsDefault = true;
+                var m = this.factory.CreateModel();
+                var vm = this.factory.CreateViewModel(m);
+                w.DataContext = vm;
+                vm.Enabled = true;
+                vm.Id = Guid.NewGuid().ToString();
+
+                await this.GetWindow().ShowChildWindowAsync(w);
+
+                if (w.Result == MessageDialogResult.Affirmative)
+                {
+                    this.Model.Add(m);
+                    this.ViewModels.Add(vm);
+                    this.EventAggregator.Publish(new NotificationSubscriptionChangedEvent { ModificationType = ModificationType.Added, ModifiedObject = m });
+                }
+            }
+            catch (Exception ex)
+            {
+                await this.DialogCoordinator.ShowMessageAsync(this, "Error", $"Could not add the notification channel\r\n{ex.Message}");
             }
         }
 
@@ -69,37 +76,44 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task Edit()
         {
-            var item = this.SelectedItem;
-
-            if (item == null)
+            try
             {
-                return;
+                var item = this.SelectedItem;
+
+                if (item == null)
+                {
+                    return;
+                }
+
+                var model = item.Model;
+
+                DialogWindow w = new DialogWindow();
+                w.Title = "Edit notification channel";
+                w.SaveButtonIsDefault = true;
+
+                var m = JsonConvert.DeserializeObject<TModel>(JsonConvert.SerializeObject(model));
+                var vm = this.factory.CreateViewModel(m);
+
+                w.DataContext = vm;
+
+                await this.GetWindow().ShowChildWindowAsync(w);
+
+                if (w.Result == MessageDialogResult.Affirmative)
+                {
+                    this.Model.Remove(model);
+
+                    int existingPosition = this.ViewModels.IndexOf(item);
+
+                    this.ViewModels.Remove(item);
+                    this.Model.Add(m);
+                    this.ViewModels.Insert(Math.Min(existingPosition, this.ViewModels.Count), vm);
+                    this.SelectedItem = vm;
+                    this.EventAggregator.Publish(new NotificationSubscriptionChangedEvent { ModificationType = ModificationType.Modified, ModifiedObject = m });
+                }
             }
-
-            var model = item.Model;
-
-            DialogWindow w = new DialogWindow();
-            w.Title = "Edit notification channel";
-            w.SaveButtonIsDefault = true;
-
-            var m = JsonConvert.DeserializeObject<TModel>(JsonConvert.SerializeObject(model));
-            var vm = this.factory.CreateViewModel(m);
-
-            w.DataContext = vm;
-
-            await this.GetWindow().ShowChildWindowAsync(w);
-
-            if (w.Result == MessageDialogResult.Affirmative)
+            catch (Exception ex)
             {
-                this.Model.Remove(model);
-
-                int existingPosition = this.ViewModels.IndexOf(item);
-
-                this.ViewModels.Remove(item);
-                this.Model.Add(m);
-                this.ViewModels.Insert(Math.Min(existingPosition, this.ViewModels.Count), vm);
-                this.SelectedItem = vm;
-                this.EventAggregator.Publish(new NotificationSubscriptionChangedEvent { ModificationType = ModificationType.Modified, ModifiedObject = m });
+                await this.DialogCoordinator.ShowMessageAsync(this, "Error", $"Could not edit the notification channel\r\n{ex.Message}");
             }
         }
 
@@ -107,25 +121,32 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task Delete()
         {
-            var deleting = this.SelectedItem;
-
-            if (deleting == null)
+            try
             {
-                return;
+                var deleting = this.SelectedItem;
+
+                if (deleting == null)
+                {
+                    return;
+                }
+
+                MetroDialogSettings s = new MetroDialogSettings
+                {
+                    AnimateShow = false,
+                    AnimateHide = false
+                };
+
+                if (await this.DialogCoordinator.ShowMessageAsync(this, "Confirm", "Are you sure you want to delete this channel?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
+                {
+                    this.Model.Remove(deleting.Model);
+                    this.ViewModels.Remove(deleting);
+                    this.SelectedItem = this.ViewModels.FirstOrDefault();
+                    this.EventAggregator.Publish(new NotificationSubscriptionChangedEvent { ModificationType = ModificationType.Deleted, ModifiedObject = deleting.Model });
+                }
             }
-
-            MetroDialogSettings s = new MetroDialogSettings
+            catch (Exception ex)
             {
-                AnimateShow = false,
-                AnimateHide = false
-            };
-
-            if (await this.DialogCoordinator.ShowMessageAsync(this, "Confirm", "Are you sure you want to delete this channel?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
-            {
-                this.Model.Remove(deleting.Model);
-                this.ViewModels.Remove(deleting);
-                this.SelectedItem = this.ViewModels.FirstOrDefault();
-                this.EventAggregator.Publish(new NotificationSubscriptionChangedEvent { ModificationType = ModificationType.Deleted, ModifiedObject = deleting.Model });
+                await this.DialogCoordinator.ShowMessageAsync(this, "Error", $"Could not delete the notification channel\r\n{ex.Message}");
             }
         }
 

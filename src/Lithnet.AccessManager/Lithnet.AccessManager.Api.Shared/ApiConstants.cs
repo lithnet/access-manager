@@ -9,6 +9,7 @@ namespace Lithnet.AccessManager.Api.Shared
         public const string BadRequest = "bad-request";
         public const string TokenValidationFailed = "token-validation-failed";
         public const string DeviceNotFound = "device-not-found";
+        public const string DeviceDisabled = "device-disabled";
         public const string DeviceNotApproved = "device-not-approved";
         public const string AadDeviceNotFound = "aad-device-not-found";
         public const string UnsupportedAuthType = "unsupported-auth-type";

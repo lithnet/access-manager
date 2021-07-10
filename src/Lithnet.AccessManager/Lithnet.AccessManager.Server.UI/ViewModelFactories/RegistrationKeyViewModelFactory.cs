@@ -5,7 +5,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class RegistrationKeyViewModelFactory : IRegistrationKeyViewModelFactory
+    public class RegistrationKeyViewModelFactory : IViewModelFactory<RegistrationKeyViewModel, IRegistrationKey>
     {
         private readonly Func<IModelValidator<RegistrationKeyViewModel>> validator;
         private readonly ILogger<RegistrationKeyViewModel> logger;

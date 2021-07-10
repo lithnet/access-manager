@@ -11,9 +11,6 @@
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d"
              Margin="5">
-    <UserControl.Resources>
-        <local:EnumToDisplayConverter x:Key="enumconv"/>
-    </UserControl.Resources>
     <AdornerDecorator>
         <StackPanel>
             <Expander Expanded="HandleExpanderExpanded"
@@ -61,7 +58,7 @@
                            Content="Type" />
                     <StackPanel Orientation="Horizontal"
                                 Grid.Row="1" Grid.Column="1">
-                        <Label Content="{Binding Type, Converter={StaticResource enumconv}, Mode=OneWay}"
+                        <Label Content="{Binding Type, Converter={StaticResource EnumDescriptionConverter}, Mode=OneWay}"
                            Margin="2" />
 
                         <local:EnterpriseEditionBadge VerticalAlignment="Center"

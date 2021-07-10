@@ -5,12 +5,10 @@ using System.Windows;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public sealed class DeviceViewModel : Screen, IViewAware
+    public sealed class DeviceViewModel : Screen
     {
 
         public IDevice Model { get; }
-
-        public UIElement View { get; set; }
 
         public DeviceViewModel(IDevice model)
         {
@@ -32,6 +30,14 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool IsPending => this.ApprovalState == ApprovalState.Pending;
 
+        public bool Disabled
+        {
+            get => this.Model.Disabled;
+            set => this.Model.Disabled = value;
+        }
+
+        public bool Enabled => !this.Model.Disabled;
+        
         public string AuthorityDeviceId => this.Model.AuthorityDeviceId;
 
         public string AuthorityId => this.Model.AuthorityId;
@@ -40,9 +46,9 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string ComputerName => this.Model.ComputerName;
 
-        public DateTime Created => this.Model.Created;
+        public DateTime Created => this.Model.Created.ToLocalTime();
 
-        public DateTime Modified => this.Model.Modified;
+        public DateTime Modified => this.Model.Modified.ToLocalTime();
 
         public string Description => this.Model.Description;
 
@@ -61,10 +67,5 @@ namespace Lithnet.AccessManager.Server.UI
         public string OperatingSystemVersion => this.Model.OperatingSystemVersion;
 
         public string Sid => this.Model.Sid;
-
-        public void AttachView(UIElement view)
-        {
-            this.View = view;
-        }
     }
 }

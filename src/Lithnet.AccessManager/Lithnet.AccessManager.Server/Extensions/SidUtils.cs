@@ -13,6 +13,16 @@ namespace Lithnet.AccessManager.Server
         public const string AadSidPrefix = "S-1-12-1-";
         public const string AmsSidPrefix = "S-1-4096-1-";
 
+        public static string ToAmsSidString(this Guid guid)
+        {
+            return $"{AmsSidPrefix}{guid.ToSidString()}";
+        }
+
+        public static string ToAadSidString(this Guid guid)
+        {
+            return $"{AadSidPrefix}{guid.ToSidString()}";
+        }
+        
         public static string ToSidString(this Guid guid)
         {
             byte[] bytes = guid.ToByteArray();

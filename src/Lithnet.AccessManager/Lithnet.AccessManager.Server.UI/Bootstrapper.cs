@@ -152,26 +152,15 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<PasswordPolicyOptions>().ToInstance(appconfig.PasswordPolicy);
                 builder.Bind<ApiAuthenticationOptions>().ToInstance(appconfig.ApiAuthentication);
 
-
                 // ViewModel factories
+                builder.Bind(typeof(IViewModelFactory<>)).ToAllImplementations();
+                builder.Bind(typeof(IViewModelFactory<,>)).ToAllImplementations();
+                builder.Bind(typeof(IViewModelFactory<,,>)).ToAllImplementations();
+                builder.Bind(typeof(IAsyncViewModelFactory<,>)).ToAllImplementations();
+                builder.Bind(typeof(IAsyncViewModelFactory<,,>)).ToAllImplementations();
                 builder.Bind(typeof(INotificationChannelDefinitionsViewModelFactory<,>)).ToAllImplementations();
                 builder.Bind(typeof(INotificationChannelDefinitionViewModelFactory<,>)).ToAllImplementations();
-                builder.Bind<INotificationChannelSelectionViewModelFactory>().To<NotificationChannelSelectionViewModelFactory>();
-                builder.Bind<ISecurityDescriptorTargetViewModelFactory>().To<SecurityDescriptorTargetViewModelFactory>();
-                builder.Bind<ISecurityDescriptorTargetsViewModelFactory>().To<SecurityDescriptorTargetsViewModelFactory>();
                 builder.Bind<IFileSelectionViewModelFactory>().To<FileSelectionViewModelFactory>();
-                builder.Bind<IActiveDirectoryDomainPermissionViewModelFactory>().To<ActiveDirectoryDomainPermissionViewModelFactory>();
-                builder.Bind<IActiveDirectoryForestSchemaViewModelFactory>().To<ActiveDirectoryForestSchemaViewModelFactory>();
-                builder.Bind<IX509Certificate2ViewModelFactory>().To<X509Certificate2ViewModelFactory>();
-                builder.Bind<IJitGroupMappingViewModelFactory>().To<JitGroupMappingViewModelFactory>();
-                builder.Bind<IJitDomainStatusViewModelFactory>().To<JitDomainStatusViewModelFactory>();
-                builder.Bind<IEffectiveAccessViewModelFactory>().To<EffectiveAccessViewModelFactory>();
-                builder.Bind<IImportProviderFactory>().To<ImportProviderFactory>();
-                builder.Bind<IImportResultsViewModelFactory>().To<ImportResultsViewModelFactory>();
-                builder.Bind<IAzureAdTenantDetailsViewModelFactory>().To<AzureAdTenantDetailsViewModelFactory>();
-                builder.Bind<IRegistrationKeyViewModelFactory>().To<RegistrationKeyViewModelFactory>();
-                builder.Bind<ISelectTargetTypeViewModelFactory>().To<SelectTargetTypeViewModelFactory>();
-                builder.Bind<IAzureAdObjectSelectorViewModelFactory>().To<AzureAdObjectSelectorViewModelFactory>();
 
                 // Services
                 builder.Bind<RandomNumberGenerator>().ToInstance(RandomNumberGenerator.Create());
@@ -193,6 +182,8 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<INotifyModelChangedEventPublisher>().To<NotifyModelChangedEventPublisher>();
                 builder.Bind<IShellExecuteProvider>().To<ShellExecuteProvider>();
                 builder.Bind<IDomainTrustProvider>().To<DomainTrustProvider>();
+                builder.Bind<IImportProviderFactory>().To<ImportProviderFactory>();
+
                 builder.Bind<IComputerTargetProvider>().To<ActiveDirectoryComputerTargetProvider>();
                 builder.Bind<IComputerTargetProvider>().To<AzureActiveDirectoryComputerTargetProvider>();
                 builder.Bind<IComputerTargetProvider>().To<AmsComputerTargetProvider>();
@@ -219,6 +210,8 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IUpgradeLog>().To<DbUpgradeLogger>();
                 builder.Bind<IHostApplicationLifetime>().To<WpfHostLifetime>();
                 builder.Bind<IDeviceProvider>().To<DbDeviceProvider>();
+                builder.Bind<IDevicePasswordProvider>().To<DbDevicePasswordProvider>();
+                builder.Bind<IAmsGroupProvider>().To<DbAmsGroupProvider>();
 
                 builder.Bind<IProtectedSecretProvider>().To<ProtectedSecretProvider>().InSingletonScope();
                 builder.Bind<IClusterProvider>().To<ClusterProvider>().InSingletonScope();

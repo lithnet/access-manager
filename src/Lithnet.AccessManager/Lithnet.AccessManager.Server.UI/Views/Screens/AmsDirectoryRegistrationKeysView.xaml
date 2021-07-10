@@ -11,6 +11,7 @@
              xmlns:icons="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:views="clr-namespace:Lithnet.AccessManager.Server.UI.Views"
+             xmlns:uiComponents="clr-namespace:Lithnet.AccessManager.Server.UI.UIComponents"
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
              d:DesignWidth="800"
@@ -24,23 +25,29 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <DockPanel Grid.Row="0">
+            <uiComponents:ErrorBanner Grid.Column="0"
+                                      MessageText="{Binding ErrorMessageText}"
+                                      HeaderText="{Binding ErrorMessageHeaderText}"/>
+
+
+            <DockPanel Grid.Row="1">
                 <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
                     <icons:PackIconMaterialLight Kind="HelpCircle" />
                 </Button>
                 <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Registration keys" />
             </DockPanel>
 
-            <TextBlock Grid.Row="1"
+            <TextBlock Grid.Row="2"
                        Margin="10 5 5 5"
                        TextWrapping="Wrap">Devices that don't use Active Directory or Azure Active Directory authentication must use a key to register with the AMS server.
             </TextBlock>
 
             <ListView
-                Grid.Row="2"
+                Grid.Row="3"
                 BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
                   ItemsSource="{Binding RegistrationKeys}"
                   SelectedItem="{Binding SelectedRegistrationKey}"
@@ -72,7 +79,7 @@
                 </ListView.View>
             </ListView>
 
-            <StackPanel Grid.Row="3"
+            <StackPanel Grid.Row="4"
                         Orientation="Horizontal"
                         Margin="10 5 5 5">
                 <Button Command="{s:Action Add}" 

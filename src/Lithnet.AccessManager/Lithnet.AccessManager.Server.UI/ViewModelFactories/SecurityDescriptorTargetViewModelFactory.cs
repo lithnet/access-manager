@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class SecurityDescriptorTargetViewModelFactory : ISecurityDescriptorTargetViewModelFactory
+    public class SecurityDescriptorTargetViewModelFactory : IAsyncViewModelFactory<SecurityDescriptorTargetViewModel, SecurityDescriptorTarget, SecurityDescriptorTargetViewModelDisplaySettings>
     {
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IAppPathProvider appPathProvider;
-        private readonly INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory;
+        private readonly IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> channelSelectionViewModelFactory;
         private readonly IFileSelectionViewModelFactory fileSelectionViewModelFactory;
         private readonly ILogger<SecurityDescriptorTargetViewModel> logger;
         private readonly IDiscoveryServices discoveryServices;
@@ -25,12 +25,12 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ScriptTemplateProvider scriptTemplateProvider;
         private readonly IAmsLicenseManager licenseManager;
         private readonly IShellExecuteProvider shellExecuteProvider;
-        private readonly ISelectTargetTypeViewModelFactory selectTargetTypeFactory;
-        private readonly IAzureAdObjectSelectorViewModelFactory aadObjectSelectorFactory;
+        private readonly IViewModelFactory<SelectTargetTypeViewModel> selectTargetTypeFactory;
+        private readonly IViewModelFactory<AzureAdObjectSelectorViewModel> aadObjectSelectorFactory;
         private readonly IAadGraphApiProvider graphProvider;
         private readonly IDeviceProvider deviceProvider;
 
-        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotificationChannelSelectionViewModelFactory channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IDirectory directory, ILocalSam localsam, IObjectSelectionProvider objectSelectionProvider, Func<IModelValidator<SecurityDescriptorTargetViewModel>> validator, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, ISelectTargetTypeViewModelFactory selectTargetTypeFactory, IAzureAdObjectSelectorViewModelFactory aadObjectSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider)
+        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IDirectory directory, ILocalSam localsam, IObjectSelectionProvider objectSelectionProvider, Func<IModelValidator<SecurityDescriptorTargetViewModel>> validator, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> selectTargetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadObjectSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.appPathProvider = appPathProvider;

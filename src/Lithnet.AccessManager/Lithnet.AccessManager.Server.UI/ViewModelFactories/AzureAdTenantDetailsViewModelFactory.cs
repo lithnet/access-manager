@@ -5,7 +5,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class AzureAdTenantDetailsViewModelFactory : IAzureAdTenantDetailsViewModelFactory
+    public class AzureAdTenantDetailsViewModelFactory : IViewModelFactory<AzureAdTenantDetailsViewModel, AzureAdTenantDetails>
     {
         private readonly Func<IModelValidator<AzureAdTenantDetailsViewModel>> validator;
         private readonly ILogger<AzureAdTenantDetailsViewModel> logger;

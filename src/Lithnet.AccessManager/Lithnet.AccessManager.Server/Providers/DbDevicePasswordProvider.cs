@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 
@@ -20,6 +21,17 @@ namespace Lithnet.AccessManager.Server
             this.dbProvider = dbProvider;
             this.logger = logger;
             this.policyOptions = policyOptions;
+        }
+
+        public async Task ExpireCurrentPassword(string deviceId)
+        {
+            await using SqlConnection con = this.dbProvider.GetConnection();
+
+            SqlCommand command = new SqlCommand("spExpireCurrentPassword", con);
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@ObjectId", deviceId);
+
+            await command.ExecuteNonQueryAsync();
         }
 
         public async Task<bool> HasPasswordExpired(string deviceId)

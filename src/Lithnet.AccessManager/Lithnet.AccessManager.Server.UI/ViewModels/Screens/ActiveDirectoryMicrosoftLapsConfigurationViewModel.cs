@@ -12,7 +12,7 @@ namespace Lithnet.AccessManager.Server.UI
     public class ActiveDirectoryMicrosoftLapsConfigurationViewModel : Screen, IHelpLink
     {
         private readonly IDialogCoordinator dialogCoordinator;
-        private readonly IActiveDirectoryForestSchemaViewModelFactory forestFactory;
+        private readonly IViewModelFactory<ActiveDirectoryForestSchemaViewModel, Forest> forestFactory;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
@@ -20,7 +20,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IWindowsServiceProvider windowsServiceProvider;
         //public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.SitemapSolid;
 
-        public ActiveDirectoryMicrosoftLapsConfigurationViewModel(IActiveDirectoryForestSchemaViewModelFactory forestFactory, IDialogCoordinator dialogCoordinator, ILogger<ActiveDirectoryMicrosoftLapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IScriptTemplateProvider scriptTemplateProvider, IWindowsServiceProvider windowsServiceProvider)
+        public ActiveDirectoryMicrosoftLapsConfigurationViewModel(IViewModelFactory<ActiveDirectoryForestSchemaViewModel, Forest> forestFactory, IDialogCoordinator dialogCoordinator, ILogger<ActiveDirectoryMicrosoftLapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IScriptTemplateProvider scriptTemplateProvider, IWindowsServiceProvider windowsServiceProvider)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.logger = logger;
@@ -35,12 +35,28 @@ namespace Lithnet.AccessManager.Server.UI
         }
         public string HelpLink => Constants.HelpLinkPageActiveDirectory;
 
-        private Task initialize;
-
         protected override void OnInitialActivate()
         {
-            this.initialize = Task.Run(async () => await this.PopulateForestsAndDomains());
+            Task.Run(async () => await this.Initialize());
         }
+
+        private async Task Initialize()
+        {
+            try
+            {
+                await this.PopulateForestsAndDomains();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Could not initialize the view model");
+                this.ErrorMessageText = ex.ToString();
+                this.ErrorMessageHeaderText = "An initialization error occurred";
+            }
+        }
+
+        public string ErrorMessageText { get; set; }
+
+        public string ErrorMessageHeaderText { get; set; }
 
         private async Task PopulateForestsAndDomains()
         {

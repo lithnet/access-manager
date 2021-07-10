@@ -6,6 +6,7 @@ using System.Windows.Input;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
 using PropertyChanged;
+using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -22,6 +23,15 @@ namespace Lithnet.AccessManager.Server.UI
             InitializeComponent();
             this.SaveButton.Focus();
             this.Owner ??= Application.Current.Windows.OfType<Window>().FirstOrDefault(t => t.IsVisible && t.IsEnabled);
+            this.Activated += this.ExternalDialogWindow_Activated;
+        }
+
+        private void ExternalDialogWindow_Activated(object sender, System.EventArgs e)
+        {
+            if (this.DataContext is IScreenState s)
+            {
+                s.Activate();
+            }
         }
 
         public ExternalDialogWindow(IShellExecuteProvider shellExecuteProvider)

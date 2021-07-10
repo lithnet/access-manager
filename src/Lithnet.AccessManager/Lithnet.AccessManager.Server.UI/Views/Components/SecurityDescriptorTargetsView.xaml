@@ -13,10 +13,7 @@
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800">
-    <UserControl.Resources>
-        <local:EnumToDisplayConverter x:Key="enumconv"/>
-    </UserControl.Resources>
-    <views:CanvasEx>
+  <views:CanvasEx>
         <Grid Height="{Binding Path=BindableActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}"
               Width="{Binding Path=BindableActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}">
 
@@ -96,7 +93,7 @@
                                         DisplayMemberBinding="{Binding DisplayName}"
                                         Width="Auto" />
                         <GridViewColumn Header="Type"
-                                        DisplayMemberBinding="{Binding Type, Converter={StaticResource enumconv}}"
+                                        DisplayMemberBinding="{Binding Type, Converter={StaticResource EnumDescriptionConverter}}"
                                         Width="Auto" />
                         <GridViewColumn Header="Status"
                                         DisplayMemberBinding="{Binding Status}"

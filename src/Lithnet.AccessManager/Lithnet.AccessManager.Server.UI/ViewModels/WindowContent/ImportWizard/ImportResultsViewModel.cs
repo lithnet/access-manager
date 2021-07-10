@@ -18,7 +18,7 @@ namespace Lithnet.AccessManager.Server.UI
     public sealed class ImportResultsViewModel : Screen, IHelpLink
     {
         private readonly ImportResults results;
-        private readonly ISecurityDescriptorTargetsViewModelFactory targetsFactory;
+        private readonly IAsyncViewModelFactory<SecurityDescriptorTargetsViewModel, IList<SecurityDescriptorTarget>> targetsFactory;
         private readonly IEventAggregator eventAggregator;
         private readonly ILogger<ImportResultsViewModel> logger;
         private readonly IDialogCoordinator dialogCoordinator;
@@ -26,7 +26,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public Task Initialization { get; private set; }
 
-        public ImportResultsViewModel(ImportResults results, ISecurityDescriptorTargetsViewModelFactory targetsFactory, IEventAggregator eventAggregator, ILogger<ImportResultsViewModel> logger, IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider)
+        public ImportResultsViewModel(ImportResults results, IAsyncViewModelFactory<SecurityDescriptorTargetsViewModel, IList<SecurityDescriptorTarget>> targetsFactory, IEventAggregator eventAggregator, ILogger<ImportResultsViewModel> logger, IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider)
         {
             this.results = results;
             this.logger = logger;

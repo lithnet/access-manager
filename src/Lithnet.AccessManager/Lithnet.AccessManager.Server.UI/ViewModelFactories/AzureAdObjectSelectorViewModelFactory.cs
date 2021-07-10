@@ -7,7 +7,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class AzureAdObjectSelectorViewModelFactory : IAzureAdObjectSelectorViewModelFactory
+    public class AzureAdObjectSelectorViewModelFactory : IViewModelFactory<AzureAdObjectSelectorViewModel>
     {
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly ILogger<AzureAdObjectSelectorViewModel> logger;

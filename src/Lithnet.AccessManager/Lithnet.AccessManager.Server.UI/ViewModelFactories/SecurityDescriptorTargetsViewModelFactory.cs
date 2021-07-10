@@ -8,18 +8,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class SecurityDescriptorTargetsViewModelFactory : ISecurityDescriptorTargetsViewModelFactory
+    public class SecurityDescriptorTargetsViewModelFactory : IAsyncViewModelFactory<SecurityDescriptorTargetsViewModel, IList<SecurityDescriptorTarget>>
     {
         private readonly IDialogCoordinator dialogCoordinator;
-        private readonly ISecurityDescriptorTargetViewModelFactory factory;
+        private readonly IAsyncViewModelFactory<SecurityDescriptorTargetViewModel, SecurityDescriptorTarget, SecurityDescriptorTargetViewModelDisplaySettings> factory;
         private readonly Func<INotifyModelChangedEventPublisher> eventPublisher;
         private readonly ILogger<SecurityDescriptorTargetsViewModel> logger;
         private readonly IDirectory directory;
         private readonly IEnumerable<IComputerTargetProvider> computerTargetProviders;
-        private readonly IEffectiveAccessViewModelFactory effectiveAccessFactory;
+        private readonly IViewModelFactory<EffectiveAccessViewModel, SecurityDescriptorTargetsViewModel> effectiveAccessFactory;
         private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public SecurityDescriptorTargetsViewModelFactory(IDialogCoordinator dialogCoordinator, ISecurityDescriptorTargetViewModelFactory factory, Func<INotifyModelChangedEventPublisher> eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IEnumerable<IComputerTargetProvider> computerTargetProviders, IEffectiveAccessViewModelFactory effectiveAccessFactory, IShellExecuteProvider shellExecuteProvider)
+        public SecurityDescriptorTargetsViewModelFactory(IDialogCoordinator dialogCoordinator, IAsyncViewModelFactory<SecurityDescriptorTargetViewModel, SecurityDescriptorTarget, SecurityDescriptorTargetViewModelDisplaySettings> factory, Func<INotifyModelChangedEventPublisher> eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IEnumerable<IComputerTargetProvider> computerTargetProviders, IViewModelFactory<EffectiveAccessViewModel, SecurityDescriptorTargetsViewModel> effectiveAccessFactory, IShellExecuteProvider shellExecuteProvider)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.factory = factory;

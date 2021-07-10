@@ -4,7 +4,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class NotificationChannelSelectionViewModelFactory : INotificationChannelSelectionViewModelFactory
+    public class NotificationChannelSelectionViewModelFactory : IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels>
     {
         private readonly INotificationSubscriptionProvider subscriptionProvider;
         private readonly Func<IEventAggregator> eventAggregator;

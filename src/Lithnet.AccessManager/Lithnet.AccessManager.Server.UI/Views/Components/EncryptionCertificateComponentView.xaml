@@ -43,6 +43,7 @@
                                       ItemsSource="{Binding AvailableCertificates}"
                                       SelectedItem="{Binding SelectedCertificate}"
                                       ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                                      MouseDoubleClick="{s:Action OnListViewDoubleClick}"
                                       Margin="5">
                 <ListView.Resources>
                     <DataTemplate x:Key="PublishedIconTemplate">

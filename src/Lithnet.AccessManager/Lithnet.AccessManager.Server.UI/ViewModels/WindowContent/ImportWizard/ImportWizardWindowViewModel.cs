@@ -26,7 +26,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ImportWizardLapsWebSettingsViewModel lapsWebVm;
         private readonly ImportWizardImportReadyViewModel importReadyVm;
         private readonly IImportProviderFactory importProviderFactory;
-        private readonly IImportResultsViewModelFactory resultsFactory;
+        private readonly IAsyncViewModelFactory<ImportResultsViewModel, ImportResults> resultsFactory;
         private readonly AuditOptions auditOptions;
         private readonly IEventAggregator eventAggregator;
         private readonly IShellExecuteProvider shellExecuteProvider;
@@ -57,7 +57,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public IList<SecurityDescriptorTarget> ImportTargetModels { get; set; }
 
-        public ImportWizardWindowViewModel(IDialogCoordinator dialogCoordinator, ILogger<ImportWizardWindowViewModel> logger, ImportWizardImportTypeViewModel importTypeVm, ImportWizardCsvSettingsViewModel csvSettingsVm, ImportWizardImportContainerViewModel containerVm, ImportWizardRuleSettingsViewModel ruleVm, ImportWizardLapsWebSettingsViewModel lapsWebVm, ImportWizardImportReadyViewModel importReadyVm, IImportProviderFactory importProviderFactory, IImportResultsViewModelFactory resultsFactory, AuditOptions auditOptions, IEventAggregator eventAggregator, IShellExecuteProvider shellExecuteProvider)
+        public ImportWizardWindowViewModel(IDialogCoordinator dialogCoordinator, ILogger<ImportWizardWindowViewModel> logger, ImportWizardImportTypeViewModel importTypeVm, ImportWizardCsvSettingsViewModel csvSettingsVm, ImportWizardImportContainerViewModel containerVm, ImportWizardRuleSettingsViewModel ruleVm, ImportWizardLapsWebSettingsViewModel lapsWebVm, ImportWizardImportReadyViewModel importReadyVm, IImportProviderFactory importProviderFactory, IAsyncViewModelFactory<ImportResultsViewModel, ImportResults> resultsFactory, AuditOptions auditOptions, IEventAggregator eventAggregator, IShellExecuteProvider shellExecuteProvider)
         {
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;

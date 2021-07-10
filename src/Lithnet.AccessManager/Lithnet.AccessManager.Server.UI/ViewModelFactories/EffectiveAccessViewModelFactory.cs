@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class EffectiveAccessViewModelFactory : IEffectiveAccessViewModelFactory
+    public class EffectiveAccessViewModelFactory : IViewModelFactory<EffectiveAccessViewModel, SecurityDescriptorTargetsViewModel>
     {
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly ILogger<EffectiveAccessViewModel> logger;

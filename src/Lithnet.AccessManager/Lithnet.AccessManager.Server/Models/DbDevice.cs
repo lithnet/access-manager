@@ -64,6 +64,8 @@ namespace Lithnet.AccessManager.Server
 
         public string OperatingSystemVersion { get; set; }
 
+        public bool Disabled { get; set; }
+
         public DbDevice()
         {
         }
@@ -71,6 +73,7 @@ namespace Lithnet.AccessManager.Server
         public DbDevice(SqlDataReader reader)
         {
             this.Id = reader["Id"].CastOrDefault<long>();
+            this.Disabled = reader["Disabled"].CastOrDefault<bool>();
             this.ObjectID = reader["ObjectId"].CastOrDefault<string>();
             this.AgentVersion = reader["AgentVersion"].CastOrDefault<string>();
             this.ComputerName = reader["ComputerName"].CastOrDefault<string>();

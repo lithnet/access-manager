@@ -1,0 +1,133 @@
+﻿<UserControl x:Class="Lithnet.AccessManager.Server.UI.DeviceView"
+              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
+             xmlns:s="https://github.com/canton7/Stylet"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             Dialog:DialogParticipation.Register="{Binding}"
+             mc:Ignorable="d">
+    <AdornerDecorator>
+        <ScrollViewer>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0"
+                       Content="Computer name"
+                       Margin="5"/>
+                <TextBox Grid.Row="0" Grid.Column="1" 
+                         Text="{Binding DisplayName, Mode=OneWay}"
+                         IsReadOnly="True"
+                         Margin="5"/>
+
+                <Label Grid.Row="1" Grid.Column="0"
+                   Content="DNS name"
+                   Margin="5"/>
+                <TextBox Grid.Row="1" Grid.Column="1" 
+                     Text="{Binding DnsHostName, Mode=OneWay}"
+                     IsReadOnly="True"
+                     Margin="5"/>
+
+                <Label Grid.Row="2" Grid.Column="0"
+                   Content="Created"
+                   Margin="5"/>
+                <TextBox Grid.Row="2" Grid.Column="1" 
+                     Text="{Binding Created, Mode=OneWay}"
+                     IsReadOnly="True"
+                     Margin="5"/>
+
+                <Label Grid.Row="3" Grid.Column="0"
+                   Content="Modified"
+                   Margin="5"/>
+                <TextBox Grid.Row="3" Grid.Column="1" 
+                     Text="{Binding Modified, Mode=OneWay}"
+                     IsReadOnly="True"
+                     Margin="5"/>
+
+                <Label Grid.Row="4" Grid.Column="0"
+                   Content="AMS device ID"
+                   Margin="5"/>
+                <TextBox Grid.Row="4" Grid.Column="1" 
+                     Text="{Binding ObjectID, Mode=OneWay}"
+                     IsReadOnly="True"
+                     Margin="5"/>
+
+                <Label Grid.Row="5" Grid.Column="0"
+                   Content="OS"
+                   Margin="5"/>
+                <TextBox Grid.Row="5" Grid.Column="1" 
+                     Text="{Binding OperatingSystemFamily, Mode=OneWay}"
+                     IsReadOnly="True"
+                     Margin="5"/>
+
+                <Label Grid.Row="6" Grid.Column="0"
+                   Content="OS Version"
+                   Margin="5"/>
+                <TextBox Grid.Row="6" Grid.Column="1" 
+                     Text="{Binding OperatingSystemVersion, Mode=OneWay}"
+                     IsReadOnly="True"
+                     Margin="5"/>
+
+                <Label Grid.Row="7" Grid.Column="0"
+                   Content="Agent Version"
+                   Margin="5"/>
+                <TextBox Grid.Row="7" Grid.Column="1" 
+                     Text="{Binding AgentVersion, Mode=OneWay}"
+                     IsReadOnly="True"
+                     Margin="5"/>
+
+                <Label Grid.Row="8" Grid.Column="0"
+                   Content="Authority"
+                   Margin="5"/>
+                <TextBox Grid.Row="8" Grid.Column="1" 
+                     Text="{Binding AuthorityType, Converter={StaticResource EnumDescriptionConverter}, Mode=OneWay}"
+                     IsReadOnly="True"
+                     Margin="5"/>
+
+                <Label Grid.Row="9" Grid.Column="0"
+                   Content="Authority ID"
+                   Margin="5"/>
+                <TextBox Grid.Row="9" Grid.Column="1" 
+                     Text="{Binding AuthorityId, Mode=OneWay}"
+                     IsReadOnly="True"
+                     Margin="5"/>
+
+                <Label Grid.Row="10" Grid.Column="0"
+                   Content="Authority Device ID"
+                   Margin="5"/>
+                <TextBox Grid.Row="10" Grid.Column="1" 
+                     Text="{Binding AuthorityDeviceId, Mode=OneWay}"
+                     IsReadOnly="True"
+                     Margin="5"/>
+
+                <Label Grid.Row="11" Grid.Column="0"
+                   Content="SID"
+                   Margin="5"/>
+                <TextBox Grid.Row="11" Grid.Column="1" 
+                     Text="{Binding Sid, Mode=OneWay}"
+                     IsReadOnly="True"
+                     Margin="5"/>
+
+            </Grid>
+        </ScrollViewer>
+    </AdornerDecorator>
+</UserControl>

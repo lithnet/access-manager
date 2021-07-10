@@ -15,14 +15,14 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDirectory directory;
         private readonly ILogger<ImportWizardRuleSettingsViewModel> logger;
         private readonly IDialogCoordinator dialogCoordinator;
-        private readonly INotificationChannelSelectionViewModelFactory notificationChannelFactory;
+        private readonly IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory;
         private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly AuditNotificationChannels channels = new AuditNotificationChannels();
         private readonly IShellExecuteProvider shellExecuteProvider;
 
         public Task Initialization { get; private set; }
 
-        public ImportWizardRuleSettingsViewModel(INotificationChannelSelectionViewModelFactory notificationChannelFactory, ILogger<ImportWizardRuleSettingsViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardRuleSettingsViewModel> validator, IDirectory directory, IObjectSelectionProvider objectSelectionProvider, IShellExecuteProvider shellExecuteProvider)
+        public ImportWizardRuleSettingsViewModel(IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory, ILogger<ImportWizardRuleSettingsViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardRuleSettingsViewModel> validator, IDirectory directory, IObjectSelectionProvider objectSelectionProvider, IShellExecuteProvider shellExecuteProvider)
         {
             this.directory = directory;
             this.logger = logger;

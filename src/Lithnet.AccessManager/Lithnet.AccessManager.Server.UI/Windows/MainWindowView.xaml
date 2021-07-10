@@ -64,7 +64,7 @@
         <telerik:RadNavigationView DockPanel.Dock="Bottom" 
                                    ItemsSource="{Binding Items}"
                                    IsPaneOpen="True" 
-                                   SelectedItem="{Binding Item}"
+                                   SelectedItem="{Binding CurrentItem}"
                                    DisplayMemberPath="DisplayName"
                                    DisplayMode="Expanded"
                                    PaneToggleButtonVisibility="Visible"

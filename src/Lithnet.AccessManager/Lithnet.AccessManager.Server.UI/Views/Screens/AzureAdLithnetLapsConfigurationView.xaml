@@ -29,5 +29,8 @@
 
         <ContentControl s:View.Model="{Binding PasswordEncryption, Mode=OneWay}"  
                         IsTabStop="False"/>
+
+        <ContentControl s:View.Model="{Binding PasswordPolicies, Mode=OneWay}"  
+                        IsTabStop="False"/>
     </StackPanel>
 </UserControl>

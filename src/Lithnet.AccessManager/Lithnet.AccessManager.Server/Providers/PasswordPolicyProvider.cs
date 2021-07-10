@@ -5,6 +5,7 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Api;
 using Lithnet.AccessManager.Server.Authorization;
+using Lithnet.AccessManager.Server.Providers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Caching.Memory;
@@ -18,14 +19,16 @@ namespace Lithnet.AccessManager.Server
         private readonly IPasswordPolicyMemoryCache cache;
         private readonly IDeviceProvider deviceProvider;
         private readonly IAadGraphApiProvider graphProvider;
+        private readonly IAmsGroupProvider groupProvider;
 
-        public PasswordPolicyProvider(IOptionsMonitor<PasswordPolicyOptions> policy, ILogger<PasswordPolicyProvider> logger, IPasswordPolicyMemoryCache cache, IDeviceProvider deviceProvider, IAadGraphApiProvider graphProvider)
+        public PasswordPolicyProvider(IOptionsMonitor<PasswordPolicyOptions> policy, ILogger<PasswordPolicyProvider> logger, IPasswordPolicyMemoryCache cache, IDeviceProvider deviceProvider, IAadGraphApiProvider graphProvider, IAmsGroupProvider groupProvider)
         {
             this.policy = policy;
             this.logger = logger;
             this.cache = cache;
             this.deviceProvider = deviceProvider;
             this.graphProvider = graphProvider;
+            this.groupProvider = groupProvider;
         }
 
         public async Task<PasswordPolicy> GetPolicy(string deviceId)
@@ -47,7 +50,7 @@ namespace Lithnet.AccessManager.Server
             PasswordPolicyEntry selectedPolicy = await this.GetDevicePolicy(deviceId);
             if (selectedPolicy != null)
             {
-                this.logger.LogTrace("Found password policy {passwordPolicyId} for device {deviceId}", selectedPolicy.Id, deviceId);
+                this.logger.LogTrace("Found password policy {passwordPolicyName}/{passwordPolicyId} for device {deviceId}", selectedPolicy.Name, selectedPolicy.Id, deviceId);
             }
             else
             {
@@ -68,33 +71,52 @@ namespace Lithnet.AccessManager.Server
         private async Task<PasswordPolicyEntry> GetDevicePolicy(string deviceId)
         {
             IDevice device = await this.deviceProvider.GetDeviceAsync(deviceId);
+            PasswordPolicyOptions options = this.policy.CurrentValue;
+
+            if (options.Policies.Count == 0)
+            {
+                return null;
+            }
 
             if (device.AuthorityType == AuthorityType.AzureActiveDirectory)
             {
-                return await this.GetAadDevicePolicy(device);
+                return await this.GetAadDevicePolicy(device, options);
+            }
+
+            if (device.AuthorityType == AuthorityType.Ams)
+            {
+                return await this.GetAmsDevicePolicy(device, options);
             }
 
             return null;
         }
 
-        private async Task<PasswordPolicyEntry> GetAadDevicePolicy(IDevice device)
+        private async Task<PasswordPolicyEntry> GetAadDevicePolicy(IDevice device, PasswordPolicyOptions options)
         {
-            PasswordPolicyOptions options = this.policy.CurrentValue;
+            List<SecurityIdentifier> items = await this.graphProvider.GetDeviceGroupSids(device.AuthorityId, device.AuthorityDeviceId);
+            items.AddRange(this.groupProvider.GetGroupSidsForDevice(device).ToEnumerable());
+            items.Add(new SecurityIdentifier(device.Sid));
 
-            if (options.Policies.All(t => t.TargetType != AuthorityType.AzureActiveDirectory))
+            return this.GetMatchingPasswordPolicyEntryOrDefault(options, items);
+        }
+
+        private async Task<PasswordPolicyEntry> GetAmsDevicePolicy(IDevice device, PasswordPolicyOptions options)
+        {
+            if (options.Policies.All(t => t.TargetType != AuthorityType.Ams))
             {
                 return null;
             }
 
-            List<SecurityIdentifier> items = await this.graphProvider.GetDeviceGroupSids(device.AuthorityId, device.AuthorityDeviceId);
+            List<SecurityIdentifier> items = await this.groupProvider.GetGroupSidsForDevice(device).ToListAsync();
+            items.Add(new SecurityIdentifier(device.Sid));
 
-            foreach (PasswordPolicyEntry entry in options.Policies.OrderBy(t => t.Order).Where(t => t.TargetType == device.AuthorityType))
+            return this.GetMatchingPasswordPolicyEntryOrDefault(options, items);
+        }
+
+        private PasswordPolicyEntry GetMatchingPasswordPolicyEntryOrDefault(PasswordPolicyOptions options, List<SecurityIdentifier> items)
+        {
+            foreach (PasswordPolicyEntry entry in options.Policies)
             {
-                if (string.Equals(entry.TargetGroup, device.Sid, StringComparison.OrdinalIgnoreCase))
-                {
-                    return entry;
-                }
-
                 if (items.Any(t => string.Equals(entry.TargetGroup, t.Value, StringComparison.OrdinalIgnoreCase)))
                 {
                     return entry;

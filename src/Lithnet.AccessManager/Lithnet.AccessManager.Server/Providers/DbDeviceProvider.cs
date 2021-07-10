@@ -59,6 +59,29 @@ namespace Lithnet.AccessManager.Server
             }
         }
 
+        public async Task DisableDevice(string deviceId)
+        {
+            await using SqlConnection con = this.dbProvider.GetConnection();
+
+            SqlCommand command = new SqlCommand("spDisableDevice", con);
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@ObjectId", deviceId);
+
+            await command.ExecuteNonQueryAsync();
+        }
+
+        public async Task EnableDevice(string deviceId)
+        {
+            await using SqlConnection con = this.dbProvider.GetConnection();
+
+            SqlCommand command = new SqlCommand("spEnableDevice", con);
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@ObjectId", deviceId);
+
+            await command.ExecuteNonQueryAsync();
+        }
+
+    
         public async Task ApproveDevice(string deviceId)
         {
             await using SqlConnection con = this.dbProvider.GetConnection();

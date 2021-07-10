@@ -62,6 +62,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task ApplySearchFilter()
         {
+
             ProgressDialogController controller = null;
 
             if (string.IsNullOrWhiteSpace(this.SearchText))
@@ -108,6 +109,7 @@ namespace Lithnet.AccessManager.Server.UI
                 this.Items.Refresh();
                 this.IsFilterApplied = true;
             }
+
             finally
             {
                 if (controller != null)
@@ -159,16 +161,6 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 return (vm.DisplayName != null && vm.DisplayName.Contains(trimmedText, StringComparison.OrdinalIgnoreCase)) || (vm.Description != null && vm.Description.Contains(trimmedText, StringComparison.OrdinalIgnoreCase));
             }
-        }
-
-        public async Task OnListViewDoubleClick(object sender, RoutedEventArgs e)
-        {
-            if (!(((FrameworkElement)(e.OriginalSource)).DataContext is SecurityDescriptorTargetViewModel))
-            {
-                return;
-            }
-
-            //await this.Edit();
         }
 
         public void OnGridViewColumnHeaderClick(object sender, RoutedEventArgs e)

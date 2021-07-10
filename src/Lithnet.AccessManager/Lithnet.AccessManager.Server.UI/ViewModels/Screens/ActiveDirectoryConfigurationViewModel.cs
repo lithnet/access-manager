@@ -12,19 +12,21 @@ namespace Lithnet.AccessManager.Server.UI
     public class ActiveDirectoryConfigurationViewModel : Conductor<PropertyChangedBase>.Collection.OneActive, IHelpLink
     {
         private readonly IDialogCoordinator dialogCoordinator;
-        private readonly IActiveDirectoryDomainPermissionViewModelFactory domainFactory;
+        private readonly IViewModelFactory<ActiveDirectoryDomainPermissionViewModel, Domain> domainFactory;
         private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
+        private readonly ILogger<ActiveDirectoryConfigurationViewModel> logger;
 
         public PackIconBoxIconsKind Icon => PackIconBoxIconsKind.RegularBookContent;
 
-        public ActiveDirectoryConfigurationViewModel(ActiveDirectoryMicrosoftLapsConfigurationViewModel msLapsVm, ActiveDirectoryLithnetLapsConfigurationViewModel lithnetLapsVm, ActiveDirectoryBitLockerViewModel bitLockerVm, ActiveDirectoryJitConfigurationViewModel jitVm, IActiveDirectoryDomainPermissionViewModelFactory domainFactory, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<ActiveDirectoryConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IScriptTemplateProvider scriptTemplateProvider)
+        public ActiveDirectoryConfigurationViewModel(ActiveDirectoryMicrosoftLapsConfigurationViewModel msLapsVm, ActiveDirectoryLithnetLapsConfigurationViewModel lithnetLapsVm, ActiveDirectoryBitLockerViewModel bitLockerVm, ActiveDirectoryJitConfigurationViewModel jitVm, IViewModelFactory<ActiveDirectoryDomainPermissionViewModel, Domain> domainFactory, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<ActiveDirectoryConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IScriptTemplateProvider scriptTemplateProvider)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.domainFactory = domainFactory;
             this.windowsServiceProvider = windowsServiceProvider;
+            this.logger = logger;
             this.shellExecuteProvider = shellExecuteProvider;
             this.domainTrustProvider = domainTrustProvider;
             this.scriptTemplateProvider = scriptTemplateProvider;
@@ -40,12 +42,28 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string HelpLink => Constants.HelpLinkPageActiveDirectory;
 
-        private Task initialize;
-
         protected override void OnInitialActivate()
         {
-            this.initialize = Task.Run(async () => await this.PopulateForestsAndDomains());
+            Task.Run(async () => await this.Initialize());
         }
+
+        private async Task Initialize()
+        {
+            try
+            {
+                await this.PopulateForestsAndDomains();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Could not populate the forest list");
+                this.ErrorMessageText = ex.ToString();
+                this.ErrorMessageHeaderText = "Could not initialize the forest list";
+            }
+        }
+
+        public string ErrorMessageText { get; set; }
+
+        public string ErrorMessageHeaderText { get; set; }
 
         private async Task PopulateForestsAndDomains()
         {
@@ -74,42 +92,58 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task RefreshGroupMembershipAsync()
         {
-            foreach (var vm in this.Domains)
+            try
             {
-                await vm.RefreshGroupMembershipAsync();
+                foreach (var vm in this.Domains)
+                {
+                    await vm.RefreshGroupMembershipAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
             }
         }
 
         public bool CanShowADPermissionScript => this.SelectedDomain != null;
 
-        public void ShowADPermissionScript()
+        public async Task ShowADPermissionScript()
         {
-            var current = this.SelectedDomain;
-
-            if (current == null)
+            try
             {
-                return;
+                var current = this.SelectedDomain;
+
+                if (current == null)
+                {
+                    return;
+                }
+
+                var vm = new ScriptContentViewModel(this.dialogCoordinator)
+                {
+                    HelpText = "Run the following script with Domain Admins rights to add the service account to the correct groups",
+                    ScriptText = this.scriptTemplateProvider.AddDomainMembershipPermissions
+                        .Replace("{domainDNS}", current.Name, StringComparison.OrdinalIgnoreCase)
+                        .Replace("{serviceAccountSid}", this.windowsServiceProvider.GetServiceAccountSid().Value, StringComparison.OrdinalIgnoreCase)
+                };
+
+                ExternalDialogWindow w = new ExternalDialogWindow
+                {
+                    Title = "Script",
+                    DataContext = vm,
+                    SaveButtonVisible = false,
+                    CancelButtonName = "Close"
+                };
+
+                w.ShowDialog();
+
+                await current.RefreshGroupMembershipAsync();
             }
-
-            var vm = new ScriptContentViewModel(this.dialogCoordinator)
+            catch (Exception ex)
             {
-                HelpText = "Run the following script with Domain Admins rights to add the service account to the correct groups",
-                ScriptText = this.scriptTemplateProvider.AddDomainMembershipPermissions
-                    .Replace("{domainDNS}", current.Name, StringComparison.OrdinalIgnoreCase)
-                    .Replace("{serviceAccountSid}", this.windowsServiceProvider.GetServiceAccountSid().Value, StringComparison.OrdinalIgnoreCase)
-            };
-
-            ExternalDialogWindow w = new ExternalDialogWindow
-            {
-                Title = "Script",
-                DataContext = vm,
-                SaveButtonVisible = false,
-                CancelButtonName = "Close"
-            };
-
-            w.ShowDialog();
-
-            current.RefreshGroupMembership();
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
+            }
         }
 
         public async Task Help()

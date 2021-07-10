@@ -9,6 +9,7 @@
              xmlns:dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:uiComponents="clr-namespace:Lithnet.AccessManager.Server.UI.UIComponents"
              dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
              d:DesignWidth="800" Margin="5">
@@ -19,6 +20,11 @@
             </Button>
             <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Active Directory" />
         </DockPanel>
+
+        <uiComponents:ErrorBanner Grid.Column="0"
+                                  Grid.ColumnSpan="2"
+                                  MessageText="{Binding ErrorMessageText}"
+                                  HeaderText="{Binding ErrorMessageHeaderText}"/>
 
         <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
                Content="Domain permissions"/>

@@ -18,7 +18,7 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly AzureAdOptions aadOptions;
         private readonly IDialogCoordinator dialogCoordinator;
-        private readonly IAzureAdTenantDetailsViewModelFactory tenantFactory;
+        private readonly IViewModelFactory<AzureAdTenantDetailsViewModel, AzureAdTenantDetails> tenantFactory;
         private readonly INotifyModelChangedEventPublisher eventPublisher;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IAadGraphApiProvider graphApiProvider;
@@ -33,7 +33,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public object Icon => PackIconMaterialKind.Triangle;
 
-        public AzureAdConfigurationViewModel(AzureAdLithnetLapsConfigurationViewModel lithnetLapsVm, AzureAdOptions aadOptions, IDialogCoordinator dialogCoordinator, IAzureAdTenantDetailsViewModelFactory tenantFactory, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IAadGraphApiProvider graphApiProvider, ILogger<AzureAdConfigurationViewModel> logger, IAmsLicenseManager licenseManager, ApiAuthenticationOptions agentOptions)
+        public AzureAdConfigurationViewModel(AzureAdLithnetLapsConfigurationViewModel lithnetLapsVm, AzureAdOptions aadOptions, IDialogCoordinator dialogCoordinator, IViewModelFactory<AzureAdTenantDetailsViewModel, AzureAdTenantDetails> tenantFactory, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IAadGraphApiProvider graphApiProvider, ILogger<AzureAdConfigurationViewModel> logger, IAmsLicenseManager licenseManager, ApiAuthenticationOptions agentOptions)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.graphApiProvider = graphApiProvider;
@@ -76,16 +76,33 @@ namespace Lithnet.AccessManager.Server.UI
 
         protected override void OnInitialActivate()
         {
-            Task.Run(() =>
+            Task.Run(this.Initialize);
+        }
+
+        private void Initialize()
+        {
+            try
             {
                 foreach (var m in this.aadOptions.Tenants)
                 {
                     this.Tenants.Add(tenantFactory.CreateViewModel(m));
                 }
-
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Could not initialize the view model");
+                this.ErrorMessageText = ex.ToString();
+                this.ErrorMessageHeaderText = "An initialization error occurred";
+            }
+            finally
+            {
                 this.eventPublisher.Register(this);
-            });
+            }
         }
+
+        public string ErrorMessageText { get; set; }
+
+        public string ErrorMessageHeaderText { get; set; }
 
         public async Task LinkHaLearnMore()
         {
@@ -103,38 +120,46 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task Add()
         {
-            DialogWindow w = new DialogWindow();
-            w.Title = "Add tenant";
-            w.SaveButtonIsDefault = true;
-            var m = new AzureAdTenantDetails();
-            var vm = this.tenantFactory.CreateViewModel(m);
-            w.DataContext = vm;
-
-            while (true)
+            try
             {
-                await this.GetWindow().ShowChildWindowAsync(w);
+                DialogWindow w = new DialogWindow();
+                w.Title = "Add tenant";
+                w.SaveButtonIsDefault = true;
+                var m = new AzureAdTenantDetails();
+                var vm = this.tenantFactory.CreateViewModel(m);
+                w.DataContext = vm;
 
-                if (w.Result != MessageDialogResult.Affirmative)
+                while (true)
                 {
+                    await this.GetWindow().ShowChildWindowAsync(w);
+
+                    if (w.Result != MessageDialogResult.Affirmative)
+                    {
+                        break;
+                    }
+
+                    if (this.aadOptions.Tenants.Any(t => string.Equals(t.ClientId, m.ClientId, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        await this.dialogCoordinator.ShowMessageAsync(this, "Duplicate entry", "A registration entry already exists for this tenant ID. Only one registration per tenant is allowed");
+                        continue;
+                    }
+
+                    if (!await this.ValidateAadCredentials(m))
+                    {
+                        continue;
+                    }
+
+                    this.aadOptions.Tenants.Add(m);
+                    this.Tenants.Add(vm);
+                    this.graphApiProvider.AddOrUpdateClientCredentials(m.TenantId, m.ClientId, m.ClientSecret);
+                    vm.TenantName = await this.graphApiProvider.GetTenantOrgName(m.TenantId);
                     break;
                 }
-
-                if (this.aadOptions.Tenants.Any(t => string.Equals(t.ClientId, m.ClientId, StringComparison.OrdinalIgnoreCase)))
-                {
-                    await this.dialogCoordinator.ShowMessageAsync(this, "Duplicate entry", "A registration entry already exists for this tenant ID. Only one registration per tenant is allowed");
-                    continue;
-                }
-
-                if (!await this.ValidateAadCredentials(m))
-                {
-                    continue;
-                }
-
-                this.aadOptions.Tenants.Add(m);
-                this.Tenants.Add(vm);
-                this.graphApiProvider.AddOrUpdateClientCredentials(m.TenantId, m.ClientId, m.ClientSecret);
-                vm.TenantName = await this.graphApiProvider.GetTenantOrgName(m.TenantId);
-                break;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
             }
         }
 
@@ -162,54 +187,62 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task Edit()
         {
-            var selectedTenant = this.SelectedTenant;
-
-            if (selectedTenant == null)
+            try
             {
-                return;
-            }
+                var selectedTenant = this.SelectedTenant;
 
-            DialogWindow w = new DialogWindow();
-            w.Title = "Edit tenant";
-            w.SaveButtonIsDefault = true;
-
-            var m = JsonConvert.DeserializeObject<AzureAdTenantDetails>(JsonConvert.SerializeObject(selectedTenant.Model));
-            var vm = this.tenantFactory.CreateViewModel(m);
-
-            w.DataContext = vm;
-
-            while (true)
-            {
-                await this.GetWindow().ShowChildWindowAsync(w);
-
-                if (w.Result != MessageDialogResult.Affirmative)
+                if (selectedTenant == null)
                 {
+                    return;
+                }
+
+                DialogWindow w = new DialogWindow();
+                w.Title = "Edit tenant";
+                w.SaveButtonIsDefault = true;
+
+                var m = JsonConvert.DeserializeObject<AzureAdTenantDetails>(JsonConvert.SerializeObject(selectedTenant.Model));
+                var vm = this.tenantFactory.CreateViewModel(m);
+
+                w.DataContext = vm;
+
+                while (true)
+                {
+                    await this.GetWindow().ShowChildWindowAsync(w);
+
+                    if (w.Result != MessageDialogResult.Affirmative)
+                    {
+                        break;
+                    }
+
+                    if (this.aadOptions.Tenants.Any(t => t != selectedTenant.Model && string.Equals(t.ClientId, m.ClientId, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        await this.dialogCoordinator.ShowMessageAsync(this, "Duplicate entry", "A registration entry already exists for this tenant ID. Only one registration per tenant is allowed");
+                        continue;
+                    }
+
+                    if (!await this.ValidateAadCredentials(m))
+                    {
+                        continue;
+                    }
+
+                    this.aadOptions.Tenants.Remove(selectedTenant.Model);
+
+                    int existingPosition = this.Tenants.IndexOf(selectedTenant);
+
+                    this.Tenants.Remove(selectedTenant);
+                    this.aadOptions.Tenants.Add(m);
+                    this.Tenants.Insert(Math.Min(existingPosition, this.Tenants.Count), vm);
+                    this.SelectedTenant = vm;
+
+                    this.graphApiProvider.AddOrUpdateClientCredentials(m.TenantId, m.ClientId, m.ClientSecret);
+                    vm.TenantName = await this.graphApiProvider.GetTenantOrgName(m.TenantId);
                     break;
                 }
-
-                if (this.aadOptions.Tenants.Any(t => t != selectedTenant.Model && string.Equals(t.ClientId, m.ClientId, StringComparison.OrdinalIgnoreCase)))
-                {
-                    await this.dialogCoordinator.ShowMessageAsync(this, "Duplicate entry", "A registration entry already exists for this tenant ID. Only one registration per tenant is allowed");
-                    continue;
-                }
-
-                if (!await this.ValidateAadCredentials(m))
-                {
-                    continue;
-                }
-
-                this.aadOptions.Tenants.Remove(selectedTenant.Model);
-
-                int existingPosition = this.Tenants.IndexOf(selectedTenant);
-
-                this.Tenants.Remove(selectedTenant);
-                this.aadOptions.Tenants.Add(m);
-                this.Tenants.Insert(Math.Min(existingPosition, this.Tenants.Count), vm);
-                this.SelectedTenant = vm;
-
-                this.graphApiProvider.AddOrUpdateClientCredentials(m.TenantId, m.ClientId, m.ClientSecret);
-                vm.TenantName = await this.graphApiProvider.GetTenantOrgName(m.TenantId);
-                break;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
             }
         }
 
@@ -217,25 +250,33 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task Delete()
         {
-            var selectedTenant = this.SelectedTenant;
-
-            if (selectedTenant == null)
+            try
             {
-                return;
+                var selectedTenant = this.SelectedTenant;
+
+                if (selectedTenant == null)
+                {
+                    return;
+                }
+
+                MetroDialogSettings s = new MetroDialogSettings
+                {
+                    AnimateShow = false,
+                    AnimateHide = false
+                };
+
+                if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", "Are you sure you want to delete this tenant?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
+                {
+                    var deleting = selectedTenant;
+                    this.aadOptions.Tenants.Remove(deleting.Model);
+                    this.Tenants.Remove(deleting);
+                    this.SelectedTenant = this.Tenants.FirstOrDefault();
+                }
             }
-
-            MetroDialogSettings s = new MetroDialogSettings
+            catch (Exception ex)
             {
-                AnimateShow = false,
-                AnimateHide = false
-            };
-
-            if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", "Are you sure you want to delete this tenant?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
-            {
-                var deleting = selectedTenant;
-                this.aadOptions.Tenants.Remove(deleting.Model);
-                this.Tenants.Remove(deleting);
-                this.SelectedTenant = this.Tenants.FirstOrDefault();
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
             }
         }
 
@@ -243,16 +284,24 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task Test()
         {
-            var selectedTenant = this.SelectedTenant;
-
-            if (selectedTenant == null)
+            try
             {
-                return;
+                var selectedTenant = this.SelectedTenant;
+
+                if (selectedTenant == null)
+                {
+                    return;
+                }
+
+                if (await this.ValidateAadCredentials(selectedTenant.Model))
+                {
+                    await this.dialogCoordinator.ShowMessageAsync(this, "Connection successful", "Successfully authenticated to the Azure Active Directory");
+                }
             }
-
-            if (await this.ValidateAadCredentials(selectedTenant.Model))
+            catch (Exception ex)
             {
-                await this.dialogCoordinator.ShowMessageAsync(this, "Connection successful", "Successfully authenticated to the Azure Active Directory");
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
             }
         }
 

@@ -24,12 +24,9 @@
                               ItemsSource="{Binding TargetTypeValues, Mode=OneWay}"
                               SelectedItem="{Binding TargetType}"
                               Margin="5">
-            <ComboBox.Resources>
-                <local:EnumToDisplayConverter x:Key="enumconv"/>
-            </ComboBox.Resources>
             <ComboBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Converter={StaticResource enumconv}}"></TextBlock>
+                    <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"></TextBlock>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
