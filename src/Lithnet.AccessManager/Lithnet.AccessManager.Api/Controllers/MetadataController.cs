@@ -36,37 +36,37 @@ namespace Lithnet.AccessManager.Api.Controllers
             {
                 return NotFound();
 
-                List<string> allowedOptions = new List<string>();
+                //List<string> allowedOptions = new List<string>();
 
-                if (this.agentOptions.Value.AllowAzureAdJoinedDeviceAuth)
-                {
-                    allowedOptions.Add("aadj");
-                }
+                //if (this.agentOptions.Value.AllowAzureAdJoinedDeviceAuth)
+                //{
+                //    allowedOptions.Add("aadj");
+                //}
 
-                if (this.agentOptions.Value.AllowAzureAdRegisteredDeviceAuth)
-                {
-                    allowedOptions.Add("aadr");
-                }
+                //if (this.agentOptions.Value.AllowAzureAdRegisteredDeviceAuth)
+                //{
+                //    allowedOptions.Add("aadr");
+                //}
 
-                if (this.agentOptions.Value.AllowWindowsAuth)
-                {
-                    allowedOptions.Add("iwa");
-                }
+                //if (this.agentOptions.Value.AllowWindowsAuth)
+                //{
+                //    allowedOptions.Add("iwa");
+                //}
 
-                if (this.agentOptions.Value.AllowAmsManagedDeviceAuth)
-                {
-                    allowedOptions.Add("ssa");
-                }
+                //if (this.agentOptions.Value.AllowAmsManagedDeviceAuth)
+                //{
+                //    allowedOptions.Add("ssa");
+                //}
 
-                return this.Json(new MetadataResponse
-                {
-                    AgentAuthentication = new AgentAuthentication
-                    {
-                        AllowedOptions = allowedOptions,
-                        AllowedAzureAdTenants = this.azureAdOptions.Value.Tenants?.Select(t => t.TenantId).ToList() ?? new List<string>()
-                    },
-                    PasswordManagement = new PasswordManagement { }
-                });
+                //return this.Json(new MetadataResponse
+                //{
+                //    AgentAuthentication = new AgentAuthentication
+                //    {
+                //        AllowedOptions = allowedOptions,
+                //        AllowedAzureAdTenants = this.azureAdOptions.Value.Tenants?.Select(t => t.TenantId).ToList() ?? new List<string>()
+                //    },
+                //    PasswordManagement = new PasswordManagement { }
+                //});
 
             }
             catch (Exception ex)

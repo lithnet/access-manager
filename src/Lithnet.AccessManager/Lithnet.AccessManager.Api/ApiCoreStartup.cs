@@ -73,7 +73,8 @@ namespace Lithnet.AccessManager.Api
             services.AddScoped<IAadGraphApiProvider, AadGraphApiProvider>();
             services.AddScoped<IDevicePasswordProvider, DbDevicePasswordProvider>();
             services.AddScoped<IPasswordPolicyProvider, PasswordPolicyProvider>();
-            
+            services.AddScoped<IAmsGroupProvider, DbAmsGroupProvider>();
+
             services.AddSingleton<IRegistrationKeyProvider, DbRegistrationKeyProvider>();
             services.AddSingleton<ICheckInDataValidator, CheckInDataValidator>();
             services.AddSingleton<IApiErrorResponseProvider, ApiErrorResponseProvider>();

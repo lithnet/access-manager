@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="17.1.2" version="17.9" Modules="enterprise" RootPath="." Language="en" Id="{8ADA5C46-1F9D-45B3-A39D-37B0D337D0DD}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="17.1.2" version="18.4" Modules="enterprise" RootPath="." Language="en" Id="{8ADA5C46-1F9D-45B3-A39D-37B0D337D0DD}">
   <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
     <ROW Name="MigrationUninstallCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
+    <ROW Property="AI_CURRENT_YEAR" Value="2021" ValueLocId="-"/>
     <ROW Property="AI_FINDEXE_TITLE" Value="Select the installation package for [|ProductName]" ValueLocId="AI.Property.FindExeTitle"/>
+    <ROW Property="AI_PREDEF_LCONDS_PROPS" Value="AI_DETECTED_INTERNET_CONNECTION"/>
     <ROW Property="AI_PREREQ_REPAIR_ENABLED" MultiBuildValue="DefaultBuild:1"/>
     <ROW Property="AI_RUN_AS_ADMIN" Value="1"/>
     <ROW Property="AI_ThemeStyle" Value="aero" MsiKey="AI_ThemeStyle"/>
@@ -18,10 +20,13 @@
     <ROW Property="IAgree" Value="No" Type="4" MsiKey="IAgree"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{2C013076-9CCD-4FFD-B8C3-D37B38B3DCDD} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{93275FA1-65D6-4D21-A52E-75BCF9F9A006} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7925.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.12.8021.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="SHOW_DB_CONFIG" Value="1"/>
+    <ROW Property="SQLEXPRESS_DEFAULT_ADMINS" Value="Builtin\Administrators"/>
+    <ROW Property="SQLEXPRESS_DEFAULT_INSTANCENAME" Value="AMS"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
@@ -79,7 +84,7 @@
     <ROW Directory="wwwroot_Dir" Directory_Parent="APPDIR" DefaultDir="wwwroot"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCompsComponent">
-    <ROW Component="AI_ExePath" ComponentId="{8B32045D-601D-45BE-AC51-7977C5CC4CBA}" Directory_="APPDIR" Attributes="260" KeyPath="AI_ExePath"/>
+    <ROW Component="AI_ExePath" ComponentId="{01E61BCE-939C-48FC-A9AB-51AF64C8FAC3}" Directory_="APPDIR" Attributes="260" KeyPath="AI_ExePath"/>
     <ROW Component="APIMSWinCoreKernel32PrivateL111.dll" ComponentId="{81CC6D8C-046A-4CE5-8730-C312A6E0FFFC}" Directory_="APPDIR" Attributes="256" KeyPath="APIMSWinCoreKernel32PrivateL111.dll"/>
     <ROW Component="APIMSWinCoreKernel32PrivateL112.dll" ComponentId="{A32F8A4C-5FE1-4AF9-9AB0-2F7009BE382D}" Directory_="APPDIR" Attributes="256" KeyPath="APIMSWinCoreKernel32PrivateL112.dll"/>
     <ROW Component="APIMSWindevicesconfigL111.dll" ComponentId="{1F0529CD-9C29-4A57-A638-9DA3E43CF770}" Directory_="APPDIR" Attributes="256" KeyPath="APIMSWindevicesconfigL111.dll"/>
@@ -97,6 +102,9 @@
     <ROW Component="HtmlAgilityPack.dll" ComponentId="{1178AE64-C2F8-4C96-9465-D773827E118D}" Directory_="APPDIR" Attributes="0" KeyPath="HtmlAgilityPack.dll"/>
     <ROW Component="InconsolataRegular.ttf" ComponentId="{F6AD0CA7-6D85-4C26-A8EC-DE54F30EEA1F}" Directory_="fonts_Dir" Attributes="0" Type="0"/>
     <ROW Component="Lithnet" ComponentId="{8D5B4FC5-E8AA-4F6A-8DFD-EECEB04DC679}" Directory_="Lithnet_Dir" Attributes="0"/>
+    <ROW Component="Lithnet.AccessManager.Api.Shared.dll" ComponentId="{CF2EFC04-B984-4A26-869A-9BF9711F8AA2}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Api.Shared.dll"/>
+    <ROW Component="Lithnet.AccessManager.Api.dll" ComponentId="{564303D1-8A9D-44AF-B433-F9751395706A}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.Api.dll"/>
+    <ROW Component="Lithnet.AccessManager.Api.exe" ComponentId="{8A984B54-AD5A-425D-BB62-B19305F2E3A3}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.Api.exe"/>
     <ROW Component="Lithnet.AccessManager.Enterprise.dll" ComponentId="{D0D3FE0C-DC3A-45A6-B1A1-7FAB92D43C71}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Enterprise.dll"/>
     <ROW Component="Lithnet.AccessManager.PowerShell.dll" ComponentId="{F1CA2D0D-972E-4AA2-BD2A-68F8281DAD34}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="256" KeyPath="Lithnet.AccessManager.PowerShell.dll"/>
     <ROW Component="Lithnet.AccessManager.Server.UI.deps.json" ComponentId="{ED70E59C-9E78-4FA9-A010-413CA7967966}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Server.UI.deps.json" Type="0"/>
@@ -157,10 +165,6 @@
     <ROW Component="Microsoft.AspNetCore.Cryptography.Internal.dll" ComponentId="{5FA995F1-2707-4CE4-AAB5-055218A8114F}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Cryptography.Internal.dll"/>
     <ROW Component="Microsoft.AspNetCore.DataProtection.Abstractions.dll" ComponentId="{3CB081FB-371D-47B0-85B9-7D22C8DFC393}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.DataProtection.Abstractions.dll"/>
     <ROW Component="Microsoft.AspNetCore.DataProtection.dll" ComponentId="{0F1B28A3-8389-4C9D-AC34-BA20DE50AE96}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.DataProtection.dll"/>
-    <ROW Component="Microsoft.AspNetCore.Http.Abstractions.dll" ComponentId="{47B6B5A4-FDBD-4787-BBAE-AA8FA61057C5}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Http.Abstractions.dll"/>
-    <ROW Component="Microsoft.AspNetCore.Http.Extensions.dll" ComponentId="{34EBBA20-CED7-4473-A89B-BACB1A46BBBC}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Http.Extensions.dll"/>
-    <ROW Component="Microsoft.AspNetCore.Http.Features.dll" ComponentId="{AD26E927-284B-4E24-9061-FA6F8AE12968}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Http.Features.dll"/>
-    <ROW Component="Microsoft.AspNetCore.HttpOverrides.dll" ComponentId="{365FDF43-16AB-4839-A0C2-BBA96D00F151}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.HttpOverrides.dll"/>
     <ROW Component="Microsoft.Azure.Services.AppAuthentication.dll" ComponentId="{C4E26029-EEF9-4701-888B-74F4C00DD557}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Azure.Services.AppAuthentication.dll"/>
     <ROW Component="Microsoft.Bcl.AsyncInterfaces.dll" ComponentId="{12C80D74-DBD4-48FE-A7DC-001835D693A3}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Bcl.AsyncInterfaces.dll"/>
     <ROW Component="Microsoft.Bcl.AsyncInterfaces.dll_1" ComponentId="{1250A0E8-C28D-4754-84A3-BF51300ED690}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Bcl.AsyncInterfaces.dll_1"/>
@@ -203,6 +207,9 @@
     <ROW Component="Microsoft.Extensions.Options.dll" ComponentId="{4EA295F0-69CA-4F41-A933-14FF8AE2E9D5}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Options.dll"/>
     <ROW Component="Microsoft.Extensions.Primitives.dll" ComponentId="{6E3A5759-974D-45BB-9C4F-F756D71128AF}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Primitives.dll"/>
     <ROW Component="Microsoft.Extensions.Primitives.dll_1" ComponentId="{4F7DD03E-F0B6-4404-884A-5CF3F9A16620}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Extensions.Primitives.dll_1"/>
+    <ROW Component="Microsoft.Graph.Auth.dll" ComponentId="{117F6274-4852-4300-8810-CA4523D113DE}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Graph.Auth.dll"/>
+    <ROW Component="Microsoft.Graph.Core.dll" ComponentId="{A3CDF02D-7A67-41D9-BDBF-61773E86394D}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Graph.Core.dll"/>
+    <ROW Component="Microsoft.Graph.dll" ComponentId="{F3F13817-9216-496F-BE58-79A4EF6A0BF5}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Graph.dll"/>
     <ROW Component="Microsoft.Identity.Client.dll" ComponentId="{744D75CE-E2A2-41DC-A8DC-EDFEA960AEBA}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Identity.Client.dll"/>
     <ROW Component="Microsoft.IdentityModel.Clients.ActiveDirectory.dll" ComponentId="{31922643-4D25-459A-B665-24AA9A634B2F}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.Clients.ActiveDirectory.dll"/>
     <ROW Component="Microsoft.IdentityModel.JsonWebTokens.dll" ComponentId="{7501CDE8-786E-4BE4-9272-A3B8938FD408}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.IdentityModel.JsonWebTokens.dll"/>
@@ -216,7 +223,6 @@
     <ROW Component="Microsoft.Management.Infrastructure.CimCmdlets.dll" ComponentId="{A304FB14-3B8F-46F9-8686-D265A739B35B}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.CimCmdlets.dll"/>
     <ROW Component="Microsoft.Management.Infrastructure.Native.dll" ComponentId="{A83A5EB9-D234-4B6F-A3CF-35B3B9CF248F}" Directory_="APPDIR" Attributes="256" KeyPath="Microsoft.Management.Infrastructure.Native.dll"/>
     <ROW Component="Microsoft.Management.Infrastructure.dll" ComponentId="{22224915-97F5-422C-BA69-54A61FA811DC}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.dll"/>
-    <ROW Component="Microsoft.Net.Http.Headers.dll" ComponentId="{A7DEA713-2E29-44A1-8A98-93D72565AA5B}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Net.Http.Headers.dll"/>
     <ROW Component="Microsoft.PowerShell.Commands.Diagnostics.dll" ComponentId="{76F6920D-00EC-468E-B997-EC3E6B691490}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.Commands.Diagnostics.dll"/>
     <ROW Component="Microsoft.PowerShell.Commands.Management.dll" ComponentId="{C9AB4CCE-E5D5-4FC7-A2A2-2707EE6EA297}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.Commands.Management.dll"/>
     <ROW Component="Microsoft.PowerShell.Commands.Utility.dll" ComponentId="{D4C8A53A-17A6-4EE2-8C3B-16C4B714C4CA}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.Commands.Utility.dll"/>
@@ -238,6 +244,8 @@
     <ROW Component="Microsoft.WSMan.Runtime.dll" ComponentId="{D96945D9-54CC-4F68-9D0E-171FC5E7D149}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.WSMan.Runtime.dll"/>
     <ROW Component="Microsoft.Win32.Primitives.dll" ComponentId="{CECDD0D2-B89C-4912-81FB-8B7FB41A02AD}" Directory_="ref_Dir" Attributes="0" KeyPath="Microsoft.Win32.Primitives.dll"/>
     <ROW Component="Microsoft.Win32.Registry.AccessControl.dll" ComponentId="{56BDF4D8-B502-4AFB-B225-330579B4DC7C}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Win32.Registry.AccessControl.dll"/>
+    <ROW Component="Microsoft.Win32.Registry.dll" ComponentId="{00270173-1C46-4ECF-AA53-2C31DD780328}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Win32.Registry.dll"/>
+    <ROW Component="Microsoft.Win32.SystemEvents.dll" ComponentId="{9460F734-50EE-4362-8331-585E52846394}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Win32.SystemEvents.dll"/>
     <ROW Component="Microsoft.Xaml.Behaviors.dll" ComponentId="{CDCD8458-38E7-42E1-99DB-695B365ACCE3}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Xaml.Behaviors.dll"/>
     <ROW Component="NJsonSchema.dll" ComponentId="{0DF2306F-10F4-42B1-85B6-031CE00F7C33}" Directory_="APPDIR" Attributes="0" KeyPath="NJsonSchema.dll"/>
     <ROW Component="NLog.Extensions.Logging.dll" ComponentId="{F82A9837-0E86-4516-8154-FC85F1338912}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.Extensions.Logging.dll"/>
@@ -247,6 +255,7 @@
     <ROW Component="NamedPipeServerStream.NetFrameworkVersion.dll" ComponentId="{A47C277D-A77D-4860-B385-82A58C7044D2}" Directory_="APPDIR" Attributes="0" KeyPath="NamedPipeServerStream.NetFrameworkVersion.dll"/>
     <ROW Component="Namotion.Reflection.dll" ComponentId="{EBB031E1-E333-43C9-A3DD-0FF3CBEFF67D}" Directory_="APPDIR" Attributes="0" KeyPath="Namotion.Reflection.dll"/>
     <ROW Component="Nerdbank.Streams.dll" ComponentId="{4D60C104-A1A0-438C-B329-A4429748AF32}" Directory_="APPDIR" Attributes="0" KeyPath="Nerdbank.Streams.dll"/>
+    <ROW Component="NewValue" ComponentId="{38A566AA-A9E8-4735-9E1A-06619AF7B0DE}" Directory_="APPDIR" Attributes="260" KeyPath="NewValue"/>
     <ROW Component="Newtonsoft.Json.dll" ComponentId="{50C02A07-DA0D-4990-8870-2B97675842D6}" Directory_="APPDIR" Attributes="0" KeyPath="Newtonsoft.Json.dll"/>
     <ROW Component="Newtonsoft.Json.dll_1" ComponentId="{F464D1BB-3348-4DC1-839C-8FC37536D0B2}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Newtonsoft.Json.dll_1"/>
     <ROW Component="PSDiagnostics.psd1" ComponentId="{6C8D997C-AC03-45AC-AD80-63881FCEEB43}" Directory_="PSDiagnostics_Dir" Attributes="0" KeyPath="PSDiagnostics.psd1" Type="0"/>
@@ -258,6 +267,7 @@
     <ROW Component="Quartz.Extensions.Hosting.dll" ComponentId="{9B0E0748-456F-47A4-AD5D-7650E083361D}" Directory_="APPDIR" Attributes="0" KeyPath="Quartz.Extensions.Hosting.dll"/>
     <ROW Component="Quartz.Serialization.Json.dll" ComponentId="{3157767C-83D8-4095-A93D-494F25A5B5CD}" Directory_="APPDIR" Attributes="0" KeyPath="Quartz.Serialization.Json.dll"/>
     <ROW Component="Quartz.dll" ComponentId="{2241C822-D276-48B0-8ABE-4CDD5C26B029}" Directory_="APPDIR" Attributes="0" KeyPath="Quartz.dll"/>
+    <ROW Component="RequiredApplication" ComponentId="{5E7E09B2-A5F0-4444-8F18-62F04BDDA570}" Directory_="APPDIR" Attributes="260" KeyPath="RequiredApplication" Options="2"/>
     <ROW Component="SslCertBinding.Net.dll" ComponentId="{1CC07107-BCBE-471C-9E3F-4143F1997FD5}" Directory_="APPDIR" Attributes="0" KeyPath="SslCertBinding.Net.dll"/>
     <ROW Component="StreamJsonRpc.dll" ComponentId="{69DC7AC6-28E6-4466-8C46-E01E35824B50}" Directory_="APPDIR" Attributes="0" KeyPath="StreamJsonRpc.dll"/>
     <ROW Component="Stylet.dll" ComponentId="{A78CBCC0-707B-4E0D-AAEA-7A296613218D}" Directory_="APPDIR" Attributes="0" KeyPath="Stylet.dll"/>
@@ -292,6 +302,7 @@
     <ROW Component="System.Diagnostics.Debug.dll" ComponentId="{2A960A8E-A6C8-4AF8-9A75-83D4592B3BFD}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Diagnostics.Debug.dll"/>
     <ROW Component="System.Diagnostics.DiagnosticSource.dll" ComponentId="{F02B31E3-BBB4-4648-A729-C6D7743A2782}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Diagnostics.DiagnosticSource.dll"/>
     <ROW Component="System.Diagnostics.DiagnosticSource.dll_1" ComponentId="{D2B179DC-8C04-4D5F-AB79-5C711568EC9F}" Directory_="APPDIR" Attributes="0" KeyPath="System.Diagnostics.DiagnosticSource.dll_1"/>
+    <ROW Component="System.Diagnostics.EventLog.dll" ComponentId="{60054A75-F1E6-4CC0-8C34-E2175AB2447E}" Directory_="APPDIR" Attributes="0" KeyPath="System.Diagnostics.EventLog.dll"/>
     <ROW Component="System.Diagnostics.FileVersionInfo.dll" ComponentId="{9F0D26AD-4C2D-4254-B08F-8555065C063E}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Diagnostics.FileVersionInfo.dll"/>
     <ROW Component="System.Diagnostics.PerformanceCounter.dll" ComponentId="{64CA3E19-2C23-47BA-9641-5BF8FDA24BC1}" Directory_="APPDIR" Attributes="0" KeyPath="System.Diagnostics.PerformanceCounter.dll"/>
     <ROW Component="System.Diagnostics.Process.dll" ComponentId="{AA776AFB-41D9-4DDE-AB39-2CA1BA323AF5}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Diagnostics.Process.dll"/>
@@ -303,6 +314,7 @@
     <ROW Component="System.DirectoryServices.AccountManagement.dll" ComponentId="{E0712A31-968B-4E51-9787-20724B8B8068}" Directory_="APPDIR" Attributes="0" KeyPath="System.DirectoryServices.AccountManagement.dll"/>
     <ROW Component="System.DirectoryServices.Protocols.dll" ComponentId="{F7CDDFC6-72CF-412F-AAE2-1EDA02DADFD0}" Directory_="APPDIR" Attributes="0" KeyPath="System.DirectoryServices.Protocols.dll"/>
     <ROW Component="System.DirectoryServices.dll" ComponentId="{5BDF998B-43FC-4D2C-B7D4-C30D2619AEE1}" Directory_="APPDIR" Attributes="0" KeyPath="System.DirectoryServices.dll"/>
+    <ROW Component="System.Drawing.Common.dll" ComponentId="{44061EFC-CE4B-4499-8CBE-25D1BB21660E}" Directory_="APPDIR" Attributes="0" KeyPath="System.Drawing.Common.dll"/>
     <ROW Component="System.Drawing.Primitives.dll" ComponentId="{3303CA18-DDAC-449A-9262-78B2735956BE}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Drawing.Primitives.dll"/>
     <ROW Component="System.Drawing.dll" ComponentId="{4781D115-C12C-47C7-A888-2B5B34D69BE5}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Drawing.dll"/>
     <ROW Component="System.Dynamic.Runtime.dll" ComponentId="{20B88BF5-5154-42D5-80B7-3792BE78CFB0}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Dynamic.Runtime.dll"/>
@@ -313,6 +325,7 @@
     <ROW Component="System.IO.Compression.FileSystem.dll" ComponentId="{A977EA81-76EF-4331-968C-91B3A945FF4D}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.Compression.FileSystem.dll"/>
     <ROW Component="System.IO.Compression.ZipFile.dll" ComponentId="{E55F9CDF-E712-4073-9022-7F298BC2E399}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.Compression.ZipFile.dll"/>
     <ROW Component="System.IO.Compression.dll" ComponentId="{5DD46815-5A4A-495D-997F-335C9130E3D9}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.Compression.dll"/>
+    <ROW Component="System.IO.FileSystem.AccessControl.dll" ComponentId="{5F57FB5D-B635-4D0C-8D63-E58C24423019}" Directory_="APPDIR" Attributes="0" KeyPath="System.IO.FileSystem.AccessControl.dll"/>
     <ROW Component="System.IO.FileSystem.DriveInfo.dll" ComponentId="{871BB73C-4EDD-48CE-AFE9-C978E5230F4C}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.FileSystem.DriveInfo.dll"/>
     <ROW Component="System.IO.FileSystem.Primitives.dll" ComponentId="{939FA925-52B4-4A51-AED2-AB710002E85A}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.FileSystem.Primitives.dll"/>
     <ROW Component="System.IO.FileSystem.Watcher.dll" ComponentId="{AF4C2AE0-C2AD-4092-8BEA-33E874C6B0C0}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.FileSystem.Watcher.dll"/>
@@ -320,12 +333,12 @@
     <ROW Component="System.IO.IsolatedStorage.dll" ComponentId="{AE25E0A4-CC76-4C47-A9AF-712E870B99EB}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.IsolatedStorage.dll"/>
     <ROW Component="System.IO.MemoryMappedFiles.dll" ComponentId="{BDA7582F-5D56-4E1F-A0B8-86EE87474187}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.MemoryMappedFiles.dll"/>
     <ROW Component="System.IO.Packaging.dll" ComponentId="{EC339A5E-9FC4-4F72-A2EC-3D1244F4FC63}" Directory_="APPDIR" Attributes="0" KeyPath="System.IO.Packaging.dll"/>
-    <ROW Component="System.IO.Pipelines.dll" ComponentId="{4C79B0D5-8D55-475D-BCF4-ECC23CD8D5F8}" Directory_="APPDIR" Attributes="0" KeyPath="System.IO.Pipelines.dll"/>
     <ROW Component="System.IO.Pipes.dll" ComponentId="{14881EEB-F7EC-402A-AB82-092287B1455B}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.Pipes.dll"/>
     <ROW Component="System.IO.Ports.dll" ComponentId="{BB64B6CA-78D3-46D4-88E2-008EA077132A}" Directory_="APPDIR" Attributes="0" KeyPath="System.IO.Ports.dll"/>
     <ROW Component="System.IO.UnmanagedMemoryStream.dll" ComponentId="{30B49399-A266-4B39-BCA4-C70824F1F7BA}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.UnmanagedMemoryStream.dll"/>
     <ROW Component="System.IO.dll" ComponentId="{58AE1064-9828-4AD6-883B-67ACF1F60105}" Directory_="ref_Dir" Attributes="0" KeyPath="System.IO.dll"/>
     <ROW Component="System.IdentityModel.Tokens.Jwt.dll" ComponentId="{3CA08793-80E7-499D-8425-6EE5632FBDA8}" Directory_="APPDIR" Attributes="0" KeyPath="System.IdentityModel.Tokens.Jwt.dll"/>
+    <ROW Component="System.Linq.Async.dll" ComponentId="{35C42F89-3B7D-44C7-A604-D1240290DA83}" Directory_="APPDIR" Attributes="0" KeyPath="System.Linq.Async.dll"/>
     <ROW Component="System.Linq.Expressions.dll" ComponentId="{EBD7BBA4-ECBC-4AE1-814F-CC5F662A118B}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Linq.Expressions.dll"/>
     <ROW Component="System.Linq.Parallel.dll" ComponentId="{F62A363C-1FBC-40D8-BBD6-E0256F576B0D}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Linq.Parallel.dll"/>
     <ROW Component="System.Linq.Queryable.dll" ComponentId="{A5408DCA-DA6F-4CD8-B11F-1284CBB6A4F4}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Linq.Queryable.dll"/>
@@ -389,6 +402,7 @@
     <ROW Component="System.Runtime.Serialization.Xml.dll" ComponentId="{35E5C017-C135-46B0-AD93-A8355450FDFF}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Runtime.Serialization.Xml.dll"/>
     <ROW Component="System.Runtime.Serialization.dll" ComponentId="{1E022F1C-DB60-42C1-9E94-59E3F3477F1E}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Runtime.Serialization.dll"/>
     <ROW Component="System.Runtime.dll" ComponentId="{EEAEC30F-783C-40DB-9BDC-37D5BCBBCFD3}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Runtime.dll"/>
+    <ROW Component="System.Security.AccessControl.dll" ComponentId="{8B359093-8956-4D38-9809-68C5678C3D3E}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.AccessControl.dll"/>
     <ROW Component="System.Security.Claims.dll" ComponentId="{9D7CB3A9-57E8-4CB4-9523-0D499A6B1BCF}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Security.Claims.dll"/>
     <ROW Component="System.Security.Cryptography.Algorithms.dll" ComponentId="{B26787FC-AE2F-46CE-B356-AB47A508ACCC}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Security.Cryptography.Algorithms.dll"/>
     <ROW Component="System.Security.Cryptography.Cng.dll" ComponentId="{6A47C7A7-89FF-4D0D-8A90-2BA2D39C55A5}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="System.Security.Cryptography.Cng.dll"/>
@@ -398,6 +412,8 @@
     <ROW Component="System.Security.Cryptography.ProtectedData.dll" ComponentId="{CE9FF8CD-7738-42EC-9190-EC311C267239}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Cryptography.ProtectedData.dll"/>
     <ROW Component="System.Security.Cryptography.ProtectedData.dll_1" ComponentId="{C3091E93-FAE5-4B90-A3DB-A591670C4790}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="System.Security.Cryptography.ProtectedData.dll_1"/>
     <ROW Component="System.Security.Cryptography.X509Certificates.dll" ComponentId="{37EED6A0-8B6E-42A2-9475-66958B2171DE}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Security.Cryptography.X509Certificates.dll"/>
+    <ROW Component="System.Security.Permissions.dll" ComponentId="{8CAAB969-CF45-4B57-AD6B-644F243A39E6}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Permissions.dll"/>
+    <ROW Component="System.Security.Principal.Windows.dll" ComponentId="{9BE9E9D4-2113-4DF6-B703-43289C206045}" Directory_="APPDIR" Attributes="0" KeyPath="System.Security.Principal.Windows.dll"/>
     <ROW Component="System.Security.Principal.dll" ComponentId="{F4953C9A-6B54-44AC-BEA8-E325FB3B300A}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Security.Principal.dll"/>
     <ROW Component="System.Security.SecureString.dll" ComponentId="{FBC95BAA-B602-4CDC-B279-476C4CDDDDEA}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Security.SecureString.dll"/>
     <ROW Component="System.Security.dll" ComponentId="{1288782C-F078-4A0A-B9EF-7BC909941B95}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Security.dll"/>
@@ -436,6 +452,7 @@
     <ROW Component="System.ValueTuple.dll_1" ComponentId="{EB96A5BF-C4EC-4602-A8C8-127D32EE1D53}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="System.ValueTuple.dll_1"/>
     <ROW Component="System.Web.HttpUtility.dll" ComponentId="{05A0C6D3-119A-4310-B0C2-42B519CC6341}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Web.HttpUtility.dll"/>
     <ROW Component="System.Web.dll" ComponentId="{F575D883-B220-4F47-94DB-379061413282}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Web.dll"/>
+    <ROW Component="System.Windows.Extensions.dll" ComponentId="{FE773FDF-490B-4714-98C0-42CCF0842745}" Directory_="APPDIR" Attributes="0" KeyPath="System.Windows.Extensions.dll"/>
     <ROW Component="System.Windows.dll" ComponentId="{A1D5D9C7-47F8-464D-A61D-F8AFBB67E8A8}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Windows.dll"/>
     <ROW Component="System.Xml.Linq.dll" ComponentId="{ACC2CDDE-C14C-4D4E-867B-6EBA0B9F12E5}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Xml.Linq.dll"/>
     <ROW Component="System.Xml.ReaderWriter.dll" ComponentId="{807FC287-E47F-4588-8E54-CF96751592CB}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Xml.ReaderWriter.dll"/>
@@ -447,6 +464,14 @@
     <ROW Component="System.Xml.XmlSerializer.dll" ComponentId="{539E4C95-FF4D-402F-B408-6391D7046A05}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Xml.XmlSerializer.dll"/>
     <ROW Component="System.Xml.dll" ComponentId="{D3A1A3BE-2689-4BA6-B46E-6D778EE58D1B}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Xml.dll"/>
     <ROW Component="System.dll" ComponentId="{0D0D6E02-1ED6-4821-B62C-F7991ACAFE61}" Directory_="ref_Dir" Attributes="0" KeyPath="System.dll"/>
+    <ROW Component="Telerik.Windows.Controls.Data.dll" ComponentId="{0B5C1C2F-6F9C-4CBC-A684-472970809F6B}" Directory_="APPDIR" Attributes="0" KeyPath="Telerik.Windows.Controls.Data.dll"/>
+    <ROW Component="Telerik.Windows.Controls.GridView.dll" ComponentId="{D4F9E156-BA7B-469D-BC46-1FB50C91B5A8}" Directory_="APPDIR" Attributes="0" KeyPath="Telerik.Windows.Controls.GridView.dll"/>
+    <ROW Component="Telerik.Windows.Controls.Input.dll" ComponentId="{70EB40BB-5F0C-42CA-BF1B-8A3FEB3F6A96}" Directory_="APPDIR" Attributes="0" KeyPath="Telerik.Windows.Controls.Input.dll"/>
+    <ROW Component="Telerik.Windows.Controls.Navigation.dll" ComponentId="{33E32CF0-208D-4389-AB03-A34320726035}" Directory_="APPDIR" Attributes="0" KeyPath="Telerik.Windows.Controls.Navigation.dll"/>
+    <ROW Component="Telerik.Windows.Controls.dll" ComponentId="{38E39336-4DB0-43C8-846C-AF63330459EE}" Directory_="APPDIR" Attributes="0" KeyPath="Telerik.Windows.Controls.dll"/>
+    <ROW Component="Telerik.Windows.Data.dll" ComponentId="{86E32039-12BC-4D2B-8B5C-FBC4CA64387A}" Directory_="APPDIR" Attributes="0" KeyPath="Telerik.Windows.Data.dll"/>
+    <ROW Component="Telerik.Windows.Themes.Office2016.dll" ComponentId="{588CD3F2-86E9-444D-85F4-9AD38C3A43C6}" Directory_="APPDIR" Attributes="0" KeyPath="Telerik.Windows.Themes.Office2016.dll"/>
+    <ROW Component="Telerik.Windows.Themes.Office2019.dll" ComponentId="{85505E4F-270C-4F8C-A9AC-D58438DC823B}" Directory_="APPDIR" Attributes="0" KeyPath="Telerik.Windows.Themes.Office2019.dll"/>
     <ROW Component="Vanara.Core.dll" ComponentId="{20B7705E-09B0-4CD3-B6D9-92DD8876D91E}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.Core.dll"/>
     <ROW Component="Vanara.Core.dll_1" ComponentId="{8FC0C4FF-9593-43AE-91F2-B4C42CF55FA2}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Vanara.Core.dll_1"/>
     <ROW Component="Vanara.PInvoke.Cryptography.dll" ComponentId="{2EF1B4E9-87AD-4768-8E40-47CFD2CC4162}" Directory_="APPDIR" Attributes="0" KeyPath="Vanara.PInvoke.Cryptography.dll"/>
@@ -517,6 +542,7 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFeatsComponent">
     <ROW Feature="ConfigurationFilesFeature" Title="ConfigurationFilesFeature" Description="Configuration files and templates" Display="3" Level="4" Directory_="CONFIG_PATH" Attributes="8"/>
     <ROW Feature="MainFeature" Title="MainFeature" Description="Description" Display="1" Level="1" Directory_="APPDIR" Attributes="8"/>
+    <ROW Feature="RequiredApplication" Title="SQL Express 2017" Description="SQL Express 2017" Display="5" Level="4" Attributes="8"/>
     <ATTRIBUTE name="CurrentFeature" value="MainFeature"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiFilesComponent">
@@ -622,10 +648,6 @@
     <ROW File="Microsoft.AspNetCore.Authentication.JwtBearer.dll" Component_="Microsoft.AspNetCore.Authentication.JwtBearer.dll" FileName="MICROS~2.DLL|Microsoft.AspNetCore.Authentication.JwtBearer.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.Authentication.JwtBearer.dll" SelfReg="false"/>
     <ROW File="Microsoft.AspNetCore.Authentication.OpenIdConnect.dll" Component_="Microsoft.AspNetCore.Authentication.OpenIdConnect.dll" FileName="MICROS~3.DLL|Microsoft.AspNetCore.Authentication.OpenIdConnect.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.Authentication.OpenIdConnect.dll" SelfReg="false"/>
     <ROW File="Microsoft.AspNetCore.Authentication.WsFederation.dll" Component_="Microsoft.AspNetCore.Authentication.WsFederation.dll" FileName="MICROS~4.DLL|Microsoft.AspNetCore.Authentication.WsFederation.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.Authentication.WsFederation.dll" SelfReg="false"/>
-    <ROW File="Microsoft.AspNetCore.Http.Abstractions.dll" Component_="Microsoft.AspNetCore.Http.Abstractions.dll" FileName="MICROS~5.DLL|Microsoft.AspNetCore.Http.Abstractions.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.Http.Abstractions.dll" SelfReg="false"/>
-    <ROW File="Microsoft.AspNetCore.Http.Extensions.dll" Component_="Microsoft.AspNetCore.Http.Extensions.dll" FileName="MICROS~6.DLL|Microsoft.AspNetCore.Http.Extensions.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.Http.Extensions.dll" SelfReg="false"/>
-    <ROW File="Microsoft.AspNetCore.Http.Features.dll" Component_="Microsoft.AspNetCore.Http.Features.dll" FileName="MICROS~7.DLL|Microsoft.AspNetCore.Http.Features.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.Http.Features.dll" SelfReg="false"/>
-    <ROW File="Microsoft.AspNetCore.HttpOverrides.dll" Component_="Microsoft.AspNetCore.HttpOverrides.dll" FileName="MICROS~8.DLL|Microsoft.AspNetCore.HttpOverrides.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.HttpOverrides.dll" SelfReg="false"/>
     <ROW File="Microsoft.CodeAnalysis.CSharp.dll" Component_="Microsoft.CodeAnalysis.CSharp.dll" FileName="MICROS~9.DLL|Microsoft.CodeAnalysis.CSharp.dll" Attributes="0" SourcePath="output\Microsoft.CodeAnalysis.CSharp.dll" SelfReg="false"/>
     <ROW File="Microsoft.CodeAnalysis.dll" Component_="Microsoft.CodeAnalysis.dll" FileName="MICRO~10.DLL|Microsoft.CodeAnalysis.dll" Attributes="0" SourcePath="output\Microsoft.CodeAnalysis.dll" SelfReg="false"/>
     <ROW File="Microsoft.Extensions.Caching.Abstractions.dll" Component_="Microsoft.Extensions.Caching.Abstractions.dll" FileName="MICRO~11.DLL|Microsoft.Extensions.Caching.Abstractions.dll" Attributes="0" SourcePath="output\Microsoft.Extensions.Caching.Abstractions.dll" SelfReg="false"/>
@@ -668,7 +690,6 @@
     <ROW File="Microsoft.Management.Infrastructure.CimCmdlets.dll" Component_="Microsoft.Management.Infrastructure.CimCmdlets.dll" FileName="MICRO~48.DLL|Microsoft.Management.Infrastructure.CimCmdlets.dll" Attributes="0" SourcePath="output\Microsoft.Management.Infrastructure.CimCmdlets.dll" SelfReg="false"/>
     <ROW File="Microsoft.Management.Infrastructure.dll" Component_="Microsoft.Management.Infrastructure.dll" FileName="MICRO~49.DLL|Microsoft.Management.Infrastructure.dll" Attributes="0" SourcePath="output\Microsoft.Management.Infrastructure.dll" SelfReg="false"/>
     <ROW File="Microsoft.Management.Infrastructure.Native.dll" Component_="Microsoft.Management.Infrastructure.Native.dll" FileName="MICRO~50.DLL|Microsoft.Management.Infrastructure.Native.dll" Attributes="0" SourcePath="output\Microsoft.Management.Infrastructure.Native.dll" SelfReg="false"/>
-    <ROW File="Microsoft.Net.Http.Headers.dll" Component_="Microsoft.Net.Http.Headers.dll" FileName="MICRO~51.DLL|Microsoft.Net.Http.Headers.dll" Attributes="0" SourcePath="output\Microsoft.Net.Http.Headers.dll" SelfReg="false"/>
     <ROW File="Microsoft.PowerShell.Commands.Diagnostics.dll" Component_="Microsoft.PowerShell.Commands.Diagnostics.dll" FileName="MICRO~52.DLL|Microsoft.PowerShell.Commands.Diagnostics.dll" Attributes="0" SourcePath="output\Microsoft.PowerShell.Commands.Diagnostics.dll" SelfReg="false"/>
     <ROW File="Microsoft.PowerShell.Commands.Management.dll" Component_="Microsoft.PowerShell.Commands.Management.dll" FileName="MICRO~53.DLL|Microsoft.PowerShell.Commands.Management.dll" Attributes="0" SourcePath="output\Microsoft.PowerShell.Commands.Management.dll" SelfReg="false"/>
     <ROW File="Microsoft.PowerShell.Commands.Utility.dll" Component_="Microsoft.PowerShell.Commands.Utility.dll" FileName="MICRO~54.DLL|Microsoft.PowerShell.Commands.Utility.dll" Attributes="0" SourcePath="output\Microsoft.PowerShell.Commands.Utility.dll" SelfReg="false"/>
@@ -963,7 +984,6 @@
     <ROW File="NamedPipeServerStream.NetFrameworkVersion.dll" Component_="NamedPipeServerStream.NetFrameworkVersion.dll" FileName="NAMEDP~1.DLL|NamedPipeServerStream.NetFrameworkVersion.dll" Attributes="0" SourcePath="output\NamedPipeServerStream.NetFrameworkVersion.dll" SelfReg="false"/>
     <ROW File="Nerdbank.Streams.dll" Component_="Nerdbank.Streams.dll" FileName="NERDBA~1.DLL|Nerdbank.Streams.dll" Attributes="0" SourcePath="output\Nerdbank.Streams.dll" SelfReg="false"/>
     <ROW File="StreamJsonRpc.dll" Component_="StreamJsonRpc.dll" FileName="STREAM~1.DLL|StreamJsonRpc.dll" Attributes="0" SourcePath="output\StreamJsonRpc.dll" SelfReg="false"/>
-    <ROW File="System.IO.Pipelines.dll" Component_="System.IO.Pipelines.dll" FileName="SYSTE~35.DLL|System.IO.Pipelines.dll" Attributes="0" SourcePath="output\System.IO.Pipelines.dll" SelfReg="false"/>
     <ROW File="Microsoft.AspNetCore.Cryptography.Internal.dll" Component_="Microsoft.AspNetCore.Cryptography.Internal.dll" FileName="MICRO~67.DLL|Microsoft.AspNetCore.Cryptography.Internal.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.Cryptography.Internal.dll" SelfReg="false"/>
     <ROW File="Microsoft.AspNetCore.DataProtection.Abstractions.dll" Component_="Microsoft.AspNetCore.DataProtection.Abstractions.dll" FileName="MICRO~68.DLL|Microsoft.AspNetCore.DataProtection.Abstractions.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.DataProtection.Abstractions.dll" SelfReg="false"/>
     <ROW File="Microsoft.AspNetCore.DataProtection.dll" Component_="Microsoft.AspNetCore.DataProtection.dll" FileName="MICRO~69.DLL|Microsoft.AspNetCore.DataProtection.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.DataProtection.dll" SelfReg="false"/>
@@ -1015,6 +1035,34 @@
     <ROW File="System.Diagnostics.DiagnosticSource.dll_1" Component_="System.Diagnostics.DiagnosticSource.dll_1" FileName="SYSTE~36.DLL|System.Diagnostics.DiagnosticSource.dll" Attributes="0" SourcePath="output\System.Diagnostics.DiagnosticSource.dll" SelfReg="false"/>
     <ROW File="Lithnet.Licensing.Core.dll" Component_="Lithnet.Licensing.Core.dll" FileName="LITHNE~8.DLL|Lithnet.Licensing.Core.dll" Attributes="0" SourcePath="output\Lithnet.Licensing.Core.dll" SelfReg="false"/>
     <ROW File="passworddisplayoptions.js" Component_="clipboard.js" FileName="PASSWO~1.JS|password-display-options.js" Attributes="0" SourcePath="output\wwwroot\js\password-display-options.js" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Api.deps.json" Component_="Lithnet.AccessManager.Server.UI.deps.json" FileName="LITHNE~5.JSO|Lithnet.AccessManager.Api.deps.json" Attributes="0" SourcePath="output\Lithnet.AccessManager.Api.deps.json" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Api.dll" Component_="Lithnet.AccessManager.Api.dll" FileName="LITHNE~9.DLL|Lithnet.AccessManager.Api.dll" Attributes="0" SourcePath="output\Lithnet.AccessManager.Api.dll" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Api.exe" Component_="Lithnet.AccessManager.Api.exe" FileName="LITHNE~3.EXE|Lithnet.AccessManager.Api.exe" Attributes="0" SourcePath="output\Lithnet.AccessManager.Api.exe" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Api.pdb" Component_="Lithnet.AccessManager.Api.exe" FileName="LITHNE~6.PDB|Lithnet.AccessManager.Api.pdb" Attributes="0" SourcePath="output\Lithnet.AccessManager.Api.pdb" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Api.runtimeconfig.json" Component_="Lithnet.AccessManager.Server.UI.deps.json" FileName="LITHNE~6.JSO|Lithnet.AccessManager.Api.runtimeconfig.json" Attributes="0" SourcePath="output\Lithnet.AccessManager.Api.runtimeconfig.json" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Api.Shared.dll" Component_="Lithnet.AccessManager.Api.Shared.dll" FileName="LITHN~10.DLL|Lithnet.AccessManager.Api.Shared.dll" Attributes="0" SourcePath="output\Lithnet.AccessManager.Api.Shared.dll" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Api.Shared.pdb" Component_="Lithnet.AccessManager.Api.Shared.dll" FileName="LITHNE~7.PDB|Lithnet.AccessManager.Api.Shared.pdb" Attributes="0" SourcePath="output\Lithnet.AccessManager.Api.Shared.pdb" SelfReg="false"/>
+    <ROW File="Microsoft.Graph.Auth.dll" Component_="Microsoft.Graph.Auth.dll" FileName="MICRO~74.DLL|Microsoft.Graph.Auth.dll" Attributes="0" SourcePath="output\Microsoft.Graph.Auth.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Graph.Core.dll" Component_="Microsoft.Graph.Core.dll" FileName="MICRO~75.DLL|Microsoft.Graph.Core.dll" Attributes="0" SourcePath="output\Microsoft.Graph.Core.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Graph.dll" Component_="Microsoft.Graph.dll" FileName="MICRO~76.DLL|Microsoft.Graph.dll" Attributes="0" SourcePath="output\Microsoft.Graph.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Win32.Registry.dll" Component_="Microsoft.Win32.Registry.dll" FileName="MICRO~77.DLL|Microsoft.Win32.Registry.dll" Attributes="0" SourcePath="output\Microsoft.Win32.Registry.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Win32.SystemEvents.dll" Component_="Microsoft.Win32.SystemEvents.dll" FileName="MICRO~78.DLL|Microsoft.Win32.SystemEvents.dll" Attributes="0" SourcePath="output\Microsoft.Win32.SystemEvents.dll" SelfReg="false"/>
+    <ROW File="System.Diagnostics.EventLog.dll" Component_="System.Diagnostics.EventLog.dll" FileName="SYSTE~37.DLL|System.Diagnostics.EventLog.dll" Attributes="0" SourcePath="output\System.Diagnostics.EventLog.dll" SelfReg="false"/>
+    <ROW File="System.Drawing.Common.dll" Component_="System.Drawing.Common.dll" FileName="SYSTE~38.DLL|System.Drawing.Common.dll" Attributes="0" SourcePath="output\System.Drawing.Common.dll" SelfReg="false"/>
+    <ROW File="System.IO.FileSystem.AccessControl.dll" Component_="System.IO.FileSystem.AccessControl.dll" FileName="SYSTE~39.DLL|System.IO.FileSystem.AccessControl.dll" Attributes="0" SourcePath="output\System.IO.FileSystem.AccessControl.dll" SelfReg="false"/>
+    <ROW File="System.Linq.Async.dll" Component_="System.Linq.Async.dll" FileName="SYSTE~40.DLL|System.Linq.Async.dll" Attributes="0" SourcePath="output\System.Linq.Async.dll" SelfReg="false"/>
+    <ROW File="System.Security.AccessControl.dll" Component_="System.Security.AccessControl.dll" FileName="SYSTE~41.DLL|System.Security.AccessControl.dll" Attributes="0" SourcePath="output\System.Security.AccessControl.dll" SelfReg="false"/>
+    <ROW File="System.Security.Permissions.dll" Component_="System.Security.Permissions.dll" FileName="SYSTE~42.DLL|System.Security.Permissions.dll" Attributes="0" SourcePath="output\System.Security.Permissions.dll" SelfReg="false"/>
+    <ROW File="System.Security.Principal.Windows.dll" Component_="System.Security.Principal.Windows.dll" FileName="SYSTE~43.DLL|System.Security.Principal.Windows.dll" Attributes="0" SourcePath="output\System.Security.Principal.Windows.dll" SelfReg="false"/>
+    <ROW File="System.Windows.Extensions.dll" Component_="System.Windows.Extensions.dll" FileName="SYSTE~44.DLL|System.Windows.Extensions.dll" Attributes="0" SourcePath="output\System.Windows.Extensions.dll" SelfReg="false"/>
+    <ROW File="Telerik.Windows.Controls.Data.dll" Component_="Telerik.Windows.Controls.Data.dll" FileName="TELERI~1.DLL|Telerik.Windows.Controls.Data.dll" Attributes="0" SourcePath="output\Telerik.Windows.Controls.Data.dll" SelfReg="false"/>
+    <ROW File="Telerik.Windows.Controls.dll" Component_="Telerik.Windows.Controls.dll" FileName="TELERI~2.DLL|Telerik.Windows.Controls.dll" Attributes="0" SourcePath="output\Telerik.Windows.Controls.dll" SelfReg="false"/>
+    <ROW File="Telerik.Windows.Controls.GridView.dll" Component_="Telerik.Windows.Controls.GridView.dll" FileName="TELERI~3.DLL|Telerik.Windows.Controls.GridView.dll" Attributes="0" SourcePath="output\Telerik.Windows.Controls.GridView.dll" SelfReg="false"/>
+    <ROW File="Telerik.Windows.Controls.Input.dll" Component_="Telerik.Windows.Controls.Input.dll" FileName="TELERI~4.DLL|Telerik.Windows.Controls.Input.dll" Attributes="0" SourcePath="output\Telerik.Windows.Controls.Input.dll" SelfReg="false"/>
+    <ROW File="Telerik.Windows.Controls.Navigation.dll" Component_="Telerik.Windows.Controls.Navigation.dll" FileName="TELERI~5.DLL|Telerik.Windows.Controls.Navigation.dll" Attributes="0" SourcePath="output\Telerik.Windows.Controls.Navigation.dll" SelfReg="false"/>
+    <ROW File="Telerik.Windows.Data.dll" Component_="Telerik.Windows.Data.dll" FileName="TELERI~6.DLL|Telerik.Windows.Data.dll" Attributes="0" SourcePath="output\Telerik.Windows.Data.dll" SelfReg="false"/>
+    <ROW File="Telerik.Windows.Themes.Office2016.dll" Component_="Telerik.Windows.Themes.Office2016.dll" FileName="TELERI~7.DLL|Telerik.Windows.Themes.Office2016.dll" Attributes="0" SourcePath="output\Telerik.Windows.Themes.Office2016.dll" SelfReg="false"/>
+    <ROW File="Telerik.Windows.Themes.Office2019.dll" Component_="Telerik.Windows.Themes.Office2019.dll" FileName="TELERI~8.DLL|Telerik.Windows.Themes.Office2019.dll" Attributes="0" SourcePath="output\Telerik.Windows.Themes.Office2019.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.custcomp.AiControlConditionAliasComponent">
     <ROW AliasRowId="ExitDialog#LaunchProdCheckBox#Hide#((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))" AliasRowOperation="2" Condition="(((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))) OR NOT IS_STANDALONE_OR_NOT_CLUSTERED_OR_ON_ACTIVE_NODE"/>
@@ -1036,8 +1084,11 @@
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites" Options="2"/>
   </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.BootstrapperUISequenceComponent">
+    <ROW Action="AI_DetectSoftware" Sequence="151"/>
+  </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="1" PackageFolder="..\..\..\..\..\..\installers\ams" Languages="en" InstallationType="4" CabsLocation="1" PackageType="1" FilesInsideExe="true" ExtractionFolder="[AppDataFolder][|Manufacturer]\[|ProductName] [|ProductVersion]\install" ExtUI="true" UseLargeSchema="true" MsiPackageType="x64" UACExecutionLevel="2"/>
+    <ROW BuildKey="DefaultBuild" BuildName="DefaultBuild" BuildOrder="1" BuildType="0" PackageFolder="..\..\..\..\..\..\installers\ams" Languages="en" InstallationType="4" CabsLocation="1" PackageType="1" FilesInsideExe="true" ExtractionFolder="[AppDataFolder][|Manufacturer]\[|ProductName] [|ProductVersion]\install" ExtUI="true" UseLargeSchema="true" MsiPackageType="x64" UACExecutionLevel="2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildEventsComponent">
     <ROW EventId="0" EventRun="dotnet" EventCmdLine="publish --runtime win-x64 --output &quot;D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager\Lithnet.AccessManager.Service.Setup\output&quot; --framework netcoreapp3.1 --self-contained false" EventWkDir="D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager\Lithnet.AccessManager.Service" EventDescription="Building service project" EventOrder="2" EventType="1" EventInterupt="true" EventEnabled="false" EventPrecompression="false" RollbackEvent="false" EventBuild="DefaultBuild"/>
@@ -1049,7 +1100,7 @@
     <ROW Path="&lt;AI_DICTS&gt;ui_en.ail"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DigCertStoreComponent">
-    <ROW TimeStampUrl="http://timestamp.digicert.com" SignerDescription="[|ProductName]" SignOptions="7" SignTool="0" UseSha256="1" Thumbprint="479022a1e03466ca9e836acf38a540e0fd6ebeb5 Subject: Lithnet&#10;Issuer: DigiCert EV Code Signing CA (SHA2)&#10;Valid from 07/18/2019 to 07/22/2022&#10;User\MY" Subject="CN=Lithnet, O=Lithnet, L=Chadstone, S=VIC, C=AU, SERIALNUMBER=DOC:20160919, OID.2.5.4.15=Business Entity, OID.1.3.6.1.4.1.311.60.2.1.3=AU"/>
+    <ROW TimeStampUrl="http://timestamp.digicert.com" SignerDescription="[|ProductName]" SignOptions="7" SignTool="0" UseSha256="1" Thumbprint="963b96e04c888e01267f46abbd2134c9eae9717b Subject: Lithnet&#10;Issuer: DigiCert SHA2 Assured ID Code Signing CA&#10;Valid from 10/26/2020 to 01/23/2024&#10;User\MY" Subject="CN=Lithnet, O=Lithnet, L=Chadstone, S=Victoria, C=AU"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.FragmentComponent">
     <ROW Fragment="CommonUI.aip" Path="&lt;AI_FRAGS&gt;CommonUI.aip"/>
@@ -1074,6 +1125,7 @@
   <COMPONENT cid="caphyon.advinst.msicomp.MsiActionTextComponent">
     <ROW Action="AI_AiBackupImmediate" Description="Preparing backup operation" DescriptionLocId="ActionText.Description.AI_AiBackupImmediate" Template="Path: [1]" TemplateLocId="ActionText.Template.AI_AiBackupImmediate"/>
     <ROW Action="AI_AiBackupRollback" Description="Rollback backup" DescriptionLocId="ActionText.Description.AI_AiBackupRollback" Template="Path: [1]" TemplateLocId="ActionText.Template.AI_AiBackupRollback"/>
+    <ROW Action="AI_AiBackupRollbackImpersonate" Description="Rollback backup" DescriptionLocId="ActionText.Description.AI_AiBackupRollback" Template="Path: [1]" TemplateLocId="ActionText.Template.AI_AiBackupRollback"/>
     <ROW Action="AI_AiRemoveRegsCommit" Description="Executing registry removal operations." DescriptionLocId="ActionText.Description.AI_AiRemoveRegsCommit" Template="Removing registry entry: [1]" TemplateLocId="ActionText.Template.AI_AiRemoveRegsCommit"/>
     <ROW Action="AI_AiRemoveRegsCommitUser" Description="Executing registry removal operations." DescriptionLocId="ActionText.Description.AI_AiRemoveRegsCommit" Template="Removing registry entry: [1]" TemplateLocId="ActionText.Template.AI_AiRemoveRegsCommit"/>
     <ROW Action="AI_AiRemoveRegsDeferred" Description="Executing registry removal operations." DescriptionLocId="ActionText.Description.AI_AiRemoveRegsDeferred" Template="Removing registry entry: [1]" TemplateLocId="ActionText.Template.AI_AiRemoveRegsDeferred"/>
@@ -1082,10 +1134,16 @@
     <ROW Action="AI_AiRestoreDeferred" Description="Executing restore operation" DescriptionLocId="ActionText.Description.AI_AiRestoreDeferred" Template="Path: [1]" TemplateLocId="ActionText.Template.AI_AiRestoreDeferred"/>
     <ROW Action="AI_AiRestoreDeferredImpersonate" Description="Executing restore operation" DescriptionLocId="ActionText.Description.AI_AiRestoreDeferred" Template="Path: [1]" TemplateLocId="ActionText.Template.AI_AiRestoreDeferred"/>
     <ROW Action="AI_AiRestoreRollback" Description="Rollback restore" DescriptionLocId="ActionText.Description.AI_AiRestoreRollback" Template="Path: [1]" TemplateLocId="ActionText.Template.AI_AiRestoreRollback"/>
+    <ROW Action="AI_ConfigureChainer" Description="Configuring prerequisites launcher" DescriptionLocId="ActionText.Description.AI_ConfigureChainer" Template="Configure Launcher" TemplateLocId="ActionText.Template.AI_ConfigureChainer"/>
     <ROW Action="AI_DeleteLzma" Description="Deleting files extracted from archive" DescriptionLocId="ActionText.Description.AI_DeleteLzma" TemplateLocId="-"/>
     <ROW Action="AI_DeleteRLzma" Description="Deleting files extracted from archive" DescriptionLocId="ActionText.Description.AI_DeleteLzma" TemplateLocId="-"/>
+    <ROW Action="AI_DownloadPrereq" Description="Downloading prerequisite software" DescriptionLocId="ActionText.Description.AI_DownloadPrereq" Template="Downloading [1]{[2] completed}" TemplateLocId="ActionText.Template.AI_DownloadPrereq"/>
     <ROW Action="AI_ExtractFiles" Description="Extracting files from archive" DescriptionLocId="ActionText.Description.AI_ExtractLzma" TemplateLocId="-"/>
     <ROW Action="AI_ExtractLzma" Description="Extracting files from archive" DescriptionLocId="ActionText.Description.AI_ExtractLzma" TemplateLocId="-"/>
+    <ROW Action="AI_ExtractPrereq" Description="Extracting prerequisite software" DescriptionLocId="ActionText.Description.AI_ExtractPrereq" Template="Extracting [1]{[2] completed}" TemplateLocId="ActionText.Template.AI_ExtractPrereq"/>
+    <ROW Action="AI_InstallPostPrerequisite" Description="Installing prerequisite software" DescriptionLocId="ActionText.Description.AI_InstallPrerequisite" Template="Installing [1]{[2] completed}" TemplateLocId="ActionText.Template.AI_InstallPrerequisite"/>
+    <ROW Action="AI_InstallPrerequisite" Description="Installing prerequisite software" DescriptionLocId="ActionText.Description.AI_InstallPrerequisite" Template="Installing [1]{[2] completed}" TemplateLocId="ActionText.Template.AI_InstallPrerequisite"/>
+    <ROW Action="AI_VerifyPrereq" Description="Verifying prerequisites" DescriptionLocId="ActionText.Description.AI_VerifyPrereq" Template="[1] was not installed correctly." TemplateLocId="ActionText.Template.AI_VerifyPrereq"/>
     <ROW Action="InstallService" Description="Installing service" Template="Installing service lithnetams"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiAppSearchComponent">
@@ -1099,18 +1157,26 @@
     <ROW Property="LOG_PATH" Signature_="AppSearchSign_7"/>
     <ROW Property="CONFIG_PATH" Signature_="AppSearchSign_8"/>
     <ROW Property="AI_SETUPEXEPATH" Signature_="AI_EXE_PATH_LM" Builds="DefaultBuild"/>
+    <ROW Property="SQLSERVER" Signature_="AppSearchSign_9"/>
     <ROW Property="AI_SETUPEXEPATH" Signature_="AI_EXE_PATH_CU" Builds="DefaultBuild"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiBinaryComponent">
     <ROW Name="PowerShellScriptLauncher.dll" SourcePath="&lt;AI_CUSTACTS&gt;PowerShellScriptLauncher.dll"/>
     <ROW Name="Prereq.dll" SourcePath="&lt;AI_CUSTACTS&gt;Prereq.dll"/>
     <ROW Name="ResourceCleaner.dll" SourcePath="&lt;AI_CUSTACTS&gt;ResourceCleaner.dll"/>
+    <ROW Name="SoftwareDetector.dll" SourcePath="&lt;AI_CUSTACTS&gt;SoftwareDetector.dll"/>
     <ROW Name="aicustact.dll" SourcePath="&lt;AI_CUSTACTS&gt;aicustact.dll"/>
+    <ROW Name="aipackagechainer.exe" SourcePath="&lt;AI_CUSTACTS&gt;aipackagechainer.exe"/>
+    <ROW Name="file_deleter.ps1" SourcePath="&lt;AI_SCRIPTS&gt;file_deleter.ps1"/>
     <ROW Name="lzmaextractor.dll" SourcePath="&lt;AI_CUSTACTS&gt;lzmaextractor.dll"/>
     <ROW Name="viewer.exe" SourcePath="&lt;AI_CUSTACTS&gt;viewer.exe"/>
   </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiCheckBoxComponent">
+    <ROW Property="INSTALL_SQL_EXPRESS" Value="1"/>
+  </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiConditionComponent">
     <ROW Feature_="ConfigurationFilesFeature" Level="1" Condition="IS_STANDALONE_OR_NOT_CLUSTERED"/>
+    <ROW Feature_="RequiredApplication" Level="1" Condition="INSTALL_SQL_EXPRESS=&quot;1&quot; AND NOT SQLEXPRESS_INSTANCE_EXISTS"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiControlComponent">
     <ROW Dialog_="ExitDialog" Control="LaunchProdText" Type="Text" X="148" Y="170" Width="220" Height="20" Attributes="196611" Text="Launch [ProductName] Configuration Utility" Order="800" MsiKey="ExitDialog#LaunchProdText"/>
@@ -1143,11 +1209,17 @@
     <ROW Dialog_="LogonInformationDlg" Control="Text_3" Type="Text" X="15" Y="54" Width="337" Height="32" Attributes="65539" Property="TEXT_3_PROP_1" Text="Enter the credentials for the service account in the format of DOMAIN\username. For a group-managed service account, leave the password field blank. " Order="1600"/>
     <ROW Dialog_="NewSeqDialog" Control="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Next]" Order="100" Options="1"/>
     <ROW Dialog_="NewSeqDialog" Control="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Cancel]" Order="200" Options="1"/>
-    <ROW Dialog_="NewSeqDialog" Control="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" Attributes="1048577" Text="[DialogBitmap]" Order="300"/>
-    <ROW Dialog_="NewSeqDialog" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="1" Text="[ButtonText_Back]" Order="400" Options="1"/>
-    <ROW Dialog_="NewSeqDialog" Control="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Attributes="196611" Text="New Dialog" TextStyle="VerdanaBold13" Order="500"/>
-    <ROW Dialog_="NewSeqDialog" Control="Description" Type="Text" X="135" Y="86" Width="220" Height="60" Attributes="196611" Text="New Dialog Description..." Order="600"/>
-    <ROW Dialog_="NewSeqDialog" Control="BottomLine" Type="Line" X="0" Y="234" Width="372" Height="0" Attributes="1" Order="700"/>
+    <ROW Dialog_="NewSeqDialog" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="1" Text="[ButtonText_Back]" Order="300" Options="1"/>
+    <ROW Dialog_="NewSeqDialog" Control="BottomLine" Type="Line" X="0" Y="234" Width="372" Height="0" Attributes="1" Order="400"/>
+    <ROW Dialog_="NewSeqDialog" Control="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" Attributes="1048577" Text="[BannerBitmap]" Order="500"/>
+    <ROW Dialog_="NewSeqDialog" Control="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" Attributes="1" Order="600"/>
+    <ROW Dialog_="NewSeqDialog" Control="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Attributes="196611" Text="Specify database connection information" Order="700"/>
+    <ROW Dialog_="NewSeqDialog" Control="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Attributes="196611" Text="Database Information" TextStyle="[DlgTitleFont]" Order="800"/>
+    <ROW Dialog_="NewSeqDialog" Control="Text_3" Type="Text" X="15" Y="54" Width="337" Height="32" Attributes="65539" Property="TEXT_3_PROP_1_1" Text="You can choose to install a dedicated SQL instance on this server for AMS, or provide the server and instance name of an existing SQL server to use" Order="900"/>
+    <ROW Dialog_="NewSeqDialog" Control="Edit_1" Type="Edit" X="137" Y="124" Width="192" Height="16" Attributes="3" Property="SQLSERVER" Text="{260}" Order="1000"/>
+    <ROW Dialog_="NewSeqDialog" Control="Text_1" Type="Text" X="38" Y="125" Width="83" Height="11" Attributes="3" Text="Server\instance name:" Order="1100"/>
+    <ROW Dialog_="NewSeqDialog" Control="CheckBox_1" Type="CheckBox" X="37" Y="100" Width="275" Height="10" Attributes="3" Property="INSTALL_SQL_EXPRESS" Text="Install a dedicated SQL express instance for AMS" Order="1200"/>
+    <ROW Dialog_="NewSeqDialog" Control="Hyperlink_2" Type="Hyperlink" X="37" Y="150" Width="310" Height="17" Attributes="65539" Property="HYPERLINK_2_PROP_1" Text="&lt;a href=&quot;https://go.lithnet.io/fwlink/enhjqpaz&quot;&gt;Database creation script and more details...&lt;/a&gt;" Order="1300"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Next]" Order="100" Options="1"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Cancel]" Order="200" Options="1"/>
     <ROW Dialog_="ServiceAccountDialog" Control="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Attributes="3" Text="[ButtonText_Back]" Order="300" Options="1"/>
@@ -1165,6 +1237,15 @@
     <ROW Dialog_="ShowGsmaScript" Control="OK" Type="PushButton" X="256" Y="158" Width="56" Height="17" Attributes="3" Text="[ButtonText_OK]" Order="100"/>
     <ROW Dialog_="ShowGsmaScript" Control="Edit_1" Type="Edit" X="14" Y="22" Width="298" Height="119" Attributes="65539" Property="EDIT_1_PROP" Order="200" ExtAttributes="521"/>
     <ATTRIBUTE name="DeletedRows" value="LogonInformationDlg#DomainEdit@LogonInformationDlg#DomainLabel"/>
+  </COMPONENT>
+  <COMPONENT cid="caphyon.advinst.msicomp.MsiControlConditionComponent">
+    <ROW Dialog_="NewSeqDialog" Control_="Hyperlink_2" Action="Hide" Condition="INSTALL_SQL_EXPRESS"/>
+    <ROW Dialog_="NewSeqDialog" Control_="Hyperlink_2" Action="Show" Condition="NOT INSTALL_SQL_EXPRESS"/>
+    <ROW Dialog_="NewSeqDialog" Control_="Edit_1" Action="Hide" Condition="INSTALL_SQL_EXPRESS"/>
+    <ROW Dialog_="NewSeqDialog" Control_="Edit_1" Action="Show" Condition="NOT INSTALL_SQL_EXPRESS"/>
+    <ROW Dialog_="NewSeqDialog" Control_="Text_1" Action="Hide" Condition="INSTALL_SQL_EXPRESS"/>
+    <ROW Dialog_="NewSeqDialog" Control_="Text_1" Action="Show" Condition="NOT INSTALL_SQL_EXPRESS"/>
+    <ROW Dialog_="NewSeqDialog" Control_="CheckBox_1" Action="Disable" Condition="SQLEXPRESS_INSTANCE_EXISTS"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiControlEventComponent">
     <ROW Dialog_="WelcomePrereqDlg" Control_="Next" Event="NewDialog" Argument="PrerequisitesDlg" Condition="AI_BOOTSTRAPPER" Ordering="1"/>
@@ -1209,15 +1290,19 @@
     <ROW Dialog_="LicenseAgreementDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="NOT AI_INSTALL" Ordering="1"/>
     <ROW Dialog_="NewSeqDialog" Control_="Cancel" Event="SpawnDialog" Argument="CancelDlg" Condition="1" Ordering="100"/>
     <ROW Dialog_="LogonInformationDlg" Control_="Back" Event="NewDialog" Argument="ServiceAccountDialog" Condition="1" Ordering="1"/>
-    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="LogonInformationDlg" Condition="NOT CAN_SKIP_DIALOGS" Ordering="199"/>
+    <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="NewSeqDialog" Condition="NOT CAN_SKIP_DIALOGS" Ordering="199"/>
     <ROW Dialog_="VerifyReadyDlg" Control_="Back" Event="NewDialog" Argument="LicenseAgreementDlg" Condition="CAN_SKIP_DIALOGS" Ordering="198"/>
     <ROW Dialog_="ServiceAccountDialog" Control_="Next" Event="NewDialog" Argument="LogonInformationDlg" Condition="AI_INSTALL" Ordering="1"/>
     <ROW Dialog_="ServiceAccountDialog" Control_="Back" Event="EndDialog" Argument="Return" Condition="AI_INSTALL AND ( NOT 1 )" Ordering="4"/>
     <ROW Dialog_="FolderDlg" Control_="Next" Event="NewDialog" Argument="ServiceAccountDialog" Condition="AI_INSTALL" Ordering="201"/>
     <ROW Dialog_="FolderDlg" Control_="Back" Event="NewDialog" Argument="LicenseAgreementDlg" Condition="AI_INSTALL" Ordering="1"/>
-    <ROW Dialog_="LogonInformationDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_INSTALL AND ( (USER_PASSWORD = USER_PASSWORD_CONFIRM) AND NOT ACCOUNT_TEST_RESULT )" Ordering="8"/>
+    <ROW Dialog_="LogonInformationDlg" Control_="Next" Event="NewDialog" Argument="NewSeqDialog" Condition="AI_INSTALL AND ( (USER_PASSWORD = USER_PASSWORD_CONFIRM) AND NOT ACCOUNT_TEST_RESULT )" Ordering="8"/>
     <ROW Dialog_="LogonInformationDlg" Control_="Back" Event="EndDialog" Argument="Return" Condition="AI_INSTALL AND ( NOT 1 )" Ordering="2"/>
     <ROW Dialog_="LicenseAgreementDlg" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="AI_INSTALL AND ( CAN_SKIP_DIALOGS )" Ordering="2"/>
+    <ROW Dialog_="ExitDialog" Control_="Finish" Event="DoAction" Argument="AI_CleanPrereq" Condition="1" Ordering="301"/>
+    <ROW Dialog_="FatalError" Control_="Finish" Event="DoAction" Argument="AI_CleanPrereq" Condition="1" Ordering="105"/>
+    <ROW Dialog_="UserExit" Control_="Finish" Event="DoAction" Argument="AI_CleanPrereq" Condition="1" Ordering="104"/>
+    <ROW Dialog_="NewSeqDialog" Control_="Next" Event="NewDialog" Argument="VerifyReadyDlg" Condition="1" Ordering="1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiCreateFolderComponent">
     <ROW Directory_="APPDIR" Component_="APPDIR" ManualDelete="true"/>
@@ -1228,6 +1313,7 @@
     <ROW Action="AI_AiBackupCleanup" Type="1" Source="ResourceCleaner.dll" Target="OnAiBackupCleanup" WithoutSeq="true"/>
     <ROW Action="AI_AiBackupImmediate" Type="1" Source="ResourceCleaner.dll" Target="OnAiBackupImmediate"/>
     <ROW Action="AI_AiBackupRollback" Type="11521" Source="ResourceCleaner.dll" Target="OnAiBackupRollback"/>
+    <ROW Action="AI_AiBackupRollbackImpersonate" Type="9473" Source="ResourceCleaner.dll" Target="OnAiBackupRollbackImpersonate"/>
     <ROW Action="AI_AiRemoveRegsCommit" Type="11777" Source="ResourceCleaner.dll" Target="OnAiRemoveRegs" WithoutSeq="true"/>
     <ROW Action="AI_AiRemoveRegsCommitUser" Type="9729" Source="ResourceCleaner.dll" Target="OnAiRemoveRegs" WithoutSeq="true"/>
     <ROW Action="AI_AiRemoveRegsDeferred" Type="11265" Source="ResourceCleaner.dll" Target="OnAiRemoveRegs" WithoutSeq="true"/>
@@ -1238,6 +1324,8 @@
     <ROW Action="AI_AiRestoreRollback" Type="11521" Source="ResourceCleaner.dll" Target="OnAiRestoreRollback" WithoutSeq="true"/>
     <ROW Action="AI_AppSearchEx" Type="1" Source="Prereq.dll" Target="DoAppSearchEx"/>
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Type="51" Source="AI_SETUPEXEPATH_ORIGINAL" Target="[AI_SETUPEXEPATH]"/>
+    <ROW Action="AI_CleanPrereq" Type="65" Source="Prereq.dll" Target="CleanPrereq" WithoutSeq="true"/>
+    <ROW Action="AI_ConfigureChainer" Type="1" Source="Prereq.dll" Target="ConfigurePrereqLauncher"/>
     <ROW Action="AI_DATA_SETTER" Type="51" Source="CustomActionData" Target="[AI_SETUPEXEPATH]"/>
     <ROW Action="AI_DATA_SETTER_1" Type="51" Source="CustomActionData" Target="AEQAaQBnAGkAdABhAGwAbAB5AFMAaQBnAG4AUwBjAHIAaQBwAHQAAgAxAAEARgBsAGEAZwBzAAIAMgABAFAAYQByAGEAbQBzAAIAAQBTAGMAcgBpAHAAdAACACQARQByAHIAbwByAEEAYwB0AGkAbwBuAFAAcgBlAGYAZQByAGUAbgBjAGUAIAA9ACAAIgBTAHQAbwBwACIADQAKACQAcwBlAHIAdgBpAGMAZQBTAEkARAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBTAGUAYwB1AHIAaQB0AHkALgBQAHIAaQBuAGMAaQBwAGEAbAAuAFMAZQBjAHUAcgBpAHQAeQBJAGQAZQBuAHQAaQBmAGkAZQByACAAIgBTAC0AMQAtADUALQA4ADAALQAxADIANQA3ADgAOAA5ADIAMwAtADEAOAAzADYANgA3ADkAOAA2ADcALQAyADYANQAzADkANQAxADMAMwAwAC0AMQA1ADMANAAzADYAOAA4ADYALQA5ADMAMwA3ADIAMQA1ADkAIgA7AA0ACgANAAoAJABsAG8AZwBQAGEAdABoACAAPQAgAEEASQBfAEcAZQB0AE0AcwBpAFAAcgBvAHAAZQByAHQAeQAgAEwATwBHAF8AUABBAFQASAANAAoAJABjAG8AbgBmAGkAZwBQAGEAdABoACAAPQAgAEEASQBfAEcAZQB0AE0AcwBpAFAAcgBvAHAAZQByAHQAeQAgAEMATwBOAEYASQBHAF8AUABBAFQASAANAAoAJABkAGIAUABhAHQAaAAgAD0AIABKAG8AaQBuAC0AUABhAHQAaAAgAC0AUABhAHQAaAAgACQAYwBvAG4AZgBpAGcAUABhAHQAaAAgAC0AQwBoAGkAbABkAFAAYQB0AGgAIAAiAGQAYgAiAA0ACgAkAHIAZQBnAEsAZQB5ACAAPQAgACIASABLAEwATQA6AFwAUwBPAEYAVABXAEEAUgBFAFwATABpAHQAaABuAGUAdABcAEEAYwBjAGUAcwBzACAATQBhAG4AYQBnAGUAcgAgAFMAZQByAHYAaQBjAGUAIgANAAoAJABjAGUAcgB0AFMAdABvAHIAZQBSAGUAZwBLAGUAeQAgAD0AIAAiAEgASwBMAE0AOgBcAFMATwBGAFQAVwBBAFIARQBcAE0AaQBjAHIAbwBzAG8AZgB0AFwAQwByAHkAcAB0AG8AZwByAGEAcABoAHkAXABTAGUAcgB2AGkAYwBlAHMAXABsAGkAdABoAG4AZQB0AGEAbQBzAFwAUwB5AHMAdABlAG0AQwBlAHIAdABpAGYAaQBjAGEAdABlAHMAXABNAFkAIgANAAoADQAKAGYAdQBuAGMAdABpAG8AbgAgAEMAcgBlAGEAdABlAEYAbwBsAGQAZQByAFcAaQB0AGgAUwBlAHIAdgBpAGMAZQBQAGUAcgBtAGkAcwBzAGkAbwBuAHMAIAAoACQAcABhAHQAaAAsACAAJABwAGUAcgBtAGkAcwBzAGkAbwBuAHMAKQANAAoAWwBcAHsAXQANAAoAIAAgACAAIABpAGYAIAAoAC0AbgBvAHQAIAAoAFQAZQBzAHQALQBQAGEAdABoACAALQBQAGEAdABoACAAJABwAGEAdABoACAALQBQAGEAdABoAFQAeQBwAGUAIABDAG8AbgB0AGEAaQBuAGUAcgApACkADQAKACAAIAAgACAAWwBcAHsAXQANAAoAIAAgACAAIAAgACAAIAAgAE4AZQB3AC0ASQB0AGUAbQAgAC0ASQB0AGUAbQBUAHkAcABlACAARABpAHIAZQBjAHQAbwByAHkAIAAtAFAAYQB0AGgAIAAkAHAAYQB0AGgADQAKACAAIAAgACAAWwBcAH0AXQANAAoADQAKACAAIAAgACAAJABhAGMAbAAgAD0AIABHAGUAdAAtAEEAYwBsACAAJABwAGEAdABoAA0ACgAgACAAIAAgACQAcgB1AGwAZQAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBTAGUAYwB1AHIAaQB0AHkALgBBAGMAYwBlAHMAcwBDAG8AbgB0AHIAbwBsAC4ARgBpAGwAZQBTAHkAcwB0AGUAbQBBAGMAYwBlAHMAcwBSAHUAbABlACgAJABzAGUAcgB2AGkAYwBlAFMASQBEACwAIAAkAHAAZQByAG0AaQBzAHMAaQBvAG4AcwAsACAAIgBDAG8AbgB0AGEAaQBuAGUAcgBJAG4AaABlAHIAaQB0ACwATwBiAGoAZQBjAHQASQBuAGgAZQByAGkAdAAiACwAIAAiAE4AbwBuAGUAIgAsACAAIgBBAGwAbABvAHcAIgApAA0ACgAgACAAIAAgACQAYQBjAGwALgBTAGUAdABBAGMAYwBlAHMAcwBSAHUAbABlACgAJAByAHUAbABlACkADQAKACAAIAAgACAAUwBlAHQALQBBAGMAbAAgAC0AUABhAHQAaAAgACQAcABhAHQAaAAgAC0AQQBjAGwATwBiAGoAZQBjAHQAIAAkAGEAYwBsAA0ACgBbAFwAfQBdAA0ACgANAAoAZgB1AG4AYwB0AGkAbwBuACAAQwByAGUAYQB0AGUAUgBlAGcAaQBzAHQAcgB5AEsAZQB5AFcAaQB0AGgAUwBlAHIAdgBpAGMAZQBQAGUAcgBtAGkAcwBzAGkAbwBuAHMAKAAkAHAAYQB0AGgALAAgACQAcABlAHIAbQBpAHMAcwBpAG8AbgBzACkADQAKAFsAXAB7AF0ADQAKACAAIAAgACAAaQBmACAAKAAtAG4AbwB0ACAAKABUAGUAcwB0AC0AUABhAHQAaAAgAC0AUABhAHQAaAAgACQAcABhAHQAaAApACkADQAKACAAIAAgACAAWwBcAHsAXQANAAoAIAAgACAAIAAgACAAIAAgAE4AZQB3AC0ASQB0AGUAbQAgAC0AUABhAHQAaAAgACQAcABhAHQAaAAgAC0ARgBvAHIAYwBlAA0ACgAgACAAIAAgAFsAXAB9AF0ADQAKACAAIAAgACAADQAKACAAIAAgACAAJABhAGMAbAAgAD0AIABHAGUAdAAtAEEAYwBsACAAJABwAGEAdABoAA0ACgAgACAAIAAgACQAcgB1AGwAZQAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBTAGUAYwB1AHIAaQB0AHkALgBBAGMAYwBlAHMAcwBDAG8AbgB0AHIAbwBsAC4AUgBlAGcAaQBzAHQAcgB5AEEAYwBjAGUAcwBzAFIAdQBsAGUAKAAkAHMAZQByAHYAaQBjAGUAUwBJAEQALAAgACQAcABlAHIAbQBpAHMAcwBpAG8AbgBzACwAIAAiAEMAbwBuAHQAYQBpAG4AZQByAEkAbgBoAGUAcgBpAHQALABPAGIAagBlAGMAdABJAG4AaABlAHIAaQB0ACIALAAgACIATgBvAG4AZQAiACwAIAAiAEEAbABsAG8AdwAiACkADQAKACAAIAAgACAAJABhAGMAbAAuAFMAZQB0AEEAYwBjAGUAcwBzAFIAdQBsAGUAKAAkAHIAdQBsAGUAKQANAAoAIAAgACAAIABTAGUAdAAtAEEAYwBsACAALQBQAGEAdABoACAAJABwAGEAdABoACAALQBBAGMAbABPAGIAagBlAGMAdAAgACQAYQBjAGwADQAKAFsAXAB9AF0ADQAKAA0ACgAkAGkAcwBBAGMAdABpAHYAZQBOAG8AZABlACAAPQAgAEEASQBfAEcAZQB0AE0AcwBpAFAAcgBvAHAAZQByAHQAeQAgAEkAUwBfAFMAVABBAE4ARABBAEwATwBOAEUAXwBPAFIAXwBOAE8AVABfAEMATABVAFMAVABFAFIARQBEAF8ATwBSAF8ATwBOAF8AQQBDAFQASQBWAEUAXwBOAE8ARABFAA0ACgANAAoAaQBmACAAKAAkAGkAcwBBAGMAdABpAHYAZQBOAG8AZABlACkADQAKAFsAXAB7AF0ADQAKAAkAQwByAGUAYQB0AGUARgBvAGwAZABlAHIAVwBpAHQAaABTAGUAcgB2AGkAYwBlAFAAZQByAG0AaQBzAHMAaQBvAG4AcwAgACQAbABvAGcAUABhAHQAaAAgACIATQBvAGQAaQBmAHkAIgANAAoACQBDAHIAZQBhAHQAZQBGAG8AbABkAGUAcgBXAGkAdABoAFMAZQByAHYAaQBjAGUAUABlAHIAbQBpAHMAcwBpAG8AbgBzACAAJABjAG8AbgBmAGkAZwBQAGEAdABoACAAIgBNAG8AZABpAGYAeQAiAA0ACgAJAEMAcgBlAGEAdABlAEYAbwBsAGQAZQByAFcAaQB0AGgAUwBlAHIAdgBpAGMAZQBQAGUAcgBtAGkAcwBzAGkAbwBuAHMAIAAkAGQAYgBQAGEAdABoACAAIgBGAHUAbABsAEMAbwBuAHQAcgBvAGwAIgANAAoAWwBcAH0AXQANAAoADQAKAEMAcgBlAGEAdABlAFIAZQBnAGkAcwB0AHIAeQBLAGUAeQBXAGkAdABoAFMAZQByAHYAaQBjAGUAUABlAHIAbQBpAHMAcwBpAG8AbgBzACAAJAByAGUAZwBLAGUAeQAgACIARgB1AGwAbABDAG8AbgB0AHIAbwBsACIADQAKAEMAcgBlAGEAdABlAFIAZQBnAGkAcwB0AHIAeQBLAGUAeQBXAGkAdABoAFMAZQByAHYAaQBjAGUAUABlAHIAbQBpAHMAcwBpAG8AbgBzACAAJABjAGUAcgB0AFMAdABvAHIAZQBSAGUAZwBLAGUAeQAgACIARgB1AGwAbABDAG8AbgB0AHIAbwBsACIADQAKAA0ACg=="/>
     <ROW Action="AI_DATA_SETTER_10" Type="51" Source="CustomActionData" Target="AEQAaQBnAGkAdABhAGwAbAB5AFMAaQBnAG4AUwBjAHIAaQBwAHQAAgAxAAEARgBsAGEAZwBzAAIANgABAFAAYQByAGEAbQBzAAIAAQBTAGMAcgBpAHAAdAACAFAAYQByAGEAbQAoACkADQAKACQASQBuAGYAbwByAG0AYQB0AGkAbwBuAFAAcgBlAGYAZQByAGUAbgBjAGUAIAA9ACAAIgBDAG8AbgB0AGkAbgB1AGUAIgANAAoAJABXAGEAcgBuAGkAbgBnAFAAcgBlAGYAZQByAGUAbgBjAGUAIAA9ACAAIgBDAG8AbgB0AGkAbgB1AGUAIgANAAoADQAKAHQAcgB5AA0ACgBbAFwAewBdAA0ACgAgACAAIAAgAEEASQBfAFMAZQB0AE0AcwBpAFAAcgBvAHAAZQByAHQAeQAgAEEAQwBDAE8AVQBOAFQAXwBUAEUAUwBUAF8AUgBFAFMAVQBMAFQAIAAiACIADQAKACAAIAAgACAAJAB1AHMAZQByAG4AYQBtAGUAIAA9ACAAQQBJAF8ARwBlAHQATQBzAGkAUAByAG8AcABlAHIAdAB5ACAAVQBTAEUAUgBfAE4AQQBNAEUAIAAtAHQAZQBzAHQAdgBhAGwAdQBlACAAIgBJAEQATQBEAEUAVgAxAFwAegBiAC0AcwB2AGMALQBsAGEAYQBtACIADQAKACAAIAAgACAAVwByAGkAdABlAC0ASQBuAGYAbwByAG0AYQB0AGkAbwBuACAAIgBWAGEAbABpAGQAYQB0AGkAbgBnACAAdQBzAGUAcgBuAGEAbQBlACAAJAB1AHMAZQByAG4AYQBtAGUAIgANAAoAIAAgACAAIABpAGYAIAAoACgAJAB1AHMAZQByAG4AYQBtAGUAIAAtAG4AbwB0AGwAaQBrAGUAIAAiACoAXAAqACIAKQAgAC0AYQBuAGQAIAAoACQAdQBzAGUAcgBuAGEAbQBlACAALQBuAG8AdABsAGkAawBlACAAIgAqAEAAKgAiACkAKQANAAoAIAAgACAAIABbAFwAewBdAA0ACgAgACAAIAAgACAAIAAgACAAQQBJAF8AUwBlAHQATQBzAGkAUAByAG8AcABlAHIAdAB5ACAAQQBDAEMATwBVAE4AVABfAFQARQBTAFQAXwBSAEUAUwBVAEwAVAAgACIAUABsAGUAYQBzAGUAIABlAG4AdABlAHIAIAB0AGgAZQAgAHUAcwBlAHIAbgBhAG0AZQAgAGkAbgAgAHQAaABlACAAZgBvAHIAbQBhAHQAIABEAE8ATQBBAEkATgBcAHUAcwBlAHIAbgBhAG0AZQAiAA0ACgAgACAAIAAgACAAIAAgACAAVwByAGkAdABlAC0AVwBhAHIAbgBpAG4AZwAgACIAVQBzAGUAcgBuAGEAbQBlACAAdwBhAHMAIABuAG8AdAAgAGkAbgAgAHQAaABlACAAYwBvAHIAcgBlAGMAdAAgAGYAbwByAG0AYQB0ACIADQAKACAAIAAgACAAIAAgACAAIAByAGUAdAB1AHIAbgA7AA0ACgAgACAAIAAgAFsAXAB9AF0ADQAKAA0ACgAgACAAIAAgAHQAcgB5AA0ACgAgACAAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAIAAgACAAIAAkAGEAYwBjAG8AdQBuAHQAIAA9ACAATgBlAHcALQBPAGIAagBlAGMAdAAgACIAUwB5AHMAdABlAG0ALgBTAGUAYwB1AHIAaQB0AHkALgBQAHIAaQBuAGMAaQBwAGEAbAAuAE4AVABBAGMAYwBvAHUAbgB0ACIAIAAkAHUAcwBlAHIAbgBhAG0AZQANAAoAIAAgACAAIAAgACAAIAAgACQAcwBpAGQAIAA9ACAAJABhAGMAYwBvAHUAbgB0AC4AVAByAGEAbgBzAGwAYQB0AGUAKABbAFwAWwBdAFMAeQBzAHQAZQBtAC4AUwBlAGMAdQByAGkAdAB5AC4AUAByAGkAbgBjAGkAcABhAGwALgBTAGUAYwB1AHIAaQB0AHkASQBkAGUAbgB0AGkAZgBpAGUAcgBbAFwAXQBdACkADQAKACAAIAAgACAAIAAgACAAIABpAGYAIAAoACQAcwBpAGQAIAAtAG4AZQAgACQAbgB1AGwAbAApAA0ACgAgACAAIAAgACAAIAAgACAAWwBcAHsAXQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAQQBJAF8AUwBlAHQATQBzAGkAUAByAG8AcABlAHIAdAB5ACAAVQBTAEUAUgBfAFMASQBEACAAJABzAGkAZAAuAFQAbwBTAHQAcgBpAG4AZwAoACkADQAKAAkACQAJAFcAcgBpAHQAZQAtAEkAbgBmAG8AcgBtAGEAdABpAG8AbgAgACIARgBvAHUAbgBkACAAYQBjAGMAbwB1AG4AdAAgACQAYQBjAGMAbwB1AG4AdAAiAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIABXAHIAaQB0AGUALQBJAG4AZgBvAHIAbQBhAHQAaQBvAG4AIAAiAEYAbwB1AG4AZAAgAHMAaQBkACAAJABzAGkAZAAiAA0ACgAgACAAIAAgACAAIAAgACAAWwBcAH0AXQANAAoAIAAgACAAIABbAFwAfQBdAA0ACgAgACAAIAAgAGMAYQB0AGMAaAAgAFsAXABbAF0ARQB4AGMAZQBwAHQAaQBvAG4AWwBcAF0AXQANAAoAIAAgACAAIABbAFwAewBdAA0ACgAgACAAIAAgACAAIAAgACAAVwByAGkAdABlAC0AVwBhAHIAbgBpAG4AZwAgACIAQwBvAHUAbABkACAAbgBvAHQAIABmAGkAbgBkACAAYQBjAGMAbwB1AG4AdAAgAG4AYQBtAGUAIgANAAoAIAAgACAAIAAgACAAIAAgAFcAcgBpAHQAZQAtAFcAYQByAG4AaQBuAGcAIAAkAF8ALgBFAHgAYwBlAHAAdABpAG8AbgAuAFQAbwBTAHQAcgBpAG4AZwAoACkADQAKACAAIAAgACAAWwBcAH0AXQANAAoADQAKACAAIAAgACAAaQBmACAAKAAtAG4AbwB0ACAAJABzAGkAZAApAA0ACgAgACAAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAIAAgACAAIAB0AHIAeQANAAoAIAAgACAAIAAgACAAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQAdQBzAGUAcgBuAGEAbQBlACAAPQAgACIAJAB1AHMAZQByAG4AYQBtAGUAYAAkACIADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgACQAYQBjAGMAbwB1AG4AdAAgAD0AIABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAIgBTAHkAcwB0AGUAbQAuAFMAZQBjAHUAcgBpAHQAeQAuAFAAcgBpAG4AYwBpAHAAYQBsAC4ATgBUAEEAYwBjAG8AdQBuAHQAIgAgACQAKAAkAHUAcwBlAHIAbgBhAG0AZQApAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIABXAHIAaQB0AGUALQBJAG4AZgBvAHIAbQBhAHQAaQBvAG4AIAAiAEYAbwB1AG4AZAAgAGEAYwBjAG8AdQBuAHQAIAAkAGEAYwBjAG8AdQBuAHQAIgANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAQQBJAF8AUwBlAHQATQBzAGkAUAByAG8AcABlAHIAdAB5ACAAVQBTAEUAUgBfAE4AQQBNAEUAIAAkAHUAcwBlAHIAbgBhAG0AZQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAJABzAGkAZAAgAD0AIAAkAGEAYwBjAG8AdQBuAHQALgBUAHIAYQBuAHMAbABhAHQAZQAoAFsAXABbAF0AUwB5AHMAdABlAG0ALgBTAGUAYwB1AHIAaQB0AHkALgBQAHIAaQBuAGMAaQBwAGEAbAAuAFMAZQBjAHUAcgBpAHQAeQBJAGQAZQBuAHQAaQBmAGkAZQByAFsAXABdAF0AKQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAaQBmACAAKAAkAHMAaQBkACAALQBuAGUAIAAkAG4AdQBsAGwAKQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAWwBcAHsAXQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIABBAEkAXwBTAGUAdABNAHMAaQBQAHIAbwBwAGUAcgB0AHkAIABVAFMARQBSAF8AUwBJAEQAIAAkAHMAaQBkAC4AVABvAFMAdAByAGkAbgBnACgAKQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIABXAHIAaQB0AGUALQBJAG4AZgBvAHIAbQBhAHQAaQBvAG4AIAAiAEYAbwB1AG4AZAAgAHMAaQBkACAAJABzAGkAZAAiAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIABbAFwAfQBdAA0ACgAgACAAIAAgACAAIAAgACAAWwBcAH0AXQANAAoAIAAgACAAIAAgACAAIAAgAGMAYQB0AGMAaAAgAFsAXABbAF0ARQB4AGMAZQBwAHQAaQBvAG4AWwBcAF0AXQANAAoAIAAgACAAIAAgACAAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgAFcAcgBpAHQAZQAtAFcAYQByAG4AaQBuAGcAIAAiAEMAbwB1AGwAZAAgAG4AbwB0ACAAZgBpAG4AZAAgAGEAYwBjAG8AdQBuAHQAIABuAGEAbQBlACIADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgAFcAcgBpAHQAZQAtAFcAYQByAG4AaQBuAGcAIAAkAF8ALgBFAHgAYwBlAHAAdABpAG8AbgAuAFQAbwBTAHQAcgBpAG4AZwAoACkADQAKACAAIAAgACAAIAAgACAAIABbAFwAfQBdAA0ACgAgACAAIAAgAFsAXAB9AF0ADQAKAA0ACgAgACAAIAAgAGkAZgAgACgAJABzAGkAZAAgAC0AZQBxACAAJABuAHUAbABsACkADQAKACAAIAAgACAAWwBcAHsAXQANAAoAIAAgACAAIAAgACAAIAAgAEEASQBfAFMAZQB0AE0AcwBpAFAAcgBvAHAAZQByAHQAeQAgAEEAQwBDAE8AVQBOAFQAXwBUAEUAUwBUAF8AUgBFAFMAVQBMAFQAIAAiAFQAaABlACAAcwBwAGUAYwBpAGYAaQBlAGQAIAB1AHMAZQByACAAYwBvAHUAbABkACAAbgBvAHQAIABiAGUAIABmAG8AdQBuAGQAIABpAG4AIAB0AGgAZQAgAGQAaQByAGUAYwB0AG8AcgB5ACIADQAKACAAIAAgACAAIAAgACAAIABXAHIAaQB0AGUALQBXAGEAcgBuAGkAbgBnACAAIgBVAHMAZQByAG4AYQBtAGUAIAB3AGEAcwAgAG4AbwB0ACAAZgBvAHUAbgBkACIADQAKACAAIAAgACAAIAAgACAAIAByAGUAdAB1AHIAbgA7AA0ACgAgACAAIAAgAFsAXAB9AF0ADQAKAA0ACgAgACAAIAAgAHQAcgB5AA0ACgAgACAAIAAgAFsAXAB7AF0ADQAKACAAIAAgACAAIAAgACAAIAAkAGQAbwBtAGEAaQBuAD0AIABHAGUAdAAtAEEARABEAG8AbQBhAGkAbgAgAC0ASQBkAGUAbgB0AGkAdAB5ACAAJABhAGMAYwBvAHUAbgB0AC4AVgBhAGwAdQBlAC4AUwBwAGwAaQB0ACgAIgBcACIAKQBbAFwAWwBdADAAWwBcAF0AXQANAAoAIAAgACAAIAAgACAAIAAgAFcAcgBpAHQAZQAtAEkAbgBmAG8AcgBtAGEAdABpAG8AbgAgACIARgBvAHUAbgBkACAAZABvAG0AYQBpAG4AIAAkAGQAbwBtAGEAaQBuAC4ARABOAFMAUgBvAG8AdAAiAA0ACgAgACAAIAAgACAAIAAgACAAJABzAGUAcgB2AGkAYwBlAEEAYwBjAG8AdQBuAHQAIAA9ACAARwBlAHQALQBBAEQAUwBlAHIAdgBpAGMAZQBBAGMAYwBvAHUAbgB0ACAAJABzAGkAZAAgAC0AUwBlAHIAdgBlAHIAIAAkAGQAbwBtAGEAaQBuAC4ARABOAFMAUgBvAG8AdAANAAoAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAJABzAGUAcgB2AGkAYwBlAEEAYwBjAG8AdQBuAHQAIAAtAG4AZQAgACQAbgB1AGwAbAApAA0ACgAgACAAIAAgACAAIAAgACAAWwBcAHsAXQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAVwByAGkAdABlAC0ASQBuAGYAbwByAG0AYQB0AGkAbwBuACAAIgBBAGMAYwBvAHUAbgB0ACAAaQBzACAAYQAgAHMAZQByAHYAaQBjAGUAIABhAGMAYwBvAHUAbgB0ACIADQAKACAAIAAgACAAIAAgACAAIAAgACAAIAAgAGkAZgAgACgAVABlAHMAdAAtAEEARABTAGUAcgB2AGkAYwBlAEEAYwBjAG8AdQBuAHQAIAAtAEkAZABlAG4AdABpAHQAeQAgACQAcwBpAGQAKQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAWwBcAHsAXQANAAoAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIABXAHIAaQB0AGUALQBJAG4AZgBvAHIAbQBhAHQAaQBvAG4AIAAiAFQAaABpAHMAIABjAG8AbQBwAHUAdABlAHIAIABjAGEAbgAgAGEAYwBjAGUAcwBzACAAdABoAGUAIABzAGUAcgB2AGkAYwBlACAAYQBjAGMAbwB1AG4AdAAiAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIABbAFwAfQBdAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIABlAGwAcwBlAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIABbAFwAewBdAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgAFcAcgBpAHQAZQAtAFcAYQByAG4AaQBuAGcAIAAiAFQAaABpAHMAIABjAG8AbQBwAHUAdABlAHIAIABjAGEAbgBuAG8AdAAgAGEAYwBjAGUAcwBzACAAdABoAGUAIABzAGUAcgB2AGkAYwBlACAAYQBjAGMAbwB1AG4AdAAiAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgACAAIAAgAEEASQBfAFMAZQB0AE0AcwBpAFAAcgBvAHAAZQByAHQAeQAgAEEAQwBDAE8AVQBOAFQAXwBUAEUAUwBUAF8AUgBFAFMAVQBMAFQAIAAiAFQAaABlACAAYwBvAG0AcAB1AHQAZQByACAAZABvAGUAcwAgAG4AbwB0ACAAaABhAHYAZQAgAHAAZQByAG0AaQBzAHMAaQBvAG4AIAB0AG8AIABhAGMAYwBlAHMAcwAgAHQAaABlACAAcwBlAHIAdgBpAGMAZQAgAGEAYwBjAG8AdQBuAHQAIABwAGEAcwBzAHcAbwByAGQALgAgAFUAcwBlACAAdABoAGUAIAAnAFMAZQB0AC0AQQBEAFMAZQByAHYAaQBjAGUAQQBjAGMAbwB1AG4AdAAnACAAUABvAHcAZQByAFMAaABlAGwAbAAgAGMAbQBkAGwAZQB0ACAAdwBpAHQAaAAgAHQAaABlACAAJwAtAFAAcgBpAG4AYwBpAHAAYQBsAHMAQQBsAGwAbwB3AGUAZABUAG8AUgBlAHQAcgBpAGUAdgBlAE0AYQBuAGEAZwBlAGQAUABhAHMAcwB3AG8AcgBkACcAIABwAGEAcgBhAG0AZQB0AGUAcgAgAHQAbwAgAGcAcgBhAG4AdAAgAHQAaABpAHMAIABjAG8AbQBwAHUAdABlAHIAIABwAGUAcgBtAGkAcwBzAGkAbwBuACAAdABvACAAcgBlAGEAZAAgAHQAaABlACAAcABhAHMAcwB3AG8AcgBkACAAYQBuAGQAIAB0AHIAeQAgAGEAZwBhAGkAbgAiAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIABbAFwAfQBdAA0ACgAgACAAIAAgACAAIAAgACAAWwBcAH0AXQANAAoAIAAgACAAIAAgACAAIAAgAGUAbABzAGUADQAKACAAIAAgACAAIAAgACAAIABbAFwAewBdAA0ACgAgACAAIAAgACAAIAAgACAAIAAgACAAIABXAHIAaQB0AGUALQBJAG4AZgBvAHIAbQBhAHQAaQBvAG4AIAAiAEEAYwBjAG8AdQBuAHQAIABpAHMAIABuAG8AdAAgAGEAIABzAGUAcgB2AGkAYwBlACAAYQBjAGMAbwB1AG4AdAAiAA0ACgAgACAAIAAgACAAIAAgACAAWwBcAH0AXQANAAoAIAAgACAAIABbAFwAfQBdAA0ACgAgACAAIAAgAGMAYQB0AGMAaAAgAFsAXABbAF0ARQB4AGMAZQBwAHQAaQBvAG4AWwBcAF0AXQANAAoAIAAgACAAIABbAFwAewBdAA0ACgAgACAAIAAgACAAIAAgACAAVwByAGkAdABlAC0AVwBhAHIAbgBpAG4AZwAgACIAQwBvAHUAbABkACAAbgBvAHQAIABkAGUAdABlAHIAbQBpAG4AZQAgAGkAZgAgAHQAaABpAHMAIABhAGMAYwBvAHUAbgB0ACAAdwBhAHMAIABhACAAcwBlAHIAdgBpAGMAZQAgAGEAYwBjAG8AdQBuAHQAIgANAAoAIAAgACAAIAAgACAAIAAgAFcAcgBpAHQAZQAtAFcAYQByAG4AaQBuAGcAIAAkAF8ALgBFAHgAYwBlAHAAdABpAG8AbgAuAFQAbwBTAHQAcgBpAG4AZwAoACkADQAKACAAIAAgACAAWwBcAH0AXQANAAoAWwBcAH0AXQANAAoAYwBhAHQAYwBoACAAWwBcAFsAXQBFAHgAYwBlAHAAdABpAG8AbgBbAFwAXQBdAA0ACgBbAFwAewBdAA0ACgAgACAAIAAgAFcAcgBpAHQAZQAtAFcAYQByAG4AaQBuAGcAIAAkAF8ALgBFAHgAYwBlAHAAdABpAG8AbgAuAFQAbwBTAHQAcgBpAG4AZwAoACkADQAKAFsAXAB9AF0="/>
@@ -1255,19 +1343,26 @@
     <ROW Action="AI_DeleteLzma" Type="1025" Source="lzmaextractor.dll" Target="DeleteLZMAFiles"/>
     <ROW Action="AI_DeleteRCadLzma" Type="51" Source="AI_DeleteRLzma" Target="[AI_SETUPEXEPATH]"/>
     <ROW Action="AI_DeleteRLzma" Type="1281" Source="lzmaextractor.dll" Target="DeleteLZMAFiles"/>
+    <ROW Action="AI_DetectSoftware" Type="257" Source="SoftwareDetector.dll" Target="OnDetectSoftware"/>
+    <ROW Action="AI_DownloadPrereq" Type="1" Source="Prereq.dll" Target="DownloadPrereq"/>
     <ROW Action="AI_DpiContentScale" Type="1" Source="aicustact.dll" Target="DpiContentScale"/>
     <ROW Action="AI_EnableDebugLog" Type="321" Source="aicustact.dll" Target="EnableDebugLog"/>
     <ROW Action="AI_ExtractCadLzma" Type="51" Source="AI_ExtractLzma" Target="[AI_SETUPEXEPATH]"/>
     <ROW Action="AI_ExtractFiles" Type="1" Source="Prereq.dll" Target="ExtractSourceFiles" AdditionalSeq="AI_DATA_SETTER"/>
     <ROW Action="AI_ExtractLzma" Type="1025" Source="lzmaextractor.dll" Target="ExtractLZMAFiles"/>
+    <ROW Action="AI_ExtractPrereq" Type="65" Source="Prereq.dll" Target="ExtractPrereq"/>
     <ROW Action="AI_FindExeLzma" Type="1" Source="lzmaextractor.dll" Target="FindEXE"/>
     <ROW Action="AI_InstallModeCheck" Type="1" Source="aicustact.dll" Target="UpdateInstallMode" WithoutSeq="true"/>
+    <ROW Action="AI_InstallPostPrerequisite" Type="1" Source="Prereq.dll" Target="InstallPostPrereq"/>
+    <ROW Action="AI_InstallPrerequisite" Type="1" Source="Prereq.dll" Target="InstallPrereq"/>
     <ROW Action="AI_LaunchApp" Type="1" Source="aicustact.dll" Target="[#Lithnet.AccessManager.Server.UI.exe]"/>
+    <ROW Action="AI_LaunchChainer" Type="3314" Source="AI_PREREQ_CHAINER"/>
     <ROW Action="AI_PREPARE_UPGRADE" Type="65" Source="aicustact.dll" Target="PrepareUpgrade"/>
     <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Type="51" Source="AI_SETUPEXEPATH" Target="[AI_SETUPEXEPATH_ORIGINAL]"/>
     <ROW Action="AI_ResolveKnownFolders" Type="1" Source="aicustact.dll" Target="AI_ResolveKnownFolders"/>
     <ROW Action="AI_SHOW_LOG" Type="65" Source="aicustact.dll" Target="LaunchLogFile" WithoutSeq="true"/>
     <ROW Action="AI_STORE_LOCATION" Type="51" Source="ARPINSTALLLOCATION" Target="[APPDIR]"/>
+    <ROW Action="AI_VerifyPrereq" Type="1" Source="Prereq.dll" Target="VerifyPrereq"/>
     <ROW Action="CreateEventSource" Type="1" Source="PowerShellScriptLauncher.dll" Target="RunPowerShellScript" Options="1" AdditionalSeq="AI_DATA_SETTER_6"/>
     <ROW Action="GatherServiceAndClusterData" Type="1" Source="PowerShellScriptLauncher.dll" Target="RunPowerShellScript" Options="1" AdditionalSeq="AI_DATA_SETTER_14"/>
     <ROW Action="InstallService" Type="1042" Source="Lithnet.AccessManager.Service.exe" Target="setup install-service &quot;[USER_NAME]&quot; &quot;[USER_PASSWORD]&quot;"/>
@@ -1283,6 +1378,8 @@
     <ROW Action="SetConfigPathDefault" Type="51" Source="CONFIG_PATH" Target="[APPDIR]config"/>
     <ROW Action="SetConfigPathExisting" Type="51" Source="CONFIG_PATH" Target="[EXISTING_CONFIG_PATH]"/>
     <ROW Action="SetDbPath" Type="51" Source="DB_PATH" Target="[CONFIG_PATH]db"/>
+    <ROW Action="SetDefaultSqlServerInstanceName" Type="51" Source="SQLSERVER" Target=".\[SQLEXPRESS_DEFAULT_INSTANCENAME]"/>
+    <ROW Action="SetInstallSqlExpressDefaultValue" Type="51" Source="INSTALL_SQL_EXPRESS" Target="1"/>
     <ROW Action="SetLogPathDefault" Type="51" Source="LOG_PATH" Target="[APPDIR]logs"/>
     <ROW Action="SetLogPathExisting" Type="51" Source="LOG_PATH" Target="[EXISTING_LOG_PATH]"/>
     <ROW Action="SetPermissions" Type="1" Source="PowerShellScriptLauncher.dll" Target="RunPowerShellScript" Options="1" AdditionalSeq="AI_DATA_SETTER_1"/>
@@ -1392,10 +1489,6 @@
     <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Authentication.JwtBearer.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Authentication.OpenIdConnect.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Authentication.WsFederation.dll"/>
-    <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Http.Abstractions.dll"/>
-    <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Http.Extensions.dll"/>
-    <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Http.Features.dll"/>
-    <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.HttpOverrides.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.CodeAnalysis.CSharp.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.CodeAnalysis.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Caching.Abstractions.dll"/>
@@ -1438,7 +1531,6 @@
     <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.CimCmdlets.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.Management.Infrastructure.Native.dll"/>
-    <ROW Feature_="MainFeature" Component_="Microsoft.Net.Http.Headers.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.Commands.Diagnostics.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.Commands.Management.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.PowerShell.Commands.Utility.dll"/>
@@ -1681,7 +1773,6 @@
     <ROW Feature_="MainFeature" Component_="NamedPipeServerStream.NetFrameworkVersion.dll"/>
     <ROW Feature_="MainFeature" Component_="Nerdbank.Streams.dll"/>
     <ROW Feature_="MainFeature" Component_="StreamJsonRpc.dll"/>
-    <ROW Feature_="MainFeature" Component_="System.IO.Pipelines.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Cryptography.Internal.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.DataProtection.Abstractions.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.DataProtection.dll"/>
@@ -1726,13 +1817,39 @@
     <ROW Feature_="MainFeature" Component_="MartinCostello.SqlLocalDb.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.Data.SqlClient.dll"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.Identity.Client.dll"/>
-    <ROW Feature_="MainFeature" Component_="AI_ExePath"/>
     <ROW Feature_="MainFeature" Component_="Quartz.dll"/>
     <ROW Feature_="MainFeature" Component_="Quartz.Extensions.DependencyInjection.dll"/>
     <ROW Feature_="MainFeature" Component_="Quartz.Extensions.Hosting.dll"/>
     <ROW Feature_="MainFeature" Component_="Quartz.Serialization.Json.dll"/>
     <ROW Feature_="MainFeature" Component_="System.Diagnostics.DiagnosticSource.dll_1"/>
     <ROW Feature_="MainFeature" Component_="Lithnet.Licensing.Core.dll"/>
+    <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Api.dll"/>
+    <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Api.exe"/>
+    <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Api.Shared.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Graph.Auth.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Graph.Core.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Graph.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Win32.Registry.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Win32.SystemEvents.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Diagnostics.EventLog.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Drawing.Common.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.IO.FileSystem.AccessControl.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Linq.Async.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Security.AccessControl.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Security.Permissions.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Security.Principal.Windows.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Windows.Extensions.dll"/>
+    <ROW Feature_="MainFeature" Component_="Telerik.Windows.Controls.Data.dll"/>
+    <ROW Feature_="MainFeature" Component_="Telerik.Windows.Controls.dll"/>
+    <ROW Feature_="MainFeature" Component_="Telerik.Windows.Controls.GridView.dll"/>
+    <ROW Feature_="MainFeature" Component_="Telerik.Windows.Controls.Input.dll"/>
+    <ROW Feature_="MainFeature" Component_="Telerik.Windows.Controls.Navigation.dll"/>
+    <ROW Feature_="MainFeature" Component_="Telerik.Windows.Data.dll"/>
+    <ROW Feature_="MainFeature" Component_="Telerik.Windows.Themes.Office2016.dll"/>
+    <ROW Feature_="MainFeature" Component_="Telerik.Windows.Themes.Office2019.dll"/>
+    <ROW Feature_="RequiredApplication" Component_="RequiredApplication"/>
+    <ROW Feature_="MainFeature" Component_="AI_ExePath"/>
+    <ROW Feature_="MainFeature" Component_="NewValue"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>
@@ -1744,11 +1861,11 @@
     <ROW IniFile="WorkingDirectory" FileName="LITHNE~1.URL|Lithnet Access Manager online help.url" DirProperty="Lithnet_Dir" Section="InternetShortcut" Key="WorkingDirectory" Value="[Lithnet_Dir]" Action="0" Component_="Lithnet.AccessManager.Server.UI.exe"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiInstExSeqComponent">
-    <ROW Action="AI_STORE_LOCATION" Condition="(Not Installed) OR REINSTALL" Sequence="1502"/>
+    <ROW Action="AI_STORE_LOCATION" Condition="(Not Installed) OR REINSTALL" Sequence="1503"/>
     <ROW Action="AI_PREPARE_UPGRADE" Condition="AI_UPGRADE=&quot;No&quot; AND (Not Installed)" Sequence="1397"/>
     <ROW Action="AI_ResolveKnownFolders" Sequence="52"/>
     <ROW Action="AI_EnableDebugLog" Sequence="51"/>
-    <ROW Action="AI_AppSearchEx" Sequence="102"/>
+    <ROW Action="AI_AppSearchEx" Sequence="103"/>
     <ROW Action="RemoveExistingProducts" Condition="AI_UPGRADE&lt;&gt;&quot;No&quot;" Sequence="1401" SeqType="0" MsiKey="RemoveExistingProducts"/>
     <ROW Action="CreateEventSource" Condition="( ( NOT Installed ) OR ( Installed AND REMOVE &lt;&gt; &quot;ALL&quot; AND AI_INSTALL_MODE &lt;&gt; &quot;Remove&quot; ) ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6412"/>
     <ROW Action="AI_DATA_SETTER_6" Condition="( ( NOT Installed ) OR ( Installed AND REMOVE &lt;&gt; &quot;ALL&quot; AND AI_INSTALL_MODE &lt;&gt; &quot;Remove&quot; ) ) AND ( (VersionNT &gt; 501) OR (VersionNT = 501 AND ServicePackLevel &gt;= 2) )" Sequence="6411"/>
@@ -1761,7 +1878,7 @@
     <ROW Action="RemoveHttpsUrlAcl" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) AND NOT UPGRADINGPRODUCTCODE ) AND ( HTTPS_ACL )" Sequence="6405"/>
     <ROW Action="RemoveCertBinding" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) AND NOT UPGRADINGPRODUCTCODE ) AND ( CERT_BINDING )" Sequence="6406"/>
     <ROW Action="AI_AiBackupImmediate" Sequence="1402"/>
-    <ROW Action="AI_AiBackupRollback" Sequence="1501"/>
+    <ROW Action="AI_AiBackupRollback" Sequence="1502"/>
     <ROW Action="AI_AiRestoreDeferredImpersonate" Sequence="6595"/>
     <ROW Action="AI_AiRestoreDeferred" Sequence="6596"/>
     <ROW Action="GatherServiceAndClusterData" Sequence="94"/>
@@ -1775,6 +1892,11 @@
     <ROW Action="AI_DOWNGRADE" Condition="AI_NEWERPRODUCTFOUND AND (UILevel &lt;&gt; 5)" Sequence="201"/>
     <ROW Action="InstallService" Condition="( ( NOT Installed ) OR ( Installed AND REMOVE &lt;&gt; &quot;ALL&quot; AND AI_INSTALL_MODE &lt;&gt; &quot;Remove&quot; ) )" Sequence="6401"/>
     <ROW Action="UninstallService" Condition="( Installed AND ( REMOVE = &quot;ALL&quot; OR AI_INSTALL_MODE = &quot;Remove&quot; ) AND NOT UPGRADINGPRODUCTCODE )" Sequence="2001"/>
+    <ROW Action="AI_AiBackupRollbackImpersonate" Sequence="1501"/>
+    <ROW Action="AI_ConfigureChainer" Condition="((UILevel = 2) OR (UILevel = 3)) AND (NOT UPGRADINGPRODUCTCODE)" Sequence="6597"/>
+    <ROW Action="AI_LaunchChainer" Condition="AI_PREREQ_CHAINER AND (NOT UPGRADINGPRODUCTCODE)" Sequence="6598"/>
+    <ROW Action="AI_DetectSoftware" Sequence="102"/>
+    <ROW Action="AI_VerifyPrereq" Sequence="1101"/>
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="99" Builds="DefaultBuild"/>
     <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="101" Builds="DefaultBuild"/>
     <ROW Action="AI_DeleteCadLzma" Condition="SETUPEXEDIR=&quot;&quot; AND Installed AND (REMOVE&lt;&gt;&quot;ALL&quot;) AND (AI_INSTALL_MODE&lt;&gt;&quot;Remove&quot;) AND (NOT PATCH)" Sequence="199" Builds="DefaultBuild"/>
@@ -1792,15 +1914,23 @@
     <ROW Action="AI_DpiContentScale" Sequence="54"/>
     <ROW Action="AI_EnableDebugLog" Sequence="53"/>
     <ROW Action="AI_BACKUP_AI_SETUPEXEPATH" Sequence="99"/>
-    <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="102"/>
-    <ROW Action="AI_AppSearchEx" Sequence="101"/>
-    <ROW Action="SetLogPathDefault" Condition="NOT EXISTING_LOG_PATH OR (IS_CLUSTER_SERVICE_ON_INACTIVE_NODE)" Sequence="1101"/>
-    <ROW Action="SetConfigPathExisting" Condition="EXISTING_LOG_PATH AND (IS_STANDALONE_OR_NOT_CLUSTERED_OR_ON_ACTIVE_NODE)" Sequence="1104"/>
-    <ROW Action="SetLogPathExisting" Condition="EXISTING_LOG_PATH AND (IS_STANDALONE_OR_NOT_CLUSTERED_OR_ON_ACTIVE_NODE)" Sequence="1102"/>
-    <ROW Action="SetConfigPathDefault" Condition="NOT EXISTING_LOG_PATH OR (IS_CLUSTER_SERVICE_ON_INACTIVE_NODE)" Sequence="1103"/>
+    <ROW Action="AI_RESTORE_AI_SETUPEXEPATH" Condition="AI_SETUPEXEPATH_ORIGINAL" Sequence="103"/>
+    <ROW Action="AI_AppSearchEx" Sequence="102"/>
+    <ROW Action="SetLogPathDefault" Condition="NOT EXISTING_LOG_PATH OR (IS_CLUSTER_SERVICE_ON_INACTIVE_NODE)" Sequence="1102"/>
+    <ROW Action="SetConfigPathExisting" Condition="EXISTING_LOG_PATH AND (IS_STANDALONE_OR_NOT_CLUSTERED_OR_ON_ACTIVE_NODE)" Sequence="1106"/>
+    <ROW Action="SetLogPathExisting" Condition="EXISTING_LOG_PATH AND (IS_STANDALONE_OR_NOT_CLUSTERED_OR_ON_ACTIVE_NODE)" Sequence="1104"/>
+    <ROW Action="SetConfigPathDefault" Condition="NOT EXISTING_LOG_PATH OR (IS_CLUSTER_SERVICE_ON_INACTIVE_NODE)" Sequence="1105"/>
     <ROW Action="GatherServiceAndClusterData" Sequence="52"/>
     <ROW Action="AI_DATA_SETTER_14" Sequence="51"/>
-    <ROW Action="SetDbPath" Sequence="1105"/>
+    <ROW Action="SetDbPath" Sequence="1107"/>
+    <ROW Action="AI_DetectSoftware" Sequence="101"/>
+    <ROW Action="AI_DownloadPrereq" Sequence="1297"/>
+    <ROW Action="AI_ExtractPrereq" Sequence="1298"/>
+    <ROW Action="AI_InstallPrerequisite" Sequence="1299"/>
+    <ROW Action="AI_InstallPostPrerequisite" Sequence="1301"/>
+    <ROW Action="AI_CleanPrereq" Sequence="1302"/>
+    <ROW Action="SetDefaultSqlServerInstanceName" Condition="NOT SQLSERVER" Sequence="1103"/>
+    <ROW Action="SetInstallSqlExpressDefaultValue" Condition="SQLEXPRESS_INSTANCE_EXISTS&lt;&gt;&quot;1&quot; AND NOT SQLSERVER" Sequence="1101"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiLaunchConditionsComponent">
     <ROW Condition="( Version9X OR ( NOT VersionNT64 ) OR ( VersionNT64 AND ((VersionNT64 &lt;&gt; 600) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 600) OR (MsiNTProductType = 1)) AND ((VersionNT64 &lt;&gt; 601) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 601) OR (MsiNTProductType = 1)) AND ((VersionNT64 &lt;&gt; 602) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 602) OR (MsiNTProductType = 1)) AND ((VersionNT64 &lt;&gt; 603) OR (MsiNTProductType &lt;&gt; 1)) AND ((VersionNT64 &lt;&gt; 1000) OR (MsiNTProductType &lt;&gt; 1)) ) )" Description="[ProductName] cannot be installed on the following Windows versions: [WindowsTypeNT64Display]." DescriptionLocId="AI.LaunchCondition.NoSpecificNT64" IsPredefined="true" Builds="DefaultBuild"/>
@@ -1808,6 +1938,7 @@
     <ROW Condition="((VersionNT &lt;&gt; 501) AND (VersionNT &lt;&gt; 502))" Description="[ProductName] cannot be installed on [WindowsTypeNT5XDisplay]." DescriptionLocId="AI.LaunchCondition.NoNT5X" IsPredefined="true" Builds="DefaultBuild"/>
     <ROW Condition="(VersionNT &lt;&gt; 400)" Description="[ProductName] cannot be installed on [WindowsTypeNT40Display]." DescriptionLocId="AI.LaunchCondition.NoNT40" IsPredefined="true" Builds="DefaultBuild"/>
     <ROW Condition="(VersionNT &lt;&gt; 500)" Description="[ProductName] cannot be installed on [WindowsTypeNT50Display]." DescriptionLocId="AI.LaunchCondition.NoNT50" IsPredefined="true" Builds="DefaultBuild"/>
+    <ROW Condition="AI_DETECTED_INTERNET_CONNECTION" Description="[ProductName] requires an active Internet connection for installation. Please check your network configuration and proxy settings." DescriptionLocId="AI.LaunchCondition.Internet" IsPredefined="true" Builds="DefaultBuild"/>
     <ROW Condition="VersionNT" Description="[ProductName] cannot be installed on [WindowsType9XDisplay]." DescriptionLocId="AI.LaunchCondition.No9X" IsPredefined="true" Builds="DefaultBuild"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRadioButtonComponent">
@@ -1815,8 +1946,8 @@
     <ROW Property="IAgree" Order="2" Value="No" X="5" Y="20" Width="250" Height="15" Text="I &amp;do not accept the terms in the License Agreement" TextStyle="DlgFont8" TextLocId="RadioButton.Text.IAgree#2" MsiKey="IAgree#2"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRegLocatorComponent">
-    <ROW Signature_="AI_EXE_PATH_CU" Root="1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="18"/>
-    <ROW Signature_="AI_EXE_PATH_LM" Root="2" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="18"/>
+    <ROW Signature_="AI_EXE_PATH_CU" Root="1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="2"/>
+    <ROW Signature_="AI_EXE_PATH_LM" Root="2" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Type="2"/>
     <ROW Signature_="AppSearchSign" Root="2" Key="SYSTEM\CurrentControlSet\Services\lithnetams" Name="ObjectName" Type="18"/>
     <ROW Signature_="AppSearchSign_1" Root="2" Key="Software\Lithnet\Access Manager Service" Name="HttpAcl" Type="18"/>
     <ROW Signature_="AppSearchSign_2" Root="2" Key="Software\Lithnet\Access Manager Service" Name="HttpsAcl" Type="18"/>
@@ -1826,14 +1957,17 @@
     <ROW Signature_="AppSearchSign_6" Root="2" Key="Software\Lithnet\Access Manager Service\Parameters" Name="ConfigPath" Type="18"/>
     <ROW Signature_="AppSearchSign_7" Root="2" Key="SOFTWARE\Microsoft\Windows\CurrentVersion" Name="ProgramFilesDir" Type="18"/>
     <ROW Signature_="AppSearchSign_8" Root="2" Key="SOFTWARE\Microsoft\Windows\CurrentVersion" Name="ProgramFilesDir" Type="18"/>
+    <ROW Signature_="AppSearchSign_9" Root="2" Key="Software\Lithnet\Access Manager Service\Parameters" Name="SQLServer" Type="18"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRegsComponent">
     <ROW Registry="AI_ExePath" Root="-1" Key="Software\Caphyon\Advanced Installer\LZMA\[ProductCode]\[ProductVersion]" Name="AI_ExePath" Value="[AI_SETUPEXEPATH]" Component_="AI_ExePath"/>
     <ROW Registry="AccessManagerService" Root="-1" Key="Software\Lithnet\Access Manager Service" Name="+" Component_="AccessManagerService"/>
     <ROW Registry="ConfigPath" Root="-1" Key="Software\Lithnet\Access Manager Service\Parameters" Name="ConfigPath" Value="[CONFIG_PATH]" Component_="ConfigPath"/>
     <ROW Registry="LogPath" Root="-1" Key="Software\Lithnet\Access Manager Service\Parameters" Name="LogPath" Value="[LOG_PATH]" Component_="LogPath"/>
+    <ROW Registry="NewValue" Root="-1" Key="Software\Lithnet\Access Manager Service\Parameters" Name="SQLServer" Value="[SQLSERVER]" Component_="NewValue"/>
     <ROW Registry="Parameters" Root="-1" Key="Software\Lithnet\Access Manager Service\Parameters" Name="+" Component_="Parameters"/>
     <ROW Registry="Path" Root="-1" Key="Software\Lithnet\Access Manager Service" Name="Path" Value="[APPDIR]" Component_="ProductInformation"/>
+    <ROW Registry="RequiredApplication" Root="-1" Key="Software\Caphyon\Advanced Installer\Prereqs\[ProductCode]\[ProductVersion]" Name="RequiredApplication" Value="1" Component_="RequiredApplication"/>
     <ROW Registry="Version" Root="-1" Key="Software\Lithnet\Access Manager Service" Name="Version" Value="[ProductVersion]" Component_="ProductInformation"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiRemoveRegComponent">
@@ -1854,14 +1988,16 @@
     <ROW UpgradeCode="[|UpgradeCode]" VersionMin="[|ProductVersion]" Attributes="2" ActionProperty="AI_NEWERPRODUCTFOUND"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.PreReqComponent">
-    <ROW PrereqKey="B467AE9894134312A9993D40B82F830D" DisplayName="PowerShell 5.0 for Windows 8.1/Server 2012R2 x64" VersionMin="5.0" SetupFileUrl="https://download.microsoft.com/download/2/C/6/2C6E1B4A-EBE5-48A6-B225-2D2058A9CEFB/Win8.1AndW2K12R2-KB3134758-x64.msu" Location="1" ExactSize="19764832" WinNTVersions="Windows 9x/ME/NT/2000/XP/Vista/Windows 7/Windows 8 x86/Windows 8.1 x86/Windows 10 x86" WinNT64Versions="Windows Vista x64, Windows Server 2008 x64, Windows 7 x64, Windows Server 2008 R2 x64, Windows 8 x64, Windows Server 2012 x64, Windows 10 x64, Windows Server x64" Operator="1" NoUiComLine="/quiet" Options="xym" MD5="a3255cb51f1bad3d78a0a0f777952823" TargetName="PowerShell 5.0"/>
+    <ROW PrereqKey="B467AE9894134312A9993D40B82F830D" DisplayName="PowerShell 5.0 for Windows 8.1/Server 2012R2 x64" VersionMin="5.0" SetupFileUrl="https://download.microsoft.com/download/2/C/6/2C6E1B4A-EBE5-48A6-B225-2D2058A9CEFB/Win8.1AndW2K12R2-KB3134758-x64.msu" Location="1" ExactSize="19764832" WinNTVersions="Windows 9x/ME/NT/2000/XP/Vista/Windows 7/Windows 8 x86/Windows 8.1 x86/Windows 10 x86" WinNT64Versions="Windows Vista x64, Windows Server 2008 x64, Windows 7 x64, Windows Server 2008 R2 x64, Windows 8 x64, Windows Server 2012 x64, Windows 10 x64, Windows Server x64" Operator="1" NoUiComLine="/quiet" Options="xmy" MD5="a3255cb51f1bad3d78a0a0f777952823" TargetName="PowerShell 5.0"/>
     <ROW PrereqKey="C4FE6FD5B7C4D07B3A313E754A9A6A8" DisplayName="Visual C++ Redistributable for Visual Studio 2015-2019 x64" VersionMin="14.26" SetupFileUrl="Prerequisites\Visual C++ Redistributable for Visual Studio 2015-2019\VC_redist.x64.exe" Location="0" ExactSize="0" WinNTVersions="Windows 9x/ME/NT/2000/XP/Vista/Windows 7/Windows 8 x86/Windows 8.1 x86/Windows 10 x86" WinNT64Versions="Windows Vista RTM x64, Windows Vista SP1 x64, Windows Server 2008 RTM x64, Windows 7 RTM x64, Windows Server 2008 R2 RTM x64" Operator="1" ComLine="/q /norestart" BasicUiComLine="/q /norestart" NoUiComLine="/q /norestart" Options="xy" TargetName="Visual C++ Redistributable for Visual Studio 2015-2019\VC_redist.x64.exe" ParentPrereq="D17D1EE3B5447079AEF0A1CF58498F1"/>
     <ROW PrereqKey="C6FE8A2F0943D2B7A0CB204E12F1F4" DisplayName="ASP.NET Core Runtime 3.1 x64" VersionMin="3.1" SetupFileUrl="https://download.visualstudio.microsoft.com/download/pr/c1ea0601-abe4-4c6d-96ed-131764bf5129/a1823d8ff605c30af412776e2e617a36/aspnetcore-runtime-3.1.10-win-x64.exe" Location="1" ExactSize="7847136" WinNTVersions="Windows 9x/ME/NT/2000/XP/Vista/Windows 7/Windows 8 x86/Windows 8.1 x86/Windows 10 x86" WinNT64Versions="Windows Vista x64, Windows Server 2008 x64, Windows 7 RTM x64, Windows Server 2008 R2 x64, Windows 8 x64, Windows Server 2012 x64, Windows 10 version 1507 x64, Windows 10 version 1511 x64" Operator="1" NoUiComLine="/q /norestart" Options="xym" MD5="c4206758df507bbc92a0be1657ce5e99" TargetName="ASP.NET Core 3.1"/>
     <ROW PrereqKey="D0156DFD814047AB868D49D0D15F8245" DisplayName=".NET Core Desktop Runtime 3.1 x64" VersionMin="3.1" SetupFileUrl="https://download.visualstudio.microsoft.com/download/pr/513acf37-8da2-497d-bdaa-84d6e33c1fee/eb7b010350df712c752f4ec4b615f89d/windowsdesktop-runtime-3.1.10-win-x64.exe" Location="1" ExactSize="54513872" WinNTVersions="Windows 9x/ME/NT/2000/XP/Vista/Windows 7/Windows 8 x86/Windows 8.1 x86/Windows 10 x86" WinNT64Versions="Windows Vista x64, Windows Server 2008 x64, Windows 7 RTM x64, Windows Server 2008 R2 x64, Windows 8 x64, Windows Server 2012 x64, Windows 10 version 1507 x64, Windows 10 version 1511 x64" Operator="1" NoUiComLine="/q /norestart" Options="xym" MD5="f5289dc19c63a60e063c77ba3f59fb43" TargetName=".NET Core 3.1"/>
-    <ROW PrereqKey="D17D1EE3B5447079AEF0A1CF58498F1" DisplayName="SQL Server Express LocalDB 2017" VersionMin="14.0" SetupFileUrl="https://download.microsoft.com/download/E/F/2/EF23C21D-7860-4F05-88CE-39AA114B014B/SqlLocalDB.msi" Location="1" ExactSize="48230400" WinNTVersions="Windows 9x/ME/NT/2000/XP/Vista/Windows 7/Windows 8 x86/Windows 8.1 x86/Windows 10 x86" WinNT64Versions="Windows Vista x64, Windows Server 2008 x64, Windows 7 x64, Windows Server 2008 R2 x64" Operator="1" BasicUiComLine="/qb IACCEPTSQLLOCALDBLICENSETERMS=YES" NoUiComLine="/qn IACCEPTSQLLOCALDBLICENSETERMS=YES" Options="xym" MD5="d180ae500607f6eae8942eaa285d8a06" TargetName="SQL Server Express LocalDB 2017"/>
-    <ATTRIBUTE name="PrereqsOrder" value="C6FE8A2F0943D2B7A0CB204E12F1F4 D0156DFD814047AB868D49D0D15F8245 C4FE6FD5B7C4D07B3A313E754A9A6A8 D17D1EE3B5447079AEF0A1CF58498F1 B467AE9894134312A9993D40B82F830D"/>
+    <ROW PrereqKey="D17D1EE3B5447079AEF0A1CF58498F1" DisplayName="SQL Server Express LocalDB 2017" VersionMin="14.0" SetupFileUrl="https://download.microsoft.com/download/E/F/2/EF23C21D-7860-4F05-88CE-39AA114B014B/SqlLocalDB.msi" Location="1" ExactSize="48230400" WinNTVersions="Windows 9x/ME/NT/2000/XP/Vista/Windows 7/Windows 8 x86/Windows 8.1 x86/Windows 10 x86" WinNT64Versions="Windows Vista x64, Windows Server 2008 x64, Windows 7 x64, Windows Server 2008 R2 x64" Operator="1" BasicUiComLine="/qb IACCEPTSQLLOCALDBLICENSETERMS=YES" NoUiComLine="/qn IACCEPTSQLLOCALDBLICENSETERMS=YES" Options="xy" MD5="d180ae500607f6eae8942eaa285d8a06" TargetName="SQL Server Express LocalDB 2017"/>
+    <ROW PrereqKey="RequiredApplication" DisplayName="SQL Express 2017" VersionMin="14.0" SetupFileUrl="https://download.microsoft.com/download/E/F/2/EF23C21D-7860-4F05-88CE-39AA114B014B/SQLEXPR_x64_ENU.exe" Location="1" ExactSize="289058768" WinNTVersions="Windows 9x/ME/NT/2000/XP/Vista/Windows 7/Windows 8 x86/Windows 8.1 x86/Windows 10 x86" Operator="1" ComLine="/SkipInstallerRunCheck /ACTION=Install /ROLE=AllFeatures_WithDefaults /QUIETSIMPLE=True /UpdateEnabled=False /USEMICROSOFTUPDATE=&quot;False&quot; /FEATURES=SQLENGINE /INSTANCENAME=&quot;[SQLEXPRESS_DEFAULT_INSTANCENAME]&quot; /INSTANCEID=&quot;[SQLEXPRESS_DEFAULT_INSTANCENAME]&quot; /SQLTELSVCACCT=&quot;NT Service\SQLTELEMETRY$[SQLEXPRESS_DEFAULT_INSTANCENAME]&quot; /AGTSVCACCOUNT=&quot;NT AUTHORITY\NETWORK SERVICE&quot; /AGTSVCSTARTUPTYPE=&quot;Disabled&quot; /SQLSVCSTARTUPTYPE=&quot;Automatic&quot; /SQLCOLLATION=&quot;Latin1_General_CI_AS&quot; /SQLSVCACCOUNT=&quot;NT Service\MSSQL$[SQLEXPRESS_DEFAULT_INSTANCENAME]&quot; /SQLSYSADMINACCOUNTS=&quot;[SQLEXPRESS_DEFAULT_ADMINS]&quot; /ADDCURRENTUSERASSQLADMIN=&quot;True&quot; /BROWSERSVCSTARTUPTYPE=&quot;Disabled&quot; /NPENABLED=&quot;0&quot; /TCPENABLED=&quot;0&quot; /IAcceptSQLServerLicenseTerms=True" BasicUiComLine="/SkipInstallerRunCheck /ACTION=Install /ROLE=AllFeatures_WithDefaults /QUIETSIMPLE=True /UpdateEnabled=False /USEMICROSOFTUPDATE=&quot;False&quot; /FEATURES=SQLENGINE /INSTANCENAME=&quot;[SQLEXPRESS_DEFAULT_INSTANCENAME]&quot; /INSTANCEID=&quot;[SQLEXPRESS_DEFAULT_INSTANCENAME]&quot; /SQLTELSVCACCT=&quot;NT Service\SQLTELEMETRY$[SQLEXPRESS_DEFAULT_INSTANCENAME]&quot; /AGTSVCACCOUNT=&quot;NT AUTHORITY\NETWORK SERVICE&quot; /AGTSVCSTARTUPTYPE=&quot;Disabled&quot; /SQLSVCSTARTUPTYPE=&quot;Automatic&quot; /SQLCOLLATION=&quot;Latin1_General_CI_AS&quot; /SQLSVCACCOUNT=&quot;NT Service\MSSQL$[SQLEXPRESS_DEFAULT_INSTANCENAME]&quot; /SQLSYSADMINACCOUNTS=&quot;[SQLEXPRESS_DEFAULT_ADMINS]&quot; /ADDCURRENTUSERASSQLADMIN=&quot;True&quot; /BROWSERSVCSTARTUPTYPE=&quot;Disabled&quot; /NPENABLED=&quot;0&quot; /TCPENABLED=&quot;0&quot; /IAcceptSQLServerLicenseTerms=True" NoUiComLine="/SkipInstallerRunCheck /ACTION=Install /ROLE=AllFeatures_WithDefaults /QUIETSIMPLE=True /UpdateEnabled=False /USEMICROSOFTUPDATE=&quot;False&quot; /FEATURES=SQLENGINE /INSTANCENAME=&quot;[SQLEXPRESS_DEFAULT_INSTANCENAME]&quot; /INSTANCEID=&quot;[SQLEXPRESS_DEFAULT_INSTANCENAME]&quot; /SQLTELSVCACCT=&quot;NT Service\SQLTELEMETRY$[SQLEXPRESS_DEFAULT_INSTANCENAME]&quot; /AGTSVCACCOUNT=&quot;NT AUTHORITY\NETWORK SERVICE&quot; /AGTSVCSTARTUPTYPE=&quot;Disabled&quot; /SQLSVCSTARTUPTYPE=&quot;Automatic&quot; /SQLCOLLATION=&quot;Latin1_General_CI_AS&quot; /SQLSVCACCOUNT=&quot;NT Service\MSSQL$[SQLEXPRESS_DEFAULT_INSTANCENAME]&quot; /SQLSYSADMINACCOUNTS=&quot;[SQLEXPRESS_DEFAULT_ADMINS]&quot; /ADDCURRENTUSERASSQLADMIN=&quot;True&quot; /BROWSERSVCSTARTUPTYPE=&quot;Disabled&quot; /NPENABLED=&quot;0&quot; /TCPENABLED=&quot;0&quot; /IAcceptSQLServerLicenseTerms=True" Options="fx" MD5="409d2384684cd6a45c64bdd5414fbf24" TargetName="SQL Server Express 2017" Feature="RequiredApplication"/>
+    <ATTRIBUTE name="PrereqsOrder" value="C6FE8A2F0943D2B7A0CB204E12F1F4 D0156DFD814047AB868D49D0D15F8245 C4FE6FD5B7C4D07B3A313E754A9A6A8 D17D1EE3B5447079AEF0A1CF58498F1 B467AE9894134312A9993D40B82F830D RequiredApplication"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.PreReqSearchComponent">
+    <ROW SearchKey="AMS" Prereq="RequiredApplication" SearchType="7" SearchString="HKLM\SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL\AMS" Order="2" Property="PreReqSearch_1" Platform="1"/>
     <ROW SearchKey="B467AE9894134312A9993D40B82F830DPow" Prereq="B467AE9894134312A9993D40B82F830D" SearchType="2" SearchString="HKLM\SOFTWARE\Microsoft\PowerShell\3\PowerShellEngine\PowerShellVersion" VerMin="5.0" Order="1" Property="PreReqSearch_B467AE9894134312A9993D"/>
     <ROW SearchKey="C4FE6FD5B7C4D07B3A313E754A9A6A8Vers" Prereq="C4FE6FD5B7C4D07B3A313E754A9A6A8" SearchType="2" SearchString="HKLM\SOFTWARE\Microsoft\DevDiv\VC\Servicing\14.0\RuntimeMinimum\Version" VerMin="14.26.28720" Order="1" Property="PreReqSearch_C4FE6FD5B7C4D07B3A313E" Platform="1"/>
     <ROW SearchKey="C6FE8A2F0943D2B7A0CB204E12F1F4ASP.N" Prereq="C6FE8A2F0943D2B7A0CB204E12F1F4" SearchType="1" SearchString="HKLM\SOFTWARE\Microsoft\ASP.NET Core\Shared Framework\v3.1" VerMin="3.1.4" Order="1" Property="PreReqSearch_C6FE8A2F0943D2B7A0CB20"/>
@@ -1870,6 +2006,7 @@
     <ROW SearchKey="_" SearchType="5" SearchString="HKLM\Cluster" Order="6" Property="IS_FAILOVER_CLUSTER" Platform="1"/>
     <ROW SearchKey="__1" SearchType="5" SearchString="SYSTEM\CurrentControlSet\Services\lithnetams" Order="7" Property="AMS_SERVICE_PRESENT" Platform="1"/>
     <ROW SearchKey="__2" SearchType="2" SearchString="HKLM\SOFTWARE\Lithnet\Access Manager Service\Version" VerMin="1.0.7822" Order="8" Property="CAN_SKIP_DIALOGS" Platform="1"/>
+    <ROW SearchKey="__3" SearchType="7" SearchString="HKLM\SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL\AMS" Order="10" Property="SQLEXPRESS_INSTANCE_EXISTS" Platform="1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.SynchronizedFolderComponent">
     <ROW Directory_="APPDIR" SourcePath="output" Feature="MainFeature" ExcludePattern="*~|#*#|%*%|._|CVS|.cvsignore|SCCS|vssver.scc|mssccprj.scc|vssver2.scc|.svn|.DS_Store|\config|\unix" ExcludeFlags="6"/>

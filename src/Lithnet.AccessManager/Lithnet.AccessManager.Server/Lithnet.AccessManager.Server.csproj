@@ -40,6 +40,8 @@
     <None Remove="DBScripts\LocalDBCreation\CreateServiceAccountPermissionToDB.sql" />
     <None Remove="DBScripts\LocalDBCreation\EnableContainment.sql" />
     <None Remove="DBScripts\Upgrade\00002-CreateQuartzTables.sql" />
+    <None Remove="DBScripts\Upgrade\00003-CreateDeviceTables.sql" />
+    <None Remove="DBScripts\Upgrade\00004-AddLocalAdmins.sql" />
     <None Remove="EmbeddedResources\Templates\CertificateExpiringEmail.html" />
     <None Remove="EmbeddedResources\Templates\NewVersionAvailableEmail.html" />
   </ItemGroup>
@@ -56,6 +58,8 @@
     <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateServiceAccountLoginToDB.sql" />
     <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateServiceAccountLoginToServer.sql" />
     <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateNewDatabaseWithPaths.sql" />
+    <EmbeddedResource Include="DBScripts\Upgrade\00004-AddLocalAdmins.sql" />
+    <EmbeddedResource Include="DBScripts\Upgrade\00003-CreateDeviceTables.sql" />
     <EmbeddedResource Include="DBScripts\Upgrade\00002-CreateQuartzTables.sql" />
     <EmbeddedResource Include="DBScripts\Upgrade\00001-CreateRateLimitCacheTable.sql" />
     <EmbeddedResource Include="EmbeddedResources\Templates\CertificateExpiringEmail.html" />
