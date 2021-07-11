@@ -53,6 +53,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             this.computerLocator = computerLocator;
         }
 
+        [HttpGet]
         public IActionResult AccessRequest()
         {
             try
@@ -69,6 +70,18 @@ namespace Lithnet.AccessManager.Service.Controllers
                 ShowReason = this.userInterfaceSettings.UserSuppliedReason != AuditReasonFieldState.Hidden,
                 ReasonRequired = this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required,
             });
+        }
+
+        [HttpGet]
+        public IActionResult AccessResponse()
+        {
+            return this.RedirectToAction("AccessRequest");
+        }
+
+        [HttpGet]
+        public IActionResult AccessRequestType()
+        {
+            return this.RedirectToAction("AccessRequest");
         }
 
         [HttpPost]
