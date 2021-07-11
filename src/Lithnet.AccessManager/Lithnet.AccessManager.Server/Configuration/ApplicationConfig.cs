@@ -35,8 +35,6 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public ForwardedHeadersAppOptions ForwardedHeaders { get; set; } = new ForwardedHeadersAppOptions();
 
-        public DatabaseConfigurationOptions DatabaseConfiguration { get; set; } = new DatabaseConfigurationOptions();
-
         public DataProtectionOptions DataProtection { get; set; } = new DataProtectionOptions();
 
         public JitConfigurationOptions JitConfiguration { get; set; } = new JitConfigurationOptions();

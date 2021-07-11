@@ -27,7 +27,7 @@ namespace Lithnet.AccessManager.Server.UI
         private SemaphoreSlim clusterWaitSemaphore;
         private int isUiLocked;
 
-        public MainWindowViewModel(IApplicationConfig model, AuthorizationViewModel authorization, HostingViewModel hosting,
+        public MainWindowViewModel(IApplicationConfig model, AuthorizationViewModel authorization, 
            HelpViewModel help, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider, ICertificateSynchronizationProvider certSyncProvider, IClusterProvider clusterProvider, ServerConfigurationViewModel serverConfigurationVm, DirectoryConfigurationViewModel directoryVm)
         {
             this.model = model;
@@ -35,7 +35,6 @@ namespace Lithnet.AccessManager.Server.UI
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
             this.windowsServiceProvider = windowsServiceProvider;
-            this.hosting = hosting;
             this.registryProvider = registryProvider;
             this.certSyncProvider = certSyncProvider;
             this.dialogCoordinator = dialogCoordinator;
@@ -50,6 +49,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.Items.Add(directoryVm);
             this.Items.Add(authorization); 
             this.Items.Add(help);
+
+            this.hosting = serverConfigurationVm.HostingViewModel;
 
             this.CurrentItem = this.Items.First();
 

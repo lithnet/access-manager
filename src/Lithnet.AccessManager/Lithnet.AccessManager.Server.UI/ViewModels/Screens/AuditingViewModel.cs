@@ -33,10 +33,6 @@ namespace Lithnet.AccessManager.Server.UI
             this.notificationChannelSelectionViewModelFactory = notificationChannelSelectionViewModelFactory;
             this.DisplayName = "Auditing";
 
-        }
-
-        protected override void OnInitialActivate()
-        {
             this.Powershell = psFactory.CreateViewModel(model.NotificationChannels.Powershell);
             this.Webhook = whFactory.CreateViewModel(model.NotificationChannels.Webhooks);
             this.Smtp = smtpFactory.CreateViewModel(model.NotificationChannels.Smtp);
@@ -44,8 +40,6 @@ namespace Lithnet.AccessManager.Server.UI
             this.Items.Add(this.Smtp);
             this.Items.Add(this.Webhook);
             this.Items.Add(this.Powershell);
-
-            this.ActivateItem(this.Smtp);
 
             this.Notifications = notificationChannelSelectionViewModelFactory.CreateViewModel(model.GlobalNotifications);
         }

@@ -29,6 +29,10 @@ namespace Lithnet.AccessManager.Server
 
         public string BasePath => baseKey?.GetValue("BasePath") as string;
 
+        public string SqlServer => paramsKey?.GetValue("SqlServer", ".\\AMS") as string;
+
+        public string ConnectionString => paramsKey?.GetValue("ConnectionString") as string;
+        
         public string ConfigPath => paramsKey?.GetValue("ConfigPath") as string;
 
         public string LogPath => paramsKey?.GetValue("LogPath") as string ?? Path.Combine(Directory.GetCurrentDirectory(), "logs");

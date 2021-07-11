@@ -144,7 +144,6 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<UserInterfaceOptions>().ToInstance(appconfig.UserInterface);
                 builder.Bind<JitConfigurationOptions>().ToInstance(appconfig.JitConfiguration);
                 builder.Bind<LicensingOptions>().ToInstance(appconfig.Licensing);
-                builder.Bind<DatabaseConfigurationOptions>().ToInstance(appconfig.DatabaseConfiguration);
                 builder.Bind<DataProtectionOptions>().ToInstance(appconfig.DataProtection);
                 builder.Bind<AdminNotificationOptions>().ToInstance(appconfig.AdminNotifications);
                 builder.Bind<AzureAdOptions>().ToInstance(appconfig.AzureAd);

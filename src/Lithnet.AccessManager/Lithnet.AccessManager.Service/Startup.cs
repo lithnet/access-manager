@@ -189,7 +189,6 @@ namespace Lithnet.AccessManager.Service
             services.Configure<ForwardedHeadersAppOptions>(Configuration.GetSection("ForwardedHeaders"));
             services.Configure<JitConfigurationOptions>(Configuration.GetSection("JitConfiguration"));
             services.Configure<LicensingOptions>(Configuration.GetSection("Licensing"));
-            services.Configure<DatabaseConfigurationOptions>(Configuration.GetSection("DatabaseConfiguration"));
             services.Configure<Server.Configuration.DataProtectionOptions>(Configuration.GetSection("DataProtection"));
             services.Configure<AdminNotificationOptions>(Configuration.GetSection("AdminNotifications"));
             services.Configure<AzureAdOptions>(this.Configuration.GetSection("AzureAd"));

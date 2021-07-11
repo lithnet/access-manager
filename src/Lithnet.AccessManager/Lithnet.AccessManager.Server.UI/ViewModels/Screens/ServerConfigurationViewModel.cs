@@ -41,6 +41,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.Items.Add(haVm);
             this.DisplayName = "Server configuration";
             this.ServiceStatus = this.windowsServiceProvider.Status.ToString();
+            this.HostingViewModel = hostingVm;
 
             this.licenseManager.OnLicenseDataChanged += delegate
             {
@@ -48,6 +49,8 @@ namespace Lithnet.AccessManager.Server.UI
                 this.NotifyOfPropertyChange(nameof(this.IsStandardEdition));
             };
         }
+
+        public HostingViewModel HostingViewModel { get; }
 
         public string HelpLink => Constants.HelpLinkPageWebHosting;
 

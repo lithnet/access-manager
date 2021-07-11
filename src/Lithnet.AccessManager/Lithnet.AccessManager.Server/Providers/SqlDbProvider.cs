@@ -1,37 +1,27 @@
-﻿using System.Data.SqlClient;
+﻿using DbUp;
+using DbUp.Engine.Output;
+using Lithnet.AccessManager.Server.Providers;
+using Microsoft.Extensions.Logging;
+using System.Data.SqlClient;
 using System.Reflection;
 using System.Threading;
-using DbUp;
-using DbUp.Engine.Output;
-using Lithnet.AccessManager.Enterprise;
-using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.AccessManager.Server.Providers;
-using Lithnet.Licensing.Core;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Server
 {
     public class SqlDbProvider : IDbProvider
     {
         private const string MutexName = "{3D9036C2-9C6A-4166-BEC4-9564FDA11A45}";
-        private readonly IAmsLicenseManager licenseManager;
-        private readonly DatabaseConfigurationOptions highAvailabilityOptions;
         private readonly ILogger<SqlDbProvider> logger;
         private readonly IUpgradeLog upgradeLogger;
-        private readonly SqlLocalDbInstanceProvider localDbInstanceProvider;
         private readonly SqlServerInstanceProvider sqlServerInstanceProvider;
         private static bool hasUpgraded = false;
 
         private ISqlInstanceProvider activeInstanceProvider;
 
-        public SqlDbProvider(IAmsLicenseManager licenseManager, IOptions<DatabaseConfigurationOptions> highAvailabilityOptions, ILogger<SqlDbProvider> logger, IUpgradeLog upgradeLogger, SqlLocalDbInstanceProvider localDbInstanceProvider, SqlServerInstanceProvider sqlServerInstanceProvider)
+        public SqlDbProvider(ILogger<SqlDbProvider> logger, IUpgradeLog upgradeLogger, SqlServerInstanceProvider sqlServerInstanceProvider)
         {
-            this.licenseManager = licenseManager;
-            this.highAvailabilityOptions = highAvailabilityOptions.Value;
             this.logger = logger;
             this.upgradeLogger = upgradeLogger;
-            this.localDbInstanceProvider = localDbInstanceProvider;
             this.sqlServerInstanceProvider = sqlServerInstanceProvider;
             this.InitializeDb();
         }
@@ -45,14 +35,7 @@ namespace Lithnet.AccessManager.Server
 
         private void InitializeDb()
         {
-            if (licenseManager.IsFeatureEnabled(LicensedFeatures.ExternalSql) && highAvailabilityOptions.UseExternalSql)
-            {
-                this.activeInstanceProvider = this.sqlServerInstanceProvider;
-            }
-            else
-            {
-                this.activeInstanceProvider = this.localDbInstanceProvider;
-            }
+            this.activeInstanceProvider = this.sqlServerInstanceProvider;
 
             this.activeInstanceProvider.InitializeDb();
 

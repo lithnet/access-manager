@@ -82,7 +82,6 @@ namespace Lithnet.AccessManager.Api
             services.AddSingleton<ISecurityTokenGenerator, SecurityTokenGenerator>();
             services.AddSingleton<ISignedAssertionValidator, SignedAssertionValidator>();
 
-            services.Configure<DatabaseConfigurationOptions>(this.Configuration.GetSection("DatabaseConfiguration"));
             services.Configure<AzureAdOptions>(this.Configuration.GetSection("AzureAd"));
             services.Configure<PasswordPolicyOptions>(this.Configuration.GetSection("PasswordPolicy"));
             services.Configure<ApiAuthenticationOptions>(this.Configuration.GetSection("ApiAuthentication"));

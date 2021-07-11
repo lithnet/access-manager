@@ -28,8 +28,6 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         UserInterfaceOptions UserInterface { get; set; }
 
-        DatabaseConfigurationOptions DatabaseConfiguration { get; set; }
-
         DataProtectionOptions DataProtection { get; set; }
 
         JitConfigurationOptions JitConfiguration { get; set; }

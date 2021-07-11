@@ -15,16 +15,20 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <ListView Grid.Row="0" Grid.Column="0" 
+            <Label Grid.Row="0"
+                   Style="{DynamicResource DescriptionHeaderStyle}"
+                   Content="Webhook notification channels" />
+
+        <ListView Grid.Row="1" Grid.Column="0" 
                       ItemsSource="{Binding ViewModels}"
                       SelectedItem="{Binding SelectedItem}" 
                       BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" 
                       BorderThickness="1"
                       MouseDoubleClick="{s:Action Edit}"
-                      Height="250"
                       Margin="5">
                 <ListView.View>
                     <GridView>
@@ -35,7 +39,7 @@
                     </GridView>
                 </ListView.View>
             </ListView>
-            <StackPanel Grid.Row="1" Grid.Column="0"
+            <StackPanel Grid.Row="2" Grid.Column="0"
                         Orientation="Horizontal">
                 <Button Command="{s:Action Add}" 
                         Content="Add..."

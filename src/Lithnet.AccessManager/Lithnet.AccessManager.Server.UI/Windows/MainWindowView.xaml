@@ -136,7 +136,7 @@
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
                                 <converter:PackIconFontAwesome Kind="ExclamationTriangleSolid" Margin="5" Foreground="Orange" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1"  TextWrapping="Wrap" Margin="5">The web service is currently not configured. Validate the information on the web hosting page, save the configuration, and restart the service to activate the Access Manager Service</TextBlock>
+                                <TextBlock Grid.Column="1"  TextWrapping="Wrap" Margin="5">The web service is currently not configured. Assign a TLS certificate and validate the information on the service hosting page, save the configuration, and restart the service to activate the Access Manager Service</TextBlock>
                             </Grid>
                             <Grid Background="LightYellow"
                               Margin="5" 

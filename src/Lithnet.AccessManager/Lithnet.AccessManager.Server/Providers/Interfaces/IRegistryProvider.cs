@@ -8,6 +8,10 @@
 
         bool IsConfigured { get; set; }
 
+        string SqlServer { get; }
+        
+        string ConnectionString { get; }
+
         string HttpAcl { get; set; }
 
         string HttpsAcl { get; set; }
@@ -29,6 +33,7 @@
         bool ResetScheduler { get; set; }
 
         bool ResetMaintenanceTaskSchedules { get; set; }
+
         bool ApiEnabled { get; set; }
     }
 }

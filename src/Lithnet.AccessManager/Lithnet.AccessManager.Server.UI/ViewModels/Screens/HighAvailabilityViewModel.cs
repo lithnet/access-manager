@@ -1,17 +1,13 @@
-﻿using System;
-using System.ServiceModel.Channels;
-using System.Threading.Tasks;
-using Lithnet.AccessManager.Enterprise;
+﻿using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Providers;
 using Lithnet.AccessManager.Server.UI.Providers;
-using Lithnet.Licensing.Core;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
-using Markdig.Extensions.TaskLists;
 using Microsoft.Extensions.Logging;
-using PropertyChanged;
 using Stylet;
+using System;
+using System.Threading.Tasks;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -21,7 +17,6 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IAmsLicenseManager licenseManager;
         private readonly ILogger<HighAvailabilityViewModel> logger;
-        private readonly DatabaseConfigurationOptions dbOptions;
         private readonly DataProtectionOptions dataProtectionOptions;
         private readonly ICertificateSynchronizationProvider certSyncProvider;
         private readonly ISecretRekeyProvider rekeyProvider;
@@ -29,12 +24,11 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IScriptTemplateProvider scriptTemplateProvider;
         private readonly IWindowsServiceProvider windowsServiceProvider;
 
-        public HighAvailabilityViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, IAmsLicenseManager licenseManager, ILogger<HighAvailabilityViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, DatabaseConfigurationOptions highAvailabilityOptions, DataProtectionOptions dataProtectionOptions, ICertificateSynchronizationProvider certSyncProvider, ISecretRekeyProvider rekeyProvider, SqlServerInstanceProvider sqlInstanceProvider, IScriptTemplateProvider scriptTemplateProvider, IWindowsServiceProvider windowsServiceProvider)
+        public HighAvailabilityViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, IAmsLicenseManager licenseManager, ILogger<HighAvailabilityViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, DataProtectionOptions dataProtectionOptions, ICertificateSynchronizationProvider certSyncProvider, ISecretRekeyProvider rekeyProvider, SqlServerInstanceProvider sqlInstanceProvider, IScriptTemplateProvider scriptTemplateProvider, IWindowsServiceProvider windowsServiceProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.licenseManager = licenseManager;
             this.logger = logger;
-            this.dbOptions = highAvailabilityOptions;
             this.dataProtectionOptions = dataProtectionOptions;
             this.certSyncProvider = certSyncProvider;
             this.dialogCoordinator = dialogCoordinator;
@@ -72,29 +66,6 @@ namespace Lithnet.AccessManager.Server.UI
         public bool IsEnterpriseEdition => this.licenseManager.IsEnterpriseEdition();
 
         public bool ShowEnterpriseEditionBanner => this.licenseManager.IsEvaluatingOrBuiltIn() || !this.licenseManager.IsEnterpriseEdition();
-
-        [NotifyModelChangedProperty]
-        [AlsoNotifyFor(nameof(UseSqlServer))]
-        public bool UseLocalDB
-        {
-            get => !this.dbOptions.UseExternalSql;
-            set => this.dbOptions.UseExternalSql = !value;
-        }
-
-        [AlsoNotifyFor(nameof(UseLocalDB))]
-        [NotifyModelChangedProperty]
-        public bool UseSqlServer
-        {
-            get => this.dbOptions.UseExternalSql;
-            set => this.dbOptions.UseExternalSql = value;
-        }
-
-        [NotifyModelChangedProperty]
-        public string ConnectionString
-        {
-            get => this.dbOptions.ConnectionString;
-            set => this.dbOptions.ConnectionString = value;
-        }
 
         [NotifyModelChangedProperty]
         public bool IsCertificateSynchronizationEnabled
@@ -154,99 +125,6 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public bool CanEditConnectionString => this.UseSqlServer;
-
-        public async Task EditConnectionString()
-        {
-            ProgressDialogController progress = null;
-            try
-            {
-                MetroDialogSettings settings = new MetroDialogSettings
-                {
-                    DefaultText = this.ConnectionString,
-                };
-
-                var connectionString = await this.dialogCoordinator.ShowInputAsync(this, "Enter connection string", "Please provide the connection string to the database server that contains the AccessManager database", settings);
-
-                if (string.IsNullOrWhiteSpace(connectionString))
-                {
-                    return;
-                }
-
-                progress = await this.dialogCoordinator.ShowProgressAsync(this, "Testing connection", string.Empty, false);
-                progress.SetIndeterminate();
-
-
-                connectionString = sqlInstanceProvider.NormalizeConnectionString(connectionString);
-                await Task.Run(() => sqlInstanceProvider.TestConnectionString(connectionString));
-                this.ConnectionString = connectionString;
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "Could not change the connection string because the connection failed");
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not connect to the database using the specified connection string\r\n\r\n{ex.Message}");
-            }
-            finally
-            {
-                if (progress != null)
-                {
-                    await progress.CloseAsync();
-                }
-            }
-        }
-
-        public bool CanCreateDatabase => this.IsEnterpriseEdition;
-
-        public async Task CreateDatabase()
-        {
-            ProgressDialogController progress = null;
-
-            try
-            {
-                MetroDialogSettings settings = new MetroDialogSettings
-                {
-                    DefaultText = this.ConnectionString,
-                };
-
-                var connectionString = await this.dialogCoordinator.ShowInputAsync(this, "Enter connection string", "Please provide the connection string to the database server where you want to create the database", settings);
-
-                if (string.IsNullOrWhiteSpace(connectionString))
-                {
-                    return;
-                }
-
-                progress = await this.dialogCoordinator.ShowProgressAsync(this, "Create new database", "Checking for existing database", false);
-                progress.SetIndeterminate();
-                connectionString = sqlInstanceProvider.NormalizeConnectionString(connectionString);
-
-                bool exists = await Task.Run(() => sqlInstanceProvider.DoesDbExist(connectionString));
-
-                if (exists)
-                {
-                    await this.dialogCoordinator.ShowMessageAsync(this, "Cannot create the database", "The database already exists");
-                    return;
-                }
-
-                progress.SetMessage("Creating database");
-                await Task.Run(() => sqlInstanceProvider.CreateDatabase(connectionString));
-
-                this.ConnectionString = connectionString;
-                await this.dialogCoordinator.ShowMessageAsync(this, "Operation successful", "The database was successfully created");
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "The database creation failed");
-                await this.dialogCoordinator.ShowMessageAsync(this, "Cannot create the database", ex.Message);
-            }
-            finally
-            {
-                if (progress != null)
-                {
-                    await progress.CloseAsync();
-                }
-            }
-        }
-
         public bool CanGetDatabaseCreationScript => this.IsEnterpriseEdition;
 
         public async Task GetDatabaseCreationScript()
@@ -276,33 +154,6 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
-            }
-        }
-        public bool CanTestConnectionString => this.UseSqlServer && !string.IsNullOrWhiteSpace(this.ConnectionString);
-
-        public async Task TestConnectionString()
-        {
-            ProgressDialogController progress = null;
-
-            try
-            {
-                progress = await this.dialogCoordinator.ShowProgressAsync(this, "Testing connection", string.Empty, false);
-                progress.SetIndeterminate();
-
-                await Task.Run(() => sqlInstanceProvider.TestConnectionString(this.ConnectionString));
-                await this.dialogCoordinator.ShowMessageAsync(this, "Test successful", "The database test was successful");
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, "The connection string test failed");
-                await this.dialogCoordinator.ShowMessageAsync(this, "Test failed", ex.Message);
-            }
-            finally
-            {
-                if (progress != null)
-                {
-                    await progress.CloseAsync();
-                }
             }
         }
     }

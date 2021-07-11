@@ -58,7 +58,6 @@
     <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateServiceAccountLoginToDB.sql" />
     <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateServiceAccountLoginToServer.sql" />
     <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateNewDatabaseWithPaths.sql" />
-    <EmbeddedResource Include="DBScripts\Upgrade\00004-AddLocalAdmins.sql" />
     <EmbeddedResource Include="DBScripts\Upgrade\00003-CreateDeviceTables.sql" />
     <EmbeddedResource Include="DBScripts\Upgrade\00002-CreateQuartzTables.sql" />
     <EmbeddedResource Include="DBScripts\Upgrade\00001-CreateRateLimitCacheTable.sql" />
@@ -69,7 +68,7 @@
   <ItemGroup>
     <PackageReference Include="DbUp-SqlServer" Version="4.4.0" />
     <PackageReference Include="htmlagilitypack" Version="1.11.24" />
-    <PackageReference Include="lithnet.accessmanager.enterprise" Version="1.0.7841.17737" />
+    <PackageReference Include="lithnet.accessmanager.enterprise" Version="1.0.7862.28599" />
     <PackageReference Include="lithnet.security.authorization" Version="1.0.7518.2238" />
     <PackageReference Include="MartinCostello.SqlLocalDb" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.2.0" />

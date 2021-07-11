@@ -1,31 +1,20 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Data.SqlClient;
-using Lithnet.AccessManager.Enterprise;
-using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.Licensing.Core;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Lithnet.AccessManager.Server.Providers
 {
     public class SqlServerInstanceProvider : ISqlInstanceProvider
     {
         private readonly ILogger<SqlServerInstanceProvider> logger;
-        private readonly DatabaseConfigurationOptions highAvailabilityOptions;
-        private readonly IAmsLicenseManager licenseManager;
         private readonly IWindowsServiceProvider windowsServiceProvider;
+        private readonly IRegistryProvider registryProvider;
 
-        public SqlServerInstanceProvider(ILogger<SqlServerInstanceProvider> logger, IOptions<DatabaseConfigurationOptions> highAvailabilityOptions, IAmsLicenseManager licenseManager, IWindowsServiceProvider windowsServiceProvider)
-            : this(logger, highAvailabilityOptions.Value, licenseManager, windowsServiceProvider)
-        {
-        }
-
-        public SqlServerInstanceProvider(ILogger<SqlServerInstanceProvider> logger, DatabaseConfigurationOptions highAvailabilityOptions, IAmsLicenseManager licenseManager, IWindowsServiceProvider windowsServiceProvider)
+        public SqlServerInstanceProvider(ILogger<SqlServerInstanceProvider> logger, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider)
         {
             this.logger = logger;
-            this.highAvailabilityOptions = highAvailabilityOptions;
-            this.licenseManager = licenseManager;
             this.windowsServiceProvider = windowsServiceProvider;
+            this.registryProvider = registryProvider;
         }
 
         public string ConnectionString { get; private set; }
@@ -44,10 +33,33 @@ namespace Lithnet.AccessManager.Server.Providers
 
         public void InitializeDb()
         {
-            this.licenseManager.ThrowOnMissingFeature(LicensedFeatures.ExternalSql);
-
             this.logger.LogTrace("Initializing external DB");
-            this.ConnectionString = this.highAvailabilityOptions.ConnectionString;
+
+            if (string.IsNullOrWhiteSpace(this.registryProvider.ConnectionString))
+            {
+                var builder = new SqlConnectionStringBuilder();
+
+                builder.InitialCatalog = "AccessManager";
+                builder.DataSource = registryProvider.SqlServer;
+                builder.IntegratedSecurity = true;
+                this.ConnectionString = builder.ToString();
+            }
+            else
+            {
+                this.ConnectionString = this.registryProvider.ConnectionString;
+            }
+
+            this.logger.LogTrace($"AMS DB connection string {this.ConnectionString}");
+
+            if (!this.DoesDbExist(this.ConnectionString))
+            {
+                this.logger.LogTrace($"Database does not exist. Attempting to create new DB.");
+                this.CreateDatabase(this.ConnectionString);
+            }
+            else
+            {
+                this.logger.LogTrace($"Database exists");
+            }
 
             using (this.GetConnection())
             {
@@ -55,7 +67,7 @@ namespace Lithnet.AccessManager.Server.Providers
             }
         }
 
-        public string NormalizeConnectionString(string connectionString, string inititalCatalog = "AccessManager")
+        public string NormalizeConnectionString(string connectionString, string initialCatalog = "AccessManager")
         {
             if (!connectionString.Contains("="))
             {
@@ -64,8 +76,8 @@ namespace Lithnet.AccessManager.Server.Providers
             }
 
             SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder(connectionString);
-            builder.InitialCatalog = inititalCatalog;
-            
+            builder.InitialCatalog = initialCatalog;
+
             if (string.IsNullOrWhiteSpace(builder.UserID))
             {
                 builder.IntegratedSecurity = true;
