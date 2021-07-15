@@ -4,7 +4,7 @@ using System.Security.Principal;
 
 namespace Lithnet.AccessManager
 {
-    public sealed class ActiveDirectoryGroupManagedServiceAccount : IGroupManagedServiceAccount
+    public sealed class ActiveDirectoryGroupManagedServiceAccount : IActiveDirectoryGroupManagedServiceAccount
     {
         private readonly DirectoryEntry de;
 

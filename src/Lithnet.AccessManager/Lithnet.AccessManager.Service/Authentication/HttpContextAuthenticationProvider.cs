@@ -10,7 +10,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
 {
     public abstract class HttpContextAuthenticationProvider : IHttpContextAuthenticationProvider
     {
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IAuthorizationContextProvider authzContextProvider;
 
@@ -18,14 +18,14 @@ namespace Lithnet.AccessManager.Service.AppSettings
 
         public abstract bool IdpLogout { get; }
 
-        protected HttpContextAuthenticationProvider(IHttpContextAccessor httpContextAccessor, IDirectory directory, IAuthorizationContextProvider authzContextProvider)
+        protected HttpContextAuthenticationProvider(IHttpContextAccessor httpContextAccessor, IActiveDirectory directory, IAuthorizationContextProvider authzContextProvider)
         {
             this.httpContextAccessor = httpContextAccessor;
             this.directory = directory;
             this.authzContextProvider = authzContextProvider;
         }
 
-        protected void AddAuthZClaims(IUser user, ClaimsIdentity identity)
+        protected void AddAuthZClaims(IActiveDirectoryUser user, ClaimsIdentity identity)
         {
             using var c = this.authzContextProvider.GetAuthorizationContext(user);
 
@@ -37,7 +37,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
             }
         }
 
-        public IUser GetLoggedInUser()
+        public IActiveDirectoryUser GetLoggedInUser()
         {
             string sid = this.GetLoggedInUserSid();
 

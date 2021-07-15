@@ -16,7 +16,7 @@ namespace Lithnet.AccessManager.Server.Workers
         private readonly ILogger logger;
         private readonly JitConfigurationOptions options;
         private readonly IJitAccessGroupResolver groupResolver;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly IDiscoveryServices discoveryServices;
         private readonly Dictionary<string, SearchParameters> deltaInformation = new Dictionary<string, SearchParameters>(StringComparer.CurrentCultureIgnoreCase);
 
@@ -26,7 +26,7 @@ namespace Lithnet.AccessManager.Server.Workers
 
         private readonly int timerInterval;
 
-        public JitGroupWorker(ILogger<JitGroupWorker> logger, IOptions<JitConfigurationOptions> options, IJitAccessGroupResolver groupResolver, IDirectory directory, IDiscoveryServices discoveryServices)
+        public JitGroupWorker(ILogger<JitGroupWorker> logger, IOptions<JitConfigurationOptions> options, IJitAccessGroupResolver groupResolver, IActiveDirectory directory, IDiscoveryServices discoveryServices)
         {
             this.logger = logger;
             this.options = options.Value;

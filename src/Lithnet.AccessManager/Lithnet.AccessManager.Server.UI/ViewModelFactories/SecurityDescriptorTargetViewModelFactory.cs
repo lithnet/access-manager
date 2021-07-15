@@ -17,7 +17,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IFileSelectionViewModelFactory fileSelectionViewModelFactory;
         private readonly ILogger<SecurityDescriptorTargetViewModel> logger;
         private readonly IDiscoveryServices discoveryServices;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly ILocalSam localSam;
         private readonly IObjectSelectionProvider objectSelectionProvider;
@@ -30,7 +30,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IAadGraphApiProvider graphProvider;
         private readonly IDeviceProvider deviceProvider;
 
-        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IDirectory directory, ILocalSam localsam, IObjectSelectionProvider objectSelectionProvider, Func<IModelValidator<SecurityDescriptorTargetViewModel>> validator, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> selectTargetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadObjectSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider)
+        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IActiveDirectory directory, ILocalSam localsam, IObjectSelectionProvider objectSelectionProvider, Func<IModelValidator<SecurityDescriptorTargetViewModel>> validator, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> selectTargetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadObjectSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.appPathProvider = appPathProvider;

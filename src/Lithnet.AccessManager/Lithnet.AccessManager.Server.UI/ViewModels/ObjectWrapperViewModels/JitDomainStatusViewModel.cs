@@ -9,13 +9,13 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class JitDomainStatusViewModel : PropertyChangedBase
     {
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
 
         private readonly Forest forest;
 
         private readonly ILogger logger;
 
-        public JitDomainStatusViewModel(IDirectory directory, JitDynamicGroupMapping mapping, Domain domain, ILogger<JitDomainStatusViewModel> logger)
+        public JitDomainStatusViewModel(IActiveDirectory directory, JitDynamicGroupMapping mapping, Domain domain, ILogger<JitDomainStatusViewModel> logger)
         {
             this.directory = directory;
             this.Domain = domain;

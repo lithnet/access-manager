@@ -13,7 +13,7 @@ namespace Lithnet.AccessManager.Server.Test
 {
     public class JitAccessProviderTests
     {
-        private IDirectory directory;
+        private IActiveDirectory directory;
 
         private IDiscoveryServices discoveryServices;
 
@@ -52,9 +52,9 @@ namespace Lithnet.AccessManager.Server.Test
             string groupname = Guid.NewGuid().ToString();
             string fqGroupName = $"{jitGroupName.Split('\\')[0]}\\{groupname}";
 
-            IGroup jitGroup = directory.GetGroup(jitGroupName);
+            IActiveDirectoryGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
-            IUser user = directory.GetUser(userName);
+            IActiveDirectoryUser user = directory.GetUser(userName);
             IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             options.DynamicGroupMappings.Add(new JitDynamicGroupMapping()
@@ -69,7 +69,7 @@ namespace Lithnet.AccessManager.Server.Test
             provider.GrantJitAccessDynamicGroup(jitGroup, user, null, false, TimeSpan.FromMinutes(1), out _);
             Thread.Sleep(TimeSpan.FromSeconds(20));
 
-            IGroup ttlGroup = directory.GetGroup(fqGroupName);
+            IActiveDirectoryGroup ttlGroup = directory.GetGroup(fqGroupName);
             Assert.IsNotNull(ttlGroup);
             Assert.AreEqual(groupname, ttlGroup.SamAccountName);
 
@@ -86,9 +86,9 @@ namespace Lithnet.AccessManager.Server.Test
             string groupname = Guid.NewGuid().ToString();
             string fqGroupName = $"{jitGroupName.Split('\\')[0]}\\{groupname}";
 
-            IGroup jitGroup = directory.GetGroup(jitGroupName);
+            IActiveDirectoryGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
-            IUser user = directory.GetUser(userName);
+            IActiveDirectoryUser user = directory.GetUser(userName);
             IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             options.DynamicGroupMappings.Add(new JitDynamicGroupMapping()
@@ -119,9 +119,9 @@ namespace Lithnet.AccessManager.Server.Test
             string groupname = Guid.NewGuid().ToString();
             string fqGroupName = $"{jitGroupName.Split('\\')[0]}\\{groupname}";
 
-            IGroup jitGroup = directory.GetGroup(jitGroupName);
+            IActiveDirectoryGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
-            IUser user = directory.GetUser(userName);
+            IActiveDirectoryUser user = directory.GetUser(userName);
             IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             options.DynamicGroupMappings.Add(new JitDynamicGroupMapping()
@@ -156,9 +156,9 @@ namespace Lithnet.AccessManager.Server.Test
             string groupname = Guid.NewGuid().ToString();
             string fqGroupName = $"{jitGroupName.Split('\\')[0]}\\{groupname}";
 
-            IGroup jitGroup = directory.GetGroup(jitGroupName);
+            IActiveDirectoryGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
-            IUser user = directory.GetUser(userName);
+            IActiveDirectoryUser user = directory.GetUser(userName);
             IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             options.DynamicGroupMappings.Add(new JitDynamicGroupMapping()
@@ -191,9 +191,9 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_PC1, C.DEV_User1)]
         public void TestPamGroupAccessExtensionAllowed(string jitGroupName, string computerName, string userName)
         {
-            IGroup jitGroup = directory.GetGroup(jitGroupName);
+            IActiveDirectoryGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
-            IUser user = directory.GetUser(userName);
+            IActiveDirectoryUser user = directory.GetUser(userName);
             IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
@@ -226,9 +226,9 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_PC1, C.DEV_User1)]
         public void TestPamGroupAccessExtensionNotAllowed(string jitGroupName, string computerName, string userName)
         {
-            IGroup jitGroup = directory.GetGroup(jitGroupName);
+            IActiveDirectoryGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
-            IUser user = directory.GetUser(userName);
+            IActiveDirectoryUser user = directory.GetUser(userName);
             IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
@@ -260,9 +260,9 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_PC1, C.DEV_User1)]
         public void TestPamGroupAccessUndo(string jitGroupName, string computerName, string userName)
         {
-            IGroup jitGroup = directory.GetGroup(jitGroupName);
+            IActiveDirectoryGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
-            IUser user = directory.GetUser(userName);
+            IActiveDirectoryUser user = directory.GetUser(userName);
             IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
@@ -282,9 +282,9 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.DEV_JIT_PC1, C.DEV_PC1, C.DEV_User1)]
         public void ThrowOnNoMappingForDomain(string jitGroupName, string computerName, string userName)
         {
-            IGroup jitGroup = directory.GetGroup(jitGroupName);
+            IActiveDirectoryGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
-            IUser user = directory.GetUser(userName);
+            IActiveDirectoryUser user = directory.GetUser(userName);
             IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);
@@ -301,9 +301,9 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_PC1, C.DEV_User1)]
         public void AddUserToGroupPam(string jitGroupName, string computerName, string userName)
         {
-            IGroup jitGroup = directory.GetGroup(jitGroupName);
+            IActiveDirectoryGroup jitGroup = directory.GetGroup(jitGroupName);
             jitGroup.RemoveMembers();
-            IUser user = directory.GetUser(userName);
+            IActiveDirectoryUser user = directory.GetUser(userName);
             IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             this.provider = new JitAccessProvider(directory, logger, this.GetOptions(), discoveryServices);

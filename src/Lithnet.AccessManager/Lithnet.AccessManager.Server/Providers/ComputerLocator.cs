@@ -9,11 +9,11 @@ namespace Lithnet.AccessManager.Server.Providers
 {
     public class ComputerLocator : IComputerLocator
     {
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly ILogger<ComputerLocator> logger;
         private readonly IDeviceProvider dbDeviceProvider;
 
-        public ComputerLocator(IDirectory directory, ILogger<ComputerLocator> logger, IDeviceProvider dbDeviceProvider)
+        public ComputerLocator(IActiveDirectory directory, ILogger<ComputerLocator> logger, IDeviceProvider dbDeviceProvider)
         {
             this.directory = directory;
             this.logger = logger;

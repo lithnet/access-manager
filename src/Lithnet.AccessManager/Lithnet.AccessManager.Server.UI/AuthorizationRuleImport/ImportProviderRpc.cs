@@ -6,11 +6,11 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
     public class ImportProviderRpc : ImportProviderComputerDiscovery
     {
         private readonly ILogger logger;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly IComputerPrincipalProvider provider;
         private readonly ImportSettingsRpc settings;
 
-        public ImportProviderRpc(ImportSettingsRpc settings, ILogger<ImportProviderRpc> logger, IDirectory directory, IComputerPrincipalProviderRpc provider)
+        public ImportProviderRpc(ImportSettingsRpc settings, ILogger<ImportProviderRpc> logger, IActiveDirectory directory, IComputerPrincipalProviderRpc provider)
             : base(settings, logger, directory)
         {
             this.logger = logger;

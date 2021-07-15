@@ -14,12 +14,12 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IAsyncViewModelFactory<SecurityDescriptorTargetViewModel, SecurityDescriptorTarget, SecurityDescriptorTargetViewModelDisplaySettings> factory;
         private readonly Func<INotifyModelChangedEventPublisher> eventPublisher;
         private readonly ILogger<SecurityDescriptorTargetsViewModel> logger;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly IEnumerable<IComputerTargetProvider> computerTargetProviders;
         private readonly IViewModelFactory<EffectiveAccessViewModel, SecurityDescriptorTargetsViewModel> effectiveAccessFactory;
         private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public SecurityDescriptorTargetsViewModelFactory(IDialogCoordinator dialogCoordinator, IAsyncViewModelFactory<SecurityDescriptorTargetViewModel, SecurityDescriptorTarget, SecurityDescriptorTargetViewModelDisplaySettings> factory, Func<INotifyModelChangedEventPublisher> eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IEnumerable<IComputerTargetProvider> computerTargetProviders, IViewModelFactory<EffectiveAccessViewModel, SecurityDescriptorTargetsViewModel> effectiveAccessFactory, IShellExecuteProvider shellExecuteProvider)
+        public SecurityDescriptorTargetsViewModelFactory(IDialogCoordinator dialogCoordinator, IAsyncViewModelFactory<SecurityDescriptorTargetViewModel, SecurityDescriptorTarget, SecurityDescriptorTargetViewModelDisplaySettings> factory, Func<INotifyModelChangedEventPublisher> eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IActiveDirectory directory, IEnumerable<IComputerTargetProvider> computerTargetProviders, IViewModelFactory<EffectiveAccessViewModel, SecurityDescriptorTargetsViewModel> effectiveAccessFactory, IShellExecuteProvider shellExecuteProvider)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.factory = factory;

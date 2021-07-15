@@ -85,7 +85,7 @@ namespace Lithnet.AccessManager.Agent
 
                         // Legacy LAPS provider services
                         services.AddTransient<ILocalSam, LocalSam>();
-                        services.AddTransient<IDirectory, ActiveDirectory>();
+                        services.AddTransient<IActiveDirectory, ActiveDirectory>();
                         services.AddTransient<IDiscoveryServices, DiscoveryServices>();
                         services.AddTransient<IPasswordChangeProvider, WindowsPasswordChangeProvider>();
                         services.AddTransient<IMsMcsAdmPwdProvider, MsMcsAdmPwdProvider>();

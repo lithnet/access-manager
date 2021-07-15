@@ -8,13 +8,13 @@ namespace Lithnet.AccessManager.Agent
     public class ActiveDirectoryLapsAgent
     {
         private readonly ILogger<ActiveDirectoryLapsAgent> logger;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly IActiveDirectoryLapsSettingsProvider settings;
         private readonly IPasswordGenerator passwordGenerator;
         private readonly ILocalSam sam;
         private readonly ILithnetAdminPasswordProvider lithnetAdminPasswordProvider;
 
-        public ActiveDirectoryLapsAgent(ILogger<ActiveDirectoryLapsAgent> logger, IDirectory directory, IActiveDirectoryLapsSettingsProvider settings, IPasswordGenerator passwordGenerator, ILocalSam sam, ILithnetAdminPasswordProvider lithnetAdminPasswordProvider)
+        public ActiveDirectoryLapsAgent(ILogger<ActiveDirectoryLapsAgent> logger, IActiveDirectory directory, IActiveDirectoryLapsSettingsProvider settings, IPasswordGenerator passwordGenerator, ILocalSam sam, ILithnetAdminPasswordProvider lithnetAdminPasswordProvider)
         {
             this.logger = logger;
             this.directory = directory;

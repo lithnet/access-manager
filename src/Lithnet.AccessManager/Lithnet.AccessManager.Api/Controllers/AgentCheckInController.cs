@@ -23,11 +23,11 @@ namespace Lithnet.AccessManager.Api.Controllers
         private readonly ILogger<AgentCheckInController> logger;
         private readonly IDeviceProvider deviceProvider;
         private readonly IApiErrorResponseProvider errorProvider;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly IAadGraphApiProvider graph;
         private readonly ICheckInDataValidator checkinDataValidator;
 
-        public AgentCheckInController(ILogger<AgentCheckInController> logger, IApiErrorResponseProvider errorProvider, IDeviceProvider deviceProvider, IDirectory directory, IAadGraphApiProvider graph, ICheckInDataValidator checkinDataValidator)
+        public AgentCheckInController(ILogger<AgentCheckInController> logger, IApiErrorResponseProvider errorProvider, IDeviceProvider deviceProvider, IActiveDirectory directory, IAadGraphApiProvider graph, ICheckInDataValidator checkinDataValidator)
         {
             this.logger = logger;
             this.errorProvider = errorProvider;

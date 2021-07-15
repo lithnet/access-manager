@@ -5,7 +5,7 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class ImportWizardRuleSettingsViewModelValidator : AbstractValidator<ImportWizardRuleSettingsViewModel>
     {
-        public ImportWizardRuleSettingsViewModelValidator(IAppPathProvider appPathProvider, IDirectory directory)
+        public ImportWizardRuleSettingsViewModelValidator(IAppPathProvider appPathProvider, IActiveDirectory directory)
         {
             this.RuleFor(r => r.JitGroupDisplayName)
                 .NotEmpty()

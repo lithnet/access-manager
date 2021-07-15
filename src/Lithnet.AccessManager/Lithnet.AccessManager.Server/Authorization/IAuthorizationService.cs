@@ -6,8 +6,8 @@ namespace Lithnet.AccessManager.Server.Authorization
 {
     public interface IAuthorizationService
     {
-        Task<AuthorizationResponse> GetAuthorizationResponse(IUser user, IComputer computer, AccessMask requestedAccess, IPAddress ip);
+        Task<AuthorizationResponse> GetAuthorizationResponse(IActiveDirectoryUser user, IComputer computer, AccessMask requestedAccess, IPAddress ip);
 
-        Task<AuthorizationResponse> GetPreAuthorization(IUser user, IComputer computer);
+        Task<AuthorizationResponse> GetPreAuthorization(IActiveDirectoryUser user, IComputer computer);
     }
 }

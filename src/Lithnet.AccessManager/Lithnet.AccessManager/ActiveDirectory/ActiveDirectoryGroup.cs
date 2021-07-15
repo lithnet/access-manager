@@ -9,7 +9,7 @@ using SearchScope = System.DirectoryServices.SearchScope;
 
 namespace Lithnet.AccessManager
 {
-    public sealed class ActiveDirectoryGroup : IGroup
+    public sealed class ActiveDirectoryGroup : IActiveDirectoryGroup
     {
         private DirectoryEntry de;
 
@@ -52,19 +52,19 @@ namespace Lithnet.AccessManager
 
         public TimeSpan? EntryTtl => this.de.Properties.Contains("entryTTL") ? TimeSpan.FromSeconds(this.de.GetPropertyInteger("entryTTL") ?? 0) : (TimeSpan?)null;
 
-        public void AddMember(ISecurityPrincipal principal, TimeSpan ttl)
+        public void AddMember(IActiveDirectorySecurityPrincipal principal, TimeSpan ttl)
         {
             de.Properties["member"].Add($"<TTL={ttl.TotalSeconds},<SID={principal.Sid}>>");
             de.CommitChanges();
         }
 
-        public void AddMember(ISecurityPrincipal principal)
+        public void AddMember(IActiveDirectorySecurityPrincipal principal)
         {
             de.Properties["member"].Add($"<SID={principal.Sid}>");
             de.CommitChanges();
         }
 
-        public void RemoveMember(ISecurityPrincipal principal)
+        public void RemoveMember(IActiveDirectorySecurityPrincipal principal)
         {
             de.Properties["member"].Remove($"<SID={principal.Sid}>");
             de.CommitChanges();
@@ -121,7 +121,7 @@ namespace Lithnet.AccessManager
             });
         }
 
-        public TimeSpan? GetMemberTtl(IUser user)
+        public TimeSpan? GetMemberTtl(IActiveDirectoryUser user)
         {
             var ttlMembers = this.GetMemberTtlDNs();
 

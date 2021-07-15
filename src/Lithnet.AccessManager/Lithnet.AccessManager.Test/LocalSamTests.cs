@@ -25,7 +25,7 @@ namespace Lithnet.AccessManager.Test
 
         private GroupPrincipal testGroup;
 
-        private IDirectory directory;
+        private IActiveDirectory directory;
 
         private IDiscoveryServices discoveryServices;
 

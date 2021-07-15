@@ -12,7 +12,7 @@ namespace Lithnet.AccessManager.Server.Test
 {
     public class PowershellSecurityDescriptorGeneratorTests
     {
-        private IDirectory directory;
+        private IActiveDirectory directory;
 
         private IDiscoveryServices discoveryServices;
 
@@ -38,7 +38,7 @@ namespace Lithnet.AccessManager.Server.Test
         [Test]
         public void TestScriptGrantLapsJit()
         {
-            IUser user = directory.GetUser(WindowsIdentity.GetCurrent().User);
+            IActiveDirectoryUser user = directory.GetUser(WindowsIdentity.GetCurrent().User);
             IActiveDirectoryComputer computer = directory.GetComputer(C.DEV_PC1); 
             var sd = generator.GenerateSecurityDescriptor(user, computer, "AuthZTestGrantLapsJit.ps1", 30);
 
@@ -51,7 +51,7 @@ namespace Lithnet.AccessManager.Server.Test
         [Test]
         public void TestScriptDenyLapsJitGrantLapsHistory()
         {
-            IUser user = directory.GetUser(WindowsIdentity.GetCurrent().User);
+            IActiveDirectoryUser user = directory.GetUser(WindowsIdentity.GetCurrent().User);
             IActiveDirectoryComputer computer = directory.GetComputer(C.DEV_PC1);
             var sd = generator.GenerateSecurityDescriptor(user, computer, "AuthZTestDenyLapsJitGrantLapsHistory.ps1", 30);
 

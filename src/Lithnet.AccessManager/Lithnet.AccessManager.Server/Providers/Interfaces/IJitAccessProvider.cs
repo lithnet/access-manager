@@ -4,6 +4,6 @@ namespace Lithnet.AccessManager.Server
 {
     public interface IJitAccessProvider
     {
-        TimeSpan GrantJitAccess(IGroup group, IUser user, IComputer computer, bool canExtend, TimeSpan requestedExpiry, out Action undo);
+        TimeSpan GrantJitAccess(IActiveDirectoryGroup group, IActiveDirectoryUser user, IComputer computer, bool canExtend, TimeSpan requestedExpiry, out Action undo);
     }
 }

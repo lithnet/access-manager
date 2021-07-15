@@ -28,13 +28,13 @@ namespace Lithnet.AccessManager.Service.AppSettings
 
         private readonly CertificateAuthenticationProviderOptions options;
 
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
 
         private readonly ILogger<CertificateAuthenticationProvider> logger;
 
         private readonly IMemoryCache cache;
 
-        public CertificateAuthenticationProvider(IOptionsSnapshot<CertificateAuthenticationProviderOptions> options, ILogger<CertificateAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider)
+        public CertificateAuthenticationProvider(IOptionsSnapshot<CertificateAuthenticationProviderOptions> options, ILogger<CertificateAuthenticationProvider> logger, IActiveDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider)
             : base(httpContextAccessor, directory, authzContextProvider)
         {
             this.directory = directory;
@@ -202,7 +202,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
 
         private bool TryResolveIdentityUpnSan(CertificateValidatedContext context, ClaimsIdentity user, string upn)
         {
-            if (this.directory.TryGetUser(upn, out IUser u))
+            if (this.directory.TryGetUser(upn, out IActiveDirectoryUser u))
             {
                 this.logger.LogTrace("Found user {user} with upn {upn}", u.MsDsPrincipalName, upn);
                 user.AddClaim(new Claim(ClaimTypes.PrimarySid, u.Sid.ToString(), context.Options.ClaimsIssuer));
@@ -258,7 +258,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
             {
                 this.logger.LogTrace("Attempting to find user with altSecurityIdentity {altSecurityIdentity}", altSecurityIdentity);
 
-                if (this.directory.TryGetUserByAltSecurityIdentity(altSecurityIdentity, out IUser u))
+                if (this.directory.TryGetUserByAltSecurityIdentity(altSecurityIdentity, out IActiveDirectoryUser u))
                 {
                     this.logger.LogTrace("Found user {user} with altSecurityIdentity {altSecurityIdentity}", u.MsDsPrincipalName, altSecurityIdentity);
                     user.AddClaim(new Claim(ClaimTypes.PrimarySid, u.Sid.ToString(), context.Options.ClaimsIssuer));

@@ -12,13 +12,13 @@ namespace Lithnet.AccessManager.Server.Authorization
 {
     public class SecurityDescriptorAuthorizationService : IAuthorizationService
     {
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly ILogger logger;
         private readonly IJitAccessGroupResolver jitResolver;
         private readonly IAuthorizationInformationBuilder authzBuilder;
         private readonly IRateLimiter rateLimiter;
 
-        public SecurityDescriptorAuthorizationService(IDirectory directory, ILogger<SecurityDescriptorAuthorizationService> logger, IJitAccessGroupResolver jitResolver, IAuthorizationInformationBuilder authzBuilder, IRateLimiter rateLimiter)
+        public SecurityDescriptorAuthorizationService(IActiveDirectory directory, ILogger<SecurityDescriptorAuthorizationService> logger, IJitAccessGroupResolver jitResolver, IAuthorizationInformationBuilder authzBuilder, IRateLimiter rateLimiter)
         {
             this.directory = directory;
             this.logger = logger;
@@ -27,7 +27,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             this.rateLimiter = rateLimiter;
         }
 
-        public async Task<AuthorizationResponse> GetAuthorizationResponse(IUser user, IComputer computer, AccessMask requestedAccess, IPAddress ip)
+        public async Task<AuthorizationResponse> GetAuthorizationResponse(IActiveDirectoryUser user, IComputer computer, AccessMask requestedAccess, IPAddress ip)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             }
         }
 
-        public async Task<AuthorizationResponse> GetPreAuthorization(IUser user, IComputer computer)
+        public async Task<AuthorizationResponse> GetPreAuthorization(IActiveDirectoryUser user, IComputer computer)
         {
             var info = await this.authzBuilder.GetAuthorizationInformation(user, computer);
 
@@ -131,7 +131,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             return response;
         }
 
-        private AuthorizationResponse BuildAuthZResponseRateLimitExceeded(IUser user, IComputer computer, AccessMask requestedAccess, RateLimitResult result, IPAddress ip, SecurityDescriptorTarget matchedTarget)
+        private AuthorizationResponse BuildAuthZResponseRateLimitExceeded(IActiveDirectoryUser user, IComputer computer, AccessMask requestedAccess, RateLimitResult result, IPAddress ip, SecurityDescriptorTarget matchedTarget)
         {
             this.logger.LogError(result.IsUserRateLimit ? EventIDs.RateLimitExceededUser : EventIDs.RateLimitExceededIP , $"User {user.MsDsPrincipalName} on IP {ip} is denied {requestedAccess} access for computer {computer.FullyQualifiedName} because they have exceeded the {(result.IsUserRateLimit ? "user" : "IP")} rate limit of {result.Threshold}/{result.Duration.TotalSeconds} seconds");
 

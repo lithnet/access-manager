@@ -16,11 +16,11 @@ namespace Lithnet.AccessManager.Service.AppSettings
     {
         private readonly ILogger logger;
 
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
 
         protected abstract string ClaimName { get; }
 
-        protected IdpAuthenticationProvider(ILogger logger, IDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider)
+        protected IdpAuthenticationProvider(ILogger logger, IActiveDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider)
             : base(httpContextAccessor, directory, authzContextProvider)
         {
             this.logger = logger;
@@ -76,7 +76,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
             }
         }
 
-        private IUser FindUserByClaim(ClaimsIdentity p, string claimName)
+        private IActiveDirectoryUser FindUserByClaim(ClaimsIdentity p, string claimName)
         {
             Claim c = p.FindFirst(claimName);
 

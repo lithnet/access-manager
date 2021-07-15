@@ -19,7 +19,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
         private readonly OidcAuthenticationProviderOptions options;
         private readonly IProtectedSecretProvider secretProvider;
 
-        public OidcAuthenticationProvider(IOptions<OidcAuthenticationProviderOptions> options, ILogger<OidcAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider, IProtectedSecretProvider secretProvider)
+        public OidcAuthenticationProvider(IOptions<OidcAuthenticationProviderOptions> options, ILogger<OidcAuthenticationProvider> logger, IActiveDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider, IProtectedSecretProvider secretProvider)
             : base(logger, directory, httpContextAccessor, authzContextProvider)
         {
             this.secretProvider = secretProvider;

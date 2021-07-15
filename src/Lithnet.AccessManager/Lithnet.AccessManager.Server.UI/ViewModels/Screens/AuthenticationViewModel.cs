@@ -20,13 +20,13 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IViewModelFactory<X509Certificate2ViewModel, X509Certificate2> x509ViewModelFactory;
         private readonly ILogger logger;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly INotifyModelChangedEventPublisher eventPublisher;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly IProtectedSecretProvider secretProvider;
 
-        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IViewModelFactory<X509Certificate2ViewModel, X509Certificate2> x509ViewModelFactory, IDirectory directory, IShellExecuteProvider shellExecuteProvider, IObjectSelectionProvider objectSelectionProvider, IProtectedSecretProvider secretProvider)
+        public AuthenticationViewModel(AuthenticationOptions model, ILogger<AuthenticationViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, IDialogCoordinator dialogCoordinator, IViewModelFactory<X509Certificate2ViewModel, X509Certificate2> x509ViewModelFactory, IActiveDirectory directory, IShellExecuteProvider shellExecuteProvider, IObjectSelectionProvider objectSelectionProvider, IProtectedSecretProvider secretProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.model = model;

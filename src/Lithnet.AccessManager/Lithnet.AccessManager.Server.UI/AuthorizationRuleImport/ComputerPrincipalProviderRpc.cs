@@ -10,9 +10,9 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
     {
         private readonly ILocalSam localSam;
         private readonly ILogger<ComputerPrincipalProviderRpc> logger;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
 
-        public ComputerPrincipalProviderRpc(ILocalSam localSam, IDirectory directory, ILogger<ComputerPrincipalProviderRpc> logger)
+        public ComputerPrincipalProviderRpc(ILocalSam localSam, IActiveDirectory directory, ILogger<ComputerPrincipalProviderRpc> logger)
         {
             this.localSam = localSam;
             this.logger = logger;

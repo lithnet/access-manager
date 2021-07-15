@@ -17,7 +17,7 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly IAuthorizationInformationBuilder authorizationBuilder;
         private readonly IDialogCoordinator dialogCoordinator;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly SecurityDescriptorTargetsViewModel targets;
         private readonly ILogger logger;
         private readonly IEnumerable<IComputerTargetProvider> computerTargetProviders;
@@ -50,7 +50,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public ObservableCollection<MatchedSecurityDescriptorTargetViewModel> MatchedTargets { get; } = new ObservableCollection<MatchedSecurityDescriptorTargetViewModel>();
 
-        public EffectiveAccessViewModel(IAuthorizationInformationBuilder authorizationBuilder, IDialogCoordinator dialogCoordinator, IDirectory directory, SecurityDescriptorTargetsViewModel targets, ILogger<EffectiveAccessViewModel> logger, IEnumerable<IComputerTargetProvider> computerTargetProviders)
+        public EffectiveAccessViewModel(IAuthorizationInformationBuilder authorizationBuilder, IDialogCoordinator dialogCoordinator, IActiveDirectory directory, SecurityDescriptorTargetsViewModel targets, ILogger<EffectiveAccessViewModel> logger, IEnumerable<IComputerTargetProvider> computerTargetProviders)
         {
             this.authorizationBuilder = authorizationBuilder;
             this.dialogCoordinator = dialogCoordinator;
@@ -93,7 +93,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                 await Task.Run(async () =>
                 {
-                    if (!this.directory.TryGetUser(this.Username, out IUser user))
+                    if (!this.directory.TryGetUser(this.Username, out IActiveDirectoryUser user))
                     {
                         await this.dialogCoordinator.ShowMessageAsync(this, "Could not find user", "Could not find a matching user in the directory", MessageDialogStyle.Affirmative, settings);
                         return;

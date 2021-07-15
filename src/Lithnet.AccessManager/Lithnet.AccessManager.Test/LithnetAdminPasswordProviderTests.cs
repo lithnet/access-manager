@@ -10,7 +10,7 @@ namespace Lithnet.AccessManager.Test
 {
     public class LithnetAdminPasswordProviderTests
     {
-        private IDirectory directory;
+        private IActiveDirectory directory;
 
         private IDiscoveryServices discoveryServices;
 

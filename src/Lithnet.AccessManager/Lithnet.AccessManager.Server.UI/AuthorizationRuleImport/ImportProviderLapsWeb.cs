@@ -13,14 +13,14 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
     public class ImportProviderLapsWeb : IImportProvider
     {
         private readonly ILogger logger;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly ImportSettingsLapsWeb settings;
 
         public event EventHandler<ImportProcessingEventArgs> OnItemProcessStart;
 
         public event EventHandler<ImportProcessingEventArgs> OnItemProcessFinish;
 
-        public ImportProviderLapsWeb(ImportSettingsLapsWeb settings, ILogger<ImportProviderLapsWeb> logger, IDirectory directory)
+        public ImportProviderLapsWeb(ImportSettingsLapsWeb settings, ILogger<ImportProviderLapsWeb> logger, IActiveDirectory directory)
         {
             this.logger = logger;
             this.directory = directory;
@@ -164,7 +164,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
             {
                 target.Type = TargetType.AdGroup;
 
-                if (this.directory.TryGetGroup(name, out IGroup group))
+                if (this.directory.TryGetGroup(name, out IActiveDirectoryGroup group))
                 {
                     target.Target = group.Sid.ToString();
                     targetFriendlyName = group.MsDsPrincipalName;
@@ -220,7 +220,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 
             foreach (string reader in readers)
             {
-                if (directory.TryGetPrincipal(reader, out ISecurityPrincipal principal))
+                if (directory.TryGetPrincipal(reader, out IActiveDirectorySecurityPrincipal principal))
                 {
                     acl.AddAccess(AccessControlType.Allow, principal.Sid, (int)mask, InheritanceFlags.None, PropagationFlags.None);
                 }

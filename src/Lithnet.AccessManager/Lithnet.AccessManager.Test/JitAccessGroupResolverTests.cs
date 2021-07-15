@@ -10,7 +10,7 @@ namespace Lithnet.AccessManager.Test
     {
         private Mock<IAppPathProvider> env;
 
-        private IDirectory directory;
+        private IActiveDirectory directory;
 
         private IDiscoveryServices discoveryServices;
 
@@ -42,7 +42,7 @@ namespace Lithnet.AccessManager.Test
         public void GetGroupFromName(string computerName, string template, string expected)
         {
             IActiveDirectoryComputer computer = this.directory.GetComputer(computerName);
-            IGroup group = this.resolver.GetJitGroup(computer, template);
+            IActiveDirectoryGroup group = this.resolver.GetJitGroup(computer, template);
 
             Assert.AreEqual(expected, group.MsDsPrincipalName.ToUpper());
         }
@@ -50,10 +50,10 @@ namespace Lithnet.AccessManager.Test
         [TestCase(C.DEV_JIT_PC1)]
         public void GetGroupFromSid(string groupName)
         {
-            IGroup group = this.directory.GetGroup(groupName);
+            IActiveDirectoryGroup group = this.directory.GetGroup(groupName);
             IActiveDirectoryComputer computer = this.directory.GetComputer(C.DEV_PC1);
 
-            IGroup found = this.resolver.GetJitGroup(computer, group.Sid.ToString());
+            IActiveDirectoryGroup found = this.resolver.GetJitGroup(computer, group.Sid.ToString());
 
             Assert.AreEqual(group.Sid, found.Sid);
         }

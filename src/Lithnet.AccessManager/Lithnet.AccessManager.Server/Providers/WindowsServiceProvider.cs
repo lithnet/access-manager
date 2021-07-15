@@ -161,7 +161,7 @@ namespace Lithnet.AccessManager.Server
             return msaInfo.State == MsaInfoState.MsaInfoInstalled;
         }
 
-        public int LogonServiceAccount(ISecurityPrincipal o, string password)
+        public int LogonServiceAccount(IActiveDirectorySecurityPrincipal o, string password)
         {
             var domain = this.discoveryServices.GetDomainNameNetBios(o.Sid);
 

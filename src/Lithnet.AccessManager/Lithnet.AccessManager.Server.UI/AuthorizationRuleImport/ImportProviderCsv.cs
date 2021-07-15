@@ -6,11 +6,11 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
     public class ImportProviderCsv : ImportProviderComputerDiscovery
     {
         private readonly ILogger logger;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly IComputerPrincipalProviderCsv provider;
         private readonly ImportSettingsCsv settings;
 
-        public ImportProviderCsv(ImportSettingsCsv settings, ILogger<ImportProviderCsv> logger, IDirectory directory, IComputerPrincipalProviderCsv provider)
+        public ImportProviderCsv(ImportSettingsCsv settings, ILogger<ImportProviderCsv> logger, IActiveDirectory directory, IComputerPrincipalProviderCsv provider)
             : base(settings, logger, directory)
         {
             this.logger = logger;

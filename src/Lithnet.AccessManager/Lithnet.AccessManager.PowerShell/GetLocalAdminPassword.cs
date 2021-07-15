@@ -25,7 +25,7 @@ namespace Lithnet.AccessManager.PowerShell
         private ICertificateProvider certificateProvider;
         private IEncryptionProvider encryptionProvider;
         private ILithnetAdminPasswordProvider adminPasswordProvider;
-        private IDirectory directory;
+        private IActiveDirectory directory;
         private X509Certificate2 certificate;
 
         protected override void BeginProcessing()

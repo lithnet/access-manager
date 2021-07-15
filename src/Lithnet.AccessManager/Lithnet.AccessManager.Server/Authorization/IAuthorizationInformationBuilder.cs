@@ -6,10 +6,10 @@ namespace Lithnet.AccessManager.Server.Authorization
 {
     public interface IAuthorizationInformationBuilder
     {
-        void ClearCache(IUser user, IComputer computer);
+        void ClearCache(IActiveDirectoryUser user, IComputer computer);
 
-        Task<AuthorizationInformation> GetAuthorizationInformation(IUser user, IComputer computer);
+        Task<AuthorizationInformation> GetAuthorizationInformation(IActiveDirectoryUser user, IComputer computer);
 
-        Task<AuthorizationInformation> BuildAuthorizationInformation(IUser user, IComputer computer, IList<SecurityDescriptorTarget> matchedComputerTargets);
+        Task<AuthorizationInformation> BuildAuthorizationInformation(IActiveDirectoryUser user, IComputer computer, IList<SecurityDescriptorTarget> matchedComputerTargets);
     }
 }

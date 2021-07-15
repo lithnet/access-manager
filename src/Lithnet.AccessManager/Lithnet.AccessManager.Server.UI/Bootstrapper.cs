@@ -166,7 +166,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IRandomValueGenerator>().To<RandomValueGenerator>();
 
                 builder.Bind<IDialogCoordinator>().To<DialogCoordinator>();
-                builder.Bind<IDirectory>().To<ActiveDirectory>();
+                builder.Bind<IActiveDirectory>().To<ActiveDirectory>();
                 builder.Bind<ILocalSam>().To<LocalSam>();
                 builder.Bind<IComputerPrincipalProviderRpc>().To<ComputerPrincipalProviderRpc>();
                 builder.Bind<IComputerPrincipalProviderCsv>().To<ComputerPrincipalProviderCsv>();

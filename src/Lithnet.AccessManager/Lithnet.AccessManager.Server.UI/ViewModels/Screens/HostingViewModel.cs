@@ -24,7 +24,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ICertificateProvider certProvider;
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IEventAggregator eventAggregator;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
         private readonly ICertificatePermissionProvider certPermissionProvider;
         private readonly IRegistryProvider registryProvider;
@@ -36,7 +36,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IProtectedSecretProvider protectedSecretProvider;
         private readonly RandomNumberGenerator csp;
 
-        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, ISecretRekeyProvider rekeyProvider, IObjectSelectionProvider objectSelectionProvider, IHttpSysConfigurationProvider certificateBindingProvider, IFirewallProvider firewallProvider, TokenIssuerOptions tokenIssuerOptions, IProtectedSecretProvider protectedSecretProvider, RandomNumberGenerator csp)
+        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IActiveDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, ISecretRekeyProvider rekeyProvider, IObjectSelectionProvider objectSelectionProvider, IHttpSysConfigurationProvider certificateBindingProvider, IFirewallProvider firewallProvider, TokenIssuerOptions tokenIssuerOptions, IProtectedSecretProvider protectedSecretProvider, RandomNumberGenerator csp)
         {
             this.logger = logger;
             this.pathProvider = pathProvider;
@@ -501,7 +501,7 @@ namespace Lithnet.AccessManager.Server.UI
                     return;
                 }
 
-                if (!directory.TryGetPrincipal(sid, out ISecurityPrincipal o))
+                if (!directory.TryGetPrincipal(sid, out IActiveDirectorySecurityPrincipal o))
                 {
                     await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not find user in the directory");
                     return;
@@ -524,7 +524,7 @@ namespace Lithnet.AccessManager.Server.UI
                     }
                 }
 
-                if (o is IGroupManagedServiceAccount)
+                if (o is IActiveDirectoryGroupManagedServiceAccount)
                 {
                     if (!this.windowsServiceProvider.CanGmsaBeUsedOnThisMachine(o.SamAccountName))
                     {

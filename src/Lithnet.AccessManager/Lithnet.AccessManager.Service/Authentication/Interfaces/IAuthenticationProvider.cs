@@ -8,7 +8,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
 
         bool IdpLogout { get; }
 
-        IUser GetLoggedInUser();
+        IActiveDirectoryUser GetLoggedInUser();
 
         void Configure(IServiceCollection services);
     }

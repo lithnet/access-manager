@@ -13,10 +13,10 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly ILogger<EffectiveAccessViewModel> logger;
         private readonly IAuthorizationInformationBuilder authorizationBuilder;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly IEnumerable<IComputerTargetProvider> computerTargetProvider;
 
-        public EffectiveAccessViewModelFactory(IDialogCoordinator dialogCoordinator, ILogger<EffectiveAccessViewModel> logger, IAuthorizationInformationBuilder authorizationBuilder, IDirectory directory, IEnumerable<IComputerTargetProvider> computerTargetProvider)
+        public EffectiveAccessViewModelFactory(IDialogCoordinator dialogCoordinator, ILogger<EffectiveAccessViewModel> logger, IAuthorizationInformationBuilder authorizationBuilder, IActiveDirectory directory, IEnumerable<IComputerTargetProvider> computerTargetProvider)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.logger = logger;

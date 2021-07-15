@@ -13,7 +13,7 @@ namespace Lithnet.AccessManager.Server.Test
 {
     public class JitAccessGroupResolverTests
     {
-        private IDirectory directory;
+        private IActiveDirectory directory;
 
         private JitAccessGroupResolver resolver;
 
@@ -33,7 +33,7 @@ namespace Lithnet.AccessManager.Server.Test
         public void GetGroupByTemplate(string groupName, string computerName)
         {
             IActiveDirectoryComputer computer = directory.GetComputer(computerName);
-            IGroup group = resolver.GetJitGroup(computer, "%computerDomain%\\JIT-%computerName%");
+            IActiveDirectoryGroup group = resolver.GetJitGroup(computer, "%computerDomain%\\JIT-%computerName%");
             Assert.AreEqual(groupName, group.MsDsPrincipalName);
         }
 
@@ -43,7 +43,7 @@ namespace Lithnet.AccessManager.Server.Test
         public void GetGroupByName(string groupName, string computerName)
         {
             IActiveDirectoryComputer computer = directory.GetComputer(computerName);
-            IGroup group = resolver.GetJitGroup(computer, groupName);
+            IActiveDirectoryGroup group = resolver.GetJitGroup(computer, groupName);
 
             Assert.AreEqual(groupName, group.MsDsPrincipalName);
         }
@@ -54,8 +54,8 @@ namespace Lithnet.AccessManager.Server.Test
         public void GetGroupBySid(string groupName, string computerName)
         {
             IActiveDirectoryComputer computer = directory.GetComputer(computerName);
-            IGroup sourceGroup = directory.GetGroup(groupName);
-            IGroup group = resolver.GetJitGroup(computer, sourceGroup.Sid.ToString());
+            IActiveDirectoryGroup sourceGroup = directory.GetGroup(groupName);
+            IActiveDirectoryGroup group = resolver.GetJitGroup(computer, sourceGroup.Sid.ToString());
             
             Assert.AreEqual(groupName, group.MsDsPrincipalName);
         }

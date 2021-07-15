@@ -10,11 +10,11 @@ namespace Lithnet.AccessManager.Server.Authorization
 {
     public class ActiveDirectoryComputerTargetProvider : IComputerTargetProvider
     {
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly ITargetDataProvider targetDataProvider;
         private readonly ILogger logger;
 
-        public ActiveDirectoryComputerTargetProvider(IDirectory directory, ITargetDataProvider targetDataProvider, ILogger<ActiveDirectoryComputerTargetProvider> logger)
+        public ActiveDirectoryComputerTargetProvider(IActiveDirectory directory, ITargetDataProvider targetDataProvider, ILogger<ActiveDirectoryComputerTargetProvider> logger)
         {
             this.logger = logger;
             this.targetDataProvider = targetDataProvider;

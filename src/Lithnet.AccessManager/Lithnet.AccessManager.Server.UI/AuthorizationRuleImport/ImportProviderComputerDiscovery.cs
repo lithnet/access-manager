@@ -14,9 +14,9 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
     public abstract class ImportProviderComputerDiscovery : IImportProvider
     {
         private readonly ILogger logger;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
 
-        private ConcurrentDictionary<SecurityIdentifier, ISecurityPrincipal> principalCache;
+        private ConcurrentDictionary<SecurityIdentifier, IActiveDirectorySecurityPrincipal> principalCache;
 
         public event EventHandler<ImportProcessingEventArgs> OnItemProcessStart;
 
@@ -24,7 +24,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 
         private readonly ImportSettingsComputerDiscovery settings;
 
-        protected ImportProviderComputerDiscovery(ImportSettingsComputerDiscovery settings, ILogger<ImportProviderComputerDiscovery> logger, IDirectory directory)
+        protected ImportProviderComputerDiscovery(ImportSettingsComputerDiscovery settings, ILogger<ImportProviderComputerDiscovery> logger, IActiveDirectory directory)
         {
             this.logger = logger;
             this.directory = directory;
@@ -279,7 +279,7 @@ string.Join(", ", computer.PrincipalsUniqueToThisLevel)
                 DiscoveryErrors = new List<DiscoveryError>(),
             };
 
-            principalCache = new ConcurrentDictionary<SecurityIdentifier, ISecurityPrincipal>();
+            principalCache = new ConcurrentDictionary<SecurityIdentifier, IActiveDirectorySecurityPrincipal>();
 
             this.PerformComputerDiscovery(ou, provider, results.DiscoveryErrors);
 
@@ -470,9 +470,9 @@ string.Join(", ", computer.PrincipalsUniqueToThisLevel)
                 }
             }
 
-            ISecurityPrincipal principal = principalCache.GetOrAdd(sid, (value) =>
+            IActiveDirectorySecurityPrincipal principal = principalCache.GetOrAdd(sid, (value) =>
             {
-                if (this.directory.TryGetPrincipal(sid, out ISecurityPrincipal p))
+                if (this.directory.TryGetPrincipal(sid, out IActiveDirectorySecurityPrincipal p))
                 {
                     return p;
                 }
@@ -494,7 +494,7 @@ string.Join(", ", computer.PrincipalsUniqueToThisLevel)
                 return true;
             }
 
-            if (!(principal is IUser || principal is IGroup))
+            if (!(principal is IActiveDirectoryUser || principal is IActiveDirectoryGroup))
             {
                 filteredReason = new DiscoveryError() { Message = "The principal was not a user or group", Principal = principal.MsDsPrincipalName, Type = DiscoveryErrorType.Error };
                 return true;

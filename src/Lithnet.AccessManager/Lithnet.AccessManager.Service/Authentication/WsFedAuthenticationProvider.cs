@@ -14,7 +14,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
     {
         private readonly WsFedAuthenticationProviderOptions options;
 
-        public WsFedAuthenticationProvider(IOptions<WsFedAuthenticationProviderOptions> options, ILogger<WsFedAuthenticationProvider> logger, IDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider)
+        public WsFedAuthenticationProvider(IOptions<WsFedAuthenticationProviderOptions> options, ILogger<WsFedAuthenticationProvider> logger, IActiveDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider)
             : base(logger, directory, httpContextAccessor, authzContextProvider)
         {
             this.options = options.Value;

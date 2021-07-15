@@ -15,7 +15,7 @@ using Lithnet.Security.Authorization;
 
 namespace Lithnet.AccessManager
 {
-    public sealed class ActiveDirectory : IDirectory
+    public sealed class ActiveDirectory : IActiveDirectory
     {
         private static readonly Guid PamFeatureGuid = new Guid("ec43e873-cce8-4640-b4ab-07ffe4ab5bcd");
 
@@ -44,17 +44,17 @@ namespace Lithnet.AccessManager
             this.discoveryServices = discoveryServices;
         }
 
-        public bool TryGetUser(string name, out IUser user)
+        public bool TryGetUser(string name, out IActiveDirectoryUser user)
         {
             return DirectoryExtensions.TryGet(() => this.GetUser(name), out user);
         }
 
-        public IUser GetUser(string name)
+        public IActiveDirectoryUser GetUser(string name)
         {
             return new ActiveDirectoryUser(this.FindUserInGc(name));
         }
 
-        public bool TryGetUserByAltSecurityIdentity(string altSecurityIdentityValue, out IUser user)
+        public bool TryGetUserByAltSecurityIdentity(string altSecurityIdentityValue, out IActiveDirectoryUser user)
         {
             user = null;
             string dn = this.GcGetDnFromAttributeSearch("altSecurityIdentities", altSecurityIdentityValue, "user");
@@ -69,7 +69,7 @@ namespace Lithnet.AccessManager
             return true;
         }
 
-        public IUser GetUser(SecurityIdentifier sid)
+        public IActiveDirectoryUser GetUser(SecurityIdentifier sid)
         {
             return new ActiveDirectoryUser(this.FindUserInGc(sid.ToString()));
         }
@@ -95,7 +95,7 @@ namespace Lithnet.AccessManager
         }
 
 
-        public ISecurityPrincipal GetPrincipal(SecurityIdentifier sid)
+        public IActiveDirectorySecurityPrincipal GetPrincipal(SecurityIdentifier sid)
         {
             var result = GetDirectoryEntry(sid);
 
@@ -122,7 +122,7 @@ namespace Lithnet.AccessManager
             throw new UnsupportedPrincipalTypeException($"The object '{sid}' was of an unknown type: {result.GetPropertyCommaSeparatedString("objectClass")}");
         }
 
-        public ISecurityPrincipal GetPrincipal(string name)
+        public IActiveDirectorySecurityPrincipal GetPrincipal(string name)
         {
             var result = this.FindInGc(name, "*");
 
@@ -149,11 +149,11 @@ namespace Lithnet.AccessManager
             throw new UnsupportedPrincipalTypeException($"The object '{name}' was of an unknown type: {result.GetPropertyCommaSeparatedString("objectClass")}");
         }
 
-        public bool TryGetPrincipal(string name, out ISecurityPrincipal principal)
+        public bool TryGetPrincipal(string name, out IActiveDirectorySecurityPrincipal principal)
         {
             return DirectoryExtensions.TryGet(() => this.GetPrincipal(name), out principal);
         }
-        public bool TryGetPrincipal(SecurityIdentifier sid, out ISecurityPrincipal principal)
+        public bool TryGetPrincipal(SecurityIdentifier sid, out IActiveDirectorySecurityPrincipal principal)
         {
             return DirectoryExtensions.TryGet(() => this.GetPrincipal(sid), out principal);
         }
@@ -173,7 +173,7 @@ namespace Lithnet.AccessManager
             }
         }
 
-        public bool IsObjectInOu(IDirectoryObject o, string ou)
+        public bool IsObjectInOu(IActiveDirectoryObject o, string ou)
         {
             DirectorySearcher d = new DirectorySearcher
             {
@@ -186,22 +186,22 @@ namespace Lithnet.AccessManager
             return d.FindOne() != null;
         }
 
-        public IGroup GetGroup(string groupName)
+        public IActiveDirectoryGroup GetGroup(string groupName)
         {
             return new ActiveDirectoryGroup(this.FindGroupInGc(groupName), this.discoveryServices);
         }
 
-        public bool TryGetGroup(string name, out IGroup group)
+        public bool TryGetGroup(string name, out IActiveDirectoryGroup group)
         {
             return DirectoryExtensions.TryGet(() => this.GetGroup(name), out group);
         }
 
-        public IGroup GetGroup(SecurityIdentifier sid)
+        public IActiveDirectoryGroup GetGroup(SecurityIdentifier sid)
         {
             return new ActiveDirectoryGroup(this.FindGroupInGc(sid.ToString()), this.discoveryServices);
         }
 
-        public bool TryGetGroup(SecurityIdentifier sid, out IGroup group)
+        public bool TryGetGroup(SecurityIdentifier sid, out IActiveDirectoryGroup group)
         {
             return DirectoryExtensions.TryGet(() => this.GetGroup(sid), out group);
         }
@@ -243,12 +243,12 @@ namespace Lithnet.AccessManager
             result.DeleteTree();
         }
 
-        public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, ISecurityPrincipal principal)
+        public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, IActiveDirectorySecurityPrincipal principal)
         {
             return this.IsSidInPrincipalToken(sidToFindInToken, principal, principal.Sid.AccountDomainSid);
         }
 
-        public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, ISecurityPrincipal principal, SecurityIdentifier targetDomainSid)
+        public bool IsSidInPrincipalToken(SecurityIdentifier sidToFindInToken, IActiveDirectorySecurityPrincipal principal, SecurityIdentifier targetDomainSid)
         {
             return CheckForSidInToken(principal.Sid, sidToFindInToken, targetDomainSid);
         }
@@ -263,12 +263,12 @@ namespace Lithnet.AccessManager
             return CheckForSidInToken(principal, sidToFindInToken, targetDomainSid);
         }
 
-        public IEnumerable<SecurityIdentifier> GetTokenGroups(ISecurityPrincipal principal)
+        public IEnumerable<SecurityIdentifier> GetTokenGroups(IActiveDirectorySecurityPrincipal principal)
         {
             return this.GetTokenGroups(principal, null);
         }
 
-        public IEnumerable<SecurityIdentifier> GetTokenGroups(ISecurityPrincipal principal, SecurityIdentifier targetDomainSid)
+        public IEnumerable<SecurityIdentifier> GetTokenGroups(IActiveDirectorySecurityPrincipal principal, SecurityIdentifier targetDomainSid)
         {
             return GetTokenGroups(principal.Sid, targetDomainSid);
         }
@@ -288,7 +288,7 @@ namespace Lithnet.AccessManager
             return this.discoveryServices.FindDcAndExecuteWithRetry(dnsDomainName, dc => NativeMethods.CrackNames(nameFormat, requiredFormat, name, dc, dnsDomainName).Name);
         }
 
-        public IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, string targetDc, TimeSpan ttl, GroupType groupType, bool removeAccountOperators)
+        public IActiveDirectoryGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, string targetDc, TimeSpan ttl, GroupType groupType, bool removeAccountOperators)
         {
             DirectoryEntry container = new DirectoryEntry($"LDAP://{targetDc}/{ou}");
             dynamic[] objectClasses = new dynamic[] { "dynamicObject", "group" };

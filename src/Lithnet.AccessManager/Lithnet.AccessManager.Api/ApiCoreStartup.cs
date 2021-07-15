@@ -55,7 +55,7 @@ namespace Lithnet.AccessManager.Api
             services.AddSingleton<IDbProvider, SqlDbProvider>();
             services.AddSingleton<SqlLocalDbInstanceProvider>();
             services.AddSingleton<SqlServerInstanceProvider>();
-            services.AddSingleton<IDirectory, ActiveDirectory>();
+            services.AddSingleton<IActiveDirectory, ActiveDirectory>();
             services.AddSingleton<ICertificateProvider, CertificateProvider>();
             services.AddSingleton<IClusterProvider, ClusterProvider>();
             services.AddSingleton<IDiscoveryServices, DiscoveryServices>();

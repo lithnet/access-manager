@@ -18,14 +18,14 @@ namespace Lithnet.AccessManager.Api.Controllers
     public class AuthIwaController : Controller
     {
         private readonly ISecurityTokenGenerator tokenGenerator;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly IDeviceProvider devices;
         private readonly IDiscoveryServices discoveryServices;
         private readonly ILogger<AuthIwaController> logger;
         private readonly IOptions<ApiAuthenticationOptions> agentOptions;
         private readonly IApiErrorResponseProvider errorProvider;
 
-        public AuthIwaController(ISecurityTokenGenerator tokenGenerator, IDirectory directory, IDeviceProvider devices, IDiscoveryServices discoveryServices, ILogger<AuthIwaController> logger, IOptions<ApiAuthenticationOptions> agentOptions, IApiErrorResponseProvider errorProvider)
+        public AuthIwaController(ISecurityTokenGenerator tokenGenerator, IActiveDirectory directory, IDeviceProvider devices, IDiscoveryServices discoveryServices, ILogger<AuthIwaController> logger, IOptions<ApiAuthenticationOptions> agentOptions, IApiErrorResponseProvider errorProvider)
         {
             this.tokenGenerator = tokenGenerator;
             this.directory = directory;

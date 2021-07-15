@@ -110,8 +110,8 @@ namespace Lithnet.AccessManager.Test
         [TestCase(C.SUBDEV_User3, C.DEV_G_DL_3), TestCase(C.SUBDEV_User3, C.DEV_G_UG_3)]
         public void IsSidInToken(string targetToFind, string targetTokensToCheck)
         {
-            ISecurityPrincipal userPrincipal = this.directory.GetPrincipal(targetToFind);
-            ISecurityPrincipal userOrGroupPrincipal = this.directory.GetPrincipal(targetTokensToCheck);
+            IActiveDirectorySecurityPrincipal userPrincipal = this.directory.GetPrincipal(targetToFind);
+            IActiveDirectorySecurityPrincipal userOrGroupPrincipal = this.directory.GetPrincipal(targetTokensToCheck);
 
             Assert.IsTrue(this.directory.IsSidInPrincipalToken(userOrGroupPrincipal.Sid, userPrincipal, userOrGroupPrincipal.Sid.AccountDomainSid));
         }
@@ -122,8 +122,8 @@ namespace Lithnet.AccessManager.Test
         [TestCase(C.DEV_User1, C.SUBDEV_User1)]
         public void IsSidNotInToken(string targetToFind, string targetTokensToCheck)
         {
-            ISecurityPrincipal userPrincipal = this.directory.GetPrincipal(targetToFind);
-            ISecurityPrincipal userOrGroupPrincipal = this.directory.GetPrincipal(targetTokensToCheck);
+            IActiveDirectorySecurityPrincipal userPrincipal = this.directory.GetPrincipal(targetToFind);
+            IActiveDirectorySecurityPrincipal userOrGroupPrincipal = this.directory.GetPrincipal(targetTokensToCheck);
 
             Assert.IsFalse(this.directory.IsSidInPrincipalToken(userOrGroupPrincipal.Sid, userPrincipal, userOrGroupPrincipal.Sid.AccountDomainSid));
         }
@@ -258,8 +258,8 @@ namespace Lithnet.AccessManager.Test
         [TestCase(C.EXTDEV_JIT_PC1, C.EXTDEV_User1)]
         public void TestTimeBasedMembershipIntraForest(string groupName, string memberName)
         {
-            IGroup group = this.directory.GetGroup(groupName);
-            ISecurityPrincipal p = this.directory.GetUser(memberName);
+            IActiveDirectoryGroup group = this.directory.GetGroup(groupName);
+            IActiveDirectorySecurityPrincipal p = this.directory.GetUser(memberName);
 
             group.AddMember(p, TimeSpan.FromSeconds(10));
 
@@ -276,8 +276,8 @@ namespace Lithnet.AccessManager.Test
         [TestCase(C.EXTDEV_JIT_PC1, C.SUBDEV_User1)]
         public void TestTimeBasedMembershipCrossForest(string groupName, string memberName)
         {
-            IGroup group = this.directory.GetGroup(groupName);
-            ISecurityPrincipal p = this.directory.GetUser(memberName);
+            IActiveDirectoryGroup group = this.directory.GetGroup(groupName);
+            IActiveDirectorySecurityPrincipal p = this.directory.GetUser(memberName);
 
             group.AddMember(p, TimeSpan.FromSeconds(10));
 
@@ -290,7 +290,7 @@ namespace Lithnet.AccessManager.Test
             Assert.IsFalse(IsSidDnInGroup(group, p), "The user was still in the group");
         }
 
-        private bool IsSidDnInGroup(IGroup group, ISecurityPrincipal p)
+        private bool IsSidDnInGroup(IActiveDirectoryGroup group, IActiveDirectorySecurityPrincipal p)
         {
             foreach (string dn in group.GetMemberDNs())
             {
@@ -317,8 +317,8 @@ namespace Lithnet.AccessManager.Test
             this.directory.CreateTtlGroup(groupName, groupName, "TTL test group 2", C.AmsTesting_DevDN, dc, TimeSpan.FromMinutes(1), GroupType.DomainLocal, true);
 
             Thread.Sleep(20000);
-            IGroup group = this.directory.GetGroup($"{C.Dev}\\{groupName}");
-            ISecurityPrincipal user = this.directory.GetUser(C.DEV_User1);
+            IActiveDirectoryGroup group = this.directory.GetGroup($"{C.Dev}\\{groupName}");
+            IActiveDirectorySecurityPrincipal user = this.directory.GetUser(C.DEV_User1);
 
             group.AddMember(user);
 
@@ -329,8 +329,8 @@ namespace Lithnet.AccessManager.Test
 
         public void TryGetGroup()
         {
-            IGroup group = this.directory.GetGroup(C.DEV_G_GG_1);
-            Assert.IsTrue(this.directory.TryGetGroup(group.Sid, out IGroup group2));
+            IActiveDirectoryGroup group = this.directory.GetGroup(C.DEV_G_GG_1);
+            Assert.IsTrue(this.directory.TryGetGroup(group.Sid, out IActiveDirectoryGroup group2));
             Assert.AreEqual(group.Sid, group2.Sid);
         }
 

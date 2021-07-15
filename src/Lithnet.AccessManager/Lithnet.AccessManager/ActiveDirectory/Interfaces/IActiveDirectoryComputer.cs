@@ -4,7 +4,7 @@ using System.DirectoryServices;
 
 namespace Lithnet.AccessManager
 {
-    public interface IActiveDirectoryComputer : ISecurityPrincipal, IComputer
+    public interface IActiveDirectoryComputer : IActiveDirectorySecurityPrincipal, IComputer
     {
         DirectoryEntry DirectoryEntry { get; }
 

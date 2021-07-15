@@ -8,7 +8,7 @@ namespace Lithnet.AccessManager.Server.Authorization
 {
     public class AuthorizationInformation
     {
-        public IUser User { get; set; }
+        public IActiveDirectoryUser User { get; set; }
 
         public IComputer Computer { get; set; }
 

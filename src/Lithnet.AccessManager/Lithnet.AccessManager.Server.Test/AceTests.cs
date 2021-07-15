@@ -11,7 +11,7 @@ namespace Lithnet.AccessManager.Server.Test
 {
     public class AceTests
     {
-        private IDirectory directory;
+        private IActiveDirectory directory;
 
         private IDiscoveryServices discoveryServices;
 

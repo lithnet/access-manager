@@ -10,7 +10,7 @@ namespace Lithnet.AccessManager.Server.Test
 {
     public class AuthorizationContextDomainDetailsTests
     {
-        private IDirectory directory;
+        private IActiveDirectory directory;
 
         private IDiscoveryServices discoveryServices;
 
@@ -24,7 +24,7 @@ namespace Lithnet.AccessManager.Server.Test
         [Test]
         public void TestGetServerOrder()
         {
-            IUser user = directory.GetUser(C.DEV_User1);
+            IActiveDirectoryUser user = directory.GetUser(C.DEV_User1);
             string dnsDomain = this.discoveryServices.GetDomainNameDns(user.Sid);
 
             AuthorizationContextDomainDetails d = new AuthorizationContextDomainDetails(user.Sid.AccountDomainSid, dnsDomain, discoveryServices);
@@ -57,7 +57,7 @@ namespace Lithnet.AccessManager.Server.Test
         [Test]
         public void TestExternalDomainDetails()
         {
-            IUser user = directory.GetUser(C.EXTDEV_User1);
+            IActiveDirectoryUser user = directory.GetUser(C.EXTDEV_User1);
             string dnsDomain = this.discoveryServices.GetDomainNameDns(user.Sid);
 
             AuthorizationContextDomainDetails d = new AuthorizationContextDomainDetails(user.Sid.AccountDomainSid, dnsDomain, discoveryServices);
@@ -68,7 +68,7 @@ namespace Lithnet.AccessManager.Server.Test
         [Test]
         public void TestThisDomainDetails()
         {
-            IUser user = directory.GetUser(C.DEV_User1);
+            IActiveDirectoryUser user = directory.GetUser(C.DEV_User1);
             string dnsDomain = this.discoveryServices.GetDomainNameDns(user.Sid);
 
             AuthorizationContextDomainDetails d = new AuthorizationContextDomainDetails(user.Sid.AccountDomainSid, dnsDomain, discoveryServices);
@@ -79,7 +79,7 @@ namespace Lithnet.AccessManager.Server.Test
         [Test]
         public void TestChildDomainDetails()
         {
-            IUser user = directory.GetUser(C.SUBDEV_User1);
+            IActiveDirectoryUser user = directory.GetUser(C.SUBDEV_User1);
             string dnsDomain = this.discoveryServices.GetDomainNameDns(user.Sid);
 
             AuthorizationContextDomainDetails d = new AuthorizationContextDomainDetails(user.Sid.AccountDomainSid, dnsDomain, discoveryServices);
@@ -90,7 +90,7 @@ namespace Lithnet.AccessManager.Server.Test
         [Test]
         public void TestGetDC()
         {
-            IUser user = directory.GetUser(C.DEV_User1);
+            IActiveDirectoryUser user = directory.GetUser(C.DEV_User1);
             string dnsDomain = this.discoveryServices.GetDomainNameDns(user.Sid);
             string dc = this.discoveryServices.GetDomainController(dnsDomain);
 

@@ -29,7 +29,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IEnumerable<IComputerTargetProvider> computerTargetProviders;
         private readonly SecurityDescriptorTargetViewModelComparer customComparer;
         private readonly IDialogCoordinator dialogCoordinator;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly IAsyncViewModelFactory<SecurityDescriptorTargetViewModel, SecurityDescriptorTarget, SecurityDescriptorTargetViewModelDisplaySettings> factory;
         private readonly ILogger<SecurityDescriptorTargetsViewModel> logger;
         private readonly IViewModelFactory<EffectiveAccessViewModel, SecurityDescriptorTargetsViewModel> effectiveAccessFactory;
@@ -44,7 +44,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public Task Initialization { get; private set; }
 
-        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, IAsyncViewModelFactory<SecurityDescriptorTargetViewModel, SecurityDescriptorTarget, SecurityDescriptorTargetViewModelDisplaySettings> factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IDirectory directory, IEnumerable<IComputerTargetProvider> computerTargetProviders, IViewModelFactory<EffectiveAccessViewModel, SecurityDescriptorTargetsViewModel> effectiveAccessFactory, IShellExecuteProvider shellExecuteProvider)
+        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, IAsyncViewModelFactory<SecurityDescriptorTargetViewModel, SecurityDescriptorTarget, SecurityDescriptorTargetViewModelDisplaySettings> factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IActiveDirectory directory, IEnumerable<IComputerTargetProvider> computerTargetProviders, IViewModelFactory<EffectiveAccessViewModel, SecurityDescriptorTargetsViewModel> effectiveAccessFactory, IShellExecuteProvider shellExecuteProvider)
         {
             this.factory = factory;
             this.Model = model;

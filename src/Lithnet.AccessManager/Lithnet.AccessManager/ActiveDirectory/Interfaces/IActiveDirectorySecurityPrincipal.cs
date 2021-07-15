@@ -2,7 +2,7 @@
 
 namespace Lithnet.AccessManager
 {
-    public interface ISecurityPrincipal : IDirectoryObject
+    public interface IActiveDirectorySecurityPrincipal : IActiveDirectoryObject
     {
         string SamAccountName { get; }
 

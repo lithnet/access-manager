@@ -17,7 +17,7 @@ namespace Lithnet.AccessManager.Server.Test
 {
     public class AuthorizationInformationBuilderTests
     {
-        private IDirectory directory;
+        private IActiveDirectory directory;
         private AuthorizationInformationMemoryCache cache;
         private AuthorizationInformationBuilder builder;
         private ILogger<AuthorizationInformationBuilder> logger;
@@ -60,7 +60,7 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.DEV_User1, C.DEV_PC1, AccessMask.LocalAdminPassword | AccessMask.LocalAdminPasswordHistory | AccessMask.Jit, AccessMask.LocalAdminPasswordHistory, AccessMask.LocalAdminPassword | AccessMask.Jit)]
         public void TestAclAuthorizationOnComputerTarget(string username, string computerName, AccessMask allowed, AccessMask denied, AccessMask expected)
         {
-            IUser user = directory.GetUser(username);
+            IActiveDirectoryUser user = directory.GetUser(username);
             IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             var options = SetupOptionsForComputerTarget(allowed, denied, computer, user);
@@ -76,7 +76,7 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.DEV_User1, C.DEV_PC1, C.DevDN, AccessMask.LocalAdminPassword, AccessMask.None, AccessMask.LocalAdminPassword)]
         public void TestAclAuthorizationOnOUTarget(string username, string computerName, string targetOU, AccessMask allowed, AccessMask denied, AccessMask expected)
         {
-            IUser user = directory.GetUser(username);
+            IActiveDirectoryUser user = directory.GetUser(username);
             IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             var options = SetupOptionsForOUTarget(allowed, denied, targetOU, user);
@@ -93,12 +93,12 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.ExtDev)]
         public void GetMatchingTargetsForComputer(string targetDomain)
         {
-            ISecurityPrincipal trustee = directory.GetPrincipal($"{targetDomain}\\user1");
+            IActiveDirectorySecurityPrincipal trustee = directory.GetPrincipal($"{targetDomain}\\user1");
 
             IActiveDirectoryComputer computer1 = directory.GetComputer($"{targetDomain}\\PC1");
             IActiveDirectoryComputer computer2 = directory.GetComputer($"{targetDomain}\\PC2");
-            IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
-            IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
+            IActiveDirectoryGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
+            IActiveDirectoryGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
 
             var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
@@ -121,7 +121,7 @@ namespace Lithnet.AccessManager.Server.Test
         [Test]
         public void ValidateTargetSortOrder()
         {
-            ISecurityPrincipal trustee = directory.GetPrincipal(C.DEV_User1);
+            IActiveDirectorySecurityPrincipal trustee = directory.GetPrincipal(C.DEV_User1);
             IActiveDirectoryComputer computer1 = directory.GetComputer(C.DEV_PC1);
 
             var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, C.AmsTesting_DevDN, trustee);
@@ -146,13 +146,13 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.EXTDEV_G_UG_1, C.EXTDEV_User1, C.ExtDev)]
         public void AllowTrusteeOnComputerTarget(string trusteeName, string requestorName, string targetDomain)
         {
-            ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
-            IUser requestor = directory.GetUser(requestorName);
+            IActiveDirectorySecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
+            IActiveDirectoryUser requestor = directory.GetUser(requestorName);
 
             IActiveDirectoryComputer computer1 = directory.GetComputer($"{targetDomain}\\PC1");
             IActiveDirectoryComputer computer2 = directory.GetComputer($"{targetDomain}\\PC2");
-            IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
-            IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
+            IActiveDirectoryGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
+            IActiveDirectoryGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
 
             var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
@@ -185,13 +185,13 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.EXTDEV_G_UG_1, C.EXTDEV_User1, C.ExtDev)]
         public void AllowTrusteeOnGroupTarget(string trusteeName, string requestorName, string targetDomain)
         {
-            ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
-            IUser requestor = directory.GetUser(requestorName);
+            IActiveDirectorySecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
+            IActiveDirectoryUser requestor = directory.GetUser(requestorName);
 
             IActiveDirectoryComputer computer1 = directory.GetComputer($"{targetDomain}\\PC1");
             IActiveDirectoryComputer computer2 = directory.GetComputer($"{targetDomain}\\PC2");
-            IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
-            IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
+            IActiveDirectoryGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
+            IActiveDirectoryGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
 
             var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
@@ -224,13 +224,13 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.EXTDEV_G_UG_1, C.EXTDEV_User1, C.ExtDev)]
         public void AllowTrusteeOnOUTarget(string trusteeName, string requestorName, string targetDomain)
         {
-            ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
-            IUser requestor = directory.GetUser(requestorName);
+            IActiveDirectorySecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
+            IActiveDirectoryUser requestor = directory.GetUser(requestorName);
 
             IActiveDirectoryComputer computer1 = directory.GetComputer($"{targetDomain}\\PC1");
             IActiveDirectoryComputer computer2 = directory.GetComputer($"{targetDomain}\\PC2");
-            IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
-            IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
+            IActiveDirectoryGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
+            IActiveDirectoryGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
 
             var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
@@ -263,13 +263,13 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.EXTDEV_G_UG_1, C.EXTDEV_User1, C.ExtDev)]
         public void DenyTrusteeOnComputerTarget(string trusteeName, string requestorName, string targetDomain)
         {
-            ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
-            IUser requestor = directory.GetUser(requestorName);
+            IActiveDirectorySecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
+            IActiveDirectoryUser requestor = directory.GetUser(requestorName);
 
             IActiveDirectoryComputer computer1 = directory.GetComputer($"{targetDomain}\\PC1");
             IActiveDirectoryComputer computer2 = directory.GetComputer($"{targetDomain}\\PC2");
-            IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
-            IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
+            IActiveDirectoryGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
+            IActiveDirectoryGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
 
             var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
@@ -300,13 +300,13 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.EXTDEV_G_UG_1, C.EXTDEV_User1, C.ExtDev)]
         public void DenyTrusteeOnOUTarget(string trusteeName, string requestorName, string targetDomain)
         {
-            ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
-            IUser requestor = directory.GetUser(requestorName);
+            IActiveDirectorySecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
+            IActiveDirectoryUser requestor = directory.GetUser(requestorName);
 
             IActiveDirectoryComputer computer1 = directory.GetComputer($"{targetDomain}\\PC1");
             IActiveDirectoryComputer computer2 = directory.GetComputer($"{targetDomain}\\PC2");
-            IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
-            IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
+            IActiveDirectoryGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
+            IActiveDirectoryGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
 
             var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
@@ -337,13 +337,13 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.EXTDEV_G_UG_1, C.EXTDEV_User1, C.ExtDev)]
         public void DenyTrusteeOnGroupTarget(string trusteeName, string requestorName, string targetDomain)
         {
-            ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
-            IUser requestor = directory.GetUser(requestorName);
+            IActiveDirectorySecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
+            IActiveDirectoryUser requestor = directory.GetUser(requestorName);
 
             IActiveDirectoryComputer computer1 = directory.GetComputer($"{targetDomain}\\PC1");
             IActiveDirectoryComputer computer2 = directory.GetComputer($"{targetDomain}\\PC2");
-            IGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
-            IGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
+            IActiveDirectoryGroup group1 = directory.GetGroup($"{targetDomain}\\G-DL-PC1");
+            IActiveDirectoryGroup group2 = directory.GetGroup($"{targetDomain}\\G-DL-PC2");
 
             var namingContext = directory.TranslateName(targetDomain + "\\", DsNameFormat.Nt4Name, DsNameFormat.DistinguishedName);
 
@@ -374,8 +374,8 @@ namespace Lithnet.AccessManager.Server.Test
         [TestCase(C.EXTDEV_User1, C.EXTDEV_User1, C.EXTDEV_PC1)]
         public void UserCanAccessComputer(string requestorName, string trusteeName, string computerName)
         {
-            IUser requestor = directory.GetUser(requestorName);
-            ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
+            IActiveDirectoryUser requestor = directory.GetUser(requestorName);
+            IActiveDirectorySecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
             IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer, trustee);
@@ -434,8 +434,8 @@ namespace Lithnet.AccessManager.Server.Test
 
         public void GroupCanAccessComputer(string requestorName, string trusteeName, string computerName)
         {
-            IUser requestor = directory.GetUser(requestorName);
-            ISecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
+            IActiveDirectoryUser requestor = directory.GetUser(requestorName);
+            IActiveDirectorySecurityPrincipal trustee = directory.GetPrincipal(trusteeName);
             IActiveDirectoryComputer computer = directory.GetComputer(computerName);
 
             var t1 = CreateTarget(AccessMask.LocalAdminPassword, AccessMask.None, computer, trustee);
@@ -450,12 +450,12 @@ namespace Lithnet.AccessManager.Server.Test
         }
 
 
-        private IOptionsSnapshot<AuthorizationOptions> SetupOptionsForOUTarget(AccessMask allowed, AccessMask denied, string ou, ISecurityPrincipal trustee)
+        private IOptionsSnapshot<AuthorizationOptions> SetupOptionsForOUTarget(AccessMask allowed, AccessMask denied, string ou, IActiveDirectorySecurityPrincipal trustee)
         {
             return SetupOptions(CreateTarget(allowed, denied, ou, trustee));
         }
 
-        private IOptionsSnapshot<AuthorizationOptions> SetupOptionsForComputerTarget(AccessMask allowed, AccessMask denied, IActiveDirectoryComputer computer, ISecurityPrincipal trustee)
+        private IOptionsSnapshot<AuthorizationOptions> SetupOptionsForComputerTarget(AccessMask allowed, AccessMask denied, IActiveDirectoryComputer computer, IActiveDirectorySecurityPrincipal trustee)
         {
             return SetupOptions(CreateTarget(allowed, denied, computer, trustee));
         }
@@ -470,7 +470,7 @@ namespace Lithnet.AccessManager.Server.Test
             return optionsSnapshot.Object;
         }
 
-        private SecurityDescriptorTarget CreateTarget(AccessMask allowed, AccessMask denied, string ou, ISecurityPrincipal trustee)
+        private SecurityDescriptorTarget CreateTarget(AccessMask allowed, AccessMask denied, string ou, IActiveDirectorySecurityPrincipal trustee)
         {
             return new SecurityDescriptorTarget
             {
@@ -482,7 +482,7 @@ namespace Lithnet.AccessManager.Server.Test
             };
         }
 
-        private SecurityDescriptorTarget CreateTarget(AccessMask allowed, AccessMask denied, ISecurityPrincipal principal, ISecurityPrincipal trustee)
+        private SecurityDescriptorTarget CreateTarget(AccessMask allowed, AccessMask denied, IActiveDirectorySecurityPrincipal principal, IActiveDirectorySecurityPrincipal trustee)
         {
             return new SecurityDescriptorTarget
             {
@@ -491,7 +491,7 @@ namespace Lithnet.AccessManager.Server.Test
                 Target = principal.Sid.ToString(),
                 Type = principal switch
                 {
-                    IGroup _ => TargetType.Group,
+                    IActiveDirectoryGroup _ => TargetType.Group,
                     IActiveDirectoryComputer _ => TargetType.Computer,
                     _ => throw new NotImplementedException(),
                 },
@@ -499,7 +499,7 @@ namespace Lithnet.AccessManager.Server.Test
             };
         }
 
-        private string CreateSecurityDescriptor(ISecurityPrincipal trustee, AccessMask allowed, AccessMask denied)
+        private string CreateSecurityDescriptor(IActiveDirectorySecurityPrincipal trustee, AccessMask allowed, AccessMask denied)
         {
             DiscretionaryAcl dacl = new DiscretionaryAcl(false, false, 2);
 

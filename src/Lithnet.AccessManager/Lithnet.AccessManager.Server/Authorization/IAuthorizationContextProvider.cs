@@ -5,8 +5,8 @@ namespace Lithnet.AccessManager.Server.Authorization
 {
     public interface IAuthorizationContextProvider
     {
-        AuthorizationContext GetAuthorizationContext(IUser user, SecurityIdentifier resourceDomainSid);
+        AuthorizationContext GetAuthorizationContext(IActiveDirectoryUser user, SecurityIdentifier resourceDomainSid);
 
-        AuthorizationContext GetAuthorizationContext(IUser user);
+        AuthorizationContext GetAuthorizationContext(IActiveDirectoryUser user);
     }
 }

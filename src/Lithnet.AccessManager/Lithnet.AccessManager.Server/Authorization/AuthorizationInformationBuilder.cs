@@ -34,13 +34,13 @@ namespace Lithnet.AccessManager.Server.Authorization
             this.licenseManager = licenseManager;
         }
 
-        public void ClearCache(IUser user, IComputer computer)
+        public void ClearCache(IActiveDirectoryUser user, IComputer computer)
         {
             string key = $"{user.Sid}-{computer.AuthorityId}-{computer.AuthorityDeviceId}-{computer.AuthorityType}";
             authzCache.Remove(key);
         }
 
-        public async Task<AuthorizationInformation> GetAuthorizationInformation(IUser user, IComputer computer)
+        public async Task<AuthorizationInformation> GetAuthorizationInformation(IActiveDirectoryUser user, IComputer computer)
         {
             string key = $"{user.Sid}-{computer.AuthorityId}-{computer.AuthorityDeviceId}-{computer.AuthorityType}";
 
@@ -72,7 +72,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             return info;
         }
 
-        public Task<AuthorizationInformation> BuildAuthorizationInformation(IUser user, IComputer computer, IList<SecurityDescriptorTarget> matchedComputerTargets)
+        public Task<AuthorizationInformation> BuildAuthorizationInformation(IActiveDirectoryUser user, IComputer computer, IList<SecurityDescriptorTarget> matchedComputerTargets)
         {
             AuthorizationInformation info = new AuthorizationInformation
             {

@@ -1,6 +1,6 @@
 ﻿namespace Lithnet.AccessManager
 {
-    public interface IUser : ISecurityPrincipal
+    public interface IActiveDirectoryUser : IActiveDirectorySecurityPrincipal
     {
         string DisplayName { get; }
 

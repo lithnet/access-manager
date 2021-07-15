@@ -8,10 +8,10 @@ namespace Lithnet.AccessManager.Server.UI
     public class JitDomainStatusViewModelFactory : IViewModelFactory<JitDomainStatusViewModel, Domain, JitDynamicGroupMapping>
     {
         private readonly IDialogCoordinator dialogCoordinator;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly ILogger<JitDomainStatusViewModel> logger;
 
-        public JitDomainStatusViewModelFactory(IDialogCoordinator dialogCoordinator, IDirectory directory, ILogger<JitDomainStatusViewModel> logger)
+        public JitDomainStatusViewModelFactory(IDialogCoordinator dialogCoordinator, IActiveDirectory directory, ILogger<JitDomainStatusViewModel> logger)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.directory = directory;

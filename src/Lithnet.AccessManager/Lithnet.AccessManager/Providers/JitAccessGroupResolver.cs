@@ -5,16 +5,16 @@ namespace Lithnet.AccessManager
 {
     public class JitAccessGroupResolver : IJitAccessGroupResolver
     {
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly IDiscoveryServices discoveryServices;
 
-        public JitAccessGroupResolver(IDirectory directory, IDiscoveryServices discoveryServices)
+        public JitAccessGroupResolver(IActiveDirectory directory, IDiscoveryServices discoveryServices)
         {
             this.directory = directory;
             this.discoveryServices = discoveryServices;
         }
 
-        public IGroup GetJitGroup(IComputer computer, string groupName)
+        public IActiveDirectoryGroup GetJitGroup(IComputer computer, string groupName)
         {
             if (computer is IActiveDirectoryComputer adComputer)
             {
@@ -24,7 +24,7 @@ namespace Lithnet.AccessManager
             throw new InvalidOperationException("The computer object type supplied is not known");
         }
 
-        public IGroup GetJitGroup(IActiveDirectoryComputer computer, string groupName)
+        public IActiveDirectoryGroup GetJitGroup(IActiveDirectoryComputer computer, string groupName)
         {
             string authorizingGroupName = groupName;
 
@@ -55,7 +55,7 @@ namespace Lithnet.AccessManager
             }
         }
 
-        public IGroup GetJitGroup(string groupNameTemplate, string computerName, string domain)
+        public IActiveDirectoryGroup GetJitGroup(string groupNameTemplate, string computerName, string domain)
         {
             if (groupNameTemplate == null)
             {
@@ -69,7 +69,7 @@ namespace Lithnet.AccessManager
 
             groupNameTemplate = this.BuildGroupName(groupNameTemplate, domain, computerName);
 
-            if (this.directory.TryGetGroup(groupNameTemplate, out IGroup group))
+            if (this.directory.TryGetGroup(groupNameTemplate, out IActiveDirectoryGroup group))
             {
                 return group;
             }

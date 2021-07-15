@@ -2,7 +2,7 @@
 
 namespace Lithnet.AccessManager
 {
-    public interface IDirectoryObject
+    public interface IActiveDirectoryObject
     {
         string Path { get; }
 

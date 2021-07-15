@@ -17,7 +17,7 @@ namespace Lithnet.AccessManager.Server.Auditing
 
         public AuthorizationResponse AuthzResponse { get; set; }
 
-        public IUser User { get; set; }
+        public IActiveDirectoryUser User { get; set; }
 
         public AuthorizationTargetType TargetType { get; set; }
 

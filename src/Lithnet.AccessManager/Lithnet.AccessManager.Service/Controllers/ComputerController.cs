@@ -27,7 +27,7 @@ namespace Lithnet.AccessManager.Service.Controllers
     {
         private readonly IAuthenticationProvider authenticationProvider;
         private readonly IAuthorizationService authorizationService;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly IJitAccessProvider jitAccessProvider;
         private readonly ILogger logger;
         private readonly IPasswordProvider passwordProvider;
@@ -37,7 +37,7 @@ namespace Lithnet.AccessManager.Service.Controllers
         private readonly IAmsLicenseManager licenseManager;
         private readonly IComputerLocator computerLocator;
 
-        public ComputerController(IAuthorizationService authorizationService, ILogger<ComputerController> logger, IDirectory directory,
+        public ComputerController(IAuthorizationService authorizationService, ILogger<ComputerController> logger, IActiveDirectory directory,
             IAuditEventProcessor reporting, IOptionsSnapshot<UserInterfaceOptions> userInterfaceSettings, IAuthenticationProvider authenticationProvider, IPasswordProvider passwordProvider, IJitAccessProvider jitAccessProvider, IBitLockerRecoveryPasswordProvider bitLockerProvider, IAmsLicenseManager licenseManager, IComputerLocator computerLocator)
         {
             this.authorizationService = authorizationService;
@@ -96,7 +96,7 @@ namespace Lithnet.AccessManager.Service.Controllers
                 return this.View("AccessRequest", model);
             }
 
-            IUser user = null;
+            IActiveDirectoryUser user = null;
             IComputer computer = null;
             model.FailureReason = null;
 
@@ -155,7 +155,7 @@ namespace Lithnet.AccessManager.Service.Controllers
                 return this.View("AccessRequest", model);
             }
 
-            IUser user = null;
+            IActiveDirectoryUser user = null;
             IComputer computer = null;
             model.FailureReason = null;
 
@@ -200,7 +200,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             }
         }
 
-        private void AuditAuthZFailure(AccessRequestModel model, AuthorizationResponse authorizationResponse, IUser user, IComputer computer)
+        private void AuditAuthZFailure(AccessRequestModel model, AuthorizationResponse authorizationResponse, IActiveDirectoryUser user, IComputer computer)
         {
             AuditableAction action = new AuditableAction
             {
@@ -247,7 +247,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             };
         }
 
-        private async Task<IActionResult> GetAuthorizationResponseAsync(AccessRequestModel model, IUser user, IComputer computer)
+        private async Task<IActionResult> GetAuthorizationResponseAsync(AccessRequestModel model, IActiveDirectoryUser user, IComputer computer)
         {
             try
             {
@@ -316,7 +316,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             };
         }
 
-        private IActionResult GetBitLockerRecoveryPasswords(AccessRequestModel model, IUser user, IComputer computer, BitLockerAuthorizationResponse authResponse)
+        private IActionResult GetBitLockerRecoveryPasswords(AccessRequestModel model, IActiveDirectoryUser user, IComputer computer, BitLockerAuthorizationResponse authResponse)
         {
             try
             {
@@ -370,7 +370,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             }
         }
 
-        private async Task<IActionResult> GetLapsPassword(AccessRequestModel model, IUser user, IComputer computer, LapsAuthorizationResponse authResponse)
+        private async Task<IActionResult> GetLapsPassword(AccessRequestModel model, IActiveDirectoryUser user, IComputer computer, LapsAuthorizationResponse authResponse)
         {
             try
             {
@@ -429,7 +429,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             }
         }
 
-        private async Task<IActionResult> GetLapsPasswordHistory(AccessRequestModel model, IUser user, IComputer computer, LapsHistoryAuthorizationResponse authResponse)
+        private async Task<IActionResult> GetLapsPasswordHistory(AccessRequestModel model, IActiveDirectoryUser user, IComputer computer, LapsHistoryAuthorizationResponse authResponse)
         {
             try
             {
@@ -487,7 +487,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             }
         }
 
-        private async Task<IActionResult> GetPreAuthorizationResponse(AccessRequestModel model, IUser user, IComputer computer)
+        private async Task<IActionResult> GetPreAuthorizationResponse(AccessRequestModel model, IActiveDirectoryUser user, IComputer computer)
         {
             try
             {
@@ -530,7 +530,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             }
         }
 
-        private IActionResult GrantJitAccess(AccessRequestModel model, IUser user, IComputer computer, JitAuthorizationResponse authResponse)
+        private IActionResult GrantJitAccess(AccessRequestModel model, IActiveDirectoryUser user, IComputer computer, JitAuthorizationResponse authResponse)
         {
             Action undo = null;
 
@@ -602,7 +602,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             return results[0];
         }
 
-        private bool GetUser(out IUser user, out IActionResult failure)
+        private bool GetUser(out IActiveDirectoryUser user, out IActionResult failure)
         {
             failure = null;
 
@@ -627,7 +627,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             }
         }
 
-        private bool ValidateRequestReason(AccessRequestModel model, IUser user, out IActionResult actionResult)
+        private bool ValidateRequestReason(AccessRequestModel model, IActiveDirectoryUser user, out IActionResult actionResult)
         {
             actionResult = null;
 
@@ -655,7 +655,7 @@ namespace Lithnet.AccessManager.Service.Controllers
             return this.View("AccessRequestError", model);
         }
 
-        private IActionResult HandleComputerLookupExceptionAndGetResponse(Exception ex, IUser user, AccessRequestModel model)
+        private IActionResult HandleComputerLookupExceptionAndGetResponse(Exception ex, IActiveDirectoryUser user, AccessRequestModel model)
         {
             switch (ex)
             {

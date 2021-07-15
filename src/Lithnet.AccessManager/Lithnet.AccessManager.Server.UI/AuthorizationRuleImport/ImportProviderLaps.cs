@@ -6,11 +6,11 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
     public class ImportProviderLaps : ImportProviderComputerDiscovery
     {
         private readonly ILogger logger;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly IComputerPrincipalProvider provider;
         private readonly ImportSettingsLaps settings;
 
-        public ImportProviderLaps(ImportSettingsLaps settings, ILogger<ImportProviderLaps> logger, IDirectory directory, IComputerPrincipalProviderLaps provider)
+        public ImportProviderLaps(ImportSettingsLaps settings, ILogger<ImportProviderLaps> logger, IActiveDirectory directory, IComputerPrincipalProviderLaps provider)
             : base(settings, logger, directory)
         {
             this.logger = logger;

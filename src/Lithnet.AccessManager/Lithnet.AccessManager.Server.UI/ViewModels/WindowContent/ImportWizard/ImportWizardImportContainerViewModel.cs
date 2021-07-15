@@ -17,12 +17,12 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IDiscoveryServices discoveryServices;
         private readonly IObjectSelectionProvider objectSelectionProvider;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly IShellExecuteProvider shellExecuteProvider;
         public Task Initialization { get; private set; }
 
-        public ImportWizardImportContainerViewModel(ILogger<ImportWizardImportContainerViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardImportContainerViewModel> validator, IObjectSelectionProvider objectSelectionProvider, IDiscoveryServices discoveryServices, IDirectory directory, IWindowsServiceProvider windowsServiceProvider, IShellExecuteProvider shellExecuteProvider)
+        public ImportWizardImportContainerViewModel(ILogger<ImportWizardImportContainerViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardImportContainerViewModel> validator, IObjectSelectionProvider objectSelectionProvider, IDiscoveryServices discoveryServices, IActiveDirectory directory, IWindowsServiceProvider windowsServiceProvider, IShellExecuteProvider shellExecuteProvider)
         {
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;

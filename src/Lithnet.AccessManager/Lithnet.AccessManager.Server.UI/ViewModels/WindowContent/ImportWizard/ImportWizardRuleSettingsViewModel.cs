@@ -12,7 +12,7 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public sealed class ImportWizardRuleSettingsViewModel : Screen, IHelpLink
     {
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly ILogger<ImportWizardRuleSettingsViewModel> logger;
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory;
@@ -22,7 +22,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public Task Initialization { get; private set; }
 
-        public ImportWizardRuleSettingsViewModel(IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory, ILogger<ImportWizardRuleSettingsViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardRuleSettingsViewModel> validator, IDirectory directory, IObjectSelectionProvider objectSelectionProvider, IShellExecuteProvider shellExecuteProvider)
+        public ImportWizardRuleSettingsViewModel(IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory, ILogger<ImportWizardRuleSettingsViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<ImportWizardRuleSettingsViewModel> validator, IActiveDirectory directory, IObjectSelectionProvider objectSelectionProvider, IShellExecuteProvider shellExecuteProvider)
         {
             this.directory = directory;
             this.logger = logger;
@@ -113,7 +113,7 @@ namespace Lithnet.AccessManager.Server.UI
                 }
                 else
                 {
-                    if (this.directory.TryGetGroup(value, out IGroup group))
+                    if (this.directory.TryGetGroup(value, out IActiveDirectoryGroup group))
                     {
                         this.JitAuthorizingGroup = group.Sid.ToString();
                     }
@@ -202,7 +202,7 @@ namespace Lithnet.AccessManager.Server.UI
             try
             {
                 SecurityIdentifier s = new SecurityIdentifier(sid);
-                if (this.directory.TryGetPrincipal(s, out ISecurityPrincipal principal))
+                if (this.directory.TryGetPrincipal(s, out IActiveDirectorySecurityPrincipal principal))
                 {
                     return principal.MsDsPrincipalName;
                 }

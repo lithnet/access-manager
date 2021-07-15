@@ -10,12 +10,12 @@ namespace Lithnet.AccessManager.Server
 {
     public class JitAccessProvider : IJitAccessProvider
     {
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly ILogger<JitAccessProvider> logger;
         private readonly JitConfigurationOptions options;
         private readonly IDiscoveryServices discoveryServices;
 
-        public JitAccessProvider(IDirectory directory, ILogger<JitAccessProvider> logger, IOptionsSnapshot<JitConfigurationOptions> options, IDiscoveryServices discoveryServices)
+        public JitAccessProvider(IActiveDirectory directory, ILogger<JitAccessProvider> logger, IOptionsSnapshot<JitConfigurationOptions> options, IDiscoveryServices discoveryServices)
         {
             this.directory = directory;
             this.logger = logger;
@@ -23,7 +23,7 @@ namespace Lithnet.AccessManager.Server
             this.discoveryServices = discoveryServices;
         }
 
-        public TimeSpan GrantJitAccess(IGroup group, IUser user, IComputer computer, bool canExtend, TimeSpan requestedExpiry, out Action undo)
+        public TimeSpan GrantJitAccess(IActiveDirectoryGroup group, IActiveDirectoryUser user, IComputer computer, bool canExtend, TimeSpan requestedExpiry, out Action undo)
         {
             if (!(computer is IActiveDirectoryComputer adComputer))
             {
@@ -42,7 +42,7 @@ namespace Lithnet.AccessManager.Server
             }
         }
 
-        public TimeSpan GrantJitAccess(IGroup group, IUser user, bool canExtend, TimeSpan requestedExpiry, out Action undo)
+        public TimeSpan GrantJitAccess(IActiveDirectoryGroup group, IActiveDirectoryUser user, bool canExtend, TimeSpan requestedExpiry, out Action undo)
         {
             this.logger.LogTrace("Adding user {user} to JIT group {group}", user.MsDsPrincipalName, group.MsDsPrincipalName);
 
@@ -56,7 +56,7 @@ namespace Lithnet.AccessManager.Server
             }
         }
 
-        public TimeSpan GrantJitAccessDynamicGroup(IGroup group, IUser user, string dcLocatorTarget, bool canExtend, TimeSpan requestedExpiry, out Action undo)
+        public TimeSpan GrantJitAccessDynamicGroup(IActiveDirectoryGroup group, IActiveDirectoryUser user, string dcLocatorTarget, bool canExtend, TimeSpan requestedExpiry, out Action undo)
         {
             JitDynamicGroupMapping mapping = this.FindDomainMapping(group);
             string groupName = this.BuildGroupSamAccountName(mapping, user, group);
@@ -67,7 +67,7 @@ namespace Lithnet.AccessManager.Server
 
             this.logger.LogTrace("Processing request to have {user} added to the JIT group {group} via dynamicObject {dynamicGroup}", user.MsDsPrincipalName, group.Path, fqGroupName);
 
-            IGroup dynamicGroup = null;
+            IActiveDirectoryGroup dynamicGroup = null;
 
             this.discoveryServices.FindDcAndExecuteWithRetry(dcLocatorTarget, this.discoveryServices.GetDomainNameDns(mapping.GroupOU), DsGetDcNameFlags.DS_DIRECTORY_SERVICE_REQUIRED | DsGetDcNameFlags.DS_WRITABLE_REQUIRED, this.GetDcLocatorMode(), dc =>
             {
@@ -121,7 +121,7 @@ namespace Lithnet.AccessManager.Server
             return grantedExpiry;
         }
 
-        public TimeSpan GrantJitAccessPam(IGroup group, IUser user, string dcLocatorTarget, bool canExtend, TimeSpan requestedExpiry, out Action undo)
+        public TimeSpan GrantJitAccessPam(IActiveDirectoryGroup group, IActiveDirectoryUser user, string dcLocatorTarget, bool canExtend, TimeSpan requestedExpiry, out Action undo)
         {
             TimeSpan? existingTtl = group.GetMemberTtl(user);
 
@@ -166,7 +166,7 @@ namespace Lithnet.AccessManager.Server
             return mapping.Description ?? "Dynamic group created for a Lithnet Access Manager JIT request";
         }
 
-        private string BuildGroupSamAccountName(JitDynamicGroupMapping mapping, IUser user, IGroup group)
+        private string BuildGroupSamAccountName(JitDynamicGroupMapping mapping, IActiveDirectoryUser user, IActiveDirectoryGroup group)
         {
             if (string.IsNullOrWhiteSpace(mapping.GroupNameTemplate))
             {
@@ -181,7 +181,7 @@ namespace Lithnet.AccessManager.Server
             }
         }
 
-        public string BuildGroupDomain(IGroup group)
+        public string BuildGroupDomain(IActiveDirectoryGroup group)
         {
             return this.discoveryServices.GetDomainNameNetBios(group.Sid.AccountDomainSid);
         }
@@ -213,7 +213,7 @@ namespace Lithnet.AccessManager.Server
             return mode;
         }
 
-        private JitDynamicGroupMapping FindDomainMapping(IGroup group)
+        private JitDynamicGroupMapping FindDomainMapping(IActiveDirectoryGroup group)
         {
             SecurityIdentifier domainSid = group.Sid.AccountDomainSid;
 

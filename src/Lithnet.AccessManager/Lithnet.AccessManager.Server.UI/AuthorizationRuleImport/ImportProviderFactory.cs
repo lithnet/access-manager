@@ -11,13 +11,13 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILogger<ImportProviderLaps> loggerLaps;
         private readonly ILogger<ImportProviderLapsWeb> loggerLapsWeb;
         private readonly ILogger<ImportProviderRpc> loggerRpc;
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly IComputerPrincipalProviderBitLocker providerBitLocker;
         private readonly IComputerPrincipalProviderCsv providerCsv;
         private readonly IComputerPrincipalProviderLaps providerLaps;
         private readonly IComputerPrincipalProviderRpc providerRpc;
 
-        public ImportProviderFactory(ILogger<ImportProviderBitLocker> loggerBitLocker, ILogger<ImportProviderCsv> loggerCsv, ILogger<ImportProviderLaps> loggerLaps, ILogger<ImportProviderLapsWeb> loggerLapsWeb, ILogger<ImportProviderRpc> loggerRpc, IDirectory directory, IComputerPrincipalProviderBitLocker providerBitLocker, IComputerPrincipalProviderCsv providerCsv, IComputerPrincipalProviderLaps providerLaps, IComputerPrincipalProviderRpc providerRpc)
+        public ImportProviderFactory(ILogger<ImportProviderBitLocker> loggerBitLocker, ILogger<ImportProviderCsv> loggerCsv, ILogger<ImportProviderLaps> loggerLaps, ILogger<ImportProviderLapsWeb> loggerLapsWeb, ILogger<ImportProviderRpc> loggerRpc, IActiveDirectory directory, IComputerPrincipalProviderBitLocker providerBitLocker, IComputerPrincipalProviderCsv providerCsv, IComputerPrincipalProviderLaps providerLaps, IComputerPrincipalProviderRpc providerRpc)
         {
             this.loggerBitLocker = loggerBitLocker;
             this.loggerCsv = loggerCsv;

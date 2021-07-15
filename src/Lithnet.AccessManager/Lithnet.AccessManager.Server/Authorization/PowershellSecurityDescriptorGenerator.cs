@@ -22,7 +22,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             this.logger = logger;
         }
 
-        public CommonSecurityDescriptor GenerateSecurityDescriptor(IUser user, IComputer computer, string script, int timeout)
+        public CommonSecurityDescriptor GenerateSecurityDescriptor(IActiveDirectoryUser user, IComputer computer, string script, int timeout)
         {
             PowerShellAuthorizationResponse result = this.GetAuthorizationResponse(script, user, computer, timeout);
             return GenerateSecurityDescriptor(user.Sid, result);
@@ -101,7 +101,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             return new CommonSecurityDescriptor(false, false, ControlFlags.DiscretionaryAclPresent, new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), null, null, dacl);
         }
 
-        private PowerShellAuthorizationResponse GetAuthorizationResponse(string script, IUser user, IComputer computer, int timeout)
+        private PowerShellAuthorizationResponse GetAuthorizationResponse(string script, IActiveDirectoryUser user, IComputer computer, int timeout)
         {
             PowerShell powershell = this.sessionProvider.GetSession(script, "Get-AuthorizationResponse");
             powershell.AddCommand("Get-AuthorizationResponse")
@@ -171,7 +171,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             return new PowerShellAuthorizationResponse();
         }
 
-        private PSObject ToPSObject(IUser user)
+        private PSObject ToPSObject(IActiveDirectoryUser user)
         {
             PSObject u = new PSObject();
             u.Properties.Add(new PSNoteProperty("Description", user.Description));

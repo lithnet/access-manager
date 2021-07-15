@@ -22,7 +22,7 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public sealed class SecurityDescriptorTargetViewModel : ValidatingModelBase, IViewAware
     {
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly ILogger<SecurityDescriptorTargetViewModel> logger;
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory;
@@ -45,7 +45,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> targetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IActiveDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> targetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider)
         {
             this.directory = directory;
             this.Model = model;
@@ -245,7 +245,7 @@ namespace Lithnet.AccessManager.Server.UI
                 }
                 else
                 {
-                    if (this.directory.TryGetGroup(value, out IGroup group))
+                    if (this.directory.TryGetGroup(value, out IActiveDirectoryGroup group))
                     {
                         this.JitAuthorizingGroup = group.Sid.ToString();
                     }
@@ -779,7 +779,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                return this.directory.TryGetPrincipal(sid, out ISecurityPrincipal principal) ? principal.MsDsPrincipalName : null;
+                return this.directory.TryGetPrincipal(sid, out IActiveDirectorySecurityPrincipal principal) ? principal.MsDsPrincipalName : null;
             }
             catch (Exception)
             {

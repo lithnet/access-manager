@@ -11,7 +11,7 @@ namespace Lithnet.AccessManager.PowerShell.Test
 {
     public class GetLithnetLocalAdminPasswordTests
     {
-        private IDirectory directory;
+        private IActiveDirectory directory;
 
         private IDiscoveryServices discoveryServices;
 

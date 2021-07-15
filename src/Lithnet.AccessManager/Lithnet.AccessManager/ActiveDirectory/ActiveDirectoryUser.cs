@@ -4,7 +4,7 @@ using System.Security.Principal;
 
 namespace Lithnet.AccessManager
 {
-    public sealed class ActiveDirectoryUser : IUser
+    public sealed class ActiveDirectoryUser : IActiveDirectoryUser
     {
         private readonly DirectoryEntry de;
 

@@ -8,7 +8,7 @@ namespace Lithnet.AccessManager.Test
 {
     public class MsMcsAdmPwdProviderTests
     {
-        private IDirectory directory;
+        private IActiveDirectory directory;
 
         private IDiscoveryServices discoveryServices;
 

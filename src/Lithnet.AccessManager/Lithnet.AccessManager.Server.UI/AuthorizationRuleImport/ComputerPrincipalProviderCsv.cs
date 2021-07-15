@@ -11,12 +11,12 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
 {
     public class ComputerPrincipalProviderCsv : IComputerPrincipalProviderCsv
     {
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
         private readonly ILogger logger;
 
         private Dictionary<string, HashSet<string>> cache;
 
-        public ComputerPrincipalProviderCsv(IDirectory directory, ILogger<ComputerPrincipalProviderCsv> logger)
+        public ComputerPrincipalProviderCsv(IActiveDirectory directory, ILogger<ComputerPrincipalProviderCsv> logger)
         {
             this.directory = directory;
             this.logger = logger;
@@ -134,7 +134,7 @@ namespace Lithnet.AccessManager.Server.UI.AuthorizationRuleImport
                     }
                     else
                     {
-                        if (!directory.TryGetPrincipal(member, out ISecurityPrincipal principal))
+                        if (!directory.TryGetPrincipal(member, out IActiveDirectorySecurityPrincipal principal))
                         {
                             continue;
                         }

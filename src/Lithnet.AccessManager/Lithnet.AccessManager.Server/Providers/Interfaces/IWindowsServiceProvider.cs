@@ -14,7 +14,7 @@ namespace Lithnet.AccessManager.Server
         SecurityIdentifier GetServiceAccountSid();
         NTAccount GetServiceNTAccount();
         void GrantLogonAsAService(string accountName);
-        int LogonServiceAccount(ISecurityPrincipal o, string password);
+        int LogonServiceAccount(IActiveDirectorySecurityPrincipal o, string password);
         void SetServiceAccount(string username, string password);
 
         Task StartServiceAsync();

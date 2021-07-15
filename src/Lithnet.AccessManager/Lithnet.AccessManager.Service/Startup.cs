@@ -97,7 +97,7 @@ namespace Lithnet.AccessManager.Service
 
             services.AddSingleton<ISmtpProvider, SmtpProvider>();
             services.AddSingleton<IApplicationUpgradeProvider, ApplicationUpgradeProvider>();
-            services.AddSingleton<IDirectory, ActiveDirectory>();
+            services.AddSingleton<IActiveDirectory, ActiveDirectory>();
             services.AddSingleton<IDiscoveryServices, DiscoveryServices>();
             services.AddSingleton<IEncryptionProvider, EncryptionProvider>();
             services.AddSingleton<ICertificateProvider, CertificateProvider>();

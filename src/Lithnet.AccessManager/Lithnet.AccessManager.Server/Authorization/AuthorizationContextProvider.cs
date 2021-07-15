@@ -27,12 +27,12 @@ namespace Lithnet.AccessManager.Server.Authorization
             this.domainCache = new ConcurrentDictionary<SecurityIdentifier, AuthorizationContextDomainDetails>();
         }
 
-        public AuthorizationContext GetAuthorizationContext(IUser user)
+        public AuthorizationContext GetAuthorizationContext(IActiveDirectoryUser user)
         {
             return this.GetAuthorizationContext(user, user.Sid.AccountDomainSid);
         }
 
-        public AuthorizationContext GetAuthorizationContext(IUser user, SecurityIdentifier resourceDomain)
+        public AuthorizationContext GetAuthorizationContext(IActiveDirectoryUser user, SecurityIdentifier resourceDomain)
         {
             var domainDetails = this.GetAuthorizationContextDomainDetails(user.Sid, resourceDomain.AccountDomainSid);
 
@@ -57,7 +57,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             }
         }
 
-        public AuthorizationContext GetContext(IUser user, SecurityIdentifier resourceDomain, AuthorizationContextDomainDetails domainDetails)
+        public AuthorizationContext GetContext(IActiveDirectoryUser user, SecurityIdentifier resourceDomain, AuthorizationContextDomainDetails domainDetails)
         {
             AuthorizationServer server = domainDetails.GetServer(false);
 

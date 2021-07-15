@@ -4,14 +4,14 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class SecurityIdentifierViewModel
     {
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
 
-        public SecurityIdentifierViewModel(string sidString, IDirectory directory)
+        public SecurityIdentifierViewModel(string sidString, IActiveDirectory directory)
             : this(new SecurityIdentifier(sidString), directory)
         {
         }
 
-        public SecurityIdentifierViewModel(SecurityIdentifier sid, IDirectory directory)
+        public SecurityIdentifierViewModel(SecurityIdentifier sid, IActiveDirectory directory)
         {
             this.directory = directory;
 

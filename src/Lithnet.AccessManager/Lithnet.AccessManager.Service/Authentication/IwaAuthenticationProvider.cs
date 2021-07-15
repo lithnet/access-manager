@@ -12,7 +12,7 @@ namespace Lithnet.AccessManager.Service.AppSettings
     {
         private readonly IwaAuthenticationProviderOptions options;
 
-        public IwaAuthenticationProvider(IOptions<IwaAuthenticationProviderOptions> options, IDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider, ILogger<IwaAuthenticationProvider> logger)
+        public IwaAuthenticationProvider(IOptions<IwaAuthenticationProviderOptions> options, IActiveDirectory directory, IHttpContextAccessor httpContextAccessor, IAuthorizationContextProvider authzContextProvider, ILogger<IwaAuthenticationProvider> logger)
             : base(httpContextAccessor, directory, authzContextProvider)
         {
             this.options = options.Value;

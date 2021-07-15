@@ -9,11 +9,11 @@ namespace Lithnet.AccessManager.Server
 {
     public class BitLockerRecoveryPasswordProvider : IBitLockerRecoveryPasswordProvider
     {
-        private readonly IDirectory directory;
+        private readonly IActiveDirectory directory;
 
         private readonly ILogger<BitLockerRecoveryPasswordProvider> logger;
 
-        public BitLockerRecoveryPasswordProvider(IDirectory directory, ILogger<BitLockerRecoveryPasswordProvider> logger)
+        public BitLockerRecoveryPasswordProvider(IActiveDirectory directory, ILogger<BitLockerRecoveryPasswordProvider> logger)
         {
             this.directory = directory;
             this.logger = logger;

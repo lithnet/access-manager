@@ -5,6 +5,6 @@ namespace Lithnet.AccessManager.Server.Authorization
 {
     public interface IPowerShellSecurityDescriptorGenerator
     {
-        CommonSecurityDescriptor GenerateSecurityDescriptor(IUser user, IComputer computer, string script, int timeout);
+        CommonSecurityDescriptor GenerateSecurityDescriptor(IActiveDirectoryUser user, IComputer computer, string script, int timeout);
     }
 }
