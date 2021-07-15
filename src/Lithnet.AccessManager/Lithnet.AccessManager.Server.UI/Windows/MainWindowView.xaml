@@ -68,10 +68,11 @@
                                    DisplayMemberPath="DisplayName"
                                    DisplayMode="Expanded"
                                    PaneToggleButtonVisibility="Visible"
-                                   ExpandedPaneWidth="350"
+                                   ExpandedPaneWidth="310"
                                    AllowMultipleExpandedItems="True" 
                                    PaneBackground="{DynamicResource MahApps.HamburgerMenu.Pane.Background}"
                                    PaneHeaderBackground="{DynamicResource MahApps.HamburgerMenu.Pane.Background}"
+                                   AutoChangeDisplayMode="True" PaneHeaderHeight="0"
         >
 
 
