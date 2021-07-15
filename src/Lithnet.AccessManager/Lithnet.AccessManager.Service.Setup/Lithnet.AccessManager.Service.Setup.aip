@@ -20,10 +20,10 @@
     <ROW Property="IAgree" Value="No" Type="4" MsiKey="IAgree"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{31E00C65-2D29-4074-B8C7-1DE02B0A38DF} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{19040A78-3809-48BC-AE45-93E1FB87120B} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.12.8035.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.12.8051.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="SHOW_DB_CONFIG" Value="1"/>
     <ROW Property="SQLEXPRESS_DEFAULT_ADMINS" Value="Builtin\Administrators"/>
     <ROW Property="SQLEXPRESS_DEFAULT_INSTANCENAME" Value="AMS"/>

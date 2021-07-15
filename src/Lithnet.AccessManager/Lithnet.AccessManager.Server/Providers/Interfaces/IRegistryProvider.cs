@@ -35,5 +35,6 @@
         bool ResetMaintenanceTaskSchedules { get; set; }
 
         bool ApiEnabled { get; set; }
+        string LicenseData { get; }
     }
 }

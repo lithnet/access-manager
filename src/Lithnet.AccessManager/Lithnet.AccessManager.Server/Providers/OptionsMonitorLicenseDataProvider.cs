@@ -14,10 +14,12 @@ namespace Lithnet.AccessManager.Server
     public class OptionsMonitorLicenseDataProvider : ILicenseDataProvider
     {
         private readonly IOptionsMonitor<LicensingOptions> options;
+        private readonly IRegistryProvider registryProvider;
 
-        public OptionsMonitorLicenseDataProvider(IOptionsMonitor<LicensingOptions> options)
+        public OptionsMonitorLicenseDataProvider(IOptionsMonitor<LicensingOptions> options, IRegistryProvider registryProvider)
         {
             this.options = options;
+            this.registryProvider = registryProvider;
             this.options.OnChange((x, y) => this.OnLicenseDataChanged?.Invoke(this, new EventArgs()));
         }
 
@@ -32,7 +34,7 @@ namespace Lithnet.AccessManager.Server
         {
             try
             {
-                string data = this.options.CurrentValue.Data;
+                string data = registryProvider.LicenseData ?? this.options.CurrentValue.Data;
                 return string.IsNullOrWhiteSpace(data) ? EmbeddedResourceProvider.GetResourceString("license.dat") : data;
             }
             catch

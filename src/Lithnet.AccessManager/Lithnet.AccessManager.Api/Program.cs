@@ -16,12 +16,18 @@ namespace Lithnet.AccessManager.Api
             RegistryProvider registryProvider = new RegistryProvider(false);
             if (!registryProvider.ApiEnabled)
             {
-                BuildUnconfiguredHost().Build().Run();
+                BuildUnconfiguredHost()
+                    .UseWindowsService()
+                    .Build()
+                    .Run();
             }
             else
             {
                 SetupNLog(registryProvider);
-                CreateDefaultHost(args).Build().Run();
+                Program.CreateApiHost(args)
+                    .UseWindowsService()
+                    .Build()
+                    .Run();
             }
         }
 
@@ -32,11 +38,10 @@ namespace Lithnet.AccessManager.Api
                 {
                     services.AddHostedService<DisabledHost>();
                 })
-                .UseWindowsService()
                 .ConfigureAccessManagerLogging();
         }
 
-        public static IHostBuilder CreateDefaultHost(string[] args)
+        public static IHostBuilder CreateApiHost(string[] args)
         {
 
             return Host
@@ -59,8 +64,7 @@ namespace Lithnet.AccessManager.Api
                      webBuilder
                          .UseHttpSys(config)
                          .UseStartup<ApiCoreStartup>();
-                 })
-                 .UseWindowsService();
+                 });
         }
 
         private static void SetupNLog(RegistryProvider registryProvider)

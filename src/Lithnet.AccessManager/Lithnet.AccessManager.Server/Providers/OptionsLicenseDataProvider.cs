@@ -13,17 +13,19 @@ namespace Lithnet.AccessManager.Server
     public class OptionsLicenseDataProvider : ILicenseDataProvider
     {
         private readonly LicensingOptions options;
+        private readonly IRegistryProvider registryProvider;
 
-        public OptionsLicenseDataProvider(LicensingOptions options)
+        public OptionsLicenseDataProvider(LicensingOptions options, IRegistryProvider registryProvider)
         {
             this.options = options;
+            this.registryProvider = registryProvider;
         }
 
         public string GetRawLicenseData()
         {
             try
             {
-                string data = this.options.Data;
+                string data = registryProvider.LicenseData ?? this.options.Data;
                 return string.IsNullOrWhiteSpace(data) ? EmbeddedResourceProvider.GetResourceString("license.dat") : data;
             }
             catch

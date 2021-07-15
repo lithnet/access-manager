@@ -60,7 +60,6 @@ namespace Lithnet.AccessManager.Api
             services.AddSingleton<IClusterProvider, ClusterProvider>();
             services.AddSingleton<IDiscoveryServices, DiscoveryServices>();
             services.AddSingleton<IWindowsServiceProvider, WindowsServiceProvider>();
-            services.AddSingleton<IRegistryProvider>(new RegistryProvider(true));
             services.AddSingleton<IProtectedSecretProvider, ProtectedSecretProvider>();
             services.AddSingleton<IEncryptionProvider, EncryptionProvider>();
             services.AddSingleton<IWindowsServiceProvider, WindowsServiceProvider>();
@@ -159,6 +158,7 @@ namespace Lithnet.AccessManager.Api
         private bool InitializeLicenseManager(IServiceCollection services)
         {
             services.AddSingleton<ILicenseDataProvider, OptionsMonitorLicenseDataProvider>();
+            services.AddSingleton<IRegistryProvider>(new RegistryProvider(true));
             services.Configure<LicensingOptions>(this.Configuration.GetSection("Licensing"));
 
             ServiceProvider provider = services.BuildServiceProvider();

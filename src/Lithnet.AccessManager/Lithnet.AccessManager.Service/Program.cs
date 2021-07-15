@@ -31,13 +31,24 @@ namespace Lithnet.AccessManager.Service
 
                 if (safeStart || !registryProvider.IsConfigured)
                 {
-                    await Program.BuildUnconfiguredHost().Build().RunAsync();
+                    await Program.BuildUnconfiguredHost()
+                        .UseWindowsService()
+                        .Build()
+                        .RunAsync();
                 }
                 else
                 {
-                    await Task.WhenAll(
-                        Program.CreateHostBuilder(args).Build().RunAsync(),
-                        Api.Program.CreateDefaultHost(args).Build().RunAsync());
+                    Task webHost = 
+                        Program.CreateWebHost(args)
+                            .UseWindowsService()
+                            .Build()
+                            .RunAsync();
+
+                    Task apiHost = Api.Program.CreateApiHost(args)
+                            .Build()
+                            .RunAsync();
+
+                    await Task.WhenAll(webHost, apiHost);
                 }
             }
         }
@@ -48,11 +59,10 @@ namespace Lithnet.AccessManager.Service
                 {
                     services.AddHostedService<UnconfiguredHost>();
                 })
-                .UseWindowsService()
                 .ConfigureAccessManagerLogging();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
+        public static IHostBuilder CreateWebHost(string[] args)
         {
             var host = new HostBuilder();
 
@@ -95,8 +105,6 @@ namespace Lithnet.AccessManager.Service
                 webBuilder.UseHttpSys(httpsysConfig);
                 webBuilder.UseStartup<Startup>();
             });
-
-            host.UseWindowsService();
 
             return host;
         }

@@ -32,6 +32,12 @@ namespace Lithnet.AccessManager.Server
         public string SqlServer => paramsKey?.GetValue("SqlServer", ".\\AMS") as string;
 
         public string ConnectionString => paramsKey?.GetValue("ConnectionString") as string;
+
+        public string LicenseData
+        {
+            get => paramsKey?.GetValue("LicenseData") as string;
+            set => paramsKey.SetValue("LicenseData", value);
+        }
         
         public string ConfigPath => paramsKey?.GetValue("ConfigPath") as string;
 
