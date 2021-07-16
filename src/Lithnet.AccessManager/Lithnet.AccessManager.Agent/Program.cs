@@ -120,7 +120,6 @@ namespace Lithnet.AccessManager.Agent
                     services.AddTransient<IAgentCheckInProvider, AgentCheckInProvider>();
                     services.AddTransient<IPasswordStorageProvider, AmsApiPasswordStorageProvider>();
                     services.AddTransient<IAuthenticationCertificateProvider, AuthenticationCertificateProvider>();
-                    services.AddSingleton<IMetadataProvider, MetadataProvider>();
                     services.AddTransient<IRegistrationProvider, RegistrationProvider>();
 
                     services.AddTransient<AmsLapsAgent>();
@@ -130,7 +129,6 @@ namespace Lithnet.AccessManager.Agent
                     services.AddSingleton<IRandomValueGenerator, RandomValueGenerator>();
 
                     services.AddTransient<IEncryptionProvider, EncryptionProvider>();
-                    services.AddSingleton<IMetadataProvider, MetadataProvider>();
 
                     services.ConfigureWritable<AppState>(configuration.GetSection("State"), "appstate.json");
                     services.Configure<AgentOptions>(configuration.GetSection("Agent"));
