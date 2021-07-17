@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Data.SqlClient;
+using System.Security.Principal;
 
 namespace Lithnet.AccessManager.Server.Providers
 {
@@ -131,6 +132,8 @@ namespace Lithnet.AccessManager.Server.Providers
                 this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("CreateServiceAccountLoginToServer.sql", "DBScripts.ExternalSqlCreation"), con);
                 this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("CreateServiceAccountLoginToDB.sql", "DBScripts.ExternalSqlCreation"), con);
                 this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("CreateServiceAccountPermissionToDB.sql", "DBScripts.ExternalSqlCreation"), con);
+                this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("CreateAmsAdminsGroupLoginToDB.sql", "DBScripts.ExternalSqlCreation"), con);
+                this.ExecuteNonQuery(EmbeddedResourceProvider.GetResourceString("CreateAmsAdminGroupPermissionToDB.sql", "DBScripts.ExternalSqlCreation"), con);
             }
 
             this.logger.LogTrace("The [AccessManager] database was created");
@@ -140,6 +143,9 @@ namespace Lithnet.AccessManager.Server.Providers
         {
             commandText = commandText
                 .Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceNTAccount().Value, StringComparison.OrdinalIgnoreCase);
+
+            string adminGroup = this.registryProvider.AmsAdminSid?.ToNtAccountName() ?? throw new InvalidOperationException("The AMS admin group was not set or not resolvable");
+            commandText = commandText.Replace("{amsAdminsGroup}", adminGroup);
 
             SqlCommand command = new SqlCommand(commandText, con);
             this.logger.LogTrace("Executing command\r\n{sql}", command.CommandText);

@@ -41,6 +41,20 @@ namespace Lithnet.AccessManager.Server
 
             return devices;
         }
+        public async IAsyncEnumerable<IDevice> GetDevices()
+        {
+            await using SqlConnection con = this.dbProvider.GetConnection();
+
+            SqlCommand command = new SqlCommand("spGetDevices", con);
+            command.CommandType = CommandType.StoredProcedure;
+
+            await using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                yield return new DbDevice(reader);
+            }
+        }
 
         public async IAsyncEnumerable<IDevice> GetDevices(int startIndex, int count)
         {

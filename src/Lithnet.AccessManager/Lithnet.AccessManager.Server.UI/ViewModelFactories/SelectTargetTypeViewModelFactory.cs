@@ -9,21 +9,21 @@ namespace Lithnet.AccessManager.Server.UI
     public class SelectTargetTypeViewModelFactory : IViewModelFactory<SelectTargetTypeViewModel>
     {
         private readonly AzureAdOptions azureAdOptions;
-        private readonly ApiAuthenticationOptions apiOptions;
+        private readonly IRegistryProvider registryProvider;
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IViewModelFactory<AzureAdTenantDetailsViewModel, AzureAdTenantDetails> aadTenantViewModelFactory;
 
-        public SelectTargetTypeViewModelFactory(AzureAdOptions azureAdOptions, ApiAuthenticationOptions apiOptions, IViewModelFactory<AzureAdTenantDetailsViewModel, AzureAdTenantDetails> aadTenantViewModelFactory, IDomainTrustProvider domainTrustProvider)
+        public SelectTargetTypeViewModelFactory(AzureAdOptions azureAdOptions, ApiAuthenticationOptions apiOptions, IViewModelFactory<AzureAdTenantDetailsViewModel, AzureAdTenantDetails> aadTenantViewModelFactory, IDomainTrustProvider domainTrustProvider, IRegistryProvider registryProvider)
         {
             this.azureAdOptions = azureAdOptions;
-            this.apiOptions = apiOptions;
             this.aadTenantViewModelFactory = aadTenantViewModelFactory;
             this.domainTrustProvider = domainTrustProvider;
+            this.registryProvider = registryProvider;
         }
 
         public SelectTargetTypeViewModel CreateViewModel()
         {
-            return new SelectTargetTypeViewModel(azureAdOptions, apiOptions, domainTrustProvider, aadTenantViewModelFactory);
+            return new SelectTargetTypeViewModel(azureAdOptions, domainTrustProvider, aadTenantViewModelFactory, registryProvider);
         }
     }
 }

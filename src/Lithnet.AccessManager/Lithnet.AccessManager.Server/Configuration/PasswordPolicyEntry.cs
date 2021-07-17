@@ -16,13 +16,13 @@
 
         public string PasswordCharacters { get; set; }
 
-        public bool UseUpper { get; set; }
+        public bool UseUpper { get; set; } = true;
 
-        public bool UseLower { get; set; }
+        public bool UseLower { get; set; } = true;
 
-        public bool UseSymbol { get; set; }
+        public bool UseSymbol { get; set; } 
 
-        public bool UseNumeric { get; set; }
+        public bool UseNumeric { get; set; } = true;
 
         public string TargetGroup { get; set; }
 

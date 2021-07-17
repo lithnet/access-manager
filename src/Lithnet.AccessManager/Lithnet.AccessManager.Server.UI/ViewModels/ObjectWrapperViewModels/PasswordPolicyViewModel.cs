@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Lithnet.AccessManager.Api;
@@ -165,7 +166,6 @@ namespace Lithnet.AccessManager.Server.UI
             try
             {
                 SelectTargetTypeViewModel vm = this.selectTargetTypeFactory.CreateViewModel();
-                vm.TargetType = Configuration.TargetType.AadGroup;
                 vm.AllowAdComputer = false;
                 vm.AllowAdContainer = false;
                 vm.AllowAdGroup = false;
@@ -173,6 +173,13 @@ namespace Lithnet.AccessManager.Server.UI
                 vm.AllowAmsGroup = true;
                 vm.AllowAzureAdComputer = false;
                 vm.AllowAzureAdGroup = true;
+
+                if (!vm.TargetTypeValues.Any())
+                {
+                    return;
+                }
+
+                vm.SetDefaultTarget(Configuration.TargetType.AadGroup);
 
                 DialogWindow w1 = new DialogWindow
                 {
@@ -189,7 +196,7 @@ namespace Lithnet.AccessManager.Server.UI
                     return;
                 }
 
-                if (vm.TargetType == Configuration.TargetType.AadGroup)
+                if (vm.TargetType == Configuration.TargetType.AadGroup && vm.SelectedAad != null)
                 {
                     this.SelectTargetAadGroup(vm.SelectedAad.TenantId);
                 }

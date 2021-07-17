@@ -8,49 +8,57 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
              Dialog:DialogParticipation.Register="{Binding}"
+              d:DesignWidth ="500"
              mc:Ignorable="d">
     <AdornerDecorator>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="400"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="400"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0"
+                <TextBlock Grid.Row="0"
+                       Grid.Column="1"
+                       Margin="5"
+                       TextWrapping="Wrap"
+                       >Create an app registration in Azure AD, and provide the client ID and secret here. If you are using Azure AD for authentication, this can be the same app that is configured for OpenID connect. The app must be granted the following API permissions: Group.Read.All, Device.Read.All, and Organization.Read.All</TextBlock>
+
+                <Label Grid.Row="1" Grid.Column="0"
                        Content="Tenant ID"
                        Margin="5"/>
-            <TextBox Grid.Row="0" Grid.Column="1" 
+                <TextBox Grid.Row="1" Grid.Column="1" 
                          Text="{Binding TenantId, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
                          IsReadOnly="False"
                          ToolTip="Enter the ID of the Azure AD tenant"
                          Margin="5"/>
 
-            <Label Grid.Row="2" Grid.Column="0"
+                <Label Grid.Row="2" Grid.Column="0"
                        Content="Client ID"
                        Margin="5"/>
-            <TextBox Grid.Row="2" Grid.Column="1" 
+                <TextBox Grid.Row="2" Grid.Column="1" 
                      Text="{Binding ClientId, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
                      IsReadOnly="false"
                      ToolTip="Enter the client ID of the registered enterprise application"
                      Margin="5"/>
 
-            <Label Grid.Row="4" Grid.Column="0"
+                <Label Grid.Row="4" Grid.Column="0"
                    Content="Client secret"
                    Margin="5"/>
-            <PasswordBox Grid.Row="4"
+                <PasswordBox Grid.Row="4"
                          Grid.Column="1"
                          local:PasswordBoxBindingHelper.BindPassword="True"
                          local:PasswordBoxBindingHelper.BoundPassword="{Binding Path=ClientSecret, Mode=TwoWay}"
                          Margin="5" />
-        </Grid>
+            </Grid>
+        </StackPanel>
     </AdornerDecorator>
 </UserControl>

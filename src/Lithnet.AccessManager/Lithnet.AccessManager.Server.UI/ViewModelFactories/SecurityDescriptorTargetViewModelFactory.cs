@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Stylet;
 using System;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.Providers;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -18,7 +19,6 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILogger<SecurityDescriptorTargetViewModel> logger;
         private readonly IDiscoveryServices discoveryServices;
         private readonly IActiveDirectory directory;
-        private readonly IDomainTrustProvider domainTrustProvider;
         private readonly ILocalSam localSam;
         private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly Func<IModelValidator<SecurityDescriptorTargetViewModel>> validator;
@@ -29,8 +29,11 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IViewModelFactory<AzureAdObjectSelectorViewModel> aadObjectSelectorFactory;
         private readonly IAadGraphApiProvider graphProvider;
         private readonly IDeviceProvider deviceProvider;
-
-        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IActiveDirectory directory, ILocalSam localsam, IObjectSelectionProvider objectSelectionProvider, Func<IModelValidator<SecurityDescriptorTargetViewModel>> validator, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> selectTargetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadObjectSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider)
+        private readonly IViewModelFactory<AmsDeviceSelectorViewModel> amsDeviceSelectorFactory;
+        private readonly IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory;
+        private readonly IAmsGroupProvider amsGroupProvider;
+        
+        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IDiscoveryServices discoveryServices, IActiveDirectory directory, ILocalSam localsam, IObjectSelectionProvider objectSelectionProvider, Func<IModelValidator<SecurityDescriptorTargetViewModel>> validator, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> selectTargetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadObjectSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider, IViewModelFactory<AmsDeviceSelectorViewModel> amsDeviceSelectorFactory, IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory, IAmsGroupProvider amsGroupProvider)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.appPathProvider = appPathProvider;
@@ -39,7 +42,6 @@ namespace Lithnet.AccessManager.Server.UI
             this.logger = logger;
             this.directory = directory;
             this.discoveryServices = discoveryServices;
-            this.domainTrustProvider = domainTrustProvider;
             this.localSam = localsam;
             this.objectSelectionProvider = objectSelectionProvider;
             this.validator = validator;
@@ -50,12 +52,15 @@ namespace Lithnet.AccessManager.Server.UI
             this.aadObjectSelectorFactory = aadObjectSelectorFactory;
             this.graphProvider = graphProvider;
             this.deviceProvider = deviceProvider;
+            this.amsDeviceSelectorFactory = amsDeviceSelectorFactory;
+            this.amsGroupSelectorFactory = amsGroupSelectorFactory;
+            this.amsGroupProvider = amsGroupProvider;
         }
 
         public async Task<SecurityDescriptorTargetViewModel> CreateViewModelAsync(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings settings)
         {
 
-            var item = new SecurityDescriptorTargetViewModel(model, settings, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, validator.Invoke(), directory, domainTrustProvider, discoveryServices, localSam, objectSelectionProvider, scriptTemplateProvider, licenseManager, shellExecuteProvider, selectTargetTypeFactory, aadObjectSelectorFactory, graphProvider, deviceProvider);
+            var item = new SecurityDescriptorTargetViewModel(model, settings, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, validator.Invoke(), directory, discoveryServices, localSam, objectSelectionProvider, scriptTemplateProvider, licenseManager, shellExecuteProvider, selectTargetTypeFactory, aadObjectSelectorFactory, graphProvider, deviceProvider, amsGroupSelectorFactory, amsDeviceSelectorFactory, amsGroupProvider);
 
             await item.Initialization;
 

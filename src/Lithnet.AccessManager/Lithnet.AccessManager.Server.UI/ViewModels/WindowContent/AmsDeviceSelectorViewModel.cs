@@ -36,9 +36,12 @@ namespace Lithnet.AccessManager.Server.UI
             try
             {
                 List<DeviceViewModel> list = new List<DeviceViewModel>();
-                await foreach (IDevice m in this.deviceProvider.GetDevices(0, 2000000))
+                await foreach (IDevice m in this.deviceProvider.GetDevices())
                 {
-                    list.Add(new DeviceViewModel(m));
+                    if (m.AuthorityType == AuthorityType.Ams)
+                    {
+                        list.Add(new DeviceViewModel(m));
+                    }
                 }
 
                 this.Devices = new BindableCollection<DeviceViewModel>(list);

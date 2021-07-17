@@ -11,12 +11,12 @@ namespace Lithnet.AccessManager.Server.UI
     public class SelectTargetTypeViewModel : PropertyChangedBase
     {
         private readonly AzureAdOptions azureAdOptions;
-        private readonly ApiAuthenticationOptions apiOptions;
+        private readonly IRegistryProvider registryProvider;
 
-        public SelectTargetTypeViewModel(AzureAdOptions azureAdOptions, ApiAuthenticationOptions apiOptions, IDomainTrustProvider domainTrustProvider, IViewModelFactory<AzureAdTenantDetailsViewModel, AzureAdTenantDetails> tenantDetailsFactory)
+        public SelectTargetTypeViewModel(AzureAdOptions azureAdOptions, IDomainTrustProvider domainTrustProvider, IViewModelFactory<AzureAdTenantDetailsViewModel, AzureAdTenantDetails> tenantDetailsFactory, IRegistryProvider registryProvider)
         {
             this.azureAdOptions = azureAdOptions;
-            this.apiOptions = apiOptions;
+            this.registryProvider = registryProvider;
 
             this.AvailableForests = domainTrustProvider.GetForests().Select(t => t.Name).ToList();
             this.AvailableAads = new List<AzureAdTenantDetailsViewModel>();
@@ -71,21 +71,21 @@ namespace Lithnet.AccessManager.Server.UI
                     yield return TargetType.AdContainer;
                 }
 
-                if (azureAdOptions.Tenants.Count > 0)
+                if (this.registryProvider.ApiEnabled)
                 {
-                    if (this.AllowAzureAdComputer)
+                    if (azureAdOptions.Tenants.Count > 0)
                     {
-                        yield return TargetType.AadComputer;
+                        if (this.AllowAzureAdComputer)
+                        {
+                            yield return TargetType.AadComputer;
+                        }
+
+                        if (this.AllowAzureAdGroup)
+                        {
+                            yield return TargetType.AadGroup;
+                        }
                     }
 
-                    if (this.AllowAzureAdGroup)
-                    {
-                        yield return TargetType.AadGroup;
-                    }
-                }
-
-                if (apiOptions.AllowAmsManagedDeviceAuth)
-                {
                     if (this.AllowAmsComputer)
                     {
                         yield return TargetType.AmsComputer;
@@ -96,6 +96,18 @@ namespace Lithnet.AccessManager.Server.UI
                         yield return TargetType.AmsGroup;
                     }
                 }
+            }
+        }
+
+        public void SetDefaultTarget(TargetType type)
+        {
+            if (this.TargetTypeValues.Contains(type))
+            {
+                this.TargetType = type;
+            }
+            else
+            {
+                this.TargetType = this.TargetTypeValues.FirstOrDefault();
             }
         }
 

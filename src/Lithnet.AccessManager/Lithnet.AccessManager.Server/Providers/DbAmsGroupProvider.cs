@@ -129,6 +129,22 @@ namespace Lithnet.AccessManager.Server.Providers
             throw new InvalidOperationException("The database did not return the new record as expected");
         }
 
+        public async Task<IAmsGroup> GetGroupBySid(string groupSid)
+        {
+            await using SqlConnection con = this.dbProvider.GetConnection();
+            SqlCommand command = new SqlCommand("spGetGroupBySid", con);
+            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@SID", groupSid);
+            
+            await using SqlDataReader reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                return new DbAmsGroup(reader);
+            }
+
+            throw new GroupNotFoundException($"Could not find a group with SID {groupSid}");
+        }
+
         public async IAsyncEnumerable<IAmsGroup> GetGroups()
         {
             await using SqlConnection con = this.dbProvider.GetConnection();

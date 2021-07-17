@@ -17,7 +17,7 @@
              d:DesignWidth="800"
              d:DesignHeight="400"
              Margin="5">
-     <views:CanvasEx>
+    <views:CanvasEx>
         <Grid Height="{Binding Path=BindableActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}"
               Width="{Binding Path=BindableActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}">
 
@@ -40,6 +40,18 @@
                 <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Devices" />
             </DockPanel>
 
+
+            <StackPanel Grid.Row="2"
+                        Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Top"
+                        Margin="5">
+                <mah:ProgressRing Height="15"
+                                  Width="15" />
+                <TextBlock Margin="5 0 0 0"
+                           Text="Loading..." />
+            </StackPanel>
+
             <telerik:RadGridView  Grid.Row="2"
                                   Margin="10 5 5 0"
                                   ItemsSource="{Binding PagedSource, ElementName=radDataPager}"
@@ -55,6 +67,7 @@
                                   LeftFrozenColumnCount="1"
                                   FrozenColumnsSplitterVisibility="Hidden"
                                   SelectionMode="Extended"
+                                  Visibility="{Binding ShowDeviceList, Converter={StaticResource BooleanToVisibilityConverter}}"
                                   MouseDoubleClick="{s:Action Edit}"
                                   >
                 <b:Interaction.Behaviors>
@@ -81,38 +94,56 @@
                                   x:Name="radDataPager" 
                                   PageSize="100"  
                                   Margin="10 0 5 5"
+                                  Visibility="{Binding ShowDeviceList, Converter={StaticResource BooleanToVisibilityConverter}}"
                                   Source="{Binding Devices}">
                 <telerik:RadDataPager.Resources>
                     <ResourceDictionary Source="pack://application:,,,/Telerik.Windows.Themes.Office2019;component/Themes/Telerik.Windows.Controls.Data.xaml"/>
                 </telerik:RadDataPager.Resources>
             </telerik:RadDataPager>
 
-            <StackPanel Grid.Row="4"
+            <Grid Grid.Row="4"
+                  Visibility="{Binding ShowDeviceList, Converter={StaticResource BooleanToVisibilityConverter}}"
+            >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0"
                 Orientation="Horizontal"
                     Margin="10 5 5 5">
-                <Button Command="{s:Action ApproveDevice}" 
+                    <Button Command="{s:Action ApproveDevice}" 
                     Content="Approve" 
                     Margin="5"/>
-                <Button Command="{s:Action RejectDevice}" 
+                    <Button Command="{s:Action RejectDevice}" 
                     Content="Reject" 
                     Margin="5"/>
-                <Button Command="{s:Action DeleteDevice}"
+                    <Button Command="{s:Action DeleteDevice}"
                     Content="Delete..."
                     Margin="5"/>
 
-                <Button Command="{s:Action EnableDevice}"
+                    <Button Command="{s:Action EnableDevice}"
                         Content="Enable..."
                         Margin="5"/>
 
-                <Button Command="{s:Action DisableDevice}"
+                    <Button Command="{s:Action DisableDevice}"
                         Content="Disable..."
                         Margin="5"/>
 
-                <Button Command="{s:Action ExpirePassword}"
+                    <Button Command="{s:Action ExpirePassword}"
                         Content="Expire password..."
                         Margin="5"/>
+                </StackPanel>
 
-            </StackPanel>
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            Margin="10 5 5 5">
+                    <Button Command="{s:Action RefreshDevices}"
+                            Content="Refresh device list"
+                            Margin="5"/>
+                </StackPanel>
+
+            </Grid>
         </Grid>
     </views:CanvasEx>
 </UserControl>

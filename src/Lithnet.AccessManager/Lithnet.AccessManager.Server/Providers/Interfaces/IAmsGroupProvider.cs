@@ -18,7 +18,11 @@ namespace Lithnet.AccessManager.Server.Providers
 
         IAsyncEnumerable<SecurityIdentifier> GetGroupSidsForDevice(IDevice device);
         Task RemoveFromGroup(IAmsGroup group, IDevice device);
+
         Task AddToGroup(IAmsGroup group, IDevice device);
+
         IAsyncEnumerable<IDevice> GetMemberDevices(IAmsGroup group);
+
+        Task<IAmsGroup> GetGroupBySid(string groupSid);
     }
 }

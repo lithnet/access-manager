@@ -50,7 +50,7 @@
                        Grid.Column="0"
                        Grid.ColumnSpan="2"
                        Margin="5"
-                       TextWrapping="Wrap">Enabling Azure Active Directory support allows the management of LAPS for AAD-joined and AAD-registered Windows 10 devices</TextBlock>
+                       TextWrapping="Wrap">Enabling Azure Active Directory support allows LAPS for AAD-joined and AAD-registered devices running Windows 10 and above</TextBlock>
 
             <CheckBox Grid.Row="1"
                       Grid.Column="1"

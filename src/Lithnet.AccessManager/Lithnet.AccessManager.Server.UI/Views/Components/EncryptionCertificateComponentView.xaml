@@ -34,7 +34,7 @@
                        Grid.Column="0"
                        Grid.ColumnSpan="2"
                        Margin="5"
-                       TextWrapping="Wrap">All passwords stored in the AMS database are encrypted. Managed devices will use the public key of this certificate to use for encryption, while the private key remains protected on this server. Note, if you lose access to the private key of this certificate, AMS will be unable to decrypt any of the passwords in the database. Keep an offline backup of the certificate in a safe and secure location.
+                       TextWrapping="Wrap">All passwords stored in the AMS database are encrypted. Registered devices will use the public key of this certificate for encryption, while the private key remains protected on this server. Note, if you lose access to the private key of this certificate, AMS will be unable to decrypt any of the passwords in the database. Keep an offline backup of the certificate in a safe and secure location.
             </TextBlock>
 
        

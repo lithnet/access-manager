@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -50,19 +51,22 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (MissingConfigurationException ex)
             {
+                Bootstrapper.Logger?.LogCritical(EventIDs.UIInitializationError, ex, "Initialization error");
                 MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 WpfBugWindow.Close();
                 this.Shutdown(1);
             }
             catch (ClusterNodeNotActiveException ex)
             {
+                Bootstrapper.Logger?.LogCritical(EventIDs.UIInitializationError, ex, "Initialization error");
                 MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 WpfBugWindow.Close();
                 this.Shutdown(1);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"There was a problem loading the application, and the application will now terminate\r\n\r\nError message: {ex}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Bootstrapper.Logger?.LogCritical(EventIDs.UIInitializationError, ex, "Initialization error");
+                MessageBox.Show($"There was a problem loading the application, and the application will now terminate\r\n\r\nError message: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 WpfBugWindow.Close();
                 this.Shutdown(1);
             }

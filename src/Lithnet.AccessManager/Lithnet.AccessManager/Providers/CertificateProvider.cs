@@ -18,8 +18,8 @@ namespace Lithnet.AccessManager
 
         private readonly IDiscoveryServices discoveryServices;
 
-        public static Oid LithnetAccessManagerPasswordEncryptionEku = new Oid("1.3.6.1.4.1.55989.2.1.1", "Lithnet Access Manager password encryption");
-        public static Oid LithnetAccessManagerClusterEncryptionEku = new Oid("1.3.6.1.4.1.55989.2.1.2", "Lithnet Access Manager cluster encryption");
+        public static Oid LithnetAccessManagerAdPasswordEncryptionEku = new Oid("1.3.6.1.4.1.55989.2.1.1", "Lithnet Access Manager password encryption (AD)");
+        public static Oid LithnetAccessManagerAmsPasswordEncryptionEku = new Oid("1.3.6.1.4.1.55989.2.1.4", "Lithnet Access Manager password encryption (AMS)");
         public static Oid ServerAuthenticationEku = new Oid("1.3.6.1.5.5.7.3.1", "Server Authentication");
 
         public X509Certificate2 CreateSelfSignedCert(string subject, Oid eku)
@@ -97,26 +97,26 @@ namespace Lithnet.AccessManager
             return cert;
         }
 
-        public X509Certificate2Collection GetEligiblePasswordEncryptionCertificates(bool needPrivateKey)
+        public X509Certificate2Collection GetEligibleAdPasswordEncryptionCertificates(bool needPrivateKey)
         {
             X509Certificate2Collection certs = new X509Certificate2Collection();
 
             X509Store store = X509ServiceStoreHelper.Open(Constants.ServiceName, OpenFlags.ReadOnly);
-            GetEligibleCertificates(needPrivateKey, LithnetAccessManagerPasswordEncryptionEku, store, certs);
+            GetEligibleCertificates(needPrivateKey, LithnetAccessManagerAdPasswordEncryptionEku, store, certs);
 
             return certs;
         }
 
-        public X509Certificate2Collection GetEligibleClusterEncryptionCertificates(bool needPrivateKey)
+        public X509Certificate2Collection GetEligibleAmsPasswordEncryptionCertificates(bool needPrivateKey)
         {
             X509Certificate2Collection certs = new X509Certificate2Collection();
 
             X509Store store = X509ServiceStoreHelper.Open(Constants.ServiceName, OpenFlags.ReadOnly);
-            GetEligibleCertificates(needPrivateKey, LithnetAccessManagerClusterEncryptionEku, store, certs);
+            GetEligibleCertificates(needPrivateKey, LithnetAccessManagerAmsPasswordEncryptionEku, store, certs);
 
             return certs;
         }
-
+        
         private static void GetEligibleCertificates(bool needPrivateKey, Oid eku, X509Store store, X509Certificate2Collection certs)
         {
             foreach (X509Certificate2 c in store.Certificates.Find(X509FindType.FindByTimeValid, DateTime.Now, false)

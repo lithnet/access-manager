@@ -109,7 +109,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert("Lithnet Access Manager password encryption", CertificateProvider.LithnetAccessManagerPasswordEncryptionEku);
+                X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert("Lithnet Access Manager password encryption", CertificateProvider.LithnetAccessManagerAmsPasswordEncryptionEku);
 
                 using X509Store store = X509ServiceStoreHelper.Open(AccessManager.Constants.ServiceName, OpenFlags.ReadWrite);
                 store.Add(cert);
@@ -120,6 +120,12 @@ namespace Lithnet.AccessManager.Server.UI
 
                 this.AvailableCertificates.Add(vm);
                 this.SelectedCertificate = vm;
+
+                if (!this.AvailableCertificates.All(t => t.IsPublished))
+                {
+                    vm.IsPublished = true;
+                    this.ActiveCertificateThumbprint = vm.Model.Thumbprint;
+                }
 
                 this.NotifyCertificateListChanged();
 
@@ -228,7 +234,12 @@ namespace Lithnet.AccessManager.Server.UI
                         using (X509Store store = X509ServiceStoreHelper.Open(AccessManager.Constants.ServiceName, OpenFlags.ReadWrite))
                         {
                             store.Remove(cert);
-                            this.NotifyCertificateListChanged();
+                        }
+
+                        this.NotifyCertificateListChanged();
+                        if (cert.Thumbprint == this.ActiveCertificateThumbprint)
+                        {
+                            this.ActiveCertificateThumbprint = null;
                         }
                     }
 
@@ -290,7 +301,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                 this.AvailableCertificates.Clear();
 
-                var allCertificates = certificateProvider.GetEligiblePasswordEncryptionCertificates(false).OfType<X509Certificate2>();
+                var allCertificates = certificateProvider.GetEligibleAmsPasswordEncryptionCertificates(false).OfType<X509Certificate2>();
 
                 X509Certificate2 publishedCert = null;
 
@@ -303,6 +314,11 @@ namespace Lithnet.AccessManager.Server.UI
                 }
                 catch
                 {
+                }
+
+                if (publishedCert == null)
+                {
+                    this.ActiveCertificateThumbprint = null;
                 }
 
                 bool foundPublished = false;

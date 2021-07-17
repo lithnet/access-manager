@@ -94,6 +94,7 @@ namespace Lithnet.AccessManager.Service
             services.AddSingleton<IDeviceProvider, DbDeviceProvider>();
             services.AddSingleton<IDevicePasswordProvider, DbDevicePasswordProvider>();
             services.AddSingleton<IRegistrationKeyProvider, DbRegistrationKeyProvider>();
+            services.AddSingleton<IAmsGroupProvider, DbAmsGroupProvider>();
 
             services.AddSingleton<ISmtpProvider, SmtpProvider>();
             services.AddSingleton<IApplicationUpgradeProvider, ApplicationUpgradeProvider>();

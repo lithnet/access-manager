@@ -1,4 +1,6 @@
-﻿namespace Lithnet.AccessManager.Server
+﻿using System.Security.Principal;
+
+namespace Lithnet.AccessManager.Server
 {
     public interface IRegistryProvider
     {
@@ -35,6 +37,11 @@
         bool ResetMaintenanceTaskSchedules { get; set; }
 
         bool ApiEnabled { get; set; }
+
         string LicenseData { get; }
+
+        string AmsAdminSidString { get; set; }
+
+        SecurityIdentifier AmsAdminSid { get; set; }
     }
 }

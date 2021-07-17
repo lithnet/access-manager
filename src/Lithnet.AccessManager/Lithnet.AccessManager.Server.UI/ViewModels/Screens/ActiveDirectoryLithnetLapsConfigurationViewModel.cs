@@ -232,7 +232,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert(this.SelectedForest.Name, CertificateProvider.LithnetAccessManagerPasswordEncryptionEku);
+                X509Certificate2 cert = this.certificateProvider.CreateSelfSignedCert(this.SelectedForest.Name, CertificateProvider.LithnetAccessManagerAdPasswordEncryptionEku);
 
                 using X509Store store = X509ServiceStoreHelper.Open(AccessManager.Constants.ServiceName, OpenFlags.ReadWrite);
                 store.Add(cert);
@@ -433,7 +433,7 @@ namespace Lithnet.AccessManager.Server.UI
                     return;
                 }
 
-                var allCertificates = certificateProvider.GetEligiblePasswordEncryptionCertificates(false).OfType<X509Certificate2>();
+                var allCertificates = certificateProvider.GetEligibleAdPasswordEncryptionCertificates(false).OfType<X509Certificate2>();
                 this.certificateProvider.TryGetCertificateFromDirectory(out X509Certificate2 publishedCert, this.SelectedForest.Forest.RootDomain.Name);
 
                 bool foundPublished = false;

@@ -11,9 +11,9 @@ namespace Lithnet.AccessManager
 
         X509Certificate2 FindDecryptionCertificate(string thumbprint);
 
-        X509Certificate2Collection GetEligiblePasswordEncryptionCertificates(bool needPrivateKey);
-
-        X509Certificate2Collection GetEligibleClusterEncryptionCertificates(bool needPrivateKey);
+        X509Certificate2Collection GetEligibleAdPasswordEncryptionCertificates(bool needPrivateKey);
+        
+        X509Certificate2Collection GetEligibleAmsPasswordEncryptionCertificates(bool needPrivateKey);
 
         bool TryGetCertificateFromDirectory(out X509Certificate2 cert, string dnsDomain);
 

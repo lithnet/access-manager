@@ -28,6 +28,8 @@
   <ItemGroup>
     <None Remove="DBScripts\00001-CreateRateLimitCacheTable.sql" />
     <None Remove="DBScripts\00003-CreateAuditTable.sql" />
+    <None Remove="DBScripts\ExternalSqlCreation\CreateAmsAdminGroupPermissionToDB.sql" />
+    <None Remove="DBScripts\ExternalSqlCreation\CreateAmsAdminsGroupLoginToDB.sql" />
     <None Remove="DBScripts\ExternalSqlCreation\CreateNewDatabase.sql" />
     <None Remove="DBScripts\ExternalSqlCreation\CreateServiceAccountLoginToDB.sql" />
     <None Remove="DBScripts\ExternalSqlCreation\CreateServiceAccountLoginToServer.sql" />
@@ -42,14 +44,17 @@
     <None Remove="DBScripts\Upgrade\00002-CreateQuartzTables.sql" />
     <None Remove="DBScripts\Upgrade\00003-CreateDeviceTables.sql" />
     <None Remove="DBScripts\Upgrade\00004-AddLocalAdmins.sql" />
+    <None Remove="DBScripts\Upgrade\00004-ProcedureUpdates.sql" />
     <None Remove="EmbeddedResources\Templates\CertificateExpiringEmail.html" />
     <None Remove="EmbeddedResources\Templates\NewVersionAvailableEmail.html" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="DBScripts\ExternalSqlCreation\CreateNewDatabase.sql" />
+    <EmbeddedResource Include="DBScripts\ExternalSqlCreation\CreateAmsAdminsGroupLoginToDB.sql" />
     <EmbeddedResource Include="DBScripts\ExternalSqlCreation\CreateServiceAccountLoginToDB.sql" />
     <EmbeddedResource Include="DBScripts\ExternalSqlCreation\CreateServiceAccountLoginToServer.sql" />
+    <EmbeddedResource Include="DBScripts\ExternalSqlCreation\CreateAmsAdminGroupPermissionToDB.sql" />
     <EmbeddedResource Include="DBScripts\ExternalSqlCreation\CreateServiceAccountPermissionToDB.sql" />
     <EmbeddedResource Include="DBScripts\LocalDBCreation\AttachDatabaseWithLog.sql" />
     <EmbeddedResource Include="DBScripts\LocalDBCreation\AttachDatabase.sql" />
@@ -58,6 +63,7 @@
     <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateServiceAccountLoginToDB.sql" />
     <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateServiceAccountLoginToServer.sql" />
     <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateNewDatabaseWithPaths.sql" />
+    <EmbeddedResource Include="DBScripts\Upgrade\00004-ProcedureUpdates.sql" />
     <EmbeddedResource Include="DBScripts\Upgrade\00003-CreateDeviceTables.sql" />
     <EmbeddedResource Include="DBScripts\Upgrade\00002-CreateQuartzTables.sql" />
     <EmbeddedResource Include="DBScripts\Upgrade\00001-CreateRateLimitCacheTable.sql" />

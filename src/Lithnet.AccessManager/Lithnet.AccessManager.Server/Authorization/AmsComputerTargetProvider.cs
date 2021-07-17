@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.Providers;
 
 namespace Lithnet.AccessManager.Server.Authorization
 {
@@ -12,10 +13,12 @@ namespace Lithnet.AccessManager.Server.Authorization
     {
         private readonly ITargetDataProvider targetDataProvider;
         private readonly ILogger logger;
+        private readonly IAmsGroupProvider groupProvider;
 
-        public AmsComputerTargetProvider(ITargetDataProvider targetDataProvider, ILogger<AmsComputerTargetProvider> logger)
+        public AmsComputerTargetProvider(ITargetDataProvider targetDataProvider, ILogger<AmsComputerTargetProvider> logger, IAmsGroupProvider groupProvider)
         {
             this.logger = logger;
+            this.groupProvider = groupProvider;
             this.targetDataProvider = targetDataProvider;
         }
 
@@ -24,7 +27,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             return computer is IDevice d && d.AuthorityType == AuthorityType.Ams;
         }
 
-        public Task<IList<SecurityDescriptorTarget>> GetMatchingTargetsForComputer(IComputer computer, IEnumerable<SecurityDescriptorTarget> targets)
+        public async Task<IList<SecurityDescriptorTarget>> GetMatchingTargetsForComputer(IComputer computer, IEnumerable<SecurityDescriptorTarget> targets)
         {
             if (!(computer is IDevice d) || (d.AuthorityType != AuthorityType.Ams))
             {
@@ -33,7 +36,7 @@ namespace Lithnet.AccessManager.Server.Authorization
 
             List<SecurityDescriptorTarget> matchingTargets = new List<SecurityDescriptorTarget>();
 
-            List<SecurityIdentifier> computerTokenSids = new List<SecurityIdentifier>(); // build ams group list
+            List<SecurityIdentifier> computerTokenSids = await this.groupProvider.GetGroupSidsForDevice(d).ToListAsync();
 
             foreach (var target in targets.OrderBy(t => (int)t.Type).ThenByDescending(this.targetDataProvider.GetSortOrder))
             {
@@ -69,7 +72,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                 }
             }
 
-            return Task.FromResult((IList<SecurityDescriptorTarget>)matchingTargets);
+            return (IList<SecurityDescriptorTarget>)matchingTargets;
         }
     }
 }

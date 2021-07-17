@@ -26,7 +26,7 @@ namespace Lithnet.AccessManager
                 }
             }
 
-            throw new UnsupportedPrincipalTypeException($"An object of type {de.SchemaClassName} was provided, but an object of one of the following types was expected '{string.Join(",", objectClasses)}'"); 
+            throw new UnsupportedPrincipalTypeException($"An object of type {de.SchemaClassName} was provided, but an object of one of the following types was expected '{string.Join(",", objectClasses)}'");
         }
 
         public static byte[] ToBytes(this SecurityIdentifier s)
@@ -46,6 +46,23 @@ namespace Lithnet.AccessManager
             {
                 return s.ToString();
             }
+        }
+
+        public static string ToNtAccountNameOrNull(this SecurityIdentifier s)
+        {
+            try
+            {
+                return ((NTAccount)s.Translate(typeof(NTAccount))).Value;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public static string ToNtAccountName(this SecurityIdentifier s)
+        {
+            return ((NTAccount)s.Translate(typeof(NTAccount))).Value;
         }
 
         internal static byte[] ToBytes(this GenericSecurityDescriptor s)

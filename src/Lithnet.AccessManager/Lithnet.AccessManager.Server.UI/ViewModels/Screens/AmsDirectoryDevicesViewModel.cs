@@ -40,8 +40,6 @@ namespace Lithnet.AccessManager.Server.UI
             this.NotifyOfPropertyChange(() => this.CanDisableDevice);
             this.NotifyOfPropertyChange(() => this.CanExpirePassword);
         }
-
-
         protected override void OnInitialActivate()
         {
             Task.Run(async () => await this.Initialize());
@@ -49,17 +47,25 @@ namespace Lithnet.AccessManager.Server.UI
 
         private async Task Initialize()
         {
+            await this.RefreshDevices();
+        }
+
+        public async Task RefreshDevices()
+        {
             try
             {
                 this.IsLoading = true;
 
                 List<DeviceViewModel> list = new List<DeviceViewModel>();
-                await foreach (IDevice m in this.deviceProvider.GetDevices(0, 2000000))
+                await foreach (IDevice m in this.deviceProvider.GetDevices())
                 {
                     list.Add(new DeviceViewModel(m));
                 }
 
                 this.Devices = new BindableCollection<DeviceViewModel>(list);
+                this.SelectedItem = null;
+                this.SelectedItems.Clear();
+                this.NotifyOfPropertyChange(() => this.SelectedItems);
             }
             catch (Exception ex)
             {
@@ -79,6 +85,8 @@ namespace Lithnet.AccessManager.Server.UI
 
 
         public bool IsLoading { get; set; }
+
+        public bool ShowDeviceList => !this.IsLoading;
 
         [NotifyModelChangedCollection]
         public BindableCollection<DeviceViewModel> Devices { get; set; }
@@ -128,7 +136,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public bool CanEnableDevice => this.SelectedItems.All(t => t.Disabled);
+        public bool CanEnableDevice => this.SelectedItems.Count > 0 && this.SelectedItems.All(t => t.Disabled);
 
         public async Task EnableDevice()
         {
@@ -173,7 +181,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public bool CanDisableDevice => this.SelectedItems.All(t => t.Enabled);
+        public bool CanDisableDevice => this.SelectedItems.Count > 0 && this.SelectedItems.All(t => t.Enabled);
 
         public async Task DisableDevice()
         {
@@ -218,7 +226,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public bool CanApproveDevice => this.SelectedItems.All(t => t.IsPending);
+        public bool CanApproveDevice => this.SelectedItems.Count > 0 && this.SelectedItems.All(t => t.IsPending);
 
         public async Task ApproveDevice()
         {
@@ -263,7 +271,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public bool CanRejectDevice => this.SelectedItems.All(t => t.IsPending);
+        public bool CanRejectDevice => this.SelectedItems.Count > 0 && this.SelectedItems.All(t => t.IsPending);
 
         public async Task RejectDevice()
         {
@@ -308,36 +316,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public bool CanDeleteDevice => !this.IsLoading && this.SelectedItems.Count > 0;
-
-        public async Task Edit()
-        {
-            try
-            {
-                var selectedItem = this.SelectedItem;
-
-                if (selectedItem == null)
-                {
-                    return;
-                }
-
-                DialogWindow w = new DialogWindow
-                {
-                    Title = "Device details",
-                    SaveButtonIsDefault = true,
-                    ShowCloseButton = false,
-                    SaveButtonName = "Close",
-                    DataContext = selectedItem
-                };
-
-                await this.GetWindow().ShowChildWindowAsync(w);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
-                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
-            }
-        }
+        public bool CanDeleteDevice => this.SelectedItems.Count > 0 && this.SelectedItems.Count > 0;
 
         public async Task DeleteDevice()
         {
@@ -375,6 +354,37 @@ namespace Lithnet.AccessManager.Server.UI
                     this.NotifyOfPropertyChange(() => this.CanApproveDevice);
                     this.NotifyOfPropertyChange(() => this.CanDeleteDevice);
                 }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Could not complete the operation\r\n{ex.Message}");
+            }
+        }
+
+        public bool CanEdit => this.SelectedItem != null;
+
+        public async Task Edit()
+        {
+            try
+            {
+                var selectedItem = this.SelectedItem;
+
+                if (selectedItem == null)
+                {
+                    return;
+                }
+
+                DialogWindow w = new DialogWindow
+                {
+                    Title = "Device details",
+                    SaveButtonIsDefault = true,
+                    ShowCloseButton = false,
+                    SaveButtonName = "Close",
+                    DataContext = selectedItem
+                };
+
+                await this.GetWindow().ShowChildWindowAsync(w);
             }
             catch (Exception ex)
             {

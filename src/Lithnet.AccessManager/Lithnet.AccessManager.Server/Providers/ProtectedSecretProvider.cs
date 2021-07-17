@@ -8,7 +8,6 @@ using System.Security.Principal;
 using System.Text;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
-using Lithnet.Licensing.Core;
 using Microsoft.Extensions.Options;
 using Vanara.InteropServices;
 using Vanara.PInvoke;
@@ -26,8 +25,10 @@ namespace Lithnet.AccessManager.Server
         private readonly IAmsLicenseManager licenseManager;
         private readonly RandomNumberGenerator rng;
         private readonly IWindowsServiceProvider windowsServiceProvider;
+        private readonly IRegistryProvider registryProvider;
 
-        public ProtectedSecretProvider(IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider, RandomNumberGenerator rng, IOptions<DataProtectionOptions> dataProtectionOptions, IWindowsServiceProvider windowsServiceProvider, IAmsLicenseManager licenseManager)
+
+        public ProtectedSecretProvider(IEncryptionProvider encryptionProvider, ICertificateProvider certificateProvider, RandomNumberGenerator rng, IOptions<DataProtectionOptions> dataProtectionOptions, IWindowsServiceProvider windowsServiceProvider, IAmsLicenseManager licenseManager, IRegistryProvider registryProvider)
         {
             this.encryptionProvider = encryptionProvider;
             this.certificateProvider = certificateProvider;
@@ -35,6 +36,7 @@ namespace Lithnet.AccessManager.Server
             this.dataProtectionOptions = dataProtectionOptions.Value;
             this.windowsServiceProvider = windowsServiceProvider;
             this.licenseManager = licenseManager;
+            this.registryProvider = registryProvider;
         }
 
         public CommonSecurityDescriptor BuildDefaultSecurityDescriptor()
@@ -53,8 +55,20 @@ namespace Lithnet.AccessManager.Server
             }
 
             sd.DiscretionaryAcl.AddAccess(AccessControlType.Allow, domainAdmins, ReadPublicAndPrivateKey, InheritanceFlags.None, PropagationFlags.None);
-            sd.DiscretionaryAcl.AddAccess(AccessControlType.Allow, WindowsIdentity.GetCurrent().User, ReadPublicAndPrivateKey, InheritanceFlags.None, PropagationFlags.None);
             sd.DiscretionaryAcl.AddAccess(AccessControlType.Allow, new SecurityIdentifier(WellKnownSidType.WorldSid, null), ReadPublicKey, InheritanceFlags.None, PropagationFlags.None);
+
+
+            var currentUser = WindowsIdentity.GetCurrent().User;
+            if (currentUser != null)
+            {
+                sd.DiscretionaryAcl.AddAccess(AccessControlType.Allow, currentUser, ReadPublicAndPrivateKey, InheritanceFlags.None, PropagationFlags.None);
+            }
+
+            var amsAdmins = registryProvider.AmsAdminSid;
+            if (amsAdmins != null)
+            {
+                sd.DiscretionaryAcl.AddAccess(AccessControlType.Allow, amsAdmins, ReadPublicAndPrivateKey, InheritanceFlags.None, PropagationFlags.None);
+            }
 
             return sd;
         }

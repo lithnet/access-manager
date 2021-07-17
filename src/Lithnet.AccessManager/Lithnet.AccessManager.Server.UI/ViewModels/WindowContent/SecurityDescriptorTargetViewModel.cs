@@ -15,6 +15,7 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
+using Lithnet.AccessManager.Server.Providers;
 using Microsoft.Graph;
 using Domain = System.DirectoryServices.ActiveDirectory.Domain;
 
@@ -26,7 +27,6 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILogger<SecurityDescriptorTargetViewModel> logger;
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory;
-        private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IDiscoveryServices discoveryServices;
         private readonly ILocalSam localSam;
         private readonly SecurityDescriptorTargetViewModelDisplaySettings displaySettings;
@@ -38,6 +38,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IViewModelFactory<AzureAdObjectSelectorViewModel> aadSelectorFactory;
         private readonly IAadGraphApiProvider graphProvider;
         private readonly IDeviceProvider deviceProvider;
+        private readonly IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory;
+        private readonly IViewModelFactory<AmsDeviceSelectorViewModel> amsDeviceSelectorFactory;
+        private readonly IAmsGroupProvider amsGroupProvider;
 
         private string jitGroupDisplayName;
 
@@ -45,7 +48,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IActiveDirectory directory, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> targetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IActiveDirectory directory, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> targetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider, IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory, IViewModelFactory<AmsDeviceSelectorViewModel> amsDeviceSelectorFactory, IAmsGroupProvider amsGroupProvider)
         {
             this.directory = directory;
             this.Model = model;
@@ -53,7 +56,6 @@ namespace Lithnet.AccessManager.Server.UI
             this.dialogCoordinator = dialogCoordinator;
             this.notificationChannelFactory = notificationChannelFactory;
             this.Validator = validator;
-            this.domainTrustProvider = domainTrustProvider;
             this.discoveryServices = discoveryServices;
             this.localSam = localSam;
             this.displaySettings = displaySettings ?? new SecurityDescriptorTargetViewModelDisplaySettings();
@@ -65,6 +67,9 @@ namespace Lithnet.AccessManager.Server.UI
             this.aadSelectorFactory = aadSelectorFactory;
             this.graphProvider = graphProvider;
             this.deviceProvider = deviceProvider;
+            this.amsGroupSelectorFactory = amsGroupSelectorFactory;
+            this.amsDeviceSelectorFactory = amsDeviceSelectorFactory;
+            this.amsGroupProvider = amsGroupProvider;
 
             this.Script = fileSelectionViewModelFactory.CreateViewModel(model, () => model.Script, appPathProvider.ScriptsPath);
             this.Script.DefaultFileExtension = "ps1";
@@ -381,8 +386,8 @@ namespace Lithnet.AccessManager.Server.UI
 
             foreach (var ace in csd.DiscretionaryAcl.OfType<CommonAce>())
             {
-                csd.DiscretionaryAcl.RemoveAccess((AccessControlType)ace.AceType, ace.SecurityIdentifier, (int) AccessMask.Jit, InheritanceFlags.None, PropagationFlags.None);
-                csd.DiscretionaryAcl.RemoveAccess((AccessControlType)ace.AceType, ace.SecurityIdentifier, (int) AccessMask.BitLocker, InheritanceFlags.None, PropagationFlags.None);
+                csd.DiscretionaryAcl.RemoveAccess((AccessControlType)ace.AceType, ace.SecurityIdentifier, (int)AccessMask.Jit, InheritanceFlags.None, PropagationFlags.None);
+                csd.DiscretionaryAcl.RemoveAccess((AccessControlType)ace.AceType, ace.SecurityIdentifier, (int)AccessMask.BitLocker, InheritanceFlags.None, PropagationFlags.None);
             }
 
             return csd;
@@ -590,6 +595,10 @@ namespace Lithnet.AccessManager.Server.UI
                 {
                     this.ShowAadObjectSelector(vm.TargetType, vm.SelectedAad.TenantId);
                 }
+                else if (vm.TargetType.IsAmsTarget())
+                {
+                    await this.ShowAmsObjectSelector(vm.TargetType);
+                }
                 else
                 {
                     await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Not yet implemented");
@@ -599,6 +608,81 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 this.logger.LogError(EventIDs.UIGenericError, ex, "Select target error");
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"An error occurred when processing the request\r\n{ex.Message}");
+            }
+        }
+
+        private async Task ShowAmsObjectSelector(TargetType type)
+        {
+            if (type == TargetType.AmsComputer)
+            {
+                this.ShowAmsDeviceSelector();
+            }
+            else if (type == TargetType.AmsGroup)
+            {
+                this.ShowAmsGroupSelector();
+            }
+            else
+            {
+                await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Not yet implemented");
+            }
+
+        }
+
+        private void ShowAmsGroupSelector()
+        {
+            var selectorVm = this.amsGroupSelectorFactory.CreateViewModel();
+
+            ExternalDialogWindow w = new ExternalDialogWindow()
+            {
+                Title = "Select AMS group",
+                DataContext = selectorVm,
+                SaveButtonName = "Select...",
+                SaveButtonIsDefault = true,
+                Owner = this.GetWindow()
+            };
+
+            if (!w.ShowDialog() ?? false)
+            {
+                return;
+            }
+
+            if (selectorVm.SelectedItem != null)
+            {
+                this.Target = selectorVm.SelectedItem.Sid;
+                this.Type = TargetType.AmsGroup;
+                this.CachedTargetName = selectorVm.SelectedItem.Name;
+                this.DisplayName = selectorVm.SelectedItem.Name;
+                this.TargetObjectId = null;
+                this.TargetAuthorityId = null;
+            }
+        }
+
+        private void ShowAmsDeviceSelector()
+        {
+            var selectorVm = this.amsDeviceSelectorFactory.CreateViewModel();
+
+            ExternalDialogWindow w = new ExternalDialogWindow()
+            {
+                Title = "Select AMS device",
+                DataContext = selectorVm,
+                SaveButtonName = "Select...",
+                SaveButtonIsDefault = true,
+                Owner = this.GetWindow()
+            };
+
+            if (!w.ShowDialog() ?? false)
+            {
+                return;
+            }
+
+            if (selectorVm.SelectedItem != null)
+            {
+                this.Target = selectorVm.SelectedItem.Sid;
+                this.Type = TargetType.AmsComputer;
+                this.CachedTargetName = selectorVm.SelectedItem.Name;
+                this.DisplayName = selectorVm.SelectedItem.Name;
+                this.TargetObjectId = selectorVm.SelectedItem.AuthorityDeviceId;
+                this.TargetAuthorityId = selectorVm.SelectedItem.AuthorityId;
             }
         }
 
@@ -716,7 +800,8 @@ namespace Lithnet.AccessManager.Server.UI
                     }
                     else
                     {
-                        return null;
+                        var group = await this.amsGroupProvider.GetGroupBySid(this.Target);
+                        return group.Name;
                     }
                 }
                 else if (s.IsAadAuthority())

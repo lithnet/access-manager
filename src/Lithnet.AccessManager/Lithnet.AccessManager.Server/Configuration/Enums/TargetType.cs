@@ -7,7 +7,7 @@ namespace Lithnet.AccessManager.Server.Configuration
     [JsonConverter(typeof(StringEnumConverter))]
     public enum TargetType
     {
-        [Description("AD-joined computer")]
+        [Description("AD computer")]
         AdComputer = 0,
 
         [Description("AD group")]
@@ -16,19 +16,19 @@ namespace Lithnet.AccessManager.Server.Configuration
         [Description("AD container")]
         AdContainer = 2,
 
-        [Description("Azure AD-managed computer")]
+        [Description("Azure AD computer")]
         AadComputer = 3,
 
         [Description("Azure AD group")]
         AadGroup = 4,
 
-        [Description("AMS-managed computer")]
+        [Description("AMS computer")]
         AmsComputer = 5,
 
-        [Description("AMS-managed computer group")]
+        [Description("AMS group")]
         AmsGroup = 6,
 
-        [Description("AD-joined computer")]
+        [Description("AD computer")]
         Computer = AdComputer,
 
         [Description("AD group")]

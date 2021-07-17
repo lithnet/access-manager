@@ -35,6 +35,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public PasswordPolicyViewModel SelectedPolicy { get; set; }
 
+        [NotifyModelChangedProperty]
         public PasswordPolicyViewModel DefaultPolicy { get; set; }
 
         private void SetupPolicies()

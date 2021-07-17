@@ -27,15 +27,17 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class Bootstrapper : Bootstrapper<MainWindowViewModel>
     {
-        private readonly ILogger logger;
+        private static ILogger logger;
 
-        private readonly ILoggerFactory loggerFactory;
+        public static ILogger Logger => logger;
+
+        private static ILoggerFactory loggerFactory;
 
         private IApplicationConfig appconfig;
 
-        private UiRegistryProvider registryProvider;
+        private static UiRegistryProvider registryProvider;
 
-        private void SetupNLog()
+        private static void SetupNLog()
         {
             var configuration = new NLog.Config.LoggingConfiguration();
 
@@ -53,22 +55,22 @@ namespace Lithnet.AccessManager.Server.UI
             NLog.LogManager.Configuration = configuration;
         }
 
-        public Bootstrapper()
+        static Bootstrapper()
         {
-            this.registryProvider = new UiRegistryProvider();
+            Bootstrapper.registryProvider = new UiRegistryProvider();
 
             SetupNLog();
 
             loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder.AddNLog();
-                builder.SetMinimumLevel(this.registryProvider.UiLogLevel);
+                builder.SetMinimumLevel(Bootstrapper.registryProvider.UiLogLevel);
                 builder.AddDebug();
                 builder.AddEventLog(new EventLogSettings()
                 {
                     SourceName = Constants.EventSourceName,
                     LogName = Constants.EventLogName,
-                    Filter = (x, y) => y >= this.registryProvider.UiEventLogLevel
+                    Filter = (x, y) => y >= Bootstrapper.registryProvider.UiEventLogLevel
                 });
             });
 
@@ -119,13 +121,13 @@ namespace Lithnet.AccessManager.Server.UI
 
                 if (!File.Exists(pathProvider.ConfigFile))
                 {
-                    this.logger.LogCritical(EventIDs.UIGenericError, "Config file was not found at path {path}", pathProvider.ConfigFile);
+                    logger.LogCritical(EventIDs.UIGenericError, "Config file was not found at path {path}", pathProvider.ConfigFile);
                     throw new MissingConfigurationException($"The appsettings.config file could not be found at path {pathProvider.ConfigFile}. Please resolve the issue and restart the application");
                 }
 
                 if (!File.Exists(pathProvider.HostingConfigFile))
                 {
-                    this.logger.LogCritical(EventIDs.UIGenericError, "Apphost file was not found at path {path}", pathProvider.HostingConfigFile);
+                    logger.LogCritical(EventIDs.UIGenericError, "Apphost file was not found at path {path}", pathProvider.HostingConfigFile);
                     throw new MissingConfigurationException($"The apphost.config file could not be found at path {pathProvider.HostingConfigFile}. Please resolve the issue and restart the application");
                 }
 
@@ -204,7 +206,6 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IAadGraphApiProvider>().To<AadGraphApiProvider>();
                 builder.Bind<IRegistrationKeyProvider>().To<DbRegistrationKeyProvider>();
                 builder.Bind<IDbProvider>().To<SqlDbProvider>().InSingletonScope();
-                builder.Bind<SqlLocalDbInstanceProvider>().ToSelf().InSingletonScope(); 
                 builder.Bind<SqlServerInstanceProvider>().ToSelf().InSingletonScope(); 
                 builder.Bind<IUpgradeLog>().To<DbUpgradeLogger>();
                 builder.Bind<IHostApplicationLifetime>().To<WpfHostLifetime>();
@@ -221,7 +222,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                 builder.Bind(typeof(IModelValidator<>)).To(typeof(FluentModelValidator<>));
                 builder.Bind(typeof(IValidator<>)).ToAllImplementations();
-                builder.Bind<ILoggerFactory>().ToInstance(this.loggerFactory);
+                builder.Bind<ILoggerFactory>().ToInstance(Bootstrapper.loggerFactory);
                 builder.Bind(typeof(ILogger<>)).To(typeof(Logger<>));
                 builder.Bind(typeof(IOptions<>)).To(typeof(OptionsWrapper<>)).InSingletonScope();
                 builder.Bind(typeof(IOptionsSnapshot<>)).To(typeof(OptionsManager<>));
@@ -232,12 +233,12 @@ namespace Lithnet.AccessManager.Server.UI
             }
             catch (ApplicationInitializationException ex)
             {
-                this.logger.LogCritical(EventIDs.UIInitializationError, ex, "Initialization error");
+                logger.LogCritical(EventIDs.UIInitializationError, ex, "Initialization error");
                 throw;
             }
             catch (Exception ex)
             {
-                this.logger.LogCritical(EventIDs.UIInitializationError, ex, "Initialization error");
+                logger.LogCritical(EventIDs.UIInitializationError, ex, "Initialization error");
                 throw new ApplicationInitializationException("The application failed to initialize", ex);
             }
         }

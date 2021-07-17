@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.IO;
+using System.Security.Principal;
 
 namespace Lithnet.AccessManager.Server
 {
@@ -31,14 +32,59 @@ namespace Lithnet.AccessManager.Server
 
         public string SqlServer => paramsKey?.GetValue("SqlServer", ".\\AMS") as string;
 
+        public string AmsAdminSidString
+        {
+            get => paramsKey?.GetValue("AmsAdmins") as string;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    paramsKey.DeleteValue("AmsAdmins");
+                }
+                else
+                {
+                    paramsKey.SetValue("AmsAdmins", value);
+                }
+            }
+        }
+
+        public SecurityIdentifier AmsAdminSid
+        {
+            get
+            {
+                var sidString = this.AmsAdminSidString;
+
+                if (!string.IsNullOrWhiteSpace(sidString))
+                {
+                    if (sidString.TryParseAsSid(out var sid))
+                    {
+                        return sid;
+                    }
+                }
+
+                return null;
+            }
+            set => this.AmsAdminSidString = value?.Value;
+        }
+
         public string ConnectionString => paramsKey?.GetValue("ConnectionString") as string;
 
         public string LicenseData
         {
             get => paramsKey?.GetValue("LicenseData") as string;
-            set => paramsKey.SetValue("LicenseData", value);
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    paramsKey.DeleteValue("LicenseData");
+                }
+                else
+                {
+                    paramsKey.SetValue("LicenseData", value);
+                }
+            }
         }
-        
+
         public string ConfigPath => paramsKey?.GetValue("ConfigPath") as string;
 
         public string LogPath => paramsKey?.GetValue("LogPath") as string ?? Path.Combine(Directory.GetCurrentDirectory(), "logs");
