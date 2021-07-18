@@ -55,17 +55,14 @@ The webhook functionality makes it really easy to get alerts via Slack or Micros
 The web app supports traditional integrated windows authentication, as well as external authentication providers such as [ADFS](https://github.com/lithnet/access-manager/wiki/Setting-up-authentication-with-ADFS) or 3rd party OpenID Connect providers such as [Azure AD](https://github.com/lithnet/access-manager/wiki/Setting-up-authentication-with-Azure-AD) and [Okta](https://github.com/lithnet/access-manager/wiki/Setting-up-authentication-with-Okta). Using an external authentication provider allows you the option of providing additional protections for the application such as multi-factor authentication.
 
 ## Guides
-*   [Getting started](https://github.com/lithnet/access-manager/wiki/Getting-Started)
+*   [Getting started]
 
 ## Download the app
 Download the [current release](https://github.com/lithnet/access-manager/releases/latest)
 
 ## Help and support
-Please read our [getting support guide](https://github.com/lithnet/access-manager/wiki/Getting-support) if you need help or encounter a problem
+Please read our [[getting support guide|Getting-support]] if you need help or encounter a problem
 
-## How can I contribute to the project?
-* We welcome code contributions. If you have a bug fix or code contribution, then feel free to submit a pull request. 
-* Make a [donation](https://lithnet.io/donate) and help us cover our costs
 
 ## Keep up to date
 *   [Visit my blog](http://blog.lithnet.io)
