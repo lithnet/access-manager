@@ -20,6 +20,15 @@
     <views:CanvasEx>
         <Grid Height="{Binding Path=BindableActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}"
               Width="{Binding Path=BindableActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <ContentControl Grid.Row="0" s:View.Model="{Binding EnterpriseEdition, Mode=OneWay}"  
+                            IsTabStop="False"/>
+
+        <Grid Grid.Row="1"
+            IsEnabled="{Binding EnterpriseEdition.IsEnterpriseEdition, Mode=OneWay}">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -144,6 +153,7 @@
                 </StackPanel>
 
             </Grid>
+        </Grid>
         </Grid>
     </views:CanvasEx>
 </UserControl>

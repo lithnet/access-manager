@@ -7,7 +7,7 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public AzureAdLithnetLapsConfigurationViewModel(IShellExecuteProvider shellExecuteProvider, INotifyModelChangedEventPublisher eventPublisher, EncryptionCertificateComponentViewModel encryptionVm, PasswordPoliciesViewModel passwordPolicies)
+        public AzureAdLithnetLapsConfigurationViewModel(IShellExecuteProvider shellExecuteProvider, INotifyModelChangedEventPublisher eventPublisher, EncryptionCertificateComponentViewModel encryptionVm, PasswordPoliciesViewModel passwordPolicies, IViewModelFactory<EnterpriseEditionBannerViewModel, EnterpriseEditionBannerModel> enterpriseEditionViewModelFactory)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.PasswordEncryption = encryptionVm;
@@ -15,7 +15,15 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.DisplayName = "Lithnet LAPS";
             eventPublisher.Register(this);
+
+            this.EnterpriseEdition = enterpriseEditionViewModelFactory.CreateViewModel(new EnterpriseEditionBannerModel
+            {
+                RequiredFeature = Enterprise.LicensedFeatures.AzureAdDeviceSupport,
+                Link = Constants.EnterpriseEditionLearnMoreLinkAzureAdDevices
+            });
         }
+
+        public EnterpriseEditionBannerViewModel EnterpriseEdition { get; set; }
 
         public EncryptionCertificateComponentViewModel PasswordEncryption { get; set; }
 

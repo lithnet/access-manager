@@ -68,6 +68,9 @@
         public const string EnterpriseEditionLearnMoreLinkHa = "https://go.lithnet.io/fwlink/vrcozgad";
         public const string EnterpriseEditionLearnMoreLinkLapsHistory = "https://go.lithnet.io/fwlink/fiacsyog";
         public const string EnterpriseEditionLearnMoreLinkPowerShellAuthz = "https://go.lithnet.io/fwlink/oockfltx";
+        public const string EnterpriseEditionLearnMoreLinkAzureAdDevices = "https://go.lithnet.io/fwlink/oockfltx";
+        public const string EnterpriseEditionLearnMoreLinkAmsDevices = "https://go.lithnet.io/fwlink/oockfltx";
+        public const string EnterpriseEditionLearnMoreLinkAmsApi = "https://go.lithnet.io/fwlink/oockfltx";
 
         public const string LinkGettingStarted = "https://go.lithnet.io/fwlink/yynjgebg";
         public const string LinkInstallingAms = "https://go.lithnet.io/fwlink/garieonh";

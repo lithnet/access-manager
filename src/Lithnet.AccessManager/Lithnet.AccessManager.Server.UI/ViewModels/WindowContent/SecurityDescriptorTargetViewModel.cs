@@ -48,7 +48,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IActiveDirectory directory, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> targetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider, IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory, IViewModelFactory<AmsDeviceSelectorViewModel> amsDeviceSelectorFactory, IAmsGroupProvider amsGroupProvider)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IActiveDirectory directory, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> targetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider, IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory, IViewModelFactory<AmsDeviceSelectorViewModel> amsDeviceSelectorFactory, IAmsGroupProvider amsGroupProvider, IViewModelFactory<EnterpriseEditionBadgeViewModel, EnterpriseEditionBadgeModel> enterpriseEditionViewModelFactory)
         {
             this.directory = directory;
             this.Model = model;
@@ -78,7 +78,44 @@ namespace Lithnet.AccessManager.Server.UI
             this.Script.ShouldValidate = false;
             this.Script.PropertyChanged += Script_PropertyChanged;
             this.Initialization = this.Initialize();
+
+            this.EnterpriseEditionTargetTypeAms = enterpriseEditionViewModelFactory.CreateViewModel(new EnterpriseEditionBadgeModel
+            {
+                ToolTipText = "This type of target is an enterprise edition feature. Click to learn more",
+                Link = Constants.EnterpriseEditionLearnMoreLinkAmsDevices,
+                RequiredFeature = LicensedFeatures.AmsRegisteredDeviceSupport
+            });
+
+            this.EnterpriseEditionTargetTypeAzureAd = enterpriseEditionViewModelFactory.CreateViewModel(new EnterpriseEditionBadgeModel
+            {
+                ToolTipText = "This type of target is an enterprise edition feature. Click to learn more",
+                Link = Constants.EnterpriseEditionLearnMoreLinkAzureAdDevices,
+                RequiredFeature = LicensedFeatures.AzureAdDeviceSupport
+            }
+            );
+
+            this.EnterpriseEditionPowerShellAcl = enterpriseEditionViewModelFactory.CreateViewModel(new EnterpriseEditionBadgeModel
+            {
+                ToolTipText = "PowerShell-based authorization is an enterprise edition feature. Click to learn more",
+                Link = Constants.EnterpriseEditionLearnMoreLinkPowerShellAuthz,
+                RequiredFeature = LicensedFeatures.PowerShellAcl
+            });
+
+            this.EnterpriseEditionLapsHistory = enterpriseEditionViewModelFactory.CreateViewModel(new EnterpriseEditionBadgeModel
+            {
+                ToolTipText = "Web-based access to the historical local admin passwords is an enterprise edition feature. Click to learn more",
+                Link = Constants.EnterpriseEditionLearnMoreLinkLapsHistory,
+                RequiredFeature = LicensedFeatures.LapsHistory
+            });
         }
+
+        public EnterpriseEditionBadgeViewModel EnterpriseEditionTargetTypeAms { get; set; }
+
+        public EnterpriseEditionBadgeViewModel EnterpriseEditionTargetTypeAzureAd { get; set; }
+
+        public EnterpriseEditionBadgeViewModel EnterpriseEditionPowerShellAcl { get; set; }
+
+        public EnterpriseEditionBadgeViewModel EnterpriseEditionLapsHistory { get; set; }
 
         private async Task Initialize()
         {
@@ -307,11 +344,13 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool IsScriptPermissionNotAllowed => !this.IsScriptPermissionAllowed;
 
-        public bool ShowPowerShellEnterpriseEditionBadge => this.IsScriptVisible && !this.licenseManager.IsFeatureCoveredByFullLicense(LicensedFeatures.PowerShellAcl);
+        public bool ShowPowerShellEnterpriseEditionBadge => this.IsScriptVisible;
 
-        public bool ShowLapsHistoryEnterpriseEditionBadge => !this.licenseManager.IsFeatureCoveredByFullLicense(LicensedFeatures.PowerShellAcl) && SdHasMask(this.SecurityDescriptor, AccessMask.LocalAdminPasswordHistory);
+        public bool ShowLapsHistoryEnterpriseEditionBadge => SdHasMask(this.SecurityDescriptor, AccessMask.LocalAdminPasswordHistory);
 
-        public bool ShowTargetTypeEnterpriseEditionBadge => this.Type.IsAadTarget() || this.Type.IsAmsTarget();
+        public bool ShowTargetTypeEnterpriseEditionBadgeAzureAd => this.Type.IsAadTarget();
+
+        public bool ShowTargetTypeEnterpriseEditionBadgeAms => this.Type.IsAmsTarget();
 
         public bool CanEditPermissions => this.CanEdit && this.AuthorizationMode == AuthorizationMode.SecurityDescriptor && this.Target != null;
 

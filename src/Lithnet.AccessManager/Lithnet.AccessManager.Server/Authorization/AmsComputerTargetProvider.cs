@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Providers;
 
 namespace Lithnet.AccessManager.Server.Authorization
@@ -14,17 +15,19 @@ namespace Lithnet.AccessManager.Server.Authorization
         private readonly ITargetDataProvider targetDataProvider;
         private readonly ILogger logger;
         private readonly IAmsGroupProvider groupProvider;
+        private readonly IAmsLicenseManager licenseManager;
 
-        public AmsComputerTargetProvider(ITargetDataProvider targetDataProvider, ILogger<AmsComputerTargetProvider> logger, IAmsGroupProvider groupProvider)
+        public AmsComputerTargetProvider(ITargetDataProvider targetDataProvider, ILogger<AmsComputerTargetProvider> logger, IAmsGroupProvider groupProvider, IAmsLicenseManager licenseManager)
         {
             this.logger = logger;
             this.groupProvider = groupProvider;
+            this.licenseManager = licenseManager;
             this.targetDataProvider = targetDataProvider;
         }
 
         public bool CanProcess(IComputer computer)
         {
-            return computer is IDevice d && d.AuthorityType == AuthorityType.Ams;
+            return computer is IDevice d && d.AuthorityType == AuthorityType.Ams && licenseManager.IsFeatureEnabled(LicensedFeatures.AmsRegisteredDeviceSupport);
         }
 
         public async Task<IList<SecurityDescriptorTarget>> GetMatchingTargetsForComputer(IComputer computer, IEnumerable<SecurityDescriptorTarget> targets)
@@ -33,6 +36,8 @@ namespace Lithnet.AccessManager.Server.Authorization
             {
                 throw new InvalidOperationException("The object passed to the method was of an incorrect type");
             }
+
+            this.licenseManager.ThrowOnMissingFeature(LicensedFeatures.AmsRegisteredDeviceSupport);
 
             List<SecurityDescriptorTarget> matchingTargets = new List<SecurityDescriptorTarget>();
 

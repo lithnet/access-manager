@@ -18,7 +18,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDevicePasswordProvider passwordProvider;
         private readonly ILogger<AmsDirectoryDevicesViewModel> logger;
 
-        public AmsDirectoryDevicesViewModel(IDeviceProvider deviceProvider, IShellExecuteProvider shellExecuteProvider, IDialogCoordinator dialogCoordinator, IDevicePasswordProvider passwordProvider, ILogger<AmsDirectoryDevicesViewModel> logger)
+        public AmsDirectoryDevicesViewModel(IDeviceProvider deviceProvider, IShellExecuteProvider shellExecuteProvider, IDialogCoordinator dialogCoordinator, IDevicePasswordProvider passwordProvider, ILogger<AmsDirectoryDevicesViewModel> logger, IViewModelFactory<EnterpriseEditionBannerViewModel, EnterpriseEditionBannerModel> enterpriseEditionViewModelFactory)
         {
             this.deviceProvider = deviceProvider;
             this.shellExecuteProvider = shellExecuteProvider;
@@ -29,7 +29,14 @@ namespace Lithnet.AccessManager.Server.UI
             this.Devices = new BindableCollection<DeviceViewModel>();
             this.SelectedItems = new ObservableCollection<DeviceViewModel>();
             this.SelectedItems.CollectionChanged += this.SelectedItems_CollectionChanged;
+            this.EnterpriseEdition = enterpriseEditionViewModelFactory.CreateViewModel(new EnterpriseEditionBannerModel
+            {
+                RequiredFeature = Enterprise.LicensedFeatures.AmsRegisteredDeviceSupport,
+                Link = Constants.EnterpriseEditionLearnMoreLinkAmsDevices
+            });
         }
+
+        public EnterpriseEditionBannerViewModel EnterpriseEdition { get; set; }
 
         private void SelectedItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {

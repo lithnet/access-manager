@@ -61,7 +61,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="9.0.1" />
-    <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7868.13906" />
+    <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7869.27380" />
     <PackageReference Include="mahapps.metro" Version="2.1.1" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="4.6.0" />
     <PackageReference Include="MahApps.Metro.SimpleChildWindow" Version="2.0.0-alpha0043" />
@@ -115,6 +115,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="UIComponents\EnterpriseEditionBadge.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Components\EnterpriseEditionBadgeView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\Components\EnterpriseEditionBannerView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Views\Components\PasswordPoliciesView.xaml">

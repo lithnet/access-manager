@@ -8,13 +8,21 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly IShellExecuteProvider shellExecuteProvider;
 
-        public AmsDirectoryLithnetLapsConfigurationViewModel(IShellExecuteProvider shellExecuteProvider, INotifyModelChangedEventPublisher eventPublisher, EncryptionCertificateComponentViewModel encryptionCertVm, PasswordPoliciesViewModel policiesVm)
+        public AmsDirectoryLithnetLapsConfigurationViewModel(IShellExecuteProvider shellExecuteProvider, EncryptionCertificateComponentViewModel encryptionCertVm, PasswordPoliciesViewModel policiesVm, IViewModelFactory<EnterpriseEditionBannerViewModel, EnterpriseEditionBannerModel> enterpriseEditionViewModelFactory)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.PasswordEncryption = encryptionCertVm;
             this.PasswordPolicies = policiesVm;
             this.DisplayName = "Lithnet LAPS";
+
+            this.EnterpriseEdition = enterpriseEditionViewModelFactory.CreateViewModel(new EnterpriseEditionBannerModel
+            {
+                RequiredFeature = Enterprise.LicensedFeatures.AmsRegisteredDeviceSupport,
+                Link = Constants.EnterpriseEditionLearnMoreLinkAmsDevices
+            });
         }
+
+        public EnterpriseEditionBannerViewModel EnterpriseEdition { get; set; }
 
         public EncryptionCertificateComponentViewModel PasswordEncryption { get; set; }
 

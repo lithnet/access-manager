@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Enterprise;
 
 namespace Lithnet.AccessManager.Server.Authorization
 {
@@ -13,17 +14,19 @@ namespace Lithnet.AccessManager.Server.Authorization
         private readonly ITargetDataProvider targetDataProvider;
         private readonly ILogger logger;
         private readonly IAadGraphApiProvider aadProvider;
+        private readonly IAmsLicenseManager licenseManager;
 
-        public AzureActiveDirectoryComputerTargetProvider(ITargetDataProvider targetDataProvider, ILogger<AzureActiveDirectoryComputerTargetProvider> logger, IAadGraphApiProvider aadProvider)
+        public AzureActiveDirectoryComputerTargetProvider(ITargetDataProvider targetDataProvider, ILogger<AzureActiveDirectoryComputerTargetProvider> logger, IAadGraphApiProvider aadProvider, IAmsLicenseManager licenseManager)
         {
             this.logger = logger;
             this.aadProvider = aadProvider;
+            this.licenseManager = licenseManager;
             this.targetDataProvider = targetDataProvider;
         }
 
         public bool CanProcess(IComputer computer)
         {
-            return computer is IDevice d && d.AuthorityType == AuthorityType.AzureActiveDirectory;
+            return computer is IDevice d && d.AuthorityType == AuthorityType.AzureActiveDirectory && this.licenseManager.IsFeatureEnabled(LicensedFeatures.AzureAdDeviceSupport);
         }
 
         public async Task<IList<SecurityDescriptorTarget>> GetMatchingTargetsForComputer(IComputer computer, IEnumerable<SecurityDescriptorTarget> targets)
@@ -32,6 +35,8 @@ namespace Lithnet.AccessManager.Server.Authorization
             {
                 throw new InvalidOperationException("The object passed to the method was of an incorrect type");
             }
+
+            this.licenseManager.ThrowOnMissingFeature(LicensedFeatures.AzureAdDeviceSupport);
 
             List<SecurityDescriptorTarget> matchingTargets = new List<SecurityDescriptorTarget>();
 

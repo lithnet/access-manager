@@ -1,5 +1,4 @@
-﻿using Lithnet.AccessManager.Enterprise;
-using Lithnet.AccessManager.Server.Configuration;
+﻿using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.Providers;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
@@ -15,39 +14,37 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IShellExecuteProvider shellExecuteProvider;
-        private readonly IAmsLicenseManager licenseManager;
         private readonly ILogger<HighAvailabilityViewModel> logger;
         private readonly DataProtectionOptions dataProtectionOptions;
         private readonly ICertificateSynchronizationProvider certSyncProvider;
         private readonly ISecretRekeyProvider rekeyProvider;
-        private readonly SqlServerInstanceProvider sqlInstanceProvider;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
         private readonly IWindowsServiceProvider windowsServiceProvider;
 
-        public HighAvailabilityViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, IAmsLicenseManager licenseManager, ILogger<HighAvailabilityViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, DataProtectionOptions dataProtectionOptions, ICertificateSynchronizationProvider certSyncProvider, ISecretRekeyProvider rekeyProvider, SqlServerInstanceProvider sqlInstanceProvider, IScriptTemplateProvider scriptTemplateProvider, IWindowsServiceProvider windowsServiceProvider)
+        public HighAvailabilityViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, ILogger<HighAvailabilityViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, DataProtectionOptions dataProtectionOptions, ICertificateSynchronizationProvider certSyncProvider, ISecretRekeyProvider rekeyProvider, IScriptTemplateProvider scriptTemplateProvider, IWindowsServiceProvider windowsServiceProvider, IViewModelFactory<EnterpriseEditionBannerViewModel, EnterpriseEditionBannerModel> enterpriseEditionViewModelFactory)
         {
             this.shellExecuteProvider = shellExecuteProvider;
-            this.licenseManager = licenseManager;
             this.logger = logger;
             this.dataProtectionOptions = dataProtectionOptions;
             this.certSyncProvider = certSyncProvider;
             this.dialogCoordinator = dialogCoordinator;
             this.rekeyProvider = rekeyProvider;
-            this.sqlInstanceProvider = sqlInstanceProvider;
             this.scriptTemplateProvider = scriptTemplateProvider;
             this.windowsServiceProvider = windowsServiceProvider;
-
-            this.licenseManager.OnLicenseDataChanged += delegate
-            {
-                this.NotifyOfPropertyChange(nameof(this.IsEnterpriseEdition));
-                this.NotifyOfPropertyChange(nameof(this.ShowEnterpriseEditionBanner));
-            };
 
             this.DisplayName = "High availability";
             eventPublisher.Register(this);
 
             this.isClusterCompatibleSecretEncryptionEnabled = this.dataProtectionOptions.EnableClusterCompatibleSecretEncryption;
+
+            this.EnterpriseEdition = enterpriseEditionViewModelFactory.CreateViewModel(new EnterpriseEditionBannerModel
+            {
+                RequiredFeature = Enterprise.LicensedFeatures.HighAvailability,
+                Link = Constants.EnterpriseEditionLearnMoreLinkHa
+            });
         }
+
+        public EnterpriseEditionBannerViewModel EnterpriseEdition { get; set; }
 
         public string HelpLink => Constants.HelpLinkPageHighAvailability;
 
@@ -57,15 +54,6 @@ namespace Lithnet.AccessManager.Server.UI
         {
             await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
         }
-
-        public async Task LinkHaLearnMore()
-        {
-            await this.shellExecuteProvider.OpenWithShellExecute(Constants.EnterpriseEditionLearnMoreLinkHa);
-        }
-
-        public bool IsEnterpriseEdition => this.licenseManager.IsEnterpriseEdition();
-
-        public bool ShowEnterpriseEditionBanner => this.licenseManager.IsEvaluatingOrBuiltIn() || !this.licenseManager.IsEnterpriseEdition();
 
         [NotifyModelChangedProperty]
         public bool IsCertificateSynchronizationEnabled
@@ -124,8 +112,6 @@ namespace Lithnet.AccessManager.Server.UI
                 await this.dialogCoordinator.ShowMessageAsync(this, "Error", $"Unable to complete the synchronization process\r\n{ex.Message}");
             }
         }
-
-        public bool CanGetDatabaseCreationScript => this.IsEnterpriseEdition;
 
         public async Task GetDatabaseCreationScript()
         {

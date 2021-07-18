@@ -17,6 +17,8 @@ namespace Lithnet.AccessManager.Api.Shared
         public const string RegistrationDisabled = "registration-disabled";
         public const string InvalidRegistrationKey = "invalid-registration-key";
         public const string InternalError = "internal-error";
+        public const string NotLicensed = "not-licensed";
+        public const string NoAuth = "no-auth";
         public const string DeviceCredentialsNotFound = "device-credentials-not-found";
     }
 }

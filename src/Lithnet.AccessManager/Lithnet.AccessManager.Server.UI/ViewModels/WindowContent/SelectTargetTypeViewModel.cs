@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Lithnet.AccessManager.Api;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Providers;
 using Stylet;
@@ -12,11 +13,13 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly AzureAdOptions azureAdOptions;
         private readonly IRegistryProvider registryProvider;
+        private readonly IAmsLicenseManager licenseManager;
 
-        public SelectTargetTypeViewModel(AzureAdOptions azureAdOptions, IDomainTrustProvider domainTrustProvider, IViewModelFactory<AzureAdTenantDetailsViewModel, AzureAdTenantDetails> tenantDetailsFactory, IRegistryProvider registryProvider)
+        public SelectTargetTypeViewModel(AzureAdOptions azureAdOptions, IDomainTrustProvider domainTrustProvider, IViewModelFactory<AzureAdTenantDetailsViewModel, AzureAdTenantDetails> tenantDetailsFactory, IRegistryProvider registryProvider, IAmsLicenseManager licenseManager)
         {
             this.azureAdOptions = azureAdOptions;
             this.registryProvider = registryProvider;
+            this.licenseManager = licenseManager;
 
             this.AvailableForests = domainTrustProvider.GetForests().Select(t => t.Name).ToList();
             this.AvailableAads = new List<AzureAdTenantDetailsViewModel>();
@@ -71,9 +74,9 @@ namespace Lithnet.AccessManager.Server.UI
                     yield return TargetType.AdContainer;
                 }
 
-                if (this.registryProvider.ApiEnabled)
+                if (this.licenseManager.IsFeatureEnabled(LicensedFeatures.AmsApi) && this.registryProvider.ApiEnabled)
                 {
-                    if (azureAdOptions.Tenants.Count > 0)
+                    if (this.licenseManager.IsFeatureEnabled(LicensedFeatures.AzureAdDeviceSupport) && this.azureAdOptions.Tenants.Count > 0)
                     {
                         if (this.AllowAzureAdComputer)
                         {
@@ -86,14 +89,17 @@ namespace Lithnet.AccessManager.Server.UI
                         }
                     }
 
-                    if (this.AllowAmsComputer)
+                    if (this.licenseManager.IsFeatureEnabled(LicensedFeatures.AmsRegisteredDeviceSupport))
                     {
-                        yield return TargetType.AmsComputer;
-                    }
+                        if (this.AllowAmsComputer)
+                        {
+                            yield return TargetType.AmsComputer;
+                        }
 
-                    if (this.AllowAmsGroup)
-                    {
-                        yield return TargetType.AmsGroup;
+                        if (this.AllowAmsGroup)
+                        {
+                            yield return TargetType.AmsGroup;
+                        }
                     }
                 }
             }

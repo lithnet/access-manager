@@ -13,24 +13,29 @@
              d:DesignWidth="800"
              Margin="5">
     <StackPanel>
-        <DockPanel>
-            <Button DockPanel.Dock="Right"
+        <ContentControl s:View.Model="{Binding EnterpriseEdition, Mode=OneWay}"  
+                        IsTabStop="False"/>
+
+        <StackPanel IsEnabled="{Binding EnterpriseEdition.IsEnterpriseEdition, Mode=OneWay}">
+            <DockPanel>
+                <Button DockPanel.Dock="Right"
                     Margin="5"
                     Click="{s:Action Help}"
                     Background="Transparent"
                     BorderThickness="0"
                     Focusable="False">
-                <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
-            </Button>
-            <Label DockPanel.Dock="Left"
+                    <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
+                </Button>
+                <Label DockPanel.Dock="Left"
                    Style="{DynamicResource DescriptionHeaderStyle}"
                    Content="Lithnet LAPS for Azure AD" />
-        </DockPanel>
+            </DockPanel>
 
-        <ContentControl s:View.Model="{Binding PasswordEncryption, Mode=OneWay}"  
+            <ContentControl s:View.Model="{Binding PasswordEncryption, Mode=OneWay}"  
                         IsTabStop="False"/>
 
-        <ContentControl s:View.Model="{Binding PasswordPolicies, Mode=OneWay}"  
+            <ContentControl s:View.Model="{Binding PasswordPolicies, Mode=OneWay}"  
                         IsTabStop="False"/>
+        </StackPanel>
     </StackPanel>
 </UserControl>

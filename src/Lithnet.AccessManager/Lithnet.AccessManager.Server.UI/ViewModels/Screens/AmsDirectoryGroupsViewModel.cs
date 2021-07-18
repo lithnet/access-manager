@@ -18,7 +18,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IViewModelFactory<AmsGroupViewModel, IAmsGroup> factory;
         private readonly ILogger<AmsDirectoryGroupsViewModel> logger;
 
-        public AmsDirectoryGroupsViewModel(IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IAmsGroupProvider groupProvider, IViewModelFactory<AmsGroupViewModel, IAmsGroup> factory, ILogger<AmsDirectoryGroupsViewModel> logger)
+        public AmsDirectoryGroupsViewModel(IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IAmsGroupProvider groupProvider, IViewModelFactory<AmsGroupViewModel, IAmsGroup> factory, ILogger<AmsDirectoryGroupsViewModel> logger, IViewModelFactory<EnterpriseEditionBannerViewModel, EnterpriseEditionBannerModel> enterpriseEditionViewModelFactory)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.eventPublisher = eventPublisher;
@@ -29,7 +29,15 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.DisplayName = "Groups";
             this.Groups = new BindableCollection<AmsGroupViewModel>();
+
+            this.EnterpriseEdition = enterpriseEditionViewModelFactory.CreateViewModel(new EnterpriseEditionBannerModel
+            {
+                RequiredFeature = Enterprise.LicensedFeatures.AmsRegisteredDeviceSupport,
+                Link = Constants.EnterpriseEditionLearnMoreLinkAmsDevices
+            });
         }
+
+        public EnterpriseEditionBannerViewModel EnterpriseEdition { get; set; }
 
         protected override void OnInitialActivate()
         {

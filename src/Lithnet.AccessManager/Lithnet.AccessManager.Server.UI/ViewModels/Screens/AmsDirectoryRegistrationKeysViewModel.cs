@@ -21,7 +21,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         //  public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.KeySolid;
 
-        public AmsDirectoryRegistrationKeysViewModel(IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IRegistrationKeyProvider keyProvider, IViewModelFactory<RegistrationKeyViewModel, IRegistrationKey> keyViewModelFactory, ILogger<AmsDirectoryRegistrationKeysViewModel> logger)
+        public AmsDirectoryRegistrationKeysViewModel(IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IRegistrationKeyProvider keyProvider, IViewModelFactory<RegistrationKeyViewModel, IRegistrationKey> keyViewModelFactory, ILogger<AmsDirectoryRegistrationKeysViewModel> logger, IViewModelFactory<EnterpriseEditionBannerViewModel, EnterpriseEditionBannerModel> enterpriseEditionViewModelFactory)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.eventPublisher = eventPublisher;
@@ -32,8 +32,15 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.DisplayName = "Registration keys";
             this.RegistrationKeys = new BindableCollection<RegistrationKeyViewModel>();
+
+            this.EnterpriseEdition = enterpriseEditionViewModelFactory.CreateViewModel(new EnterpriseEditionBannerModel
+            {
+                RequiredFeature = Enterprise.LicensedFeatures.AmsRegisteredDeviceSupport,
+                Link = Constants.EnterpriseEditionLearnMoreLinkAmsDevices
+            });
         }
 
+        public EnterpriseEditionBannerViewModel EnterpriseEdition { get; set; }
 
         protected override void OnInitialActivate()
         {

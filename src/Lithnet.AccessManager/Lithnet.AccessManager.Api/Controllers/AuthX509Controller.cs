@@ -10,6 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server;
 using Microsoft.Graph;
 using Microsoft.IdentityModel.Tokens;
@@ -30,8 +31,9 @@ namespace Lithnet.AccessManager.Api.Controllers
         private readonly IAadGraphApiProvider graphProvider;
         private readonly IOptionsMonitor<ApiAuthenticationOptions> agentOptions;
         private readonly IApiErrorResponseProvider errorProvider;
+        private readonly IAmsLicenseManager licenseManager;
 
-        public AuthX509Controller(ISecurityTokenGenerator tokenGenerator, IDeviceProvider devices, ISignedAssertionValidator signedAssertionValidator, IAadGraphApiProvider graphProvider, ILogger<AuthX509Controller> logger, IOptionsMonitor<ApiAuthenticationOptions> agentOptions, IApiErrorResponseProvider errorProvider)
+        public AuthX509Controller(ISecurityTokenGenerator tokenGenerator, IDeviceProvider devices, ISignedAssertionValidator signedAssertionValidator, IAadGraphApiProvider graphProvider, ILogger<AuthX509Controller> logger, IOptionsMonitor<ApiAuthenticationOptions> agentOptions, IApiErrorResponseProvider errorProvider, IAmsLicenseManager licenseManager)
         {
             this.tokenGenerator = tokenGenerator;
             this.devices = devices;
@@ -40,6 +42,7 @@ namespace Lithnet.AccessManager.Api.Controllers
             this.logger = logger;
             this.agentOptions = agentOptions;
             this.errorProvider = errorProvider;
+            this.licenseManager = licenseManager;
         }
 
         [HttpPost]
@@ -152,10 +155,12 @@ namespace Lithnet.AccessManager.Api.Controllers
         private void ValidateAadDeviceState(Device aadDevice)
         {
             aadDevice.ThrowOnDeviceDisabled();
+            this.licenseManager.ThrowOnMissingFeature(LicensedFeatures.AzureAdDeviceSupport);
 
             switch (aadDevice.TrustType.ToLowerInvariant())
             {
                 case "azuread":
+                case "serverad":
                     if (!this.agentOptions.CurrentValue.AllowAzureAdJoinedDeviceAuth)
                     {
                         throw new UnsupportedAuthenticationTypeException("The device is Azure AD joined, but Azure AD-joined devices are not permitted to authenticate to the system");
@@ -191,6 +196,8 @@ namespace Lithnet.AccessManager.Api.Controllers
             {
                 throw new NotSupportedException("The device requested an authentication type that was not supported");
             }
+
+            this.licenseManager.ThrowOnMissingFeature(LicensedFeatures.AmsRegisteredDeviceSupport);
 
             ClaimsIdentity identity = device.ToClaimsIdentity();
 

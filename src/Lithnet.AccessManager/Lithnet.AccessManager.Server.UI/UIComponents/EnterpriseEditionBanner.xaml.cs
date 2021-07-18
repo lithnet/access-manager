@@ -10,13 +10,13 @@ namespace Lithnet.AccessManager.Server.UI
     {
         public EnterpriseEditionBanner()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         public string FeatureName
         {
-            get => (string)GetValue(FeatureNameProperty);
-            set => SetValue(FeatureNameProperty, value);
+            get => (string) this.GetValue(FeatureNameProperty);
+            set => this.SetValue(FeatureNameProperty, value);
         }
 
         public static readonly DependencyProperty FeatureNameProperty = DependencyProperty.Register(nameof(FeatureName), typeof(string), typeof(EnterpriseEditionBanner), new PropertyMetadata());
@@ -25,19 +25,14 @@ namespace Lithnet.AccessManager.Server.UI
 
         public event RoutedEventHandler LinkClick
         {
-            add { AddHandler(LinkClickEvent, value); }
-            remove { RemoveHandler(LinkClickEvent, value); }
+            add => this.AddHandler(LinkClickEvent, value);
+            remove => this.RemoveHandler(LinkClickEvent, value);
         }
 
         void RaiseClickEvent()
         {
             RoutedEventArgs newEventArgs = new RoutedEventArgs(EnterpriseEditionBanner.LinkClickEvent);
-            RaiseEvent(newEventArgs);
-        }
-
-        void OnClick()
-        {
-            RaiseClickEvent();
+            this.RaiseEvent(newEventArgs);
         }
 
         private void Hyperlink_Click(object sender, RoutedEventArgs e)

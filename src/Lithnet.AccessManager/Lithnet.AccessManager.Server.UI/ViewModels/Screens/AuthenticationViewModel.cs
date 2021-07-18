@@ -38,7 +38,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.objectSelectionProvider = objectSelectionProvider;
             this.secretProvider = secretProvider;
 
-            this.DisplayName = "Authentication";
+            this.DisplayName = "User authentication";
 
             model.Iwa ??= new IwaAuthenticationProviderOptions();
             model.Oidc ??= new OidcAuthenticationProviderOptions();

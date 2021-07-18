@@ -21,32 +21,40 @@
     <views:CanvasEx>
         <Grid Height="{Binding Path=BindableActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}"
               Width="{Binding Path=BindableActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}">
-
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <uiComponents:ErrorBanner Grid.Column="0"
+            <ContentControl Grid.Row="0" s:View.Model="{Binding EnterpriseEdition, Mode=OneWay}"  
+                            IsTabStop="False"/>
+
+            <Grid Grid.Row="1"
+                  IsEnabled="{Binding EnterpriseEdition.IsEnterpriseEdition, Mode=OneWay}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <uiComponents:ErrorBanner Grid.Column="0"
                                       MessageText="{Binding ErrorMessageText}"
                                       HeaderText="{Binding ErrorMessageHeaderText}"/>
 
 
-            <DockPanel Grid.Row="1">
-                <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
-                    <icons:PackIconMaterialLight Kind="HelpCircle" />
-                </Button>
-                <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Registration keys" />
-            </DockPanel>
+                <DockPanel Grid.Row="1">
+                    <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
+                        <icons:PackIconMaterialLight Kind="HelpCircle" />
+                    </Button>
+                    <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Registration keys" />
+                </DockPanel>
 
-            <TextBlock Grid.Row="2"
+                <TextBlock Grid.Row="2"
                        Margin="10 5 5 5"
                        TextWrapping="Wrap">Devices that don't use Active Directory or Azure Active Directory authentication must use a key to register with the AMS server.
-            </TextBlock>
+                </TextBlock>
 
-            <ListView
+                <ListView
                 Grid.Row="3"
                 BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
                   ItemsSource="{Binding RegistrationKeys}"
@@ -55,45 +63,46 @@
                   VerticalAlignment="Stretch"
                   MouseDoubleClick="{s:Action Edit}"
                   Margin="10 5 5 5">
-                <b:Interaction.Behaviors>
-                    <local:ListViewScrollBarBehavior />
-                </b:Interaction.Behaviors>
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Key name" 
+                    <b:Interaction.Behaviors>
+                        <local:ListViewScrollBarBehavior />
+                    </b:Interaction.Behaviors>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Key name" 
                                             DisplayMemberBinding="{Binding Name}" 
                                             Width="Auto"/>
-                        <GridViewColumn Header="Enabled" 
+                            <GridViewColumn Header="Enabled" 
                                     DisplayMemberBinding="{Binding Enabled}" 
                                     Width="Auto"/>
-                        <GridViewColumn Header="Approval Required" 
+                            <GridViewColumn Header="Approval Required" 
                                         DisplayMemberBinding="{Binding ApprovalRequired}" 
                                         Width="Auto"/>
-                        <GridViewColumn Header="Activation limit"
+                            <GridViewColumn Header="Activation limit"
                                             DisplayMemberBinding="{Binding ActivationLimitDescription}" 
                                             Width="Auto"/>
-                        <GridViewColumn Header="Activation count"
+                            <GridViewColumn Header="Activation count"
                                             DisplayMemberBinding="{Binding ActivationCount}" 
                                             Width="Auto"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
 
-            <StackPanel Grid.Row="4"
+                <StackPanel Grid.Row="4"
                         Orientation="Horizontal"
                         Margin="10 5 5 5">
-                <Button Command="{s:Action Add}" 
+                    <Button Command="{s:Action Add}" 
                     Content="Add..." 
                     Margin="5"/>
-                <Button Command="{s:Action Delete}"
+                    <Button Command="{s:Action Delete}"
                     Content="Delete selected..."
                     Margin="5"/>
-                <Button Command="{s:Action Edit}"
+                    <Button Command="{s:Action Edit}"
                     Content="Edit selected..."
                     Margin="5"/>
 
-            </StackPanel>
+                </StackPanel>
 
+            </Grid>
         </Grid>
     </views:CanvasEx>
 </UserControl>

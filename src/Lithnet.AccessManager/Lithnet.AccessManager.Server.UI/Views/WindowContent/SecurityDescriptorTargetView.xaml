@@ -61,12 +61,18 @@
                         <Label Content="{Binding Type, Converter={StaticResource EnumDescriptionConverter}, Mode=OneWay}"
                            Margin="2" />
 
-                        <local:EnterpriseEditionBadge VerticalAlignment="Center"
-                                                      Visibility="{Binding ShowTargetTypeEnterpriseEditionBadge, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
-                                                      ToolTipText="This type of target is an enterprise edition feature. Click to learn more"
-                                                      Click="{s:Action LearnMoreLinkLapsHistory}"
-                                                      ShowText="True"
-                                                      Margin="2 0 5 0" />
+                        <ContentControl s:View.Model="{Binding EnterpriseEditionTargetTypeAms, Mode=OneWay}"  
+                                        Visibility="{Binding ShowTargetTypeEnterpriseEditionBadgeAms, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+                                        IsTabStop="False"
+                                        VerticalAlignment="Center"
+                                        Margin="2 0 5 0" />
+
+                        <ContentControl s:View.Model="{Binding EnterpriseEditionTargetTypeAzureAd, Mode=OneWay}"  
+                                        Visibility="{Binding ShowTargetTypeEnterpriseEditionBadgeAzureAd, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+                                        IsTabStop="False"
+                                        VerticalAlignment="Center"
+                                        Margin="2 0 5 0" />
+
                     </StackPanel>
                     <Label Grid.Row="2"
                            Grid.Column="0"
@@ -169,21 +175,13 @@
                                 VerticalAlignment="Center"
                                 Margin="2" />
 
-                        <!--<Button Grid.Row="1"
-                            Grid.Column="2"
-                            Command="{s:Action ImportJitAdminsFromComputer}"
-                            Content="Import admins from computer..."
-                            HorizontalAlignment="Left"
-                            Margin="2" />-->
-
-                        <local:EnterpriseEditionBadge Grid.Row="0"
-                                                      Grid.Column="1"
-                                                      VerticalAlignment="Top"
-                                                      Visibility="{Binding ShowLapsHistoryEnterpriseEditionBadge, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
-                                                      ToolTipText="Web-based access to the historical local admin passwords is an enterprise edition feature. Click to learn more"
-                                                      Click="{s:Action LearnMoreLinkLapsHistory}"
-                                                      ShowText="False"
-                                                      Margin="2 0 5 0" />
+                        <ContentControl Grid.Row="0"
+                                        Grid.Column="1"
+                                        s:View.Model="{Binding EnterpriseEditionLapsHistory, Mode=OneWay}"  
+                                        Visibility="{Binding ShowLapsHistoryEnterpriseEditionBadge, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+                                        IsTabStop="False"
+                                        VerticalAlignment="Center"
+                                        Margin="2 0 5 0" />
 
                         <StackPanel  Grid.Row="2"
                                      Grid.Column="0"
@@ -198,15 +196,14 @@
 
                         </StackPanel>
 
-                        <local:EnterpriseEditionBadge Grid.Row="2"
-                                                      Grid.Column="1"
-                                                      VerticalAlignment="Top"
-                                                      Visibility="{Binding ShowPowerShellEnterpriseEditionBadge, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
-                                                      ToolTipText="PowerShell-based authorization is an enterprise edition feature. Click to learn more"
-                                                      Click="{s:Action LearnMoreLinkPowerShellAuthZ}"
-                                                      ShowText="False"
-                                                      Margin="2 0 5 0" />
-
+                        <ContentControl Grid.Row="2"
+                                        Grid.Column="1"
+                                        s:View.Model="{Binding EnterpriseEditionPowerShellAcl, Mode=OneWay}"  
+                                        Visibility="{Binding ShowPowerShellEnterpriseEditionBadge, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+                                        IsTabStop="False"
+                                        VerticalAlignment="Top"
+                                        Margin="2 0 5 0" />
+                        
                         <ContentControl Grid.Row="2"
                                         Grid.Column="2"
                                         s:View.Model="{Binding Script}"

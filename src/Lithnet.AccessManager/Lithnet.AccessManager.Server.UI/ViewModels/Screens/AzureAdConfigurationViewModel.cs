@@ -2,15 +2,12 @@
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
 using MahApps.Metro.SimpleChildWindow;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Stylet;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
-using Lithnet.AccessManager.Enterprise;
-using Microsoft.Extensions.Logging;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -23,40 +20,35 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IAadGraphApiProvider graphApiProvider;
         private readonly ILogger<AzureAdConfigurationViewModel> logger;
-        private readonly IAmsLicenseManager licenseManager;
         private readonly ApiAuthenticationOptions agentOptions;
-
-        private ImageSource ResourcePathToImageSource(string resourcesName)
-        {
-            return (DrawingImage)Application.Current.TryFindResource(resourcesName);
-        }
 
         public object Icon => PackIconMaterialKind.Triangle;
 
-        public AzureAdConfigurationViewModel(AzureAdLithnetLapsConfigurationViewModel lithnetLapsVm, AzureAdOptions aadOptions, IDialogCoordinator dialogCoordinator, IViewModelFactory<AzureAdTenantDetailsViewModel, AzureAdTenantDetails> tenantFactory, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IAadGraphApiProvider graphApiProvider, ILogger<AzureAdConfigurationViewModel> logger, IAmsLicenseManager licenseManager, ApiAuthenticationOptions agentOptions)
+        public AzureAdConfigurationViewModel(AzureAdLithnetLapsConfigurationViewModel lithnetLapsVm, AzureAdOptions aadOptions, IDialogCoordinator dialogCoordinator, IViewModelFactory<AzureAdTenantDetailsViewModel, AzureAdTenantDetails> tenantFactory, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IAadGraphApiProvider graphApiProvider, ILogger<AzureAdConfigurationViewModel> logger, ApiAuthenticationOptions agentOptions, IViewModelFactory<EnterpriseEditionBannerViewModel, EnterpriseEditionBannerModel> enterpriseEditionViewModelFactory)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.graphApiProvider = graphApiProvider;
             this.logger = logger;
-            this.licenseManager = licenseManager;
             this.agentOptions = agentOptions;
             this.dialogCoordinator = dialogCoordinator;
             this.aadOptions = aadOptions;
             this.tenantFactory = tenantFactory;
             this.eventPublisher = eventPublisher;
 
-            this.licenseManager.OnLicenseDataChanged += delegate
-            {
-                this.NotifyOfPropertyChange(nameof(this.IsEnterpriseEdition));
-                this.NotifyOfPropertyChange(nameof(this.ShowEnterpriseEditionBanner));
-            };
-
             this.DisplayName = "Azure Active Directory";
 
-            this.Items.Add(lithnetLapsVm);
+            //this.Items.Add(lithnetLapsVm);
 
             this.Tenants = new BindableCollection<AzureAdTenantDetailsViewModel>();
+
+            this.EnterpriseEdition = enterpriseEditionViewModelFactory.CreateViewModel(new EnterpriseEditionBannerModel
+            {
+                RequiredFeature = Enterprise.LicensedFeatures.AzureAdDeviceSupport,
+                Link = Constants.EnterpriseEditionLearnMoreLinkAzureAdDevices
+            });
         }
+
+        public EnterpriseEditionBannerViewModel EnterpriseEdition { get; set; }
 
 
         [NotifyModelChangedProperty(RequiresServiceRestart = true)]
@@ -103,15 +95,6 @@ namespace Lithnet.AccessManager.Server.UI
         public string ErrorMessageText { get; set; }
 
         public string ErrorMessageHeaderText { get; set; }
-
-        public async Task LinkHaLearnMore()
-        {
-            await this.shellExecuteProvider.OpenWithShellExecute(Constants.EnterpriseEditionLearnMoreLinkHa);
-        }
-
-        public bool IsEnterpriseEdition => this.licenseManager.IsEnterpriseEdition();
-
-        public bool ShowEnterpriseEditionBanner => this.licenseManager.IsEvaluatingOrBuiltIn() || !this.licenseManager.IsEnterpriseEdition();
 
         [NotifyModelChangedCollection]
         public BindableCollection<AzureAdTenantDetailsViewModel> Tenants { get; }

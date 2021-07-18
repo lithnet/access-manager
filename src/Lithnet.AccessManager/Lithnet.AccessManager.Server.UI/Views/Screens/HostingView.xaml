@@ -288,14 +288,20 @@
                 <CheckBox 
                       Margin="5"
                       Content="Enable the Access Manager API"
-                      IsEnabled="{Binding IsEnterpriseEdition, UpdateSourceTrigger=PropertyChanged}"
+                      IsEnabled="{Binding EnterpriseEdition.IsEnterpriseEdition, UpdateSourceTrigger=PropertyChanged}"
                       IsChecked="{Binding ApiEnabled, UpdateSourceTrigger=PropertyChanged}"/>
-                <local:EnterpriseEditionBadge 
-                                           Visibility="{Binding ShowEnterpriseEditionBanner, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                           ToolTipText="Access Manager API is an enterprise edition feature. Click to learn more"
-                                           Click="{s:Action LinkHaLearnMore}"
-                                           VerticalAlignment="Center"
-                                           Margin="10 2 5 2" />
+
+                <ContentControl s:View.Model="{Binding EnterpriseEdition, Mode=OneWay}"  
+                                IsTabStop="False"
+                                VerticalAlignment="Center"
+                                Margin="10 2 5 2"/>
+
+                <!--<local:EnterpriseEditionBadge ShowText="False"
+                                              Visibility="{Binding ShowEnterpriseEditionBanner, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                              ToolTipText="Access Manager API is an enterprise edition feature. Click to learn more"
+                                              Click="{s:Action LinkHaLearnMore}"
+                                              VerticalAlignment="Center"
+                                              Margin="10 2 5 2" />-->
             </StackPanel>
 
             <TextBlock Grid.Row="24"
@@ -306,7 +312,7 @@
             <TextBox Grid.Row="24"
                      Grid.Column="1"
                      VerticalAlignment="Center"
-                     IsEnabled="{Binding IsEnterpriseEdition, UpdateSourceTrigger=PropertyChanged}"
+                     IsEnabled="{Binding EnterpriseEdition.IsEnterpriseEdition, UpdateSourceTrigger=PropertyChanged}"
                      Text="{Binding ApiHostname, UpdateSourceTrigger=PropertyChanged}"
                      Margin="5 5 5 0" />
             <TextBlock Grid.Row="25"

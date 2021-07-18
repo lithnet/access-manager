@@ -1,4 +1,5 @@
-﻿using Lithnet.AccessManager.Api;
+﻿using System.Threading.Tasks;
+using Lithnet.AccessManager.Api;
 using MahApps.Metro.IconPacks;
 using Stylet;
 
@@ -8,7 +9,7 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly ApiAuthenticationOptions agentOptions;
 
-        public AmsDirectoryConfigurationViewModel(AmsDirectoryRegistrationKeysViewModel registrationKeysVm, AmsDirectoryDevicesViewModel devicesVm, AmsDirectoryGroupsViewModel groupsVm, AmsDirectoryLithnetLapsConfigurationViewModel lapsVm, ApiAuthenticationOptions agentOptions, INotifyModelChangedEventPublisher eventPublisher)
+        public AmsDirectoryConfigurationViewModel(AmsDirectoryRegistrationKeysViewModel registrationKeysVm, AmsDirectoryDevicesViewModel devicesVm, AmsDirectoryGroupsViewModel groupsVm, AmsDirectoryLithnetLapsConfigurationViewModel lapsVm, ApiAuthenticationOptions agentOptions, INotifyModelChangedEventPublisher eventPublisher, IViewModelFactory<EnterpriseEditionBannerViewModel, EnterpriseEditionBannerModel> enterpriseEditionViewModelFactory)
         {
             this.agentOptions = agentOptions;
 
@@ -19,7 +20,15 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.DisplayName = "Access Manager Directory";
             eventPublisher.Register(this);
+
+            this.EnterpriseEdition = enterpriseEditionViewModelFactory.CreateViewModel(new EnterpriseEditionBannerModel
+            {
+                RequiredFeature = Enterprise.LicensedFeatures.AmsRegisteredDeviceSupport,
+                Link = Constants.EnterpriseEditionLearnMoreLinkAmsDevices
+            });
         }
+
+        public EnterpriseEditionBannerViewModel EnterpriseEdition { get; set; }
 
         public string HelpLink => Constants.HelpLinkPageWebHosting;
 

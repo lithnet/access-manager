@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using Lithnet.AccessManager.Server;
+using Lithnet.Licensing.Core;
 
 namespace Lithnet.AccessManager.Api
 {
@@ -72,6 +73,14 @@ namespace Lithnet.AccessManager.Api
                     return new JsonResult(new { Error = new ApiError(ApiConstants.InvalidRegistrationKey, "The registration key was not accepted") })
                     {
                         StatusCode = StatusCodes.Status412PreconditionFailed
+                    };
+
+                case LicenseException _:
+                    this.logger.LogError(ex, "A licensing error occurred");
+
+                    return new JsonResult(new { Error = new ApiError(ApiConstants.NotLicensed, "The AMS server does not have a license allowing the use of this feature") })
+                    {
+                        StatusCode = StatusCodes.Status503ServiceUnavailable
                     };
 
                 default:

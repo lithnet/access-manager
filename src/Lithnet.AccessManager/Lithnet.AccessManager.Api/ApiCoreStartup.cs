@@ -99,6 +99,11 @@ namespace Lithnet.AccessManager.Api
             var secretProvider = serviceProvider.GetRequiredService<IProtectedSecretProvider>();
             var hostingOptions = serviceProvider.GetRequiredService<IOptions<HostingOptions>>();
 
+            if (tokenIssuerOptions.SigningKey == null)
+            {
+                throw new ConfigurationException("The API token signing key was not present");
+            }
+
             SymmetricSecurityKey sharedKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretProvider.UnprotectSecret(tokenIssuerOptions.SigningKey)));
 
             services.AddAuthentication()
@@ -168,19 +173,19 @@ namespace Lithnet.AccessManager.Api
 
             services.AddSingleton<IAmsLicenseManager>(licenseManager);
 
-            return licenseManager.IsEnterpriseEdition();
+            return licenseManager.IsFeatureEnabled(LicensedFeatures.AmsApi);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IAmsLicenseManager licenseManager, IOptions<ApiAuthenticationOptions> agentAuthOptions)
         {
-            if (!licenseManager.IsEnterpriseEdition())
+            if (!licenseManager.IsFeatureEnabled(LicensedFeatures.AmsApi))
             {
                 app.Run(async context =>
                 {
                     context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
                     context.Response.ContentType = "application/json";
 
-                    await context.Response.WriteAsync(JsonSerializer.Serialize(new ApiError("not-licensed", "The AMS server does not have a license to allow API use")));
+                    await context.Response.WriteAsync(JsonSerializer.Serialize(new ApiError(ApiConstants.NotLicensed, "The AMS server does not have a license to allow API use")));
                 });
                 return;
             }
@@ -192,7 +197,7 @@ namespace Lithnet.AccessManager.Api
                     context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
                     context.Response.ContentType = "application/json";
 
-                    await context.Response.WriteAsync(JsonSerializer.Serialize(new ApiError("no-auth", "The AMS server does not have any authentication modes enabled")));
+                    await context.Response.WriteAsync(JsonSerializer.Serialize(new ApiError(ApiConstants.NoAuth, "The AMS server does not have any authentication modes enabled")));
                 });
                 return;
             }

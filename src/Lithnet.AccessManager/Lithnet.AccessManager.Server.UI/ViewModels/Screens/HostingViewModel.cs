@@ -36,7 +36,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IProtectedSecretProvider protectedSecretProvider;
         private readonly RandomNumberGenerator csp;
 
-        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IActiveDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, ISecretRekeyProvider rekeyProvider, IObjectSelectionProvider objectSelectionProvider, IHttpSysConfigurationProvider certificateBindingProvider, IFirewallProvider firewallProvider, TokenIssuerOptions tokenIssuerOptions, IProtectedSecretProvider protectedSecretProvider, RandomNumberGenerator csp)
+        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IActiveDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, ISecretRekeyProvider rekeyProvider, IObjectSelectionProvider objectSelectionProvider, IHttpSysConfigurationProvider certificateBindingProvider, IFirewallProvider firewallProvider, TokenIssuerOptions tokenIssuerOptions, IProtectedSecretProvider protectedSecretProvider, RandomNumberGenerator csp, IViewModelFactory<EnterpriseEditionBadgeViewModel, EnterpriseEditionBadgeModel> enterpriseEditionViewModelFactory)
         {
             this.logger = logger;
             this.pathProvider = pathProvider;
@@ -67,7 +67,16 @@ namespace Lithnet.AccessManager.Server.UI
             this.DisplayName = "Service host";
 
             eventPublisher.Register(this);
+
+            this.EnterpriseEdition = enterpriseEditionViewModelFactory.CreateViewModel(new EnterpriseEditionBadgeModel
+            {
+                ToolTipText = "Access Manager API is an enterprise edition feature. Click to learn more",
+                RequiredFeature = Enterprise.LicensedFeatures.AmsApi,
+                Link = Constants.EnterpriseEditionLearnMoreLinkAmsApi
+            });
         }
+
+        public EnterpriseEditionBadgeViewModel EnterpriseEdition { get; set; }
 
         public string HelpLink => Constants.HelpLinkPageWebHosting;
 
@@ -341,17 +350,6 @@ namespace Lithnet.AccessManager.Server.UI
                 if (updateApi)
                 {
                     this.registryProvider.ApiEnabled = this.ApiEnabled;
-
-                    if (this.ApiEnabled)
-                    {
-                        if (this.tokenIssuerOptions.SigningKey == null)
-                        {
-                            byte[] buffer = new byte[128];
-                            this.csp.GetBytes(buffer);
-                            this.tokenIssuerOptions.SigningKey = this.protectedSecretProvider.ProtectSecret(Convert.ToBase64String(buffer));
-                            this.tokenIssuerOptions.SigningAlgorithm = "HS512";
-                        }
-                    }
                 }
             }
             catch (Exception ex)
@@ -489,6 +487,20 @@ namespace Lithnet.AccessManager.Server.UI
             catch (Exception ex)
             {
                 this.logger.LogError(EventIDs.UIGenericError, ex, "Could not complete the operation");
+            }
+        }
+
+        public void OnApiEnabledChanged()
+        {
+            if (this.ApiEnabled)
+            {
+                if (this.tokenIssuerOptions.SigningKey == null)
+                {
+                    byte[] buffer = new byte[128];
+                    this.csp.GetBytes(buffer);
+                    this.tokenIssuerOptions.SigningKey = this.protectedSecretProvider.ProtectSecret(Convert.ToBase64String(buffer));
+                    this.tokenIssuerOptions.SigningAlgorithm = "HS512";
+                }
             }
         }
 

@@ -16,104 +16,104 @@
              d:DesignWidth="800"
              Margin="5">
     <StackPanel>
-        <uiComponents:ErrorBanner MessageText="{Binding ErrorMessageText}"
+        <ContentControl s:View.Model="{Binding EnterpriseEdition, Mode=OneWay}"  
+                        IsTabStop="False"/>
+
+        <StackPanel IsEnabled="{Binding EnterpriseEdition.IsEnterpriseEdition, Mode=OneWay}">
+            <uiComponents:ErrorBanner MessageText="{Binding ErrorMessageText}"
                                   HeaderText="{Binding ErrorMessageHeaderText}"/>
-        <DockPanel>
-            <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
-                <icons:PackIconMaterialLight Kind="HelpCircle" />
-            </Button>
-            <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Azure Active Directory" />
-        </DockPanel>
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
+                    <icons:PackIconMaterialLight Kind="HelpCircle" />
+                </Button>
+                <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Azure Active Directory" />
+            </DockPanel>
 
-        <local:EnterpriseEditionBadge Visibility="{Binding ShowEnterpriseEditionBanner, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                      ToolTipText="Managing Azure Active Directory devices is an enterprise edition feature. Click to learn more"
-                                      Click="{s:Action LinkHaLearnMore}"
-                                      Margin="2 2 5 2" />
-
-        <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
+            <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
                Content="General settings" />
 
-        <Grid Margin="5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0"
+                <TextBlock Grid.Row="0"
                        Grid.Column="0"
                        Grid.ColumnSpan="2"
                        Margin="5"
                        TextWrapping="Wrap">Enabling Azure Active Directory support allows LAPS for AAD-joined and AAD-registered devices running Windows 10 and above</TextBlock>
 
-            <CheckBox Grid.Row="1"
+                <CheckBox Grid.Row="1"
                       Grid.Column="1"
                       IsChecked="{Binding AllowAzureAdJoinedDevices}"
-                      Content="Allow Azure AD-joined devices (Windows 10 or later)"
+                      Content="Allow Azure AD-joined devices (Windows 10 or later) to register with the AMS directory"
                       Margin="5" />
 
-            <CheckBox Grid.Row="2"
+                <CheckBox Grid.Row="2"
                       Grid.Column="1"
                       IsChecked="{Binding AllowAzureAdRegisteredDevices}"
-                      Content="Allow Azure AD-registered devices (Windows 10 or later)"
+                      Content="Allow Azure AD-registered devices (Windows 10 or later) to register with the AMS directory"
                       Margin="5" />
 
-        </Grid>
+            </Grid>
 
-        <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
+            <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
                Content="Tenant configuration" />
 
-        <TextBlock Margin="10 5 5 5"
+            <TextBlock Margin="10 5 5 5"
                    TextWrapping="Wrap">For each of your Azure AD tenants, you'll need to create a registered application and assign the appropriate rights to allow AMS to read the directory. See the <Hyperlink>Setup guide for more details</Hyperlink>.
-        </TextBlock>
+            </TextBlock>
 
-        <StackPanel IsEnabled="{Binding IsEnterpriseEdition}">
-            <ListView BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
+            <StackPanel IsEnabled="{Binding IsEnterpriseEdition}">
+                <ListView BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
                   ItemsSource="{Binding Tenants}"
                   SelectedItem="{Binding SelectedTenant}"
                   ScrollViewer.VerticalScrollBarVisibility="Auto" 
                   Height="200"
                   MouseDoubleClick="{s:Action Edit}"
                   Margin="10 5 5 5">
-                <b:Interaction.Behaviors>
-                    <local:ListViewScrollBarBehavior />
-                </b:Interaction.Behaviors>
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Tenant name" 
+                    <b:Interaction.Behaviors>
+                        <local:ListViewScrollBarBehavior />
+                    </b:Interaction.Behaviors>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Tenant name" 
                                             DisplayMemberBinding="{Binding TenantName}" 
                                             Width="Auto"/>
-                        <GridViewColumn Header="Tenant ID"
+                            <GridViewColumn Header="Tenant ID"
                                             DisplayMemberBinding="{Binding TenantId}" 
                                             Width="Auto"/>
-                        <GridViewColumn Header="Client ID"
+                            <GridViewColumn Header="Client ID"
                                             DisplayMemberBinding="{Binding ClientId}" 
                                             Width="Auto"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
 
-            <StackPanel Orientation="Horizontal"
+                <StackPanel Orientation="Horizontal"
                     Margin="10 5 5 5">
-                <Button Command="{s:Action Add}" 
+                    <Button Command="{s:Action Add}" 
                     Content="Add..." 
                     Margin="5"/>
-                <Button Command="{s:Action Delete}"
+                    <Button Command="{s:Action Delete}"
                     Content="Delete selected..."
                     Margin="5"/>
-                <Button Command="{s:Action Edit}"
+                    <Button Command="{s:Action Edit}"
                     Content="Edit selected..."
                     Margin="5"/>
-                <Button Command="{s:Action Test}"
+                    <Button Command="{s:Action Test}"
                     Margin="5"  
                     VerticalContentAlignment="Center"
                     Content="Test..."/>
+                </StackPanel>
             </StackPanel>
         </StackPanel>
     </StackPanel>
