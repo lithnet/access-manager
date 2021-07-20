@@ -13,6 +13,7 @@ using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Providers;
 
@@ -31,8 +32,9 @@ namespace Lithnet.AccessManager.Api.Controllers
         private readonly IApiErrorResponseProvider errorProvider;
         private readonly ICheckInDataValidator checkInDataValidator;
         private readonly IRegistrationKeyProvider regKeyProvider;
+        private readonly IAmsLicenseManager licenseManager;
 
-        public AgentRegisterController(ILogger<AgentRegisterController> logger, ISignedAssertionValidator assertionValidator, IDeviceProvider devices, IOptions<ApiAuthenticationOptions> agentOptions, IApiErrorResponseProvider errorProvider, ICheckInDataValidator checkInDataValidator, IRegistrationKeyProvider regKeyProvider)
+        public AgentRegisterController(ILogger<AgentRegisterController> logger, ISignedAssertionValidator assertionValidator, IDeviceProvider devices, IOptions<ApiAuthenticationOptions> agentOptions, IApiErrorResponseProvider errorProvider, ICheckInDataValidator checkInDataValidator, IRegistrationKeyProvider regKeyProvider, IAmsLicenseManager licenseManager)
         {
             this.logger = logger;
             this.assertionValidator = assertionValidator;
@@ -41,6 +43,7 @@ namespace Lithnet.AccessManager.Api.Controllers
             this.errorProvider = errorProvider;
             this.checkInDataValidator = checkInDataValidator;
             this.regKeyProvider = regKeyProvider;
+            this.licenseManager = licenseManager;
         }
 
         [HttpPost("credential")]
@@ -100,6 +103,8 @@ namespace Lithnet.AccessManager.Api.Controllers
                 {
                     throw new RegistrationDisabledException("A client attempted to register, but registration is disabled");
                 }
+
+                this.licenseManager.ThrowOnMissingFeature(LicensedFeatures.AmsRegisteredDeviceSupport);
 
                 JwtSecurityToken token = this.assertionValidator.Validate(request.Assertion, "api/v1.0/agent/register", out X509Certificate2 signingCertificate);
 

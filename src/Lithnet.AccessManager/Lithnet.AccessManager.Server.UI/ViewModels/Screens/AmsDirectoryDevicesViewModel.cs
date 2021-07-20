@@ -47,6 +47,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.NotifyOfPropertyChange(() => this.CanDisableDevice);
             this.NotifyOfPropertyChange(() => this.CanExpirePassword);
         }
+
         protected override void OnInitialActivate()
         {
             Task.Run(async () => await this.Initialize());

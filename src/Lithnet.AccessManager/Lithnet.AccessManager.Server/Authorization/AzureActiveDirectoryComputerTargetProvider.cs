@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Enterprise;
+using Lithnet.AccessManager.Server.Providers;
 
 namespace Lithnet.AccessManager.Server.Authorization
 {
@@ -15,12 +16,14 @@ namespace Lithnet.AccessManager.Server.Authorization
         private readonly ILogger logger;
         private readonly IAadGraphApiProvider aadProvider;
         private readonly IAmsLicenseManager licenseManager;
+        private readonly IAmsGroupProvider groupProvider;
 
-        public AzureActiveDirectoryComputerTargetProvider(ITargetDataProvider targetDataProvider, ILogger<AzureActiveDirectoryComputerTargetProvider> logger, IAadGraphApiProvider aadProvider, IAmsLicenseManager licenseManager)
+        public AzureActiveDirectoryComputerTargetProvider(ITargetDataProvider targetDataProvider, ILogger<AzureActiveDirectoryComputerTargetProvider> logger, IAadGraphApiProvider aadProvider, IAmsLicenseManager licenseManager, IAmsGroupProvider groupProvider)
         {
             this.logger = logger;
             this.aadProvider = aadProvider;
             this.licenseManager = licenseManager;
+            this.groupProvider = groupProvider;
             this.targetDataProvider = targetDataProvider;
         }
 
@@ -66,6 +69,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                         if (computerTokenSids == null)
                         {
                             computerTokenSids = await this.aadProvider.GetDeviceGroupSids(computer.AuthorityId, computer.AuthorityDeviceId);
+                            computerTokenSids.AddRange(await this.groupProvider.GetGroupSidsForDevice(d).ToListAsync());
                         }
 
                         if (computerTokenSids.Any(t => t == targetData.Sid))

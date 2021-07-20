@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using Lithnet.AccessManager.Server.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.SimpleChildWindow;
@@ -29,12 +30,19 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.DisplayName = "Groups";
             this.Groups = new BindableCollection<AmsGroupViewModel>();
-
+            this.SelectedItems = new ObservableCollection<AmsGroupViewModel>();
+            this.SelectedItems.CollectionChanged += this.SelectedItems_CollectionChanged;
             this.EnterpriseEdition = enterpriseEditionViewModelFactory.CreateViewModel(new EnterpriseEditionBannerModel
             {
                 RequiredFeature = Enterprise.LicensedFeatures.AmsRegisteredDeviceSupport,
                 Link = Constants.EnterpriseEditionLearnMoreLinkAmsDevices
             });
+        }
+
+        private void SelectedItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            this.NotifyOfPropertyChange(() => this.CanDelete);
+            this.NotifyOfPropertyChange(() => this.CanEdit);
         }
 
         public EnterpriseEditionBannerViewModel EnterpriseEdition { get; set; }
@@ -63,6 +71,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.eventPublisher.Register(this);
         }
 
+        public ObservableCollection<AmsGroupViewModel> SelectedItems { get; }
+
         public string ErrorMessageText { get; set; }
 
         public string ErrorMessageHeaderText { get; set; }
@@ -90,9 +100,15 @@ namespace Lithnet.AccessManager.Server.UI
 
                 if (w.Result == MessageDialogResult.Affirmative)
                 {
-                    await this.groupProvider.UpdateGroup(m);
-                    this.Groups.Add(vm);
+                    m = await this.groupProvider.UpdateGroup(m);
+                    this.Groups.Add(this.factory.CreateViewModel(m));
+
+                    foreach (var d in vm.MembersToAdd)
+                    {
+                        await this.groupProvider.AddToGroup(m, d.Value);
+                    }
                 }
+
             }
             catch (Exception ex)
             {
@@ -101,7 +117,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public bool CanEdit => this.SelectedItem != null;
+        public bool CanEdit => this.SelectedItems.Count == 1;
 
         public async Task Edit()
         {
@@ -149,15 +165,15 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public bool CanDelete => this.SelectedItem != null;
+        public bool CanDelete => this.SelectedItems.Count > 0;
 
         public async Task Delete()
         {
             try
             {
-                var selectedItem = this.SelectedItem;
+                var selectedItems = this.SelectedItems.ToList();
 
-                if (selectedItem == null)
+                if (selectedItems.Count == 0)
                 {
                     return;
                 }
@@ -168,11 +184,24 @@ namespace Lithnet.AccessManager.Server.UI
                     AnimateHide = false
                 };
 
-                if (await this.dialogCoordinator.ShowMessageAsync(this, "Confirm", "Are you sure you want to delete this group?", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
+                string message = "this group";
+
+                if (selectedItems.Count > 1)
                 {
-                    await this.groupProvider.DeleteGroup(selectedItem.Model);
-                    this.Groups.Remove(selectedItem);
-                    this.SelectedItem = this.Groups.FirstOrDefault();
+                    message = $"these {selectedItems.Count} groups";
+                }
+
+                if (await this.dialogCoordinator.ShowMessageAsync(this, "Warning", $"Are you sure you want to delete {message}? This operation can not be undone", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
+                {
+                    foreach (var item in selectedItems)
+                    {
+                        await this.groupProvider.DeleteGroup(item.Model);
+                        this.Groups.Remove(item);
+                        this.SelectedItem = this.Groups.FirstOrDefault();
+                    }
+
+                    this.NotifyOfPropertyChange(() => this.CanEdit);
+                    this.NotifyOfPropertyChange(() => this.CanDelete);
                 }
             }
             catch (Exception ex)

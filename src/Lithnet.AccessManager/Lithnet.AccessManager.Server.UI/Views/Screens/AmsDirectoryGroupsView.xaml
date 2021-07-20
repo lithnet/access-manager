@@ -12,6 +12,7 @@
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:views="clr-namespace:Lithnet.AccessManager.Server.UI.Views"
              xmlns:uiComponents="clr-namespace:Lithnet.AccessManager.Server.UI.UIComponents"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
              d:DesignWidth="800"
@@ -37,6 +38,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <uiComponents:ErrorBanner Grid.Column="0"
@@ -55,31 +57,50 @@
                        TextWrapping="Wrap">AMS groups can be used for password policy and permission assignment for AMS-registered devices.
                 </TextBlock>
 
-                <ListView
-                Grid.Row="3"
-                BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
-                  ItemsSource="{Binding Groups}"
-                  SelectedItem="{Binding SelectedItem}"
-                  ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                  VerticalAlignment="Stretch"
-                  MouseDoubleClick="{s:Action Edit}"
-                  Margin="10 5 5 5">
+                <telerik:RadGridView  Grid.Row="3"
+                                  Margin="10 5 5 0"
+                                  ItemsSource="{Binding PagedSource, ElementName=radDataPager}"
+                                  SelectedItem="{Binding SelectedItem}" 
+                                  SelectionUnit="FullRow"
+                                  AutoGenerateColumns="False"
+                                  ShowGroupPanel="False"
+                                  ShowSearchPanel="True"
+                                  CanUserDeleteRows="False"
+                                  CanUserInsertRows="False"
+                                  IsReadOnly="True"
+                                  EnableRowVirtualization="True"
+                                  LeftFrozenColumnCount="1"
+                                  FrozenColumnsSplitterVisibility="Hidden"
+                                  SelectionMode="Extended"
+                                  MouseDoubleClick="{s:Action Edit}"
+                                  >
                     <b:Interaction.Behaviors>
-                        <local:ListViewScrollBarBehavior />
+                        <local:SelectedItemsBehavior SelectedItems="{Binding SelectedItems}" />
                     </b:Interaction.Behaviors>
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Name" 
-                                            DisplayMemberBinding="{Binding Name}" 
-                                            Width="300"/>
-                            <GridViewColumn Header="Description" 
-                                    DisplayMemberBinding="{Binding Description}" 
-                                    />
-                        </GridView>
-                    </ListView.View>
-                </ListView>
 
-                <StackPanel Grid.Row="4"
+                    <telerik:RadGridView.Resources>
+                        <ResourceDictionary Source="pack://application:,,,/Telerik.Windows.Themes.Office2019;component/Themes/Telerik.Windows.Controls.GridView.xaml"/>
+                    </telerik:RadGridView.Resources>
+                    <telerik:RadGridView.Columns>
+                        <telerik:GridViewDataColumn DataMemberBinding="{Binding Name}" Header="NAME" />
+                        <telerik:GridViewDataColumn DataMemberBinding="{Binding Description}" Header="DESCRIPTION"/>
+                    </telerik:RadGridView.Columns>
+                </telerik:RadGridView>
+
+
+                <telerik:RadDataPager Grid.Row="4"
+                                  x:Name="radDataPager" 
+                                  PageSize="100"  
+                                  Margin="10 0 5 5"
+                                  Source="{Binding Groups}">
+                    <telerik:RadDataPager.Resources>
+                        <ResourceDictionary Source="pack://application:,,,/Telerik.Windows.Themes.Office2019;component/Themes/Telerik.Windows.Controls.Data.xaml"/>
+                    </telerik:RadDataPager.Resources>
+                </telerik:RadDataPager>
+
+
+
+                <StackPanel Grid.Row="5"
                         Orientation="Horizontal"
                         Margin="10 5 5 5">
                     <Button Command="{s:Action Add}" 

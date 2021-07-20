@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -16,40 +17,47 @@ namespace Lithnet.AccessManager.Service
 {
     public class Program
     {
+        private static RegistryProvider registryProvider = new RegistryProvider(false);
+
         public static async Task Main(string[] args)
         {
+            SetupNLog(registryProvider);
+
             if (args != null && args.Length > 0 && args[0] == "setup")
             {
                 Setup.Process(args);
+                return;
             }
-            else
+
+            await Task.WhenAll(GetIHosts(args).Select(t => t.RunAsync()));
+        }
+
+        public static IEnumerable<IHost> GetIHosts(string[] args)
+        {
+            SetupNLog(registryProvider);
+
+            bool safeStart = args?.Any(t => string.Equals(t, "/safeStart", StringComparison.OrdinalIgnoreCase)) ?? false;
+
+            if (safeStart || !registryProvider.IsConfigured)
             {
-                RegistryProvider registryProvider = new RegistryProvider(false);
-                SetupNLog(registryProvider);
+                yield return Program.BuildUnconfiguredHost().UseWindowsService().Build();
+                yield break;
+            }
 
-                bool safeStart = args?.Any(t => string.Equals(t, "/safeStart", StringComparison.OrdinalIgnoreCase)) ?? false;
+            var webHostBuilder = CreateWebHost(args).UseWindowsService();
+            var webHost = webHostBuilder.Build();
+            yield return webHost;
 
-                if (safeStart || !registryProvider.IsConfigured)
-                {
-                    await Program.BuildUnconfiguredHost()
-                        .UseWindowsService()
-                        .Build()
-                        .RunAsync();
-                }
-                else
-                {
-                    Task webHost = 
-                        Program.CreateWebHost(args)
-                            .UseWindowsService()
-                            .Build()
-                            .RunAsync();
+            if (registryProvider.ApiEnabled)
+            {
+                // Extract the WindowsServiceLifetime manager from the web host 
+                var lifetime = webHost.Services.GetRequiredService<IHostApplicationLifetime>();
 
-                    Task apiHost = Api.Program.CreateApiHost(args)
-                            .Build()
-                            .RunAsync();
-
-                    await Task.WhenAll(webHost, apiHost);
-                }
+                yield return Api.Program.GetHostBuilder(args).ConfigureServices((builder) =>
+                { 
+                    // and inject it into the API host. The last HostApplicationLifetime injected is the one that is used by the framework
+                    builder.AddSingleton<IHostApplicationLifetime>(lifetime);
+                }).Build();
             }
         }
 
@@ -62,7 +70,7 @@ namespace Lithnet.AccessManager.Service
                 .ConfigureAccessManagerLogging();
         }
 
-        public static IHostBuilder CreateWebHost(string[] args)
+        private static IHostBuilder CreateWebHost(string[] args)
         {
             var host = new HostBuilder();
 

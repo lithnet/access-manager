@@ -1,6 +1,5 @@
 using System.IO;
 using Lithnet.AccessManager.Server;
-using Lithnet.AccessManager.Service;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,23 +10,27 @@ namespace Lithnet.AccessManager.Api
 {
     public class Program
     {
+        private static RegistryProvider registryProvider = new RegistryProvider(false);
+
         public static void Main(string[] args)
         {
-            RegistryProvider registryProvider = new RegistryProvider(false);
+            SetupNLog(registryProvider);
+
+            GetHostBuilder(args)
+                .UseWindowsService()
+                .Build()
+                .Run();
+        }
+
+        public static IHostBuilder GetHostBuilder(string[] args)
+        {
             if (!registryProvider.ApiEnabled)
             {
-                BuildUnconfiguredHost()
-                    .UseWindowsService()
-                    .Build()
-                    .Run();
+                return BuildUnconfiguredHost();
             }
             else
             {
-                SetupNLog(registryProvider);
-                Program.CreateApiHost(args)
-                    .UseWindowsService()
-                    .Build()
-                    .Run();
+                return CreateApiHost(args);
             }
         }
 
@@ -41,7 +44,7 @@ namespace Lithnet.AccessManager.Api
                 .ConfigureAccessManagerLogging();
         }
 
-        public static IHostBuilder CreateApiHost(string[] args)
+        private static IHostBuilder CreateApiHost(string[] args)
         {
 
             return Host

@@ -107,15 +107,6 @@ namespace Lithnet.AccessManager.Agent
                 this.settingsProvider.RegistrationKey = null;
                 return this.settingsProvider.RegistrationState;
             }
-            else if (httpResponseMessage.StatusCode == HttpStatusCode.NotFound)
-            {
-                this.settingsProvider.RegistrationState = RegistrationState.NotRegistered;
-                this.settingsProvider.ClientId = null;
-                this.settingsProvider.RegistrationKey = null;
-
-                this.logger.LogError(EventIDs.AmsRegistrationMissing, "The agent was pending registration, but the server no longer has a record of the registration request. The agent will reset the registration data, and try again on the next run, if a registration key is present");
-                return this.settingsProvider.RegistrationState;
-            }
 
             throw httpResponseMessage.CreateException(responseString);
         }
