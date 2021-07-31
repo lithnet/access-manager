@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Security.Claims;
 using System.Text;
+using Lithnet.AccessManager.Api.Shared;
 
 namespace Lithnet.AccessManager.Server
 {

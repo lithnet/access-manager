@@ -1,34 +1,30 @@
 ﻿using Lithnet.AccessManager.Agent.Providers;
 using Lithnet.AccessManager.Api.Shared;
-using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Lithnet.AccessManager.Agent.Authentication
 {
     public class X509TokenProvider : ITokenProvider
     {
-        private readonly IHttpClientFactory httpClientFactory;
+        private readonly IAmsApiHttpClient httpClient;
         private readonly IAgentSettings settings;
         private readonly IAuthenticationCertificateProvider certProvider;
-        private readonly ITokenClaimProvider claimProvider;
-        private readonly IRandomValueGenerator rvg;
+        private readonly IEnumerable<ITokenClaimProvider> claimProviders;
+        private readonly IClientAssertionProvider assertionProvider;
 
         private TokenResponse token;
 
-        public X509TokenProvider(IHttpClientFactory httpClientFactory, IAgentSettings settings, IAuthenticationCertificateProvider certProvider, ITokenClaimProvider claimProvider, IRandomValueGenerator rvg)
+        public X509TokenProvider(IAmsApiHttpClient httpClient, IAgentSettings settings, IAuthenticationCertificateProvider certProvider, IEnumerable<ITokenClaimProvider> claimProvider, IClientAssertionProvider assertionProvider)
         {
-            this.httpClientFactory = httpClientFactory;
+            this.httpClient = httpClient;
             this.settings = settings;
             this.certProvider = certProvider;
-            this.claimProvider = claimProvider;
-            this.rvg = rvg;
+            this.claimProviders = claimProvider;
+            this.assertionProvider = assertionProvider;
         }
 
         public async Task<string> GetAccessToken()
@@ -56,60 +52,20 @@ namespace Lithnet.AccessManager.Agent.Authentication
         private async Task<TokenResponse> RequestAccessToken()
         {
             ClientAssertion assertion = await this.certProvider.DelegateCertificateOperation(this.BuildAssertion);
-            return await this.RequestAccessToken(assertion);
+            this.token = await this.httpClient.RequestAccessTokenX509Async(assertion);
+            return this.token;
         }
 
         private async Task<ClientAssertion> BuildAssertion(X509Certificate2 certificate)
         {
-            string url = $"https://{this.settings.Server.Trim()}/api/v1.0/auth/x509";
-            return new ClientAssertion { Assertion = await this.BuildAssertion(certificate, url) };
-        }
+            List<Claim> additionalClaims = new List<Claim>();
 
-        private async Task<TokenResponse> RequestAccessToken(ClientAssertion assertion)
-        {
-            using (var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthAnonymous))
+            foreach (var claimsProvider in this.claimProviders)
             {
-                using (var httpResponseMessage = await client.PostAsync("auth/x509", assertion.AsJsonStringContent()))
-                {
-                    var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
-                    httpResponseMessage.EnsureSuccessStatusCode(responseString);
-
-                    this.token = JsonSerializer.Deserialize<TokenResponse>(responseString);
-
-                    return this.token;
-                }
+                additionalClaims.AddRange(claimsProvider.GetClaims());
             }
-        }
 
-        private async Task<string> BuildAssertion(X509Certificate2 cert, string audience)
-        {
-            string hostname = Environment.MachineName;
-
-            string exportedCertificate = Convert.ToBase64String(cert.Export(X509ContentType.Cert));
-
-            string myIssuer = hostname;
-
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim("jti",this.rvg.GenerateRandomString(32)),
-                }),
-                IssuedAt = DateTime.UtcNow,
-                Expires = DateTime.UtcNow.AddMinutes(4),
-                Issuer = myIssuer,
-                Audience = audience,
-                SigningCredentials = new SigningCredentials(new X509SecurityKey(cert), SecurityAlgorithms.RsaSha256)
-            };
-
-            await this.claimProvider.AddClaims(tokenDescriptor);
-
-            // Add x5c header parameter containing the signing certificate:
-            JwtSecurityToken jwt = (JwtSecurityToken)tokenHandler.CreateToken(tokenDescriptor);
-            jwt.Header.Add(JwtHeaderParameterNames.X5c, new List<string> { exportedCertificate });
-
-            return tokenHandler.WriteToken(jwt);
+            return await this.assertionProvider.BuildAssertion(certificate, new Uri(this.httpClient.BaseAddress, "auth/x509").ToString(), additionalClaims);
         }
     }
 }

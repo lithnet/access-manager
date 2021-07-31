@@ -165,7 +165,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public bool CanDelete => this.SelectedItems.Count > 0;
+        public bool CanDelete => this.SelectedItems.Count > 0 && this.SelectedItems.All(t => t.Type == AmsGroupType.Normal);
 
         public async Task Delete()
         {
@@ -193,7 +193,7 @@ namespace Lithnet.AccessManager.Server.UI
 
                 if (await this.dialogCoordinator.ShowMessageAsync(this, "Warning", $"Are you sure you want to delete {message}? This operation can not be undone", MessageDialogStyle.AffirmativeAndNegative, s) == MessageDialogResult.Affirmative)
                 {
-                    foreach (var item in selectedItems)
+                    foreach (var item in selectedItems.Where(t => t.Type == AmsGroupType.Normal))
                     {
                         await this.groupProvider.DeleteGroup(item.Model);
                         this.Groups.Remove(item);

@@ -1,8 +1,0 @@
-{
-  "State": {
-    "RegistrationKey": null,
-    "ClientId": "b47841b1-1f46-4c26-ad58-f737f09278bf",
-    "CheckRegistrationUrl": "/api/v1.0/agent/register/b47841b1-1f46-4c26-ad58-f737f09278bf/b47841b1-1f46-4c26-ad58-f737f09278bf",
-    "RegistrationState": 0
-  }
-}

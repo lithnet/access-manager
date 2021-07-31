@@ -10,21 +10,26 @@ namespace Lithnet.AccessManager.Agent
 {
     public class WritableOptions<T> : IWritableOptions<T> where T : class, new()
     {
-        private readonly IHostEnvironment environment;
         private readonly IOptionsMonitor<T> options;
         private readonly string section;
         private readonly string file;
+        private object lockObject = new object();
 
-        public WritableOptions(
-            IHostEnvironment environment,
-            IOptionsMonitor<T> options,
-            string section,
-            string file)
+        public WritableOptions(IHostEnvironment environment, IOptionsMonitor<T> options, string section, string file)
         {
-            this.environment = environment;
             this.options = options;
             this.section = section;
-            this.file = file;
+
+            if (Path.IsPathRooted(file))
+            {
+                this.file = file;
+            }
+            else
+            {
+                IFileProvider fileProvider = environment.ContentRootFileProvider;
+                IFileInfo fileInfo = fileProvider.GetFileInfo(file);
+                this.file = fileInfo.PhysicalPath;
+            }
         }
 
         public T Value => this.options.CurrentValue;
@@ -33,18 +38,19 @@ namespace Lithnet.AccessManager.Agent
 
         public void Update(Action<T> applyChanges)
         {
-            IFileProvider fileProvider = this.environment.ContentRootFileProvider;
-            IFileInfo fileInfo = fileProvider.GetFileInfo(this.file);
-            string physicalPath = fileInfo.PhysicalPath;
+            lock (lockObject)
+            {
+                var jObject = JsonConvert.DeserializeObject<JObject>(File.ReadAllText(file));
+                T sectionObject = jObject.TryGetValue(this.section, out JToken s) ?
+                    JsonConvert.DeserializeObject<T>(s.ToString()) : (this.Value ?? new T());
 
-            JObject jObject = JsonConvert.DeserializeObject<JObject>(File.ReadAllText(physicalPath));
-            T sectionObject = jObject.TryGetValue(this.section, out JToken s) ?
-                JsonConvert.DeserializeObject<T>(s.ToString()) : (this.Value ?? new T());
+                applyChanges(sectionObject);
 
-            applyChanges(sectionObject);
+                jObject[this.section] = JObject.Parse(JsonConvert.SerializeObject(sectionObject));
 
-            jObject[this.section] = JObject.Parse(JsonConvert.SerializeObject(sectionObject));
-            File.WriteAllText(physicalPath, JsonConvert.SerializeObject(jObject, Formatting.Indented));
+                Directory.CreateDirectory(Path.GetDirectoryName(this.file));
+                File.WriteAllText(this.file, JsonConvert.SerializeObject(jObject, Formatting.Indented));
+            }
         }
     }
 }

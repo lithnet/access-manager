@@ -34,6 +34,11 @@ namespace Lithnet.AccessManager.Api.Providers
             {
                 throw new BadRequestException("The request did not provide a OS version");
             }
+
+            if (string.Equals(data.Hostname, "localhost", StringComparison.OrdinalIgnoreCase) || string.Equals(data.DnsName, "localhost", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new BadRequestException("The hostname provided by the agent was set to 'localhost'");
+            }
         }
     }
 }

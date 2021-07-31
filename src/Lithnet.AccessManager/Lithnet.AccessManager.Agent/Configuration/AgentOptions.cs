@@ -26,8 +26,6 @@ namespace Lithnet.AccessManager.Agent.Configuration
 
         public List<string> AzureTenantIDs { get; set; } = new List<string>();
 
-        public TimeSpan MetadataCacheDuration { get; set; } = TimeSpan.FromHours(1);
-
         public bool RegisterSecondaryCredentialsForAadr { get; set; } = true;
 
         public bool RegisterSecondaryCredentialsForAadj { get; set; } = false;

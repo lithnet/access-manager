@@ -22,6 +22,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Cryptography;
 using Lithnet.AccessManager.Server.Authorization;
 
 namespace Lithnet.AccessManager.Api

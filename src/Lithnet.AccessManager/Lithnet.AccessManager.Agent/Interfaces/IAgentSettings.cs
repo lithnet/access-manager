@@ -22,8 +22,6 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         int CheckInIntervalHours { get; }
 
-        TimeSpan MetadataCacheDuration { get; }
-
         bool RegisterSecondaryCredentialsForAadr { get; }
 
         bool RegisterSecondaryCredentialsForAadj { get; }

@@ -1,0 +1,16 @@
+﻿[Unit]
+Description=Lithnet Access Manager Agent
+After=network.target
+
+[Service]
+Type=notify
+ExecStart=/opt/LithnetAccessManagerAgent/Lithnet.AccessManager.Agent
+WorkingDirectory=/opt/LithnetAccessManagerAgent
+Restart=always
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=LithnetAccessManagerAgent
+User=root
+
+[Install]
+WantedBy=multi-user.target

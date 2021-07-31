@@ -13,22 +13,13 @@ namespace Lithnet.AccessManager.Agent
     {
         private readonly ILogger<Worker> logger;
         private readonly IAgentSettings settings;
-        private readonly IHostApplicationLifetime appLifetime;
         private readonly ILapsAgent lapsAgent;
-        private readonly ILocalSam sam;
 
-        public Worker(ILogger<Worker> logger, IAgentSettings settings, IHostApplicationLifetime appLifetime, ILapsAgent lapsWorker)
+        public Worker(ILogger<Worker> logger, IAgentSettings settings,  ILapsAgent lapsWorker)
         {
             this.logger = logger;
             this.settings = settings;
-            this.appLifetime = appLifetime;
             this.lapsAgent = lapsWorker;
-        }
-
-        public Worker(ILogger<Worker> logger, IAgentSettings settings, IHostApplicationLifetime appLifetime, ILapsAgent lapsWorker, ILocalSam sam)
-        :this(logger, settings, appLifetime, lapsWorker)
-        {
-            this.sam = sam;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -40,16 +31,6 @@ namespace Lithnet.AccessManager.Agent
                 try
                 {
                     this.logger.LogTrace("Worker running at: {time}", DateTimeOffset.Now);
-
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    {
-                        if (this.sam.IsDomainController())
-                        {
-                            this.logger.LogWarning(EventIDs.RunningOnDC, "This application should not be run on a domain controller. Shutting down");
-                            this.appLifetime.StopApplication();
-                            return;
-                        }
-                    }
 
                     await this.RunCheck();
                 }

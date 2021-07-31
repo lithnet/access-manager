@@ -1,6 +1,7 @@
 ﻿using System;
+using Lithnet.AccessManager.Cryptography;
 
-namespace Lithnet.AccessManager.Agent
+namespace Lithnet.AccessManager.Agent.Providers
 {
     public class RandomPasswordGenerator : IPasswordGenerator
     {

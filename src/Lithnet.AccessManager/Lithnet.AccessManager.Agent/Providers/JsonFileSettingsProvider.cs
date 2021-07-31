@@ -37,15 +37,12 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         public int CheckInIntervalHours => this.agentOptions.CurrentValue.CheckInIntervalHours;
 
-        public TimeSpan MetadataCacheDuration => this.agentOptions.CurrentValue.MetadataCacheDuration;
-
         public bool EnableAdminAccount => this.agentOptions.CurrentValue.EnableAdminAccount;
 
         public bool Reset { get; set; } = false;
 
         public void Clear()
         {
-           // this.RegistrationKey = null;
             this.ClientId = null;
             this.RegistrationState = 0;
             this.AuthCertificate = null;
@@ -58,6 +55,7 @@ namespace Lithnet.AccessManager.Agent.Providers
             get => this.appState.Value.RegistrationKey;
             set
             {
+                this.appState.Value.RegistrationKey = value;
                 this.appState.Update(t => t.RegistrationKey = value);
             }
         }
@@ -67,6 +65,7 @@ namespace Lithnet.AccessManager.Agent.Providers
             get => this.appState.Value.ClientId;
             set
             {
+                this.appState.Value.ClientId = value;
                 this.appState.Update(t => t.ClientId = value);
             }
         }
@@ -76,6 +75,7 @@ namespace Lithnet.AccessManager.Agent.Providers
             get => this.appState.Value.RegistrationState;
             set
             {
+                this.appState.Value.RegistrationState = value;
                 this.appState.Update(t => t.RegistrationState = value);
             }
         }
@@ -85,6 +85,7 @@ namespace Lithnet.AccessManager.Agent.Providers
             get => this.appState.Value.AuthCertificate;
             set
             {
+                this.appState.Value.AuthCertificate = value;
                 this.appState.Update(t => t.AuthCertificate = value);
             }
         }
@@ -94,6 +95,7 @@ namespace Lithnet.AccessManager.Agent.Providers
             get => this.appState.Value.LastCheckIn;
             set
             {
+                this.appState.Value.LastCheckIn = value;
                 this.appState.Update(t => t.LastCheckIn = value);
             }
         }
@@ -103,6 +105,7 @@ namespace Lithnet.AccessManager.Agent.Providers
             get => this.appState.Value.HasRegisteredSecondaryCredentials;
             set
             {
+                this.appState.Value.HasRegisteredSecondaryCredentials = value;
                 this.appState.Update(t => t.HasRegisteredSecondaryCredentials = value);
             }
         }

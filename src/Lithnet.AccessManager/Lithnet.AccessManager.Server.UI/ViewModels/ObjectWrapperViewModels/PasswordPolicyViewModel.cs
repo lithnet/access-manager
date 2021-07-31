@@ -173,6 +173,7 @@ namespace Lithnet.AccessManager.Server.UI
                 vm.AllowAmsGroup = true;
                 vm.AllowAzureAdComputer = false;
                 vm.AllowAzureAdGroup = true;
+                vm.AllowAzureAdTenant = false;
 
                 if (!vm.TargetTypeValues.Any())
                 {

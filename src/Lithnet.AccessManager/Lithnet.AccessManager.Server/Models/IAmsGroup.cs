@@ -12,6 +12,8 @@ namespace Lithnet.AccessManager.Server
 
         string Sid { get; set; }
 
+        AmsGroupType Type { get; set; }
+
         SecurityIdentifier SecurityIdentifier { get; set; }
     }
 }

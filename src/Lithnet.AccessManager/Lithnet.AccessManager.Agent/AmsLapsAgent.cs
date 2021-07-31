@@ -47,6 +47,10 @@ namespace Lithnet.AccessManager.Agent
                     await this.checkInProvider.CheckinIfRequired();
                     await this.CheckAndChangePassword();
                 }
+                else
+                {
+                    this.logger.LogTrace("Agent is not able to initialize at this time");
+                }
             }
             catch (ApiException ex)
             {

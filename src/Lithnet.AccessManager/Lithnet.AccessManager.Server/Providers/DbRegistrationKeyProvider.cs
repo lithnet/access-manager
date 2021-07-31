@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Cryptography;
 
 namespace Lithnet.AccessManager.Server.Providers
 {
@@ -93,6 +94,46 @@ namespace Lithnet.AccessManager.Server.Providers
                 Enabled = true,
                 ApprovalRequired = false
             });
+        }
+
+        public async IAsyncEnumerable<IAmsGroup> GetRegistrationKeyGroups(IRegistrationKey key)
+        {
+            await using SqlConnection con = this.dbProvider.GetConnection();
+
+            SqlCommand command = new SqlCommand("spGetRegistrationKeyGroups", con);
+            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@ID", key.Id);
+
+            await using SqlDataReader reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                yield return new DbAmsGroup(reader);
+            }
+        }
+
+        public async Task AddGroupToKey(IRegistrationKey key, IAmsGroup group)
+        {
+            await using SqlConnection con = this.dbProvider.GetConnection();
+
+            SqlCommand command = new SqlCommand("spAddGroupToRegistrationKey", con);
+            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@GroupID", group.Id);
+            command.Parameters.AddWithValue("@RegistrationKeyId", key.Id);
+
+            await command.ExecuteNonQueryAsync();
+        }
+
+        public async Task RemoveGroupFromKey(IRegistrationKey key, IAmsGroup group)
+        {
+            await using SqlConnection con = this.dbProvider.GetConnection();
+
+            SqlCommand command = new SqlCommand("spRemoveGroupFromRegistrationKey", con);
+            command.CommandType = System.Data.CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@GroupID", group.Id);
+            command.Parameters.AddWithValue("@RegistrationKeyId", key.Id);
+
+            await command.ExecuteNonQueryAsync();
         }
 
         public async Task<IRegistrationKey> UpdateRegistrationKey(IRegistrationKey key)

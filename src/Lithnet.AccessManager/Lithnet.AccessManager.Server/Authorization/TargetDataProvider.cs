@@ -63,7 +63,7 @@ namespace Lithnet.AccessManager.Server.Authorization
 
         private SecurityIdentifier GetSid(SecurityDescriptorTarget target)
         {
-            if (target.Type == TargetType.AdContainer)
+            if (target.Type == TargetType.AdContainer || target.Type == TargetType.AadTenant)
             {
                 return null;
             }

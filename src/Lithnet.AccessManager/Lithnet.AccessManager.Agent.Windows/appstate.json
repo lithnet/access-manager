@@ -1,0 +1,12 @@
+{
+  "State": {
+    "RegistrationKey": "wgqhwvatudqpmvczpekpmdpnmwhsrhwi",
+    "RegistrationState": 0
+  },
+  "Agent": {
+    "Enabled": true,
+    "Interval": 60,
+    "Server": "ams2.dev.lithnet.local",
+    "AuthenticationMode": "Ams"
+  }
+}

@@ -22,10 +22,10 @@
     <ROW Property="IAgree" Value="No" Type="4" MsiKey="IAgree"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{6BEDCF73-4A5D-4288-A9A8-1336A9EB50A1} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{5BB635E5-2C17-4175-A552-3B4131FE51AC} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.12.8090.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.12.8127.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="SHOW_DB_CONFIG" Value="1"/>
     <ROW Property="SQLEXPRESS_DEFAULT_ADMINS" Value="Builtin\Administrators"/>
     <ROW Property="SQLEXPRESS_DEFAULT_INSTANCENAME" Value="AMS"/>
@@ -108,6 +108,8 @@
     <ROW Component="Lithnet.AccessManager.Api.Shared.dll" ComponentId="{CF2EFC04-B984-4A26-869A-9BF9711F8AA2}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Api.Shared.dll"/>
     <ROW Component="Lithnet.AccessManager.Api.dll" ComponentId="{564303D1-8A9D-44AF-B433-F9751395706A}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.Api.dll"/>
     <ROW Component="Lithnet.AccessManager.Api.exe" ComponentId="{8A984B54-AD5A-425D-BB62-B19305F2E3A3}" Directory_="APPDIR" Attributes="256" KeyPath="Lithnet.AccessManager.Api.exe"/>
+    <ROW Component="Lithnet.AccessManager.Cryptography.dll" ComponentId="{B0C46305-C9B7-4217-9DD5-49C51A7B3FF6}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Cryptography.dll"/>
+    <ROW Component="Lithnet.AccessManager.Cryptography.dll_1" ComponentId="{AFD7C57C-6B56-4971-B2F3-CE6103D65D32}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Lithnet.AccessManager.Cryptography.dll_1"/>
     <ROW Component="Lithnet.AccessManager.Enterprise.dll" ComponentId="{D0D3FE0C-DC3A-45A6-B1A1-7FAB92D43C71}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Enterprise.dll"/>
     <ROW Component="Lithnet.AccessManager.PowerShell.dll" ComponentId="{F1CA2D0D-972E-4AA2-BD2A-68F8281DAD34}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="256" KeyPath="Lithnet.AccessManager.PowerShell.dll"/>
     <ROW Component="Lithnet.AccessManager.Server.UI.deps.json" ComponentId="{ED70E59C-9E78-4FA9-A010-413CA7967966}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Server.UI.deps.json" Type="0"/>
@@ -1066,6 +1068,10 @@
     <ROW File="Telerik.Windows.Data.dll" Component_="Telerik.Windows.Data.dll" FileName="TELERI~6.DLL|Telerik.Windows.Data.dll" Attributes="0" SourcePath="output\Telerik.Windows.Data.dll" SelfReg="false"/>
     <ROW File="Telerik.Windows.Themes.Office2016.dll" Component_="Telerik.Windows.Themes.Office2016.dll" FileName="TELERI~7.DLL|Telerik.Windows.Themes.Office2016.dll" Attributes="0" SourcePath="output\Telerik.Windows.Themes.Office2016.dll" SelfReg="false"/>
     <ROW File="Telerik.Windows.Themes.Office2019.dll" Component_="Telerik.Windows.Themes.Office2019.dll" FileName="TELERI~8.DLL|Telerik.Windows.Themes.Office2019.dll" Attributes="0" SourcePath="output\Telerik.Windows.Themes.Office2019.dll" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Cryptography.dll" Component_="Lithnet.AccessManager.Cryptography.dll" FileName="LITHN~11.DLL|Lithnet.AccessManager.Cryptography.dll" Attributes="0" SourcePath="output\Lithnet.AccessManager.Cryptography.dll" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Cryptography.pdb" Component_="Lithnet.AccessManager.Cryptography.dll" FileName="LITHNE~8.PDB|Lithnet.AccessManager.Cryptography.pdb" Attributes="0" SourcePath="output\Lithnet.AccessManager.Cryptography.pdb" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Cryptography.dll_1" Component_="Lithnet.AccessManager.Cryptography.dll_1" FileName="LITHNE~4.DLL|Lithnet.AccessManager.Cryptography.dll" Attributes="0" SourcePath="output-ps\Lithnet.AccessManager.Cryptography.dll" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Cryptography.pdb_1" Component_="Lithnet.AccessManager.Cryptography.dll_1" FileName="LITHNE~3.PDB|Lithnet.AccessManager.Cryptography.pdb" Attributes="0" SourcePath="output-ps\Lithnet.AccessManager.Cryptography.pdb" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.custcomp.AiControlConditionAliasComponent">
     <ROW AliasRowId="ExitDialog#LaunchProdCheckBox#Hide#((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))" AliasRowOperation="2" Condition="(((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))) OR NOT IS_STANDALONE_OR_NOT_CLUSTERED_OR_ON_ACTIVE_NODE"/>
@@ -1880,6 +1886,8 @@
     <ROW Feature_="MainFeature" Component_="NewValue"/>
     <ROW Feature_="MainFeature" Component_="AMSAdmins"/>
     <ROW Feature_="MainFeature" Component_="AI_ExePath"/>
+    <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Cryptography.dll"/>
+    <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Cryptography.dll_1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>

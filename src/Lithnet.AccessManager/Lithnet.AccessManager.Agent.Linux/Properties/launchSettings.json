@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "Lithnet.AccessManager.Agent.Linux": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

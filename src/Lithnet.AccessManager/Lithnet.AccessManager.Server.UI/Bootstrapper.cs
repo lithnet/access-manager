@@ -7,6 +7,7 @@ using System.Windows.Threading;
 using DbUp.Engine.Output;
 using FluentValidation;
 using Lithnet.AccessManager.Api;
+using Lithnet.AccessManager.Cryptography;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
@@ -185,9 +186,9 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IDomainTrustProvider>().To<DomainTrustProvider>();
                 builder.Bind<IImportProviderFactory>().To<ImportProviderFactory>();
 
-                builder.Bind<IComputerTargetProvider>().To<ActiveDirectoryComputerTargetProvider>();
-                builder.Bind<IComputerTargetProvider>().To<AzureActiveDirectoryComputerTargetProvider>();
-                builder.Bind<IComputerTargetProvider>().To<AmsComputerTargetProvider>();
+                builder.Bind<IComputerTargetProvider>().To<ComputerTargetProviderAd>();
+                builder.Bind<IComputerTargetProvider>().To<ComputerTargetProviderAzureAd>();
+                builder.Bind<IComputerTargetProvider>().To<ComputerTargetProviderAms>();
                 builder.Bind<IObjectSelectionProvider>().To<ObjectSelectionProvider>();
                 builder.Bind<ITargetDataProvider>().To<TargetDataProvider>();
                 builder.Bind<ITargetDataCache>().To<TargetDataCache>();

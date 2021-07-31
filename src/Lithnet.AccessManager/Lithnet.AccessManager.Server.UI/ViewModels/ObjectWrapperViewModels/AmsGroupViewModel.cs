@@ -102,6 +102,11 @@ namespace Lithnet.AccessManager.Server.UI
             set => this.Model.Name = value;
         }
 
+        public AmsGroupType Type
+        {
+            get => this.Model.Type;
+        }
+
         public Dictionary<string, IDevice> MembersToAdd { get; } = new Dictionary<string, IDevice>(StringComparer.OrdinalIgnoreCase);
 
         public Dictionary<string, IDevice> MembersToRemove { get; } = new Dictionary<string, IDevice>(StringComparer.OrdinalIgnoreCase);

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
-namespace Lithnet.AccessManager.Agent.Test
+namespace Lithnet.AccessManager.Agent.Windows.Test
 {
     public class LapsAgentTests
     {
@@ -34,14 +34,14 @@ namespace Lithnet.AccessManager.Agent.Test
 
             agent.ChangePassword(this.computer.Object);
 
-            lithnetPwdProvider.Verify(v => v.UpdateCurrentPassword(It.IsAny<IActiveDirectoryComputer>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), PasswordAttributeBehaviour.Ignore), Times.Once);
-            sam.Verify(v => v.SetLocalAccountPassword(It.IsAny<SecurityIdentifier>(), It.IsAny<string>()));
+            this.lithnetPwdProvider.Verify(v => v.UpdateCurrentPassword(It.IsAny<IActiveDirectoryComputer>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<int>(), PasswordAttributeBehaviour.Ignore), Times.Once);
+            this.sam.Verify(v => v.SetLocalAccountPassword(It.IsAny<SecurityIdentifier>(), It.IsAny<string>()));
         }
 
         [Test]
         public void HasPasswordExpiredAppDataNull()
         {
-            lithnetPwdProvider.Setup(a => a.GetExpiry(It.IsAny<IActiveDirectoryComputer>())).Returns((DateTime?)null);
+            this.lithnetPwdProvider.Setup(a => a.GetExpiry(It.IsAny<IActiveDirectoryComputer>())).Returns((DateTime?)null);
             ActiveDirectoryLapsAgent agent = this.BuildAgent();
 
             Assert.IsFalse(agent.HasPasswordExpired(this.computer.Object));
@@ -50,7 +50,7 @@ namespace Lithnet.AccessManager.Agent.Test
         [Test]
         public void HasPasswordExpiredAppDataExpired()
         {
-            lithnetPwdProvider.Setup(a => a.HasPasswordExpired(It.IsAny<IActiveDirectoryComputer>(), false)).Returns(true);
+            this.lithnetPwdProvider.Setup(a => a.HasPasswordExpired(It.IsAny<IActiveDirectoryComputer>(), false)).Returns(true);
 
             ActiveDirectoryLapsAgent agent = this.BuildAgent();
 
@@ -60,7 +60,7 @@ namespace Lithnet.AccessManager.Agent.Test
         [Test]
         public void HasPasswordExpiredAppDataNotExpired()
         {
-            lithnetPwdProvider.Setup(a => a.GetExpiry(It.IsAny<IActiveDirectoryComputer>())).Returns(DateTime.UtcNow.AddDays(1));
+            this.lithnetPwdProvider.Setup(a => a.GetExpiry(It.IsAny<IActiveDirectoryComputer>())).Returns(DateTime.UtcNow.AddDays(1));
 
             ActiveDirectoryLapsAgent agent = this.BuildAgent();
 

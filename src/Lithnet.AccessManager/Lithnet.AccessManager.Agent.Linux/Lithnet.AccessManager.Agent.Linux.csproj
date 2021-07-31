@@ -1,0 +1,83 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>dotnet-Lithnet.AccessMangaer.Agent.Linux-C970DD0E-D7B5-4405-8DBC-BD99EAAFC38B</UserSecretsId>
+    <Platforms>AnyCPU</Platforms>
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+    <Company>Lithnet</Company>
+    <Product>Access Manager</Product>
+    <Authors>Lithnet</Authors>
+    <Description>Lithnet Access Manager</Description>
+    <Copyright>(c) 2021 Lithnet</Copyright>
+    <PackageProjectUrl>https://github.com/lithnet/access-manager</PackageProjectUrl>
+    <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <AssemblyName>Lithnet.AccessManager.Agent</AssemblyName>
+    <SelfContained>True</SelfContained>
+    <InvariantGlobalization>True</InvariantGlobalization>
+  </PropertyGroup>
+
+  <!-- DEB/RPM Package properties -->
+
+  <PropertyGroup>
+    <InstallService>True</InstallService>
+    <PackagePrefix>LithnetAccessManagerAgent</PackagePrefix>
+    <Prefix>/opt/LithnetAccessManagerAgent</Prefix>
+    <TarballPrefix>/opt/LithnetAccessManagerAgent</TarballPrefix>
+    <CreateUser>false</CreateUser>
+    <PackageMaintainer>Lithnet &lt;support@lithnet.io&gt;</PackageMaintainer>
+    <PackageDescription>Lithnet Access Manager Agent</PackageDescription>
+    <SymlinkAppHostInBin>true</SymlinkAppHostInBin>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="NLog.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="configure-agent.sh" />
+    <None Remove="LithnetAccessManagerAgent.conf" />
+    <None Remove="LithnetAccessManagerAgent.service" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="configure-agent.sh" CopyToPublishDirectory="PreserveNewest" LinuxFileMode="755">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LithnetAccessManagerAgent.conf" CopyToPublishDirectory="PreserveNewest" LinuxFileMode="644">
+      <LinuxPath>/etc/LithnetAccessManagerAgent.conf</LinuxPath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="LithnetAccessManagerAgent.service" CopyToPublishDirectory="PreserveNewest" LinuxFileMode="755">
+      <LinuxPath>/etc/systemd/system/LithnetAccessManagerAgent.service</LinuxPath>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="NLog.config">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.11.1" />
+    <PackageReference Include="nlog" Version="4.7.10" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="1.7.2" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.11.1" />
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lithnet.AccessManager.Agent\Lithnet.AccessManager.Agent.Shared.csproj" />
+    <ProjectReference Include="..\Lithnet.AccessManager.Api.Shared\Lithnet.AccessManager.Api.Shared.csproj" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="call %25BuildToolsPath%25\sign-and-save-symbols.bat $(TargetPath) $(TargetDir) $(ProjectName)" />
+  </Target>
+
+</Project>

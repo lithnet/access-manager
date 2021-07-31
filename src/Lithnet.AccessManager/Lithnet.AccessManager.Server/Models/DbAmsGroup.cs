@@ -17,6 +17,7 @@ namespace Lithnet.AccessManager.Server.Providers
             this.Name = reader["Name"].CastOrDefault<string>();
             this.Description= reader["Description"].CastOrDefault<string>();
             this.Sid = reader["Sid"].CastOrDefault<string>();
+            this.Type = (AmsGroupType)reader["Type"].CastOrDefault<int>();
         }
 
         public long Id { get; set; }
@@ -24,6 +25,8 @@ namespace Lithnet.AccessManager.Server.Providers
         public string Name { get; set; }
 
         public string Description { get; set; }
+
+        public AmsGroupType Type { get; set; }
 
         public string Sid
         {

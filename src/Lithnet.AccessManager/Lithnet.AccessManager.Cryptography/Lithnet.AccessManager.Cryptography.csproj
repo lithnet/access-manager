@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
+    <Platforms>AnyCPU</Platforms>
+    <Company>Lithnet</Company>
+    <Product>Access Manager</Product>
+    <Authors>Lithnet</Authors>
+    <Description>Lithnet Access Manager</Description>
+    <Copyright>(c) 2021 Lithnet</Copyright>
+    <PackageProjectUrl>https://github.com/lithnet/access-manager</PackageProjectUrl>
+    <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="call %25BuildToolsPath%25\sign-and-save-symbols.bat $(TargetPath) $(TargetDir) $(ProjectName)" />
+  </Target>
+</Project>

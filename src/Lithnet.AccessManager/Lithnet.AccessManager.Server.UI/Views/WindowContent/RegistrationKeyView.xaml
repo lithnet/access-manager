@@ -7,6 +7,10 @@
              xmlns:s="https://github.com/canton7/Stylet"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:uiComponents="clr-namespace:Lithnet.AccessManager.Server.UI.UIComponents"
+              d:DataContext="{d:DesignInstance Type=local:RegistrationKeyViewModel}"
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d">
     <AdornerDecorator>
@@ -23,34 +27,43 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0"
+            <uiComponents:ErrorBanner Grid.Column="0"
+                                      Grid.ColumnSpan="3"
+                                      MessageText="{Binding ErrorMessageText}"
+                                      HeaderText="{Binding ErrorMessageHeaderText}"/>
+
+            <Label Grid.Row="1" Grid.Column="0"
                        Content="Friendly name"
                        Margin="5"/>
-            <TextBox Grid.Row="0" Grid.Column="1" 
+            <TextBox Grid.Row="1" Grid.Column="1" 
                          Text="{Binding Name, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
                          ToolTip="Specify a friendly name to reference with key by"
                          Margin="5"/>
 
-            <CheckBox Grid.Row="1" Grid.Column="1" 
+            <CheckBox Grid.Row="2" Grid.Column="1" 
                       Margin="5"
                       Content="Key is enabled"
                       IsChecked="{Binding Enabled}"/>
 
-            <Label Grid.Row="2" Grid.Column="0"
+            <Label Grid.Row="3" Grid.Column="0"
                    Content="Key value"
                    Margin="5"/>
-            <TextBox Grid.Row="2" Grid.Column="1" 
+            <TextBox Grid.Row="3" Grid.Column="1" 
                      Text="{Binding Key, ValidatesOnDataErrors=True, ValidatesOnNotifyDataErrors=True, NotifyOnValidationError=True, UpdateSourceTrigger=PropertyChanged}"
                      IsReadOnly="True"
                      ToolTip="The registration key value"
                      Margin="5"/>
 
-            <Label Grid.Row="3" Grid.Column="0"
+            <Label Grid.Row="4" Grid.Column="0"
                    Content="Activation limit"
                    Margin="5"/>
-            <StackPanel Grid.Row="3" Grid.Column="1">
+            <StackPanel Grid.Row="4" Grid.Column="1">
                 <CheckBox Margin="5"
                       Content="Limit the number of times this key can be used"
                       IsChecked="{Binding IsActivationLimited}"/>
@@ -63,20 +76,71 @@
             </StackPanel>
 
 
-            <CheckBox Grid.Row="4" Grid.Column="1" 
+            <CheckBox Grid.Row="5" Grid.Column="1" 
                       Margin="5"
                       Content="Require manual device approval after registration"
                       IsChecked="{Binding ApprovalRequired}"/>
 
-            <Label Grid.Row="5" Grid.Column="0"
+            <Label Grid.Row="6" Grid.Column="0"
                    Content="Activation count"
                    Margin="5"/>
-            <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal">
+            <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal">
                 <Label Content="{Binding ActivationCount, Mode=OneWay, FallbackValue=0}"
                          Margin="5"/>
                 <Button Margin="5"
                         Command="{s:Action ResetActivationCount}"
                         Content="Reset count"/>
+            </StackPanel>
+
+            <Label Grid.Row="7" Grid.Column="0"
+                   Content="Add computers that register with this key to the following AMS groups"
+                   Grid.ColumnSpan="2"
+                   Margin="5"/>
+
+            <telerik:RadGridView  Grid.Row="8"
+                                  Grid.Column="0"
+                                  Grid.ColumnSpan="2"
+                                  Margin="10 5 5 5"
+                                  Height="150"
+                                  ItemsSource="{Binding Groups}"
+                                  SelectedItem="{Binding SelectedItem}" 
+                                  SelectionUnit="FullRow"
+                                  AutoGenerateColumns="False"
+                                  ShowGroupPanel="False"
+                                  ShowSearchPanel="False"
+                                  CanUserDeleteRows="False"
+                                  CanUserInsertRows="False"
+                                  IsReadOnly="True"
+                                  EnableRowVirtualization="True"
+                                  LeftFrozenColumnCount="1"
+                                  FrozenColumnsSplitterVisibility="Hidden"
+                                  SelectionMode="Extended"
+            >
+                <b:Interaction.Behaviors>
+                    <local:SelectedItemsBehavior SelectedItems="{Binding SelectedItems}" />
+                </b:Interaction.Behaviors>
+
+                <telerik:RadGridView.Resources>
+                    <ResourceDictionary Source="pack://application:,,,/Telerik.Windows.Themes.Office2019;component/Themes/Telerik.Windows.Controls.GridView.xaml"/>
+                </telerik:RadGridView.Resources>
+                <telerik:RadGridView.Columns>
+                    <telerik:GridViewDataColumn DataMemberBinding="{Binding Name}" Header="NAME" />
+                </telerik:RadGridView.Columns>
+            </telerik:RadGridView>
+
+            <StackPanel Grid.Row="9"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Orientation="Horizontal"
+                        Margin="10 5 5 5">
+
+                <Button Command="{s:Action Add}" 
+                        Content="Add group..." 
+                        Margin="5"/>
+                <Button Command="{s:Action Delete}" 
+                        Content="Delete group..." 
+                        Margin="5"/>
+
             </StackPanel>
 
         </Grid>

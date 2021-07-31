@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Cryptography;
 using Lithnet.AccessManager.Enterprise;
 using Microsoft.Extensions.Logging;
 

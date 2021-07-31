@@ -1,0 +1,84 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFrameworks>net472</TargetFrameworks>
+    <UserSecretsId>dotnet-Lithnet.AccessManager.JitAgent-4F2CEA0A-AC62-4D10-A0DA-F863A79BFEF7</UserSecretsId>
+    <Company>Lithnet</Company>
+    <Product>Access Manager</Product>
+    <Authors>Lithnet</Authors>
+    <Description>Lithnet Access Manager</Description>
+    <Copyright>(c) 2020 Lithnet</Copyright>
+    <PackageProjectUrl>https://github.com/lithnet/access-manager</PackageProjectUrl>
+    <Deterministic>false</Deterministic>
+    <Platforms>AnyCPU</Platforms>
+    <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <ApplicationIcon>access-manager.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>Lithnet.AccessManager.Agent</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="PolicyDefinitions\en-US\lithnet.accessmanager.agent.adml" />
+    <None Remove="PolicyDefinitions\en-US\lithnet.accessmanager.agent.password.adml" />
+    <None Remove="PolicyDefinitions\en-US\lithnet.adml" />
+    <None Remove="PolicyDefinitions\lithnet.accessmanager.agent.admx" />
+    <None Remove="PolicyDefinitions\lithnet.accessmanager.agent.password.admx" />
+    <None Remove="PolicyDefinitions\lithnet.admx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="PolicyDefinitions\en-US\lithnet.accessmanager.agent.adml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PolicyDefinitions\en-US\lithnet.accessmanager.agent.password.adml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PolicyDefinitions\en-US\lithnet.adml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PolicyDefinitions\lithnet.accessmanager.agent.admx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PolicyDefinitions\lithnet.accessmanager.agent.password.admx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="PolicyDefinitions\lithnet.admx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.11.1" />
+    <PackageReference Include="Microsoft.Win32.Registry" Version="5.0.0" />
+    <PackageReference Include="nlog" Version="4.7.10" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="1.7.2" />
+    <PackageReference Include="system.directoryservices" Version="5.0.0" />
+    <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.7.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.11.1" />
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
+    <PackageReference Include="vanara.systemservices" Version="3.3.10" />
+    <PackageReference Include="vanara.pinvoke.netapi32" Version="3.3.10" />
+    <PackageReference Include="vanara.pinvoke.userenv" Version="3.3.10" />
+    <PackageReference Include="vanara.security" Version="3.3.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lithnet.AccessManager.Agent\Lithnet.AccessManager.Agent.Shared.csproj" />
+    <ProjectReference Include="..\Lithnet.AccessManager.Api.Shared\Lithnet.AccessManager.Api.Shared.csproj" />
+    <ProjectReference Include="..\Lithnet.AccessManager\Lithnet.AccessManager.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="NLog.config">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="call %25BuildToolsPath%25\sign-and-save-symbols.bat $(TargetPath) $(TargetDir) $(ProjectName)" />
+  </Target>
+</Project>

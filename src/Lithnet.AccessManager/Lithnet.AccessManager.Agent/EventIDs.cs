@@ -1,6 +1,6 @@
 ﻿namespace Lithnet.AccessManager.Agent
 {
-    internal class EventIDs 
+    public class EventIDs 
     {
         public const int AgentStarted = 1000;
         public const int AgentDisabled = 1001;

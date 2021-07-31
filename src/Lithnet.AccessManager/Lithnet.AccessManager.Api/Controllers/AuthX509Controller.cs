@@ -60,7 +60,7 @@ namespace Lithnet.AccessManager.Api.Controllers
 
                 var unvalidatedToken = this.signedAssertionValidator.Validate(request.Assertion, "api/v1.0/auth/x509", out X509Certificate2 signingCertificate);
 
-                var authModeClaim = this.GetClaimOrThrowIfMissingOrNull(unvalidatedToken.Claims, "auth-mode");
+                var authModeClaim = this.GetClaimOrThrowIfMissingOrNull(unvalidatedToken.Claims, AmsClaimNames.AuthMode);
 
                 if (!Enum.TryParse(authModeClaim, out AgentAuthenticationMode authMode))
                 {
@@ -73,8 +73,8 @@ namespace Lithnet.AccessManager.Api.Controllers
                 {
                     if (options.AllowAadAuth)
                     {
-                        var tenantId = this.GetClaimOrThrowIfMissingOrNull(unvalidatedToken.Claims, "aad-tenant-id");
-                        var deviceId = this.GetClaimOrThrowIfMissingOrNull(unvalidatedToken.Claims, "aad-device-id");
+                        var tenantId = this.GetClaimOrThrowIfMissingOrNull(unvalidatedToken.Claims, AmsClaimNames.AadTenantId);
+                        var deviceId = this.GetClaimOrThrowIfMissingOrNull(unvalidatedToken.Claims, AmsClaimNames.AadDeviceId);
 
                         token = await this.ValidateAadAssertionAsync(signingCertificate, tenantId, deviceId);
                     }

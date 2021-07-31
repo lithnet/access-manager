@@ -2,6 +2,7 @@
 using System.Data.SqlClient;
 using System.Security.Claims;
 using System.Security.Principal;
+using Lithnet.AccessManager.Api.Shared;
 
 namespace Lithnet.AccessManager.Server
 {

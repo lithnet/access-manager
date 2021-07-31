@@ -7,6 +7,7 @@ using System.Security.Principal;
 using System.Threading.Channels;
 using DbUp.Engine.Output;
 using Lithnet.AccessManager.Api;
+using Lithnet.AccessManager.Cryptography;
 using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Auditing;
@@ -84,9 +85,9 @@ namespace Lithnet.AccessManager.Service
             services.AddScoped<ITargetDataProvider, TargetDataProvider>();
             services.AddScoped<IBitLockerRecoveryPasswordProvider, BitLockerRecoveryPasswordProvider>();
 
-            services.AddScoped<IComputerTargetProvider, ActiveDirectoryComputerTargetProvider>();
-            services.AddScoped<IComputerTargetProvider, AzureActiveDirectoryComputerTargetProvider>();
-            services.AddScoped<IComputerTargetProvider, AmsComputerTargetProvider>();
+            services.AddScoped<IComputerTargetProvider, ComputerTargetProviderAd>();
+            services.AddScoped<IComputerTargetProvider, ComputerTargetProviderAzureAd>();
+            services.AddScoped<IComputerTargetProvider, ComputerTargetProviderAms>();
 
             services.AddScoped<IComputerLocator, ComputerLocator>();
             services.AddScoped<IAadGraphApiProvider, AadGraphApiProvider>();

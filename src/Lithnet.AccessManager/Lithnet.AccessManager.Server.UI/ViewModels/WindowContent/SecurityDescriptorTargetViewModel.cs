@@ -15,7 +15,9 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows;
+using Lithnet.AccessManager.Api;
 using Lithnet.AccessManager.Server.Providers;
+using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Domain = System.DirectoryServices.ActiveDirectory.Domain;
 
@@ -41,6 +43,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory;
         private readonly IViewModelFactory<AmsDeviceSelectorViewModel> amsDeviceSelectorFactory;
         private readonly IAmsGroupProvider amsGroupProvider;
+        private readonly IOptionsMonitor<AzureAdOptions> azureAdOptions;
 
         private string jitGroupDisplayName;
 
@@ -48,7 +51,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IActiveDirectory directory, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> targetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider, IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory, IViewModelFactory<AmsDeviceSelectorViewModel> amsDeviceSelectorFactory, IAmsGroupProvider amsGroupProvider, IViewModelFactory<EnterpriseEditionBadgeViewModel, EnterpriseEditionBadgeModel> enterpriseEditionViewModelFactory)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IActiveDirectory directory, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> targetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider, IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory, IViewModelFactory<AmsDeviceSelectorViewModel> amsDeviceSelectorFactory, IAmsGroupProvider amsGroupProvider, IViewModelFactory<EnterpriseEditionBadgeViewModel, EnterpriseEditionBadgeModel> enterpriseEditionViewModelFactory, IOptionsMonitor<AzureAdOptions> azureAdOptions)
         {
             this.directory = directory;
             this.Model = model;
@@ -70,6 +73,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.amsGroupSelectorFactory = amsGroupSelectorFactory;
             this.amsDeviceSelectorFactory = amsDeviceSelectorFactory;
             this.amsGroupProvider = amsGroupProvider;
+            this.azureAdOptions = azureAdOptions;
 
             this.Script = fileSelectionViewModelFactory.CreateViewModel(model, () => model.Script, appPathProvider.ScriptsPath);
             this.Script.DefaultFileExtension = "ps1";
@@ -228,6 +232,11 @@ namespace Lithnet.AccessManager.Server.UI
             else if (this.Type == TargetType.AdContainer)
             {
                 this.DisplayName = this.Target;
+            }
+            else if (this.Type == TargetType.AadTenant)
+            {
+                this.CachedTargetName = this.azureAdOptions.CurrentValue.Tenants.FirstOrDefault(t => t.TenantId == this.Target)?.TenantName;
+                this.DisplayName = this.CachedTargetName ?? "Unknown Azure AD Tenant";
             }
             else
             {
@@ -632,7 +641,19 @@ namespace Lithnet.AccessManager.Server.UI
                 }
                 else if (vm.TargetType.IsAadTarget())
                 {
-                    this.ShowAadObjectSelector(vm.TargetType, vm.SelectedAad.TenantId);
+                    if (vm.TargetType == TargetType.AadTenant)
+                    {
+                        this.Target = vm.SelectedAad.TenantId;
+                        this.Type = vm.TargetType;
+                        this.TargetObjectId = null;
+                        this.CachedTargetName = vm.SelectedAad.TenantName;
+                        this.DisplayName = vm.SelectedAad.TenantName;
+                        this.TargetAuthorityId = null;
+                    }
+                    else
+                    {
+                        this.ShowAadObjectSelector(vm.TargetType, vm.SelectedAad.TenantId);
+                    }
                 }
                 else if (vm.TargetType.IsAmsTarget())
                 {

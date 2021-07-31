@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.DirectoryServices;
 using System.Linq;
+using Lithnet.AccessManager.Cryptography;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 

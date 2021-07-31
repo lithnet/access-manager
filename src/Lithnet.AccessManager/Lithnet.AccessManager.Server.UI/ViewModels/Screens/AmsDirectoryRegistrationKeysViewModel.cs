@@ -93,8 +93,13 @@ namespace Lithnet.AccessManager.Server.UI
 
                 if (w.Result == MessageDialogResult.Affirmative)
                 {
-                    await this.keyProvider.UpdateRegistrationKey(m);
-                    this.RegistrationKeys.Add(vm);
+                    m = await this.keyProvider.UpdateRegistrationKey(m);
+                    this.RegistrationKeys.Add(this.keyViewModelFactory.CreateViewModel(m));
+
+                    foreach (var d in vm.MembersToAdd)
+                    {
+                        await this.keyProvider.AddGroupToKey(m, d.Value);
+                    }
                 }
             }
             catch (Exception ex)
@@ -139,6 +144,16 @@ namespace Lithnet.AccessManager.Server.UI
                     selectedKey.Name = vm.Name;
                     selectedKey.ApprovalRequired = vm.ApprovalRequired;
                     await this.keyProvider.UpdateRegistrationKey(selectedKey.Model);
+
+                    foreach (var d in vm.MembersToAdd)
+                    {
+                        await this.keyProvider.AddGroupToKey(selectedKey.Model, d.Value);
+                    }
+
+                    foreach (var d in vm.MembersToRemove)
+                    {
+                        await this.keyProvider.RemoveGroupFromKey(selectedKey.Model, d.Value);
+                    }
                 }
             }
             catch (Exception ex)

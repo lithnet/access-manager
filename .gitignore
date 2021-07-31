@@ -268,9 +268,7 @@ output/
 *-SetupFiles/
 *.back*.aip
 
-output-x64
-output-x86
-output-ps
+output-*/
 
 setup-packages/
 Prerequisites/

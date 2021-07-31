@@ -1,21 +1,19 @@
 ﻿using Lithnet.AccessManager.Agent.Providers;
 using Lithnet.AccessManager.Api.Shared;
 using System;
-using System.Net.Http;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Lithnet.AccessManager.Agent.Authentication
 {
     public class IwaTokenProvider : ITokenProvider
     {
-        private readonly IHttpClientFactory httpClientFactory;
+        private readonly IAmsApiHttpClient httpClient;
         private readonly IAgentSettings settings;
         private TokenResponse token;
 
-        public IwaTokenProvider(IHttpClientFactory httpClientFactory, IAgentSettings settings)
+        public IwaTokenProvider(IAmsApiHttpClient httpClient, IAgentSettings settings)
         {
-            this.httpClientFactory = httpClientFactory;
+            this.httpClient = httpClient;
             this.settings = settings;
         }
 
@@ -41,20 +39,8 @@ namespace Lithnet.AccessManager.Agent.Authentication
 
         private async Task<TokenResponse> RequestAccessToken()
         {
-            using (var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthIwa))
-            {
-                using (var httpResponseMessage = await client.GetAsync("auth/iwa"))
-                {
-
-
-                    var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
-                    httpResponseMessage.EnsureSuccessStatusCode(responseString);
-
-                    this.token = JsonSerializer.Deserialize<TokenResponse>(responseString);
-
-                    return this.token;
-                }
-            }
+            this.token = await this.httpClient.RequestAccessTokenIwaAsync();
+            return this.token;
         }
     }
 }

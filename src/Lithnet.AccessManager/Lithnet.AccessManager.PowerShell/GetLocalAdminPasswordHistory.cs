@@ -3,6 +3,7 @@ using System.Management.Automation;
 using System.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel.Channels;
+using Lithnet.AccessManager.Cryptography;
 using Microsoft.Extensions.Logging;
 using Microsoft.PowerShell.Cmdletization.Xml;
 

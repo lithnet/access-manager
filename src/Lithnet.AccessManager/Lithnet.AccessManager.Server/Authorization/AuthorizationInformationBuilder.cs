@@ -87,18 +87,18 @@ namespace Lithnet.AccessManager.Server.Authorization
                 return Task.FromResult(info);
             }
 
-            AuthorizationContext c;
+            AuthorizationContext authzContext;
 
             if (computer is IActiveDirectoryComputer adComputer)
             {
-                c = authorizationContextProvider.GetAuthorizationContext(user, adComputer.Sid);
+                authzContext = authorizationContextProvider.GetAuthorizationContext(user, adComputer.Sid);
             }
             else
             {
-                c = authorizationContextProvider.GetAuthorizationContext(user);
+                authzContext = authorizationContextProvider.GetAuthorizationContext(user);
             }
 
-            using (c)
+            using (authzContext)
             {
 
                 DiscretionaryAcl masterDacl = new DiscretionaryAcl(false, false, info.MatchedComputerTargets.Count);
@@ -170,25 +170,25 @@ namespace Lithnet.AccessManager.Server.Authorization
 
                     int i = matchedTargetCount;
 
-                    if (c.AccessCheck(sd, (int)AccessMask.LocalAdminPassword))
+                    if (authzContext.AccessCheck(sd, (int)AccessMask.LocalAdminPassword))
                     {
                         info.SuccessfulLapsTargets.Add(target);
                         matchedTargetCount++;
                     }
 
-                    if (c.AccessCheck(sd, (int)AccessMask.LocalAdminPasswordHistory))
+                    if (authzContext.AccessCheck(sd, (int)AccessMask.LocalAdminPasswordHistory))
                     {
                         info.SuccessfulLapsHistoryTargets.Add(target);
                         matchedTargetCount++;
                     }
 
-                    if (c.AccessCheck(sd, (int)AccessMask.Jit))
+                    if (authzContext.AccessCheck(sd, (int)AccessMask.Jit))
                     {
                         info.SuccessfulJitTargets.Add(target);
                         matchedTargetCount++;
                     }
 
-                    if (c.AccessCheck(sd, (int)AccessMask.BitLocker))
+                    if (authzContext.AccessCheck(sd, (int)AccessMask.BitLocker))
                     {
                         info.SuccessfulBitLockerTargets.Add(target);
                         matchedTargetCount++;
@@ -207,10 +207,10 @@ namespace Lithnet.AccessManager.Server.Authorization
 
                     this.logger.LogTrace($"Resultant security descriptor for computer {computer.FullyQualifiedName}: {info.SecurityDescriptor.GetSddlForm(AccessControlSections.All)}");
 
-                    info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.LocalAdminPassword) ? AccessMask.LocalAdminPassword : 0;
-                    info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.Jit) ? AccessMask.Jit : 0;
-                    info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.LocalAdminPasswordHistory) ? AccessMask.LocalAdminPasswordHistory : 0;
-                    info.EffectiveAccess |= c.AccessCheck(info.SecurityDescriptor, (int)AccessMask.BitLocker) ? AccessMask.BitLocker : 0;
+                    info.EffectiveAccess |= authzContext.AccessCheck(info.SecurityDescriptor, (int)AccessMask.LocalAdminPassword) ? AccessMask.LocalAdminPassword : 0;
+                    info.EffectiveAccess |= authzContext.AccessCheck(info.SecurityDescriptor, (int)AccessMask.Jit) ? AccessMask.Jit : 0;
+                    info.EffectiveAccess |= authzContext.AccessCheck(info.SecurityDescriptor, (int)AccessMask.LocalAdminPasswordHistory) ? AccessMask.LocalAdminPasswordHistory : 0;
+                    info.EffectiveAccess |= authzContext.AccessCheck(info.SecurityDescriptor, (int)AccessMask.BitLocker) ? AccessMask.BitLocker : 0;
                 }
 
                 this.logger.LogTrace($"User {user.MsDsPrincipalName} has effective access of {info.EffectiveAccess} on computer {computer.FullyQualifiedName}");

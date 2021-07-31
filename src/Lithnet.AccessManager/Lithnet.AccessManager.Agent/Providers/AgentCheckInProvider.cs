@@ -1,23 +1,21 @@
-﻿using System;
-using System.Net;
-using Lithnet.AccessManager.Agent.Providers;
-using Lithnet.AccessManager.Api.Shared;
-using System.Net.Http;
+﻿using Lithnet.AccessManager.Api.Shared;
+using System;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace Lithnet.AccessManager.Agent
+namespace Lithnet.AccessManager.Agent.Providers
 {
     public class AgentCheckInProvider : IAgentCheckInProvider
     {
-        private readonly IHttpClientFactory httpClientFactory;
+        private readonly IAmsApiHttpClient httpClient;
         private readonly IAgentSettings settingsProvider;
+        private readonly IPlatformDataProvider dataProvider;
 
-        public AgentCheckInProvider(IHttpClientFactory httpClientFactory, IAgentSettings settingsProvider)
+        public AgentCheckInProvider(IAmsApiHttpClient httpClient, IAgentSettings settingsProvider, IPlatformDataProvider dataProvider)
         {
-            this.httpClientFactory = httpClientFactory;
+            this.httpClient = httpClient;
             this.settingsProvider = settingsProvider;
+            this.dataProvider = dataProvider;
         }
 
         public async Task CheckinIfRequired()
@@ -29,30 +27,28 @@ namespace Lithnet.AccessManager.Agent
             }
         }
 
-        public async Task<AgentCheckIn> GenerateCheckInData()
+        public Task<AgentCheckIn> GenerateCheckInData()
         {
-            return new AgentCheckIn
+            string machineName = this.dataProvider.GetMachineName();
+            if (string.Equals(machineName, "localhost", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new UnsupportedConfigurationException("The local machine has a name of 'localhost'. Rename the computer in order to continue");
+            }
+
+            return Task.FromResult(new AgentCheckIn
             {
                 AgentVersion = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.0.0.0",
-                DnsName = (await Dns.GetHostEntryAsync("LocalHost")).HostName,
-                Hostname = Environment.MachineName,
-                OperatingSystem = RuntimeInformation.OSDescription,
-                OperationSystemVersion = Environment.OSVersion.Version.ToString()
-            };
+                DnsName = this.dataProvider.GetDnsName(),
+                Hostname = machineName,
+                OperatingSystem = this.dataProvider.GetOSName(),
+                OperationSystemVersion = this.dataProvider.GetOSVersion()
+            });
         }
 
         private async Task CheckIn()
         {
             AgentCheckIn data = await this.GenerateCheckInData();
-
-            using (var client = this.httpClientFactory.CreateClient(Constants.HttpClientAuthBearer))
-            {
-                using (var httpResponseMessage = await client.PostAsync($"agent/checkin", data.AsJsonStringContent()))
-                {
-                    var responseString = await httpResponseMessage.Content.ReadAsStringAsync();
-                    httpResponseMessage.EnsureSuccessStatusCode(responseString);
-                }
-            }
+            await this.httpClient.CheckInAsync(data);
         }
     }
 }

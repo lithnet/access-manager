@@ -17,10 +17,10 @@
     <ROW Property="AZUREADTENANTID" Comments="AMS"/>
     <ROW Property="INTERVAL" Comments="AMS"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
-    <ROW Property="ProductCode" Value="1033:{73A2D3AF-7441-486C-97CB-61E2363EFE53} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{B3C4D926-A988-4DAF-8A65-637A44A99255} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Agent"/>
-    <ROW Property="ProductVersion" Value="1.12.8082.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
+    <ROW Property="ProductVersion" Value="1.12.8127.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
     <ROW Property="REGISTRATIONKEY" Options="1" Comments="AMS"/>
     <ROW Property="REG_REGISTRATIONKEY" Options="1" Comments="AMS"/>
     <ROW Property="RESET" Value="0"/>
@@ -54,8 +54,10 @@
     <ROW Component="AzureAdTenantId" ComponentId="{2506B8CB-9FC4-4D6B-8636-C3D0E267140F}" Directory_="APPDIR" Attributes="260" KeyPath="AzureAdTenantId"/>
     <ROW Component="CsvHelper.dll" ComponentId="{58C961DF-36AD-4251-B93F-F4D7788ECBC5}" Directory_="APPDIR" Attributes="0" KeyPath="CsvHelper.dll"/>
     <ROW Component="Enable" ComponentId="{A01DAE3C-26DD-47C5-B8FE-7BF49F1DDC67}" Directory_="APPDIR" Attributes="260" KeyPath="Enable"/>
+    <ROW Component="Lithnet.AccessManager.Agent.Shared.dll" ComponentId="{C48161D9-D7E7-44A3-AD51-5421BE12A75A}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Agent.Shared.dll"/>
     <ROW Component="Lithnet.AccessManager.Agent.exe" ComponentId="{FC28B581-C649-40ED-8567-583F066D6BED}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Agent.exe"/>
     <ROW Component="Lithnet.AccessManager.Api.Shared.dll" ComponentId="{EC149915-E03E-4DD0-B1DB-188D2D25A657}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Api.Shared.dll"/>
+    <ROW Component="Lithnet.AccessManager.Cryptography.dll" ComponentId="{A8AF5863-807F-4F76-B91B-2B52A927E92D}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.Cryptography.dll"/>
     <ROW Component="Lithnet.AccessManager.dll" ComponentId="{4179A33C-62B0-42B7-9D04-6136929D0B19}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.AccessManager.dll"/>
     <ROW Component="Lithnet.Security.Authorization.dll" ComponentId="{AEFC29AF-0317-4898-8716-5856F34209CC}" Directory_="APPDIR" Attributes="0" KeyPath="Lithnet.Security.Authorization.dll"/>
     <ROW Component="Microsoft.Bcl.AsyncInterfaces.dll" ComponentId="{F0F9D6E9-09EF-4C62-AF50-F059F9DB3230}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Bcl.AsyncInterfaces.dll"/>
@@ -242,6 +244,10 @@
     <ROW File="System.Security.Cryptography.ProtectedData.dll" Component_="System.Security.Cryptography.ProtectedData.dll" FileName="SYSTEM~8.DLL|System.Security.Cryptography.ProtectedData.dll" Attributes="0" SourcePath="output-x86\System.Security.Cryptography.ProtectedData.dll" SelfReg="false"/>
     <ROW File="System.Threading.Tasks.Extensions.dll" Component_="System.Threading.Tasks.Extensions.dll" FileName="SYSTE~13.DLL|System.Threading.Tasks.Extensions.dll" Attributes="0" SourcePath="output-x86\System.Threading.Tasks.Extensions.dll" SelfReg="false"/>
     <ROW File="System.ValueTuple.dll" Component_="System.ValueTuple.dll" FileName="SYSTE~15.DLL|System.ValueTuple.dll" Attributes="0" SourcePath="output-x86\System.ValueTuple.dll" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Agent.Shared.dll" Component_="Lithnet.AccessManager.Agent.Shared.dll" FileName="LITHNE~3.DLL|Lithnet.AccessManager.Agent.Shared.dll" Attributes="0" SourcePath="output-x86\Lithnet.AccessManager.Agent.Shared.dll" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Agent.Shared.pdb" Component_="Lithnet.AccessManager.Agent.Shared.dll" FileName="LITHNE~4.PDB|Lithnet.AccessManager.Agent.Shared.pdb" Attributes="0" SourcePath="output-x86\Lithnet.AccessManager.Agent.Shared.pdb" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Cryptography.dll" Component_="Lithnet.AccessManager.Cryptography.dll" FileName="LITHNE~5.DLL|Lithnet.AccessManager.Cryptography.dll" Attributes="0" SourcePath="output-x86\Lithnet.AccessManager.Cryptography.dll" SelfReg="false"/>
+    <ROW File="Lithnet.AccessManager.Cryptography.pdb" Component_="Lithnet.AccessManager.Cryptography.dll" FileName="LITHNE~5.PDB|Lithnet.AccessManager.Cryptography.pdb" Attributes="0" SourcePath="output-x86\Lithnet.AccessManager.Cryptography.pdb" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BootstrOptComponent">
     <ROW BootstrOptKey="GlobalOptions" GeneralOptions="o" DownloadFolder="[AppDataFolder][|Manufacturer]\[|ProductName]\prerequisites"/>
@@ -512,6 +518,8 @@
     <ROW Feature_="MainFeature" Component_="System.Threading.Tasks.Extensions.dll"/>
     <ROW Feature_="MainFeature" Component_="System.ValueTuple.dll"/>
     <ROW Feature_="MainFeature" Component_="Reset"/>
+    <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Agent.Shared.dll"/>
+    <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Cryptography.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>

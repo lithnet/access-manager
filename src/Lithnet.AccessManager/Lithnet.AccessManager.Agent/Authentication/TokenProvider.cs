@@ -6,16 +6,14 @@ namespace Lithnet.AccessManager.Agent.Authentication
 {
     public class TokenProvider : ITokenProvider
     {
-        private readonly IAgentSettings settings;
         private readonly ITokenProvider selectedTokenProvider;
 
-        public TokenProvider(IAgentSettings settings, X509TokenProvider x509Provider)
+        public TokenProvider(X509TokenProvider x509Provider)
         {
-            this.settings = settings;
             this.selectedTokenProvider = x509Provider;
         }
 
-        public TokenProvider(IAgentSettings settings, X509TokenProvider x509Provider, IwaTokenProvider iwaProvider) : this(settings, x509Provider)
+        public TokenProvider(IAgentSettings settings, X509TokenProvider x509Provider, IwaTokenProvider iwaProvider) : this(x509Provider)
         {
             if (settings.AuthenticationMode == AgentAuthenticationMode.Iwa)
             {

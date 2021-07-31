@@ -1,21 +1,19 @@
 ﻿using Lithnet.AccessManager.Api.Providers;
 using Lithnet.AccessManager.Api.Shared;
+using Lithnet.AccessManager.Enterprise;
+using Lithnet.AccessManager.Server;
+using Lithnet.AccessManager.Server.Providers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Enterprise;
-using Lithnet.AccessManager.Server;
-using Lithnet.AccessManager.Server.Providers;
 
 namespace Lithnet.AccessManager.Api.Controllers
 {
@@ -33,8 +31,9 @@ namespace Lithnet.AccessManager.Api.Controllers
         private readonly ICheckInDataValidator checkInDataValidator;
         private readonly IRegistrationKeyProvider regKeyProvider;
         private readonly IAmsLicenseManager licenseManager;
+        private readonly IAmsGroupProvider groupProvider;
 
-        public AgentRegisterController(ILogger<AgentRegisterController> logger, ISignedAssertionValidator assertionValidator, IDeviceProvider devices, IOptions<ApiAuthenticationOptions> agentOptions, IApiErrorResponseProvider errorProvider, ICheckInDataValidator checkInDataValidator, IRegistrationKeyProvider regKeyProvider, IAmsLicenseManager licenseManager)
+        public AgentRegisterController(ILogger<AgentRegisterController> logger, ISignedAssertionValidator assertionValidator, IDeviceProvider devices, IOptions<ApiAuthenticationOptions> agentOptions, IApiErrorResponseProvider errorProvider, ICheckInDataValidator checkInDataValidator, IRegistrationKeyProvider regKeyProvider, IAmsLicenseManager licenseManager, IAmsGroupProvider groupProvider)
         {
             this.logger = logger;
             this.assertionValidator = assertionValidator;
@@ -44,6 +43,7 @@ namespace Lithnet.AccessManager.Api.Controllers
             this.checkInDataValidator = checkInDataValidator;
             this.regKeyProvider = regKeyProvider;
             this.licenseManager = licenseManager;
+            this.groupProvider = groupProvider;
         }
 
         [HttpPost("credential")]
@@ -113,6 +113,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                     IDevice existingDevice = await this.devices.GetDeviceAsync(signingCertificate);
                     existingDevice.ThrowOnDeviceDisabled();
                     this.logger.LogInformation("An agent requested registration, and its certificate {thumbprint} was found in the database with device ID {deviceId}", signingCertificate.Thumbprint, existingDevice.ObjectID);
+
                     return this.GetDeviceApprovalResult(existingDevice);
                 }
                 catch (DeviceCredentialsNotFoundException)
@@ -120,8 +121,10 @@ namespace Lithnet.AccessManager.Api.Controllers
                     this.logger.LogInformation("A new agent requested registration with certificate {thumbprint} from IP {ip}", signingCertificate.Thumbprint, this.HttpContext.Connection.RemoteIpAddress);
                 }
 
-                IDevice device = await this.ValidateRegistrationClaims(token);
+                IRegistrationKey registrationKey = await this.ValidateRegistrationClaims(token);
+                var device = this.ConstructDeviceFromCheckInDetails(token, registrationKey);
                 device = await this.devices.CreateDeviceAsync(device, signingCertificate);
+                await this.ProcessRegistrationKeyGroups(registrationKey, device);
 
                 this.logger.LogInformation("Created new device {deviceId} associated with the credentials {thumbprint}", device.ObjectID, signingCertificate.Thumbprint);
 
@@ -138,47 +141,48 @@ namespace Lithnet.AccessManager.Api.Controllers
             if (device.ApprovalState == ApprovalState.Approved)
             {
                 this.logger.LogInformation("The device {deviceId} has been approved", device.ObjectID);
-                return this.Json(new RegistrationResponse { State = "approved", ClientId = device.ObjectID });
+                return this.Ok(new RegistrationResponse { ApprovalState = ApprovalState.Approved, ClientId = device.ObjectID });
 
             }
             else if (device.ApprovalState == ApprovalState.Pending)
             {
                 this.logger.LogInformation("The device {deviceId} is pending approval", device.ObjectID);
-                JsonResult result = this.Json(new RegistrationResponse { State = "pending", ClientId = device.ObjectID });
-                result.StatusCode = StatusCodes.Status202Accepted;
-                return result;
+                return this.Ok(new RegistrationResponse { ApprovalState = ApprovalState.Pending, ClientId = device.ObjectID });
             }
             else
             {
                 this.logger.LogInformation("The device {deviceId} has been rejected", device.ObjectID);
-                JsonResult result = this.Json(new RegistrationResponse { State = "rejected", ClientId = device.ObjectID });
-                result.StatusCode = StatusCodes.Status410Gone;
-                return result;
+                return this.Ok(new RegistrationResponse { ApprovalState = ApprovalState.Rejected, ClientId = device.ObjectID });
             }
         }
 
-        private async Task<IDevice> ValidateRegistrationClaims(JwtSecurityToken token)
+        private async Task<IRegistrationKey> ValidateRegistrationClaims(JwtSecurityToken token)
         {
-            string registrationKey = token.Claims.FirstOrDefault(t => t.Type == "registration-key")?.Value;
-            if (string.IsNullOrWhiteSpace(registrationKey))
+            string key = token.Claims.FirstOrDefault(t => t.Type == AmsClaimNames.RegistrationKey)?.Value;
+            if (string.IsNullOrWhiteSpace(key))
             {
                 throw new RegistrationKeyValidationException("The registration information did not include a registration key");
             }
 
-            var keyDetails = await this.regKeyProvider.ValidateRegistrationKey(registrationKey);
+            var registrationKey = await this.regKeyProvider.ValidateRegistrationKey(key);
 
-            if (keyDetails == null)
+            if (registrationKey == null)
             {
                 throw new RegistrationKeyValidationException("The registration key validation failed");
             }
 
-            string data = token.Claims.FirstOrDefault(t => t.Type == "data")?.Value;
+            return registrationKey;
+        }
+
+        private IDevice ConstructDeviceFromCheckInDetails(JwtSecurityToken token, IRegistrationKey registrationKey)
+        {
+            string data = token.Claims.FirstOrDefault(t => t.Type == AmsClaimNames.Data)?.Value;
             if (string.IsNullOrWhiteSpace(data))
             {
                 throw new BadRequestException("The registration information did not include a data element");
             }
 
-            AgentCheckIn checkInData = JsonSerializer.Deserialize<AgentCheckIn>(data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? throw new BadRequestException("The registration data element could not be decoded");
+            AgentCheckIn checkInData = JsonSerializer.Deserialize<AgentCheckIn>(data, new JsonSerializerOptions {PropertyNameCaseInsensitive = true}) ?? throw new BadRequestException("The registration data element could not be decoded");
 
             this.checkInDataValidator.ValidateCheckInData(checkInData);
 
@@ -191,11 +195,34 @@ namespace Lithnet.AccessManager.Api.Controllers
                 OperatingSystemVersion = checkInData.OperationSystemVersion,
             };
 
-            device.ApprovalState = keyDetails.ApprovalRequired ? ApprovalState.Pending : ApprovalState.Approved;
+            device.ApprovalState = registrationKey.ApprovalRequired ? ApprovalState.Pending : ApprovalState.Approved;
 
-            this.logger.LogInformation("Validated registration key '{registrationKeyName}' provided by device {deviceName}. Device approval state is {approvalState}", keyDetails.Name, device.Name, device.ApprovalState);
+            this.logger.LogInformation("Validated registration key '{registrationKeyName}' provided by device '{deviceName}'. Device approval state is '{approvalState}'", registrationKey.Name, device.Name, device.ApprovalState);
 
             return device;
+        }
+
+        private async Task ProcessRegistrationKeyGroups(IRegistrationKey key, IDevice device)
+        {
+            try
+            {
+                await foreach (var group in this.regKeyProvider.GetRegistrationKeyGroups(key))
+                {
+                    try
+                    {
+                        await this.groupProvider.AddToGroup(group, device);
+                        this.logger.LogInformation("Add device '{deviceName}' to group '{groupName}'", device.Name, group.Name);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.logger.LogWarning(ex, "Failed to add device '{deviceName}' to group '{groupName}' associated with registration key '{registrationKeyName}'", device.Name, group.Name, key.Name);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogWarning(ex, "Failed to get list of groups associated with the registration key from the database");
+            }
         }
     }
 }

@@ -4,12 +4,35 @@ SETLOCAL
 SET solutiondir=D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager
 SET outputdirx86=%solutiondir%\Lithnet.AccessManager.Agent.Setup\output-x86
 SET outputdirx64=%solutiondir%\Lithnet.AccessManager.Agent.Setup\output-x64
-SET agentProject=%solutiondir%\Lithnet.AccessManager.Agent\Lithnet.AccessManager.Agent.csproj
+SET agentProjectWindows=%solutiondir%\Lithnet.AccessManager.Agent.Windows\Lithnet.AccessManager.Agent.Windows.csproj
 
 SET setupProjectx64=%solutiondir%\Lithnet.AccessManager.Agent.Setup\Lithnet.AccessManager.Agent.Setup-x64.aip
 SET setupProjectx86=%solutiondir%\Lithnet.AccessManager.Agent.Setup\Lithnet.AccessManager.Agent.Setup-x86.aip
 SET intuneBuildDirx64=%amsBuildFolder%\intune\x64
 SET intuneBuildDirx86=%amsBuildFolder%\intune\x86
+
+SET outputdirx64Linux=D:\dev\installers\ams
+SET agentProjectLinux=%solutiondir%\Lithnet.AccessManager.Agent.Linux\Lithnet.AccessManager.Agent.Linux.csproj
+
+
+REM ************************* linux installer *********************************
+
+REM ECHO [92mClearing 64-bit output directory[0m
+REM IF EXIST "%outputdirx64Linux%" powershell -Command "& Remove-Item '%outputdirx64Linux%\*' -recurse -force" || exit /b %errorlevel%
+REM if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
+
+ECHO [92mBuilding 64-bit DEB package[0m
+dotnet publish "%agentProjectLinux%" --runtime linux-x64 --framework netcoreapp3.1 --self-contained true /property:Version=%version% /property:FileVersion=%version%  /p:TreatWarningsAsErrors=true /warnaserror /target:CreateDeb /p:PackageDir="%amsBuildFolder%"
+if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
+
+ECHO [92mBuilding 64-bit RPM package[0m
+dotnet publish "%agentProjectLinux%" --runtime linux-x64 --framework netcoreapp3.1 --self-contained true /property:Version=%version% /property:FileVersion=%version%  /p:TreatWarningsAsErrors=true /warnaserror /target:CreateRpm /p:PackageDir="%amsBuildFolder%"
+if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
+
+ECHO [92mBuilding 64-bit Tarball package[0m
+dotnet publish "%agentProjectLinux%" --runtime linux-x64 --framework netcoreapp3.1 --self-contained true /property:Version=%version% /property:FileVersion=%version%  /p:TreatWarningsAsErrors=true /warnaserror /target:CreateTarBall /p:PackageDir="%amsBuildFolder%"
+if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
+
 
 REM ************************* 64-bit installer *********************************
 
@@ -23,7 +46,7 @@ IF EXIST "%outputdirx64%" powershell -Command "& Remove-Item '%outputdirx64%\*' 
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
 ECHO [92mBuilding 64-bit agent project[0m
-dotnet publish "%agentProject%" --runtime win-x64 --output "%outputdirx64%" --framework net472 --self-contained false /property:Version=%version% /property:FileVersion=%version%  /p:TreatWarningsAsErrors=true /warnaserror 
+dotnet publish "%agentProjectWindows%" --runtime win-x64 --output "%outputdirx64%" --framework net472 --self-contained false /property:Version=%version% /property:FileVersion=%version%  /p:TreatWarningsAsErrors=true /warnaserror 
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
 ECHO [92mSigning 64-bit Lithnet EXEs[0m
@@ -57,7 +80,7 @@ IF EXIST "%outputdirx86%" powershell -Command "& Remove-Item '%outputdirx86%\*' 
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
 ECHO [92mBuilding 32-bit agent project[0m
-dotnet publish "%agentProject%" --runtime win-x86 --output "%outputdirx86%" --framework net472 --self-contained false  /property:Version=%version% /property:FileVersion=%version%
+dotnet publish "%agentProjectWindows%" --runtime win-x86 --output "%outputdirx86%" --framework net472 --self-contained false  /property:Version=%version% /property:FileVersion=%version%
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
 ECHO [92mSigning 32-bit Lithnet EXEs[0m

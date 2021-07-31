@@ -22,6 +22,9 @@ namespace Lithnet.AccessManager.Server.Configuration
         [Description("Azure AD group")]
         AadGroup = 4,
 
+        [Description("Azure AD tenant")]
+        AadTenant = 7,
+        
         [Description("AMS computer")]
         AmsComputer = 5,
 

@@ -16,5 +16,8 @@ namespace Lithnet.AccessManager.Server.Providers
         Task<IRegistrationKey> UpdateRegistrationKey(IRegistrationKey key);
 
         Task<IRegistrationKey> CloneRegistrationKey(IRegistrationKey key);
+        IAsyncEnumerable<IAmsGroup> GetRegistrationKeyGroups(IRegistrationKey key);
+        Task AddGroupToKey(IRegistrationKey key, IAmsGroup group);
+        Task RemoveGroupFromKey(IRegistrationKey key, IAmsGroup group);
     }
 }

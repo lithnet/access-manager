@@ -35,6 +35,8 @@ namespace Lithnet.AccessManager.Server.UI
 
         public bool AllowAzureAdGroup { get; set; } = true;
 
+        public bool AllowAzureAdTenant { get; set; } = true;
+
         public bool AllowAzureAdComputer { get; set; } = true;
 
         public bool AllowAdComputer { get; set; } = true;
@@ -87,6 +89,11 @@ namespace Lithnet.AccessManager.Server.UI
                         {
                             yield return TargetType.AadGroup;
                         }
+
+                        if (this.AllowAzureAdTenant)
+                        {
+                            yield return TargetType.AadTenant;
+                        }
                     }
 
                     if (this.licenseManager.IsFeatureEnabled(LicensedFeatures.AmsRegisteredDeviceSupport))
@@ -119,7 +126,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public AzureAdTenantDetailsViewModel SelectedAad { get; set; }
 
-        public bool ShowAad => this.TargetType == TargetType.AadComputer || this.TargetType == TargetType.AadGroup;
+        public bool ShowAad => this.TargetType.IsAadTarget();
 
         public List<AzureAdTenantDetailsViewModel> AvailableAads { get; set; }
     }

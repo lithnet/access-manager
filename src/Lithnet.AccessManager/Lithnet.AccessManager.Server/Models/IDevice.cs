@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Principal;
+using Lithnet.AccessManager.Api.Shared;
 
 namespace Lithnet.AccessManager.Server
 {

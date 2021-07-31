@@ -6,7 +6,7 @@ using System.Text;
 namespace Lithnet.AccessManager.Agent
 {
     [Serializable]
-    public class UnexpectedResponseException : AccessManagerException
+    public class UnexpectedResponseException : Exception
     {
         public UnexpectedResponseException()
         {

@@ -102,7 +102,7 @@ namespace Lithnet.AccessManager.Server
 
         public static bool IsAadTarget(this TargetType t)
         {
-            return t == TargetType.AadComputer || t == TargetType.AadGroup;
+            return t == TargetType.AadComputer || t == TargetType.AadGroup || t == TargetType.AadTenant;
         }
 
         public static bool IsAmsTarget(this TargetType t)

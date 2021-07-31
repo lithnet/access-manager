@@ -2,6 +2,7 @@
 using Stylet;
 using System;
 using System.Windows;
+using Lithnet.AccessManager.Api.Shared;
 
 namespace Lithnet.AccessManager.Server.UI
 {

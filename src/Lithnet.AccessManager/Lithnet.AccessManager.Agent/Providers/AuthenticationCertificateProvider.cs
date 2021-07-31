@@ -1,32 +1,32 @@
-﻿using Lithnet.AccessManager.Agent.Providers;
+﻿using Lithnet.AccessManager.Api.Shared;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using Lithnet.AccessManager.Api.Shared;
 
-namespace Lithnet.AccessManager.Agent
+namespace Lithnet.AccessManager.Agent.Providers
 {
-    public class AuthenticationCertificateProvider : IAuthenticationCertificateProvider
+    public abstract class AuthenticationCertificateProvider : IAuthenticationCertificateProvider
     {
-        private readonly IAgentSettings settings;
-        private readonly IAadJoinInformationProvider aadProvider;
-        private readonly ILogger<AuthenticationCertificateProvider> logger;
+        protected readonly IAgentSettings settings;
+        protected readonly ILogger<AuthenticationCertificateProvider> logger;
 
         private X509Certificate2 cachedCertificate;
 
-        public AuthenticationCertificateProvider(IAgentSettings settings, IAadJoinInformationProvider aadProvider, ILogger<AuthenticationCertificateProvider> logger)
+        protected StoreLocation storeLocation;
+
+        protected AuthenticationCertificateProvider(ILogger<AuthenticationCertificateProvider> logger, IAgentSettings settings, StoreLocation storeLocation)
         {
             this.settings = settings;
-            this.aadProvider = aadProvider;
             this.logger = logger;
+
+            this.storeLocation = storeLocation;
         }
 
-        public T DelegateCertificateOperation<T>(Func<X509Certificate2, T> certificateOperation)
+        public virtual T DelegateCertificateOperation<T>(Func<X509Certificate2, T> certificateOperation)
         {
             if (this.settings.AuthenticationMode == AgentAuthenticationMode.Ams || this.settings.HasRegisteredSecondaryCredentials)
             {
@@ -39,10 +39,6 @@ namespace Lithnet.AccessManager.Agent
 
                 this.logger.LogTrace($"Found AMS certificate with thumbprint {cert.Thumbprint}");
                 return certificateOperation(cert);
-            }
-            else if (this.settings.AuthenticationMode == AgentAuthenticationMode.Aad)
-            {
-                return this.aadProvider.DelegateCertificateOperation(certificateOperation);
             }
 
             throw new InvalidOperationException("The authentication mode is not supported");
@@ -73,7 +69,7 @@ namespace Lithnet.AccessManager.Agent
                 }
             }
 
-            cert = this.GetCertificateFromStoreByOid(Constants.AgentAuthenticationCertificateOid, StoreLocation.LocalMachine);
+            cert = this.GetCertificateFromStoreByOid(Constants.AgentAuthenticationCertificateOid, this.storeLocation);
 
             if (cert != null)
             {
@@ -94,13 +90,13 @@ namespace Lithnet.AccessManager.Agent
 
         public void DeleteAgentCertificates()
         {
-            this.RemoveCertificatesFromStoreByOid(Constants.AgentAuthenticationCertificateOid, StoreLocation.LocalMachine);
+            this.RemoveCertificatesFromStoreByOid(Constants.AgentAuthenticationCertificateOid, this.storeLocation);
         }
 
-        public X509Certificate2 CreateSelfSignedCert()
+        public virtual X509Certificate2 CreateSelfSignedCert()
         {
             CertificateRequest request = new CertificateRequest($"CN={Environment.MachineName},OU=Agent,OU=Access Manager,O=Lithnet", RSA.Create(3072), HashAlgorithmName.SHA384, RSASignaturePadding.Pss);
-
+            
             request.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(new OidCollection
             {
                 new Oid(Constants.AgentAuthenticationCertificateOid, "Access Manager Agent Authentication")
@@ -117,66 +113,12 @@ namespace Lithnet.AccessManager.Agent
             var raw = cert.Export(X509ContentType.Pfx, p);
             var f = new X509Certificate2(raw, p, X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.Exportable | X509KeyStorageFlags.PersistKeySet);
 
-            X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+            X509Store store = new X509Store(StoreName.My, this.storeLocation);
             store.Open(OpenFlags.ReadWrite);
             store.Add(f);
             store.Close();
 
             return f;
-        }
-
-        private X509Certificate2 CreateSelfSignedCertInTpm()
-        {
-            RSA rsa;
-
-            // We might need to do something like this to get around the internal error bug with the platform provider
-            // https://github.com/glueckkanja-pki/TPMImport
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                CngKeyCreationParameters creationParameters = new CngKeyCreationParameters()
-                {
-                    KeyCreationOptions = CngKeyCreationOptions.MachineKey,
-                    KeyUsage = CngKeyUsages.AllUsages,
-                    Provider = new CngProvider("Microsoft Platform Crypto Provider"),
-                    ExportPolicy = CngExportPolicies.None,
-                    UIPolicy = new CngUIPolicy(CngUIProtectionLevels.None),
-                };
-
-                // creationParameters.Parameters.Add(new CngProperty("Length", BitConverter.GetBytes(1024 * 3), CngPropertyOptions.None));
-
-                CngKey key = CngKey.Create(CngAlgorithm.Rsa, Guid.NewGuid().ToString(), creationParameters);
-                rsa = new RSACng(key);
-            }
-            else
-            {
-                rsa = RSA.Create(3 * 1024);
-            }
-
-            using (rsa)
-            {
-                CertificateRequest request = new CertificateRequest($"CN={Environment.MachineName},OU=Agent,OU=Access Manager,O=Lithnet", rsa, HashAlgorithmName.SHA384, RSASignaturePadding.Pss);
-
-                request.CertificateExtensions.Add(new X509EnhancedKeyUsageExtension(new OidCollection
-                {
-                    new Oid(Constants.AgentAuthenticationCertificateOid, "Access Manager Agent Authentication")
-                }, true));
-                request.CertificateExtensions.Add(new X509KeyUsageExtension(
-                    X509KeyUsageFlags.KeyEncipherment |
-                    X509KeyUsageFlags.DigitalSignature |
-                    X509KeyUsageFlags.NonRepudiation
-                    , true));
-                request.CertificateExtensions.Add(new X509BasicConstraintsExtension(false, false, 0, true));
-
-                X509Certificate2 cert = request.CreateSelfSigned(DateTimeOffset.UtcNow, DateTime.UtcNow.AddYears(10));
-
-                X509Store store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
-                store.Open(OpenFlags.ReadWrite);
-                store.Add(cert);
-                store.Close();
-
-                return cert;
-            }
         }
 
         private X509Certificate2 GetCertificateFromStoreByOid(string oid, StoreLocation storeLocation)
@@ -227,8 +169,7 @@ namespace Lithnet.AccessManager.Agent
 
         private X509Certificate2 ResolveCertificateFromLocalStore(string thumbprint)
         {
-            return GetCertificateFromStore(thumbprint, StoreLocation.CurrentUser) ??
-                   GetCertificateFromStore(thumbprint, StoreLocation.LocalMachine) ??
+            return GetCertificateFromStore(thumbprint, this.storeLocation) ??
                    throw new CertificateNotFoundException($"An authentication certificate with the thumbprint {thumbprint} could not be found");
         }
 
