@@ -19,6 +19,7 @@ namespace Lithnet.AccessManager.Server
         private readonly IOptionsMonitor<AzureAdOptions> azureAdOptions;
         private readonly Dictionary<string, IGraphServiceClient> clients;
         private readonly IProtectedSecretProvider protectedSecretProvider;
+        private readonly Dictionary<string, string> tenantNameCache = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         public AadGraphApiProvider(IOptionsMonitor<AzureAdOptions> azureAdOptions, IProtectedSecretProvider protectedSecretProvider)
         {
@@ -82,12 +83,25 @@ namespace Lithnet.AccessManager.Server
 
         public async Task<string> GetTenantOrgName(string tenantId)
         {
+            return await this.GetTenantOrgName(tenantId, false);
+        }
+
+        public async Task<string> GetTenantOrgName(string tenantId, bool forceRefresh)
+        {
+            string cachedName = this.tenantNameCache.GetValueOrDefault(tenantId, null) ?? this.azureAdOptions.CurrentValue.Tenants.FirstOrDefault(t => string.Equals(t.TenantId, tenantId, StringComparison.OrdinalIgnoreCase))?.TenantName;
+
+            if (cachedName != null && !forceRefresh)
+            {
+                return cachedName;
+            }
+
             var org = await this.GetClient(tenantId).Organization.Request().GetAsync();
             if (org.Count == 0)
             {
                 return null;
             }
 
+            this.tenantNameCache.TryAdd(tenantId, org[0].DisplayName);
             return org[0].DisplayName;
         }
 

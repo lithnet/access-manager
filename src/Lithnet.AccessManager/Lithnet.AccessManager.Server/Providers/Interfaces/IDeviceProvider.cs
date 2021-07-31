@@ -25,7 +25,7 @@ namespace Lithnet.AccessManager.Server
         Task<IDevice> GetDeviceAsync(string deviceId);
 
         Task<IList<IDevice>> FindDevices(string name);
-
+        
         IAsyncEnumerable<IDevice> GetDevices(int startIndex, int count);
 
         Task ApproveDevice(string deviceId);

@@ -74,5 +74,6 @@ namespace Lithnet.AccessManager
         string TranslateName(string name, DsNameFormat nameFormat, DsNameFormat requiredFormat);
         bool CanAccountBeDelegated(SecurityIdentifier serviceAccount);
         bool IsAccountGmsa(SecurityIdentifier serviceAccount);
+        IEnumerable<IActiveDirectoryComputer> GetComputers(string name);
     }
 }

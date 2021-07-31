@@ -21,7 +21,7 @@
     <div class="form-content-header">
         @UIMessages.HeadingRequestAccess
     </div>
-    @using (Html.BeginForm("AccessRequestType", "Computer", FormMethod.Post))
+    @using (Html.BeginForm("AccessRequestComputer", "Computer", FormMethod.Post))
     {
         @if (!string.IsNullOrWhiteSpace(uiSettings.Value.RequestScreenCustomHeading) || !string.IsNullOrWhiteSpace(uiSettings.Value.RequestScreenCustomMessage))
         {

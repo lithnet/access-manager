@@ -40,6 +40,7 @@
         public const int RateLimitExceededUser = 4018;
         public const int BitLockerKeysNotPresent = 4019;
         public const int AuthZRateLimitExceeded = 4020;
+        public const int TooManyResults = 4021;
 
         // 5000 range - Server errors
         public const int LocalSamGroupMemberAddFailed = 5001;

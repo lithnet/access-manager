@@ -79,6 +79,35 @@ namespace Lithnet.AccessManager
             return new ActiveDirectoryComputer(this.FindComputerInGc(name));
         }
 
+        public IEnumerable<IActiveDirectoryComputer> GetComputers(string name)
+        {
+            if (name.Contains("\\"))
+            {
+                yield return new ActiveDirectoryComputer(this.FindComputerInGc(name));
+            }
+            else
+            {
+                HashSet<string> dns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                foreach (var dn in this.GcGetDnsFromAttributeSearch("name", name, "computer"))
+                {
+                    if (dns.Add(dn))
+                    {
+                        yield return new ActiveDirectoryComputer(this.GetDirectoryEntry(dn, DsNameFormat.DistinguishedName));
+                    }
+                }
+
+                foreach (var dn in this.GcGetDnsFromAttributeSearch("dnsHostName", name, "computer"))
+                {
+                    if (dns.Add(dn))
+                    {
+                        yield return new ActiveDirectoryComputer(this.GetDirectoryEntry(dn, DsNameFormat.DistinguishedName));
+                    }
+                }
+            }
+        }
+
+
         public IActiveDirectoryComputer GetComputer(SecurityIdentifier sid)
         {
             return new ActiveDirectoryComputer(this.FindComputerInGc(sid.ToString()));
@@ -633,6 +662,26 @@ namespace Lithnet.AccessManager
                     }
 
                     return result[0].Properties["distinguishedName"][0].ToString();
+                }
+            });
+        }
+
+        private IEnumerable<string> GcGetDnsFromAttributeSearch(string attributeName, string attributeValue, string objectClass)
+        {
+            return this.discoveryServices.FindGcAndExecuteWithRetry(Forest.GetCurrentForest().Name, dc =>
+            {
+                DirectorySearcher d = new DirectorySearcher
+                {
+                    SearchRoot = new DirectoryEntry($"GC://{dc}"),
+                    SearchScope = SearchScope.Subtree,
+                    Filter = $"(&(objectClass={objectClass})({attributeName}={EscapeSearchFilterParameter(attributeValue)}))"
+                };
+
+                d.PropertiesToLoad.Add("distinguishedName");
+
+                using (SearchResultCollection result = d.FindAll())
+                {
+                    return result.OfType<SearchResult>().Select(t => t.Properties["distinguishedName"][0].ToString()).ToList();
                 }
             });
         }

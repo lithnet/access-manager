@@ -42,6 +42,7 @@ namespace Lithnet.AccessManager.Server
 
             return devices;
         }
+
         public async IAsyncEnumerable<IDevice> GetDevices()
         {
             await using SqlConnection con = this.dbProvider.GetConnection();

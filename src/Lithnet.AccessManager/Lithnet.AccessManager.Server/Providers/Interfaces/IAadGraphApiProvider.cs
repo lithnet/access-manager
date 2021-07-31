@@ -20,8 +20,10 @@ namespace Lithnet.AccessManager.Server
         
         Task ValidateCredentials(string tenantId, string clientId, ProtectedSecret secret);
         
+        Task<string> GetTenantOrgName(string tenantId, bool forceRefresh);
+
         Task<string> GetTenantOrgName(string tenantId);
-        
+
         void AddOrUpdateClientCredentials(string tenantId, string clientId, ProtectedSecret secret);
         
         IAsyncEnumerable<Group> FindGroups(string tenant, string searchText);

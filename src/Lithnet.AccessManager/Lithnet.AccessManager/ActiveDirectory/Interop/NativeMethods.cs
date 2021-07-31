@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
@@ -14,10 +13,6 @@ namespace Lithnet.AccessManager.Interop
         private static SecurityIdentifier localMachineSid;
 
         public static int DirectoryReferralLimit { get; set; } = 10;
-
-        internal const int InsufficientBuffer = 122;
-
-        private const int ErrorMoreData = 234;
 
         [DllImport("Ntdsapi.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern int DsBind(string domainControllerName, string dnsDomainName, out IntPtr hds);
@@ -46,8 +41,8 @@ namespace Lithnet.AccessManager.Interop
 
         [DllImport("NetAPI32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern int NetLocalGroupGetMembers([MarshalAs(UnmanagedType.LPWStr)]
-            string servername, [MarshalAs(UnmanagedType.LPWStr)]
-            string localgroupname, int level, out IntPtr bufptr, int prefmaxlen, out int entriesread, out int totalentries, IntPtr resume_handle);
+            string serverName, [MarshalAs(UnmanagedType.LPWStr)]
+            string localGroupName, int level, out IntPtr bufPtr, int prefMaxLen, out int entriesRead, out int totalEntries, IntPtr resumeHandle);
 
         [DllImport("netapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern int NetLocalGroupAddMember(string server, string groupName, IntPtr sid);
@@ -55,28 +50,8 @@ namespace Lithnet.AccessManager.Interop
         [DllImport("netapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern int NetLocalGroupDelMember(string server, string groupName, IntPtr sid);
 
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        private static extern bool CreateWellKnownSid(WellKnownSidType wellKnownSidType, IntPtr domainSid, IntPtr pSid, ref int cbSid);
-
-        [DllImport("Advapi32.dll", SetLastError = true, PreserveSig = true, CharSet = CharSet.Unicode)]
-        private static extern int LsaQueryInformationPolicy(IntPtr pPolicyHandle, PolicyInformationClass informationClass, out IntPtr pData);
-
-        [DllImport("advapi32.dll", SetLastError = true, PreserveSig = true, CharSet = CharSet.Unicode)]
-        private static extern int LsaOpenPolicy([In] in LsaUnicodeString server, [In] in LsaObjectAttributes objectAttributes, LsaAccessPolicy desiredAccess, out IntPtr pPolicyHandle);
-
-        [DllImport("advapi32.dll", CharSet = CharSet.Unicode)]
-        private static extern int LsaClose(IntPtr hPolicy);
-
-        [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        private static extern int LsaNtStatusToWinError(int status);
-
-        [DllImport("advapi32.dll", SetLastError = true)]
-        private static extern int LsaFreeMemory(IntPtr buffer);
-
         [DllImport("netapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         private static extern int DsGetSiteName(string computerName, out IntPtr siteName);
-
-        private const int ERROR_SUCCESS = 0;
 
         public static string GetComputerSiteName(string computerName)
         {
@@ -136,26 +111,25 @@ namespace Lithnet.AccessManager.Interop
         {
             var sid = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null);
 
-            byte[] sidbytes = new byte[sid.BinaryLength];
-            sid.GetBinaryForm(sidbytes, 0);
+            byte[] sidBytes = new byte[sid.BinaryLength];
+            sid.GetBinaryForm(sidBytes, 0);
 
             int accountNameSize = 0;
             int domainNameSize = 0;
-            AdvApi32.SID_NAME_USE use;
 
             StringBuilder accountName = new StringBuilder(accountNameSize);
             StringBuilder domainName = new StringBuilder(domainNameSize);
 
-            if (!AdvApi32.LookupAccountSid(server, sidbytes, accountName, ref accountNameSize, domainName, ref domainNameSize, out use))
+            if (!AdvApi32.LookupAccountSid(server, sidBytes, accountName, ref accountNameSize, domainName, ref domainNameSize, out AdvApi32.SID_NAME_USE _))
             {
                 int error = Marshal.GetLastWin32Error();
-                if (error != Vanara.PInvoke.Win32Error.ERROR_INSUFFICIENT_BUFFER)
+                if (error != Win32Error.ERROR_INSUFFICIENT_BUFFER)
                 {
                     throw new Win32Exception(error);
                 }
             }
 
-            if (!AdvApi32.LookupAccountSid(server, sidbytes, accountName, ref accountNameSize, domainName, ref domainNameSize, out use))
+            if (!AdvApi32.LookupAccountSid(server, sidBytes, accountName, ref accountNameSize, domainName, ref domainNameSize, out AdvApi32.SID_NAME_USE _))
             {
                 int error = Marshal.GetLastWin32Error();
                 throw new Win32Exception(error);
@@ -226,15 +200,14 @@ namespace Lithnet.AccessManager.Interop
 
             do
             {
-                int totalEntries;
                 IntPtr resume = IntPtr.Zero;
                 IntPtr pLocalGroupMemberInfo = IntPtr.Zero;
 
                 try
                 {
-                    result = NetLocalGroupGetMembers(server, groupName, 0, out pLocalGroupMemberInfo, -1, out int entriesRead, out totalEntries, resume);
+                    result = NetLocalGroupGetMembers(server, groupName, 0, out pLocalGroupMemberInfo, -1, out int entriesRead, out int _, resume);
 
-                    if (result != 0 && result != InsufficientBuffer)
+                    if (result != 0 && result != Win32Error.ERROR_MORE_DATA)
                     {
                         if (result == Win32Error.ERROR_ACCESS_DENIED)
                         {
@@ -245,7 +218,7 @@ namespace Lithnet.AccessManager.Interop
                         {
                             throw new DirectoryException("The RPC server is not available");
                         }
-                        
+
                         throw new Win32Exception(result);
                     }
 
@@ -253,7 +226,7 @@ namespace Lithnet.AccessManager.Interop
 
                     for (int i = 0; i < entriesRead; i++)
                     {
-                        var item = (LocalGroupMembersInfo0)Marshal.PtrToStructure<LocalGroupMembersInfo0>(currentPosition);
+                        var item = Marshal.PtrToStructure<LocalGroupMembersInfo0>(currentPosition);
                         list.Add(new SecurityIdentifier(item.pSID));
                         currentPosition = IntPtr.Add(currentPosition, Marshal.SizeOf(typeof(LocalGroupMembersInfo0)));
                     }
@@ -266,7 +239,7 @@ namespace Lithnet.AccessManager.Interop
                     }
                 }
             }
-            while (result == ErrorMoreData);
+            while (result == Win32Error.ERROR_MORE_DATA);
 
             return list;
         }
@@ -428,7 +401,7 @@ namespace Lithnet.AccessManager.Interop
             try
             {
                 int result = DsGetDcName(null, dns, IntPtr.Zero, null, DsGetDcNameFlags.DS_IS_DNS_NAME | DsGetDcNameFlags.DS_RETURN_FLAT_NAME, out pDomainInfo);
-            
+
                 if (result != 0)
                 {
                     throw new Win32Exception(result);
@@ -469,7 +442,7 @@ namespace Lithnet.AccessManager.Interop
                     throw new DirectoryException("DsCrackNames failed", new Win32Exception(result));
                 }
 
-                DsNameResult dsNameResult = (DsNameResult)Marshal.PtrToStructure(pDsNameResult, typeof(DsNameResult));
+                DsNameResult dsNameResult = Marshal.PtrToStructure<DsNameResult>(pDsNameResult);
 
                 if (dsNameResult.cItems == 0)
                 {
@@ -481,7 +454,7 @@ namespace Lithnet.AccessManager.Interop
 
                 for (int idx = 0; idx < dsNameResult.cItems; idx++)
                 {
-                    resultItems[idx] = (DsNameResultItem)Marshal.PtrToStructure(pItem, typeof(DsNameResultItem));
+                    resultItems[idx] = Marshal.PtrToStructure<DsNameResultItem>(pItem);
                     pItem = IntPtr.Add(pItem, Marshal.SizeOf(resultItems[idx]));
                 }
             }

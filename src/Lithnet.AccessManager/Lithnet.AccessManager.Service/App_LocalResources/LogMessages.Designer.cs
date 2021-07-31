@@ -399,6 +399,15 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The user {0} search for the computer {1} failed because the number of results exceeded the search result limit.
+        /// </summary>
+        internal static string TooManyResults {
+            get {
+                return ResourceManager.GetString("TooManyResults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An unhandled error occurred while processing the request for {0} access to computer {1} for user {2}.
         /// </summary>
         internal static string UnhandledError {

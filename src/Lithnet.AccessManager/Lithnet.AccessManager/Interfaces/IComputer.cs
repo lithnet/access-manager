@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Principal;
-using System.Text;
 
 namespace Lithnet.AccessManager
 {
@@ -20,6 +18,8 @@ namespace Lithnet.AccessManager
         string ObjectID { get; }
 
         string AuthorityId { get; }
+
+        DateTime? LastActivity { get; }
 
         AuthorityType AuthorityType { get; }
 

@@ -7,7 +7,7 @@ namespace Lithnet.AccessManager
 {
     public sealed class ActiveDirectoryComputer : IActiveDirectoryComputer
     {
-        internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "description", "displayName", "objectGuid", "objectSid", "msDS-PrincipalName", "objectClass", "dNSHostName" };
+        internal static string[] PropertiesToGet = new string[] { "samAccountName", "distinguishedName", "description", "name", "objectGuid", "objectSid", "msDS-PrincipalName", "objectClass", "dNSHostName", "lastLogonTimestamp" };
 
         private readonly DirectoryEntry de;
 
@@ -28,7 +28,7 @@ namespace Lithnet.AccessManager
 
         public string Description => this.de.GetPropertyString("description");
 
-        public string DisplayName => this.de.GetPropertyString("displayName");
+        public string DisplayName => this.de.GetPropertyString("name");
 
         public string DnsHostName => this.de.GetPropertyString("dNSHostName");
 
@@ -39,6 +39,10 @@ namespace Lithnet.AccessManager
         public string ObjectID => this.de.GetPropertyGuid("objectGuid").ToString();
 
         public string AuthorityId => this.Sid.AccountDomainSid.ToString();
+
+        public DateTime? LastLogonTimestamp => this.de.GetPropertyDateTimeFromAdsLargeInteger("lastLogonTimestamp");
+
+        public DateTime? LastActivity => this.LastLogonTimestamp;
 
         public AuthorityType AuthorityType => AuthorityType.ActiveDirectory;
 

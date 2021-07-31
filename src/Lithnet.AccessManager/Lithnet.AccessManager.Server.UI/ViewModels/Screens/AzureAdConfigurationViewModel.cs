@@ -135,7 +135,7 @@ namespace Lithnet.AccessManager.Server.UI
                     this.aadOptions.Tenants.Add(m);
                     this.Tenants.Add(vm);
                     this.graphApiProvider.AddOrUpdateClientCredentials(m.TenantId, m.ClientId, m.ClientSecret);
-                    vm.TenantName = await this.graphApiProvider.GetTenantOrgName(m.TenantId);
+                    vm.TenantName = await this.graphApiProvider.GetTenantOrgName(m.TenantId, true);
                     break;
                 }
             }
@@ -218,7 +218,7 @@ namespace Lithnet.AccessManager.Server.UI
                     this.SelectedTenant = vm;
 
                     this.graphApiProvider.AddOrUpdateClientCredentials(m.TenantId, m.ClientId, m.ClientSecret);
-                    vm.TenantName = await this.graphApiProvider.GetTenantOrgName(m.TenantId);
+                    vm.TenantName = await this.graphApiProvider.GetTenantOrgName(m.TenantId, true);
                     break;
                 }
             }

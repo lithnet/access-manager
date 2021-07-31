@@ -17,10 +17,10 @@
     <ROW Property="AZUREADTENANTID" Comments="AMS"/>
     <ROW Property="INTERVAL" Comments="AMS"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
-    <ROW Property="ProductCode" Value="1033:{C6B891B8-AACB-46E6-80B4-37BA83182E89} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{11BB8B0E-0EE6-402A-BFB4-B1C9F4B23247} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Agent"/>
-    <ROW Property="ProductVersion" Value="1.12.8136.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
+    <ROW Property="ProductVersion" Value="1.12.8137.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
     <ROW Property="REGISTRATIONKEY" Options="1" Comments="AMS"/>
     <ROW Property="REG_REGISTRATIONKEY" Options="1" Comments="AMS"/>
     <ROW Property="RESET" Value="0"/>

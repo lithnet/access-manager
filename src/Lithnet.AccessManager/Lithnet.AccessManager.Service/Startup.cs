@@ -88,9 +88,10 @@ namespace Lithnet.AccessManager.Service
             services.AddScoped<IComputerTargetProvider, ComputerTargetProviderAd>();
             services.AddScoped<IComputerTargetProvider, ComputerTargetProviderAzureAd>();
             services.AddScoped<IComputerTargetProvider, ComputerTargetProviderAms>();
+            services.AddScoped<IComputerTokenSidProvider, ComputerTokenSidProvider>();
 
-            services.AddScoped<IComputerLocator, ComputerLocator>();
-            services.AddScoped<IAadGraphApiProvider, AadGraphApiProvider>();
+            services.AddSingleton<IComputerLocator, ComputerLocator>();
+            services.AddSingleton<IAadGraphApiProvider, AadGraphApiProvider>();
 
             services.AddSingleton<IDeviceProvider, DbDeviceProvider>();
             services.AddSingleton<IDevicePasswordProvider, DbDevicePasswordProvider>();

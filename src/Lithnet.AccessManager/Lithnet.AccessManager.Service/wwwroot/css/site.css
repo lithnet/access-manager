@@ -469,6 +469,21 @@ body {
     font-weight: 600;
 }
 
+.active-card {
+    border-color: #007bff !important;
+    background-color: #f2f2f2;
+   /*box-shadow: 0 3px 6px rgba(0, 0, 0, 0.18), 0 3px 6px rgba(0, 0, 0, 0.23);*/
+}
+
+.card-shadow {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15), 0 2px 5px rgba(0, 0, 0, 0.2);
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+}
+
+
 #copy-button {
     margin-left: 10px;
 }

@@ -273,4 +273,7 @@
   <data name="ComputerNameIsTooLong" xml:space="preserve">
     <value>The computer name is too long</value>
   </data>
+  <data name="TooManyResults" xml:space="preserve">
+    <value>The search returned too many results. Please try a more specific search.</value>
+  </data>
 </root>

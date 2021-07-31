@@ -1,5 +1,7 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Lithnet.AccessManager.Server;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Service.App_LocalResources;
 
@@ -25,5 +27,9 @@ namespace Lithnet.AccessManager.Service.Models
         public bool ReasonRequired { get; set; }
 
         public string FailureReason { get; set; }
+
+        public string SelectedComputerKey { get; set; }
+
+        public List<ComputerSearchResult> MatchingComputers { get; set; }
     }
 }

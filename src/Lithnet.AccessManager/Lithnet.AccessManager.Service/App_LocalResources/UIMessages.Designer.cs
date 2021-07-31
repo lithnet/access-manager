@@ -475,6 +475,15 @@ namespace Lithnet.AccessManager.Service.App_LocalResources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The search returned too many results. Please try a more specific search..
+        /// </summary>
+        public static string TooManyResults {
+            get {
+                return ResourceManager.GetString("TooManyResults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to grant access.
         /// </summary>
         public static string UnableToGrantAccess {

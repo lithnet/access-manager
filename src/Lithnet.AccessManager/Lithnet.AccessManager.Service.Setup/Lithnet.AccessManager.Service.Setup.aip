@@ -22,10 +22,10 @@
     <ROW Property="IAgree" Value="No" Type="4" MsiKey="IAgree"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{A788BEFF-F3BE-40F5-8CFD-07C25E1AF206} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{03A0EDBD-3ABA-4AD7-B514-EAC3503C417A} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.12.8135.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.12.8137.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="SHOW_DB_CONFIG" Value="1"/>
     <ROW Property="SQLEXPRESS_DEFAULT_ADMINS" Value="Builtin\Administrators"/>
     <ROW Property="SQLEXPRESS_DEFAULT_INSTANCENAME" Value="AMS"/>
@@ -1072,6 +1072,7 @@
     <ROW File="Lithnet.AccessManager.Cryptography.pdb" Component_="Lithnet.AccessManager.Cryptography.dll" FileName="LITHNE~8.PDB|Lithnet.AccessManager.Cryptography.pdb" Attributes="0" SourcePath="output\Lithnet.AccessManager.Cryptography.pdb" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Cryptography.dll_1" Component_="Lithnet.AccessManager.Cryptography.dll_1" FileName="LITHNE~4.DLL|Lithnet.AccessManager.Cryptography.dll" Attributes="0" SourcePath="output-ps\Lithnet.AccessManager.Cryptography.dll" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Cryptography.pdb_1" Component_="Lithnet.AccessManager.Cryptography.dll_1" FileName="LITHNE~3.PDB|Lithnet.AccessManager.Cryptography.pdb" Attributes="0" SourcePath="output-ps\Lithnet.AccessManager.Cryptography.pdb" SelfReg="false"/>
+    <ROW File="cardselection.js" Component_="clipboard.js" FileName="CARD-S~1.JS|card-selection.js" Attributes="0" SourcePath="output\wwwroot\js\card-selection.js" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.custcomp.AiControlConditionAliasComponent">
     <ROW AliasRowId="ExitDialog#LaunchProdCheckBox#Hide#((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))" AliasRowOperation="2" Condition="(((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))) OR NOT IS_STANDALONE_OR_NOT_CLUSTERED_OR_ON_ACTIVE_NODE"/>

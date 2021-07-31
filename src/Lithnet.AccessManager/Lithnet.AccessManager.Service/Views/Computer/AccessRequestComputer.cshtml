@@ -1,0 +1,87 @@
+﻿@using Lithnet.AccessManager.Server.Configuration;
+@using Microsoft.Extensions.Options;
+@using Lithnet.AccessManager.Server
+
+@inject IOptionsSnapshot<UserInterfaceOptions> uiSettings
+
+@{
+    ViewBag.Title = UIMessages.HeadingRequestAccess;
+}
+
+@model Lithnet.AccessManager.Service.Models.AccessRequestModel
+
+
+<div class="loading-overlay">
+    <div class="loading-content d-flex justify-content-center">
+        <div class="spinner-border color-ams-blue" role="status"></div>
+        <div class="loading-text">Requesting access...</div>
+    </div>
+</div>
+
+<div class="form-container">
+    <div class="form-content-header">
+        Select computer
+    </div>
+    <div class="form-content">
+        @using (Html.BeginForm("AccessRequestType", "Computer", FormMethod.Post))
+        {
+            <section>
+                <label class="lead">Multiple matches were found for the name "@Model.ComputerName"</label>
+            </section>
+
+            <section>
+
+                <div>
+                    @{
+                        int count = 0;
+                    }
+
+                    @foreach (var c in Model.MatchingComputers)
+                    {
+                        count++;
+
+                        <div class="card mb-4" id="@($"computer{count}-card")">
+
+                            <div class="card-body" role="button">
+                                <h5 class="card-title">
+                                    @Html.RadioButtonFor(m => m.SelectedComputerKey, c.Key, new { @id = $"computer{count}" })
+                                    <label for="@($"computer{count}")">@c.Name </label>
+                                </h5>
+                                <div>Found in @c.AuthorityName</div>
+                                @if (c.DnsName != null)
+                                {
+                                    <div>DNS Name: @c.DnsName</div>
+                                }
+                                @if (c.LastUpdate != null)
+                                {
+                                    <div>
+                                        Last check-in: @c.LastUpdate
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+
+            </section>
+
+            @Html.HiddenFor(m => m.ComputerName);
+            @Html.HiddenFor(m => m.UserRequestReason);
+            @Html.AntiForgeryToken();
+
+            <footer>
+                <div class="center-content">
+                    <button type="submit" class="btn btn-primary button-loading-overlay">Next</button>
+
+                    @Html.ActionLink(UIMessages.ButtonNewRequest, "AccessRequest", "Computer", null, new { @class = "btn btn-outline-secondary" })
+                </div>
+            </footer>
+        }
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="@Url.Content("~/js/card-selection.js")"></script>
+
+}

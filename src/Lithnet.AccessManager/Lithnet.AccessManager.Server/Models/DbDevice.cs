@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Lithnet.AccessManager.Api.Shared;
+using System;
 using System.Data.SqlClient;
-using System.Security.Claims;
 using System.Security.Principal;
-using Lithnet.AccessManager.Api.Shared;
 
 namespace Lithnet.AccessManager.Server
 {
@@ -21,6 +20,8 @@ namespace Lithnet.AccessManager.Server
         public DateTime Created { get; set; }
 
         public DateTime Modified { get; set; }
+
+        public DateTime? LastActivity => this.Modified;
 
         public AuthorityType AuthorityType { get; set; }
         

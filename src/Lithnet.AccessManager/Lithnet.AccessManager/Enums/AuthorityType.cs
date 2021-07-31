@@ -13,7 +13,7 @@ namespace Lithnet.AccessManager
         [Description("Azure Active Directory")]
         AzureActiveDirectory = 2,
 
-        [Description("Access Manager")]
+        [Description("Access Manager Directory")]
         Ams = 3
     }
 }

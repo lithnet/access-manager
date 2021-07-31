@@ -84,6 +84,75 @@ namespace Lithnet.AccessManager.Service.Controllers
             return this.RedirectToAction("AccessRequest");
         }
 
+        [HttpGet]
+        public IActionResult AccessRequestComputer()
+        {
+            return this.RedirectToAction("AccessRequest");
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AccessRequestComputer(AccessRequestModel model)
+        {
+            model.ShowReason = this.userInterfaceSettings.UserSuppliedReason != AuditReasonFieldState.Hidden;
+            model.ReasonRequired = this.userInterfaceSettings.UserSuppliedReason == AuditReasonFieldState.Required;
+
+            if (!this.ModelState.IsValid)
+            {
+                return this.View("AccessRequest", model);
+            }
+
+            IActiveDirectoryUser user = null;
+            IComputer computer = null;
+            model.FailureReason = null;
+
+            try
+            {
+                try
+                {
+                    user = this.authenticationProvider.GetLoggedInUser() ?? throw new ObjectNotFoundException();
+                }
+                catch (Exception ex)
+                {
+                    return this.HandleUserLookupExceptionAndGetResponse(ex);
+                }
+
+                this.logger.LogInformation(EventIDs.UserRequestedAccessToComputer, string.Format(LogMessages.UserHasRequestedAccessToComputer, user.MsDsPrincipalName, model.ComputerName, model.RequestType));
+
+                if (!ValidateRequestReason(model, user, out IActionResult actionResult))
+                {
+                    return actionResult;
+                }
+
+                try
+                {
+                    await GetComputerMatches(model);
+                    if (model.MatchingComputers.Count == 1)
+                    {
+                        return await this.AccessRequestType(model);
+                    }
+
+                    return this.View(model);
+                }
+                catch (Exception ex)
+                {
+                    return this.HandleComputerLookupExceptionAndGetResponse(ex, user, model);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UnexpectedError, ex, string.Format(LogMessages.UnhandledError, model.RequestType, computer?.FullyQualifiedName, user?.MsDsPrincipalName));
+
+                return this.View("AccessRequestError", new ErrorModel
+                {
+                    Heading = UIMessages.UnableToProcessRequest,
+                    Message = UIMessages.UnexpectedError
+                });
+            }
+
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AccessRequestType(AccessRequestModel model)
@@ -265,7 +334,7 @@ namespace Lithnet.AccessManager.Service.Controllers
                 }
                 else if (authResponse.EvaluatedAccess == AccessMask.LocalAdminPasswordHistory)
                 {
-                    return await this .GetLapsPasswordHistory(model, user, computer, (LapsHistoryAuthorizationResponse)authResponse);
+                    return await this.GetLapsPasswordHistory(model, user, computer, (LapsHistoryAuthorizationResponse)authResponse);
                 }
                 else if (authResponse.EvaluatedAccess == AccessMask.Jit)
                 {
@@ -587,6 +656,16 @@ namespace Lithnet.AccessManager.Service.Controllers
 
         private async Task<IComputer> GetComputer(AccessRequestModel model)
         {
+            if (string.IsNullOrWhiteSpace(model.SelectedComputerKey))
+            {
+                throw new ObjectNotFoundException("The selected computer was not specified");
+            }
+
+            return await this.computerLocator.GetComputerFromKey(model.SelectedComputerKey);
+        }
+
+        private async Task GetComputerMatches(AccessRequestModel model)
+        {
             var results = await this.computerLocator.FindComputers(model.ComputerName.Trim());
 
             if (results.Count == 0)
@@ -594,12 +673,8 @@ namespace Lithnet.AccessManager.Service.Controllers
                 throw new ObjectNotFoundException();
             }
 
-            if (results.Count > 1)
-            {
-                throw new AmbiguousNameException();
-            }
-
-            return results[0];
+            model.SelectedComputerKey = results[0].Key;
+            model.MatchingComputers = results;
         }
 
         private bool GetUser(out IActiveDirectoryUser user, out IActionResult failure)
@@ -661,9 +736,15 @@ namespace Lithnet.AccessManager.Service.Controllers
             {
                 case AmbiguousNameException e:
                     this.logger.LogError(EventIDs.ComputerNameAmbiguous, ex, string.Format(LogMessages.ComputerNameAmbiguous, user.MsDsPrincipalName, model.ComputerName, model.RequestType));
-
                     model.FailureReason = UIMessages.ComputerNameAmbiguous;
                     return this.View("AccessRequest", model);
+
+
+                case TooManyResultsException e:
+                    this.logger.LogError(EventIDs.TooManyResults, ex, string.Format(LogMessages.TooManyResults, user.MsDsPrincipalName, model.ComputerName));
+                    model.FailureReason = UIMessages.TooManyResults;
+                    return this.View("AccessRequest", model);
+
 
                 case ObjectNotFoundException e:
                     this.logger.LogError(EventIDs.ComputerNotFoundInDirectory, ex, string.Format(LogMessages.ComputerNotFoundInDirectory, user.MsDsPrincipalName, model.ComputerName, model.RequestType));

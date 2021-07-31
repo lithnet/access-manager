@@ -204,7 +204,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IApplicationUpgradeProvider>().To<ApplicationUpgradeProvider>();
                 builder.Bind<IFirewallProvider>().To<FirewallProvider>();
                 builder.Bind<IHttpSysConfigurationProvider>().To<HttpSysConfigurationProvider>();
-                builder.Bind<IAadGraphApiProvider>().To<AadGraphApiProvider>();
+                builder.Bind<IAadGraphApiProvider>().To<AadGraphApiProvider>().InSingletonScope();
                 builder.Bind<IRegistrationKeyProvider>().To<DbRegistrationKeyProvider>();
                 builder.Bind<IDbProvider>().To<SqlDbProvider>().InSingletonScope();
                 builder.Bind<SqlServerInstanceProvider>().ToSelf().InSingletonScope(); 

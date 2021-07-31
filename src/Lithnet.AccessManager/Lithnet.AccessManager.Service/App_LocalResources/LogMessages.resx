@@ -246,4 +246,7 @@
   <data name="AuthZResponseUserRateLimitExceeded" xml:space="preserve">
     <value>The user exceeded the per-user request limit</value>
   </data>
+  <data name="TooManyResults" xml:space="preserve">
+    <value>The user {0} search for the computer {1} failed because the number of results exceeded the search result limit</value>
+  </data>
 </root>
