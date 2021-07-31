@@ -90,6 +90,16 @@ namespace Lithnet.AccessManager.Agent.Providers
             }
         }
 
+        public string CheckInDataHash
+        {
+            get => this.appState.Value.CheckInDataHash;
+            set
+            {
+                this.appState.Value.CheckInDataHash = value;
+                this.appState.Update(t => t.CheckInDataHash = value);
+            }
+        }
+
         public DateTime LastCheckIn
         {
             get => this.appState.Value.LastCheckIn;

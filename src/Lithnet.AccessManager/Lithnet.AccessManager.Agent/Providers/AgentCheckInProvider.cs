@@ -20,10 +20,15 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         public async Task CheckinIfRequired()
         {
-            if (DateTime.UtcNow > this.settingsProvider.LastCheckIn.AddHours(Math.Max(2, this.settingsProvider.CheckInIntervalHours)))
+            AgentCheckIn data = await this.GenerateCheckInData();
+            var hash = data.ToHash();
+
+            if (hash != this.settingsProvider.CheckInDataHash ||
+                DateTime.UtcNow > this.settingsProvider.LastCheckIn.AddHours(Math.Max(2, this.settingsProvider.CheckInIntervalHours)))
             {
-                await this.CheckIn();
+                await this.CheckIn(data);
                 this.settingsProvider.LastCheckIn = DateTime.UtcNow;
+                this.settingsProvider.CheckInDataHash = hash;
             }
         }
 
@@ -45,9 +50,8 @@ namespace Lithnet.AccessManager.Agent.Providers
             });
         }
 
-        private async Task CheckIn()
+        private async Task CheckIn(AgentCheckIn data)
         {
-            AgentCheckIn data = await this.GenerateCheckInData();
             await this.httpClient.CheckInAsync(data);
         }
     }

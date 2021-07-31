@@ -213,6 +213,8 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IDeviceProvider>().To<DbDeviceProvider>();
                 builder.Bind<IDevicePasswordProvider>().To<DbDevicePasswordProvider>();
                 builder.Bind<IAmsGroupProvider>().To<DbAmsGroupProvider>();
+                builder.Bind<IComputerTokenSidProvider>().To<ComputerTokenSidProvider>();
+                    
 
                 builder.Bind<IProtectedSecretProvider>().To<ProtectedSecretProvider>().InSingletonScope();
                 builder.Bind<IClusterProvider>().To<ClusterProvider>().InSingletonScope();

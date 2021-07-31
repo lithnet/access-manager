@@ -60,6 +60,12 @@ namespace Lithnet.AccessManager.Agent.Linux
                     continue;
                 }
 
+                if (args[i] == "--install")
+                {
+                    InstallService();
+                    return;
+                }
+
                 if (args[i] == "--setup")
                 {
                     PromptForConfig();
@@ -110,6 +116,11 @@ namespace Lithnet.AccessManager.Agent.Linux
                     Console.WriteLine("Control the agent state");
                     Console.WriteLine("--disable                       Disable the agent");
                     Console.WriteLine("--enable                        Enable the agent");
+                    Console.WriteLine();
+                    Console.WriteLine();
+                    Console.WriteLine("Install the agent as a service (non-packaged installs only)");
+                    Console.WriteLine("--install                       Installs the agent - use only when not using");
+                    Console.WriteLine("                                a package installer (eg from tar.gz)");
                     return;
                 }
 
@@ -210,35 +221,12 @@ namespace Lithnet.AccessManager.Agent.Linux
 
         private static bool TryRestartService()
         {
-            Process process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "/bin/sh",
-                    Arguments = "-c \"systemctl restart LithnetAccessManagerAgent\"",
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardInput = true,
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true,
-                }
-            };
+            LinuxCommandLineRunner cmdRunner = new LinuxCommandLineRunner();
 
             try
             {
-                process.Start();
-
-                if (process.WaitForExit(5000))
-                {
-                    if (process.ExitCode == 0)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    process.Kill();
-                }
+                cmdRunner.ExecuteCommandWithShell("systemctl restart LithnetAccessManagerAgent.service");
+                return true;
             }
             catch (Exception ex)
             {
@@ -247,6 +235,30 @@ namespace Lithnet.AccessManager.Agent.Linux
 
             return false;
         }
+
+        private static void InstallService()
+        {
+            Console.WriteLine("Reloading systemctl and starting service");
+            try
+            {
+                TryEnableService();
+                Console.WriteLine("Done");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Unable to install service: {ex.Message}");
+            }
+        }
+
+        private static void TryEnableService()
+        {
+            LinuxCommandLineRunner cmdRunner = new LinuxCommandLineRunner();
+
+            cmdRunner.ExecuteCommandWithShell("systemctl daemon-reload");
+            cmdRunner.ExecuteCommandWithShell("systemctl enable LithnetAccessManagerAgent.service");
+            cmdRunner.ExecuteCommandWithShell("systemctl start LithnetAccessManagerAgent.service");
+        }
+
 
         [DebuggerStepThrough]
         public static IHostBuilder CreateHostBuilder(string[] args)

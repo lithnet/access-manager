@@ -37,6 +37,7 @@ BEGIN
 	COMMIT
 END
 
+GO
 
 CREATE TABLE [dbo].[RegistrationKeyGroupMapping](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,

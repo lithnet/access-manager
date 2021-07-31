@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 
 namespace Lithnet.AccessManager.Api.Shared
 {
@@ -13,5 +16,15 @@ namespace Lithnet.AccessManager.Api.Shared
         public string Hostname { get; set; }
 
         public string DnsName { get; set; }
+
+        public string ToHash()
+        {
+            var data = JsonSerializer.Serialize(this);
+
+            using (var hasher = SHA1.Create())
+            {
+                return Convert.ToBase64String(hasher.ComputeHash(Encoding.UTF8.GetBytes(data)));
+            }
+        }
     }
 }

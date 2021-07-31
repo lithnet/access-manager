@@ -16,6 +16,8 @@ namespace Lithnet.AccessManager.Agent.Configuration
 
         public DateTime LastCheckIn { get; set; }
 
+        public string CheckInDataHash { get; set; }
+
         public bool HasRegisteredSecondaryCredentials { get; set; }
     }
 }

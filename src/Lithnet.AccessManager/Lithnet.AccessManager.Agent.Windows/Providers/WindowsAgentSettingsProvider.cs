@@ -49,7 +49,6 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         public void Clear()
         {
-            //this.RegistrationKey = null;
             this.ClientId = null;
             this.AuthCertificate = null;
             this.LastCheckIn = new DateTime(0);
@@ -76,6 +75,12 @@ namespace Lithnet.AccessManager.Agent.Providers
         {
             get => this.registryState.GetValue<string>("AuthCertificate", null);
             set => this.registryState.SetValue("AuthCertificate", value);
+        }
+
+        public string CheckInDataHash
+        {
+            get => this.registryState.GetValue<string>("CheckInDataHash", null);
+            set => this.registryState.SetValue("CheckInDataHash", value);
         }
 
         public DateTime LastCheckIn

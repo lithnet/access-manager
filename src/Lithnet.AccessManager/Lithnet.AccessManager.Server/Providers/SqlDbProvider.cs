@@ -49,6 +49,7 @@ namespace Lithnet.AccessManager.Server
                 .SqlDatabase(this.ConnectionString)
                 .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly(), script => script.StartsWith("Lithnet.AccessManager.Server.DBScripts.Upgrade", System.StringComparison.OrdinalIgnoreCase))
                 .LogScriptOutput()
+                .WithTransactionPerScript()
                 .LogTo(this.upgradeLogger)
                 .Build();
 
