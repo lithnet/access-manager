@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Lithnet.AccessManager.Api.Shared;
 using System.Data.SqlClient;
 using System.Security.Claims;
-using System.Text;
-using Lithnet.AccessManager.Api.Shared;
 
 namespace Lithnet.AccessManager.Server
 {
@@ -42,6 +39,7 @@ namespace Lithnet.AccessManager.Server
             command.Parameters.AddWithValue("@AgentVersion", device.AgentVersion);
             command.Parameters.AddWithValue("@OSFamily", device.OperatingSystemFamily);
             command.Parameters.AddWithValue("@OSVersion", device.OperatingSystemVersion);
+            command.Parameters.AddWithValue("@OSType", device.OperatingSystemType);
         }
 
         public static void ToUpdateCommandParameters(this IDevice device, SqlCommand command)
@@ -52,6 +50,7 @@ namespace Lithnet.AccessManager.Server
             command.Parameters.AddWithValue("@AgentVersion", device.AgentVersion);
             command.Parameters.AddWithValue("@OSFamily", device.OperatingSystemFamily);
             command.Parameters.AddWithValue("@OSVersion", device.OperatingSystemVersion);
+            command.Parameters.AddWithValue("@OSType", device.OperatingSystemType);
         }
 
         public static void ThrowOnInvalidStateForAuthentication(this IDevice device)

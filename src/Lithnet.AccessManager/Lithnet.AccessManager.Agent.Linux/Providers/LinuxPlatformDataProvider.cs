@@ -5,6 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Net;
 using System.Text.RegularExpressions;
+using Lithnet.AccessManager.Api.Shared;
 
 namespace Lithnet.AccessManager.Agent.Providers
 {
@@ -81,6 +82,11 @@ namespace Lithnet.AccessManager.Agent.Providers
             return dnsName;
         }
 
+        public OsType GetOsType()
+        {
+            return OsType.Linux;
+        }
+
         private void PopulateOsData()
         {
             if (this.osData != null)
@@ -90,7 +96,14 @@ namespace Lithnet.AccessManager.Agent.Providers
 
             try
             {
-                this.osData = this.ExecuteCommandLine("/bin/sh", "-c \"cat /etc/*-release\"");
+                if (System.IO.File.Exists("/etc/os-release"))
+                {
+                    this.osData = System.IO.File.ReadAllText("/etc/os-release");
+                }
+                else
+                {
+                    this.osData = System.IO.File.ReadAllText("/usr/lib/os-release");
+                }
             }
             catch (Exception ex)
             {

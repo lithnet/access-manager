@@ -25,7 +25,7 @@ namespace Lithnet.AccessManager.Agent
             {
                 if (string.IsNullOrWhiteSpace(this.agentSettings.Server))
                 {
-                    this.logger.LogError("The agent has not been configured. Run '/opt/LithnetAccessManagerAgent/configure-agent.sh to configure the agent");
+                    this.logger.LogError("The agent has not been configured. Run '/opt/LithnetAccessManagerAgent/Lithnet.AccessManager.Agent --setup' to configure the agent");
                     return;
                 }
 

@@ -26,9 +26,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.PowerShell.5.ReferenceAssemblies" Version="1.1.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Lithnet.AccessManager\Lithnet.AccessManager.csproj" />
   </ItemGroup>

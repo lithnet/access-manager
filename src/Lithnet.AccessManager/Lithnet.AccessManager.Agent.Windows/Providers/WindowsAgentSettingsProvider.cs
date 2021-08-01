@@ -33,7 +33,7 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         public int CheckInIntervalHours => this.policyAgent.GetValue<int>("CheckInIntervalHours", this.settingsAgent.GetValue<int>("CheckInIntervalHours", 24));
 
-        public bool RegisterSecondaryCredentialsForAadj => this.policyAgent.GetValue<bool>("RegisterSecondaryCredentialsForAadj", this.settingsAgent.GetValue<bool>("RegisterSecondaryCredentialsForAadj", false));
+        public bool RegisterSecondaryCredentialsForAadj => this.policyAgent.GetValue<bool>("RegisterSecondaryCredentialsForAadj", this.settingsAgent.GetValue<bool>("RegisterSecondaryCredentialsForAadj", true));
 
         public bool RegisterSecondaryCredentialsForAadr => this.policyAgent.GetValue<bool>("RegisterSecondaryCredentialsForAadr", this.settingsAgent.GetValue<bool>("RegisterSecondaryCredentialsForAadr", true));
 

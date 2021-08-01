@@ -31,7 +31,6 @@ namespace Lithnet.AccessManager.Agent
             return Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
-                    config.AddJsonFile("/etc/lithnetaccessmanager.conf", optional: true, reloadOnChange: true);
                 })
                 .ConfigureAccessManagerAgent()
                 .ConfigureServices((hostContext, services) =>

@@ -12,5 +12,7 @@ namespace Lithnet.AccessManager.Agent
         string GetMachineName();
 
         string GetDnsName();
+
+        OsType GetOsType();
     }
 }

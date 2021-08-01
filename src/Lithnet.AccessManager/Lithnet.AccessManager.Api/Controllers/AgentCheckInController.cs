@@ -53,7 +53,8 @@ namespace Lithnet.AccessManager.Api.Controllers
                 device.ComputerName = data.Hostname;
                 device.DnsName = data.DnsName;
                 device.OperatingSystemFamily = data.OperatingSystem;
-                device.OperatingSystemVersion = data.OperationSystemVersion;
+                device.OperatingSystemVersion = data.OperatingSystemVersion;
+                device.OperatingSystemType = data.OperatingSystemType;
 
                 await this.OverlayAuthorityData(device);
                 await this.deviceProvider.UpdateDeviceAsync(device);

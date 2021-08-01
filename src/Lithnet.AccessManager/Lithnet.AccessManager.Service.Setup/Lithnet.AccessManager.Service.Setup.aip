@@ -22,10 +22,10 @@
     <ROW Property="IAgree" Value="No" Type="4" MsiKey="IAgree"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{03A0EDBD-3ABA-4AD7-B514-EAC3503C417A} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{CF0F897E-D0B7-44FD-B6F3-CD35133677D1} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.12.8137.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.14.8163.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="SHOW_DB_CONFIG" Value="1"/>
     <ROW Property="SQLEXPRESS_DEFAULT_ADMINS" Value="Builtin\Administrators"/>
     <ROW Property="SQLEXPRESS_DEFAULT_INSTANCENAME" Value="AMS"/>
@@ -98,7 +98,6 @@
     <ROW Component="ConfigPath" ComponentId="{07BA9FC9-8B21-48F0-AEC8-07C734FFA085}" Directory_="APPDIR" Attributes="260" KeyPath="ConfigPath"/>
     <ROW Component="ControlzEx.dll" ComponentId="{9C3762B9-ABAB-4449-A6AF-91367E2F6403}" Directory_="APPDIR" Attributes="0" KeyPath="ControlzEx.dll"/>
     <ROW Component="CsvHelper.dll" ComponentId="{642CAADC-1A42-4939-8198-51AA2F539E17}" Directory_="APPDIR" Attributes="0" KeyPath="CsvHelper.dll"/>
-    <ROW Component="CsvHelper.dll_1" ComponentId="{8903DBC8-11E8-4470-9EB2-F2F2A96D756E}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="CsvHelper.dll_1"/>
     <ROW Component="Diagnostics.format.ps1xml" ComponentId="{F5E4C148-FB9F-4A3D-9DBE-4BF6A60D75B8}" Directory_="Microsoft.PowerShell.Diagnostic_Dir" Attributes="0" KeyPath="Diagnostics.format.ps1xml" Type="0"/>
     <ROW Component="EventLogMessages.dll" ComponentId="{7FE7C140-8CAE-47B1-9473-16C699118079}" Directory_="APPDIR" Attributes="256" KeyPath="EventLogMessages.dll"/>
     <ROW Component="FluentValidation.dll" ComponentId="{90128C55-8A3A-41CA-8321-B747036BDF5F}" Directory_="APPDIR" Attributes="0" KeyPath="FluentValidation.dll"/>
@@ -256,7 +255,6 @@
     <ROW Component="NLog.Extensions.Logging.dll" ComponentId="{F82A9837-0E86-4516-8154-FC85F1338912}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.Extensions.Logging.dll"/>
     <ROW Component="NLog.Web.AspNetCore.dll" ComponentId="{BE1BF87A-39E7-4B38-A2ED-43AC639610E6}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.Web.AspNetCore.dll"/>
     <ROW Component="NLog.dll" ComponentId="{A90F678F-CC68-43FA-98D6-DA6CA2B42D39}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.dll"/>
-    <ROW Component="NLog.dll_1" ComponentId="{3AA445C8-D5E1-403D-8353-C231F885C6C8}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="NLog.dll_1"/>
     <ROW Component="NamedPipeServerStream.NetFrameworkVersion.dll" ComponentId="{A47C277D-A77D-4860-B385-82A58C7044D2}" Directory_="APPDIR" Attributes="0" KeyPath="NamedPipeServerStream.NetFrameworkVersion.dll"/>
     <ROW Component="Namotion.Reflection.dll" ComponentId="{EBB031E1-E333-43C9-A3DD-0FF3CBEFF67D}" Directory_="APPDIR" Attributes="0" KeyPath="Namotion.Reflection.dll"/>
     <ROW Component="Nerdbank.Streams.dll" ComponentId="{4D60C104-A1A0-438C-B329-A4429748AF32}" Directory_="APPDIR" Attributes="0" KeyPath="Nerdbank.Streams.dll"/>
@@ -998,7 +996,6 @@
     <ROW File="Microsoft.IdentityModel.Clients.ActiveDirectory.dll" Component_="Microsoft.IdentityModel.Clients.ActiveDirectory.dll" FileName="MICRO~71.DLL|Microsoft.IdentityModel.Clients.ActiveDirectory.dll" Attributes="0" SourcePath="output\Microsoft.IdentityModel.Clients.ActiveDirectory.dll" SelfReg="false"/>
     <ROW File="Vanara.PInvoke.NTDSApi.dll" Component_="Vanara.PInvoke.NTDSApi.dll" FileName="VANARA~8.DLL|Vanara.PInvoke.NTDSApi.dll" Attributes="0" SourcePath="output\Vanara.PInvoke.NTDSApi.dll" SelfReg="false"/>
     <ROW File="Vanara.Security.dll" Component_="Vanara.Security.dll" FileName="VANARA~9.DLL|Vanara.Security.dll" Attributes="0" SourcePath="output\Vanara.Security.dll" SelfReg="false"/>
-    <ROW File="CsvHelper.dll_1" Component_="CsvHelper.dll_1" FileName="CSVHEL~1.DLL|CsvHelper.dll" Attributes="0" SourcePath="output-ps\CsvHelper.dll" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.PowerShell.dll" Component_="Lithnet.AccessManager.PowerShell.dll" FileName="LITHNE~2.DLL|Lithnet.AccessManager.PowerShell.dll" Attributes="0" SourcePath="output-ps\Lithnet.AccessManager.PowerShell.dll" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.PowerShell.pdb" Component_="Lithnet.AccessManager.PowerShell.dll" FileName="LITHNE~2.PDB|Lithnet.AccessManager.PowerShell.pdb" Attributes="0" SourcePath="output-ps\Lithnet.AccessManager.PowerShell.pdb" SelfReg="false"/>
     <ROW File="Lithnet.Security.Authorization.dll_1" Component_="Lithnet.Security.Authorization.dll_1" FileName="LITHNE~3.DLL|Lithnet.Security.Authorization.dll" Attributes="0" SourcePath="output-ps\Lithnet.Security.Authorization.dll" SelfReg="false"/>
@@ -1010,7 +1007,6 @@
     <ROW File="Microsoft.Extensions.Logging.Abstractions.dll_1" Component_="Microsoft.Extensions.Logging.Abstractions.dll_1" FileName="MICROS~9.DLL|Microsoft.Extensions.Logging.Abstractions.dll" Attributes="0" SourcePath="output-ps\Microsoft.Extensions.Logging.Abstractions.dll" SelfReg="false"/>
     <ROW File="Microsoft.Extensions.Primitives.dll_1" Component_="Microsoft.Extensions.Primitives.dll_1" FileName="MICRO~12.DLL|Microsoft.Extensions.Primitives.dll" Attributes="0" SourcePath="output-ps\Microsoft.Extensions.Primitives.dll" SelfReg="false"/>
     <ROW File="Newtonsoft.Json.dll_1" Component_="Newtonsoft.Json.dll_1" FileName="NEWTON~1.DLL|Newtonsoft.Json.dll" Attributes="0" SourcePath="output-ps\Newtonsoft.Json.dll" SelfReg="false"/>
-    <ROW File="NLog.dll_1" Component_="NLog.dll_1" FileName="NLog.dll" Attributes="0" SourcePath="output-ps\NLog.dll" SelfReg="false"/>
     <ROW File="System.Buffers.dll_1" Component_="System.Buffers.dll_1" FileName="SYSTEM~1.DLL|System.Buffers.dll" Attributes="0" SourcePath="output-ps\System.Buffers.dll" SelfReg="false"/>
     <ROW File="System.Management.Automation.dll_1" Component_="System.Management.Automation.dll_1" FileName="SYSTEM~3.DLL|System.Management.Automation.dll" Attributes="0" SourcePath="output-ps\System.Management.Automation.dll" SelfReg="false"/>
     <ROW File="System.Memory.dll_1" Component_="System.Memory.dll_1" FileName="SYSTEM~4.DLL|System.Memory.dll" Attributes="0" SourcePath="output-ps\System.Memory.dll" SelfReg="false"/>
@@ -1820,7 +1816,6 @@
     <ROW Feature_="MainFeature" Component_="Microsoft.IdentityModel.Clients.ActiveDirectory.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.PInvoke.NTDSApi.dll"/>
     <ROW Feature_="MainFeature" Component_="Vanara.Security.dll"/>
-    <ROW Feature_="MainFeature" Component_="CsvHelper.dll_1"/>
     <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.PowerShell.dll"/>
     <ROW Feature_="MainFeature" Component_="Lithnet.Security.Authorization.dll_1"/>
     <ROW Feature_="MainFeature" Component_="LithnetAccessManger.psd1"/>
@@ -1832,7 +1827,6 @@
     <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Logging.Abstractions.dll_1"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Primitives.dll_1"/>
     <ROW Feature_="MainFeature" Component_="Newtonsoft.Json.dll_1"/>
-    <ROW Feature_="MainFeature" Component_="NLog.dll_1"/>
     <ROW Feature_="MainFeature" Component_="System.Buffers.dll_1"/>
     <ROW Feature_="MainFeature" Component_="System.Management.Automation.dll_1"/>
     <ROW Feature_="MainFeature" Component_="System.Memory.dll_1"/>

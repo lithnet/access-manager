@@ -1,11 +1,9 @@
 ﻿using Lithnet.AccessManager.Api.Shared;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 
 namespace Lithnet.AccessManager.Agent.Providers
 {
@@ -21,14 +19,9 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         public override T DelegateCertificateOperation<T>(Func<X509Certificate2, T> certificateOperation)
         {
-            if (this.settings.AuthenticationMode == AgentAuthenticationMode.Aad)
+            if (!this.settings.HasRegisteredSecondaryCredentials && this.settings.AuthenticationMode == AgentAuthenticationMode.Aad)
             {
-                try
-                {
-                    return this.aadProvider.DelegateCertificateOperation(certificateOperation);
-                }
-                catch (NotImplementedException)
-                { }
+                return this.aadProvider.DelegateCertificateOperation(certificateOperation);
             }
 
             return base.DelegateCertificateOperation(certificateOperation);

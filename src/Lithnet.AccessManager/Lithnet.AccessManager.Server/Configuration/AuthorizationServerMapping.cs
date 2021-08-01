@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NLog.LayoutRenderers.Wrappers;
+﻿using System.Collections.Generic;
 
 namespace Lithnet.AccessManager.Server.Configuration
 {

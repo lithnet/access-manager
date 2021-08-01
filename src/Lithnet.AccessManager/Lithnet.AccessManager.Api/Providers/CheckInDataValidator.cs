@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Lithnet.AccessManager.Api.Shared;
+﻿using Lithnet.AccessManager.Api.Shared;
+using System;
 
 namespace Lithnet.AccessManager.Api.Providers
 {
@@ -30,7 +27,7 @@ namespace Lithnet.AccessManager.Api.Providers
                 throw new BadRequestException("The request did not provide a OS family");
             }
 
-            if (string.IsNullOrWhiteSpace(data.OperationSystemVersion))
+            if (string.IsNullOrWhiteSpace(data.OperatingSystemVersion))
             {
                 throw new BadRequestException("The request did not provide a OS version");
             }

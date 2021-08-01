@@ -1,14 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Lithnet.AccessManager.Api.Shared;
 using Stylet;
 using System;
-using System.Windows;
-using Lithnet.AccessManager.Api.Shared;
 
 namespace Lithnet.AccessManager.Server.UI
 {
     public sealed class DeviceViewModel : Screen
     {
-
         public IDevice Model { get; }
 
         public DeviceViewModel(IDevice model)
@@ -66,6 +63,7 @@ namespace Lithnet.AccessManager.Server.UI
         public string OperatingSystemFamily => this.Model.OperatingSystemFamily;
 
         public string OperatingSystemVersion => this.Model.OperatingSystemVersion;
+        public OsType OperatingSystemType => this.Model.OperatingSystemType;
 
         public string Sid => this.Model.Sid;
     }

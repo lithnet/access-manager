@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Lithnet.AccessManager.Api.Shared;
+using System;
 using System.Net;
-using System.Text;
+using Microsoft.Win32;
 
 namespace Lithnet.AccessManager.Agent.Providers
 {
@@ -9,7 +9,7 @@ namespace Lithnet.AccessManager.Agent.Providers
     {
         public string GetOSName()
         {
-            return "Windows";
+            return Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ProductName", null) as string ?? "Windows";
         }
 
         public string GetOSVersion()
@@ -31,6 +31,11 @@ namespace Lithnet.AccessManager.Agent.Providers
             }
 
             return dnsName;
+        }
+
+        public OsType GetOsType()
+        {
+            return OsType.Windows;
         }
     }
 }

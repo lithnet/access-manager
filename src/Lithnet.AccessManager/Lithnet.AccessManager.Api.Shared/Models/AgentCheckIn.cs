@@ -9,13 +9,15 @@ namespace Lithnet.AccessManager.Api.Shared
     {
         public string OperatingSystem { get; set; }
 
-        public string OperationSystemVersion { get; set; }
+        public string OperatingSystemVersion { get; set; }
 
         public string AgentVersion { get; set; }
 
         public string Hostname { get; set; }
 
         public string DnsName { get; set; }
+
+        public OsType OperatingSystemType { get; set; }
 
         public string ToHash()
         {

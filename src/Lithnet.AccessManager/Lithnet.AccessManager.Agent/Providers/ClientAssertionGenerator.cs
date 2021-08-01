@@ -42,7 +42,7 @@ namespace Lithnet.AccessManager.Agent.Providers
                 Expires = DateTime.UtcNow.AddMinutes(4),
                 Issuer = myIssuer,
                 Audience = audience,
-                SigningCredentials = new SigningCredentials(new X509SecurityKey(cert), SecurityAlgorithms.RsaSsaPssSha384)
+                SigningCredentials = new SigningCredentials(new X509SecurityKey(cert), SecurityAlgorithms.RsaSha256)
             };
 
             if (additionalClaims != null)

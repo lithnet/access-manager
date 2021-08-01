@@ -182,7 +182,7 @@ namespace Lithnet.AccessManager.Api.Controllers
                 throw new BadRequestException("The registration information did not include a data element");
             }
 
-            AgentCheckIn checkInData = JsonSerializer.Deserialize<AgentCheckIn>(data, new JsonSerializerOptions {PropertyNameCaseInsensitive = true}) ?? throw new BadRequestException("The registration data element could not be decoded");
+            AgentCheckIn checkInData = JsonSerializer.Deserialize<AgentCheckIn>(data, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? throw new BadRequestException("The registration data element could not be decoded");
 
             this.checkInDataValidator.ValidateCheckInData(checkInData);
 
@@ -192,7 +192,8 @@ namespace Lithnet.AccessManager.Api.Controllers
                 DnsName = checkInData.DnsName,
                 AgentVersion = checkInData.AgentVersion,
                 OperatingSystemFamily = checkInData.OperatingSystem,
-                OperatingSystemVersion = checkInData.OperationSystemVersion,
+                OperatingSystemVersion = checkInData.OperatingSystemVersion,
+                OperatingSystemType = checkInData.OperatingSystemType
             };
 
             device.ApprovalState = registrationKey.ApprovalRequired ? ApprovalState.Pending : ApprovalState.Approved;

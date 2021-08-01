@@ -66,6 +66,8 @@ namespace Lithnet.AccessManager.Server
 
         public string OperatingSystemVersion { get; set; }
 
+        public OsType OperatingSystemType { get; set; }
+
         public bool Disabled { get; set; }
 
         public DbDevice()
@@ -89,6 +91,7 @@ namespace Lithnet.AccessManager.Server
             this.ApprovalState = (ApprovalState)reader["ApprovalState"].CastOrDefault<int>();
             this.OperatingSystemFamily = reader["OperatingSystemFamily"].CastOrDefault<string>();
             this.OperatingSystemVersion = reader["OperatingSystemVersion"].CastOrDefault<string>();
+            this.OperatingSystemType = (OsType)reader["OperatingSystemType"].CastOrDefault<int>();
         }
     }
 }

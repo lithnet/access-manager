@@ -46,7 +46,8 @@ namespace Lithnet.AccessManager.Agent.Providers
                 DnsName = this.dataProvider.GetDnsName(),
                 Hostname = machineName,
                 OperatingSystem = this.dataProvider.GetOSName(),
-                OperationSystemVersion = this.dataProvider.GetOSVersion()
+                OperatingSystemVersion = this.dataProvider.GetOSVersion(),
+                OperatingSystemType = this.dataProvider.GetOsType()
             });
         }
 
