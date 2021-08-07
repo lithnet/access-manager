@@ -10,8 +10,15 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 call action-core-build-service.bat
 if %errorlevel% neq 0 exit /b %errorlevel%
 
-call action-core-build-agent.bat
+call action-core-build-agent-macos.bat
 if %errorlevel% neq 0 exit /b %errorlevel%
+
+call action-core-build-agent-linux.bat
+if %errorlevel% neq 0 exit /b %errorlevel%
+
+call action-core-build-agent-windows.bat
+if %errorlevel% neq 0 exit /b %errorlevel%
+
 
 ECHO %version%| clip
 explorer %amsBuildFolder%

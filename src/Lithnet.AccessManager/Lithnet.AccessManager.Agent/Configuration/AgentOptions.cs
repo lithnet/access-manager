@@ -1,7 +1,4 @@
-﻿using Lithnet.AccessManager.Api.Shared;
-using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Lithnet.AccessManager.Agent.Configuration
 {
@@ -18,16 +15,6 @@ namespace Lithnet.AccessManager.Agent.Configuration
 
         public bool EnableAdminAccount { get; set; } = true;
 
-        public bool AmsPasswordStorageEnabled { get; set; } = true;
-
-        public AgentAuthenticationMode AuthenticationMode { get; set; } = AgentAuthenticationMode.None;
-
         public string Server { get; set; }
-
-        public List<string> AzureTenantIDs { get; set; } = new List<string>();
-
-        public bool RegisterSecondaryCredentialsForAadr { get; set; } = true;
-
-        public bool RegisterSecondaryCredentialsForAadj { get; set; } = false;
     }
 }

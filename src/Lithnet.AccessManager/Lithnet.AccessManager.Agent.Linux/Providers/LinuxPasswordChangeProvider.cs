@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Diagnostics;
+using Lithnet.AccessManager.Agent.Configuration;
 using Lithnet.AccessManager.Agent.Linux.Configuration;
 using Microsoft.Extensions.Options;
 
@@ -13,19 +14,21 @@ namespace Lithnet.AccessManager.Agent.Providers
         private static string chpasswdCommand;
 
         private readonly LinuxOptions linuxOptions;
+        private readonly UnixOptions unixOptions;
         private readonly ILogger<LinuxPasswordChangeProvider> logger;
         private readonly int timeout;
 
-        public LinuxPasswordChangeProvider(ILogger<LinuxPasswordChangeProvider> logger, IOptions<LinuxOptions> linuxOptions)
+        public LinuxPasswordChangeProvider(ILogger<LinuxPasswordChangeProvider> logger, IOptions<LinuxOptions> linuxOptions, IOptions<UnixOptions> unixOptions)
         {
             this.logger = logger;
+            this.unixOptions = unixOptions.Value;
             this.linuxOptions = linuxOptions.Value;
-            this.timeout = this.linuxOptions.ProcessTimeoutMilliseconds <= 0 ? 5000 : this.linuxOptions.ProcessTimeoutMilliseconds;
+            this.timeout = (int)TimeSpan.FromSeconds(Math.Max(1, this.unixOptions.DefaultCommandTimeoutSeconds)).TotalMilliseconds;
         }
 
         public string GetAccountName()
         {
-            return string.IsNullOrWhiteSpace(linuxOptions.Username) ? "root" : linuxOptions.Username;
+            return string.IsNullOrWhiteSpace(unixOptions.Username) ? "root" : unixOptions.Username;
         }
 
         private bool HasChangePasswordCommand()

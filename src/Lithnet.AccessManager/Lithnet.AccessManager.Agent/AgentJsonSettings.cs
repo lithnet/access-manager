@@ -13,6 +13,7 @@ namespace Lithnet.AccessManager.Agent.Shared
             IgnoreNullValues = true,
             PropertyNamingPolicy = null,
             WriteIndented = true,
+            AllowTrailingCommas = true
         };
 
     }

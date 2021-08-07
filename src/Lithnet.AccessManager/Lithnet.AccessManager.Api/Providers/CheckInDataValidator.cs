@@ -24,12 +24,12 @@ namespace Lithnet.AccessManager.Api.Providers
 
             if (string.IsNullOrWhiteSpace(data.OperatingSystem))
             {
-                throw new BadRequestException("The request did not provide a OS family");
+                throw new BadRequestException("The request did not provide an OS family");
             }
 
             if (string.IsNullOrWhiteSpace(data.OperatingSystemVersion))
             {
-                throw new BadRequestException("The request did not provide a OS version");
+                throw new BadRequestException("The request did not provide an OS version");
             }
 
             if (string.Equals(data.Hostname, "localhost", StringComparison.OrdinalIgnoreCase) || string.Equals(data.DnsName, "localhost", StringComparison.OrdinalIgnoreCase))

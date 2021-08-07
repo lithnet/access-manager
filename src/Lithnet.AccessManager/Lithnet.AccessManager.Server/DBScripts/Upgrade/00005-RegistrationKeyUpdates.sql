@@ -166,6 +166,7 @@ BEGIN
 	
 	COMMIT
 END
+GO
 
 DROP PROCEDURE [dbo].[spHasPasswordExpired]
 GO

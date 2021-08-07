@@ -1,6 +1,5 @@
 @echo off
 SETLOCAL
-SET solutiondir=D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager
 SET outputdirservice=%solutiondir%\Lithnet.AccessManager.Service.Setup\output
 SET outputdirps=%solutiondir%\Lithnet.AccessManager.Service.Setup\output-ps
 SET serviceProject=%solutiondir%\Lithnet.AccessManager.Service\Lithnet.AccessManager.Service.csproj

@@ -1,27 +1,22 @@
-﻿using Lithnet.AccessManager.Agent.Linux.Configuration;
+﻿using Lithnet.AccessManager.Api.Shared;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
-using System.Diagnostics;
 using System.Net;
 using System.Text.RegularExpressions;
-using Lithnet.AccessManager.Api.Shared;
 
 namespace Lithnet.AccessManager.Agent.Providers
 {
     public class LinuxPlatformDataProvider : IPlatformDataProvider
     {
         private readonly ILogger<LinuxPlatformDataProvider> logger;
-        private readonly IOptions<LinuxOptions> linuxOptions;
 
         private string osName = null;
         private string osVersion = null;
         private string osData = null;
 
-        public LinuxPlatformDataProvider(ILogger<LinuxPlatformDataProvider> logger, IOptions<LinuxOptions> linuxOptions)
+        public LinuxPlatformDataProvider(ILogger<LinuxPlatformDataProvider> logger)
         {
             this.logger = logger;
-            this.linuxOptions = linuxOptions;
         }
 
         public string GetOSName()
@@ -132,60 +127,6 @@ namespace Lithnet.AccessManager.Agent.Providers
             this.logger.LogTrace($"Could not find request key '{valueName}' in the OS data set");
 
             return null;
-        }
-
-        private string ExecuteCommandLine(string cmd, string args)
-        {
-            Process process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = cmd,
-                    Arguments = args,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardInput = true,
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true,
-                }
-            };
-
-            process.Start();
-            this.logger.LogTrace($"Started command line '{cmd} {args}'");
-
-            this.logger.LogTrace("Waiting for process to exit");
-
-            if (process.WaitForExit(this.linuxOptions.Value.ProcessTimeoutMilliseconds))
-            {
-                this.logger.LogTrace("Process exited");
-            }
-            else
-            {
-                process.Kill();
-                this.logger.LogTrace("Process didn't exit");
-            }
-
-            string response = null;
-            if (!process.StandardOutput.EndOfStream)
-            {
-                response = process.StandardOutput.ReadToEnd();
-                this.logger.LogTrace($"Stdout: {response}");
-            }
-
-            if (!process.StandardError.EndOfStream)
-            {
-                this.logger.LogTrace($"Stderr: {process.StandardError.ReadToEnd()}");
-            }
-
-            if (process.ExitCode == 0)
-            {
-                this.logger.LogTrace("Command was successful");
-                return response;
-            }
-            else
-            {
-                throw new Exception($"Command returned error {process.ExitCode}");
-            }
         }
     }
 }

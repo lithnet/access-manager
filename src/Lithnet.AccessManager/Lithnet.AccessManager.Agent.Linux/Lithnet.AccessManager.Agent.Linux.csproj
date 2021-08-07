@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>dotnet-Lithnet.AccessMangaer.Agent.Linux-C970DD0E-D7B5-4405-8DBC-BD99EAAFC38B</UserSecretsId>
     <Platforms>AnyCPU</Platforms>
-    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+    <RuntimeIdentifiers>linux-x64;linux-arm64</RuntimeIdentifiers>
     <Company>Lithnet</Company>
     <Product>Access Manager</Product>
     <Authors>Lithnet</Authors>
@@ -14,8 +14,9 @@
     <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <AssemblyName>Lithnet.AccessManager.Agent</AssemblyName>
-    <SelfContained>True</SelfContained>
+    <SelfContained>false</SelfContained>
     <InvariantGlobalization>True</InvariantGlobalization>
+    <TrimUnusedDependencies>true</TrimUnusedDependencies>
   </PropertyGroup>
 
   <!-- DEB/RPM Package properties -->
@@ -29,6 +30,16 @@
     <PackageMaintainer>Lithnet &lt;support@lithnet.io&gt;</PackageMaintainer>
     <PackageDescription>Lithnet Access Manager Agent</PackageDescription>
     <SymlinkAppHostInBin>true</SymlinkAppHostInBin>
+    <PostInstallScript>
+      <![CDATA[
+      
+if [ ! -f "/var/lib/LithnetAccessManagerAgent/LithnetAccessManagerAgent.state" ]; then
+    printf "Run 'sudo /opt/LithnetAccessManagerAgent/Lithnet.AccessManager.Agent --setup' to configure the agent\n"
+fi
+printf "View logs with 'sudo journalctl -u LithnetAccessManagerAgent -p 7 -a -f'\n"
+
+
+    ]]></PostInstallScript>
   </PropertyGroup>
 
   <ItemGroup>
@@ -70,6 +81,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Lithnet.AccessManager.Agent\Lithnet.AccessManager.Agent.Shared.csproj" />
     <ProjectReference Include="..\Lithnet.AccessManager.Api.Shared\Lithnet.AccessManager.Api.Shared.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Exceptions\" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+if [ ! -f /Library/LaunchDaemons/io.lithnet.accessmanager.agent.plist ]
+then
+	ln -s /Applications/LithnetAccessManagerAgent/io.lithnet.accessmanager.agent.plist /Library/LaunchDaemons/io.lithnet.accessmanager.agent.plist
+fi
+/bin/launchctl load "/Library/LaunchDaemons/io.lithnet.accessmanager.agent.plist"

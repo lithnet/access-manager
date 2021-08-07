@@ -1,18 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Security.Cryptography.X509Certificates;
 
 namespace Lithnet.AccessManager.Agent.Providers
 {
     public class LinuxAadJoinInformationProvider : IAadJoinInformationProvider
     {
-        private readonly ILogger<LinuxAadJoinInformationProvider> logger;
-        private readonly IAgentSettings agentSettings;
-
-        public LinuxAadJoinInformationProvider(ILogger<LinuxAadJoinInformationProvider> logger, IAgentSettings agentSettings)
+        public LinuxAadJoinInformationProvider()
         {
-            this.logger = logger;
-            this.agentSettings = agentSettings;
         }
 
         public bool InitializeJoinInformation()

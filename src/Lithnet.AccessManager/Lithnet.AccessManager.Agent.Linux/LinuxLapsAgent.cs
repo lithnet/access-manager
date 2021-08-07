@@ -25,7 +25,13 @@ namespace Lithnet.AccessManager.Agent
             {
                 if (string.IsNullOrWhiteSpace(this.agentSettings.Server))
                 {
-                    this.logger.LogError("The agent has not been configured. Run '/opt/LithnetAccessManagerAgent/Lithnet.AccessManager.Agent --setup' to configure the agent");
+                    var executable = Environment.GetCommandLineArgs()[0];
+                    if (executable.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+                    {
+                        executable = executable.Substring(0, executable.Length - 4);
+                    }
+
+                    this.logger.LogError($"The agent has not been configured. Run '{executable} --setup' to configure the agent");
                     return;
                 }
 

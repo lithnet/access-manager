@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -12,7 +13,14 @@ namespace Lithnet.AccessManager.Cryptography
         public string Encrypt(X509Certificate2 cert, string data)
         {
 #if NETCOREAPP
-            return this.Encrypt(cert, data, 2);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                return this.Encrypt(cert, data, 1);
+            }
+            else
+            {
+                return this.Encrypt(cert, data, 2);
+            }
 #else
             return this.Encrypt(cert, data, 1);
 #endif

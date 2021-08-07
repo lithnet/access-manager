@@ -1,0 +1,71 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>dotnet-Lithnet.AccessManager.Agent.MacOs-5D98A6BF-8302-48DC-B4F5-BE44BF5FB5A1</UserSecretsId>
+    <RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
+    <AssemblyName>Lithnet.AccessManager.Agent</AssemblyName>
+    <Platforms>AnyCPU</Platforms>
+    <Company>Lithnet</Company>
+    <Product>Access Manager</Product>
+    <Authors>Lithnet</Authors>
+    <Description>Lithnet Access Manager</Description>
+    <Copyright>(c) 2021 Lithnet</Copyright>
+    <PackageProjectUrl>https://github.com/lithnet/access-manager</PackageProjectUrl>
+    <CopyRefAssembliesToPublishDirectory>false</CopyRefAssembliesToPublishDirectory>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <AssemblyName>Lithnet.AccessManager.Agent</AssemblyName>
+    <SelfContained>False</SelfContained>
+    <InvariantGlobalization>True</InvariantGlobalization>
+    <TrimUnusedDependencies>true</TrimUnusedDependencies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="LithnetAccessManagerAgent.conf" />
+    <None Remove="LithnetAccessManagerAgent.state" />
+    <None Remove="scripts\postinstall" />
+    <None Remove="scripts\preinstall" />
+    <None Remove="uninstall.sh" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="io.lithnet.accessmanager.agent.plist">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="scripts\postinstall">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="scripts\preinstall">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="uninstall.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.16" />
+    <PackageReference Include="Microsoft.Packaging.Tools.Trimming" Version="1.1.0-preview1-26619-01" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lithnet.AccessManager.Agent\Lithnet.AccessManager.Agent.Shared.csproj" />
+    <ProjectReference Include="..\Lithnet.AccessManager.Api.Shared\Lithnet.AccessManager.Api.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Exceptions\" />
+  </ItemGroup>
+
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="call %25BuildToolsPath%25\sign-and-save-symbols.bat $(TargetPath) $(TargetDir) $(ProjectName)" />
+  </Target>
+
+</Project>

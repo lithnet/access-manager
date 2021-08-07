@@ -8,11 +8,16 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5436F418-3FBB-4453-84C6-1CF0B98B8AA5}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		action-core-build-agent.bat = action-core-build-agent.bat
+		action-core-build-agent-linux.bat = action-core-build-agent-linux.bat
+		action-core-build-agent-macos.bat = action-core-build-agent-macos.bat
+		action-core-build-agent-windows.bat = action-core-build-agent-windows.bat
 		action-core-build-service.bat = action-core-build-service.bat
 		action-do-pre-build.bat = action-do-pre-build.bat
 		action-new-version.bat = action-new-version.bat
-		build-agent.bat = build-agent.bat
+		build-agent-all.bat = build-agent-all.bat
+		build-agent-linux.bat = build-agent-linux.bat
+		build-agent-macos.bat = build-agent-macos.bat
+		build-agent-win.bat = build-agent-win.bat
 		build-all-beta.bat = build-all-beta.bat
 		build-all-ev.bat = build-all-ev.bat
 		build-all.bat = build-all.bat
@@ -49,7 +54,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager.Agent
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager.Cryptography", "Lithnet.AccessManager.Cryptography\Lithnet.AccessManager.Cryptography.csproj", "{16DC6088-D29F-4D6E-8002-72CF52D1F621}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lithnet.AccessManager.Agent.Shared.Test", "Lithnet.AccessManager.Agent.Shared.Test\Lithnet.AccessManager.Agent.Shared.Test.csproj", "{9534049B-0A85-4DBD-BAEB-E599BF8F3261}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager.Agent.Shared.Test", "Lithnet.AccessManager.Agent.Shared.Test\Lithnet.AccessManager.Agent.Shared.Test.csproj", "{9534049B-0A85-4DBD-BAEB-E599BF8F3261}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lithnet.AccessManager.Agent.MacOs", "Lithnet.AccessManager.Agent.MacOs\Lithnet.AccessManager.Agent.MacOs.csproj", "{375F813E-6943-4BDC-9B17-A1951B9A5FCD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -451,6 +458,30 @@ Global
 		{9534049B-0A85-4DBD-BAEB-E599BF8F3261}.Release|x64.Build.0 = Release|Any CPU
 		{9534049B-0A85-4DBD-BAEB-E599BF8F3261}.Release|x86.ActiveCfg = Release|Any CPU
 		{9534049B-0A85-4DBD-BAEB-E599BF8F3261}.Release|x86.Build.0 = Release|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.All|Any CPU.ActiveCfg = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.All|Any CPU.Build.0 = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.All|x64.ActiveCfg = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.All|x64.Build.0 = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.All|x86.ActiveCfg = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.All|x86.Build.0 = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Debug|x64.Build.0 = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Debug|x86.Build.0 = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Dev|Any CPU.ActiveCfg = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Dev|Any CPU.Build.0 = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Dev|x64.ActiveCfg = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Dev|x64.Build.0 = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Dev|x86.ActiveCfg = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Dev|x86.Build.0 = Debug|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Release|x64.ActiveCfg = Release|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Release|x64.Build.0 = Release|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Release|x86.ActiveCfg = Release|Any CPU
+		{375F813E-6943-4BDC-9B17-A1951B9A5FCD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

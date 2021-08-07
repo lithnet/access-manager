@@ -1,44 +1,19 @@
 @echo off
 SETLOCAL
 
-SET solutiondir=D:\dev\git\lithnet\access-manager\src\Lithnet.AccessManager
 SET outputdirx86=%solutiondir%\Lithnet.AccessManager.Agent.Setup\output-x86
 SET outputdirx64=%solutiondir%\Lithnet.AccessManager.Agent.Setup\output-x64
+SET outputdirarm64=%solutiondir%\Lithnet.AccessManager.Agent.Setup\output-arm64
+
 SET agentProjectWindows=%solutiondir%\Lithnet.AccessManager.Agent.Windows\Lithnet.AccessManager.Agent.Windows.csproj
 
 SET setupProjectx64=%solutiondir%\Lithnet.AccessManager.Agent.Setup\Lithnet.AccessManager.Agent.Setup-x64.aip
+SET setupProjectarm64=%solutiondir%\Lithnet.AccessManager.Agent.Setup\Lithnet.AccessManager.Agent.Setup-arm64.aip
 SET setupProjectx86=%solutiondir%\Lithnet.AccessManager.Agent.Setup\Lithnet.AccessManager.Agent.Setup-x86.aip
+
 SET intuneBuildDirx64=%amsBuildFolder%\intune\x64
+SET intuneBuildDirarm64=%amsBuildFolder%\intune\arm64
 SET intuneBuildDirx86=%amsBuildFolder%\intune\x86
-
-SET outputdirx64Linux=D:\dev\installers\ams
-SET agentProjectLinux=%solutiondir%\Lithnet.AccessManager.Agent.Linux\Lithnet.AccessManager.Agent.Linux.csproj
-
-
-REM ************************* linux installer *********************************
-
-ECHO [92mClearing old linux packages from the output directory[0m
-powershell -Command "& Remove-Item '%outputdirx64Linux%\*.rpm' -recurse -force" || exit /b %errorlevel%
-if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
-
-powershell -Command "& Remove-Item '%outputdirx64Linux%\*.deb' -recurse -force" || exit /b %errorlevel%
-if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
-
-powershell -Command "& Remove-Item '%outputdirx64Linux%\*.tar.gz' -recurse -force" || exit /b %errorlevel%
-if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
-
-ECHO [92mBuilding 64-bit DEB package[0m
-dotnet publish "%agentProjectLinux%" --runtime linux-x64 --framework netcoreapp3.1 --self-contained true /property:Version=%version% /property:FileVersion=%version%  /p:TreatWarningsAsErrors=true /warnaserror /target:CreateDeb /p:PackageDir="%amsBuildFolder%"
-if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
-
-ECHO [92mBuilding 64-bit RPM package[0m
-dotnet publish "%agentProjectLinux%" --runtime linux-x64 --framework netcoreapp3.1 --self-contained true /property:Version=%version% /property:FileVersion=%version%  /p:TreatWarningsAsErrors=true /warnaserror /target:CreateRpm /p:PackageDir="%amsBuildFolder%"
-if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
-
-ECHO [92mBuilding 64-bit Tarball package[0m
-dotnet publish "%agentProjectLinux%" --runtime linux-x64 --framework netcoreapp3.1 --self-contained true /property:Version=%version% /property:FileVersion=%version%  /p:TreatWarningsAsErrors=true /warnaserror /target:CreateTarBall /p:PackageDir="%amsBuildFolder%"
-if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
-
 
 REM ************************* 64-bit installer *********************************
 
@@ -101,7 +76,6 @@ ECHO [92mBuilding 32-bit installer[0m
 "%AIPATH%\AdvancedInstaller.com" /build "%setupProjectx86%"
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
-
 ECHO [92mCreating 32-bit intune package[0m
 echo  "%amsBuildFolder%\Lithnet Access Manager Agent Setup-x86.msi" "%intuneBuildDirx86%" 
 copy "%amsBuildFolder%\Lithnet Access Manager Agent Setup-x86.msi" "%intuneBuildDirx86%" /y
@@ -110,6 +84,41 @@ if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
 
+
+REM ************************* ARM64 installer *********************************
+
+REM ECHO [92mClearing arm64 intune output directory[0m
+REM IF EXIST "%intuneBuildDirarm64%" powershell -Command "& Remove-Item '%intuneBuildDirarm64%\*' -recurse -force" || exit /b %errorlevel%
+REM if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
+REM IF NOT EXIST "%intuneBuildDirarm64%" md "%intuneBuildDirarm64%" || exit /b %errorlevel%
+
+REM ECHO [92mClearing arm64 output directory[0m
+REM IF EXIST "%outputdirarm64%" powershell -Command "& Remove-Item '%outputdirarm64%\*' -recurse -force" || exit /b %errorlevel%
+REM if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
+
+REM ECHO [92mBuilding arm64 agent project[0m
+REM dotnet publish "%agentProjectWindows%" --runtime win-arm64 --output "%outputdirarm64%" --framework net472 --self-contained false /property:Version=%version% /property:FileVersion=%version%  / p:TreatWarningsAsErrors=true /warnaserror 
+REM if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
+
+REM ECHO [92mSigning arm64 Lithnet EXEs[0m
+REM "%SIGNTOOLPATH%\signtool.exe" sign /sha1 %CSCERTTHUMBPRINT% /d "Lithnet Access Manager" /t http://timestamp.digicert.com /fd sha256 /v "%outputdirarm64%\Lithnet*.exe"
+REM if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
+
+REM ECHO [92mSigning arm64 Lithnet DLLs[0m
+REM "%SIGNTOOLPATH%\signtool.exe" sign /sha1 %CSCERTTHUMBPRINT% /d "Lithnet Access Manager" /t http://timestamp.digicert.com /fd sha256 /v "%outputdirarm64%\Lithnet*.dll"
+REM if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
+
+REM ECHO [92mBuilding arm64 installer[0m
+REM "%AIPATH%\AdvancedInstaller.com" /build "%setupProjectarm64%"
+REM if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
+
+REM ECHO [92mCreating arm64 intune package[0m
+REM echo  "%amsBuildFolder%\Lithnet Access Manager Agent Setup-arm64.msi" "%intuneBuildDirarm64%" 
+REM copy "%amsBuildFolder%\Lithnet Access Manager Agent Setup-arm64.msi" "%intuneBuildDirarm64%" /y
+REM if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
+REM %devToolsPath%\IntuneWinAppUtil.exe -c "%intuneBuildDirarm64%" -s "Lithnet Access Manager Agent Setup-arm64.msi" -o "%amsBuildFolder%" -q
+REM if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
+
+
 ENDLOCAL
 
-ECHO [92mAgent built with version %version%[0m

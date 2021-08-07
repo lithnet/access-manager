@@ -19,21 +19,21 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         public int Interval => this.agentOptions.CurrentValue.Interval;
 
-        public bool AmsPasswordStorageEnabled => this.agentOptions.CurrentValue.AmsPasswordStorageEnabled;
+        public bool AmsPasswordStorageEnabled => true;
 
         public bool AmsServerManagementEnabled => this.agentOptions.CurrentValue.Enabled;
-        
+
         public bool Enabled => this.agentOptions.CurrentValue.Enabled;
 
-        public AgentAuthenticationMode AuthenticationMode => this.agentOptions.CurrentValue.AuthenticationMode;
+        public AgentAuthenticationMode AuthenticationMode => AgentAuthenticationMode.Ams;
 
         public string Server => this.agentOptions.CurrentValue.Server;
 
-        public IEnumerable<string> AzureAdTenantIDs => this.agentOptions.CurrentValue.AzureTenantIDs;
+        public IEnumerable<string> AzureAdTenantIDs => new List<string>();
 
-        public bool RegisterSecondaryCredentialsForAadr => this.agentOptions.CurrentValue.RegisterSecondaryCredentialsForAadr;
+        public bool RegisterSecondaryCredentialsForAadr => false;
 
-        public bool RegisterSecondaryCredentialsForAadj => this.agentOptions.CurrentValue.RegisterSecondaryCredentialsForAadj;
+        public bool RegisterSecondaryCredentialsForAadj => false;
 
         public int CheckInIntervalHours => this.agentOptions.CurrentValue.CheckInIntervalHours;
 

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+set -e
+if /bin/launchctl list "io.lithnet.accessmanager.agent" &> /dev/null; then
+    /bin/launchctl unload "/Library/LaunchDaemons/io.lithnet.accessmanager.agent.plist"
+fi
