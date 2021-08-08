@@ -1,8 +1,6 @@
-﻿using Lithnet.AccessManager.Api;
-using Microsoft.AspNetCore.DataProtection;
+﻿using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -60,37 +58,21 @@ namespace Lithnet.AccessManager.Server.Providers
 
                 if (string.Equals(domain, "AccessManager", StringComparison.OrdinalIgnoreCase))
                 {
-                    foreach (var device in (await this.dbDeviceProvider.FindDevices(host)).Where(t => t.AuthorityType == AuthorityType.Ams))
-                    {
-                        foundComputers.TryAdd(device.Sid, (IComputer)device);
-                    }
+                    await this.FindAndAddDevices(host, AuthorityType.Ams, foundComputers);
                 }
                 else if (string.Equals(domain, "AzureAD", StringComparison.OrdinalIgnoreCase))
                 {
-                    foreach (var device in (await this.dbDeviceProvider.FindDevices(host)).Where(t => t.AuthorityType ==  AuthorityType.AzureActiveDirectory))
-                    {
-                        foundComputers.TryAdd(device.Sid, (IComputer)device);
-                    }
+                    await this.FindAndAddDevices(host, AuthorityType.AzureActiveDirectory, foundComputers);
                 }
                 else
                 {
-                    foreach (var computer in this.directory.GetComputers(searchText))
-                    {
-                        foundComputers.TryAdd(computer.Sid.ToString(), computer);
-                    }
+                    this.FindAndAddAdComputers(searchText, foundComputers);
                 }
             }
             else
             {
-                foreach (var device in await this.dbDeviceProvider.FindDevices(searchText))
-                {
-                    foundComputers.TryAdd(device.Sid, (IComputer)device);
-                }
-
-                foreach (var computer in this.directory.GetComputers(searchText))
-                {
-                    foundComputers.TryAdd(computer.Sid.ToString(), computer);
-                }
+                await this.FindAndAddDevices(searchText, AuthorityType.None, foundComputers);
+                this.FindAndAddAdComputers(searchText, foundComputers);
             }
 
             if (foundComputers.Count > 100)
@@ -100,6 +82,37 @@ namespace Lithnet.AccessManager.Server.Providers
 
             return await this.CreateSearchResults(foundComputers.Values.ToList<IComputer>());
         }
+
+        private void FindAndAddAdComputers(string searchText, Dictionary<string, IComputer> foundComputers)
+        {
+            try
+            {
+                foreach (var computer in this.directory.GetComputers(searchText))
+                {
+                    foundComputers.TryAdd(computer.Sid.ToString(), computer);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, $"An error occurred while searching the directory for matches to the name '{searchText}'. Search results may be incomplete");
+            }
+        }
+
+        private async Task FindAndAddDevices(string searchText, AuthorityType authority, Dictionary<string, IComputer> foundComputers)
+        {
+            try
+            {
+                foreach (var device in (await this.dbDeviceProvider.FindDevices(searchText)).Where(t => authority == AuthorityType.None || t.AuthorityType == authority))
+                {
+                    foundComputers.TryAdd(device.Sid, (IComputer)device);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, $"An error occurred while searching the database for matches to the name '{searchText}'. Search results may be incomplete");
+            }
+        }
+
 
         public async Task<IComputer> GetComputer(string authorityId, AuthorityType authorityType, string authorityDeviceId)
         {

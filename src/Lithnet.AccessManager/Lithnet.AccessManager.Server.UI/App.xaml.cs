@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
-using System.Threading.Tasks;
+using System.DirectoryServices.ActiveDirectory;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Threading;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -29,6 +28,9 @@ namespace Lithnet.AccessManager.Server.UI
             EventManager.RegisterClassHandler(typeof(PasswordBox), UIElement.GotKeyboardFocusEvent, new RoutedEventHandler(SelectAllText));
             EventManager.RegisterClassHandler(typeof(PasswordBox), Control.MouseDoubleClickEvent, new RoutedEventHandler(SelectAllText));
 
+            FrameworkElement.LanguageProperty.OverrideMetadata(typeof(FrameworkElement),
+                new FrameworkPropertyMetadata(System.Windows.Markup.XmlLanguage.GetLanguage(System.Globalization.CultureInfo.CurrentCulture.IetfLanguageTag)));
+
             Window WpfBugWindow = new Window()
             {
                 AllowsTransparency = true,
@@ -45,6 +47,17 @@ namespace Lithnet.AccessManager.Server.UI
 
             try
             {
+                try
+                {
+                    var name = Forest.GetCurrentForest().RootDomain.GetDirectoryEntry().Name;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Unable to get information about the current domain. Ensure the domain is contactable and try again.\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    this.Shutdown(1);
+                    return;
+                }
+
                 base.OnStartup(e);
                 ShutdownMode = ShutdownMode.OnLastWindowClose;
                 WpfBugWindow.Close();
