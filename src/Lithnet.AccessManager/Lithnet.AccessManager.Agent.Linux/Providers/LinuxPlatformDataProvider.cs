@@ -124,7 +124,7 @@ namespace Lithnet.AccessManager.Agent.Providers
                 return match.Groups["value"].Value;
             }
 
-            this.logger.LogTrace($"Could not find request key '{valueName}' in the OS data set");
+            this.logger.LogWarning($"Could not find request key '{valueName}' in the OS data set");
 
             return null;
         }

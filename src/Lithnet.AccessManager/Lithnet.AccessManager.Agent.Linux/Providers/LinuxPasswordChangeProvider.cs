@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Lithnet.AccessManager.Agent.Configuration;
 using Lithnet.AccessManager.Agent.Linux.Configuration;
@@ -9,18 +10,20 @@ namespace Lithnet.AccessManager.Agent.Providers
 {
     public class LinuxPasswordChangeProvider : IPasswordChangeProvider
     {
-        private static bool hasChpasswd;
-        private static bool hasCheckedChpasswd;
+        private static List<string> knownChPasswdLocations = new List<string> { "/sbin/chpasswd", "/usr/sbin/chpasswd" };
+
         private static string chpasswdCommand;
 
         private readonly LinuxOptions linuxOptions;
         private readonly UnixOptions unixOptions;
         private readonly ILogger<LinuxPasswordChangeProvider> logger;
         private readonly int timeout;
+        private readonly ICommandLineRunner runner;
 
-        public LinuxPasswordChangeProvider(ILogger<LinuxPasswordChangeProvider> logger, IOptions<LinuxOptions> linuxOptions, IOptions<UnixOptions> unixOptions)
+        public LinuxPasswordChangeProvider(ILogger<LinuxPasswordChangeProvider> logger, IOptions<LinuxOptions> linuxOptions, IOptions<UnixOptions> unixOptions, ICommandLineRunner runner)
         {
             this.logger = logger;
+            this.runner = runner;
             this.unixOptions = unixOptions.Value;
             this.linuxOptions = linuxOptions.Value;
             this.timeout = (int)TimeSpan.FromSeconds(Math.Max(1, this.unixOptions.DefaultCommandTimeoutSeconds)).TotalMilliseconds;
@@ -31,169 +34,133 @@ namespace Lithnet.AccessManager.Agent.Providers
             return string.IsNullOrWhiteSpace(unixOptions.Username) ? "root" : unixOptions.Username;
         }
 
-        private bool HasChangePasswordCommand()
+        private string GetChPasswdPath()
         {
-            if (hasCheckedChpasswd)
+            if (chpasswdCommand != null)
             {
-                return hasChpasswd;
+                return chpasswdCommand;
             }
 
-            if (linuxOptions.DisableChpasswd ?? false)
+            if (!string.IsNullOrWhiteSpace(linuxOptions.ChpasswdPath) && System.IO.File.Exists(linuxOptions.ChpasswdPath))
             {
-                return false;
-            }
-
-            if (!string.IsNullOrWhiteSpace(linuxOptions.ChpasswdPath))
-            {
-                this.logger.LogTrace($"Using chpasswd from config file {linuxOptions.ChpasswdPath}");
-
-                hasCheckedChpasswd = true;
-                hasChpasswd = true;
                 chpasswdCommand = linuxOptions.ChpasswdPath;
-                return true;
+                return chpasswdCommand;
+            }
+
+            foreach (var path in knownChPasswdLocations)
+            {
+                if (System.IO.File.Exists(path))
+                {
+                    chpasswdCommand = path;
+                    return chpasswdCommand;
+                }
             }
 
             this.logger.LogTrace("Looking for chpasswd");
-            Process process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "/bin/sh",
-                    Arguments = "-c \"command -v chpasswd\"",
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardInput = true,
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true,
-                }
-            };
 
-            process.Start();
+            var result = runner.ExecuteCommand("/bin/sh", "-c \"command -v chpasswd\"");
+            result.EnsureSuccess();
 
-            hasChpasswd = false;
-
-            if (process.WaitForExit(timeout))
+            if (System.IO.File.Exists(result.StdOut))
             {
-                if (process.ExitCode == 0)
-                {
-                    chpasswdCommand = process.StandardOutput.ReadToEnd().Trim();
-                    this.logger.LogTrace($"chpasswd found at {chpasswdCommand}");
-                    hasChpasswd = true;
-                }
-                else
-                {
-                    this.logger.LogTrace($"command lookup returned exit code {process.ExitCode}");
-                }
-            }
-            else
-            {
-                process.Kill();
+                chpasswdCommand = result.StdOut;
+                return chpasswdCommand;
             }
 
-            hasCheckedChpasswd = true;
-            return hasChpasswd;
+            throw new MissingDependencyException("The chpasswd command could not be found on this system");
         }
 
         public void ChangePassword(string password)
         {
-            if (this.HasChangePasswordCommand())
-            {
-                this.ChangePasswordWithChpasswd(password);
-            }
-            else
-            {
-                this.ChangePasswordWithPasswd(password);
-            }
+            this.ChangePasswordWithChpasswd(password);
         }
 
-        private void ChangePasswordWithPasswd(string password)
-        {
-            this.logger.LogTrace("Preparing command line to change password via passwd");
+        //private void ChangePasswordWithPasswd(string password)
+        //{
+        //    this.logger.LogTrace("Preparing command line to change password via passwd");
 
-            string args = linuxOptions.PasswdArgs;
-            if(string.IsNullOrWhiteSpace(args))
-            {
-                args = this.GetAccountName();
-            }
-            else
-            {
-                args.Replace("{username}", this.GetAccountName(), StringComparison.OrdinalIgnoreCase);
-            }
+        //    string args = linuxOptions.PasswdArgs;
+        //    if(string.IsNullOrWhiteSpace(args))
+        //    {
+        //        args = this.GetAccountName();
+        //    }
+        //    else
+        //    {
+        //        args.Replace("{username}", this.GetAccountName(), StringComparison.OrdinalIgnoreCase);
+        //    }
 
-            string cmdLine = linuxOptions.PasswdPath;
-            if( string.IsNullOrWhiteSpace(cmdLine))
-            {
-                cmdLine = "passwd";
-            }
+        //    string cmdLine = linuxOptions.PasswdPath;
+        //    if( string.IsNullOrWhiteSpace(cmdLine))
+        //    {
+        //        cmdLine = "passwd";
+        //    }
 
-            Process process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = cmdLine,
-                    Arguments = args,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardInput = true,
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true,
-                }
-            };
+        //    Process process = new Process
+        //    {
+        //        StartInfo = new ProcessStartInfo
+        //        {
+        //            FileName = cmdLine,
+        //            Arguments = args,
+        //            UseShellExecute = false,
+        //            CreateNoWindow = true,
+        //            RedirectStandardInput = true,
+        //            RedirectStandardError = true,
+        //            RedirectStandardOutput = true,
+        //        }
+        //    };
 
-            process.Start();
-            this.logger.LogTrace("Started command line to change password");
+        //    process.Start();
+        //    this.logger.LogTrace("Started command line to change password");
 
-            process.StandardInput.WriteLine(password);
-            process.StandardInput.WriteLine(password);
+        //    process.StandardInput.WriteLine(password);
+        //    process.StandardInput.WriteLine(password);
 
-            this.logger.LogTrace("Wrote new password to stdin");
+        //    this.logger.LogTrace("Wrote new password to stdin");
 
-            process.StandardInput.Close();
+        //    process.StandardInput.Close();
 
-            this.logger.LogTrace("Waiting for process to exit");
+        //    this.logger.LogTrace("Waiting for process to exit");
 
-            if (process.WaitForExit(timeout))
-            {
-                this.logger.LogTrace("Process exited");
-            }
-            else
-            {
-                process.Kill();
-                this.logger.LogTrace("Process didn't exit");
-            }
+        //    if (process.WaitForExit(timeout))
+        //    {
+        //        this.logger.LogTrace("Process exited");
+        //    }
+        //    else
+        //    {
+        //        process.Kill();
+        //        this.logger.LogTrace("Process didn't exit");
+        //    }
 
-            if (!process.StandardOutput.EndOfStream)
-            {
-                this.logger.LogTrace($"Stdout: {process.StandardOutput.ReadToEnd()}");
-            }
+        //    if (!process.StandardOutput.EndOfStream)
+        //    {
+        //        this.logger.LogTrace($"Stdout: {process.StandardOutput.ReadToEnd()}");
+        //    }
 
-            if (!process.StandardError.EndOfStream)
-            {
-                this.logger.LogTrace($"Stderr: {process.StandardError.ReadToEnd()}");
-            }
+        //    if (!process.StandardError.EndOfStream)
+        //    {
+        //        this.logger.LogTrace($"Stderr: {process.StandardError.ReadToEnd()}");
+        //    }
 
 
-            if (process.ExitCode == 0)
-            {
-                this.logger.LogTrace("Password change was successful");
-            }
-            else
-            {
-                throw new Exception($"Password change returned error {process.ExitCode}");
-            }
-        }
+        //    if (process.ExitCode == 0)
+        //    {
+        //        this.logger.LogTrace("Password change was successful");
+        //    }
+        //    else
+        //    {
+        //        throw new Exception($"Password change returned error {process.ExitCode}");
+        //    }
+        //}
+
         private void ChangePasswordWithChpasswd(string password)
         {
-            this.logger.LogTrace("Preparing command line to change password via chpasswd");
-
-            string args = this.linuxOptions.ChpasswdArgs ?? string.Empty;
+            string chPasswd = this.GetChPasswdPath();
 
             Process process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = chpasswdCommand,
-                    Arguments = args,
+                    FileName = chPasswd,
                     UseShellExecute = false,
                     CreateNoWindow = true,
                     RedirectStandardInput = true,
@@ -203,24 +170,16 @@ namespace Lithnet.AccessManager.Agent.Providers
             };
 
             process.Start();
-            this.logger.LogTrace("Started command line to change password");
+            this.logger.LogTrace($"Changing password with {chPasswd}");
 
             process.StandardInput.WriteLine($"{this.GetAccountName()}:{password}");
 
-            this.logger.LogTrace("Wrote new password to stdin");
-
             process.StandardInput.Close();
 
-            this.logger.LogTrace("Waiting for process to exit");
-
-            if (process.WaitForExit(this.timeout))
-            {
-                this.logger.LogTrace("Process exited");
-            }
-            else
+            if (!process.WaitForExit(this.timeout))
             {
                 process.Kill();
-                this.logger.LogTrace("Process didn't exit");
+                this.logger.LogWarning("chpasswd process didn't exit and was terminated");
             }
 
             if (!process.StandardOutput.EndOfStream)
@@ -233,14 +192,13 @@ namespace Lithnet.AccessManager.Agent.Providers
                 this.logger.LogTrace($"Stderr: {process.StandardError.ReadToEnd()}");
             }
 
-
             if (process.ExitCode == 0)
             {
-                this.logger.LogTrace("Password change was successful");
+                this.logger.LogTrace("chpasswd was successful");
             }
             else
             {
-                throw new Exception($"Password change returned error {process.ExitCode}");
+                throw new Exception($"chpasswd returned error {process.ExitCode}");
             }
         }
 

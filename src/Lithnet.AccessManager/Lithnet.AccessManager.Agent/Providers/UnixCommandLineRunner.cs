@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Lithnet.AccessManager.Agent.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Diagnostics;
-using Lithnet.AccessManager.Agent.Configuration;
-using Microsoft.Extensions.Options;
+using System.Linq;
 
 namespace Lithnet.AccessManager.Agent.Providers
 {
@@ -30,19 +31,18 @@ namespace Lithnet.AccessManager.Agent.Providers
             this.logger = logger;
         }
 
-        public CommandLineResult ExecuteCommand(string cmd, string args)
+        public CommandLineResult ExecuteCommand(string cmd, params string[] args)
         {
-            return this.ExecuteCommand(cmd, args, this.defaultTimeout);
+            return this.ExecuteCommand(cmd, this.defaultTimeout, args);
         }
 
-        public CommandLineResult ExecuteCommand(string cmd, string args, TimeSpan timeout)
+        public CommandLineResult ExecuteCommand(string cmd, TimeSpan timeout, params string[] args)
         {
             Process process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = cmd,
-                    Arguments = args,
                     UseShellExecute = false,
                     CreateNoWindow = true,
                     RedirectStandardInput = true,
@@ -50,6 +50,21 @@ namespace Lithnet.AccessManager.Agent.Providers
                     RedirectStandardOutput = true,
                 }
             };
+
+#if NETCOREAPP
+            if (args != null)
+            {
+                foreach (var arg in args)
+                {
+                    process.StartInfo.ArgumentList.Add(arg);
+                }
+            }
+#else
+            if (args != null || args.Any())
+            {
+                throw new NotSupportedException();
+            }
+#endif
 
             process.Start();
 
@@ -73,43 +88,8 @@ namespace Lithnet.AccessManager.Agent.Providers
                     ExitCode = process.ExitCode,
                     Timeout = true,
                 };
+
             }
-        }
-        public CommandLineResult ExecuteCommandWithDefaultShell(string cmd)
-        {
-            return this.ExecuteCommandWithDefaultShell(cmd, this.defaultTimeout);
-        }
-
-        public CommandLineResult ExecuteCommandWithDefaultShell(string cmd, TimeSpan timeout)
-        {
-            return this.ExecuteCommand(this.options.DefaultShell, $"-c \"{cmd}\"", timeout);
-
-        }
-
-        public CommandLineResult ExecuteCommandWithDefaultShell(string cmd, string args, TimeSpan timeout)
-        {
-            return this.ExecuteCommand(this.options.DefaultShell, $"-c \"{cmd} {args}\"", timeout);
-        }
-
-        public CommandLineResult ExecuteCommandWithDefaultShell(string cmd, string args)
-        {
-            return this.ExecuteCommandWithDefaultShell(cmd, args, this.defaultTimeout);
-        }
-
-        public bool TryExecuteCommandWithShell(string cmd, out CommandLineResult result)
-        {
-            try
-            {
-                result = this.ExecuteCommandWithDefaultShell(cmd);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                this.logger?.LogError(ex, "The process did not complete successfully");
-            }
-
-            result = null;
-            return false;
         }
     }
 }

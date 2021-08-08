@@ -16,7 +16,7 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         public void RestartService()
         {
-            cmdRunner.ExecuteCommandWithDefaultShell("systemctl restart LithnetAccessManagerAgent.service").EnsureSuccess();
+            cmdRunner.ExecuteCommand("systemctl", "restart", "LithnetAccessManagerAgent.service").EnsureSuccess();
         }
 
         public void InstallService()
@@ -37,9 +37,9 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         public void EnableService()
         {
-            cmdRunner.ExecuteCommandWithDefaultShell("systemctl daemon-reload").EnsureSuccess();
-            cmdRunner.ExecuteCommandWithDefaultShell("systemctl enable LithnetAccessManagerAgent.service").EnsureSuccess();
-            cmdRunner.ExecuteCommandWithDefaultShell("systemctl start LithnetAccessManagerAgent.service").EnsureSuccess();
+            cmdRunner.ExecuteCommand("systemctl", "daemon-reload").EnsureSuccess();
+            cmdRunner.ExecuteCommand("systemctl", "enable", "LithnetAccessManagerAgent.service").EnsureSuccess();
+            cmdRunner.ExecuteCommand("systemctl", "start", "LithnetAccessManagerAgent.service").EnsureSuccess();
         }
     }
 }

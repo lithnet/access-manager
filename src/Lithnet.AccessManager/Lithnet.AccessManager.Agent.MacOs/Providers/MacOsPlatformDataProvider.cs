@@ -82,9 +82,9 @@ namespace Lithnet.AccessManager.Agent.Providers
             return OsType.MacOS;
         }
 
-        private string ExecuteCommandLine(string cmd, string args)
+        private string ExecuteCommandLine(string cmd, string arg)
         {
-            var result = this.cmdlineRunner.ExecuteCommandWithDefaultShell(cmd, args);
+            var result = this.cmdlineRunner.ExecuteCommand(cmd, arg);
 
             result.EnsureSuccess();
 

@@ -16,7 +16,7 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         public void RestartService()
         {
-            cmdLineRunner.ExecuteCommand("/bin/launchctl", "kickstart -k system/io.lithnet.accessmanager.agent").EnsureSuccess();
+            cmdLineRunner.ExecuteCommand("/bin/launchctl", "kickstart", "-k", "system/io.lithnet.accessmanager.agent").EnsureSuccess();
         }
 
         public void InstallService()
@@ -37,7 +37,7 @@ namespace Lithnet.AccessManager.Agent.Providers
 
         public void EnableService()
         {
-            cmdLineRunner.ExecuteCommand("/bin/launchctl", "load /Library/LaunchDaemons/io.lithnet.accessmanager.agent.plist").EnsureSuccess();
+            cmdLineRunner.ExecuteCommand("/bin/launchctl", "load", "/Library/LaunchDaemons/io.lithnet.accessmanager.agent.plist").EnsureSuccess();
         }
     }
 }

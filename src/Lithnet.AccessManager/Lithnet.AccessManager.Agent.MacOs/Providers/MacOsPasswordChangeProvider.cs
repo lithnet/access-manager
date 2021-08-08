@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Lithnet.AccessManager.Agent.Configuration;
 using Microsoft.Extensions.Options;
@@ -33,10 +34,7 @@ namespace Lithnet.AccessManager.Agent.Providers
         {
             this.logger.LogTrace("Preparing command line to change password via dscl");
 
-            string args = ". -passwd /Users/{username} \"{password}\"";
-
-            args = args.Replace("{username}", this.GetAccountName(), StringComparison.OrdinalIgnoreCase);
-            args = args.Replace("{password}", password, StringComparison.OrdinalIgnoreCase);
+            List<string> arguments = new List<string> { ".", "-passwd", $"/Users/{this.GetAccountName()}", password };
 
             string cmdLine = "dscl";
 
@@ -45,7 +43,6 @@ namespace Lithnet.AccessManager.Agent.Providers
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = cmdLine,
-                    Arguments = args,
                     UseShellExecute = false,
                     CreateNoWindow = true,
                     RedirectStandardInput = true,
@@ -53,6 +50,11 @@ namespace Lithnet.AccessManager.Agent.Providers
                     RedirectStandardOutput = true,
                 }
             };
+
+            foreach (var arg in arguments)
+            {
+                process.StartInfo.ArgumentList.Add(arg);
+            }
 
             process.Start();
 
