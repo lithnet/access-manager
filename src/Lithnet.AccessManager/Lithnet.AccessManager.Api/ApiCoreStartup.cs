@@ -24,6 +24,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Cryptography;
 using Lithnet.AccessManager.Server.Authorization;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Lithnet.AccessManager.Api
 {
@@ -67,8 +68,10 @@ namespace Lithnet.AccessManager.Api
             services.AddSingleton(RandomNumberGenerator.Create());
             services.AddSingleton<IRandomValueGenerator, RandomValueGenerator>();
             services.AddSingleton<IPasswordPolicyMemoryCache, PasswordPolicyMemoryCache>();
-            // Our services
+            services.AddSingleton<ITokenReplayCache, TokenReplayCache>();
+            services.AddTransient<IMemoryCache, MemoryCache>();
 
+            // Our services
             services.AddScoped<IDeviceProvider, DbDeviceProvider>();
             services.AddScoped<IAadGraphApiProvider, AadGraphApiProvider>();
             services.AddScoped<IDevicePasswordProvider, DbDevicePasswordProvider>();

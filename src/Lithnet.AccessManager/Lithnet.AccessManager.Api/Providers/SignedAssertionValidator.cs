@@ -12,11 +12,13 @@ namespace Lithnet.AccessManager.Api.Providers
     {
         private readonly IOptions<SignedAssertionValidationOptions> validatorOptions;
         private readonly IOptions<HostingOptions> httpSysOptions;
+        private readonly ITokenReplayCache tokenReplayCache;
 
-        public SignedAssertionValidator(IOptions<SignedAssertionValidationOptions> validatorOptions, IOptions<HostingOptions> httpSysOptions)
+        public SignedAssertionValidator(IOptions<SignedAssertionValidationOptions> validatorOptions, IOptions<HostingOptions> httpSysOptions, ITokenReplayCache tokenReplayCache)
         {
             this.validatorOptions = validatorOptions;
             this.httpSysOptions = httpSysOptions;
+            this.tokenReplayCache = tokenReplayCache;
         }
 
         public JwtSecurityToken Validate(string assertion, string audiencePath, out X509Certificate2 signingCertificate)
@@ -36,7 +38,8 @@ namespace Lithnet.AccessManager.Api.Providers
                 ValidateIssuerSigningKey = false,
                 ValidAlgorithms = this.validatorOptions.Value.AllowedSigningAlgorithms,
                 ValidAudience = this.httpSysOptions.Value.HttpSys.BuildApiHostUrl(audiencePath),
-                IssuerSigningKey = new RsaSecurityKey(signingCertificate.GetRSAPublicKey())
+                IssuerSigningKey = new RsaSecurityKey(signingCertificate.GetRSAPublicKey()),
+                TokenReplayCache = this.tokenReplayCache
             }, out SecurityToken validatedToken);
 
             JwtSecurityToken jwt = (JwtSecurityToken)validatedToken;
