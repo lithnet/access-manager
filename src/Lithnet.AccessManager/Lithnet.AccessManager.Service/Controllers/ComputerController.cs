@@ -35,10 +35,10 @@ namespace Lithnet.AccessManager.Service.Controllers
         private readonly UserInterfaceOptions userInterfaceSettings;
         private readonly IBitLockerRecoveryPasswordProvider bitLockerProvider;
         private readonly IAmsLicenseManager licenseManager;
-        private readonly IComputerLocator computerLocator;
+        private readonly IComputerSearchResultProvider computerLocator;
 
         public ComputerController(IAuthorizationService authorizationService, ILogger<ComputerController> logger, IActiveDirectory directory,
-            IAuditEventProcessor reporting, IOptionsSnapshot<UserInterfaceOptions> userInterfaceSettings, IAuthenticationProvider authenticationProvider, IPasswordProvider passwordProvider, IJitAccessProvider jitAccessProvider, IBitLockerRecoveryPasswordProvider bitLockerProvider, IAmsLicenseManager licenseManager, IComputerLocator computerLocator)
+            IAuditEventProcessor reporting, IOptionsSnapshot<UserInterfaceOptions> userInterfaceSettings, IAuthenticationProvider authenticationProvider, IPasswordProvider passwordProvider, IJitAccessProvider jitAccessProvider, IBitLockerRecoveryPasswordProvider bitLockerProvider, IAmsLicenseManager licenseManager, IComputerSearchResultProvider computerLocator)
         {
             this.authorizationService = authorizationService;
             this.logger = logger;

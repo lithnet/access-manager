@@ -11,11 +11,27 @@ namespace Lithnet.AccessManager.Server
     public static class SidUtils
     {
         public const string AadSidPrefix = "S-1-12-1-";
-        public const string AmsSidPrefix = "S-1-4096-1-";
+        public const string AmsSidPrefix = "S-1-4096-";
+        public const string AmsObjectSidPrefix = "S-1-4096-1-";
+        public const string AmsBuiltInSidPrefix = "S-1-4096-2-";
 
+        public static bool IsAmsBuiltInSid(string sid)
+        {
+            return sid.StartsWith(AmsBuiltInSidPrefix, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public static bool IsAmsObjectSid(string sid)
+        {
+            return sid.StartsWith(AmsObjectSidPrefix, StringComparison.OrdinalIgnoreCase);
+        }
+        public static bool IsAmsSid(string sid)
+        {
+            return sid.StartsWith(AmsSidPrefix, StringComparison.OrdinalIgnoreCase);
+        }
+        
         public static string ToAmsSidString(this Guid guid)
         {
-            return $"{AmsSidPrefix}{guid.ToSidString()}";
+            return $"{AmsObjectSidPrefix}{guid.ToSidString()}";
         }
 
         public static string ToAadSidString(this Guid guid)

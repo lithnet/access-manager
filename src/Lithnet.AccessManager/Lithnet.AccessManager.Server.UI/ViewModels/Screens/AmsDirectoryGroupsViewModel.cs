@@ -117,7 +117,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public bool CanEdit => this.SelectedItems.Count == 1;
+        public bool CanEdit => this.SelectedItems.Count == 1 && this.SelectedItem?.Type == AmsGroupType.Normal;
 
         public async Task Edit()
         {
@@ -125,10 +125,11 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 var selectedKey = this.SelectedItem;
 
-                if (selectedKey == null)
+                if (selectedKey == null || selectedKey.Type == AmsGroupType.System)
                 {
                     return;
                 }
+
                 var m = await this.groupProvider.CloneGroup(selectedKey.Model);
                 var vm = this.factory.CreateViewModel(m);
 
@@ -140,6 +141,11 @@ namespace Lithnet.AccessManager.Server.UI
                 };
 
                 await this.GetWindow().ShowChildWindowAsync(w);
+
+                if (selectedKey.Model.Type == AmsGroupType.System)
+                {
+                    return;
+                }
 
                 if (w.Result == MessageDialogResult.Affirmative)
                 {

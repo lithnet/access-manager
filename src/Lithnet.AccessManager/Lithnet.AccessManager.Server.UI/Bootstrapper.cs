@@ -16,6 +16,8 @@ using Lithnet.AccessManager.Server.UI.AuthorizationRuleImport;
 using Lithnet.AccessManager.Server.UI.Providers;
 using Lithnet.Licensing.Core;
 using MahApps.Metro.Controls.Dialogs;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
@@ -23,6 +25,7 @@ using Microsoft.Extensions.Options;
 using NLog.Extensions.Logging;
 using Stylet;
 using StyletIoC;
+using DataProtectionOptions = Lithnet.AccessManager.Server.Configuration.DataProtectionOptions;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -99,7 +102,7 @@ namespace Lithnet.AccessManager.Server.UI
         protected override void ConfigureIoC(IStyletIoCBuilder builder)
         {
             IAppPathProvider pathProvider = new AppPathProvider(registryProvider);
-            
+
             try
             {
                 try
@@ -190,6 +193,9 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IComputerTargetProvider>().To<ComputerTargetProviderAzureAd>();
                 builder.Bind<IComputerTargetProvider>().To<ComputerTargetProviderAms>();
                 builder.Bind<IObjectSelectionProvider>().To<ObjectSelectionProvider>();
+
+                builder.Bind<IComputerLocator>().To<ComputerLocator>();
+                builder.Bind<IAuthorityDataProvider>().To<AuthorityDataProvider>().InSingletonScope();
                 builder.Bind<ITargetDataProvider>().To<TargetDataProvider>();
                 builder.Bind<ITargetDataCache>().To<TargetDataCache>();
                 builder.Bind<IAuthorizationContextProvider>().To<AuthorizationContextProvider>();
@@ -207,14 +213,16 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<IAadGraphApiProvider>().To<AadGraphApiProvider>().InSingletonScope();
                 builder.Bind<IRegistrationKeyProvider>().To<DbRegistrationKeyProvider>();
                 builder.Bind<IDbProvider>().To<SqlDbProvider>().InSingletonScope();
-                builder.Bind<SqlServerInstanceProvider>().ToSelf().InSingletonScope(); 
+                builder.Bind<SqlServerInstanceProvider>().ToSelf().InSingletonScope();
                 builder.Bind<IUpgradeLog>().To<DbUpgradeLogger>();
                 builder.Bind<IHostApplicationLifetime>().To<WpfHostLifetime>();
                 builder.Bind<IDeviceProvider>().To<DbDeviceProvider>();
                 builder.Bind<IDevicePasswordProvider>().To<DbDevicePasswordProvider>();
-                builder.Bind<IAmsGroupProvider>().To<DbAmsGroupProvider>();
+                builder.Bind<IAmsGroupProvider>().To<AmsGroupProvider>();
+                builder.Bind<IDbAmsGroupProvider>().To<DbAmsGroupProvider>();
+                builder.Bind<IAmsSystemGroupProvider>().To<AmsSystemGroupProvider>();
                 builder.Bind<IComputerTokenSidProvider>().To<ComputerTokenSidProvider>();
-                    
+
 
                 builder.Bind<IProtectedSecretProvider>().To<ProtectedSecretProvider>().InSingletonScope();
                 builder.Bind<IClusterProvider>().To<ClusterProvider>().InSingletonScope();

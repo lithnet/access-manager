@@ -182,7 +182,7 @@
                                     DisplayMemberBinding="{Binding DisplayName}" 
                                     Width="Auto"/>
                             <GridViewColumn Header="Type"
-                                    DisplayMemberBinding="{Binding Type}" 
+                                    DisplayMemberBinding="{Binding Type, Converter={StaticResource EnumDescriptionConverter}}" 
                                     Width="Auto"/>
                             <GridViewColumn Header="Effective Access"
                                     DisplayMemberBinding="{Binding EffectiveAccess}" 

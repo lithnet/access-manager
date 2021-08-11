@@ -61,7 +61,7 @@ namespace Lithnet.AccessManager.Server.Authorization
                             matchingTargets.Add(target);
                         }
                     }
-                    else if (target.Type == TargetType.AadGroup)
+                    else if (target.Type == TargetType.AadGroup || target.Type == TargetType.AmsGroup)
                     {
                         computerTokenSids ??= await this.computerTokenSidProvider.GetTokenSids(computer);
 

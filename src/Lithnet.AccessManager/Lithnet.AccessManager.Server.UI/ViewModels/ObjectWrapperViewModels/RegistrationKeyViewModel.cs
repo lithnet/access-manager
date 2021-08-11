@@ -143,6 +143,7 @@ namespace Lithnet.AccessManager.Server.UI
             try
             {
                 var selectorVm = this.groupSelectorFactory.CreateViewModel();
+                selectorVm.ShowBuiltInGroups = false;
 
                 ExternalDialogWindow w = new ExternalDialogWindow()
                 {

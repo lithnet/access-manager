@@ -216,6 +216,7 @@ namespace Lithnet.AccessManager.Server.UI
         private void SelectTargetAmsGroup()
         {
             var selectorVm = this.amsGroupSelectorFactory.CreateViewModel();
+            selectorVm.ShowBuiltInGroups = true;
 
             ExternalDialogWindow w = new ExternalDialogWindow()
             {

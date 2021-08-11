@@ -72,11 +72,13 @@ namespace Lithnet.AccessManager.Api
             services.AddTransient<IMemoryCache, MemoryCache>();
 
             // Our services
-            services.AddScoped<IDeviceProvider, DbDeviceProvider>();
-            services.AddScoped<IAadGraphApiProvider, AadGraphApiProvider>();
-            services.AddScoped<IDevicePasswordProvider, DbDevicePasswordProvider>();
-            services.AddScoped<IPasswordPolicyProvider, PasswordPolicyProvider>();
-            services.AddScoped<IAmsGroupProvider, DbAmsGroupProvider>();
+            services.AddSingleton<IDeviceProvider, DbDeviceProvider>();
+            services.AddSingleton<IAadGraphApiProvider, AadGraphApiProvider>();
+            services.AddSingleton<IDevicePasswordProvider, DbDevicePasswordProvider>();
+            services.AddSingleton<IPasswordPolicyProvider, PasswordPolicyProvider>();
+            services.AddSingleton<IAmsGroupProvider, AmsGroupProvider>();
+            services.AddSingleton<IAmsSystemGroupProvider, AmsSystemGroupProvider>();
+            services.AddSingleton<IDbAmsGroupProvider, DbAmsGroupProvider>();
 
             services.AddSingleton<IRegistrationKeyProvider, DbRegistrationKeyProvider>();
             services.AddSingleton<ICheckInDataValidator, CheckInDataValidator>();

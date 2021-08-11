@@ -90,14 +90,18 @@ namespace Lithnet.AccessManager.Service
             services.AddScoped<IComputerTargetProvider, ComputerTargetProviderAms>();
             services.AddScoped<IComputerTokenSidProvider, ComputerTokenSidProvider>();
 
+            services.AddSingleton<IComputerSearchResultProvider, ComputerSearchResultProvider>();
             services.AddSingleton<IComputerLocator, ComputerLocator>();
             services.AddSingleton<IAadGraphApiProvider, AadGraphApiProvider>();
 
             services.AddSingleton<IDeviceProvider, DbDeviceProvider>();
             services.AddSingleton<IDevicePasswordProvider, DbDevicePasswordProvider>();
             services.AddSingleton<IRegistrationKeyProvider, DbRegistrationKeyProvider>();
-            services.AddSingleton<IAmsGroupProvider, DbAmsGroupProvider>();
-
+            services.AddSingleton<IAmsGroupProvider, AmsGroupProvider>();
+            services.AddSingleton<IDbAmsGroupProvider, DbAmsGroupProvider>();
+            services.AddSingleton<IAmsSystemGroupProvider, AmsSystemGroupProvider>();
+            services.AddSingleton<IAuthorityDataProvider, AuthorityDataProvider>();
+                
             services.AddSingleton<ISmtpProvider, SmtpProvider>();
             services.AddSingleton<IApplicationUpgradeProvider, ApplicationUpgradeProvider>();
             services.AddSingleton<IActiveDirectory, ActiveDirectory>();

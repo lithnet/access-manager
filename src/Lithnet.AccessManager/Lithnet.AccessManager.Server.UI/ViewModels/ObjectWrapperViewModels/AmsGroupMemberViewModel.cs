@@ -1,6 +1,6 @@
 ﻿namespace Lithnet.AccessManager.Server.UI
 {
-    public class AmsGroupMemberViewModel : IAmsGroupMemberViewModel
+    public class AmsGroupMemberViewModel 
     {
         public object Model => this.model;
 

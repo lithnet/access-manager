@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Lithnet.AccessManager.Server.Providers
 {
-    public class DbAmsGroupProvider : IAmsGroupProvider
+    public class DbAmsGroupProvider : IDbAmsGroupProvider
     {
         private readonly IDbProvider dbProvider;
         private readonly ILogger<DbAmsGroupProvider> logger;

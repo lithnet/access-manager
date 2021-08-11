@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
+using Lithnet.AccessManager.Server.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Stylet;
@@ -21,6 +22,8 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly SecurityDescriptorTargetsViewModel targets;
         private readonly ILogger logger;
         private readonly IEnumerable<IComputerTargetProvider> computerTargetProviders;
+        private readonly IComputerLocator computerLocator;
+        private readonly IAsyncViewModelFactory<ComputerSelectorViewModel, IList<IComputer>> computerSelectorViewModelFactory;
 
         public string ComputerName { get; set; }
 
@@ -50,13 +53,15 @@ namespace Lithnet.AccessManager.Server.UI
 
         public ObservableCollection<MatchedSecurityDescriptorTargetViewModel> MatchedTargets { get; } = new ObservableCollection<MatchedSecurityDescriptorTargetViewModel>();
 
-        public EffectiveAccessViewModel(IAuthorizationInformationBuilder authorizationBuilder, IDialogCoordinator dialogCoordinator, IActiveDirectory directory, SecurityDescriptorTargetsViewModel targets, ILogger<EffectiveAccessViewModel> logger, IEnumerable<IComputerTargetProvider> computerTargetProviders)
+        public EffectiveAccessViewModel(IAuthorizationInformationBuilder authorizationBuilder, IDialogCoordinator dialogCoordinator, IActiveDirectory directory, SecurityDescriptorTargetsViewModel targets, ILogger<EffectiveAccessViewModel> logger, IEnumerable<IComputerTargetProvider> computerTargetProviders, IComputerLocator computerLocator, IAsyncViewModelFactory<ComputerSelectorViewModel, IList<IComputer>> computerSelectorViewModelFactory)
         {
             this.authorizationBuilder = authorizationBuilder;
             this.dialogCoordinator = dialogCoordinator;
             this.directory = directory;
             this.targets = targets;
             this.computerTargetProviders = computerTargetProviders;
+            this.computerLocator = computerLocator;
+            this.computerSelectorViewModelFactory = computerSelectorViewModelFactory;
             this.logger = logger;
         }
 
@@ -99,13 +104,53 @@ namespace Lithnet.AccessManager.Server.UI
                         return;
                     }
 
-                    if (!this.directory.TryGetComputer(this.ComputerName, out IActiveDirectoryComputer computer))
+                    var computers = await this.computerLocator.FindComputers(this.ComputerName);
+
+                    if (computers == null || computers.Count == 0)
                     {
                         await this.dialogCoordinator.ShowMessageAsync(this, "Could not find computer", "Could not find a matching computer in the directory", MessageDialogStyle.Affirmative, settings);
                         return;
                     }
 
-                    controller.SetMessage($"Evaluating access to computer {computer.MsDsPrincipalName} for user {user.MsDsPrincipalName}");
+                    IComputer computer;
+
+                    if (computers.Count > 1)
+                    {
+                        var selectorVm = await this.computerSelectorViewModelFactory.CreateViewModelAsync(computers);
+                        selectorVm.SelectionMode = System.Windows.Controls.SelectionMode.Single;
+
+                        await Execute.OnUIThreadAsync(() =>
+                        {
+                            ExternalDialogWindow w = new ExternalDialogWindow()
+                            {
+                                Title = "Select computer",
+                                DataContext = selectorVm,
+                                SaveButtonName = "Select...",
+                                SaveButtonIsDefault = true,
+                                Owner = this.GetWindow()
+                            };
+
+                            if (!w.ShowDialog() ?? false)
+                            {
+                                selectorVm.SelectedItem = null;
+                            }
+                        });
+
+                        if (selectorVm.SelectedItem == null)
+                        {
+                            return;
+                        }
+
+                        computer = selectorVm.SelectedItem.Model;
+                    }
+                    else
+                    {
+                        computer = computers[0];
+                    }
+
+                    this.ComputerName = computer.FullyQualifiedName;
+
+                    controller.SetMessage($"Evaluating access to computer {computer.FullyQualifiedName} for user {user.MsDsPrincipalName}");
 
                     List<SecurityDescriptorTarget> matchingComputerTargets = new List<SecurityDescriptorTarget>();
 

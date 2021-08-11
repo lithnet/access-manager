@@ -35,6 +35,11 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 await foreach (IAmsGroup m in this.groupProvider.GetGroups())
                 {
+                    if (!this.ShowBuiltInGroups && m.Type == AmsGroupType.System)
+                    {
+                        continue;
+                    }
+
                     this.Groups.Add(factory.CreateViewModel(m));
                 }
             }
@@ -45,6 +50,9 @@ namespace Lithnet.AccessManager.Server.UI
                 this.ErrorMessageHeaderText = "An initialization error occurred";
             }
         }
+
+        public bool ShowBuiltInGroups { get; set; } = true;
+
         public string ErrorMessageText { get; set; }
 
         public string ErrorMessageHeaderText { get; set; }

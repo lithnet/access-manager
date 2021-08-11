@@ -4,16 +4,16 @@ namespace Lithnet.AccessManager.Server
 {
     public interface IAmsGroup
     {
-        long Id { get; set; }
+        long Id { get; }
 
         string Name { get; set; }
 
         string Description { get; set; }
 
-        string Sid { get; set; }
+        string Sid { get; }
 
-        AmsGroupType Type { get; set; }
+        AmsGroupType Type { get; }
 
-        SecurityIdentifier SecurityIdentifier { get; set; }
+        SecurityIdentifier SecurityIdentifier { get; }
     }
 }

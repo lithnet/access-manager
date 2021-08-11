@@ -123,9 +123,10 @@ namespace Lithnet.AccessManager.Server.UI
             this.jitGroupDisplayName = this.JitAuthorizingGroup;
             await this.UpdateDisplayName(false);
             await this.UpdateJitGroupDisplayName();
-            await this.ValidateAsync();
             this.LastModifiedBy = await this.GetNameFromActiveDirectorySidOrDefaultAsync(this.Model.LastModifiedBy) ?? this.Model.LastModifiedBy;
             this.CreatedBy = await this.GetNameFromActiveDirectorySidOrDefaultAsync(this.Model.CreatedBy) ?? this.Model.CreatedBy;
+            await this.ValidateAsync();
+
         }
 
         private void Script_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -695,6 +696,7 @@ namespace Lithnet.AccessManager.Server.UI
         private void ShowAmsGroupSelector()
         {
             var selectorVm = this.amsGroupSelectorFactory.CreateViewModel();
+            selectorVm.ShowBuiltInGroups = true;
 
             ExternalDialogWindow w = new ExternalDialogWindow()
             {

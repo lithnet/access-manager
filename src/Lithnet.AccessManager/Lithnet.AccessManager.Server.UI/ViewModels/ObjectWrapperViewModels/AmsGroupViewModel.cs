@@ -4,11 +4,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Stylet;
-using System.Windows;
 using Lithnet.AccessManager.Server.Providers;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
-using PropertyChanged;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -32,8 +30,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.Validator = validator;
 
             this.Validate();
-            this.Members = new BindableCollection<IAmsGroupMemberViewModel>();
-            this.SelectedItems = new ObservableCollection<IAmsGroupMemberViewModel>();
+            this.Members = new BindableCollection<AmsGroupMemberViewModel>();
+            this.SelectedItems = new ObservableCollection<AmsGroupMemberViewModel>();
             this.SelectedItems.CollectionChanged += this.SelectedItems_CollectionChanged;
         }
 
@@ -78,11 +76,11 @@ namespace Lithnet.AccessManager.Server.UI
         public bool IsLoading { get; set; }
 
         [NotifyModelChangedCollection]
-        public BindableCollection<IAmsGroupMemberViewModel> Members { get; }
+        public BindableCollection<AmsGroupMemberViewModel> Members { get; }
 
-        public IAmsGroupMemberViewModel SelectedItem { get; set; }
+        public AmsGroupMemberViewModel SelectedItem { get; set; }
 
-        public ObservableCollection<IAmsGroupMemberViewModel> SelectedItems { get; }
+        public ObservableCollection<AmsGroupMemberViewModel> SelectedItems { get; }
 
         public string Description
         {
@@ -93,7 +91,6 @@ namespace Lithnet.AccessManager.Server.UI
         public string Sid
         {
             get => this.Model.Sid;
-            set => this.Model.Sid = value;
         }
 
         public string Name
