@@ -39,7 +39,7 @@
       </elements>
     </policy>
 
-    <policy name="pol_enableAgent_advanced"
+    <!--<policy name="pol_enableAgent_advanced"
             class="Machine"
             displayName="$(string.pol_enableAgent_advanced)"
             explainText="$(string.pol_enableAgent_advanced_help)"
@@ -70,6 +70,6 @@
         </enum>
         <text id="txt_tenantId"  valueName="AzureAdTenantId" required="false"/>
       </elements>
-    </policy>
+    </policy>-->
   </policies>
 </policyDefinitions>
