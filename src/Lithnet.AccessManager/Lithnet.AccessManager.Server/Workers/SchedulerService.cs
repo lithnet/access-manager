@@ -58,6 +58,8 @@ namespace Lithnet.AccessManager.Server
 
             await CertificateExpiryCheckJob.EnsureCreated(this.scheduler);
             await NewVersionCheckJob.EnsureCreated(this.scheduler);
+            await DbMaintenanceJob.EnsureCreated(this.scheduler);
+            await DbBackupJob.EnsureCreated(this.scheduler);
         }
     }
 }

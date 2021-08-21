@@ -48,6 +48,7 @@
     <None Remove="DBScripts\Upgrade\00005-RegistrationKeyUpdates.sql" />
     <None Remove="DBScripts\Upgrade\00006.sql" />
     <None Remove="DBScripts\Upgrade\00007.sql" />
+    <None Remove="DBScripts\Upgrade\00008.sql" />
     <None Remove="EmbeddedResources\Templates\CertificateExpiringEmail.html" />
     <None Remove="EmbeddedResources\Templates\NewVersionAvailableEmail.html" />
   </ItemGroup>
@@ -66,6 +67,7 @@
     <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateServiceAccountLoginToDB.sql" />
     <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateServiceAccountLoginToServer.sql" />
     <EmbeddedResource Include="DBScripts\LocalDBCreation\CreateNewDatabaseWithPaths.sql" />
+    <EmbeddedResource Include="DBScripts\Upgrade\00008.sql" />
     <EmbeddedResource Include="DBScripts\Upgrade\00007.sql" />
     <EmbeddedResource Include="DBScripts\Upgrade\00006.sql" />
     <EmbeddedResource Include="DBScripts\Upgrade\00005-RegistrationKeyUpdates.sql" />

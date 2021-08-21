@@ -156,6 +156,7 @@ namespace Lithnet.AccessManager.Server.UI
                 builder.Bind<TokenIssuerOptions>().ToInstance(appconfig.TokenIssuer);
                 builder.Bind<PasswordPolicyOptions>().ToInstance(appconfig.PasswordPolicy);
                 builder.Bind<ApiAuthenticationOptions>().ToInstance(appconfig.ApiAuthentication);
+                builder.Bind<DatabaseOptions>().ToInstance(appconfig.Database);
 
                 // ViewModel factories
                 builder.Bind(typeof(IViewModelFactory<>)).ToAllImplementations();

@@ -38,6 +38,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         ApiAuthenticationOptions ApiAuthentication { get; set; }
 
+        DatabaseOptions Database { get; set; }
+        
         void Save(string file, bool forceOverwrite);
 
         bool HasFileBeenModified();

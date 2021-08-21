@@ -133,6 +133,8 @@ namespace Lithnet.AccessManager.Service
 
             services.AddTransient<NewVersionCheckJob>();
             services.AddTransient<CertificateExpiryCheckJob>();
+            services.AddTransient<DbBackupJob>();
+            services.AddTransient<DbMaintenanceJob>();
 
             services.AddOptions<QuartzOptions>()
                 .Configure<IDbProvider>(
@@ -199,6 +201,7 @@ namespace Lithnet.AccessManager.Service
             services.Configure<Server.Configuration.DataProtectionOptions>(Configuration.GetSection("DataProtection"));
             services.Configure<AdminNotificationOptions>(Configuration.GetSection("AdminNotifications"));
             services.Configure<AzureAdOptions>(this.Configuration.GetSection("AzureAd"));
+            services.Configure<DatabaseOptions>(this.Configuration.GetSection("Database"));
 
             IAmsLicenseManager licenseManager = this.CreateLicenseManager(services);
 

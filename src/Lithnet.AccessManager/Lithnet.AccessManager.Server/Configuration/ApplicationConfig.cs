@@ -45,6 +45,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public ApiAuthenticationOptions ApiAuthentication { get; set; } = new ApiAuthenticationOptions();
 
+        public DatabaseOptions Database { get; set; } = new DatabaseOptions();
+        
         [JsonExtensionData]
         public IDictionary<string, object> OtherData { get; set; }
 
