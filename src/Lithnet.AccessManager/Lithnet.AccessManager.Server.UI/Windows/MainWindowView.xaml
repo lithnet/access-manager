@@ -12,7 +12,6 @@
         xmlns:helpers="clr-namespace:Telerik.Windows.Controls.Theming.Helpers;assembly=Telerik.Windows.Controls"
         Title="{Binding WindowTitle}"
         BorderThickness="1"
-        Height="Auto"
         Width="1200" 
         controls:DialogParticipation.Register="{Binding}" 
         SizeToContent="Manual">

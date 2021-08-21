@@ -3,9 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Lithnet.AccessManager.Server.UI"
              xmlns:s="https://github.com/canton7/Stylet"
-    xmlns:themes="http://schemas.telerik.com/2008/xaml/presentation"
-    xmlns:telerik1="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls"
-    xmlns:helpers="clr-namespace:Telerik.Windows.Controls.Theming.Helpers;assembly=Telerik.Windows.Controls"
     xmlns:system="clr-namespace:System;assembly=System.Runtime">
     <Application.Resources>
         <s:ApplicationLoader>
@@ -38,6 +35,7 @@
                         <Setter Property="Foreground" Value="#99000000"/>
                     </Style>
                     <local:EnumToDisplayConverter x:Key="EnumDescriptionConverter"/>
+                    <system:String x:Key="Telerik.Windows.Controls.Key">Lithnet Access Manager</system:String>
                 </ResourceDictionary>
             </s:ApplicationLoader.MergedDictionaries>
         </s:ApplicationLoader>

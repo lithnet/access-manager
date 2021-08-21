@@ -22,10 +22,10 @@
     <ROW Property="IAgree" Value="No" Type="4" MsiKey="IAgree"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{AF9521D1-51D3-4610-A2D1-BC1135764DB4} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{7EEC6436-AB38-482E-8CF5-76196B58F8C3} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.14.8318.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.14.8319.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="SHOW_DB_CONFIG" Value="1"/>
     <ROW Property="SQLEXPRESS_DEFAULT_ADMINS" Value="Builtin\Administrators"/>
     <ROW Property="SQLEXPRESS_DEFAULT_INSTANCENAME" Value="AMS"/>
@@ -172,10 +172,13 @@
     <ROW Component="Microsoft.Azure.Services.AppAuthentication.dll" ComponentId="{C4E26029-EEF9-4701-888B-74F4C00DD557}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Azure.Services.AppAuthentication.dll"/>
     <ROW Component="Microsoft.Bcl.AsyncInterfaces.dll" ComponentId="{12C80D74-DBD4-48FE-A7DC-001835D693A3}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Bcl.AsyncInterfaces.dll"/>
     <ROW Component="Microsoft.Bcl.AsyncInterfaces.dll_1" ComponentId="{1250A0E8-C28D-4754-84A3-BF51300ED690}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Bcl.AsyncInterfaces.dll_1"/>
+    <ROW Component="Microsoft.Bcl.HashCode.dll" ComponentId="{EC6385CC-46C4-427E-A6A6-BECF958F2256}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Bcl.HashCode.dll"/>
     <ROW Component="Microsoft.CSharp.dll" ComponentId="{6201D11C-A198-4D35-9407-FFF0D907B37F}" Directory_="ref_Dir" Attributes="0" KeyPath="Microsoft.CSharp.dll"/>
     <ROW Component="Microsoft.CodeAnalysis.CSharp.dll" ComponentId="{92B5C8B4-AA1C-4671-A6A7-3701660F1214}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.CodeAnalysis.CSharp.dll"/>
     <ROW Component="Microsoft.CodeAnalysis.dll" ComponentId="{FA510BBE-C203-4047-8E19-1ECEBE2DCAEE}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.CodeAnalysis.dll"/>
     <ROW Component="Microsoft.Data.SqlClient.dll" ComponentId="{CD314EEF-76B8-4BF9-9A7A-E824E10BF18E}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Data.SqlClient.dll"/>
+    <ROW Component="Microsoft.EntityFrameworkCore.Abstractions.dll" ComponentId="{EDA4676B-7A0A-4255-8D92-3B1A553804A4}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.EntityFrameworkCore.Abstractions.dll"/>
+    <ROW Component="Microsoft.EntityFrameworkCore.dll" ComponentId="{C9F16212-C817-4F76-96AF-3EB1DA561379}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.EntityFrameworkCore.dll"/>
     <ROW Component="Microsoft.Extensions.Caching.Abstractions.dll" ComponentId="{080ECD81-4CBC-4B39-B871-0AEF129AD246}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Caching.Abstractions.dll"/>
     <ROW Component="Microsoft.Extensions.Caching.Memory.dll" ComponentId="{17B712D4-D493-403A-8622-B1BA845FE8D1}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Caching.Memory.dll"/>
     <ROW Component="Microsoft.Extensions.Configuration.Abstractions.dll" ComponentId="{CE2F1CDA-DC3A-4D9A-97F6-5BBDB001E26E}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.Abstractions.dll"/>
@@ -227,6 +230,9 @@
     <ROW Component="Microsoft.Management.Infrastructure.CimCmdlets.dll" ComponentId="{A304FB14-3B8F-46F9-8686-D265A739B35B}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.CimCmdlets.dll"/>
     <ROW Component="Microsoft.Management.Infrastructure.Native.dll" ComponentId="{A83A5EB9-D234-4B6F-A3CF-35B3B9CF248F}" Directory_="APPDIR" Attributes="256" KeyPath="Microsoft.Management.Infrastructure.Native.dll"/>
     <ROW Component="Microsoft.Management.Infrastructure.dll" ComponentId="{22224915-97F5-422C-BA69-54A61FA811DC}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Management.Infrastructure.dll"/>
+    <ROW Component="Microsoft.OData.Client.dll" ComponentId="{D61B2519-184C-4C78-A523-9600D2962545}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.OData.Client.dll"/>
+    <ROW Component="Microsoft.OData.Core.dll" ComponentId="{6D66D04C-26D6-4874-BC7B-1A54031E6080}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.OData.Core.dll"/>
+    <ROW Component="Microsoft.OData.Edm.dll" ComponentId="{870E1058-DFEF-4957-BDB5-06C37A127E90}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.OData.Edm.dll"/>
     <ROW Component="Microsoft.PowerShell.Commands.Diagnostics.dll" ComponentId="{76F6920D-00EC-468E-B997-EC3E6B691490}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.Commands.Diagnostics.dll"/>
     <ROW Component="Microsoft.PowerShell.Commands.Management.dll" ComponentId="{C9AB4CCE-E5D5-4FC7-A2A2-2707EE6EA297}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.Commands.Management.dll"/>
     <ROW Component="Microsoft.PowerShell.Commands.Utility.dll" ComponentId="{D4C8A53A-17A6-4EE2-8C3B-16C4B714C4CA}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.Commands.Utility.dll"/>
@@ -239,6 +245,7 @@
     <ROW Component="Microsoft.PowerShell.Security.dll" ComponentId="{6B20B026-6BF8-4C55-8D3F-39A4DFACCAD5}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.PowerShell.Security.dll"/>
     <ROW Component="Microsoft.PowerShell.Security.psd1" ComponentId="{50A923CB-8387-4F36-AE7C-261C41EA68AF}" Directory_="Microsoft.PowerShell.Security_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.Security.psd1" Type="0"/>
     <ROW Component="Microsoft.PowerShell.Utility.psd1" ComponentId="{C37CFC0C-7F69-49B4-95AD-23D507FA0F86}" Directory_="Microsoft.PowerShell.Utility_Dir" Attributes="0" KeyPath="Microsoft.PowerShell.Utility.psd1" Type="0"/>
+    <ROW Component="Microsoft.Spatial.dll" ComponentId="{EEF20864-5719-48A2-998E-48A6AF40774B}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Spatial.dll"/>
     <ROW Component="Microsoft.VisualBasic.Core.dll" ComponentId="{87AB875B-01BD-42EB-8665-77E53E2C088D}" Directory_="ref_Dir" Attributes="0" KeyPath="Microsoft.VisualBasic.Core.dll"/>
     <ROW Component="Microsoft.VisualBasic.dll" ComponentId="{F20E1C25-B81B-4554-8FC9-52E04988A93F}" Directory_="ref_Dir" Attributes="0" KeyPath="Microsoft.VisualBasic.dll"/>
     <ROW Component="Microsoft.VisualStudio.Threading.dll" ComponentId="{FE573470-EE18-4545-BAA9-B0A92DF3EE79}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.VisualStudio.Threading.dll"/>
@@ -271,6 +278,13 @@
     <ROW Component="Quartz.Serialization.Json.dll" ComponentId="{3157767C-83D8-4095-A93D-494F25A5B5CD}" Directory_="APPDIR" Attributes="0" KeyPath="Quartz.Serialization.Json.dll"/>
     <ROW Component="Quartz.dll" ComponentId="{2241C822-D276-48B0-8ABE-4CDD5C26B029}" Directory_="APPDIR" Attributes="0" KeyPath="Quartz.dll"/>
     <ROW Component="RequiredApplication" ComponentId="{5E7E09B2-A5F0-4444-8F18-62F04BDDA570}" Directory_="APPDIR" Attributes="260" KeyPath="RequiredApplication" Options="2"/>
+    <ROW Component="SharpDX.D3DCompiler.dll" ComponentId="{4C63F763-1400-4ED9-A92F-A0D3194BB5F3}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.D3DCompiler.dll"/>
+    <ROW Component="SharpDX.DXGI.dll" ComponentId="{77BE6BB9-F977-4014-B1E5-ADFA98F3183F}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.DXGI.dll"/>
+    <ROW Component="SharpDX.Direct2D1.dll" ComponentId="{CA792B90-368B-4490-B3D9-5118ECE0EA83}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.Direct2D1.dll"/>
+    <ROW Component="SharpDX.Direct3D10.dll" ComponentId="{0481A2AC-A4D6-4DB7-8D00-561D86186938}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.Direct3D10.dll"/>
+    <ROW Component="SharpDX.Direct3D9.dll" ComponentId="{B7BC87C2-E656-466A-B304-5DDECFB01081}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.Direct3D9.dll"/>
+    <ROW Component="SharpDX.Mathematics.dll" ComponentId="{5641CDDA-17C4-406D-ADD6-08DB6B9FA95A}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.Mathematics.dll"/>
+    <ROW Component="SharpDX.dll" ComponentId="{F35E6025-8E18-4E2D-B80E-1FD4D0E57025}" Directory_="APPDIR" Attributes="0" KeyPath="SharpDX.dll"/>
     <ROW Component="SslCertBinding.Net.dll" ComponentId="{1CC07107-BCBE-471C-9E3F-4143F1997FD5}" Directory_="APPDIR" Attributes="0" KeyPath="SslCertBinding.Net.dll"/>
     <ROW Component="StreamJsonRpc.dll" ComponentId="{69DC7AC6-28E6-4466-8C46-E01E35824B50}" Directory_="APPDIR" Attributes="0" KeyPath="StreamJsonRpc.dll"/>
     <ROW Component="Stylet.dll" ComponentId="{A78CBCC0-707B-4E0D-AAEA-7A296613218D}" Directory_="APPDIR" Attributes="0" KeyPath="Stylet.dll"/>
@@ -280,6 +294,7 @@
     <ROW Component="System.CodeDom.dll" ComponentId="{7BB31933-6CAA-4A30-9B97-59BC3F163B61}" Directory_="APPDIR" Attributes="0" KeyPath="System.CodeDom.dll"/>
     <ROW Component="System.Collections.Concurrent.dll" ComponentId="{702E82ED-EEBE-4AF8-A8DA-D318EC8108DB}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Collections.Concurrent.dll"/>
     <ROW Component="System.Collections.Immutable.dll" ComponentId="{7802FA54-C0AB-4875-BA58-CA14C23F2026}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Collections.Immutable.dll"/>
+    <ROW Component="System.Collections.Immutable.dll_1" ComponentId="{7BC019F4-549F-4943-B234-A3FA456CFAEA}" Directory_="APPDIR" Attributes="0" KeyPath="System.Collections.Immutable.dll_1"/>
     <ROW Component="System.Collections.NonGeneric.dll" ComponentId="{C54C9A5D-8B31-4952-9D4D-7AC563C10409}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Collections.NonGeneric.dll"/>
     <ROW Component="System.Collections.Specialized.dll" ComponentId="{A1D0878E-B485-4B46-8DC9-6AEB68FE325E}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Collections.Specialized.dll"/>
     <ROW Component="System.Collections.dll" ComponentId="{FF79776E-8D5C-424B-87CD-8475D95FF0F7}" Directory_="ref_Dir" Attributes="0" KeyPath="System.Collections.dll"/>
@@ -1069,6 +1084,21 @@
     <ROW File="Lithnet.AccessManager.Cryptography.dll_1" Component_="Lithnet.AccessManager.Cryptography.dll_1" FileName="LITHNE~4.DLL|Lithnet.AccessManager.Cryptography.dll" Attributes="0" SourcePath="output-ps\Lithnet.AccessManager.Cryptography.dll" SelfReg="false"/>
     <ROW File="Lithnet.AccessManager.Cryptography.pdb_1" Component_="Lithnet.AccessManager.Cryptography.dll_1" FileName="LITHNE~3.PDB|Lithnet.AccessManager.Cryptography.pdb" Attributes="0" SourcePath="output-ps\Lithnet.AccessManager.Cryptography.pdb" SelfReg="false"/>
     <ROW File="cardselection.js" Component_="clipboard.js" FileName="CARD-S~1.JS|card-selection.js" Attributes="0" SourcePath="output\wwwroot\js\card-selection.js" SelfReg="false"/>
+    <ROW File="Microsoft.Bcl.HashCode.dll" Component_="Microsoft.Bcl.HashCode.dll" FileName="MICROS~5.DLL|Microsoft.Bcl.HashCode.dll" Attributes="0" SourcePath="output\Microsoft.Bcl.HashCode.dll" SelfReg="false"/>
+    <ROW File="Microsoft.EntityFrameworkCore.Abstractions.dll" Component_="Microsoft.EntityFrameworkCore.Abstractions.dll" FileName="MICROS~6.DLL|Microsoft.EntityFrameworkCore.Abstractions.dll" Attributes="0" SourcePath="output\Microsoft.EntityFrameworkCore.Abstractions.dll" SelfReg="false"/>
+    <ROW File="Microsoft.EntityFrameworkCore.dll" Component_="Microsoft.EntityFrameworkCore.dll" FileName="MICROS~7.DLL|Microsoft.EntityFrameworkCore.dll" Attributes="0" SourcePath="output\Microsoft.EntityFrameworkCore.dll" SelfReg="false"/>
+    <ROW File="Microsoft.OData.Client.dll" Component_="Microsoft.OData.Client.dll" FileName="MICROS~8.DLL|Microsoft.OData.Client.dll" Attributes="0" SourcePath="output\Microsoft.OData.Client.dll" SelfReg="false"/>
+    <ROW File="Microsoft.OData.Core.dll" Component_="Microsoft.OData.Core.dll" FileName="MICRO~51.DLL|Microsoft.OData.Core.dll" Attributes="0" SourcePath="output\Microsoft.OData.Core.dll" SelfReg="false"/>
+    <ROW File="Microsoft.OData.Edm.dll" Component_="Microsoft.OData.Edm.dll" FileName="MICRO~79.DLL|Microsoft.OData.Edm.dll" Attributes="0" SourcePath="output\Microsoft.OData.Edm.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Spatial.dll" Component_="Microsoft.Spatial.dll" FileName="MICRO~80.DLL|Microsoft.Spatial.dll" Attributes="0" SourcePath="output\Microsoft.Spatial.dll" SelfReg="false"/>
+    <ROW File="SharpDX.D3DCompiler.dll" Component_="SharpDX.D3DCompiler.dll" FileName="SHARPD~1.DLL|SharpDX.D3DCompiler.dll" Attributes="0" SourcePath="output\SharpDX.D3DCompiler.dll" SelfReg="false"/>
+    <ROW File="SharpDX.Direct2D1.dll" Component_="SharpDX.Direct2D1.dll" FileName="SHARPD~2.DLL|SharpDX.Direct2D1.dll" Attributes="0" SourcePath="output\SharpDX.Direct2D1.dll" SelfReg="false"/>
+    <ROW File="SharpDX.Direct3D10.dll" Component_="SharpDX.Direct3D10.dll" FileName="SHARPD~3.DLL|SharpDX.Direct3D10.dll" Attributes="0" SourcePath="output\SharpDX.Direct3D10.dll" SelfReg="false"/>
+    <ROW File="SharpDX.Direct3D9.dll" Component_="SharpDX.Direct3D9.dll" FileName="SHARPD~4.DLL|SharpDX.Direct3D9.dll" Attributes="0" SourcePath="output\SharpDX.Direct3D9.dll" SelfReg="false"/>
+    <ROW File="SharpDX.dll" Component_="SharpDX.dll" FileName="SharpDX.dll" Attributes="0" SourcePath="output\SharpDX.dll" SelfReg="false"/>
+    <ROW File="SharpDX.DXGI.dll" Component_="SharpDX.DXGI.dll" FileName="SHARPD~5.DLL|SharpDX.DXGI.dll" Attributes="0" SourcePath="output\SharpDX.DXGI.dll" SelfReg="false"/>
+    <ROW File="SharpDX.Mathematics.dll" Component_="SharpDX.Mathematics.dll" FileName="SHARPD~6.DLL|SharpDX.Mathematics.dll" Attributes="0" SourcePath="output\SharpDX.Mathematics.dll" SelfReg="false"/>
+    <ROW File="System.Collections.Immutable.dll_1" Component_="System.Collections.Immutable.dll_1" FileName="SYSTE~35.DLL|System.Collections.Immutable.dll" Attributes="0" SourcePath="output\System.Collections.Immutable.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.custcomp.AiControlConditionAliasComponent">
     <ROW AliasRowId="ExitDialog#LaunchProdCheckBox#Hide#((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))" AliasRowOperation="2" Condition="(((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))) OR NOT IS_STANDALONE_OR_NOT_CLUSTERED_OR_ON_ACTIVE_NODE"/>
@@ -1883,6 +1913,21 @@
     <ROW Feature_="MainFeature" Component_="AI_ExePath"/>
     <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Cryptography.dll"/>
     <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Cryptography.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Bcl.HashCode.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.EntityFrameworkCore.Abstractions.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.EntityFrameworkCore.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.OData.Client.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.OData.Core.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.OData.Edm.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Spatial.dll"/>
+    <ROW Feature_="MainFeature" Component_="SharpDX.D3DCompiler.dll"/>
+    <ROW Feature_="MainFeature" Component_="SharpDX.Direct2D1.dll"/>
+    <ROW Feature_="MainFeature" Component_="SharpDX.Direct3D10.dll"/>
+    <ROW Feature_="MainFeature" Component_="SharpDX.Direct3D9.dll"/>
+    <ROW Feature_="MainFeature" Component_="SharpDX.dll"/>
+    <ROW Feature_="MainFeature" Component_="SharpDX.DXGI.dll"/>
+    <ROW Feature_="MainFeature" Component_="SharpDX.Mathematics.dll"/>
+    <ROW Feature_="MainFeature" Component_="System.Collections.Immutable.dll_1"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>
