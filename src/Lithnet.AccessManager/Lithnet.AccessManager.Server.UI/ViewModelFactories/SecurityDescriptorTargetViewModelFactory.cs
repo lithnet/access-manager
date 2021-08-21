@@ -32,8 +32,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory;
         private readonly IAmsGroupProvider amsGroupProvider;
         private readonly IViewModelFactory<EnterpriseEditionBadgeViewModel, EnterpriseEditionBadgeModel> enterpriseEditionBadgeFactory;
+        private readonly IWindowManager windowManager;
 
-        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IDiscoveryServices discoveryServices, IActiveDirectory directory, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, Func<IModelValidator<SecurityDescriptorTargetViewModel>> validator, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> selectTargetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadObjectSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider, IViewModelFactory<AmsDeviceSelectorViewModel> amsDeviceSelectorFactory, IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory, IAmsGroupProvider amsGroupProvider, IViewModelFactory<EnterpriseEditionBadgeViewModel, EnterpriseEditionBadgeModel> enterpriseEditionBadgeFactory)
+        public SecurityDescriptorTargetViewModelFactory(IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> channelSelectionViewModelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, ILogger<SecurityDescriptorTargetViewModel> logger, IDiscoveryServices discoveryServices, IActiveDirectory directory, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, Func<IModelValidator<SecurityDescriptorTargetViewModel>> validator, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> selectTargetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadObjectSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider, IViewModelFactory<AmsDeviceSelectorViewModel> amsDeviceSelectorFactory, IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory, IAmsGroupProvider amsGroupProvider, IViewModelFactory<EnterpriseEditionBadgeViewModel, EnterpriseEditionBadgeModel> enterpriseEditionBadgeFactory, IWindowManager windowManager)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.appPathProvider = appPathProvider;
@@ -56,11 +57,12 @@ namespace Lithnet.AccessManager.Server.UI
             this.amsGroupSelectorFactory = amsGroupSelectorFactory;
             this.amsGroupProvider = amsGroupProvider;
             this.enterpriseEditionBadgeFactory = enterpriseEditionBadgeFactory;
+            this.windowManager = windowManager;
         }
 
         public async Task<SecurityDescriptorTargetViewModel> CreateViewModelAsync(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings settings)
         {
-            var item = new SecurityDescriptorTargetViewModel(model, settings, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, validator.Invoke(), directory, discoveryServices, localSam, objectSelectionProvider, scriptTemplateProvider, licenseManager, shellExecuteProvider, selectTargetTypeFactory, aadObjectSelectorFactory, graphProvider, deviceProvider, amsGroupSelectorFactory, amsDeviceSelectorFactory, amsGroupProvider, enterpriseEditionBadgeFactory);
+            var item = new SecurityDescriptorTargetViewModel(model, settings, channelSelectionViewModelFactory, fileSelectionViewModelFactory, appPathProvider, logger, dialogCoordinator, validator.Invoke(), directory, discoveryServices, localSam, objectSelectionProvider, scriptTemplateProvider, licenseManager, shellExecuteProvider, selectTargetTypeFactory, aadObjectSelectorFactory, graphProvider, deviceProvider, amsGroupSelectorFactory, amsDeviceSelectorFactory, amsGroupProvider, enterpriseEditionBadgeFactory, windowManager);
 
             await item.Initialization;
 

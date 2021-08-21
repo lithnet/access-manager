@@ -40,6 +40,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory;
         private readonly IViewModelFactory<AmsDeviceSelectorViewModel> amsDeviceSelectorFactory;
         private readonly IAmsGroupProvider amsGroupProvider;
+        private readonly IWindowManager windowManager;
 
         private string jitGroupDisplayName;
 
@@ -47,7 +48,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IActiveDirectory directory, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> targetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider, IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory, IViewModelFactory<AmsDeviceSelectorViewModel> amsDeviceSelectorFactory, IAmsGroupProvider amsGroupProvider, IViewModelFactory<EnterpriseEditionBadgeViewModel, EnterpriseEditionBadgeModel> enterpriseEditionViewModelFactory)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IActiveDirectory directory, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> targetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider, IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory, IViewModelFactory<AmsDeviceSelectorViewModel> amsDeviceSelectorFactory, IAmsGroupProvider amsGroupProvider, IViewModelFactory<EnterpriseEditionBadgeViewModel, EnterpriseEditionBadgeModel> enterpriseEditionViewModelFactory, IWindowManager windowManager)
         {
             this.directory = directory;
             this.Model = model;
@@ -69,6 +70,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.amsGroupSelectorFactory = amsGroupSelectorFactory;
             this.amsDeviceSelectorFactory = amsDeviceSelectorFactory;
             this.amsGroupProvider = amsGroupProvider;
+            this.windowManager = windowManager;
 
             this.Script = fileSelectionViewModelFactory.CreateViewModel(model, () => model.Script, appPathProvider.ScriptsPath);
             this.Script.DefaultFileExtension = "ps1";
@@ -211,11 +213,7 @@ namespace Lithnet.AccessManager.Server.UI
         public string Target
         {
             get => this.Model.Target;
-            set
-            {
-                this.Model.Target = value;
-                _ = this.UpdateDisplayName(true);
-            }
+            set => this.Model.Target = value;
         }
 
         public async Task UpdateDisplayName(bool force)

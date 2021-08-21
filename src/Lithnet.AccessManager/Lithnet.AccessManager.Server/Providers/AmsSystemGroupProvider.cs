@@ -43,7 +43,7 @@ namespace Lithnet.AccessManager.Server.Providers
                 {SidAllLinuxDevices, new BuiltInAmsGroup(new SecurityIdentifier(SidAllLinuxDevices), "All Linux devices", "All Linux devices",
                     device => device.OperatingSystemType == Api.Shared.OsType.Linux)},
 
-                {SidAllMacOsDevices, new BuiltInAmsGroup(new SecurityIdentifier(SidAllMacOsDevices), "All MacOS devices", "All macOS devices",
+                {SidAllMacOsDevices, new BuiltInAmsGroup(new SecurityIdentifier(SidAllMacOsDevices), "All macOS devices", "All macOS devices",
                     device => device.OperatingSystemType == Api.Shared.OsType.MacOS)},
 
                 {SidAllAmsWindowsDevices, new BuiltInAmsGroup(new SecurityIdentifier(SidAllWindowsDevices), "AMS Windows devices", "Windows devices registered using AMS authentication",
@@ -52,7 +52,7 @@ namespace Lithnet.AccessManager.Server.Providers
                 {SidAllAmsLinuxDevices, new BuiltInAmsGroup(new SecurityIdentifier(SidAllLinuxDevices), "AMS Linux devices", "Linux devices registered using AMS authentication",
                     device => device.OperatingSystemType == Api.Shared.OsType.Linux && device.AuthorityType == AuthorityType.Ams)},
 
-                {SidAllAmsMacOsDevices, new BuiltInAmsGroup(new SecurityIdentifier(SidAllMacOsDevices), "AMS MacOS devices", "macOS devices registered using AMS authentication",
+                {SidAllAmsMacOsDevices, new BuiltInAmsGroup(new SecurityIdentifier(SidAllMacOsDevices), "AMS macOS devices", "macOS devices registered using AMS authentication",
                     device => device.OperatingSystemType == Api.Shared.OsType.MacOS && device.AuthorityType == AuthorityType.Ams)},
 
                 {SidAllAzureWindowsDevices, new BuiltInAmsGroup(new SecurityIdentifier(SidAllWindowsDevices), "Azure AD Windows devices", "Windows devices registered using Azure authentication",
