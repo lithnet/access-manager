@@ -3,25 +3,25 @@ using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Stylet;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class AmsGroupSelectorViewModel : Screen
+    public class AmsGroupSelectorViewModel : Screen, IExternalDialogAware
     {
-        private readonly IDialogCoordinator dialogCoordinator;
         private readonly ILogger<AmsGroupSelectorViewModel> logger;
         private readonly IAmsGroupProvider groupProvider;
         private readonly IViewModelFactory<AmsGroupViewModel, IAmsGroup> factory;
 
-        public AmsGroupSelectorViewModel(IDialogCoordinator dialogCoordinator, ILogger<AmsGroupSelectorViewModel> logger, IModelValidator<AmsGroupSelectorViewModel> validator, IAmsGroupProvider groupProvider, IViewModelFactory<AmsGroupViewModel, IAmsGroup> factory) : base(validator)
+        public AmsGroupSelectorViewModel(ILogger<AmsGroupSelectorViewModel> logger, IModelValidator<AmsGroupSelectorViewModel> validator, IAmsGroupProvider groupProvider, IViewModelFactory<AmsGroupViewModel, IAmsGroup> factory) : base(validator)
         {
-            this.dialogCoordinator = dialogCoordinator;
             this.logger = logger;
             this.groupProvider = groupProvider;
             this.factory = factory;
             this.Groups = new BindableCollection<AmsGroupViewModel>();
             this.Validate();
+            this.DisplayName = "Select an AMS group";
         }
 
         protected override void OnInitialActivate()
@@ -41,6 +41,7 @@ namespace Lithnet.AccessManager.Server.UI
                     }
 
                     this.Groups.Add(factory.CreateViewModel(m));
+                    this.SelectedItem = this.Groups.FirstOrDefault();
                 }
             }
             catch (Exception ex)
@@ -60,5 +61,17 @@ namespace Lithnet.AccessManager.Server.UI
         public BindableCollection<AmsGroupViewModel> Groups { get; }
 
         public AmsGroupViewModel SelectedItem { get; set; }
+
+        public bool CancelButtonVisible { get; set; } = true;
+
+        public bool SaveButtonVisible { get; set; } = true;
+
+        public bool CancelButtonIsDefault { get; set; } = false;
+
+        public bool SaveButtonIsDefault { get; set; } = true;
+
+        public string SaveButtonName { get; set; } = "Select...";
+
+        public string CancelButtonName { get; set; } = "Cancel";
     }
 }

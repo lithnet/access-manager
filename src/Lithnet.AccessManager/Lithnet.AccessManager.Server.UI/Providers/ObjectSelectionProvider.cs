@@ -13,11 +13,15 @@ namespace Lithnet.AccessManager.Server.UI
     {
         private readonly IDiscoveryServices discoveryServices;
         private readonly IDomainTrustProvider domainTrustProvider;
+        private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
+        private readonly IWindowManager windowManager;
 
-        public ObjectSelectionProvider(IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider)
+        public ObjectSelectionProvider(IDiscoveryServices discoveryServices, IDomainTrustProvider domainTrustProvider, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory, IWindowManager windowManager)
         {
             this.discoveryServices = discoveryServices;
             this.domainTrustProvider = domainTrustProvider;
+            this.externalDialogWindowFactory = externalDialogWindowFactory;
+            this.windowManager = windowManager;
         }
 
         public bool SelectContainer(IViewAware owner, string dialogTitle, string treeViewTitle, string baseContainer, string selectedContainer, out string container)
@@ -68,8 +72,8 @@ namespace Lithnet.AccessManager.Server.UI
 
             return this.ShowDialog(owner, scope, targetServer, out sid);
         }
-        
-        public bool GetUserOrServiceAccount (IViewAware owner, out SecurityIdentifier sid)
+
+        public bool GetUserOrServiceAccount(IViewAware owner, out SecurityIdentifier sid)
         {
             return this.GetUserOrServiceAccount(owner, null, out sid);
         }
@@ -297,15 +301,6 @@ namespace Lithnet.AccessManager.Server.UI
 
             SelectForestViewModel vm = new SelectForestViewModel();
 
-            ExternalDialogWindow w = new ExternalDialogWindow
-            {
-                Title = "Select forest",
-                DataContext = vm,
-                SaveButtonName = "Next...",
-                SizeToContent = SizeToContent.WidthAndHeight,
-                SaveButtonIsDefault = true
-            };
-
             foreach (Forest forest in this.domainTrustProvider.GetForests())
             {
                 vm.AvailableForests.Add(forest.Name);
@@ -315,9 +310,9 @@ namespace Lithnet.AccessManager.Server.UI
 
             if (vm.AvailableForests.Count > 1)
             {
-                w.Owner = owner.GetWindow();
-
-                if (!w.ShowDialog() ?? false)
+                var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
+                
+                if (!windowManager.ShowDialog(evm, owner) ?? false)
                 {
                     return false;
                 }

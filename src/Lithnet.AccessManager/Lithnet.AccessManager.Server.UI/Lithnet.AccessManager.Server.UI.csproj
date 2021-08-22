@@ -101,6 +101,9 @@
     <Compile Update="UIComponents\EnterpriseEditionBadge - Copy.xaml.cs">
       <DependentUpon>EnterpriseEditionBadge.xaml.cs</DependentUpon>
     </Compile>
+    <Compile Update="Windows\ExternalDialogWindowView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Windows\ImportWizardWindowView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -269,6 +272,10 @@
     </Page>
     <Page Update="Views\WindowContent\AboutView.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
+    <Page Update="Windows\ExternalDialogWindowView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
     </Page>
     <Page Update="Windows\ImportWizardWindowView.xaml">
       <SubType>Designer</SubType>

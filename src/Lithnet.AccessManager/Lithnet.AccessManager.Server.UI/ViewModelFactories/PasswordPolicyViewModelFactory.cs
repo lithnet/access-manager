@@ -14,8 +14,10 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IViewModelFactory<AmsGroupSelectorViewModel> amsSelectorFactory;
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly ILogger<PasswordPolicyViewModel> logger;
+        private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
+        private readonly IWindowManager windowManager;
 
-        public PasswordPolicyViewModelFactory(Func<IModelValidator<PasswordPolicyViewModel>> validator, IViewModelFactory<AzureAdObjectSelectorViewModel> aadSelectorFactory, IViewModelFactory<SelectTargetTypeViewModel> selectTargetTypeFactory, IViewModelFactory<AmsGroupSelectorViewModel> amsSelectorFactory, IDialogCoordinator dialogCoordinator, ILogger<PasswordPolicyViewModel> logger)
+        public PasswordPolicyViewModelFactory(Func<IModelValidator<PasswordPolicyViewModel>> validator, IViewModelFactory<AzureAdObjectSelectorViewModel> aadSelectorFactory, IViewModelFactory<SelectTargetTypeViewModel> selectTargetTypeFactory, IViewModelFactory<AmsGroupSelectorViewModel> amsSelectorFactory, IDialogCoordinator dialogCoordinator, ILogger<PasswordPolicyViewModel> logger, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory, IWindowManager windowManager)
         {
             this.validator = validator;
             this.aadSelectorFactory = aadSelectorFactory;
@@ -23,11 +25,13 @@ namespace Lithnet.AccessManager.Server.UI
             this.amsSelectorFactory = amsSelectorFactory;
             this.dialogCoordinator = dialogCoordinator;
             this.logger = logger;
+            this.externalDialogWindowFactory = externalDialogWindowFactory;
+            this.windowManager = windowManager;
         }
 
         public PasswordPolicyViewModel CreateViewModel(PasswordPolicyEntry model)
         {
-            return new PasswordPolicyViewModel(model, validator.Invoke(), aadSelectorFactory, selectTargetTypeFactory, amsSelectorFactory, dialogCoordinator, logger);
+            return new PasswordPolicyViewModel(model, validator.Invoke(), aadSelectorFactory, selectTargetTypeFactory, amsSelectorFactory, dialogCoordinator, logger, externalDialogWindowFactory, windowManager);
         }
     }
 }

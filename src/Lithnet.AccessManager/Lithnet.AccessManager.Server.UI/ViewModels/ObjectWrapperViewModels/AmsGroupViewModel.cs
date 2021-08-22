@@ -17,16 +17,20 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILogger<AmsGroupViewModel> logger;
         private readonly IViewModelFactory<AmsDeviceSelectorViewModel> deviceSelectorFactory;
         private HashSet<string> currentMembers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        
+        private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
+        private readonly IWindowManager windowManager;
+
         public IAmsGroup Model { get; }
 
-        public AmsGroupViewModel(IAmsGroup model, IModelValidator<AmsGroupViewModel> validator, IAmsGroupProvider provider, IDialogCoordinator dialogCoordinator, ILogger<AmsGroupViewModel> logger, IViewModelFactory<AmsDeviceSelectorViewModel> deviceSelectorFactory)
+        public AmsGroupViewModel(IAmsGroup model, IModelValidator<AmsGroupViewModel> validator, IAmsGroupProvider provider, IDialogCoordinator dialogCoordinator, ILogger<AmsGroupViewModel> logger, IViewModelFactory<AmsDeviceSelectorViewModel> deviceSelectorFactory, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory, IWindowManager windowManager)
         {
             this.Model = model;
             this.groupProvider = provider;
             this.dialogCoordinator = dialogCoordinator;
             this.logger = logger;
             this.deviceSelectorFactory = deviceSelectorFactory;
+            this.externalDialogWindowFactory = externalDialogWindowFactory;
+            this.windowManager = windowManager;
             this.Validator = validator;
 
             this.Validate();
@@ -115,16 +119,9 @@ namespace Lithnet.AccessManager.Server.UI
                 var selectorVm = this.deviceSelectorFactory.CreateViewModel();
                 selectorVm.SelectionMode = System.Windows.Controls.SelectionMode.Extended;
 
-                ExternalDialogWindow w = new ExternalDialogWindow()
-                {
-                    Title = "Select device",
-                    DataContext = selectorVm,
-                    SaveButtonName = "Select...",
-                    SaveButtonIsDefault = true,
-                    Owner = this.GetWindow()
-                };
+                var evm = externalDialogWindowFactory.CreateViewModel(selectorVm);
 
-                if (!w.ShowDialog() ?? false)
+                if (!windowManager.ShowDialog(evm) ?? false)
                 {
                     return;
                 }

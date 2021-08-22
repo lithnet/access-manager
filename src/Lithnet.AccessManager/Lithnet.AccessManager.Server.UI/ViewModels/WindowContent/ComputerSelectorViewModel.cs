@@ -8,7 +8,7 @@ using System.Windows.Controls;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class ComputerSelectorViewModel : Screen
+    public class ComputerSelectorViewModel : Screen, IExternalDialogAware
     {
         private readonly ILogger<ComputerSelectorViewModel> logger;
         private readonly IList<IComputer> computers;
@@ -24,17 +24,19 @@ namespace Lithnet.AccessManager.Server.UI
             this.Validate();
             this.SelectedItems = new ObservableCollection<ComputerViewModel>();
             this.Initialization = this.Initialize();
+            this.DisplayName = "Select a computer";
         }
 
         private async Task Initialize()
         {
             List<ComputerViewModel> com = new List<ComputerViewModel>();
-            foreach( var item in computers)
+            foreach (var item in computers)
             {
                 com.Add(await this.computerViewModelFactory.CreateViewModelAsync(item));
             }
 
             this.Devices = new BindableCollection<ComputerViewModel>(com);
+            this.SelectedItem = this.Devices.FirstOrDefault();
         }
 
         public ObservableCollection<ComputerViewModel> SelectedItems { get; }
@@ -44,5 +46,17 @@ namespace Lithnet.AccessManager.Server.UI
         public BindableCollection<ComputerViewModel> Devices { get; private set; }
 
         public ComputerViewModel SelectedItem { get; set; }
+
+        public bool CancelButtonVisible { get; set; } = true;
+
+        public bool SaveButtonVisible { get; set; } = true;
+
+        public bool CancelButtonIsDefault { get; set; } = false;
+
+        public bool SaveButtonIsDefault { get; set; } = true;
+
+        public string SaveButtonName { get; set; } = "Select...";
+
+        public string CancelButtonName { get; set; } = "Cancel";
     }
 }

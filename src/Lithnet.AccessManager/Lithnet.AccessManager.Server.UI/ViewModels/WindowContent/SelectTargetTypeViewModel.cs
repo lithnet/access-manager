@@ -9,7 +9,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class SelectTargetTypeViewModel : PropertyChangedBase
+    public class SelectTargetTypeViewModel : Screen
     {
         private readonly AzureAdOptions azureAdOptions;
         private readonly IRegistryProvider registryProvider;

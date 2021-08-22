@@ -1,9 +1,7 @@
-﻿using System;
-using Lithnet.AccessManager.Api;
-using Lithnet.AccessManager.Server.UI.Providers;
-using MahApps.Metro.Controls.Dialogs;
+﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Stylet;
+using System;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -12,9 +10,9 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly ILogger<AzureAdObjectSelectorViewModel> logger;
         private readonly IAadGraphApiProvider graphProvider;
-        private readonly IModelValidator<AzureAdObjectSelectorViewModel> validator;
+        private readonly Func<IModelValidator<AzureAdObjectSelectorViewModel>> validator;
 
-        public AzureAdObjectSelectorViewModelFactory(IDialogCoordinator dialogCoordinator, ILogger<AzureAdObjectSelectorViewModel> logger, IAadGraphApiProvider graphProvider, IModelValidator<AzureAdObjectSelectorViewModel> validator)
+        public AzureAdObjectSelectorViewModelFactory(IDialogCoordinator dialogCoordinator, ILogger<AzureAdObjectSelectorViewModel> logger, IAadGraphApiProvider graphProvider, Func<IModelValidator<AzureAdObjectSelectorViewModel>> validator)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.logger = logger;
@@ -24,7 +22,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public AzureAdObjectSelectorViewModel CreateViewModel()
         {
-            return new AzureAdObjectSelectorViewModel(dialogCoordinator, logger, graphProvider, validator);
+            return new AzureAdObjectSelectorViewModel(dialogCoordinator, logger, graphProvider, validator.Invoke());
         }
     }
 }

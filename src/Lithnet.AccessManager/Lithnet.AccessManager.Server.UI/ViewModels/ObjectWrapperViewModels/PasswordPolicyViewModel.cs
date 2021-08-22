@@ -1,15 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-using Lithnet.AccessManager.Api;
-using Lithnet.AccessManager.Server.Configuration;
+﻿using Lithnet.AccessManager.Api;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.SimpleChildWindow;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Stylet;
-using Stylet.Xaml;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -20,12 +18,14 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IViewModelFactory<SelectTargetTypeViewModel> selectTargetTypeFactory;
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly ILogger<PasswordPolicyViewModel> logger;
+        private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
+        private readonly IWindowManager windowManager;
 
         private bool isDefault;
 
         public PasswordPolicyEntry Model { get; }
 
-        public PasswordPolicyViewModel(PasswordPolicyEntry model, IModelValidator<PasswordPolicyViewModel> validator, IViewModelFactory<AzureAdObjectSelectorViewModel> aadSelectorFactory, IViewModelFactory<SelectTargetTypeViewModel> selectTargetTypeFactory, IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory, IDialogCoordinator dialogCoordinator, ILogger<PasswordPolicyViewModel> logger)
+        public PasswordPolicyViewModel(PasswordPolicyEntry model, IModelValidator<PasswordPolicyViewModel> validator, IViewModelFactory<AzureAdObjectSelectorViewModel> aadSelectorFactory, IViewModelFactory<SelectTargetTypeViewModel> selectTargetTypeFactory, IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory, IDialogCoordinator dialogCoordinator, ILogger<PasswordPolicyViewModel> logger, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory, IWindowManager windowManager)
         {
             this.Model = model;
             this.aadSelectorFactory = aadSelectorFactory;
@@ -33,6 +33,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.amsGroupSelectorFactory = amsGroupSelectorFactory;
             this.dialogCoordinator = dialogCoordinator;
             this.logger = logger;
+            this.externalDialogWindowFactory = externalDialogWindowFactory;
+            this.windowManager = windowManager;
             this.Validator = validator;
             this.Validate();
         }
@@ -218,16 +220,9 @@ namespace Lithnet.AccessManager.Server.UI
             var selectorVm = this.amsGroupSelectorFactory.CreateViewModel();
             selectorVm.ShowBuiltInGroups = true;
 
-            ExternalDialogWindow w = new ExternalDialogWindow()
-            {
-                Title = "Select AMS group",
-                DataContext = selectorVm,
-                SaveButtonName = "Select...",
-                SaveButtonIsDefault = true,
-                Owner = this.GetWindow()
-            };
-            
-            if (!w.ShowDialog() ?? false)
+            var evm = externalDialogWindowFactory.CreateViewModel(selectorVm);
+
+            if (!windowManager.ShowDialog(evm) ?? false)
             {
                 return;
             }
@@ -245,17 +240,9 @@ namespace Lithnet.AccessManager.Server.UI
             var selectorVm = this.aadSelectorFactory.CreateViewModel();
             selectorVm.Type = Configuration.TargetType.AadGroup;
             selectorVm.TenantId = tenant;
+            var evm = externalDialogWindowFactory.CreateViewModel(selectorVm);
 
-            ExternalDialogWindow w = new ExternalDialogWindow()
-            {
-                Title = "Select Azure AD group",
-                DataContext = selectorVm,
-                SaveButtonName = "Select...",
-                SaveButtonIsDefault = true,
-                Owner = this.GetWindow()
-            };
-
-            if (!w.ShowDialog() ?? false)
+            if (!windowManager.ShowDialog(evm) ?? false)
             {
                 return;
             }

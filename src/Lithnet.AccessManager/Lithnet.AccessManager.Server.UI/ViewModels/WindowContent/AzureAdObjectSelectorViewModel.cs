@@ -1,31 +1,18 @@
-﻿using Lithnet.AccessManager.Server.Authorization;
-using Lithnet.AccessManager.Server.Configuration;
+﻿using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Stylet;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
-using Microsoft.Graph;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class AzureAdObjectSelectorViewModel : ValidatingModelBase
+    public class AzureAdObjectSelectorViewModel : Screen, IExternalDialogAware
     {
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly ILogger<AzureAdObjectSelectorViewModel> logger;
         private readonly IAadGraphApiProvider graphProvider;
-        private ListSortDirection currentSortDirection = ListSortDirection.Ascending;
-        private GridViewColumnHeader lastHeaderClicked;
-        private HashSet<string> matchedComputerViewModels;
-        private IList selectedItems;
 
         public AzureAdObjectSelectorViewModel(IDialogCoordinator dialogCoordinator, ILogger<AzureAdObjectSelectorViewModel> logger, IAadGraphApiProvider graphProvider, IModelValidator<AzureAdObjectSelectorViewModel> validator) : base(validator)
         {
@@ -34,12 +21,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.graphProvider = graphProvider;
             this.Items = new BindableCollection<object>();
             this.Validate();
-        }
-
-        public void SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            this.selectedItems ??= (e.Source as ListView)?.SelectedItems;
-            this.Validate();
+            this.DisplayName = "Select an Azure AD object";
         }
 
         public bool IsFilterApplied { get; set; }
@@ -127,7 +109,6 @@ namespace Lithnet.AccessManager.Server.UI
         public void ClearSearchFilter()
         {
             this.SearchText = null;
-            this.matchedComputerViewModels = null;
             this.IsFilterApplied = false;
             this.Items.Clear();
             this.Items.Refresh();
@@ -142,83 +123,32 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        private bool IsFiltered(object item)
+        public void OnTypeChanged()
         {
-            var trimmedText = this.SearchText?.TrimStart('?');
-
-            if (string.IsNullOrWhiteSpace(trimmedText))
+            if (this.Type == TargetType.AadComputer)
             {
-                return true;
+                this.DisplayName = "Select an Azure AD computer";
             }
-
-            SecurityDescriptorTargetViewModel vm = (SecurityDescriptorTargetViewModel)item;
-
-            if (this.matchedComputerViewModels != null)
+            else if (this.Type == TargetType.AadGroup)
             {
-                return this.matchedComputerViewModels.Contains(vm.Id);
+                this.DisplayName = "Select an Azure AD group";
             }
             else
             {
-                return (vm.DisplayName != null && vm.DisplayName.Contains(trimmedText, StringComparison.OrdinalIgnoreCase)) || (vm.Description != null && vm.Description.Contains(trimmedText, StringComparison.OrdinalIgnoreCase));
+                this.DisplayName = "Select an Azure AD object";
             }
         }
 
-        public void OnGridViewColumnHeaderClick(object sender, RoutedEventArgs e)
-        {
-            if (!(e.OriginalSource is GridViewColumnHeader gridViewColumnHeader))
-            {
-                return;
-            }
+        public bool CancelButtonVisible { get; set; } = true;
 
-            if (gridViewColumnHeader.Column == null)
-            {
-                return;
-            }
+        public bool SaveButtonVisible { get; set; } = true;
 
-            ListSortDirection newSortDirection = ListSortDirection.Ascending;
+        public bool CancelButtonIsDefault { get; set; } = false;
 
-            if ((lastHeaderClicked == null || lastHeaderClicked == gridViewColumnHeader) && currentSortDirection == ListSortDirection.Ascending)
-            {
-                newSortDirection = ListSortDirection.Descending;
-            }
+        public bool SaveButtonIsDefault { get; set; } = true;
 
-            string propertyName = (gridViewColumnHeader.Column.DisplayMemberBinding as Binding)?.Path.Path;
-            propertyName ??= gridViewColumnHeader.Column.Header as string;
+        public string SaveButtonName { get; set; } = "Select...";
 
-            SortListView(propertyName, newSortDirection);
-
-            lastHeaderClicked = gridViewColumnHeader;
-            currentSortDirection = newSortDirection;
-
-            e.Handled = true;
-        }
-
-        private void SortListView(string propertyName, ListSortDirection sortDirection)
-        {
-            //if (propertyName == null)
-            //{
-            //    return;
-            //}
-
-            //this.Items.SortDescriptions.Clear();
-
-            //if (propertyName == nameof(DisplayName))
-            //{
-            //    //if (this.Items.CustomSort == null)
-            //    //{
-            //    //    this.Items.CustomSort = this.customComparer;
-            //    //}
-
-            //    //this.customComparer.SortDirection = sortDirection;
-            //}
-            //else
-            //{
-            //    this.Items.CustomSort = null;
-            //    SortDescription sd = new SortDescription(propertyName, sortDirection);
-            //    this.Items.SortDescriptions.Add(sd);
-            //}
-
-            this.Items.Refresh();
-        }
+        public string CancelButtonName { get; set; } = "Cancel";
     }
 }

@@ -41,6 +41,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IViewModelFactory<AmsDeviceSelectorViewModel> amsDeviceSelectorFactory;
         private readonly IAmsGroupProvider amsGroupProvider;
         private readonly IWindowManager windowManager;
+        private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
 
         private string jitGroupDisplayName;
 
@@ -48,7 +49,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public SecurityDescriptorTarget Model { get; }
 
-        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IActiveDirectory directory, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> targetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider, IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory, IViewModelFactory<AmsDeviceSelectorViewModel> amsDeviceSelectorFactory, IAmsGroupProvider amsGroupProvider, IViewModelFactory<EnterpriseEditionBadgeViewModel, EnterpriseEditionBadgeModel> enterpriseEditionViewModelFactory, IWindowManager windowManager)
+        public SecurityDescriptorTargetViewModel(SecurityDescriptorTarget model, SecurityDescriptorTargetViewModelDisplaySettings displaySettings, IViewModelFactory<NotificationChannelSelectionViewModel, AuditNotificationChannels> notificationChannelFactory, IFileSelectionViewModelFactory fileSelectionViewModelFactory, IAppPathProvider appPathProvider, ILogger<SecurityDescriptorTargetViewModel> logger, IDialogCoordinator dialogCoordinator, IModelValidator<SecurityDescriptorTargetViewModel> validator, IActiveDirectory directory, IDiscoveryServices discoveryServices, ILocalSam localSam, IObjectSelectionProvider objectSelectionProvider, ScriptTemplateProvider scriptTemplateProvider, IAmsLicenseManager licenseManager, IShellExecuteProvider shellExecuteProvider, IViewModelFactory<SelectTargetTypeViewModel> targetTypeFactory, IViewModelFactory<AzureAdObjectSelectorViewModel> aadSelectorFactory, IAadGraphApiProvider graphProvider, IDeviceProvider deviceProvider, IViewModelFactory<AmsGroupSelectorViewModel> amsGroupSelectorFactory, IViewModelFactory<AmsDeviceSelectorViewModel> amsDeviceSelectorFactory, IAmsGroupProvider amsGroupProvider, IViewModelFactory<EnterpriseEditionBadgeViewModel, EnterpriseEditionBadgeModel> enterpriseEditionViewModelFactory, IWindowManager windowManager, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory)
         {
             this.directory = directory;
             this.Model = model;
@@ -71,6 +72,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.amsDeviceSelectorFactory = amsDeviceSelectorFactory;
             this.amsGroupProvider = amsGroupProvider;
             this.windowManager = windowManager;
+            this.externalDialogWindowFactory = externalDialogWindowFactory;
 
             this.Script = fileSelectionViewModelFactory.CreateViewModel(model, () => model.Script, appPathProvider.ScriptsPath);
             this.Script.DefaultFileExtension = "ps1";
@@ -616,6 +618,7 @@ namespace Lithnet.AccessManager.Server.UI
             {
                 SelectTargetTypeViewModel vm = this.targetTypeFactory.CreateViewModel();
                 vm.TargetType = this.Type;
+                vm.SelectedForest = this.GetForestForTargetOrDefault();
 
                 DialogWindow w = new DialogWindow
                 {
@@ -624,8 +627,6 @@ namespace Lithnet.AccessManager.Server.UI
                     SaveButtonName = "Next...",
                     SaveButtonIsDefault = true
                 };
-
-                vm.SelectedForest = this.GetForestForTargetOrDefault();
 
                 await this.GetWindow().ShowChildWindowAsync(w);
 
@@ -696,16 +697,9 @@ namespace Lithnet.AccessManager.Server.UI
             var selectorVm = this.amsGroupSelectorFactory.CreateViewModel();
             selectorVm.ShowBuiltInGroups = true;
 
-            ExternalDialogWindow w = new ExternalDialogWindow()
-            {
-                Title = "Select AMS group",
-                DataContext = selectorVm,
-                SaveButtonName = "Select...",
-                SaveButtonIsDefault = true,
-                Owner = this.GetWindow()
-            };
+            var evm = this.externalDialogWindowFactory.CreateViewModel(selectorVm);
 
-            if (!w.ShowDialog() ?? false)
+            if (!windowManager.ShowDialog(evm) ?? false)
             {
                 return;
             }
@@ -724,17 +718,9 @@ namespace Lithnet.AccessManager.Server.UI
         private void ShowAmsDeviceSelector()
         {
             var selectorVm = this.amsDeviceSelectorFactory.CreateViewModel();
+            var evm = this.externalDialogWindowFactory.CreateViewModel(selectorVm);
 
-            ExternalDialogWindow w = new ExternalDialogWindow()
-            {
-                Title = "Select AMS device",
-                DataContext = selectorVm,
-                SaveButtonName = "Select...",
-                SaveButtonIsDefault = true,
-                Owner = this.GetWindow()
-            };
-
-            if (!w.ShowDialog() ?? false)
+            if (!windowManager.ShowDialog(evm) ?? false)
             {
                 return;
             }
@@ -756,16 +742,9 @@ namespace Lithnet.AccessManager.Server.UI
             selectorVm.Type = type;
             selectorVm.TenantId = selectedTenant;
 
-            ExternalDialogWindow w = new ExternalDialogWindow()
-            {
-                Title = "Select Azure AD " + (type == TargetType.AadComputer ? "managed computer" : "group"),
-                DataContext = selectorVm,
-                SaveButtonName = "Select...",
-                SaveButtonIsDefault = true,
-                Owner = this.GetWindow()
-            };
+            var evm = externalDialogWindowFactory.CreateViewModel(selectorVm);
 
-            if (!w.ShowDialog() ?? false)
+            if (!windowManager.ShowDialog(evm) ?? false)
             {
                 return;
             }

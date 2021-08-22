@@ -24,6 +24,8 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IEnumerable<IComputerTargetProvider> computerTargetProviders;
         private readonly IComputerLocator computerLocator;
         private readonly IAsyncViewModelFactory<ComputerSelectorViewModel, IList<IComputer>> computerSelectorViewModelFactory;
+        private readonly IWindowManager windowManager;
+        private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
 
         public string ComputerName { get; set; }
 
@@ -53,7 +55,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public ObservableCollection<MatchedSecurityDescriptorTargetViewModel> MatchedTargets { get; } = new ObservableCollection<MatchedSecurityDescriptorTargetViewModel>();
 
-        public EffectiveAccessViewModel(IAuthorizationInformationBuilder authorizationBuilder, IDialogCoordinator dialogCoordinator, IActiveDirectory directory, SecurityDescriptorTargetsViewModel targets, ILogger<EffectiveAccessViewModel> logger, IEnumerable<IComputerTargetProvider> computerTargetProviders, IComputerLocator computerLocator, IAsyncViewModelFactory<ComputerSelectorViewModel, IList<IComputer>> computerSelectorViewModelFactory)
+        public EffectiveAccessViewModel(IAuthorizationInformationBuilder authorizationBuilder, IDialogCoordinator dialogCoordinator, IActiveDirectory directory, SecurityDescriptorTargetsViewModel targets, ILogger<EffectiveAccessViewModel> logger, IEnumerable<IComputerTargetProvider> computerTargetProviders, IComputerLocator computerLocator, IAsyncViewModelFactory<ComputerSelectorViewModel, IList<IComputer>> computerSelectorViewModelFactory, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory, IWindowManager windowManager)
         {
             this.authorizationBuilder = authorizationBuilder;
             this.dialogCoordinator = dialogCoordinator;
@@ -62,11 +64,13 @@ namespace Lithnet.AccessManager.Server.UI
             this.computerTargetProviders = computerTargetProviders;
             this.computerLocator = computerLocator;
             this.computerSelectorViewModelFactory = computerSelectorViewModelFactory;
+            this.externalDialogWindowFactory = externalDialogWindowFactory;
+            this.windowManager = windowManager;
             this.logger = logger;
         }
 
         public bool CanCalculateEffectiveAccess => !string.IsNullOrWhiteSpace(this.Username) && !string.IsNullOrWhiteSpace(this.ComputerName);
-        
+
         public async Task CalculateEffectiveAccess()
         {
             this.ClearResults();
@@ -119,18 +123,11 @@ namespace Lithnet.AccessManager.Server.UI
                         var selectorVm = await this.computerSelectorViewModelFactory.CreateViewModelAsync(computers);
                         selectorVm.SelectionMode = System.Windows.Controls.SelectionMode.Single;
 
+                        var evm = this.externalDialogWindowFactory.CreateViewModel(selectorVm);
+
                         await Execute.OnUIThreadAsync(() =>
                         {
-                            ExternalDialogWindow w = new ExternalDialogWindow()
-                            {
-                                Title = "Select computer",
-                                DataContext = selectorVm,
-                                SaveButtonName = "Select...",
-                                SaveButtonIsDefault = true,
-                                Owner = this.GetWindow()
-                            };
-
-                            if (!w.ShowDialog() ?? false)
+                            if (!this.windowManager.ShowDialog(evm) ?? false)
                             {
                                 selectorVm.SelectedItem = null;
                             }

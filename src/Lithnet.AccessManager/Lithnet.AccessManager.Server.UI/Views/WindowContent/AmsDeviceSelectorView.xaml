@@ -15,8 +15,10 @@
              xmlns:uiComponents="clr-namespace:Lithnet.AccessManager.Server.UI.UIComponents"
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
+             Width="800"
+             Height="450"
              d:DesignWidth="800"
-              d:DesignHeight="400"
+             d:DesignHeight="400"
              Margin="5">
 
     <Grid>
@@ -31,7 +33,7 @@
 
         <telerik:RadGridView Margin="10 5 5 0"
                             ItemsSource="{Binding PagedSource, ElementName=radDataPager}"
-                            SelectedItem="{Binding SelectedItem}" 
+                            SelectedItem="{Binding SelectedItem, ValidatesOnNotifyDataErrors=True}" 
                             SelectionUnit="FullRow"
                             AutoGenerateColumns="False"
                             ShowGroupPanel="False"
@@ -41,6 +43,8 @@
                             IsReadOnly="True"
                             EnableRowVirtualization="True" EnableColumnVirtualization="True"
                             LeftFrozenColumnCount="1"
+                            MouseDoubleClick="{s:Action Save, ActionNotFound=Enable, NullTarget=Enable}"
+                            s:View.ActionTarget="{Binding Parent}"
                             FrozenColumnsSplitterVisibility="Hidden"
                             SelectionMode="{Binding SelectionMode}" Grid.Row="1"
        >

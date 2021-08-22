@@ -15,22 +15,24 @@
              xmlns:uiComponents="clr-namespace:Lithnet.AccessManager.Server.UI.UIComponents"
              Dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
+             Width="800"
+             Height="450"
              d:DesignWidth="800"
-              d:DesignHeight="400"
+             d:DesignHeight="400"
              Margin="5">
 
-   <Grid>
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-       <uiComponents:ErrorBanner Grid.Column="0"
+        <uiComponents:ErrorBanner Grid.Column="0"
                                  MessageText="{Binding ErrorMessageText}"
                                  HeaderText="{Binding ErrorMessageHeaderText}"/>
         <telerik:RadGridView Grid.Row="1"
                              Margin="10 5 5 5"
                             ItemsSource="{Binding Groups}"
-                            SelectedItem="{Binding SelectedItem}" 
+                            SelectedItem="{Binding SelectedItem, ValidatesOnNotifyDataErrors=True}" 
                             SelectionUnit="FullRow"
                             AutoGenerateColumns="False"
                             ShowGroupPanel="False"
@@ -40,10 +42,12 @@
                             IsReadOnly="True"
                             EnableRowVirtualization="True"
                             LeftFrozenColumnCount="1"
+                            MouseDoubleClick="{s:Action Save, ActionNotFound=Enable, NullTarget=Enable}"
+                            s:View.ActionTarget="{Binding Parent}"
                             FrozenColumnsSplitterVisibility="Hidden"
                             SelectionMode="Single"
        >
-            
+
             <telerik:RadGridView.Resources>
                 <ResourceDictionary Source="pack://application:,,,/Telerik.Windows.Themes.Office2019;component/Themes/Telerik.Windows.Controls.GridView.xaml"/>
             </telerik:RadGridView.Resources>

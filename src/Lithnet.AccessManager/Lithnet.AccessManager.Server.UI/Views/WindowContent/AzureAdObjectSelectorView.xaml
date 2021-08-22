@@ -9,14 +9,14 @@
              xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
              xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:views="clr-namespace:Lithnet.AccessManager.Server.UI.Views"
+             xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
              Dialog:DialogParticipation.Register="{Binding}"
+             Width="800"
+             Height="450"
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800">
-    <!--<views:CanvasEx>-->
     <Grid>
-        <!--Height="{Binding Path=BindableActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}"
-              Width="{Binding Path=BindableActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UIElement}}">-->
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -72,33 +72,34 @@
 
         </StackPanel>
 
-        <ListView Grid.Row="3"
-                      x:Name="listbox"
-                      ItemsSource="{Binding Items}"
-                      SelectedItem="{Binding SelectedItem}"
-                      BorderBrush="{StaticResource MahApps.Brushes.Control.Border}"
-                      BorderThickness="1"
-                      Margin="0 5 0 5"
-                      GridViewColumnHeader.Click="{s:Action OnGridViewColumnHeaderClick}"
-                      SelectionChanged="{s:Action SelectionChanged}">
-            <b:Interaction.Behaviors>
-                <local:ListViewScrollBarBehavior />
-            </b:Interaction.Behaviors>
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Name"
-                                        DisplayMemberBinding="{Binding DisplayName}"
-                                        Width="Auto" />
-                    <GridViewColumn Header="Object ID"
-                                        DisplayMemberBinding="{Binding Id}"
-                                        Width="Auto" />
-                    <GridViewColumn Header="Description"
-                                        DisplayMemberBinding="{Binding Description}"
-                                        Width="Auto" />
-                </GridView>
-            </ListView.View>
-        </ListView>
+        <telerik:RadGridView Grid.Row="3"
+                             Margin="10 5 5 5"
+                             ItemsSource="{Binding Items}"
+                             SelectedItem="{Binding SelectedItem, ValidatesOnNotifyDataErrors=True}" 
+                             SelectionUnit="FullRow"
+                             AutoGenerateColumns="False"
+                             ShowGroupPanel="False"
+                             ShowSearchPanel="False"
+                             CanUserDeleteRows="False"
+                             CanUserInsertRows="False"
+                             IsReadOnly="True"
+                             EnableRowVirtualization="True"
+                             LeftFrozenColumnCount="1"
+                             MouseDoubleClick="{s:Action Save, ActionNotFound=Enable, NullTarget=Enable}"
+                             s:View.ActionTarget="{Binding Parent}"
+                             FrozenColumnsSplitterVisibility="Hidden"
+                             SelectionMode="Single"
+        >
+
+            <telerik:RadGridView.Resources>
+                <ResourceDictionary Source="pack://application:,,,/Telerik.Windows.Themes.Office2019;component/Themes/Telerik.Windows.Controls.GridView.xaml"/>
+            </telerik:RadGridView.Resources>
+            <telerik:RadGridView.Columns>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding DisplayName}" Header="NAME" />
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding Id}" Header="OBJECT ID" />
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding Description}" Header="DESCRIPTION"/>
+            </telerik:RadGridView.Columns>
+        </telerik:RadGridView>
 
     </Grid>
-    <!--</views:CanvasEx>-->
 </UserControl>

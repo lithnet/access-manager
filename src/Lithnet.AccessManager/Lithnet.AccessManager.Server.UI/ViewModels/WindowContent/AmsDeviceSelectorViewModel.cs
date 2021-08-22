@@ -1,29 +1,27 @@
-﻿using Lithnet.AccessManager.Server.Providers;
-using MahApps.Metro.Controls.Dialogs;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Stylet;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class AmsDeviceSelectorViewModel : Screen
+    public class AmsDeviceSelectorViewModel : Screen, IExternalDialogAware
     {
-        private readonly IDialogCoordinator dialogCoordinator;
         private readonly ILogger<AmsDeviceSelectorViewModel> logger;
         private readonly IDeviceProvider deviceProvider;
 
-        public AmsDeviceSelectorViewModel(IDialogCoordinator dialogCoordinator, ILogger<AmsDeviceSelectorViewModel> logger, IModelValidator<AmsDeviceSelectorViewModel> validator, IDeviceProvider deviceProvider) : base(validator)
+        public AmsDeviceSelectorViewModel(ILogger<AmsDeviceSelectorViewModel> logger, IModelValidator<AmsDeviceSelectorViewModel> validator, IDeviceProvider deviceProvider) : base(validator)
         {
-            this.dialogCoordinator = dialogCoordinator;
             this.logger = logger;
             this.deviceProvider = deviceProvider;
             this.Devices = new BindableCollection<DeviceViewModel>();
             this.Validate();
             this.SelectedItems = new ObservableCollection<DeviceViewModel>();
+            this.DisplayName = "Select an AMS device";
         }
 
         protected override void OnInitialActivate()
@@ -45,6 +43,7 @@ namespace Lithnet.AccessManager.Server.UI
                 }
 
                 this.Devices = new BindableCollection<DeviceViewModel>(list);
+                this.SelectedItem = this.Devices.FirstOrDefault();
             }
             catch (Exception ex)
             {
@@ -65,5 +64,17 @@ namespace Lithnet.AccessManager.Server.UI
         public BindableCollection<DeviceViewModel> Devices { get; set; }
 
         public DeviceViewModel SelectedItem { get; set; }
+        
+        public bool CancelButtonVisible { get; set; } = true;
+
+        public bool SaveButtonVisible { get; set; } = true;
+
+        public bool CancelButtonIsDefault { get; set; } = false;
+
+        public bool SaveButtonIsDefault { get; set; } = true;
+
+        public string SaveButtonName { get; set; } = "Select...";
+
+        public string CancelButtonName { get; set; } = "Cancel";
     }
 }
