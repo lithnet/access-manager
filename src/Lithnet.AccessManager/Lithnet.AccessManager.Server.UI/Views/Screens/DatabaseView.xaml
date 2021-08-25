@@ -30,11 +30,14 @@
 
         <Grid Margin="5">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -46,38 +49,61 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-
-
             <Label Grid.Row="0"
+                   Grid.Column="0" 
+                   Style="{DynamicResource SubDescriptionHeaderStyle}"
+                   Content="Connection details" />
+
+            <Label Grid.Row="1"
+                   Grid.Column="0" 
+                   Margin="5"
+                   Content="Server\instance name" />
+
+            <Label Grid.Row="1"
+                   Grid.Column="1" 
+                   Margin="5"
+                   Content="{Binding DatabaseServer}" />
+
+            <Label Grid.Row="2"
+                   Margin="5"
+                   Grid.Column="0" 
+                   Content="Database name" />
+
+            <Label Grid.Row="2"
+                   Margin="5"
+                   Grid.Column="1" 
+                   Content="{Binding DatabaseName}" />
+
+            <Label Grid.Row="3"
                 Grid.Column="0" 
                 Style="{DynamicResource SubDescriptionHeaderStyle}"
                    Content="Maintenance" />
 
-            <CheckBox Grid.Row="1"
+            <CheckBox Grid.Row="4"
                       Grid.Column="1"
                       Margin="5"
                       IsChecked="{Binding EnableBuiltInMaintenance}"
                       Content="Enable automatic database maintenance" />
 
-            <TextBlock Grid.Row="2"
+            <TextBlock Grid.Row="5"
                        Grid.Column="1"
                        TextWrapping="Wrap"
                        Margin="5 0 5 5"
                        FontStyle="Italic"
                        Text="If you have your own database maintenance process to manage indexes and update statistics, you may wish to disable automatic database maintenance" />
 
-            <Label Grid.Row="3"
+            <Label Grid.Row="6"
                    Grid.Column="0"
                    Style="{DynamicResource SubDescriptionHeaderStyle}"
                    Content="Backup" />
 
-            <CheckBox Grid.Row="4"
+            <CheckBox Grid.Row="7"
                       Grid.Column="1"
                       Margin="5"
                       IsChecked="{Binding EnableBackup}"
                       Content="Enable nightly database backup" />
 
-            <StackPanel  Grid.Row="5"
+            <StackPanel  Grid.Row="8"
                          Grid.Column="1"
                          Orientation="Horizontal">
                 <CheckBox
@@ -90,25 +116,25 @@
                 <TextBlock Text="days" Margin="5"/>
             </StackPanel>
 
-            <TextBlock Grid.Row="6"
+            <TextBlock Grid.Row="9"
                        Grid.Column="0"
-                       Margin="5"
+                       Margin="10 5 5 5 "
                        Text="Backup folder" />
 
-            <TextBox Grid.Row="6"
+            <TextBox Grid.Row="9"
                      Grid.Column="1"
                      Margin="5"
                      IsEnabled="{Binding EnableBackup, Mode=OneWay}"
                      Text="{Binding BackupPath}"/>
 
-            <TextBlock Grid.Row="7"
+            <TextBlock Grid.Row="10"
                        Grid.Column="1"
                        TextWrapping="Wrap"
                        Margin="5 0 5 5"
                        FontStyle="Italic"
                        >Leave blank to use the default SQL server backup destination<LineBreak/>Note: Backup paths are relative to the database server itself</TextBlock>
 
-            <StackPanel Grid.Row="8"
+            <StackPanel Grid.Row="11"
                         Grid.Column="1">
                 <Button 
                     Margin="5"

@@ -9,7 +9,6 @@ using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Server.UI.Interop;
 using Lithnet.AccessManager.Server.UI.Providers;
 using MahApps.Metro.Controls.Dialogs;
-using MahApps.Metro.IconPacks;
 using Microsoft.Extensions.Logging;
 using Stylet;
 
@@ -20,7 +19,6 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ICertificateProvider certificateProvider;
         private readonly IViewModelFactory<X509Certificate2ViewModel, X509Certificate2> certificate2ViewModelFactory;
         private readonly IViewModelFactory<ActiveDirectoryForestSchemaViewModel, Forest> forestFactory;
-
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IWindowsServiceProvider windowsServiceProvider;
         private readonly ILogger<ActiveDirectoryLithnetLapsConfigurationViewModel> logger;
@@ -31,8 +29,10 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ICertificatePermissionProvider certPermissionProvider;
         private readonly DataProtectionOptions dataProtectionOptions;
         private readonly INotifyModelChangedEventPublisher eventPublisher;
+        private readonly IWindowManager windowManager;
+        private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
 
-        public ActiveDirectoryLithnetLapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IViewModelFactory<X509Certificate2ViewModel, X509Certificate2> certificate2ViewModelFactory, IWindowsServiceProvider windowsServiceProvider, ILogger<ActiveDirectoryLithnetLapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, DataProtectionOptions dataProtectionOptions, INotifyModelChangedEventPublisher eventPublisher, IViewModelFactory<ActiveDirectoryForestSchemaViewModel, Forest> forestFactory)
+        public ActiveDirectoryLithnetLapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IViewModelFactory<X509Certificate2ViewModel, X509Certificate2> certificate2ViewModelFactory, IWindowsServiceProvider windowsServiceProvider, ILogger<ActiveDirectoryLithnetLapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, DataProtectionOptions dataProtectionOptions, INotifyModelChangedEventPublisher eventPublisher, IViewModelFactory<ActiveDirectoryForestSchemaViewModel, Forest> forestFactory, IWindowManager windowManager, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.certificateProvider = certificateProvider;
@@ -46,6 +46,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.dataProtectionOptions = dataProtectionOptions;
             this.eventPublisher = eventPublisher;
             this.forestFactory = forestFactory;
+            this.windowManager = windowManager;
+            this.externalDialogWindowFactory = externalDialogWindowFactory;
 
             this.Forests = new BindableCollection<ActiveDirectoryForestSchemaViewModel>();
 
@@ -125,15 +127,8 @@ namespace Lithnet.AccessManager.Server.UI
                         .Replace("{forest}", current.Name)
                 };
 
-                ExternalDialogWindow w = new ExternalDialogWindow
-                {
-                    Title = "Script",
-                    DataContext = vm,
-                    SaveButtonVisible = false,
-                    CancelButtonName = "Close"
-                };
-
-                w.ShowDialog();
+                var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
+                windowManager.ShowDialog(evm);
 
                 await current.RefreshSchemaStatusAsync();
             }
@@ -180,15 +175,8 @@ namespace Lithnet.AccessManager.Server.UI
                         .Replace("{forest}", this.SelectedForest.Name)
                 };
 
-                ExternalDialogWindow w = new ExternalDialogWindow
-                {
-                    Title = "Script",
-                    DataContext = vm,
-                    SaveButtonVisible = false,
-                    CancelButtonName = "Close"
-                };
-
-                w.ShowDialog();
+                var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
+                windowManager.ShowDialog(evm);
 
                 try
                 {
@@ -387,15 +375,8 @@ namespace Lithnet.AccessManager.Server.UI
                     ScriptText = this.scriptTemplateProvider.GrantAccessManagerPermissions.Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceAccountSid().ToString(), StringComparison.OrdinalIgnoreCase)
                 };
 
-                ExternalDialogWindow w = new ExternalDialogWindow
-                {
-                    Title = "Script",
-                    DataContext = vm,
-                    SaveButtonVisible = false,
-                    CancelButtonName = "Close"
-                };
-
-                w.ShowDialog();
+                var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
+                windowManager.ShowDialog(evm);
             }
             catch (Exception ex)
             {

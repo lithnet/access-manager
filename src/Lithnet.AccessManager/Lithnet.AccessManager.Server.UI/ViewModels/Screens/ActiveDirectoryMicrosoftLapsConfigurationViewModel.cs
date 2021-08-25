@@ -18,9 +18,10 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IScriptTemplateProvider scriptTemplateProvider;
         private readonly ILogger<ActiveDirectoryMicrosoftLapsConfigurationViewModel> logger;
         private readonly IWindowsServiceProvider windowsServiceProvider;
-        //public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.SitemapSolid;
+        private readonly IWindowManager windowManager;
+        private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
 
-        public ActiveDirectoryMicrosoftLapsConfigurationViewModel(IViewModelFactory<ActiveDirectoryForestSchemaViewModel, Forest> forestFactory, IDialogCoordinator dialogCoordinator, ILogger<ActiveDirectoryMicrosoftLapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IScriptTemplateProvider scriptTemplateProvider, IWindowsServiceProvider windowsServiceProvider)
+        public ActiveDirectoryMicrosoftLapsConfigurationViewModel(IViewModelFactory<ActiveDirectoryForestSchemaViewModel, Forest> forestFactory, IDialogCoordinator dialogCoordinator, ILogger<ActiveDirectoryMicrosoftLapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IScriptTemplateProvider scriptTemplateProvider, IWindowsServiceProvider windowsServiceProvider, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory, IWindowManager windowManager)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.logger = logger;
@@ -29,6 +30,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.domainTrustProvider = domainTrustProvider;
             this.scriptTemplateProvider = scriptTemplateProvider;
             this.windowsServiceProvider = windowsServiceProvider;
+            this.externalDialogWindowFactory = externalDialogWindowFactory;
+            this.windowManager = windowManager;
             this.DisplayName = "Microsoft LAPS";
 
             this.Forests = new BindableCollection<ActiveDirectoryForestSchemaViewModel>();
@@ -114,15 +117,8 @@ namespace Lithnet.AccessManager.Server.UI
                 ScriptText = this.scriptTemplateProvider.GrantMsLapsPermissions.Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceAccountSid().ToString(), StringComparison.OrdinalIgnoreCase)
             };
 
-            ExternalDialogWindow w = new ExternalDialogWindow
-            {
-                Title = "Script",
-                DataContext = vm,
-                SaveButtonVisible = false,
-                CancelButtonName = "Close"
-            };
-
-            w.ShowDialog();
+            var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
+            windowManager.ShowDialog(evm);
         }
     }
 }

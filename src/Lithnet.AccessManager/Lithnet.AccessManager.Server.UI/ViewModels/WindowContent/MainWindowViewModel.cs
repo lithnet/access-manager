@@ -23,12 +23,14 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ICertificateSynchronizationProvider certSyncProvider;
         private readonly IClusterProvider clusterProvider;
         private readonly HostingViewModel hosting;
+        private readonly IWindowManager windowManager;
+        private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
 
         private SemaphoreSlim clusterWaitSemaphore;
         private int isUiLocked;
 
-        public MainWindowViewModel(IApplicationConfig model, AuthorizationViewModel authorization, 
-           HelpViewModel help, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider, ICertificateSynchronizationProvider certSyncProvider, IClusterProvider clusterProvider, ServerConfigurationViewModel serverConfigurationVm, DirectoryConfigurationViewModel directoryVm)
+        public MainWindowViewModel(IApplicationConfig model, AuthorizationViewModel authorization,
+           HelpViewModel help, IEventAggregator eventAggregator, IDialogCoordinator dialogCoordinator, ILogger<MainWindowViewModel> logger, IShellExecuteProvider shellExecuteProvider, IWindowsServiceProvider windowsServiceProvider, IRegistryProvider registryProvider, ICertificateSynchronizationProvider certSyncProvider, IClusterProvider clusterProvider, ServerConfigurationViewModel serverConfigurationVm, DirectoryConfigurationViewModel directoryVm, IWindowManager windowManager, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory)
         {
             this.model = model;
             this.shellExecuteProvider = shellExecuteProvider;
@@ -39,6 +41,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.certSyncProvider = certSyncProvider;
             this.dialogCoordinator = dialogCoordinator;
             this.clusterProvider = clusterProvider;
+            this.windowManager = windowManager;
+            this.externalDialogWindowFactory = externalDialogWindowFactory;
             this.clusterWaitSemaphore = new SemaphoreSlim(0, 1);
 
             eventAggregator.Subscribe(this);
@@ -47,7 +51,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.Items.Add(serverConfigurationVm);
             this.Items.Add(directoryVm);
-            this.Items.Add(authorization); 
+            this.Items.Add(authorization);
             this.Items.Add(help);
 
             this.hosting = serverConfigurationVm.HostingViewModel;
@@ -244,18 +248,11 @@ namespace Lithnet.AccessManager.Server.UI
 
         public void About()
         {
-            ExternalDialogWindow w = new ExternalDialogWindow
-            {
-                Title = "About",
-                SaveButtonIsDefault = false,
-                SaveButtonVisible = false,
-                CancelButtonName = "Close"
-            };
-
-
             var vm = new AboutViewModel();
-            w.DataContext = vm;
-            w.ShowDialog();
+
+            var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
+
+            windowManager.ShowDialog(evm);
         }
 
         public override async Task<bool> CanCloseAsync()

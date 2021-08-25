@@ -18,17 +18,21 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly IViewModelFactory<AmsGroupSelectorViewModel> groupSelectorFactory;
         private readonly IRegistrationKeyProvider registrationKeyProvider;
+        private readonly IWindowManager windowManager;
+        private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
 
         private HashSet<string> currentMembers = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         public IRegistrationKey Model { get; }
 
-        public RegistrationKeyViewModel(IRegistrationKey model, ILogger<RegistrationKeyViewModel> logger, IModelValidator<RegistrationKeyViewModel> validator, IDialogCoordinator dialogCoordinator, IViewModelFactory<AmsGroupSelectorViewModel> groupSelectorFactory, IRegistrationKeyProvider registrationKeyProvider)
+        public RegistrationKeyViewModel(IRegistrationKey model, ILogger<RegistrationKeyViewModel> logger, IModelValidator<RegistrationKeyViewModel> validator, IDialogCoordinator dialogCoordinator, IViewModelFactory<AmsGroupSelectorViewModel> groupSelectorFactory, IRegistrationKeyProvider registrationKeyProvider, IWindowManager windowManager, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory)
         {
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
             this.groupSelectorFactory = groupSelectorFactory;
             this.registrationKeyProvider = registrationKeyProvider;
+            this.windowManager = windowManager;
+            this.externalDialogWindowFactory = externalDialogWindowFactory;
             this.Model = model;
             this.Validator = validator;
             this.Validate();
@@ -145,16 +149,9 @@ namespace Lithnet.AccessManager.Server.UI
                 var selectorVm = this.groupSelectorFactory.CreateViewModel();
                 selectorVm.ShowBuiltInGroups = false;
 
-                ExternalDialogWindow w = new ExternalDialogWindow()
-                {
-                    Title = "Select group",
-                    DataContext = selectorVm,
-                    SaveButtonName = "Select...",
-                    SaveButtonIsDefault = true,
-                    Owner = this.GetWindow()
-                };
+                var evm = this.externalDialogWindowFactory.CreateViewModel(selectorVm);
 
-                if (!w.ShowDialog() ?? false)
+                if (!windowManager.ShowDialog(evm) ?? false)
                 {
                     return;
                 }

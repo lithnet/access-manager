@@ -19,11 +19,18 @@ namespace Lithnet.AccessManager.Server.UI
             if (this.ActiveItem is IExternalDialogAware e)
             {
                 this.CancelButtonIsDefault = e.CancelButtonIsDefault;
-                this.CancelButtonName = e.CancelButtonName;
+                this.CancelButtonName = e.CancelButtonName ?? "Cancel";
                 this.CancelButtonVisible = e.CancelButtonVisible;
                 this.SaveButtonIsDefault = e.SaveButtonIsDefault;
-                this.SaveButtonName = e.SaveButtonName;
+                this.SaveButtonName = e.SaveButtonName ?? "Save";
                 this.SaveButtonVisible = e.SaveButtonVisible;
+            }
+
+            if (this.ActiveItem is IHasSize s)
+            {
+                this.Width = s.Width;
+                this.Height = s.Height;
+                this.SizeToContent = SizeToContent.Manual;
             }
         }
 
@@ -44,6 +51,12 @@ namespace Lithnet.AccessManager.Server.UI
         public string SaveButtonName { get; set; } = "Save";
 
         public string CancelButtonName { get; set; } = "Cancel";
+
+        public SizeToContent SizeToContent { get; set; } = SizeToContent.WidthAndHeight;
+
+        public double Width { get; set; } = 800;
+
+        public double Height { get; set; } = 500;
 
         public bool HasChildErrors { get; set; }
 

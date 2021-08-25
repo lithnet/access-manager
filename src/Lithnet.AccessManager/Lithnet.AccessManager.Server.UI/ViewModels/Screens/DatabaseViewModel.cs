@@ -16,19 +16,22 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDbProvider dbProvider;
         private readonly ILogger<DatabaseViewModel> logger;
         private readonly IDialogCoordinator dialogCoordinator;
+        private readonly IRegistryProvider registryProvider;
 
-        public DatabaseViewModel(DatabaseOptions databaseOptions, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IDbProvider dbProvider, ILogger<DatabaseViewModel> logger, IDialogCoordinator dialogCoordinator)
+        public DatabaseViewModel(DatabaseOptions databaseOptions, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IDbProvider dbProvider, ILogger<DatabaseViewModel> logger, IDialogCoordinator dialogCoordinator, IRegistryProvider registryProvider)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.dbProvider = dbProvider;
             this.logger = logger;
             this.dialogCoordinator = dialogCoordinator;
+            this.registryProvider = registryProvider;
             this.databaseOptions = databaseOptions;
-
             this.DisplayName = "Database";
+            this.PopulateConnectionString();
+
             eventPublisher.Register(this);
         }
-
+        
         public string HelpLink => Constants.HelpLinkPageEmail;
 
         public PackIconMaterialKind Icon => PackIconMaterialKind.Database;
@@ -47,6 +50,26 @@ namespace Lithnet.AccessManager.Server.UI
 
         [NotifyModelChangedProperty]
         public int BackupRetentionDays { get => this.databaseOptions.BackupRetentionDays; set => this.databaseOptions.BackupRetentionDays = value; }
+
+        public string DatabaseServer { get; set; }
+
+        public string DatabaseName { get; set; }
+
+        private void PopulateConnectionString()
+        {
+            try
+            {
+                using var connection = dbProvider.GetConnection();
+                this.DatabaseServer = connection.DataSource;
+                this.DatabaseName = connection.Database;
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(EventIDs.UIGenericError, ex, "Unable to determine database information");
+                this.DatabaseServer = "Unknown";
+                this.DatabaseName = "Unknown";
+            }
+        }
 
         public async Task BackupNow()
         {

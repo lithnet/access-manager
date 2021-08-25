@@ -62,7 +62,7 @@
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="27.1.1" />
     <PackageReference Include="FluentValidation" Version="9.0.1" />
-    <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7869.27380" />
+    <PackageReference Include="Lithnet.AccessManager.Enterprise" Version="1.0.7906.21482" />
     <PackageReference Include="mahapps.metro" Version="2.1.1" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="4.6.0" />
     <PackageReference Include="MahApps.Metro.SimpleChildWindow" Version="2.0.0-alpha0043" />
@@ -107,7 +107,7 @@
     <Compile Update="Windows\ImportWizardWindowView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="Windows\ExternalDialogWindow.xaml.cs">
+    <Compile Update="Windows\ExternalDialogWindowOld.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
@@ -280,7 +280,7 @@
     <Page Update="Windows\ImportWizardWindowView.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Windows\ExternalDialogWindow.xaml">
+    <Page Update="Windows\ExternalDialogWindowOld.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

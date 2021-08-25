@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class AzureAdObjectSelectorViewModel : Screen, IExternalDialogAware
+    public class AzureAdObjectSelectorViewModel : Screen, IExternalDialogAware, IHasSize 
     {
         private readonly IDialogCoordinator dialogCoordinator;
         private readonly ILogger<AzureAdObjectSelectorViewModel> logger;
@@ -150,5 +150,9 @@ namespace Lithnet.AccessManager.Server.UI
         public string SaveButtonName { get; set; } = "Select...";
 
         public string CancelButtonName { get; set; } = "Cancel";
+        
+        public int Width { get; } = 800;
+
+        public int Height { get; } = 500;
     }
 }

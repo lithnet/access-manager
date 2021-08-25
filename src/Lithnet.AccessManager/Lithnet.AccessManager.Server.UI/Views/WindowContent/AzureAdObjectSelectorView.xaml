@@ -11,8 +11,6 @@
              xmlns:views="clr-namespace:Lithnet.AccessManager.Server.UI.Views"
              xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
              Dialog:DialogParticipation.Register="{Binding}"
-             Width="800"
-             Height="450"
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800">

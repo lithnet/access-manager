@@ -95,7 +95,7 @@
                                         VerticalAlignment="Center" />
 
             <TextBlock Margin="5 0 0 0"
-                       Text="Standard edition"
+                       Text="Community edition"
                        FontWeight="Normal"
                        VerticalAlignment="Center" />
         </StackPanel>

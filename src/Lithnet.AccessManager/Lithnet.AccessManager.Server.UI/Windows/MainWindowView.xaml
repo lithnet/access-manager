@@ -7,9 +7,10 @@
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
         xmlns:s="https://github.com/canton7/Stylet"
-        xmlns:converter="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:metroIcons="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
         xmlns:helpers="clr-namespace:Telerik.Windows.Controls.Theming.Helpers;assembly=Telerik.Windows.Controls"
+        xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
         Title="{Binding WindowTitle}"
         BorderThickness="1"
         Width="1200" 
@@ -27,7 +28,7 @@
     </Window.InputBindings>
 
     <DockPanel LastChildFill="True">
-    
+
         <Menu DockPanel.Dock="Top"
               BorderBrush="{DynamicResource MahApps.Brushes.Control.Border}"
               BorderThickness="0,0,0,1">
@@ -68,12 +69,12 @@
                                    DisplayMode="Expanded"
                                    PaneToggleButtonVisibility="Visible"
                                    ExpandedPaneWidth="310"
-                                   AllowMultipleExpandedItems="True" 
+                                   AllowMultipleExpandedItems="True"
                                    PaneBackground="{DynamicResource MahApps.HamburgerMenu.Pane.Background}"
                                    PaneHeaderBackground="{DynamicResource MahApps.HamburgerMenu.Pane.Background}"
                                    AutoChangeDisplayMode="True" PaneHeaderHeight="0"
+                                   telerik:AnimationManager.IsAnimationEnabled="False"
         >
-
 
             <telerik:RadNavigationView.Resources>
                 <ResourceDictionary>
@@ -82,7 +83,7 @@
                         <Setter Property="BorderThickness" Value="0" />
                         <Setter Property="Foreground" Value="{DynamicResource MahApps.HamburgerMenu.Pane.Foreground}" />
                         <Setter Property="FontSize" Value="16"/>
-
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded, FallbackValue=false}"/>
                         <Setter Property="helpers:ThemeHelper.MouseOverBrush" Value="{DynamicResource MahApps.Brushes.Accent}"/>
                         <Setter Property="helpers:ThemeHelper.PressedBrush" Value="{DynamicResource MahApps.Brushes.Accent}"/>
                         <Setter Property="helpers:ThemeHelper.FocusBrush" Value="{DynamicResource MahApps.Brushes.Accent}"/>
@@ -91,7 +92,7 @@
                         <Setter Property="CollapsedIconTemplate">
                             <Setter.Value>
                                 <DataTemplate>
-                                    <converter:PackIconFontAwesome Kind="ChevronDownSolid" Foreground="White" VerticalAlignment="Center" Height="10" Width="10" HorizontalAlignment="Right" Margin="0 0 10 0"/>
+                                    <metroIcons:PackIconFontAwesome Kind="ChevronDownSolid" Foreground="White" VerticalAlignment="Center" Height="10" Width="10" HorizontalAlignment="Right" Margin="0 0 10 0"/>
                                 </DataTemplate>
                             </Setter.Value>
                         </Setter>
@@ -99,7 +100,7 @@
                         <Setter Property="ExpandedIconTemplate">
                             <Setter.Value>
                                 <DataTemplate>
-                                    <converter:PackIconFontAwesome Kind="ChevronUpSolid" Foreground="White" VerticalAlignment="Center" Height="10" Width="10" HorizontalAlignment="Right" Margin="0 0 10 0"/>
+                                    <metroIcons:PackIconFontAwesome Kind="ChevronUpSolid" Foreground="White" VerticalAlignment="Center" Height="10" Width="10" HorizontalAlignment="Right" Margin="0 0 10 0"/>
                                 </DataTemplate>
                             </Setter.Value>
                         </Setter>
@@ -116,7 +117,7 @@
                                        Width="16"
                                        Height="16"
                                        Margin="5"
-                                       Source="{Binding Converter={converter:PackIconKindToImageConverter Brush=White}}"/>
+                                       Source="{Binding Converter={metroIcons:PackIconKindToImageConverter Brush=White}}"/>
                                 </DataTemplate>
                             </Setter.Value>
                         </Setter>
@@ -135,7 +136,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
-                                <converter:PackIconFontAwesome Kind="ExclamationTriangleSolid" Margin="5" Foreground="Orange" VerticalAlignment="Center"/>
+                                <metroIcons:PackIconFontAwesome Kind="ExclamationTriangleSolid" Margin="5" Foreground="Orange" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="1"  TextWrapping="Wrap" Margin="5">The web service is currently not configured. Assign a TLS certificate and validate the information on the service hosting page, save the configuration, and restart the service to activate the Access Manager Service</TextBlock>
                             </Grid>
                             <Grid Background="LightYellow"
@@ -145,7 +146,7 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
-                                <converter:PackIconFontAwesome Kind="ExclamationTriangleSolid" Margin="5" Foreground="Orange" VerticalAlignment="Center"/>
+                                <metroIcons:PackIconFontAwesome Kind="ExclamationTriangleSolid" Margin="5" Foreground="Orange" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="1" TextWrapping="Wrap" Margin="5">Changes have been made that will not take effect until the service is restarted</TextBlock>
                             </Grid>
                         </StackPanel>

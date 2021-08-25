@@ -35,6 +35,23 @@ namespace Lithnet.AccessManager.Server.UI
         [NotifyModelChangedProperty(RequiresServiceRestart = true)]
         public bool AllowAmsManagedDeviceAuth { get => this.agentOptions.AllowAmsManagedDeviceAuth; set => this.agentOptions.AllowAmsManagedDeviceAuth = value; }
 
+
+
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
+        public bool AllowAzureAdJoinedDevices
+        {
+            get => this.agentOptions.AllowAzureAdJoinedDeviceAuth;
+            set => this.agentOptions.AllowAzureAdJoinedDeviceAuth = value;
+        }
+
+        [NotifyModelChangedProperty(RequiresServiceRestart = true)]
+        public bool AllowAzureAdRegisteredDevices
+        {
+            get => this.agentOptions.AllowAzureAdRegisteredDeviceAuth;
+            set => this.agentOptions.AllowAzureAdRegisteredDeviceAuth = value;
+        }
+
+
         public PackIconMaterialKind Icon => PackIconMaterialKind.ShieldLock;
     }
 }

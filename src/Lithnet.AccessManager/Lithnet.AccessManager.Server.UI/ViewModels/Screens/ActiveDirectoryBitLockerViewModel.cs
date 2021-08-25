@@ -1,10 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using Lithnet.AccessManager.Server.Configuration;
-using MahApps.Metro.Controls.Dialogs;
-using MahApps.Metro.IconPacks;
+﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Stylet;
+using System;
+using System.Threading.Tasks;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -15,12 +13,16 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
         private readonly ILogger<ActiveDirectoryBitLockerViewModel> logger;
+        private readonly IWindowManager windowManager;
+        private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
 
-        public ActiveDirectoryBitLockerViewModel(IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, IShellExecuteProvider shellExecuteProvider, IScriptTemplateProvider scriptTemplateProvider, ILogger<ActiveDirectoryBitLockerViewModel> logger)
+        public ActiveDirectoryBitLockerViewModel(IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, IShellExecuteProvider shellExecuteProvider, IScriptTemplateProvider scriptTemplateProvider, ILogger<ActiveDirectoryBitLockerViewModel> logger, IWindowManager windowManager, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.scriptTemplateProvider = scriptTemplateProvider;
             this.logger = logger;
+            this.windowManager = windowManager;
+            this.externalDialogWindowFactory = externalDialogWindowFactory;
             this.dialogCoordinator = dialogCoordinator;
             this.windowsServiceProvider = windowsServiceProvider;
             this.DisplayName = "BitLocker";
@@ -38,15 +40,8 @@ namespace Lithnet.AccessManager.Server.UI
                     ScriptText = this.scriptTemplateProvider.GrantBitLockerRecoveryPasswordPermissions.Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceAccountSid().ToString(), StringComparison.OrdinalIgnoreCase)
                 };
 
-                ExternalDialogWindow w = new ExternalDialogWindow
-                {
-                    Title = "Script",
-                    DataContext = vm,
-                    SaveButtonVisible = false,
-                    CancelButtonName = "Close"
-                };
-
-                w.ShowDialog();
+                var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
+                windowManager.ShowDialog(evm);
             }
             catch (Exception ex)
             {

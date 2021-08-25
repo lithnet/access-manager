@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Telerik.Windows.Controls;
 
 namespace Lithnet.AccessManager.Server.UI
 {
@@ -27,6 +28,8 @@ namespace Lithnet.AccessManager.Server.UI
             EventManager.RegisterClassHandler(typeof(PasswordBox), UIElement.PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(SelectivelyIgnoreMouseButton));
             EventManager.RegisterClassHandler(typeof(PasswordBox), UIElement.GotKeyboardFocusEvent, new RoutedEventHandler(SelectAllText));
             EventManager.RegisterClassHandler(typeof(PasswordBox), Control.MouseDoubleClickEvent, new RoutedEventHandler(SelectAllText));
+
+            EventManager.RegisterClassHandler(typeof(RadNavigationViewItem), RadNavigationViewItem.ClickEvent, new RoutedEventHandler(OnRadNavigationViewItemClick));
 
             FrameworkElement.LanguageProperty.OverrideMetadata(typeof(FrameworkElement),
                 new FrameworkPropertyMetadata(System.Windows.Markup.XmlLanguage.GetLanguage(System.Globalization.CultureInfo.CurrentCulture.IetfLanguageTag)));
@@ -115,6 +118,27 @@ namespace Lithnet.AccessManager.Server.UI
             if (e.OriginalSource is PasswordBox passwordBox)
             {
                 passwordBox.SelectAll();
+            }
+        }
+
+        private void OnRadNavigationViewItemClick(object sender, RoutedEventArgs e)
+        {
+            RadNavigationViewItem item = e.OriginalSource as RadNavigationViewItem;
+            if (item == null)
+            {
+                return;
+            }
+
+            if (item.Items.Count == 0)
+            {
+                return;
+            }
+
+            if (item.IsExpanded && !item.IsSelected)
+            {
+                // The nav view is going to toggle the expanded state, so in the case where a user is returning to a top level menu that is already expanded, set the isexpanded property to false, so that the toggle that comes next returns the value to true.
+                item.IsExpanded = false; 
+                e.Handled = true;
             }
         }
     }

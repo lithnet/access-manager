@@ -113,7 +113,7 @@
                                         IsSolid="True"
                                         Grid.Column="1"
                                         Visibility="{Binding IsStandardEdition, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                        ToolTipText="Standard edition"
+                                        ToolTipText="Community edition"
                                         Margin="2 2 5 2" />
         </Grid>
     </StackPanel>

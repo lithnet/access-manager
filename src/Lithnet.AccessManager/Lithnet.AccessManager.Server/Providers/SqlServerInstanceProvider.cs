@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Data.SqlClient;
-using System.Security.Principal;
 
 namespace Lithnet.AccessManager.Server.Providers
 {
@@ -49,8 +48,6 @@ namespace Lithnet.AccessManager.Server.Providers
             {
                 this.ConnectionString = this.registryProvider.ConnectionString;
             }
-
-            this.logger.LogTrace($"AMS DB connection string {this.ConnectionString}");
 
             if (!this.DoesDbExist(this.ConnectionString))
             {

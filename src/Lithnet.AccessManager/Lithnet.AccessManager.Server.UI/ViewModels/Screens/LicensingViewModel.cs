@@ -23,8 +23,10 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly LicensingOptions licensingOptions;
         private readonly ILicenseDataProvider licenseDataProvider;
         private readonly IEventAggregator eventAggregator;
+        private readonly IWindowManager windowManager;
+        private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
 
-        public LicensingViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, IAmsLicenseManager licenseManager, ILogger<LicensingViewModel> logger, LicensingOptions licensingOptions, INotifyModelChangedEventPublisher eventPublisher, ILicenseDataProvider licenseDataProvider, IEventAggregator eventAggregator)
+        public LicensingViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, IAmsLicenseManager licenseManager, ILogger<LicensingViewModel> logger, LicensingOptions licensingOptions, INotifyModelChangedEventPublisher eventPublisher, ILicenseDataProvider licenseDataProvider, IEventAggregator eventAggregator, IWindowManager windowManager, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.licenseManager = licenseManager;
@@ -32,6 +34,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.licensingOptions = licensingOptions;
             this.licenseDataProvider = licenseDataProvider;
             this.eventAggregator = eventAggregator;
+            this.windowManager = windowManager;
+            this.externalDialogWindowFactory = externalDialogWindowFactory;
             this.dialogCoordinator = dialogCoordinator;
             this.DisplayName = "AMS License";
             this.ValidationResult = licenseManager.ValidateLicense(licenseDataProvider.GetRawLicenseData());
@@ -160,9 +164,9 @@ namespace Lithnet.AccessManager.Server.UI
 
         public string Product => this.License?.ProductName;
 
-        public string EffectiveProductEdition => this.ValidationResult.EffectiveSku == (uint)ProductSku.Enterprise ? "Enterprise" : "Standard";
+        public string EffectiveProductEdition => this.ValidationResult.EffectiveSku == (uint)ProductSku.Enterprise ? "Enterprise" : "Community";
 
-        public string ProductEdition => this.License == null ? null : this.License.ProductSku == (uint)ProductSku.Enterprise ? "Enterprise" : "Standard";
+        public string ProductEdition => this.License == null ? null : this.License.ProductSku == (uint)ProductSku.Enterprise ? "Enterprise" : "Community";
 
         public string Units => this.License?.Units.ToString();
 
@@ -193,25 +197,19 @@ namespace Lithnet.AccessManager.Server.UI
             try
             {
                 LicenseKeyViewModel vm = new LicenseKeyViewModel();
-                ExternalDialogWindow window = new ExternalDialogWindow
-                {
-                    DataContext = vm,
-                    Height = 600,
-                    SaveButtonName = "OK"
-                };
+                var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
 
-                if (window.ShowDialog() == false)
+                if (!windowManager.ShowDialog(evm) ?? false)
                 {
                     return;
                 }
-
+        
                 string data = vm.LicenseKeyData;
 
                 if (string.IsNullOrWhiteSpace(data))
                 {
                     return;
                 }
-
 
                 data = data.Trim().Replace("\r", "").Replace("\n", "").Replace(" ", "").Replace("\t", "");
 
@@ -262,7 +260,7 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                var result = await this.dialogCoordinator.ShowMessageAsync(this, "Delete license data", "By removing the license data, the application will revert immediately to standard edition, and any enterprise edition features will no longer be available. Are you sure you want to delete the existing license data?", MessageDialogStyle.AffirmativeAndNegative);
+                var result = await this.dialogCoordinator.ShowMessageAsync(this, "Delete license data", "By removing the license data, the application will revert immediately to community edition, and any enterprise edition features will no longer be available. Are you sure you want to delete the existing license data?", MessageDialogStyle.AffirmativeAndNegative);
 
                 if (result == MessageDialogResult.Affirmative)
                 {

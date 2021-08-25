@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class AmsGroupSelectorViewModel : Screen, IExternalDialogAware
+    public class AmsGroupSelectorViewModel : Screen, IExternalDialogAware, IHasSize
     {
         private readonly ILogger<AmsGroupSelectorViewModel> logger;
         private readonly IAmsGroupProvider groupProvider;
@@ -73,5 +73,9 @@ namespace Lithnet.AccessManager.Server.UI
         public string SaveButtonName { get; set; } = "Select...";
 
         public string CancelButtonName { get; set; } = "Cancel";
+
+        public int Width { get; } = 800;
+
+        public int Height { get; } = 500;
     }
 }

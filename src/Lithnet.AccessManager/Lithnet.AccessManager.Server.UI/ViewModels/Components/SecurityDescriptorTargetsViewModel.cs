@@ -24,8 +24,6 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class SecurityDescriptorTargetsViewModel : Screen
     {
-        private const int childWindowHeight = 586;
-        private const int childWindowWidth = 862;
         private readonly IEnumerable<IComputerTargetProvider> computerTargetProviders;
         private readonly SecurityDescriptorTargetViewModelComparer customComparer;
         private readonly IDialogCoordinator dialogCoordinator;
@@ -35,6 +33,8 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IViewModelFactory<EffectiveAccessViewModel, SecurityDescriptorTargetsViewModel> effectiveAccessFactory;
         private readonly INotifyModelChangedEventPublisher eventPublisher;
         private readonly IShellExecuteProvider shellExecuteProvider;
+        private readonly IWindowManager windowManager;
+        private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
 
         private bool firstSearch;
         private ListSortDirection currentSortDirection = ListSortDirection.Ascending;
@@ -44,7 +44,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public Task Initialization { get; private set; }
 
-        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, IAsyncViewModelFactory<SecurityDescriptorTargetViewModel, SecurityDescriptorTarget, SecurityDescriptorTargetViewModelDisplaySettings> factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IActiveDirectory directory, IEnumerable<IComputerTargetProvider> computerTargetProviders, IViewModelFactory<EffectiveAccessViewModel, SecurityDescriptorTargetsViewModel> effectiveAccessFactory, IShellExecuteProvider shellExecuteProvider)
+        public SecurityDescriptorTargetsViewModel(IList<SecurityDescriptorTarget> model, IAsyncViewModelFactory<SecurityDescriptorTargetViewModel, SecurityDescriptorTarget, SecurityDescriptorTargetViewModelDisplaySettings> factory, IDialogCoordinator dialogCoordinator, INotifyModelChangedEventPublisher eventPublisher, ILogger<SecurityDescriptorTargetsViewModel> logger, IActiveDirectory directory, IEnumerable<IComputerTargetProvider> computerTargetProviders, IViewModelFactory<EffectiveAccessViewModel, SecurityDescriptorTargetsViewModel> effectiveAccessFactory, IShellExecuteProvider shellExecuteProvider, IWindowManager windowManager, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory)
         {
             this.factory = factory;
             this.Model = model;
@@ -54,6 +54,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.computerTargetProviders = computerTargetProviders;
             this.effectiveAccessFactory = effectiveAccessFactory;
             this.shellExecuteProvider = shellExecuteProvider;
+            this.windowManager = windowManager;
+            this.externalDialogWindowFactory = externalDialogWindowFactory;
             this.customComparer = new SecurityDescriptorTargetViewModelComparer();
             this.ChildDisplaySettings = new SecurityDescriptorTargetViewModelDisplaySettings();
             this.eventPublisher = eventPublisher;
@@ -94,28 +96,23 @@ namespace Lithnet.AccessManager.Server.UI
         {
             try
             {
-                ExternalDialogWindow w = new ExternalDialogWindow
-                {
-                    Title = "Add authorization rule",
-                    SaveButtonIsDefault = true,
-                    Height = childWindowHeight,
-                    Width = childWindowWidth,
-                };
-
                 var m = new SecurityDescriptorTarget();
                 var vm = await this.factory.CreateViewModelAsync(m, this.ChildDisplaySettings);
-                w.DataContext = vm;
+                var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
+                evm.DisplayName = "Add new authorization rule";
 
-                if (w.ShowDialog() == true)
+                if (!windowManager.ShowDialog(evm) ?? false)
                 {
-                    m.CreatedBy = WindowsIdentity.GetCurrent().User.ToString();
-                    m.Created = DateTime.UtcNow;
-                    m.LastModifiedBy = WindowsIdentity.GetCurrent().User.ToString();
-                    m.LastModified = m.Created;
-
-                    this.Model.Add(m);
-                    this.ViewModels.Add(vm);
+                    return;
                 }
+
+                m.CreatedBy = WindowsIdentity.GetCurrent().User.ToString();
+                m.Created = DateTime.UtcNow;
+                m.LastModifiedBy = WindowsIdentity.GetCurrent().User.ToString();
+                m.LastModified = m.Created;
+
+                this.Model.Add(m);
+                this.ViewModels.Add(vm);
             }
             catch (Exception ex)
             {
@@ -233,20 +230,9 @@ namespace Lithnet.AccessManager.Server.UI
         public void ShowEffectivePermissions()
         {
             var vm = this.effectiveAccessFactory.CreateViewModel(this);
+            var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
 
-            ExternalDialogWindow window = new ExternalDialogWindow(shellExecuteProvider)
-            {
-                Title = "Effective Access",
-                DataContext = vm,
-                CancelButtonName = "Close",
-                SaveButtonVisible = false,
-                Height = 770
-            };
-
-            if (window.ShowDialog() == false)
-            {
-                return;
-            }
+            windowManager.ShowDialog(evm);
         }
 
         public async Task Delete(IList items)
@@ -288,10 +274,10 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task Edit()
         {
-            await this.EditItem(this.SelectedItem, this.GetWindow());
+            await this.EditItem(this.SelectedItem);
         }
 
-        public async Task EditItem(SecurityDescriptorTargetViewModel selectedItem, Window owner)
+        public async Task EditItem(SecurityDescriptorTargetViewModel selectedItem)
         {
             try
             {
@@ -300,38 +286,31 @@ namespace Lithnet.AccessManager.Server.UI
                     return;
                 }
 
-                ExternalDialogWindow w = new ExternalDialogWindow
-                {
-                    Title = "Edit rule",
-                    SaveButtonIsDefault = true,
-                    Height = childWindowHeight,
-                    Width = childWindowWidth,
-                    Owner = owner
-                };
-
                 var m = JsonConvert.DeserializeObject<SecurityDescriptorTarget>(JsonConvert.SerializeObject(selectedItem.Model));
                 var vm = await this.factory.CreateViewModelAsync(m, this.ChildDisplaySettings);
-
                 vm.IsEditing = true;
-
-                w.DataContext = vm;
                 await vm.UpdateDisplayName(true);
 
-                if (w.ShowDialog() == true)
+                var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
+                evm.DisplayName = "Edit authorization rule";
+
+                if (!windowManager.ShowDialog(evm) ?? false)
                 {
-                    this.Model.Remove(selectedItem.Model);
-
-                    int existingPosition = this.ViewModels.IndexOf(selectedItem);
-
-                    this.ViewModels.Remove(selectedItem);
-                    this.Model.Add(m);
-
-                    m.LastModifiedBy = WindowsIdentity.GetCurrent().User.ToString();
-                    m.LastModified = DateTime.UtcNow;
-
-                    this.ViewModels.Insert(Math.Min(Math.Max(existingPosition, 0), this.ViewModels.Count), vm);
-                    this.SelectedItem = vm;
+                    return;
                 }
+
+                this.Model.Remove(selectedItem.Model);
+
+                int existingPosition = this.ViewModels.IndexOf(selectedItem);
+
+                this.ViewModels.Remove(selectedItem);
+                this.Model.Add(m);
+
+                m.LastModifiedBy = WindowsIdentity.GetCurrent().User.ToString();
+                m.LastModified = DateTime.UtcNow;
+
+                this.ViewModels.Insert(Math.Min(Math.Max(existingPosition, 0), this.ViewModels.Count), vm);
+                this.SelectedItem = vm;
             }
             catch (Exception ex)
             {

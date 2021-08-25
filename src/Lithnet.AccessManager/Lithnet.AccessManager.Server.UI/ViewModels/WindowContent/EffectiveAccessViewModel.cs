@@ -14,7 +14,7 @@ using Stylet;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class EffectiveAccessViewModel : Screen, IHelpLink
+    public class EffectiveAccessViewModel : Screen, IHelpLink, IExternalDialogAware, IHasSize
     {
         private readonly IAuthorizationInformationBuilder authorizationBuilder;
         private readonly IDialogCoordinator dialogCoordinator;
@@ -67,6 +67,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.externalDialogWindowFactory = externalDialogWindowFactory;
             this.windowManager = windowManager;
             this.logger = logger;
+            this.DisplayName = "Calculate effective access";
         }
 
         public bool CanCalculateEffectiveAccess => !string.IsNullOrWhiteSpace(this.Username) && !string.IsNullOrWhiteSpace(this.ComputerName);
@@ -234,7 +235,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public async Task Edit()
         {
-            await this.targets.EditItem(this.SelectedItem?.Model, this.GetWindow());
+            await this.targets.EditItem(this.SelectedItem?.Model);
         }
 
         public async Task ComputerNameTextBoxKeyDown(object sender, KeyEventArgs e)
@@ -267,5 +268,21 @@ namespace Lithnet.AccessManager.Server.UI
         }
 
         public string HelpLink => Constants.HelpLinkPageEffectiveAccess;
+
+        public bool CancelButtonVisible { get; } = true;
+
+        public bool SaveButtonVisible { get; } = false;
+
+        public bool CancelButtonIsDefault { get; } = true;
+
+        public bool SaveButtonIsDefault { get; } = false;
+
+        public string SaveButtonName { get; } = null;
+
+        public string CancelButtonName { get; } = "Close";
+
+        public int Width { get; } = 800;
+
+        public int Height { get; } = 770;
     }
 }

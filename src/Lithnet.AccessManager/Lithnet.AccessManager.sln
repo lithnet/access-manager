@@ -23,6 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		build-all.bat = build-all.bat
 		build-service-beta.bat = build-service-beta.bat
 		build-service.bat = build-service.bat
+		notarize.ps1 = notarize.ps1
 		version.txt = version.txt
 	EndProjectSection
 EndProject

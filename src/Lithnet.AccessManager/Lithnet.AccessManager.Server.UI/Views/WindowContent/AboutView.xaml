@@ -9,21 +9,22 @@
              dialog:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" d:DesignWidth="800"
              Margin="5">
-    <StackPanel>
-        <Image Source="/access-manager.png" Height="50" HorizontalAlignment="Left"/>
-
-        <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0">
+            <Image Source="/access-manager.png" Height="50" HorizontalAlignment="Left"/>
+            <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
                Content="About" />
-
-        <TextBlock Margin="5">Lithnet Access Manager (c) 2021 Lithnet Pty Ltd</TextBlock>
-
-        <TextBlock Margin="5" Text="{Binding CurrentVersion, FallbackValue='1.0.0.0'}" />
-     
-
-        <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
+            <TextBlock Margin="5">Lithnet Access Manager (c) 2021 Lithnet Pty Ltd</TextBlock>
+            <TextBlock  Margin="5" Text="{Binding CurrentVersion, FallbackValue='1.0.0.0'}" />
+            <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
                Content="Third party notices" />
-        <local:BindableRichTextBox FlowDocument="{Binding ThirdPartyNotices}" IsReadOnly="True" Height="200" VerticalScrollBarVisibility="Visible"></local:BindableRichTextBox>
+        </StackPanel>
+        <local:BindableRichTextBox Grid.Row="1" FlowDocument="{Binding ThirdPartyNotices}" IsReadOnly="True"  VerticalScrollBarVisibility="Visible"></local:BindableRichTextBox>
 
-    </StackPanel>
+    </Grid>
 
 </UserControl>

@@ -240,7 +240,7 @@ namespace Lithnet.AccessManager.Service
             }
             else
             {
-                logger.LogInformation("Starting Lithnet Access Manager Standard Edition");
+                logger.LogInformation("Starting Lithnet Access Manager Community Edition");
             }
 
             return licenseManager;

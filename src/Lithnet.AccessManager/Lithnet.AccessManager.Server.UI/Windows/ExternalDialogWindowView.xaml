@@ -15,7 +15,9 @@
                       ShowMaxRestoreButton="False"
                       ShowMinButton="False"
                       WindowStyle="SingleBorderWindow"
-                      SizeToContent="WidthAndHeight"
+                      SizeToContent="{Binding SizeToContent}"
+                      Width="{Binding Width, Mode=TwoWay, FallbackValue=800}"
+                      Height="{Binding Height, Mode=TwoWay, FallbackValue=500}"
                       xmlns:s="https://github.com/canton7/Stylet"
                       controls:DialogParticipation.Register="{Binding}"
                       mc:Ignorable="d">

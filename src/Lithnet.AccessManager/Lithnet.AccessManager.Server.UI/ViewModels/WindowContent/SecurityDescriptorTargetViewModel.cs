@@ -20,7 +20,7 @@ using Domain = System.DirectoryServices.ActiveDirectory.Domain;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public sealed class SecurityDescriptorTargetViewModel : ValidatingModelBase, IViewAware
+    public sealed class SecurityDescriptorTargetViewModel : Screen, IExternalDialogAware, IHasSize
     {
         private readonly IActiveDirectory directory;
         private readonly ILogger<SecurityDescriptorTargetViewModel> logger;
@@ -343,8 +343,6 @@ namespace Lithnet.AccessManager.Server.UI
         public int JitExpireMinutes { get => (int)this.JitExpireAfter.TotalMinutes; set => this.JitExpireAfter = new TimeSpan(0, Math.Max(value, 15), 0); }
 
         public PasswordStorageLocation RetrievalLocation { get => this.Model.Laps.RetrievalLocation; set => this.Model.Laps.RetrievalLocation = value; }
-
-        public string DisplayName { get; private set; }
 
         public string CachedTargetName { get => this.Model.CachedTargetName; set => this.Model.CachedTargetName = value; }
 
@@ -821,8 +819,6 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public UIElement View { get; set; }
-
         private async Task<string> GetTargetNameFromSidOrDefaultAsync(string sid)
         {
             if (string.IsNullOrWhiteSpace(sid))
@@ -973,11 +969,6 @@ namespace Lithnet.AccessManager.Server.UI
             return null;
         }
 
-        public void AttachView(UIElement view)
-        {
-            this.View = view;
-        }
-
         public async Task LearnMoreLinkLapsHistory()
         {
             await this.shellExecuteProvider.OpenWithShellExecute(Constants.EnterpriseEditionLearnMoreLinkLapsHistory);
@@ -987,5 +978,21 @@ namespace Lithnet.AccessManager.Server.UI
         {
             await this.shellExecuteProvider.OpenWithShellExecute(Constants.EnterpriseEditionLearnMoreLinkPowerShellAuthz);
         }
+
+        public bool CancelButtonVisible { get; } = true;
+        
+        public bool SaveButtonVisible { get; } = true;
+        
+        public bool CancelButtonIsDefault { get; } = false;
+        
+        public bool SaveButtonIsDefault { get; } = true;
+        
+        public string SaveButtonName { get; } = "Save";
+        
+        public string CancelButtonName { get; } = "Cancel";
+        
+        public int Width { get; } = 862;
+        
+        public int Height { get; } = 586;
     }
 }

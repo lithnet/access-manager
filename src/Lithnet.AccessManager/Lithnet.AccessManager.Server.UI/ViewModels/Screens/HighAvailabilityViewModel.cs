@@ -20,8 +20,10 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ISecretRekeyProvider rekeyProvider;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
         private readonly IWindowsServiceProvider windowsServiceProvider;
+        private readonly IWindowManager windowManager;
+        private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
 
-        public HighAvailabilityViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, ILogger<HighAvailabilityViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, DataProtectionOptions dataProtectionOptions, ICertificateSynchronizationProvider certSyncProvider, ISecretRekeyProvider rekeyProvider, IScriptTemplateProvider scriptTemplateProvider, IWindowsServiceProvider windowsServiceProvider, IViewModelFactory<EnterpriseEditionBannerViewModel, EnterpriseEditionBannerModel> enterpriseEditionViewModelFactory)
+        public HighAvailabilityViewModel(IDialogCoordinator dialogCoordinator, IShellExecuteProvider shellExecuteProvider, ILogger<HighAvailabilityViewModel> logger, INotifyModelChangedEventPublisher eventPublisher, DataProtectionOptions dataProtectionOptions, ICertificateSynchronizationProvider certSyncProvider, ISecretRekeyProvider rekeyProvider, IScriptTemplateProvider scriptTemplateProvider, IWindowsServiceProvider windowsServiceProvider, IViewModelFactory<EnterpriseEditionBannerViewModel, EnterpriseEditionBannerModel> enterpriseEditionViewModelFactory, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory, IWindowManager windowManager)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.logger = logger;
@@ -31,6 +33,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.rekeyProvider = rekeyProvider;
             this.scriptTemplateProvider = scriptTemplateProvider;
             this.windowsServiceProvider = windowsServiceProvider;
+            this.externalDialogWindowFactory = externalDialogWindowFactory;
+            this.windowManager = windowManager;
 
             this.DisplayName = "High availability";
             eventPublisher.Register(this);
@@ -126,15 +130,8 @@ namespace Lithnet.AccessManager.Server.UI
                         .Replace("{serviceAccount}", this.windowsServiceProvider.GetServiceNTAccount().Value, StringComparison.OrdinalIgnoreCase)
                 };
 
-                ExternalDialogWindow w = new ExternalDialogWindow
-                {
-                    Title = "Script",
-                    DataContext = vm,
-                    SaveButtonVisible = false,
-                    CancelButtonName = "Close"
-                };
-
-                w.ShowDialog();
+                var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
+                windowManager.ShowDialog(evm);
             }
             catch (Exception ex)
             {

@@ -9,7 +9,7 @@ using System.Windows.Controls;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class AmsDeviceSelectorViewModel : Screen, IExternalDialogAware
+    public class AmsDeviceSelectorViewModel : Screen, IExternalDialogAware, IHasSize
     {
         private readonly ILogger<AmsDeviceSelectorViewModel> logger;
         private readonly IDeviceProvider deviceProvider;
@@ -64,7 +64,7 @@ namespace Lithnet.AccessManager.Server.UI
         public BindableCollection<DeviceViewModel> Devices { get; set; }
 
         public DeviceViewModel SelectedItem { get; set; }
-        
+
         public bool CancelButtonVisible { get; set; } = true;
 
         public bool SaveButtonVisible { get; set; } = true;
@@ -76,5 +76,9 @@ namespace Lithnet.AccessManager.Server.UI
         public string SaveButtonName { get; set; } = "Select...";
 
         public string CancelButtonName { get; set; } = "Cancel";
+
+        public int Width { get; } = 800;
+
+        public int Height { get; } = 500;
     }
 }

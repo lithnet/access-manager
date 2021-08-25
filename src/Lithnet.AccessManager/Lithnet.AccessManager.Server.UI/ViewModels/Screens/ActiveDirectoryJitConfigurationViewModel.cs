@@ -28,10 +28,10 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IObjectSelectionProvider objectSelectionProvider;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
         private readonly ILogger<ActiveDirectoryJitConfigurationViewModel> logger;
+        private readonly IWindowManager windowManager;
+        private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
 
-        // public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.UserClockSolid;
-
-        public ActiveDirectoryJitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IViewModelFactory<JitGroupMappingViewModel, JitGroupMapping> groupMappingFactory, INotifyModelChangedEventPublisher eventPublisher, IViewModelFactory<JitDomainStatusViewModel, Domain, JitDynamicGroupMapping> jitDomainStatusFactory, IWindowsServiceProvider windowsServiceProvider, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IObjectSelectionProvider objectSelectionProvider, IScriptTemplateProvider scriptTemplateProvider, ILogger<ActiveDirectoryJitConfigurationViewModel> logger)
+        public ActiveDirectoryJitConfigurationViewModel(JitConfigurationOptions jitOptions, IDialogCoordinator dialogCoordinator, IViewModelFactory<JitGroupMappingViewModel, JitGroupMapping> groupMappingFactory, INotifyModelChangedEventPublisher eventPublisher, IViewModelFactory<JitDomainStatusViewModel, Domain, JitDynamicGroupMapping> jitDomainStatusFactory, IWindowsServiceProvider windowsServiceProvider, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IObjectSelectionProvider objectSelectionProvider, IScriptTemplateProvider scriptTemplateProvider, ILogger<ActiveDirectoryJitConfigurationViewModel> logger, IWindowManager windowManager, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.dialogCoordinator = dialogCoordinator;
@@ -45,6 +45,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.objectSelectionProvider = objectSelectionProvider;
             this.scriptTemplateProvider = scriptTemplateProvider;
             this.logger = logger;
+            this.windowManager = windowManager;
+            this.externalDialogWindowFactory = externalDialogWindowFactory;
 
             this.DisplayName = "Just-in-time access";
             this.GroupMappings = new BindableCollection<JitGroupMappingViewModel>();
@@ -285,15 +287,8 @@ namespace Lithnet.AccessManager.Server.UI
                         .Replace("{domain}", discoveryServices.GetDomainNameDns(current.GroupOU))
                 };
 
-                ExternalDialogWindow w = new ExternalDialogWindow
-                {
-                    Title = "Script",
-                    DataContext = vm,
-                    SaveButtonVisible = false,
-                    CancelButtonName = "Close"
-                };
-
-                w.ShowDialog();
+                var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
+                windowManager.ShowDialog(evm);
             }
             catch (Exception ex)
             {
@@ -319,15 +314,8 @@ namespace Lithnet.AccessManager.Server.UI
                         .Replace("{domain}", current.Domain.Name)
                 };
 
-                ExternalDialogWindow w = new ExternalDialogWindow
-                {
-                    Title = "Script",
-                    DataContext = vm,
-                    SaveButtonVisible = false,
-                    CancelButtonName = "Close"
-                };
-
-                w.ShowDialog();
+                var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
+                windowManager.ShowDialog(evm);
             }
             catch (Exception ex)
             {
@@ -351,15 +339,8 @@ namespace Lithnet.AccessManager.Server.UI
                         .Replace("{domain}", current.Domain.Forest.Name)
                 };
 
-                ExternalDialogWindow w = new ExternalDialogWindow
-                {
-                    Title = "Script",
-                    DataContext = vm,
-                    SaveButtonVisible = false,
-                    CancelButtonName = "Close"
-                };
-
-                w.ShowDialog();
+                var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
+                windowManager.ShowDialog(evm);
                 await current.RefreshStatus();
             }
             catch (Exception ex)

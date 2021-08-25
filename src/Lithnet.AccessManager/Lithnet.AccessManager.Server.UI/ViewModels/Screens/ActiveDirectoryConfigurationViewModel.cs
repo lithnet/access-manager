@@ -18,10 +18,12 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IDomainTrustProvider domainTrustProvider;
         private readonly IScriptTemplateProvider scriptTemplateProvider;
         private readonly ILogger<ActiveDirectoryConfigurationViewModel> logger;
+        private readonly IWindowManager windowManager;
+        private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
 
         public PackIconBoxIconsKind Icon => PackIconBoxIconsKind.RegularBookContent;
 
-        public ActiveDirectoryConfigurationViewModel(ActiveDirectoryMicrosoftLapsConfigurationViewModel msLapsVm, ActiveDirectoryLithnetLapsConfigurationViewModel lithnetLapsVm, ActiveDirectoryBitLockerViewModel bitLockerVm, ActiveDirectoryJitConfigurationViewModel jitVm, IViewModelFactory<ActiveDirectoryDomainPermissionViewModel, Domain> domainFactory, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<ActiveDirectoryConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IScriptTemplateProvider scriptTemplateProvider)
+        public ActiveDirectoryConfigurationViewModel(ActiveDirectoryMicrosoftLapsConfigurationViewModel msLapsVm, ActiveDirectoryLithnetLapsConfigurationViewModel lithnetLapsVm, ActiveDirectoryBitLockerViewModel bitLockerVm, ActiveDirectoryJitConfigurationViewModel jitVm, IViewModelFactory<ActiveDirectoryDomainPermissionViewModel, Domain> domainFactory, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<ActiveDirectoryConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IScriptTemplateProvider scriptTemplateProvider, IWindowManager windowManager, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.domainFactory = domainFactory;
@@ -30,6 +32,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.shellExecuteProvider = shellExecuteProvider;
             this.domainTrustProvider = domainTrustProvider;
             this.scriptTemplateProvider = scriptTemplateProvider;
+            this.windowManager = windowManager;
+            this.externalDialogWindowFactory = externalDialogWindowFactory;
             this.DisplayName = "Active Directory";
 
             this.Items.Add(msLapsVm);
@@ -127,15 +131,8 @@ namespace Lithnet.AccessManager.Server.UI
                         .Replace("{serviceAccountSid}", this.windowsServiceProvider.GetServiceAccountSid().Value, StringComparison.OrdinalIgnoreCase)
                 };
 
-                ExternalDialogWindow w = new ExternalDialogWindow
-                {
-                    Title = "Script",
-                    DataContext = vm,
-                    SaveButtonVisible = false,
-                    CancelButtonName = "Close"
-                };
-
-                w.ShowDialog();
+                var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
+                windowManager.ShowDialog(evm);
 
                 await current.RefreshGroupMembershipAsync();
             }

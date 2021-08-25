@@ -6,97 +6,97 @@
     xmlns:telerik1="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls"
     xmlns:telerikNavigation="clr-namespace:Telerik.Windows.Controls;assembly=Telerik.Windows.Controls.Navigation"
     xmlns:animation="clr-namespace:Telerik.Windows.Controls.Animation;assembly=Telerik.Windows.Controls">
-        <SolidColorBrush x:Key="NavigationView_HamburgerButtonIconForeground" Color="#FF000000"/>
+    <SolidColorBrush x:Key="NavigationView_HamburgerButtonIconForeground" Color="#FF000000"/>
 
-        <LinearGradientBrush x:Key="NavigationView_NavItemBorderBrush_Selected_Outer" EndPoint="0.5,1" StartPoint="0.5,0">
-            <GradientStop Color="#FF282828" Offset="0"/>
-            <GradientStop Color="#FF5F5F5F" Offset="1"/>
-        </LinearGradientBrush>
+    <LinearGradientBrush x:Key="NavigationView_NavItemBorderBrush_Selected_Outer" EndPoint="0.5,1" StartPoint="0.5,0">
+        <GradientStop Color="#FF282828" Offset="0"/>
+        <GradientStop Color="#FF5F5F5F" Offset="1"/>
+    </LinearGradientBrush>
 
-        <SolidColorBrush x:Key="NavigationView_NavItemForeground" Color="#FF1E1E1E"/>
-        <system:String x:Key="GlyphArrowChevronUp"></system:String>
-        <system:String x:Key="GlyphArrowChevronDown"></system:String>
+    <SolidColorBrush x:Key="NavigationView_NavItemForeground" Color="#FF1E1E1E"/>
+    <system:String x:Key="GlyphArrowChevronUp"></system:String>
+    <system:String x:Key="GlyphArrowChevronDown"></system:String>
 
-        <telerik1:DoubleToThicknessConverter x:Key="DoubleToThicknessConverter"/>
-        <telerik1:ThicknessToOrientedThicknessConverter x:Key="ThicknessToOrientedThicknessConverter"/>
- 
-        <ControlTemplate x:Key="RadNavigationViewItemTemplate" TargetType="telerik:RadNavigationViewItem">
-            <Grid x:Name="PART_LayoutRoot">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid x:Name="PART_ContainerGrid">
-                    <Border x:Name="BackgroundVisual"
+    <telerik1:DoubleToThicknessConverter x:Key="DoubleToThicknessConverter"/>
+    <telerik1:ThicknessToOrientedThicknessConverter x:Key="ThicknessToOrientedThicknessConverter"/>
+
+    <ControlTemplate x:Key="RadNavigationViewItemTemplate" TargetType="telerik:RadNavigationViewItem">
+        <Grid x:Name="PART_LayoutRoot">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid x:Name="PART_ContainerGrid">
+                <Border x:Name="BackgroundVisual"
                                         SnapsToDevicePixels="True"
                                         BorderThickness="{TemplateBinding BorderThickness}"
                                         BorderBrush="{TemplateBinding BorderBrush}"
                                         Background="{TemplateBinding Background}"
                                         CornerRadius="{TemplateBinding helpers:ThemeHelper.CornerRadius}"/>
-                    <Border x:Name="SelectedVisual"
+                <Border x:Name="SelectedVisual"
                                         Opacity="0"
                                         BorderThickness="{TemplateBinding BorderThickness}"
                                         BorderBrush="{StaticResource NavigationView_NavItemBorderBrush_Selected_Outer}"
                                         CornerRadius="{TemplateBinding helpers:ThemeHelper.CornerRadius}"
                                         Background="White">
-                        <Border
+                    <Border
                                         BorderThickness="{TemplateBinding BorderThickness}"
                                         CornerRadius="1"
                                         BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
                                         Background="{TemplateBinding helpers:ThemeHelper.CheckedBrush}"/>
-                    </Border>
-                    <Border x:Name="HighlightedVisual"
+                </Border>
+                <Border x:Name="HighlightedVisual"
                                         Opacity="0"
                                         BorderThickness="{TemplateBinding BorderThickness}"
                                         BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
                                         CornerRadius="{TemplateBinding helpers:ThemeHelper.CornerRadius}"
                                         Background="White">
-                        <Border BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="1" BorderBrush="White" Background="{DynamicResource MahApps.Brushes.SystemControlBackgroundAccent}"/>
-                    </Border>
-                    <Border x:Name="PressedVisual"
+                    <Border BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="1" BorderBrush="White" Background="{DynamicResource MahApps.Brushes.SystemControlBackgroundAccent}"/>
+                </Border>
+                <Border x:Name="PressedVisual"
                                         Opacity="0"
                                         BorderThickness="{TemplateBinding BorderThickness}"
                                         BorderBrush="{StaticResource NavigationView_NavItemBorderBrush_Selected_Outer}"
                                         CornerRadius="{TemplateBinding helpers:ThemeHelper.CornerRadius}"
                                         Background="White">
-                        <Border
+                    <Border
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="1"
                             BorderBrush="{DynamicResource MahApps.Brushes.Accent}"
                             Background="{TemplateBinding helpers:ThemeHelper.PressedBrush}"/>
-                    </Border>
-                    <Grid x:Name="ItemContentGrid" MinHeight="{TemplateBinding MinHeight}" Background="Transparent">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition x:Name="IconColumn" Width="{Binding RelativeSource={RelativeSource AncestorType=telerik:RadNavigationView}, Path=CompactPaneWidth}"/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <ContentPresenter x:Name="IconContent"
+                </Border>
+                <Grid x:Name="ItemContentGrid" MinHeight="{TemplateBinding MinHeight}" Background="Transparent">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition x:Name="IconColumn" Width="{Binding RelativeSource={RelativeSource AncestorType=telerik:RadNavigationView}, Path=CompactPaneWidth}"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ContentPresenter x:Name="IconContent"
                                             ContentSource="Icon"
                                             TextElement.Foreground="{StaticResource NavigationView_HamburgerButtonIconForeground}"
                                             Visibility="{TemplateBinding IconVisibility}"/>
-                        <ContentPresenter x:Name="Content"
+                    <ContentPresenter x:Name="Content"
                                             Grid.Column="1"
                                             RecognizesAccessKey="True"
                                             TextElement.Foreground="{TemplateBinding Foreground}"
                                             Margin="{TemplateBinding Padding}"
                                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                        <Grid x:Name="PART_ExpandCollapseIconHost" Grid.Column="2" Background="Transparent" MinWidth="{TemplateBinding MinHeight}">
-                            <ContentPresenter x:Name="ExpandedIcon"
+                    <Grid x:Name="PART_ExpandCollapseIconHost" Grid.Column="2" Background="Transparent" MinWidth="{TemplateBinding MinHeight}">
+                        <ContentPresenter x:Name="ExpandedIcon"
                                                 Content="{TemplateBinding ExpandedIcon}"
                                                 ContentTemplate="{TemplateBinding ExpandedIconTemplate}"
                                                 TextElement.Foreground="{StaticResource NavigationView_HamburgerButtonIconForeground}"
                                                 Opacity="0"/>
-                            <ContentPresenter x:Name="CollapsedIcon"
+                        <ContentPresenter x:Name="CollapsedIcon"
                                                 Content="{TemplateBinding CollapsedIcon}"
                                                 ContentTemplate="{TemplateBinding CollapsedIconTemplate}"
                                                 TextElement.Foreground="{StaticResource NavigationView_HamburgerButtonIconForeground}"
                                                 Opacity="0"/>
-                        </Grid>
                     </Grid>
                 </Grid>
-                <telerik:NavigationViewSubItemsHost x:Name="PART_NavigationViewSubItemsHost"
+            </Grid>
+            <telerik:NavigationViewSubItemsHost x:Name="PART_NavigationViewSubItemsHost"
                                 Grid.Row="1"
                                 Background="Transparent"
                                 ItemsSource="{TemplateBinding ItemsSource}"
@@ -106,75 +106,75 @@
                                 UseLayoutRounding="True"
                                 Focusable="False"
                                 Visibility="Collapsed"/>
-            </Grid>
-            <ControlTemplate.Triggers>
-                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsTopLevel}" Value="False">
-                    <Setter TargetName="ItemContentGrid" Property="Margin" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=CalculatedItemIndentation, Converter={StaticResource DoubleToThicknessConverter}, ConverterParameter=Left}"/>
-                </DataTrigger>
-                <Trigger Property="IsExpanded" Value="True">
-                    <Setter TargetName="ExpandedIcon" Property="Opacity" Value="1"/>
-                </Trigger>
-                <Trigger Property="IsExpanded" Value="False">
-                    <Setter TargetName="CollapsedIcon" Property="Opacity" Value="1"/>
-                </Trigger>
-                <Trigger Property="IconVisibility" Value="Collapsed">
-                    <Setter TargetName="IconColumn" Property="Width" Value="0"/>
-                </Trigger>
-                <Trigger Property="IsHighlighted" Value="True">
-                    <Setter TargetName="HighlightedVisual" Property="Opacity" Value="1"/>
-                </Trigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter TargetName="SelectedVisual" Property="Opacity" Value="1"/>
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter TargetName="PressedVisual" Property="Opacity" Value="1"/>
-                </Trigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsExpanded}" Value="False"/>
-                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=HasSelectedSubItem}" Value="True"/>
-                    </MultiDataTrigger.Conditions>
-                    <Setter TargetName="SelectedVisual" Property="Opacity" Value="1"/>
-                </MultiDataTrigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsExpanded}" Value="True"/>
-                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=HasSelectedSubItem}" Value="True"/>
-                    </MultiDataTrigger.Conditions>
-                    <Setter TargetName="SelectedVisual" Property="Opacity" Value="0"/>
-                </MultiDataTrigger>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter TargetName="ItemContentGrid" Property="Opacity" Value="0.5"/>
-                </Trigger>
-            </ControlTemplate.Triggers>
-        </ControlTemplate>
-        <Style TargetType="telerik:RadNavigationViewItem" x:Key="RadNavigationViewItemStyle1">
-            <Setter Property="helpers:ThemeHelper.CornerRadius" Value="2"/>
-            <Setter Property="helpers:ThemeHelper.CheckedBrush" Value="{DynamicResource MahApps.Brushes.Accent}"/>
-            <Setter Property="helpers:ThemeHelper.PressedBrush" Value="{DynamicResource MahApps.Brushes.Accent}"/>
-            <Setter Property="Foreground" Value="{StaticResource NavigationView_NavItemForeground}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="MinHeight" Value="36"/>
-            <Setter Property="Padding" Value="10 0"/>
-            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-            <Setter Property="ExpandedIcon" Value="{StaticResource GlyphArrowChevronUp}"/>
-            <Setter Property="ExpandedIconTemplate">
-                <Setter.Value>
-                    <DataTemplate>
-                        <telerik:RadGlyph Glyph="{Binding}" FontSize="12"/>
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="CollapsedIcon" Value="{StaticResource GlyphArrowChevronDown}"/>
-            <Setter Property="CollapsedIconTemplate">
-                <Setter.Value>
-                    <DataTemplate>
-                        <telerik:RadGlyph Glyph="{Binding}" FontSize="12"/>
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Template" Value="{StaticResource RadNavigationViewItemTemplate}"/>
-        </Style>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsTopLevel}" Value="False">
+                <Setter TargetName="ItemContentGrid" Property="Margin" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=CalculatedItemIndentation, Converter={StaticResource DoubleToThicknessConverter}, ConverterParameter=Left}"/>
+            </DataTrigger>
+            <Trigger Property="IsExpanded" Value="True">
+                <Setter TargetName="ExpandedIcon" Property="Opacity" Value="1"/>
+            </Trigger>
+            <Trigger Property="IsExpanded" Value="False">
+                <Setter TargetName="CollapsedIcon" Property="Opacity" Value="1"/>
+            </Trigger>
+            <Trigger Property="IconVisibility" Value="Collapsed">
+                <Setter TargetName="IconColumn" Property="Width" Value="0"/>
+            </Trigger>
+            <Trigger Property="IsHighlighted" Value="True">
+                <Setter TargetName="HighlightedVisual" Property="Opacity" Value="1"/>
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter TargetName="SelectedVisual" Property="Opacity" Value="1"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="PressedVisual" Property="Opacity" Value="1"/>
+            </Trigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsExpanded}" Value="False"/>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=HasSelectedSubItem}" Value="True"/>
+                </MultiDataTrigger.Conditions>
+                <Setter TargetName="SelectedVisual" Property="Opacity" Value="1"/>
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsExpanded}" Value="True"/>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=HasSelectedSubItem}" Value="True"/>
+                </MultiDataTrigger.Conditions>
+                <Setter TargetName="SelectedVisual" Property="Opacity" Value="0"/>
+            </MultiDataTrigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="ItemContentGrid" Property="Opacity" Value="0.5"/>
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+    <Style TargetType="telerik:RadNavigationViewItem" x:Key="RadNavigationViewItemStyle1">
+        <Setter Property="helpers:ThemeHelper.CornerRadius" Value="2"/>
+        <Setter Property="helpers:ThemeHelper.CheckedBrush" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+        <Setter Property="helpers:ThemeHelper.PressedBrush" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+        <Setter Property="Foreground" Value="{StaticResource NavigationView_NavItemForeground}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="MinHeight" Value="36"/>
+        <Setter Property="Padding" Value="10 0"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="ExpandedIcon" Value="{StaticResource GlyphArrowChevronUp}"/>
+        <Setter Property="ExpandedIconTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <telerik:RadGlyph Glyph="{Binding}" FontSize="12"/>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="CollapsedIcon" Value="{StaticResource GlyphArrowChevronDown}"/>
+        <Setter Property="CollapsedIconTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <telerik:RadGlyph Glyph="{Binding}" FontSize="12"/>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template" Value="{StaticResource RadNavigationViewItemTemplate}"/>
+    </Style>
 </ResourceDictionary>

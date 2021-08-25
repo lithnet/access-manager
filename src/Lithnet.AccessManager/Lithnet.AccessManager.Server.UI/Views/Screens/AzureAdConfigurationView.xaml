@@ -30,46 +30,10 @@
             </DockPanel>
 
             <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
-               Content="General settings" />
-
-            <Grid Margin="5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-
-                <TextBlock Grid.Row="0"
-                       Grid.Column="0"
-                       Grid.ColumnSpan="2"
-                       Margin="5"
-                       TextWrapping="Wrap">Enabling Azure Active Directory support allows LAPS for AAD-joined and AAD-registered devices running Windows 10 and above</TextBlock>
-
-                <CheckBox Grid.Row="1"
-                      Grid.Column="1"
-                      IsChecked="{Binding AllowAzureAdJoinedDevices}"
-                      Content="Allow Azure AD-joined devices (Windows 10 or later) to register with the AMS directory"
-                      Margin="5" />
-
-                <CheckBox Grid.Row="2"
-                      Grid.Column="1"
-                      IsChecked="{Binding AllowAzureAdRegisteredDevices}"
-                      Content="Allow Azure AD-registered devices (Windows 10 or later) to register with the AMS directory"
-                      Margin="5" />
-
-            </Grid>
-
-            <Label Style="{DynamicResource SubDescriptionHeaderStyle}"
                Content="Tenant configuration" />
 
             <TextBlock Margin="10 5 5 5"
-                   TextWrapping="Wrap">For each of your Azure AD tenants, you'll need to create a registered application and assign the appropriate rights to allow AMS to read the directory. See the <Hyperlink>Setup guide for more details</Hyperlink>.
+                   TextWrapping="Wrap">In order to enable Azure AD integration, for each of your Azure AD tenants, you'll need to create a registered application and assign the appropriate rights to allow AMS to read the directory. See the <Hyperlink>Setup guide for more details</Hyperlink>.
             </TextBlock>
 
             <StackPanel IsEnabled="{Binding IsEnterpriseEdition}">

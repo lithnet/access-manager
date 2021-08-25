@@ -8,7 +8,7 @@ using System.Windows.Controls;
 
 namespace Lithnet.AccessManager.Server.UI
 {
-    public class ComputerSelectorViewModel : Screen, IExternalDialogAware
+    public class ComputerSelectorViewModel : Screen, IExternalDialogAware, IHasSize
     {
         private readonly ILogger<ComputerSelectorViewModel> logger;
         private readonly IList<IComputer> computers;
@@ -58,5 +58,9 @@ namespace Lithnet.AccessManager.Server.UI
         public string SaveButtonName { get; set; } = "Select...";
 
         public string CancelButtonName { get; set; } = "Cancel";
+
+        public int Width { get; } = 800;
+
+        public int Height { get; } = 500;
     }
 }

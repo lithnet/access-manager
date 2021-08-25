@@ -58,7 +58,7 @@
 
                 <local:StandardEditionBadge IsSolid="True"
                                             Visibility="{Binding HasStandardLicense, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                            ToolTipText="Standard edition"
+                                            ToolTipText="Community edition"
                                             Margin="2 2 5 2" />
             </StackPanel>
 

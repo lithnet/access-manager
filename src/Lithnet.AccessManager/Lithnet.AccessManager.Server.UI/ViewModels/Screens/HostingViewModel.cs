@@ -35,8 +35,10 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly TokenIssuerOptions tokenIssuerOptions;
         private readonly IProtectedSecretProvider protectedSecretProvider;
         private readonly RandomNumberGenerator csp;
+        private readonly IWindowManager windowManager;
+        private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
 
-        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IActiveDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, ISecretRekeyProvider rekeyProvider, IObjectSelectionProvider objectSelectionProvider, IHttpSysConfigurationProvider certificateBindingProvider, IFirewallProvider firewallProvider, TokenIssuerOptions tokenIssuerOptions, IProtectedSecretProvider protectedSecretProvider, RandomNumberGenerator csp, IViewModelFactory<EnterpriseEditionBadgeViewModel, EnterpriseEditionBadgeModel> enterpriseEditionViewModelFactory)
+        public HostingViewModel(HostingOptions model, IDialogCoordinator dialogCoordinator, IWindowsServiceProvider windowsServiceProvider, ILogger<HostingViewModel> logger, IModelValidator<HostingViewModel> validator, IAppPathProvider pathProvider, INotifyModelChangedEventPublisher eventPublisher, ICertificateProvider certProvider, IShellExecuteProvider shellExecuteProvider, IEventAggregator eventAggregator, IActiveDirectory directory, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, IRegistryProvider registryProvider, ISecretRekeyProvider rekeyProvider, IObjectSelectionProvider objectSelectionProvider, IHttpSysConfigurationProvider certificateBindingProvider, IFirewallProvider firewallProvider, TokenIssuerOptions tokenIssuerOptions, IProtectedSecretProvider protectedSecretProvider, RandomNumberGenerator csp, IViewModelFactory<EnterpriseEditionBadgeViewModel, EnterpriseEditionBadgeModel> enterpriseEditionViewModelFactory, IWindowManager windowManager, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory)
         {
             this.logger = logger;
             this.pathProvider = pathProvider;
@@ -58,6 +60,8 @@ namespace Lithnet.AccessManager.Server.UI
             this.tokenIssuerOptions = tokenIssuerOptions;
             this.protectedSecretProvider = protectedSecretProvider;
             this.csp = csp;
+            this.windowManager = windowManager;
+            this.externalDialogWindowFactory = externalDialogWindowFactory;
 
             this.WorkingModel = this.CloneModel(model);
             this.Certificate = this.certificateBindingProvider.GetCertificate();
@@ -188,15 +192,9 @@ namespace Lithnet.AccessManager.Server.UI
                         .Replace("{sid}", this.ServiceAccount.ToString(), StringComparison.OrdinalIgnoreCase)
                 };
 
-                ExternalDialogWindow w = new ExternalDialogWindow
-                {
-                    Title = "Script",
-                    DataContext = vm,
-                    SaveButtonVisible = false,
-                    CancelButtonName = "Close"
-                };
+                var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
 
-                w.ShowDialog();
+                windowManager.ShowDialog(evm);
 
                 this.PopulateCanDelegate();
             }
@@ -217,16 +215,9 @@ namespace Lithnet.AccessManager.Server.UI
                     ScriptText = this.scriptTemplateProvider.CreateGmsa
                         .Replace("{serverName}", Environment.MachineName, StringComparison.OrdinalIgnoreCase)
                 };
+                var evm = this.externalDialogWindowFactory.CreateViewModel(vm);
 
-                ExternalDialogWindow w = new ExternalDialogWindow
-                {
-                    Title = "Script",
-                    DataContext = vm,
-                    SaveButtonVisible = false,
-                    CancelButtonName = "Close"
-                };
-
-                w.ShowDialog();
+                windowManager.ShowDialog(evm);
             }
             catch (Exception ex)
             {
