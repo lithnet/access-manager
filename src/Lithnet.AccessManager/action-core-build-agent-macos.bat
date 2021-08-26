@@ -6,6 +6,7 @@ SET outputdirarm64MacOs=%amsBuildFolder%\macos-arm64
 SET pkgStagingPath=~/Documents/LithnetAccessManagerAgent-%version%.macos-x64.pkg
 SET macOSPackageFolder=/Volumes/ams
 SET macOSBuildFolder=%macOSPackageFolder%/macos-x64
+SET sshPath=C:\Program Files\Git\usr\bin
 
 If "%MacOSNotarizationAppleIDPassword%"=="" SET /P MacOSNotarizationAppleIDPassword=Please enter notarization password: 
 
@@ -29,19 +30,22 @@ move "%outputdirx64MacOs%\*" "%outputdirx64MacOs%\LithnetAccessManagerAgent"
 
 ECHO [92mSigning files[0m
 
-"C:\Program Files\Git\usr\bin\ssh.exe" %MacOSBuildHostUsername%@%MacOSBuildHost% "codesign --sign ""%MacOSDeveloperIDApplicationCertificate%"" --keychain %MacOSSigningCertificateKeychain% --verbose --options runtime --timestamp %macOSBuildFolder%/LithnetAccessManagerAgent/*.dylib"
+"%sshPath%\ssh.exe" %MacOSBuildHostUsername%@%MacOSBuildHost% "codesign --sign ""%MacOSDeveloperIDApplicationCertificate%"" --keychain %MacOSSigningCertificateKeychain% --verbose --options runtime --entitlements ""%macOSBuildFolder%/LithnetAccessManagerAgent/io.lithnet.accessmanager.agent.entitlements"" --timestamp %macOSBuildFolder%/LithnetAccessManagerAgent/*.dylib"
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
  
-"C:\Program Files\Git\usr\bin\ssh.exe" %MacOSBuildHostUsername%@%MacOSBuildHost% "codesign --sign ""%MacOSDeveloperIDApplicationCertificate%"" --keychain %MacOSSigningCertificateKeychain% --verbose --options runtime --timestamp %macOSBuildFolder%/LithnetAccessManagerAgent/Lithnet.AccessManager.Agent"
+"%sshPath%\ssh.exe" %MacOSBuildHostUsername%@%MacOSBuildHost% "codesign --sign ""%MacOSDeveloperIDApplicationCertificate%"" --keychain %MacOSSigningCertificateKeychain% --verbose --options runtime --entitlements ""%macOSBuildFolder%/LithnetAccessManagerAgent/io.lithnet.accessmanager.agent.entitlements"" --timestamp %macOSBuildFolder%/LithnetAccessManagerAgent/Lithnet.AccessManager.Agent"
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
  
-"C:\Program Files\Git\usr\bin\ssh.exe" %MacOSBuildHostUsername%@%MacOSBuildHost% "pkgbuild --identifier io.lithnet.accessmanager.agent --install-location /Applications --scripts ""%macOSBuildFolder%/scripts"" --keychain %MacOSSigningCertificateKeychain% --sign ""%MacOSDeveloperIDInstallerCertificate%"" --timestamp --root %macOSBuildFolder%/ %pkgStagingPath%"
+"%sshPath%\ssh.exe" %MacOSBuildHostUsername%@%MacOSBuildHost% "pkgbuild --identifier io.lithnet.accessmanager.agent --install-location /Applications --scripts ""%macOSBuildFolder%/scripts"" --keychain %MacOSSigningCertificateKeychain% --sign ""%MacOSDeveloperIDInstallerCertificate%"" --timestamp --root %macOSBuildFolder%/ %pkgStagingPath%"
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
  
-powershell -File "%solutiondir%\Notarize.ps1" -Username "%MacOSBuildHostUsername%" -sshhost "%MacOSBuildHost%" -scriptPath "%macOSPackageFolder%/app_notarizer.sh" -packageLocation "%pkgStagingPath%" -macOSSignerAppleId "%MacOSNotarizationAppleID%" -macOsSignerAppPassword "%MacOSNotarizationAppleIDPassword%" -appIdentifier "io.lithnet.accessmanager.agent" -macOsSignerTeamId "%MacOSNotarizationTeamID%"
+"%sshPath%\ssh.exe" %MacOSBuildHostUsername%@%MacOSBuildHost% "xcrun notarytool submit %pkgStagingPath% --wait --apple-id %MacOSNotarizationAppleID% --team-id %MacOSNotarizationTeamID% --password %MacOSNotarizationAppleIDPassword%"
+if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
+ 
+"%sshPath%\ssh.exe" %MacOSBuildHostUsername%@%MacOSBuildHost% "xcrun stapler staple %pkgStagingPath%"
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
-"C:\Program Files\Git\usr\bin\scp.exe" -r "%MacOSBuildHostUsername%@%MacOSBuildHost%:%pkgStagingPath%" "%amsBuildFolder%
+"%sshPath%\scp.exe" -r "%MacOSBuildHostUsername%@%MacOSBuildHost%:%pkgStagingPath%" "%amsBuildFolder%
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
  
 ENDLOCAL
