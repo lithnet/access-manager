@@ -1,5 +1,4 @@
 ﻿using Lithnet.AccessManager.Cryptography;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Management.Automation;
 using System.Security;
@@ -20,23 +19,22 @@ namespace Lithnet.AccessManager.PowerShell
         [Parameter(Mandatory = true, ParameterSetName = "CertificateFile", Position = 3)]
         public SecureString PfxCertificateFilePassword { get; set; }
 
-        private ILoggerFactory logFactory;
-        private IDiscoveryServices discoveryServices;
-        private ICertificateProvider certificateProvider;
-        private IEncryptionProvider encryptionProvider;
-        private ILithnetAdminPasswordProvider adminPasswordProvider;
-        private IActiveDirectory directory;
+        private readonly ICertificateProvider certificateProvider;
+        private readonly IEncryptionProvider encryptionProvider;
+        private readonly ILithnetAdminPasswordProvider adminPasswordProvider;
+        private readonly IActiveDirectory directory;
         private X509Certificate2 certificate;
+
+        public GetLocalAdminPasswordHistory()
+        {
+            this.certificateProvider = DiServices.GetRequiredService<ICertificateProvider>();
+            this.encryptionProvider = DiServices.GetRequiredService<IEncryptionProvider>();
+            this.adminPasswordProvider = DiServices.GetRequiredService<ILithnetAdminPasswordProvider>();
+            this.directory = DiServices.GetRequiredService<IActiveDirectory>();
+        }
 
         protected override void BeginProcessing()
         {
-            this.logFactory = Microsoft.Extensions.Logging.Abstractions.NullLoggerFactory.Instance;
-            this.discoveryServices = new DiscoveryServices(logFactory.CreateLogger<DiscoveryServices>());
-            this.certificateProvider = new CertificateProvider(logFactory.CreateLogger<CertificateProvider>(), discoveryServices);
-            this.encryptionProvider = new EncryptionProvider();
-            this.adminPasswordProvider = new LithnetAdminPasswordProvider(logFactory.CreateLogger<LithnetAdminPasswordProvider>(), encryptionProvider, certificateProvider);
-            this.directory = new ActiveDirectory(discoveryServices);
-
             if (this.PfxCertificateFile != null)
             {
                 this.certificate = new X509Certificate2(this.PfxCertificateFile, this.PfxCertificateFilePassword);
@@ -52,7 +50,7 @@ namespace Lithnet.AccessManager.PowerShell
             IActiveDirectoryComputer computer = this.directory.GetComputer(this.ComputerName);
 
             var items = this.adminPasswordProvider.GetPasswordHistory(computer);
-            
+
             if (items == null || items.Count == 0)
             {
                 this.WriteVerbose("The computer did not have a Lithnet local admin password");
@@ -78,6 +76,11 @@ namespace Lithnet.AccessManager.PowerShell
 
                     var result = new PSObject();
                     result.Properties.Add(new PSNoteProperty("ComputerName", computer.MsDsPrincipalName));
+                    if (!string.IsNullOrWhiteSpace(item.AccountName))
+                    {
+                        result.Properties.Add(new PSNoteProperty("AccountName", item.AccountName));
+                    }
+
                     result.Properties.Add(new PSNoteProperty("Password", decryptedData));
                     result.Properties.Add(new PSNoteProperty("Created", item.Created.ToLocalTime()));
                     result.Properties.Add(new PSNoteProperty("Retired", item.Retired?.ToLocalTime()));

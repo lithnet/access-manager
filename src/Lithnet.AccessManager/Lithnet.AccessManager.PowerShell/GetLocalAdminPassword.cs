@@ -1,5 +1,4 @@
 ﻿using Lithnet.AccessManager.Cryptography;
-using Microsoft.Extensions.Logging;
 using System.Management.Automation;
 using System.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -19,22 +18,22 @@ namespace Lithnet.AccessManager.PowerShell
         [Parameter(Mandatory = true, ParameterSetName = "CertificateFile", Position = 3)]
         public SecureString PfxCertificateFilePassword { get; set; }
 
-        private ILoggerFactory logFactory;
-        private IDiscoveryServices discoveryServices;
-        private ICertificateProvider certificateProvider;
-        private IEncryptionProvider encryptionProvider;
-        private ILithnetAdminPasswordProvider adminPasswordProvider;
-        private IActiveDirectory directory;
+        private readonly ICertificateProvider certificateProvider;
+        private readonly IEncryptionProvider encryptionProvider;
+        private readonly ILithnetAdminPasswordProvider adminPasswordProvider;
+        private readonly IActiveDirectory directory;
         private X509Certificate2 certificate;
+
+        public GetLocalAdminPassword()
+        {
+            this.certificateProvider = DiServices.GetRequiredService<ICertificateProvider>();
+            this.encryptionProvider = DiServices.GetRequiredService<IEncryptionProvider>();
+            this.adminPasswordProvider = DiServices.GetRequiredService<ILithnetAdminPasswordProvider>();
+            this.directory = DiServices.GetRequiredService<IActiveDirectory>();
+        }
 
         protected override void BeginProcessing()
         {
-            this.logFactory = Microsoft.Extensions.Logging.Abstractions.NullLoggerFactory.Instance;
-            this.discoveryServices = new DiscoveryServices(logFactory.CreateLogger<DiscoveryServices>());
-            this.certificateProvider = new CertificateProvider(logFactory.CreateLogger<CertificateProvider>(), discoveryServices);
-            this.encryptionProvider = new EncryptionProvider();
-            this.adminPasswordProvider = new LithnetAdminPasswordProvider(logFactory.CreateLogger<LithnetAdminPasswordProvider>(), encryptionProvider, certificateProvider);
-            this.directory = new ActiveDirectory(discoveryServices);
 
             if (this.PfxCertificateFile != null)
             {

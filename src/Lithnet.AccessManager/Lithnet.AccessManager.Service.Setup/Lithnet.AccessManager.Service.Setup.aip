@@ -22,10 +22,10 @@
     <ROW Property="IAgree" Value="No" Type="4" MsiKey="IAgree"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{C39356E5-5DBA-4A38-81C0-05BEA6E3E850} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{8D43ABFA-AB69-41AB-912D-184E894CC84B} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.14.8324.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.14.8382.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="SHOW_DB_CONFIG" Value="1"/>
     <ROW Property="SQLEXPRESS_DEFAULT_ADMINS" Value="Builtin\Administrators"/>
     <ROW Property="SQLEXPRESS_DEFAULT_INSTANCENAME" Value="AMS"/>
@@ -1253,7 +1253,7 @@
     <ROW Dialog_="SqlServerDetailsDialog" Control="Edit_1" Type="Edit" X="137" Y="124" Width="192" Height="16" Attributes="3" Property="SQLSERVER" Text="{260}" Order="1000"/>
     <ROW Dialog_="SqlServerDetailsDialog" Control="Text_1" Type="Text" X="38" Y="125" Width="83" Height="11" Attributes="3" Text="Server\instance name:" Order="1100"/>
     <ROW Dialog_="SqlServerDetailsDialog" Control="CheckBox_1" Type="CheckBox" X="37" Y="100" Width="275" Height="10" Attributes="3" Property="INSTALL_SQL_EXPRESS" Text="Install a dedicated SQL express instance for AMS" Order="1200"/>
-    <ROW Dialog_="SqlServerDetailsDialog" Control="Hyperlink_2" Type="Hyperlink" X="37" Y="150" Width="310" Height="17" Attributes="65539" Property="HYPERLINK_2_PROP_1" Text="&lt;a href=&quot;https://go.lithnet.io/fwlink/enhjqpaz&quot;&gt;Database creation script and more details...&lt;/a&gt;" Order="1300"/>
+    <ROW Dialog_="SqlServerDetailsDialog" Control="Hyperlink_2" Type="Hyperlink" X="37" Y="150" Width="310" Height="28" Attributes="65539" Property="HYPERLINK_2_PROP_1" Text="&lt;a href=&quot;https://go.lithnet.io/fwlink/enhjqpaz&quot;&gt;Learn more about using an external SQL server, rather than the built-in SQL express instance&lt;/a&gt;" Order="1300"/>
     <ATTRIBUTE name="DeletedRows" value="LogonInformationDlg#DomainEdit@LogonInformationDlg#DomainLabel"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiControlConditionComponent">

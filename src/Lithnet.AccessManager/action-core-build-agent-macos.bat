@@ -8,6 +8,8 @@ SET macOSPackageFolder=/Volumes/ams
 SET macOSBuildFolder=%macOSPackageFolder%/macos-x64
 SET sshPath=C:\Program Files\Git\usr\bin
 
+if NOT "%MacOSNotarizationAppleIDPasswordEncrypted%"=="" FOR /F "tokens=*" %%g IN ('powershell -File "%buildToolsPath%\dpapi-protection.ps1" -data "%MacOSNotarizationAppleIDPasswordEncrypted%"') do (SET MacOSNotarizationAppleIDPassword=%%g)  
+
 If "%MacOSNotarizationAppleIDPassword%"=="" SET /P MacOSNotarizationAppleIDPassword=Please enter notarization password: 
 
 REM ************************* macos installer *********************************
