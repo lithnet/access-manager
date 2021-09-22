@@ -24,7 +24,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public object Icon => PackIconMaterialKind.Triangle;
 
-        public AzureAdConfigurationViewModel(AzureAdLithnetLapsConfigurationViewModel lithnetLapsVm, AzureAdOptions aadOptions, IDialogCoordinator dialogCoordinator, IViewModelFactory<AzureAdTenantDetailsViewModel, AzureAdTenantDetails> tenantFactory, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IAadGraphApiProvider graphApiProvider, ILogger<AzureAdConfigurationViewModel> logger, ApiAuthenticationOptions agentOptions, IViewModelFactory<EnterpriseEditionBannerViewModel, EnterpriseEditionBannerModel> enterpriseEditionViewModelFactory)
+        public AzureAdConfigurationViewModel(AzureAdOptions aadOptions, IDialogCoordinator dialogCoordinator, IViewModelFactory<AzureAdTenantDetailsViewModel, AzureAdTenantDetails> tenantFactory, INotifyModelChangedEventPublisher eventPublisher, IShellExecuteProvider shellExecuteProvider, IAadGraphApiProvider graphApiProvider, ILogger<AzureAdConfigurationViewModel> logger, ApiAuthenticationOptions agentOptions, IViewModelFactory<EnterpriseEditionBannerViewModel, EnterpriseEditionBannerModel> enterpriseEditionViewModelFactory)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.graphApiProvider = graphApiProvider;

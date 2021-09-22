@@ -15,275 +15,283 @@
              d:DesignWidth="800"
              Margin="5">
     <StackPanel>
-        <uiComponents:ErrorBanner Grid.Column="0"
+        <ContentControl s:View.Model="{Binding EnterpriseEdition, Mode=OneWay}"  
+                        IsTabStop="False"/>
+        <StackPanel IsEnabled="{Binding EnterpriseEdition.IsEnterpriseEdition, Mode=OneWay}">
+            <uiComponents:ErrorBanner Grid.Column="0"
                                   Grid.ColumnSpan="2"
                                   MessageText="{Binding ErrorMessageText}"
                                   HeaderText="{Binding ErrorMessageHeaderText}"/>
-        <DockPanel>
-            <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
-                <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
-            </Button>
-            <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Lithnet LAPS" />
-        </DockPanel>
 
-        <TextBlock TextWrapping="Wrap" Margin="5">Lithnet Access Manager comes with its own agent that can be used instead of the Microsoft LAPS agent. The Lithnet Access Manager Agent (AMA) has several benefits over the use of the Microsoft LAPS agent. It encrypts the passwords before storing them in the directory, and can optionally store a history of previously set passwords. Read our guide on <Hyperlink Click="{s:Action OpenLapsStrategyLink}">choosing between the Microsoft LAPS agent and the Lithnet Access Manager Agent</Hyperlink> to learn more.</TextBlock>
+            <ContentControl s:View.Model="{Binding EnterpriseEdition, Mode=OneWay}"  
+                        IsTabStop="False"/>
+
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
+                    <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
+                </Button>
+                <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Lithnet LAPS" />
+            </DockPanel>
+
+            <TextBlock TextWrapping="Wrap" Margin="5">Lithnet Access Manager comes with its own agent that can be used instead of the Microsoft LAPS agent. The Lithnet Access Manager Agent (AMA) has several benefits over the use of the Microsoft LAPS agent. It encrypts the passwords before storing them in the directory, and can optionally store a history of previously set passwords. Read our guide on <Hyperlink Click="{s:Action OpenLapsStrategyLink}">choosing between the Microsoft LAPS agent and the Lithnet Access Manager Agent</Hyperlink> to learn more.</TextBlock>
 
 
 
-        <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
+            <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
                Content="Schema status"/>
 
-        <TextBlock TextWrapping="WrapWithOverflow"
+            <TextBlock TextWrapping="WrapWithOverflow"
                    Margin="5">The list below shows the deployment status of the Lithnet Access Manager Agent schema in each forest. If any forests are missing the schema, you can use the button below to generate a script to deploy the schema to that forest</TextBlock>
 
-        <ListView BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
+            <ListView BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
                       ItemsSource="{Binding Forests}"
                       SelectedItem="{Binding SelectedForest}"
                       ScrollViewer.VerticalScrollBarVisibility="Auto" 
                       Height="100"
                       Margin="5">
-            <b:Interaction.Behaviors>
-                <local:ListViewScrollBarBehavior />
-            </b:Interaction.Behaviors>
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Forest" 
+                <b:Interaction.Behaviors>
+                    <local:ListViewScrollBarBehavior />
+                </b:Interaction.Behaviors>
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Forest" 
                                     DisplayMemberBinding="{Binding Name}" 
                                     Width="Auto"/>
-                    <GridViewColumn Header="Lithnet Access Manager Agent schema status"
+                        <GridViewColumn Header="Lithnet Access Manager Agent schema status"
                                     Width="Auto">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <mah:ProgressRing Height="15" Width="15"
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <mah:ProgressRing Height="15" Width="15"
                                                           Visibility="{Binding LithnetSchemaLookupInProgress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                    <iconPacks:PackIconFontAwesome Kind="CheckCircleRegular"
+                                        <iconPacks:PackIconFontAwesome Kind="CheckCircleRegular"
                                                                        Foreground="Green" 
                                                                        Visibility="{Binding IsLithnetSchemaPresent, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                                        VerticalAlignment="Center"/>
 
-                                    <iconPacks:PackIconBoxIcons Kind="RegularInfoCircle" 
+                                        <iconPacks:PackIconBoxIcons Kind="RegularInfoCircle" 
                                                                        Foreground="Gray" 
                                                                        Visibility="{Binding IsNotLithnetSchemaPresent, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                                        VerticalAlignment="Center"/>
-                                    <Label
+                                        <Label
                                             VerticalAlignment="Center"
                                             Content="{Binding LithnetAccessManagerSchemaPresentText, Mode=OneWay,FallbackValue='Status unknown'}"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
 
-                </GridView>
-            </ListView.View>
-        </ListView>
+                    </GridView>
+                </ListView.View>
+            </ListView>
 
-        <StackPanel DataContext="{Binding SelectedForest}"  Orientation="Horizontal">
-            <Button Command="{s:Action RefreshSchemaStatusAsync}"
+            <StackPanel DataContext="{Binding SelectedForest}"  Orientation="Horizontal">
+                <Button Command="{s:Action RefreshSchemaStatusAsync}"
                         Margin="5" 
                         Content="Refresh Status"/>
-            <Button Command="{s:Action ExtendSchemaLithnetAccessManager}"
+                <Button Command="{s:Action ExtendSchemaLithnetAccessManager}"
                         Margin="5" 
                         HorizontalAlignment="Left"
                         VerticalContentAlignment="Center">
-                <StackPanel Orientation="Horizontal" 
+                    <StackPanel Orientation="Horizontal" 
                                 VerticalAlignment="Center">
-                    <iconPacks:PackIconMaterial Kind="ScriptOutline" Margin="0 0 2 0"/>
-                    <TextBlock Text="DEPLOY SCHEMA..." VerticalAlignment="Center"/>
-                </StackPanel>
-            </Button>
-        </StackPanel>
+                        <iconPacks:PackIconMaterial Kind="ScriptOutline" Margin="0 0 2 0"/>
+                        <TextBlock Text="DEPLOY SCHEMA..." VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
 
-        <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
+            <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
                Content="Permissions"/>
 
-        <Grid Margin="5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="150"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
                            TextWrapping="Wrap"
                            Text="If you plan to use the Lithnet Access Manager Agent (AMA) to generate local admin passwords, then you must set specific permissions on the OUs that contain computers where AMA will be installed. Use the following script to assign access for computers to write their encrypted password data and history to the directory, and to allow the Lithnet Access Manager Service (AMS) account to read that data"
                            Margin="5"/>
 
-            <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                         Command="{s:Action DelegateServicePermission}"
                         Margin="5" 
                         HorizontalAlignment="Left"
                         VerticalContentAlignment="Center">
-                <StackPanel Orientation="Horizontal" 
+                    <StackPanel Orientation="Horizontal" 
                                 VerticalAlignment="Center">
-                    <iconPacks:PackIconMaterial Kind="ScriptOutline" Margin="0 0 2 0"/>
-                    <TextBlock Text="DELEGATE PERMISSIONS..." VerticalAlignment="Center"/>
-                </StackPanel>
-            </Button>
+                        <iconPacks:PackIconMaterial Kind="ScriptOutline" Margin="0 0 2 0"/>
+                        <TextBlock Text="DELEGATE PERMISSIONS..." VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
 
-            <TextBlock Grid.Row="1" Grid.Column="2" 
+                <TextBlock Grid.Row="1" Grid.Column="2" 
                            VerticalAlignment="Center"
                            Margin="5">
                     <Hyperlink Click="{s:Action OpenAccessManagerAgentDownload}">Download Lithnet Access Manager Agent</Hyperlink>
-            </TextBlock>
+                </TextBlock>
 
-        </Grid>
+            </Grid>
 
-        <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
+            <Label Style="{DynamicResource SubDescriptionHeaderStyle}" 
                Content="Encryption"/>
 
-        <Grid Margin="5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="150"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
                            TextWrapping="Wrap"
                            Text="Local admin passwords generated the AMA are always encrypted before they are stored in the directory. You need to ensure each forest has an encryption certificate generated and published so the agent can find it. The public key is published to Active Directory, while the private key remains on this server. "
                            Margin="5"/>
 
-            <TextBlock Grid.Row="2" Grid.Column="0" 
+                <TextBlock Grid.Row="2" Grid.Column="0" 
                    Text="Forest"
                    Margin="5"/>
-            <ComboBox Grid.Row="2" Grid.Column="1" 
+                <ComboBox Grid.Row="2" Grid.Column="1" 
                   ItemsSource="{Binding Forests, Mode=OneWay}"
                   SelectedItem="{Binding SelectedForest}"
                   DisplayMemberPath="Name"
                   Margin="5"/>
 
-            <TextBlock Grid.Row="3" Grid.Column="0"
+                <TextBlock Grid.Row="3" Grid.Column="0"
                            Text="Password encryption certificates"
                            TextWrapping="Wrap"
                            Margin="5"/>
 
-            <ListView Grid.Row="3" Grid.Column="1"
+                <ListView Grid.Row="3" Grid.Column="1"
                                       BorderBrush="{StaticResource MahApps.Brushes.Control.Border}" BorderThickness="1"
                                       ItemsSource="{Binding AvailableCertificates}"
                                       SelectedItem="{Binding SelectedCertificate}"
                                       ScrollViewer.VerticalScrollBarVisibility="Auto" 
                                       Margin="5">
-                <ListView.Resources>
-                    <DataTemplate x:Key="PublishedIconTemplate">
-                        <iconPacks:PackIconFontAwesome Kind="CheckSolid"
+                    <ListView.Resources>
+                        <DataTemplate x:Key="PublishedIconTemplate">
+                            <iconPacks:PackIconFontAwesome Kind="CheckSolid"
                                                    Foreground="DarkGreen" 
                                                    Visibility="{Binding IsPublished, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                    VerticalAlignment="Center"/>
-                    </DataTemplate>
-                    <DataTemplate x:Key="PrivateKeyIconTemplate">
-                        <StackPanel Orientation="Horizontal">
-                            <iconPacks:PackIconFontAwesome Kind="CheckSolid"
+                        </DataTemplate>
+                        <DataTemplate x:Key="PrivateKeyIconTemplate">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconFontAwesome Kind="CheckSolid"
                                                    Foreground="DarkGreen" 
                                                    Visibility="{Binding HasPrivateKey, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                    VerticalAlignment="Center"/>
-                            <iconPacks:PackIconFontAwesome Kind="TimesCircleRegular" 
+                                <iconPacks:PackIconFontAwesome Kind="TimesCircleRegular" 
                                                    Foreground="DarkRed" 
                                                    Visibility="{Binding HasNoPrivateKey, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                    VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </DataTemplate>
-                    <DataTemplate x:Key="HasPermissionIconTemplate">
-                        <StackPanel Orientation="Horizontal">
-                            <iconPacks:PackIconFontAwesome Kind="CheckSolid"
+                            </StackPanel>
+                        </DataTemplate>
+                        <DataTemplate x:Key="HasPermissionIconTemplate">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconFontAwesome Kind="CheckSolid"
                                                            Foreground="DarkGreen" 
                                                            Visibility="{Binding HasPermission, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                            VerticalAlignment="Center"/>
-                            <iconPacks:PackIconFontAwesome Kind="TimesCircleRegular" 
+                                <iconPacks:PackIconFontAwesome Kind="TimesCircleRegular" 
                                                            Foreground="DarkRed" 
                                                            Visibility="{Binding HasNoPermission, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                            VerticalAlignment="Center"/>
-                            <iconPacks:PackIconTypicons Kind="WarningOutline" 
+                                <iconPacks:PackIconTypicons Kind="WarningOutline" 
                                                            Foreground="DarkOrange" 
                                                            Visibility="{Binding HasPermissionError, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                            VerticalAlignment="Center"/>
-                            <Label Content="{Binding PermissionError}"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.Resources>
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Subject" 
+                                <Label Content="{Binding PermissionError}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.Resources>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Subject" 
                                             DisplayMemberBinding="{Binding Subject}" 
                                             Width="Auto"/>
-                        <GridViewColumn Header="Issued"
+                            <GridViewColumn Header="Issued"
                                             DisplayMemberBinding="{Binding NotBefore}" 
                                             Width="Auto"/>
-                        <GridViewColumn Header="Expiry"
+                            <GridViewColumn Header="Expiry"
                                             DisplayMemberBinding="{Binding NotAfter}" 
                                             Width="Auto"/>
-                        <GridViewColumn Header="Published"
+                            <GridViewColumn Header="Published"
                                             CellTemplate="{StaticResource PublishedIconTemplate}"
                                             Width="Auto"/>
-                        <GridViewColumn Header="Has Private Key"
+                            <GridViewColumn Header="Has Private Key"
                                     CellTemplate="{StaticResource PrivateKeyIconTemplate}"
                                     Width="Auto"/>
-                        <GridViewColumn Header="Private key permission"
+                            <GridViewColumn Header="Private key permission"
                                         CellTemplate="{StaticResource HasPermissionIconTemplate}"
                                         Width="Auto"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
 
-            <StackPanel Grid.Row="3" Grid.Column="2"
+                <StackPanel Grid.Row="3" Grid.Column="2"
                             Orientation="Vertical">
-                <Button Command="{s:Action ShowCertificateDialog}"
+                    <Button Command="{s:Action ShowCertificateDialog}"
                             Content="View certificate..."
                             Height="Auto"
                             VerticalAlignment="Bottom"
                             Margin="5"/>
 
-                <Button Command="{s:Action ExportCertificate}"
+                    <Button Command="{s:Action ExportCertificate}"
                         Content="Export..."
                         Margin="5"/>
-                <Button Command="{s:Action PublishSelectedCertificate}"
+                    <Button Command="{s:Action PublishSelectedCertificate}"
                     Margin="5" 
                     VerticalContentAlignment="Center">
-                    <StackPanel Orientation="Horizontal" 
+                        <StackPanel Orientation="Horizontal" 
                             VerticalAlignment="Center">
-                        <iconPacks:PackIconMaterial Kind="ScriptOutline" Margin="0 0 2 0"/>
-                        <TextBlock Text="PUBLISH..." VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
+                            <iconPacks:PackIconMaterial Kind="ScriptOutline" Margin="0 0 2 0"/>
+                            <TextBlock Text="PUBLISH..." VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
 
-                <Button Command="{s:Action DeleteCertificate}"
+                    <Button Command="{s:Action DeleteCertificate}"
                         Content="Delete..."
                         Margin="5"/>
 
-                <!--<Button Command="{s:Action Repermission}"
+                    <!--<Button Command="{s:Action Repermission}"
                         Content="Reset permission..."
                         Margin="5"/>-->
-            </StackPanel>
+                </StackPanel>
 
-            <StackPanel Grid.Row="4" Grid.Column="1"
+                <StackPanel Grid.Row="4" Grid.Column="1"
                         HorizontalAlignment="Left"
                         Orientation="Horizontal">
-                <Button Command="{s:Action GenerateEncryptionCertificate}"
+                    <Button Command="{s:Action GenerateEncryptionCertificate}"
                         Content="Generate new..."
                         Margin="5"/>
 
-                <Button Command="{s:Action ImportCertificate}"
+                    <Button Command="{s:Action ImportCertificate}"
                         Content="Import..."
                         Margin="5"/>
-            </StackPanel>
-        </Grid>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
     </StackPanel>
 </UserControl>

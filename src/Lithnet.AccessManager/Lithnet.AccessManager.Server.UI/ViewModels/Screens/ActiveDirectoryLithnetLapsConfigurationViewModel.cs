@@ -32,7 +32,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IWindowManager windowManager;
         private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
 
-        public ActiveDirectoryLithnetLapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IViewModelFactory<X509Certificate2ViewModel, X509Certificate2> certificate2ViewModelFactory, IWindowsServiceProvider windowsServiceProvider, ILogger<ActiveDirectoryLithnetLapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, DataProtectionOptions dataProtectionOptions, INotifyModelChangedEventPublisher eventPublisher, IViewModelFactory<ActiveDirectoryForestSchemaViewModel, Forest> forestFactory, IWindowManager windowManager, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory)
+        public ActiveDirectoryLithnetLapsConfigurationViewModel(IDialogCoordinator dialogCoordinator, ICertificateProvider certificateProvider, IViewModelFactory<X509Certificate2ViewModel, X509Certificate2> certificate2ViewModelFactory, IWindowsServiceProvider windowsServiceProvider, ILogger<ActiveDirectoryLithnetLapsConfigurationViewModel> logger, IShellExecuteProvider shellExecuteProvider, IDomainTrustProvider domainTrustProvider, IDiscoveryServices discoveryServices, IScriptTemplateProvider scriptTemplateProvider, ICertificatePermissionProvider certPermissionProvider, DataProtectionOptions dataProtectionOptions, INotifyModelChangedEventPublisher eventPublisher, IViewModelFactory<ActiveDirectoryForestSchemaViewModel, Forest> forestFactory, IWindowManager windowManager, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory, IViewModelFactory<EnterpriseEditionBannerViewModel, EnterpriseEditionBannerModel> enterpriseEditionViewModelFactory)
         {
             this.shellExecuteProvider = shellExecuteProvider;
             this.certificateProvider = certificateProvider;
@@ -54,7 +54,15 @@ namespace Lithnet.AccessManager.Server.UI
             this.AvailableCertificates = new BindableCollection<X509Certificate2ViewModel>();
             this.DisplayName = "Lithnet LAPS";
             this.certPermissionProvider = certPermissionProvider;
+
+            this.EnterpriseEdition = enterpriseEditionViewModelFactory.CreateViewModel(new EnterpriseEditionBannerModel
+            {
+                RequiredFeature = Enterprise.LicensedFeatures.AzureAdDeviceSupport,
+                Link = Constants.EnterpriseEditionLearnMoreLinkAzureAdDevices
+            });
         }
+
+        public EnterpriseEditionBannerViewModel EnterpriseEdition { get; set; }
 
         public string HelpLink => Constants.HelpLinkPageLocalAdminPasswords;
 

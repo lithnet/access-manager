@@ -15,11 +15,11 @@ namespace Lithnet.AccessManager.Server
         public static readonly JobKey JobKey = new JobKey($"{JobName}Job", SchedulerService.MaintenanceGroupName);
         public static readonly TriggerKey TriggerKey = new TriggerKey($"{JobName}Trigger", SchedulerService.MaintenanceGroupName);
 
-        private readonly ILogger<DbMaintenanceJob> logger;
+                private readonly ILogger<DbBackupJob> logger;
         private readonly IDbProvider dbProvider;
         private readonly IOptions<DatabaseOptions> dbOptions;
 
-        public DbBackupJob(ILogger<DbMaintenanceJob> logger, IDbProvider dbProvider, IOptions<DatabaseOptions> dbOptions)
+        public DbBackupJob(ILogger<DbBackupJob> logger, IDbProvider dbProvider, IOptions<DatabaseOptions> dbOptions)
         {
             this.logger = logger;
             this.dbProvider = dbProvider;
@@ -76,7 +76,7 @@ namespace Lithnet.AccessManager.Server
                 return;
             }
 
-            IJobDetail job = JobBuilder.Create<DbMaintenanceJob>()
+            IJobDetail job = JobBuilder.Create<DbBackupJob>()
                      .WithIdentity(JobKey)
                      .Build();
 

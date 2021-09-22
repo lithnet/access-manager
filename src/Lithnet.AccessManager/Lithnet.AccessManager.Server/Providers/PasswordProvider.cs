@@ -154,6 +154,11 @@ namespace Lithnet.AccessManager.Server
 
         private PasswordEntry GetLithnetCurrentPassword(IActiveDirectoryComputer computer, DateTime? newExpiry)
         {
+            if (!licenseManager.IsFeatureEnabled(LicensedFeatures.AdEncryptedLaps))
+            {
+                return null;
+            }
+
             var item = this.lithnetProvider.GetCurrentPassword(computer, newExpiry);
 
             if (item == null)
