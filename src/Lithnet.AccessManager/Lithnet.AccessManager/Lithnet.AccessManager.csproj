@@ -24,7 +24,7 @@
     <PackageReference Include="Nlog" Version="4.7.5" />
     <PackageReference Include="system.directoryservices" Version="4.7.0" />
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.7.0" />
-    <PackageReference Include="System.DirectoryServices.Protocols" Version="4.7.0" />
+    <PackageReference Include="System.DirectoryServices.Protocols" Version="5.0.1" />
     <PackageReference Include="system.security.Cryptography.Cng" Version="4.7.0" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="4.7.0" />
     <PackageReference Include="Vanara.PInvoke.Cryptography" Version="3.2.20" />
