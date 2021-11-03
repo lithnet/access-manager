@@ -49,10 +49,7 @@
                     <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Registration keys" />
                 </DockPanel>
 
-                <TextBlock Grid.Row="2"
-                       Margin="10 5 5 5"
-                       TextWrapping="Wrap">Devices that don't use Active Directory or Azure Active Directory authentication must use a key to register with the AMS server.
-                </TextBlock>
+            
 
                 <ListView
                 Grid.Row="3"

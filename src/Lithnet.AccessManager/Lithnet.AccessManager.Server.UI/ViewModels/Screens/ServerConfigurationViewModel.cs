@@ -22,7 +22,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly ILogger<ServerConfigurationViewModel> logger;
         private readonly IApplicationUpgradeProvider appUpgradeProvider;
 
-        public ServerConfigurationViewModel(HostingViewModel hostingVm, LicensingViewModel licensingVm, AuthenticationViewModel authenticationVm, EmailViewModel emailVm, RateLimitsViewModel rateLimitsVm, IpDetectionViewModel ipDetectionVm, AuditingViewModel auditingVm, HighAvailabilityViewModel haVm, DatabaseViewModel dbVm, IAmsLicenseManager licenseManager, IWindowsServiceProvider windowsServiceProvider, IShellExecuteProvider shellExecuteProvider, IDialogCoordinator dialogCoordinator, ILogger<ServerConfigurationViewModel> logger, IApplicationUpgradeProvider appUpgradeProvider)
+        public ServerConfigurationViewModel(HostingViewModel hostingVm, LicensingViewModel licensingVm, AuthenticationViewModel authenticationVm, EmailViewModel emailVm, RateLimitsViewModel rateLimitsVm, IpDetectionViewModel ipDetectionVm, AuditingViewModel auditingVm, HighAvailabilityViewModel haVm, DatabaseViewModel dbVm, UserInterfaceViewModel uiVm, IAmsLicenseManager licenseManager, IWindowsServiceProvider windowsServiceProvider, IShellExecuteProvider shellExecuteProvider, IDialogCoordinator dialogCoordinator, ILogger<ServerConfigurationViewModel> logger, IApplicationUpgradeProvider appUpgradeProvider)
         {
             this.licenseManager = licenseManager;
             this.windowsServiceProvider = windowsServiceProvider;
@@ -37,6 +37,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.Items.Add(emailVm);
             this.Items.Add(rateLimitsVm);
             this.Items.Add(ipDetectionVm);
+            this.Items.Add(uiVm);
             this.Items.Add(auditingVm);
             this.Items.Add(haVm);
             this.Items.Add(dbVm);
