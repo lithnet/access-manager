@@ -36,7 +36,7 @@ namespace Lithnet.AccessManager.Server.UI
 
             this.Forests = new BindableCollection<ActiveDirectoryForestSchemaViewModel>();
         }
-        public string HelpLink => Constants.HelpLinkPageActiveDirectory;
+        public string HelpLink => Constants.HelpLinkPageMicrosoftLaps;
 
         protected override void OnInitialActivate()
         {

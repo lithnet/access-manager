@@ -13,28 +13,13 @@
              d:DesignHeight="450" d:DesignWidth="800"
              Margin="5">
     <StackPanel>
-        <!--<DockPanel>
-            <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
-                <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
-            </Button>
-            <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Notification Channels" />
+
+        <DockPanel>
+        <Button DockPanel.Dock="Right" Margin="5" Click="{s:Action Help}" Background="Transparent" BorderThickness="0" Focusable="False" >
+            <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
+        </Button>
+            <Label DockPanel.Dock="Left" Style="{DynamicResource DescriptionHeaderStyle}" Content="Global events" />
         </DockPanel>
-
-        <mah:MetroAnimatedSingleRowTabControl BorderThickness="1"  
-                                                  ItemsSource="{Binding Items}" 
-                                                  SelectedItem="{Binding ActiveItem}"
-                                                  DisplayMemberPath="DisplayName"
-                                                  Margin="5">-->
-            <!--<TabControl.ContentTemplate>
-                <DataTemplate>
-                    <ContentControl s:View.Model="{Binding}" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" IsTabStop="False"/>
-                </DataTemplate>
-            </TabControl.ContentTemplate>
-        </mah:MetroAnimatedSingleRowTabControl>-->
-
-
-        <Label Style="{DynamicResource DescriptionHeaderStyle}" 
-               Content="Global events"/>
 
         <Grid Margin="5">
             <Grid.RowDefinitions>

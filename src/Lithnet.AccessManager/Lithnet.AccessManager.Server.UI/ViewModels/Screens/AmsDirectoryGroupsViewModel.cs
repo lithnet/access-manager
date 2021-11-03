@@ -217,7 +217,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public string HelpLink => Constants.HelpLinkPageJitAccess;
+        public string HelpLink => Constants.HelpLinkAmsGroupsPage;
 
         public async Task Help()
         {

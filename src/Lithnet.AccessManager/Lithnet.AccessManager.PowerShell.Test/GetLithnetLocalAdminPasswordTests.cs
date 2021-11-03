@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Management.Automation;
 using System.Linq;
+using Lithnet.AccessManager.Cryptography;
 using Microsoft.Extensions.Logging;
 using C = Lithnet.AccessManager.Test.TestEnvironmentConstants;
 using NUnit.Framework;

@@ -17,8 +17,10 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IComputerLocator computerLocator;
         private readonly IAsyncViewModelFactory<ComputerSelectorViewModel, IList<IComputer>> computerSelectorViewModelFactory;
         private readonly IWindowManager windowManager;
+        private readonly IShellExecuteProvider shellExecuteProvider;
         private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
-        public EffectiveAccessViewModelFactory(IDialogCoordinator dialogCoordinator, ILogger<EffectiveAccessViewModel> logger, IAuthorizationInformationBuilder authorizationBuilder, IActiveDirectory directory, IEnumerable<IComputerTargetProvider> computerTargetProvider, IComputerLocator computerLocator, IAsyncViewModelFactory<ComputerSelectorViewModel, IList<IComputer>> computerSelectorViewModelFactory, IWindowManager windowManager, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory)
+
+        public EffectiveAccessViewModelFactory(IDialogCoordinator dialogCoordinator, ILogger<EffectiveAccessViewModel> logger, IAuthorizationInformationBuilder authorizationBuilder, IActiveDirectory directory, IEnumerable<IComputerTargetProvider> computerTargetProvider, IComputerLocator computerLocator, IAsyncViewModelFactory<ComputerSelectorViewModel, IList<IComputer>> computerSelectorViewModelFactory, IWindowManager windowManager, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory, IShellExecuteProvider shellExecuteProvider)
         {
             this.dialogCoordinator = dialogCoordinator;
             this.logger = logger;
@@ -29,11 +31,12 @@ namespace Lithnet.AccessManager.Server.UI
             this.computerSelectorViewModelFactory = computerSelectorViewModelFactory;
             this.windowManager = windowManager;
             this.externalDialogWindowFactory = externalDialogWindowFactory;
+            this.shellExecuteProvider = shellExecuteProvider;
         }
 
         public EffectiveAccessViewModel CreateViewModel(SecurityDescriptorTargetsViewModel targets)
         {
-            return new EffectiveAccessViewModel(authorizationBuilder, dialogCoordinator, directory, targets, logger, computerTargetProvider, computerLocator, computerSelectorViewModelFactory, externalDialogWindowFactory, windowManager);
+            return new EffectiveAccessViewModel(authorizationBuilder, dialogCoordinator, directory, targets, logger, computerTargetProvider, computerLocator, computerSelectorViewModelFactory, externalDialogWindowFactory, windowManager, shellExecuteProvider);
         }
     }
 }

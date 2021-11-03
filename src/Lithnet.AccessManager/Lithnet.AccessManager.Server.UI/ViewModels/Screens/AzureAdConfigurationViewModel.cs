@@ -291,7 +291,7 @@ namespace Lithnet.AccessManager.Server.UI
         [NotifyModelChangedProperty]
         public int HasBeenChanged { get; set; }
 
-        public string HelpLink => Constants.HelpLinkPageJitAccess;
+        public string HelpLink => Constants.HelpLinkAzureAdPage;
 
         public async Task Help()
         {

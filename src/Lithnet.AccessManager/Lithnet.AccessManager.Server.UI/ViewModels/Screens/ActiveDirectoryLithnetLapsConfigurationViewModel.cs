@@ -64,7 +64,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public EnterpriseEditionBannerViewModel EnterpriseEdition { get; set; }
 
-        public string HelpLink => Constants.HelpLinkPageLocalAdminPasswords;
+        public string HelpLink => Constants.HelpLinkLithnetLapsForAdPage;
 
         protected override void OnInitialActivate()
         {

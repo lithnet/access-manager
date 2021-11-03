@@ -31,8 +31,8 @@ namespace Lithnet.AccessManager.Server.UI
 
             eventPublisher.Register(this);
         }
-        
-        public string HelpLink => Constants.HelpLinkPageEmail;
+
+        public string HelpLink => Constants.HelpLinkDatabasePage;
 
         public PackIconMaterialKind Icon => PackIconMaterialKind.Database;
 

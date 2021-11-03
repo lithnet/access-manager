@@ -14,14 +14,14 @@
              Margin="5">
     <StackPanel>
         <DockPanel>
-            <Button DockPanel.Dock="Right"
+            <!--<Button DockPanel.Dock="Right"
                     Margin="5"
                     Click="{s:Action Help}"
                     Background="Transparent"
                     BorderThickness="0"
                     Focusable="False">
                 <iconPacks:PackIconMaterialLight Kind="HelpCircle" />
-            </Button>
+            </Button>-->
             <Label DockPanel.Dock="Left"
                    Style="{DynamicResource DescriptionHeaderStyle}"
                    Content="Directory configuration" />

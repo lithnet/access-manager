@@ -26,6 +26,7 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IAsyncViewModelFactory<ComputerSelectorViewModel, IList<IComputer>> computerSelectorViewModelFactory;
         private readonly IWindowManager windowManager;
         private readonly IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory;
+        private readonly IShellExecuteProvider shellExecuteProvider;
 
         public string ComputerName { get; set; }
 
@@ -55,7 +56,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public ObservableCollection<MatchedSecurityDescriptorTargetViewModel> MatchedTargets { get; } = new ObservableCollection<MatchedSecurityDescriptorTargetViewModel>();
 
-        public EffectiveAccessViewModel(IAuthorizationInformationBuilder authorizationBuilder, IDialogCoordinator dialogCoordinator, IActiveDirectory directory, SecurityDescriptorTargetsViewModel targets, ILogger<EffectiveAccessViewModel> logger, IEnumerable<IComputerTargetProvider> computerTargetProviders, IComputerLocator computerLocator, IAsyncViewModelFactory<ComputerSelectorViewModel, IList<IComputer>> computerSelectorViewModelFactory, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory, IWindowManager windowManager)
+        public EffectiveAccessViewModel(IAuthorizationInformationBuilder authorizationBuilder, IDialogCoordinator dialogCoordinator, IActiveDirectory directory, SecurityDescriptorTargetsViewModel targets, ILogger<EffectiveAccessViewModel> logger, IEnumerable<IComputerTargetProvider> computerTargetProviders, IComputerLocator computerLocator, IAsyncViewModelFactory<ComputerSelectorViewModel, IList<IComputer>> computerSelectorViewModelFactory, IViewModelFactory<ExternalDialogWindowViewModel, Screen> externalDialogWindowFactory, IWindowManager windowManager, IShellExecuteProvider shellExecuteProvider)
         {
             this.authorizationBuilder = authorizationBuilder;
             this.dialogCoordinator = dialogCoordinator;
@@ -66,6 +67,7 @@ namespace Lithnet.AccessManager.Server.UI
             this.computerSelectorViewModelFactory = computerSelectorViewModelFactory;
             this.externalDialogWindowFactory = externalDialogWindowFactory;
             this.windowManager = windowManager;
+            this.shellExecuteProvider = shellExecuteProvider;
             this.logger = logger;
             this.DisplayName = "Calculate effective access";
         }
@@ -284,5 +286,11 @@ namespace Lithnet.AccessManager.Server.UI
         public int Width { get; } = 800;
 
         public int Height { get; } = 770;
+
+
+        public async Task Help()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
+        }
     }
 }

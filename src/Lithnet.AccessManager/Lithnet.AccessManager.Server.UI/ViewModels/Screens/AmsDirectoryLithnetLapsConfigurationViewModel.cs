@@ -28,7 +28,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public PasswordPoliciesViewModel PasswordPolicies { get; set; }
 
-        public string HelpLink => Constants.HelpLinkPageEmail;
+        public string HelpLink => Constants.HelpLinkLithnetLapsForAmsPage;
 
         public async Task Help()
         {

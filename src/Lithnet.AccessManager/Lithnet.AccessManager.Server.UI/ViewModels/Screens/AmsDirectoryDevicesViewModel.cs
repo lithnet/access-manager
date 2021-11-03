@@ -402,7 +402,7 @@ namespace Lithnet.AccessManager.Server.UI
             }
         }
 
-        public string HelpLink => Constants.HelpLinkPageJitAccess;
+        public string HelpLink => Constants.HelpLinkAmsDevicesPage;
 
         public async Task Help()
         {

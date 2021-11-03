@@ -178,11 +178,10 @@ namespace Lithnet.AccessManager.Server.UI
         }
 
         public PackIconMaterialKind Icon => PackIconMaterialKind.Application;
-        
+
         public async Task Help()
         {
             await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
         }
-
     }
 }

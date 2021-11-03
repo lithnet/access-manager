@@ -13,16 +13,24 @@ namespace Lithnet.AccessManager.Server.UI
 {
     public class DirectoryConfigurationViewModel : Conductor<PropertyChangedBase>.Collection.OneActive, IHelpLink
     {
-        public DirectoryConfigurationViewModel(ActiveDirectoryConfigurationViewModel adVm,  AzureAdConfigurationViewModel aadVm, AmsDirectoryConfigurationViewModel amsVm)
+        private readonly IShellExecuteProvider shellExecuteProvider;
+
+        public DirectoryConfigurationViewModel(ActiveDirectoryConfigurationViewModel adVm,  AzureAdConfigurationViewModel aadVm, AmsDirectoryConfigurationViewModel amsVm, IShellExecuteProvider shellExecuteProvider)
         {
             this.Items.Add(adVm);
             this.Items.Add(aadVm);
             this.Items.Add(amsVm);
             this.DisplayName = "Directory configuration";
+            this.shellExecuteProvider = shellExecuteProvider;
         }
 
         public string HelpLink => Constants.HelpLinkPageWebHosting;
 
         public PackIconFontAwesomeKind Icon => PackIconFontAwesomeKind.SitemapSolid;
+
+        public async Task Help()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
+        }
     }
 }

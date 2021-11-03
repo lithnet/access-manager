@@ -45,5 +45,10 @@ namespace Lithnet.AccessManager.Server.UI
         public void SupportInformation() => this.shellExecuteProvider.OpenWithShellExecute(Constants.LinkSupportInformation);
 
         public string HelpLink => Constants.HelpLinkPageHelp;
+
+        public async Task Help()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
+        }
     }
 }

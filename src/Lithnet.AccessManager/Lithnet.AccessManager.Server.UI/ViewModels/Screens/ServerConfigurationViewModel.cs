@@ -55,7 +55,7 @@ namespace Lithnet.AccessManager.Server.UI
 
         public HostingViewModel HostingViewModel { get; }
 
-        public string HelpLink => Constants.HelpLinkPageWebHosting;
+        public string HelpLink => Constants.HelpLinkServerConfiguration;
 
         public PackIconFeatherIconsKind Icon => PackIconFeatherIconsKind.Server;
 
@@ -281,6 +281,11 @@ namespace Lithnet.AccessManager.Server.UI
             }
 
             Debug.WriteLine("Poll stopped");
+        }
+
+        public async Task Help()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
         }
     }
 }
