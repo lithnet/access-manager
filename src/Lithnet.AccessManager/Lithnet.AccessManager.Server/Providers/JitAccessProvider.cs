@@ -25,6 +25,8 @@ namespace Lithnet.AccessManager.Server
 
         public TimeSpan GrantJitAccess(IGroup group, IUser user, IComputer computer, bool canExtend, TimeSpan requestedExpiry, out Action undo)
         {
+            requestedExpiry = requestedExpiry.Ticks <= 0 ? TimeSpan.FromMinutes(5) : requestedExpiry;
+
             this.logger.LogTrace("Adding user {user} to JIT group {group}", user.MsDsPrincipalName, group.MsDsPrincipalName);
 
             if (this.directory.IsPamFeatureEnabled(group.Sid, false))
@@ -39,6 +41,8 @@ namespace Lithnet.AccessManager.Server
 
         public TimeSpan GrantJitAccess(IGroup group, IUser user, bool canExtend, TimeSpan requestedExpiry, out Action undo)
         {
+            requestedExpiry = requestedExpiry.Ticks <= 0 ? TimeSpan.FromMinutes(5) : requestedExpiry;
+
             this.logger.LogTrace("Adding user {user} to JIT group {group}", user.MsDsPrincipalName, group.MsDsPrincipalName);
 
             if (this.directory.IsPamFeatureEnabled(group.Sid, false))
