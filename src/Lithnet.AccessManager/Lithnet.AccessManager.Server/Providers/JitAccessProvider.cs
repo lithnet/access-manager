@@ -32,6 +32,8 @@ namespace Lithnet.AccessManager.Server
 
             this.logger.LogTrace("Adding user {user} to JIT group {group}", user.MsDsPrincipalName, group.MsDsPrincipalName);
 
+            requestedExpiry = requestedExpiry.Ticks <= 0 ? TimeSpan.FromMinutes(5) : requestedExpiry;
+
             if (this.directory.IsPamFeatureEnabled(group.Sid, false))
             {
                 return this.GrantJitAccessPam(group, user, this.GetDcLocatorTarget(adComputer), canExtend, requestedExpiry, out undo);
@@ -45,6 +47,8 @@ namespace Lithnet.AccessManager.Server
         public TimeSpan GrantJitAccess(IActiveDirectoryGroup group, IActiveDirectoryUser user, bool canExtend, TimeSpan requestedExpiry, out Action undo)
         {
             this.logger.LogTrace("Adding user {user} to JIT group {group}", user.MsDsPrincipalName, group.MsDsPrincipalName);
+
+            requestedExpiry = requestedExpiry.Ticks <= 0 ? TimeSpan.FromMinutes(5) : requestedExpiry;
 
             if (this.directory.IsPamFeatureEnabled(group.Sid, false))
             {
