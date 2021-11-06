@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="17.3" version="18.4" Modules="enterprise" RootPath="." Language="en" Id="{6231D1B4-23AF-4C6E-998C-070D74534FAD}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="17.3" version="18.8.1" Modules="enterprise" RootPath="." Language="en" Id="{6231D1B4-23AF-4C6E-998C-070D74534FAD}">
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AGENTENABLED" Comments="AMS"/>
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
@@ -17,10 +17,10 @@
     <ROW Property="AZUREADTENANTID" Comments="AMS"/>
     <ROW Property="INTERVAL" Comments="AMS"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
-    <ROW Property="ProductCode" Value="1033:{317530D7-BEAA-4140-BAE3-9974CFA59518} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{5754CB99-B77F-46F6-A451-A6888DC9E413} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Agent"/>
-    <ROW Property="ProductVersion" Value="1.14.8382.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
+    <ROW Property="ProductVersion" Value="2.0.8392.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
     <ROW Property="REGISTRATIONKEY" Options="1" Comments="AMS"/>
     <ROW Property="REGKEYNOTREQUIRED" Value="0" Comments="AMS"/>
     <ROW Property="REG_REGISTRATIONKEY" Options="1" Comments="AMS"/>
