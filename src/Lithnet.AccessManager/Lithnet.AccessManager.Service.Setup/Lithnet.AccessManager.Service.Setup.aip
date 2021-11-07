@@ -22,10 +22,10 @@
     <ROW Property="IAgree" Value="No" Type="4" MsiKey="IAgree"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{EC175F33-4B54-4239-BFF6-6BACA01D42B5} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{9640453A-F12D-4BE4-8D64-088F7E0AF2E1} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="2.0.8392.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="2.0.8393.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="SHOW_DB_CONFIG" Value="1"/>
     <ROW Property="SQLEXPRESS_DEFAULT_ADMINS" Value="Builtin\Administrators"/>
     <ROW Property="SQLEXPRESS_DEFAULT_INSTANCENAME" Value="AMS"/>
@@ -191,6 +191,7 @@
     <ROW Component="Microsoft.Extensions.DependencyInjection.Abstractions.dll_1" ComponentId="{19F68A2B-F446-42A5-B6B1-313B0D334872}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Extensions.DependencyInjection.Abstractions.dll_1"/>
     <ROW Component="Microsoft.Extensions.DependencyInjection.dll" ComponentId="{A60A83D7-B83F-46EB-8E0E-B3FCC29F10E4}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.DependencyInjection.dll"/>
     <ROW Component="Microsoft.Extensions.DependencyInjection.dll_1" ComponentId="{873CB984-6893-40A1-89A4-66E613A08177}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Extensions.DependencyInjection.dll_1"/>
+    <ROW Component="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll" ComponentId="{CEC32403-68D6-40DA-98E2-C19067E80A41}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll"/>
     <ROW Component="Microsoft.Extensions.FileProviders.Abstractions.dll" ComponentId="{8A26B84E-D1EB-4A1F-8E29-5CFA9B7ECEB1}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.FileProviders.Abstractions.dll"/>
     <ROW Component="Microsoft.Extensions.FileProviders.Abstractions.dll_1" ComponentId="{D7880797-3FBD-474E-8200-3C71FF56B1BB}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Extensions.FileProviders.Abstractions.dll_1"/>
     <ROW Component="Microsoft.Extensions.FileProviders.Embedded.dll" ComponentId="{D90D8CD1-FCCA-4E0D-A44B-F7A518C40FD0}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.FileProviders.Embedded.dll"/>
@@ -1071,6 +1072,7 @@
     <ROW File="Lithnet.AccessManager.Cryptography.pdb_1" Component_="Lithnet.AccessManager.Cryptography.dll_1" FileName="LITHNE~3.PDB|Lithnet.AccessManager.Cryptography.pdb" Attributes="0" SourcePath="output-ps\Lithnet.AccessManager.Cryptography.pdb" SelfReg="false"/>
     <ROW File="cardselection.js" Component_="clipboard.js" FileName="CARD-S~1.JS|card-selection.js" Attributes="0" SourcePath="output\wwwroot\js\card-selection.js" SelfReg="false"/>
     <ROW File="Microsoft.Extensions.DependencyInjection.dll_1" Component_="Microsoft.Extensions.DependencyInjection.dll_1" FileName="MICROS~3.DLL|Microsoft.Extensions.DependencyInjection.dll" Attributes="0" SourcePath="output-ps\Microsoft.Extensions.DependencyInjection.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll" Component_="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll" FileName="MICROS~5.DLL|Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll" Attributes="0" SourcePath="output\Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.custcomp.AiControlConditionAliasComponent">
     <ROW AliasRowId="ExitDialog#LaunchProdCheckBox#Hide#((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))" AliasRowOperation="2" Condition="(((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))) OR NOT IS_STANDALONE_OR_NOT_CLUSTERED_OR_ON_ACTIVE_NODE"/>
@@ -1886,6 +1888,7 @@
     <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Cryptography.dll"/>
     <ROW Feature_="MainFeature" Component_="Lithnet.AccessManager.Cryptography.dll_1"/>
     <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.DependencyInjection.dll_1"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>

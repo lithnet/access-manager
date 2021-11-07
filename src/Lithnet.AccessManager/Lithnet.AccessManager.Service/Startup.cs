@@ -65,6 +65,9 @@ namespace Lithnet.AccessManager.Service
                 options.Secure = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
             });
 
+            services.AddHealthChecks()
+                .AddCheck<WebServiceHealthCheckProvider>("web_service_check");
+
             services.AddScoped<IIwaAuthenticationProvider, IwaAuthenticationProvider>();
             services.AddScoped<IOidcAuthenticationProvider, OidcAuthenticationProvider>();
             services.AddScoped<IWsFedAuthenticationProvider, WsFedAuthenticationProvider>();
@@ -274,12 +277,13 @@ namespace Lithnet.AccessManager.Service
             app.UseReferrerPolicy();
             app.UseContentTypeOptions();
             app.UseStaticFiles();
-
+        
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapHealthChecks("/health-check");
             });
         }
 
