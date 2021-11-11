@@ -1,28 +1,27 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN"
-    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-  <dict>
-    <key>Label</key>
-    <string>io.lithnet.accessmanager.agent</string>
-    <key>ServiceDescription</key>
-    <string>Lithnet Access Manager Agent</string>
-    <key>Program</key>
-    <string>/Applications/LithnetAccessManagerAgent/Lithnet.AccessManager.Agent</string>
-    <key>RunAtLoad</key>
-    <true/>
-    <key>WorkingDirectory</key>
-    <string>/Applications/LithnetAccessManagerAgent</string>
-    <key>KeepAlive</key>
-    <dict>
-      <key>SuccessfulExit</key>
-      <false/>
-    </dict>
-    <key>EnableTransactions</key>
-    <false/>
-    <key>StandardOutPath</key>
-    <string>/Library/Logs/LithnetAccessManagerAgent/LithnetAccessManagerAgent-stdout.log</string>
-    <key>StandardErrorPath</key>
-    <string>/Library/Logs/LithnetAccessManagerAgent/LithnetAccessManagerAgent-stderr.log</string>
-  </dict>
+<dict>
+	<key>Label</key>
+	<string>io.lithnet.accessmanager.agent</string>
+	<key>ServiceDescription</key>
+	<string>Lithnet Access Manager Agent</string>
+	<key>Program</key>
+	<string>/Applications/LithnetAccessManagerAgent/Lithnet.AccessManager.Agent</string>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>WorkingDirectory</key>
+	<string>/Applications/LithnetAccessManagerAgent</string>
+	<key>KeepAlive</key>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
+	<key>EnableTransactions</key>
+	<false/>
+	<key>StandardOutPath</key>
+	<string>/Library/Logs/LithnetAccessManagerAgent/LithnetAccessManagerAgent-stdout.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Library/Logs/LithnetAccessManagerAgent/LithnetAccessManagerAgent-stderr.log</string>
+</dict>
 </plist>
