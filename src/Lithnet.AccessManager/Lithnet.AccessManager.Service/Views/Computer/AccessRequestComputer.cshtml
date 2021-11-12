@@ -42,9 +42,9 @@
 
                         <div class="card mb-4" id="@($"computer{count}-card")">
 
-                            <div class="card-body" role="button">
+                            <div class="card-body">
                                 <h5 class="card-title">
-                                    @Html.RadioButtonFor(m => m.SelectedComputerKey, c.Key, new { @id = $"computer{count}" })
+                                    @Html.RadioButtonFor(m => m.SelectedComputerKey, c.Key, new {@id = $"computer{count}"})
                                     <label for="@($"computer{count}")">@c.Name </label>
                                 </h5>
                                 <div>Found in @c.AuthorityName</div>
