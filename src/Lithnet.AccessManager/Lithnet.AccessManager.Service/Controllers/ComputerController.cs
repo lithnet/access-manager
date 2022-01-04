@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Threading.Tasks;
+using Lithnet.AccessManager.Server.App_LocalResources;
 using Lithnet.AccessManager.Server.Providers;
 using IAuthorizationService = Lithnet.AccessManager.Server.Authorization.IAuthorizationService;
 

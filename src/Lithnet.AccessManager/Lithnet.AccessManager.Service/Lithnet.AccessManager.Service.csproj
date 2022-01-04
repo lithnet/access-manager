@@ -108,11 +108,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="App_LocalResources\LogMessages.Designer.cs">
-      <DependentUpon>LogMessages.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
     <Compile Update="App_LocalResources\UIMessages.Designer.cs">
       <DependentUpon>UIMessages.resx</DependentUpon>
       <DesignTime>True</DesignTime>
@@ -121,11 +116,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="App_LocalResources\LogMessages.resx">
-      <SubType>Designer</SubType>
-      <LastGenOutput>LogMessages.Designer.cs</LastGenOutput>
-      <Generator>ResXFileCodeGenerator</Generator>
-    </EmbeddedResource>
     <EmbeddedResource Update="App_LocalResources\UIMessages.resx">
       <LastGenOutput>UIMessages.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>

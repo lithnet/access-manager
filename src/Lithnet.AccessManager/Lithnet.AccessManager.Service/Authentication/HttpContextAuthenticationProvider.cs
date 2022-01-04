@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Security.Claims;
+using Lithnet.AccessManager.Server.App_LocalResources;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Service.App_LocalResources;
 using Microsoft.AspNetCore.Http;

@@ -83,7 +83,7 @@
     <PackageReference Include="DbUp-SqlServer" Version="4.4.0" />
     <PackageReference Include="htmlagilitypack" Version="1.11.24" />
     <PackageReference Include="lithnet.accessmanager.enterprise" Version="1.0.7936.15678" />
-    <PackageReference Include="lithnet.security.authorization" Version="1.0.7518.2238" />
+    <PackageReference Include="lithnet.security.authorization" Version="1.0.7986.57202" />
     <PackageReference Include="MartinCostello.SqlLocalDb" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.Abstractions" Version="5.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.HttpOverrides" Version="2.2.0" />
@@ -125,7 +125,7 @@
     <EmbeddedResource Update="App_LocalResources\LogMessages.resx">
       <SubType>Designer</SubType>
       <LastGenOutput>LogMessages.Designer.cs</LastGenOutput>
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
   </ItemGroup>
 

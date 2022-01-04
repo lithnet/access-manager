@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server;
+using Lithnet.AccessManager.Server.App_LocalResources;
 using Lithnet.AccessManager.Server.Auditing;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Service.App_LocalResources;

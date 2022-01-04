@@ -15,7 +15,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="lithnet.security.authorization" Version="1.0.7518.2238" />
+    <PackageReference Include="lithnet.security.authorization" Version="1.0.7986.57202" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

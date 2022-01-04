@@ -1,0 +1,80 @@
+﻿@using Lithnet.AccessManager.Server.Configuration;
+@using Microsoft.Extensions.Options;
+@using Lithnet.AccessManager.Server
+
+@inject IOptionsSnapshot<UserInterfaceOptions> uiSettings
+
+@{
+    ViewBag.Title = UIMessages.HeadingRequestAccess;
+}
+
+@model Lithnet.AccessManager.Service.Models.RoleRequestModel
+
+
+<div class="loading-overlay">
+    <div class="loading-content d-flex justify-content-center">
+        <div class="spinner-border color-ams-blue" role="status"></div>
+        <div class="loading-text">Requesting access...</div>
+    </div>
+</div>
+
+<div class="form-container">
+    <div class="form-content-header">
+        Available roles
+    </div>
+    <div class="form-content">
+        @using (Html.BeginForm("AccessResponse", "Role", FormMethod.Post))
+        {
+            <section>
+                <label class="lead">Select the role you wish to claim</label>
+            </section>
+
+            <section>
+
+                <div>
+                    @{
+                        int count = 0;
+                    }
+
+                    @Html.DropDownListFor(m => m.SelectedRoleKey, Model.SelectionItems, "Select a role", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.SelectedRoleKey)
+                    @*@foreach (var c in Model.AvailableRoles)
+                    {
+                        count++;
+
+                        <div class="card mb-4" id="@($"role{count}-card")">
+
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    @Html.RadioButtonFor(m => m.SelectedRoleKey, c.Key, new { @id = $"role{count}" })
+                                    <label for="@($"role{count}")">@c.Name </label>
+                                </h5>
+                            </div>
+                        </div>
+                    }*@
+                </div>
+
+            </section>
+
+            @Html.HiddenFor(m => m.UserRequestReason);
+            @Html.HiddenFor(m => m.RequestedDuration);
+            @Html.HiddenFor(m => m.SelectionItems);
+            @Html.HiddenFor(m => m.AvailableRoles);
+            @Html.AntiForgeryToken();
+
+            <footer>
+                <div class="center-content">
+                    <button type="submit" class="btn btn-primary button-loading-overlay">Next</button>
+
+                    @Html.ActionLink(UIMessages.ButtonNewRequest, "AccessRequest", "Role", null, new { @class = "btn btn-outline-secondary" })
+                </div>
+            </footer>
+        }
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="@Url.Content("~/js/card-selection.js")"></script>
+
+}

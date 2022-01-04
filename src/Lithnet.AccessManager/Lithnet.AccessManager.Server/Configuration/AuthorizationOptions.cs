@@ -8,6 +8,8 @@ namespace Lithnet.AccessManager.Server.Configuration
 
         public List<SecurityDescriptorTarget> ComputerTargets { get; set; } = new List<SecurityDescriptorTarget>();
 
+        public List<RoleSecurityDescriptorTarget> Roles { get; set; } = new List<RoleSecurityDescriptorTarget>();
+        
         public int AuthZCacheDuration { get; set; }
     }
 }

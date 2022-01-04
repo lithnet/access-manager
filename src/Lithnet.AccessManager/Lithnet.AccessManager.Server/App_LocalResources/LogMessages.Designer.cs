@@ -22,7 +22,7 @@ namespace Lithnet.AccessManager.Server.App_LocalResources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class LogMessages {
+    public class LogMessages {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Lithnet.AccessManager.Server.App_LocalResources {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Lithnet.AccessManager.Server.App_LocalResources.LogMessages", typeof(LogMessages).Assembly);
@@ -51,7 +51,7 @@ namespace Lithnet.AccessManager.Server.App_LocalResources {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace Lithnet.AccessManager.Server.App_LocalResources {
         /// <summary>
         ///   Looks up a localized string similar to Access to {computer.MsDsPrincipalName} was denied for {user.MsDsPrincipalName}.
         /// </summary>
-        internal static string AuditEmailSubjectFailure {
+        public static string AuditEmailSubjectFailure {
             get {
                 return ResourceManager.GetString("AuditEmailSubjectFailure", resourceCulture);
             }
@@ -72,9 +72,230 @@ namespace Lithnet.AccessManager.Server.App_LocalResources {
         /// <summary>
         ///   Looks up a localized string similar to Access to {computer.MsDsPrincipalName} was granted for {user.MsDsPrincipalName}.
         /// </summary>
-        internal static string AuditEmailSubjectSuccess {
+        public static string AuditEmailSubjectSuccess {
             get {
                 return ResourceManager.GetString("AuditEmailSubjectSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully authenticated and mapped directory user
+        ///{0}.
+        /// </summary>
+        public static string AuthenticatedAndMappedUser {
+            get {
+                return ResourceManager.GetString("AuthenticatedAndMappedUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The external authentication provider denied the logon request.
+        /// </summary>
+        public static string AuthNAccessDenied {
+            get {
+                return ResourceManager.GetString("AuthNAccessDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred looking up the claim value in the directory {0}:{1}.
+        /// </summary>
+        public static string AuthNDirectoryLookupError {
+            get {
+                return ResourceManager.GetString("AuthNDirectoryLookupError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The authentication provider returned an error.
+        /// </summary>
+        public static string AuthNProviderError {
+            get {
+                return ResourceManager.GetString("AuthNProviderError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There was an exception processing the response from the external identity provider.
+        /// </summary>
+        public static string AuthNResponseProcessingError {
+            get {
+                return ResourceManager.GetString("AuthNResponseProcessingError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user {0} is not authorized to access the computer {1}..
+        /// </summary>
+        public static string AuthorizationFailed {
+            get {
+                return ResourceManager.GetString("AuthorizationFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred during the authorization code flow.
+        /// </summary>
+        public static string AuthZCodeFlowError {
+            get {
+                return ResourceManager.GetString("AuthZCodeFlowError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unexpected error occurred during the authorization process for user {0} requesting {2} access to computer {1}.
+        /// </summary>
+        public static string AuthZError {
+            get {
+                return ResourceManager.GetString("AuthZError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user {0} requested {2} access to computer {1} which was authorized, but one or more audit notification channels failed to deliver the audit response, and were configured to deny access to the password when auditing fails.
+        /// </summary>
+        public static string AuthZFailedAuditError {
+            get {
+                return ResourceManager.GetString("AuthZFailedAuditError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user {0} requested access to computer {1} but does not match any of the reader principals that are allowed access to this computer.
+        /// </summary>
+        public static string AuthZFailedNoReaderPrincipalMatch {
+            get {
+                return ResourceManager.GetString("AuthZFailedNoReaderPrincipalMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user was explicitly denied access to the computer.
+        /// </summary>
+        public static string AuthZResponseExplicitlyDenied {
+            get {
+                return ResourceManager.GetString("AuthZResponseExplicitlyDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not authorized.
+        /// </summary>
+        public static string AuthZResponseFallback {
+            get {
+                return ResourceManager.GetString("AuthZResponseFallback", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user exceeded the per-IP address request limit.
+        /// </summary>
+        public static string AuthZResponseIpRateLimitExceeded {
+            get {
+                return ResourceManager.GetString("AuthZResponseIpRateLimitExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There were no authorization rules that apply to the requested computer.
+        /// </summary>
+        public static string AuthZResponseNoMatchingRuleForComputer {
+            get {
+                return ResourceManager.GetString("AuthZResponseNoMatchingRuleForComputer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are no authorization rules that grant the user access to the requested computer.
+        /// </summary>
+        public static string AuthZResponseNoMatchingRuleForUser {
+            get {
+                return ResourceManager.GetString("AuthZResponseNoMatchingRuleForUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user exceeded the per-user request limit.
+        /// </summary>
+        public static string AuthZResponseUserRateLimitExceeded {
+            get {
+                return ResourceManager.GetString("AuthZResponseUserRateLimitExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred when trying to get the BitLocker recovery passwords for computer {0} as requested by user {1}.
+        /// </summary>
+        public static string BitLockerKeyAccessError {
+            get {
+                return ResourceManager.GetString("BitLockerKeyAccessError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User {1} requested access to the BitLocker recovery passwords for computer {0}, but the computer does not have any BitLocker recovery passwords in the directory.
+        /// </summary>
+        public static string BitLockerKeysNotPresent {
+            get {
+                return ResourceManager.GetString("BitLockerKeysNotPresent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The certificate could not be validated due to an unexpected error
+        ///
+        ///{0}.
+        /// </summary>
+        public static string CertificateAuthNGenericFailure {
+            get {
+                return ResourceManager.GetString("CertificateAuthNGenericFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The certificate presented by the client could not be validated. Check for prior log messages for additional context. If there are no previous log messages related to this authentication attempt, then ensure the certificate was not self-signed, is issued by a certificate authority trusted by this computer, and contains the client authentication EKU
+        ///
+        ///{0}.
+        /// </summary>
+        public static string CertificateAuthNValidationFailure {
+            get {
+                return ResourceManager.GetString("CertificateAuthNValidationFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No user claim was found with the type {0}.
+        /// </summary>
+        public static string ClaimNotFound {
+            get {
+                return ResourceManager.GetString("ClaimNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unexpected error occurred while trying to find a computer named {0} in the directory for user {1} requesting {2} access..
+        /// </summary>
+        public static string ComputerDiscoveryError {
+            get {
+                return ResourceManager.GetString("ComputerDiscoveryError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user {0} requested {2} access to computer {1}, but multiple computers matching that name were found in the directory.
+        /// </summary>
+        public static string ComputerNameAmbiguous {
+            get {
+                return ResourceManager.GetString("ComputerNameAmbiguous", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user {0} requested {2} access to computer {1} which was not found in the directory.
+        /// </summary>
+        public static string ComputerNotFoundInDirectory {
+            get {
+                return ResourceManager.GetString("ComputerNotFoundInDirectory", resourceCulture);
             }
         }
         
@@ -91,7 +312,7 @@ namespace Lithnet.AccessManager.Server.App_LocalResources {
         ///Reader principal:			{reader.Principal}
         ///Detail:				{message}.
         /// </summary>
-        internal static string DefaultAuditFailureText {
+        public static string DefaultAuditFailureText {
             get {
                 return ResourceManager.GetString("DefaultAuditFailureText", resourceCulture);
             }
@@ -109,18 +330,181 @@ namespace Lithnet.AccessManager.Server.App_LocalResources {
         ///Target ID:			{target.ID}
         ///Reader principal:			{reader.Principal}.
         /// </summary>
-        internal static string DefaultAuditSuccessText {
+        public static string DefaultAuditSuccessText {
             get {
                 return ResourceManager.GetString("DefaultAuditSuccessText", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The request failed because the information about the authenticated user could not be found.
+        /// </summary>
+        public static string IdentityDiscoveryError {
+            get {
+                return ResourceManager.GetString("IdentityDiscoveryError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred when trying to grant JIT access to {0} for user {1}.
+        /// </summary>
+        public static string JitError {
+            get {
+                return ResourceManager.GetString("JitError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred when trying to rollback the JIT access for user {0} to computer {1}.
+        /// </summary>
+        public static string JitRollbackFailed {
+            get {
+                return ResourceManager.GetString("JitRollbackFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rolling back JIT access for user {0} to computer {1} due to an exception in the audit process.
+        /// </summary>
+        public static string JitRollbackInProgress {
+            get {
+                return ResourceManager.GetString("JitRollbackInProgress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred when trying to get the password for computer {0} as requested by user {1}.
+        /// </summary>
+        public static string LapsPasswordError {
+            get {
+                return ResourceManager.GetString("LapsPasswordError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred when trying to get the password history for computer {0} as requested by user {1}.
+        /// </summary>
+        public static string LapsPasswordHistoryError {
+            get {
+                return ResourceManager.GetString("LapsPasswordHistoryError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The computer {0} requested by {1} did not have a local admin password in the directory.
+        /// </summary>
+        public static string NoLapsPassword {
+            get {
+                return ResourceManager.GetString("NoLapsPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The computer {0} requested by {1} did not have any historical local admin passwords in the directory.
+        /// </summary>
+        public static string NoLapsPasswordHistory {
+            get {
+                return ResourceManager.GetString("NoLapsPasswordHistory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The notification channel &apos;{0}&apos; failed to process the audit message.
         /// </summary>
-        internal static string NotificationChannelError {
+        public static string NotificationChannelError {
             get {
                 return ResourceManager.GetString("NotificationChannelError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unexpected error occurred during the pre-authorization process for user {0} requesting {2} access to {1}.
+        /// </summary>
+        public static string PreAuthZError {
+            get {
+                return ResourceManager.GetString("PreAuthZError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user {0} on IP {1} has exceeded the maximum allowed number of requests per IP ({2} per {3} seconds). The user requested {4} access to {5}..
+        /// </summary>
+        public static string RateLimitExceededIP {
+            get {
+                return ResourceManager.GetString("RateLimitExceededIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user {0} on IP {1} has exceeded the maximum allowed number of requests per user ({2} per {3} seconds). The user requested {4} access to {5}..
+        /// </summary>
+        public static string RateLimitExceededUser {
+            get {
+                return ResourceManager.GetString("RateLimitExceededUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user {0} did not fill out the mandatory request reason field for their {1} access request to {2}.
+        /// </summary>
+        public static string ReasonRequired {
+            get {
+                return ResourceManager.GetString("ReasonRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target rule requires password to change after {0}.
+        /// </summary>
+        public static string TargetRuleRequiresPasswordChange {
+            get {
+                return ResourceManager.GetString("TargetRuleRequiresPasswordChange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user {0} search for the computer {1} failed because the number of results exceeded the search result limit.
+        /// </summary>
+        public static string TooManyResults {
+            get {
+                return ResourceManager.GetString("TooManyResults", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An unhandled error occurred while processing the request for {0} access to computer {1} for user {2}.
+        /// </summary>
+        public static string UnhandledError {
+            get {
+                return ResourceManager.GetString("UnhandledError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to unknown.
+        /// </summary>
+        public static string UnknownComputerPlaceholder {
+            get {
+                return ResourceManager.GetString("UnknownComputerPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} has requested {2} access to computer {1}.
+        /// </summary>
+        public static string UserHasRequestedAccessToComputer {
+            get {
+                return ResourceManager.GetString("UserHasRequestedAccessToComputer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The request could not be processed because the authenticated user was not found in the directory. Claim information:
+        ///{0}.
+        /// </summary>
+        public static string UserNotFoundInDirectory {
+            get {
+                return ResourceManager.GetString("UserNotFoundInDirectory", resourceCulture);
             }
         }
     }

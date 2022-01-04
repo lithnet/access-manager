@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Lithnet.AccessManager.Server;
+using Lithnet.AccessManager.Server.App_LocalResources;
 using Lithnet.AccessManager.Server.Authorization;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Service.App_LocalResources;

@@ -1,0 +1,20 @@
+﻿@{
+    ViewBag.Title = "Error";
+}
+
+@model Lithnet.AccessManager.Service.Models.ErrorModel
+
+<div class="form-container">
+    <div class="form-content-header">
+        @Model.Heading
+    </div>
+    <div class="form-content">
+        <div class="alert alert-danger">
+            @Model.Message
+        </div>
+
+        <footer>
+            @Html.ActionLink(UIMessages.ButtonNewRequest, "AccessRequest", "Role", null, new { @class="btn btn-outline-secondary" })
+        </footer>
+    </div>
+</div>

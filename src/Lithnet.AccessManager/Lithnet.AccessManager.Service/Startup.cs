@@ -134,6 +134,11 @@ namespace Lithnet.AccessManager.Service
             services.AddSingleton<SqlServerInstanceProvider>();
             services.AddSingleton<IHttpSysConfigurationProvider, HttpSysConfigurationProvider>();
 
+            services.AddScoped<RoleAuthorizationService>();
+            services.AddScoped<RoleAuthorizationInformationBuilder>();
+            services.AddScoped<RoleFulfillmentService>();
+
+
             services.AddTransient<NewVersionCheckJob>();
             services.AddTransient<CertificateExpiryCheckJob>();
             services.AddTransient<DbBackupJob>();

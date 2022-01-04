@@ -1,0 +1,38 @@
+﻿@{
+    ViewBag.Title = "JIT Details";
+}
+
+@model Lithnet.AccessManager.Service.Models.JitDetailsModel
+
+<div class="form-container">
+
+    <div class="form-content-header">
+        @UIMessages.HeadingJitRequest
+    </div>
+    <div class="form-content">
+
+        <div class="alert alert-success">
+            @UIMessages.HeadingAccessApproved
+        </div>
+
+        <section>
+            <label class="title">Role</label>
+            <p class="lead">@Model.ComputerName</p>
+        </section>
+
+        <section>
+            <label class="title">User</label>
+            <p class="lead">@Model.Username</p>
+        </section>
+
+
+        <section>
+            <label class="title">Access expires</label>
+            <p class="lead">@Model.ValidUntil</p>
+        </section>
+      
+        <footer>
+            @Html.ActionLink(UIMessages.ButtonNewRequest, "AccessRequest", "Role", null, new { @class = "btn btn-outline-secondary" })
+        </footer>
+    </div>
+</div>
