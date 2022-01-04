@@ -463,20 +463,27 @@ namespace Lithnet.AccessManager.Service.Controllers
                     return this.View("AccessRequestError", GenerateAuthzFaiureModel(authResponse));
                 }
 
-                model.AllowedRequestTypes = authResponse.EvaluatedAccess;
+                model.AllowedRequestTypes = new List<AccessMask>();
+                List<AccessMask> orderedMasks;
 
-                if (model.AllowedRequestTypes.HasFlag(AccessMask.LocalAdminPassword))
+                if (!licenseManager.IsEnterpriseEdition() || userInterfaceSettings.AuthZDisplayOrder == null || userInterfaceSettings.AuthZDisplayOrder.Count == 0)
                 {
-                    model.RequestType = AccessMask.LocalAdminPassword;
-                }
-                else if (model.AllowedRequestTypes.HasFlag(AccessMask.LocalAdminPasswordHistory))
-                {
-                    model.RequestType = AccessMask.LocalAdminPasswordHistory;
+                    orderedMasks = new List<AccessMask> { AccessMask.LocalAdminPassword, AccessMask.LocalAdminPasswordHistory, AccessMask.Jit, AccessMask.BitLocker };
                 }
                 else
                 {
-                    model.RequestType = AccessMask.Jit;
+                    orderedMasks = userInterfaceSettings.AuthZDisplayOrder;
                 }
+
+                foreach (var orderedMask in orderedMasks)
+                {
+                    if (authResponse.EvaluatedAccess.HasFlag(orderedMask) && !model.AllowedRequestTypes.Contains(orderedMask))
+                    {
+                        model.AllowedRequestTypes.Add(orderedMask);
+                    }
+                }
+
+                model.RequestType = model.AllowedRequestTypes[0];
 
                 model.ComputerName = computer.MsDsPrincipalName;
 

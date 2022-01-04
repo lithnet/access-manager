@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using Lithnet.AccessManager.Enterprise;
 using Lithnet.AccessManager.Server.Configuration;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.IconPacks;
@@ -21,16 +23,29 @@ namespace Lithnet.AccessManager.Server.UI
         private readonly IAppPathProvider appPathProvider;
         private readonly ILogger<UserInterfaceViewModel> logger;
         private readonly IShellExecuteProvider shellExecuteProvider;
+        private readonly IAmsLicenseManager licenseManager;
 
-        public UserInterfaceViewModel(UserInterfaceOptions model, IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotifyModelChangedEventPublisher eventPublisher, ILogger<UserInterfaceViewModel> logger, IShellExecuteProvider shellExecuteProvider)
+        public UserInterfaceViewModel(UserInterfaceOptions model, IDialogCoordinator dialogCoordinator, IAppPathProvider appPathProvider, INotifyModelChangedEventPublisher eventPublisher, ILogger<UserInterfaceViewModel> logger, IShellExecuteProvider shellExecuteProvider, IAmsLicenseManager licenseManager)
         {
             this.shellExecuteProvider = shellExecuteProvider;
+            this.licenseManager = licenseManager;
             this.appPathProvider = appPathProvider;
             this.dialogCoordinator = dialogCoordinator;
             this.logger = logger;
             this.model = model;
             this.DisplayName = "User interface";
             model.PhoneticSettings ??= new PhoneticSettings();
+
+            this.AuthZDisplayOrder = new BindableCollection<AccessMask>();
+
+            if (model.AuthZDisplayOrder == null || model.AuthZDisplayOrder.Count == 0 || model.AuthZDisplayOrder.Count < 4)
+            {
+                this.AuthZDisplayOrder.AddRange(new[] { AccessMask.LocalAdminPassword, AccessMask.LocalAdminPasswordHistory, AccessMask.Jit, AccessMask.BitLocker });
+            }
+            else
+            {
+                this.AuthZDisplayOrder.AddRange(model.AuthZDisplayOrder);
+            }
 
             eventPublisher.Register(this);
         }
@@ -54,6 +69,9 @@ namespace Lithnet.AccessManager.Server.UI
 
         [NotifyModelChangedProperty]
         public AuditReasonFieldState UserSuppliedReason { get => this.model.UserSuppliedReason; set => this.model.UserSuppliedReason = value; }
+
+        [NotifyModelChangedCollection]
+        public BindableCollection<AccessMask> AuthZDisplayOrder { get; }
 
         public IEnumerable<AuditReasonFieldState> UserSuppliedReasonValues => Enum.GetValues(typeof(AuditReasonFieldState)).Cast<AuditReasonFieldState>();
 
@@ -83,6 +101,93 @@ namespace Lithnet.AccessManager.Server.UI
         public string PreviewPassword { get; set; } = "Password123!";
 
         public string Preview { get; private set; }
+
+        [PropertyChanged.AlsoNotifyFor(nameof(CanMoveAuthZDisplayOrderItemDown), nameof(CanMoveAuthZDisplayOrderItemUp))]
+        public AccessMask SelectedAuthZDisplayOrderItem { get; set; }
+
+        public bool CanMoveAuthZDisplayOrderItemUp
+        {
+            get
+            {
+                if (!licenseManager.IsEnterpriseEdition())
+                {
+                    return false;
+                }
+
+                if (this.SelectedAuthZDisplayOrderItem <= 0)
+                {
+                    return false;
+                }
+
+                int index = this.AuthZDisplayOrder.IndexOf(this.SelectedAuthZDisplayOrderItem);
+
+                return index > 0;
+            }
+        }
+
+        public bool CanMoveAuthZDisplayOrderItemDown
+        {
+            get
+            {
+                if (!licenseManager.IsEnterpriseEdition())
+                {
+                    return false;
+                }
+
+                if (this.SelectedAuthZDisplayOrderItem <= 0)
+                {
+                    return false;
+                }
+
+                int index = this.AuthZDisplayOrder.IndexOf(this.SelectedAuthZDisplayOrderItem);
+
+                return index < this.AuthZDisplayOrder.Count - 1;
+            }
+        }
+
+        public void MoveAuthZDisplayOrderItemUp()
+        {
+            if (this.SelectedAuthZDisplayOrderItem <= 0)
+            {
+                return;
+            }
+
+            int index = this.AuthZDisplayOrder.IndexOf(this.SelectedAuthZDisplayOrderItem);
+
+            if (index <= 0)
+            {
+                return;
+            }
+
+            this.AuthZDisplayOrder.Move(index, --index);
+            this.model.AuthZDisplayOrder = this.AuthZDisplayOrder.ToList();
+
+            this.NotifyOfPropertyChange(nameof(CanMoveAuthZDisplayOrderItemDown));
+            this.NotifyOfPropertyChange(nameof(CanMoveAuthZDisplayOrderItemUp));
+        }
+
+        public bool ShowLapsHistoryEnterpriseEditionBadge => !this.licenseManager.IsFullEnterpriseLicense();
+
+        public void MoveAuthZDisplayOrderItemDown()
+        {
+            if (this.SelectedAuthZDisplayOrderItem <= 0)
+            {
+                return;
+            }
+
+            int index = this.AuthZDisplayOrder.IndexOf(this.SelectedAuthZDisplayOrderItem);
+
+            if (index >= this.AuthZDisplayOrder.Count - 1)
+            {
+                return;
+            }
+
+            this.AuthZDisplayOrder.Move(index, ++index);
+            this.model.AuthZDisplayOrder = this.AuthZDisplayOrder.ToList();
+
+            this.NotifyOfPropertyChange(nameof(CanMoveAuthZDisplayOrderItemDown));
+            this.NotifyOfPropertyChange(nameof(CanMoveAuthZDisplayOrderItemUp));
+        }
 
         public void BuildPreview()
         {
@@ -171,11 +276,16 @@ namespace Lithnet.AccessManager.Server.UI
         }
 
         public PackIconMaterialKind Icon => PackIconMaterialKind.Application;
-        
+
         public async Task Help()
         {
             await this.shellExecuteProvider.OpenWithShellExecute(this.HelpLink);
         }
 
+
+        public async Task LearnMoreLinkEnterpriseEdition()
+        {
+            await this.shellExecuteProvider.OpenWithShellExecute(Constants.HelpLinkLearnMoreAboutEnterpriseEdition);
+        }
     }
 }

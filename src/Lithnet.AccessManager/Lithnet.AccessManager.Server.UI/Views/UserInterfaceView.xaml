@@ -74,9 +74,11 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
@@ -110,6 +112,35 @@
                      VerticalScrollBarVisibility="Auto"
                      Height="75"
                      Margin="5"/>
+
+            <StackPanel Grid.Row="3" Grid.Column="0"  Orientation="Vertical">
+            <Label 
+                   Content="Request type display order" 
+                   Margin="5"/>
+
+            <local:EnterpriseEditionBadge Visibility="{Binding ShowLapsHistoryEnterpriseEditionBadge, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+                                          ToolTipText="Request type display ordering is an enterprise edition feature. Click to learn more"
+                                          Click="{s:Action LearnMoreLinkEnterpriseEdition}"
+                                          ShowText="False"
+                                          Margin="5 0 5 5 " />
+            </StackPanel>
+
+            <ListBox Grid.Row="3" Grid.Column="1" Height="130"
+                     ItemsSource="{Binding AuthZDisplayOrder}"
+                     SelectedItem="{Binding SelectedAuthZDisplayOrderItem}"
+                     BorderBrush="{DynamicResource MahApps.Brushes.Control.Border}"
+                     BorderThickness="1"
+                     Margin="5"/>
+
+
+            <StackPanel Orientation="Vertical" Margin="0 5 5 5" Width="35"
+                        Grid.Row="3" Grid.Column="2">
+                <Button Content="▲"  Command="{s:Action MoveAuthZDisplayOrderItemUp}"/>
+                <Button Content="▼"  Command="{s:Action MoveAuthZDisplayOrderItemDown}"/>
+            </StackPanel>
+
+
+            
 
         </Grid>
 

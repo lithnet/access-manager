@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Lithnet.AccessManager.Server.Configuration;
 using Lithnet.AccessManager.Service.App_LocalResources;
@@ -18,7 +19,7 @@ namespace Lithnet.AccessManager.Service.Models
 
         public AccessMask RequestType { get; set; }
 
-        public AccessMask AllowedRequestTypes { get; set; }
+        public List<AccessMask> AllowedRequestTypes { get; set; }
 
         public bool ShowReason { get; set; }
 

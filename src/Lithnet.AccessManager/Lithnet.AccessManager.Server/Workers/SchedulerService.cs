@@ -25,11 +25,18 @@ namespace Lithnet.AccessManager.Server
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            this.logger.LogTrace("Starting scheduler background processing thread");
-            scheduler = await schedulerFactory.GetScheduler(cancellationToken);
-            await this.SetupJobsAsync();
+            try
+            {
+                this.logger.LogTrace("Starting scheduler background processing thread");
+                scheduler = await schedulerFactory.GetScheduler(cancellationToken);
+                await this.SetupJobsAsync();
 
-            await scheduler.Start(cancellationToken);
+                await scheduler.Start(cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError(ex, "Unable to start the scheduler service");
+            }
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
