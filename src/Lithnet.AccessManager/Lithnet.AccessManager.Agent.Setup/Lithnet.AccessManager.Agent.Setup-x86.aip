@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="17.3" version="17.9" Modules="professional" RootPath="." Language="en" Id="{6231D1B4-23AF-4C6E-998C-070D74534FAD}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="17.3" version="18.8.1" Modules="professional" RootPath="." Language="en" Id="{6231D1B4-23AF-4C6E-998C-070D74534FAD}">
   <COMPONENT cid="caphyon.advinst.msicomp.MsiPropsComponent">
     <ROW Property="AI_BITMAP_DISPLAY_MODE" Value="0"/>
+    <ROW Property="AI_CURRENT_YEAR" Value="2022" ValueLocId="-"/>
     <ROW Property="AI_PREDEF_LCONDS_PROPS" Value="AI_DETECTED_DOTNET_VERSION"/>
     <ROW Property="AI_REQUIRED_DOTNET_DISPLAY" MultiBuildValue="MSIOnlyBuild_1_2:4.7.2" ValueLocId="-"/>
     <ROW Property="AI_REQUIRED_DOTNET_VERSION" MultiBuildValue="MSIOnlyBuild_1_2:4.7.2" ValueLocId="-"/>
@@ -9,10 +10,10 @@
     <ROW Property="ARPCOMMENTS" Value="This installer database contains the logic and data required to install [|ProductName]." ValueLocId="*"/>
     <ROW Property="ARPPRODUCTICON" Value="accessmanager.exe" Type="8"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
-    <ROW Property="ProductCode" Value="1033:{5B83FDD1-0428-44A6-BDDE-89B0CD161E6C} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{170A644B-E350-4E27-A797-542CE32F784B} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Agent"/>
-    <ROW Property="ProductVersion" Value="1.0.7925.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7929.0" Type="32" TargetFile="Lithnet.AccessManager.Agent.exe"/>
     <ROW Property="SETUPEXEDIR" Value="1"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND"/>
     <ROW Property="UpgradeCode" Value="{EEDECF4C-BABB-4AE0-9CB9-DC051FF1AE75}"/>
@@ -183,7 +184,7 @@
     <ROW Action="AI_DetectSoftware" Sequence="151"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.BuildComponent">
-    <ROW BuildKey="MSIOnlyBuild_1_2" BuildName="Net472Msi" BuildOrder="1" BuildType="1" PackageFolder="..\..\..\..\..\..\installers\ams" PackageFileName="Lithnet Access Manager Agent Setup-x86" Languages="en" InstallationType="4" UseLargeSchema="true"/>
+    <ROW BuildKey="MSIOnlyBuild_1_2" BuildName="Net472Msi" BuildOrder="1" BuildType="0" PackageFolder="..\..\..\..\..\..\installers\ams" PackageFileName="Lithnet Access Manager Agent Setup-x86" Languages="en" InstallationType="4" UseLargeSchema="true"/>
     <ATTRIBUTE name="CompConditionPolicy" value="0"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.DictionaryComponent">
