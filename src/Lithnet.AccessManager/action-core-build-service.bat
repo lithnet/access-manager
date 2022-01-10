@@ -31,15 +31,15 @@ if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 )
 
 ECHO [92mBuilding service project[0m
-dotnet publish "%serviceProject%" --runtime win8-x64 --output "%outputdirservice%" --framework netcoreapp3.1 --self-contained false  /p:TreatWarningsAsErrors=true /warnaserror
+dotnet publish "%serviceProject%" --runtime win8-x64 --output "%outputdirservice%" --framework netcoreapp3.1 --self-contained false  
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
 ECHO [92mBuilding UI project[0m
-dotnet publish "%uiproject%" --runtime win8-x64 --output "%outputdirservice%" --framework netcoreapp3.1 --self-contained false  /p:TreatWarningsAsErrors=true /warnaserror
+dotnet publish "%uiproject%" --runtime win8-x64 --output "%outputdirservice%" --framework netcoreapp3.1 --self-contained false  
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
 ECHO [92mBuilding PowerShell project[0m
-dotnet publish "%powerShellProject%" --output "%outputdirps%" --runtime win-x64 --framework net472 --self-contained false --configuration Release /property:Version=%version% /property:FileVersion=%version% /p:TreatWarningsAsErrors=true /warnaserror
+dotnet publish "%powerShellProject%" --output "%outputdirps%" --runtime win-x64 --framework net472 --self-contained false --configuration Release /property:Version=%version% /property:FileVersion=%version% 
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
 ECHO [92mSigning Lithnet EXEs[0m

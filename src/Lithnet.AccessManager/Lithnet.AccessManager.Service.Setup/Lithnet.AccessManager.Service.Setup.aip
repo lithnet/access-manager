@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<DOCUMENT Type="Advanced Installer" CreateVersion="17.1.2" version="18.8.1" Modules="enterprise" RootPath="." Language="en" Id="{8ADA5C46-1F9D-45B3-A39D-37B0D337D0DD}">
+<DOCUMENT Type="Advanced Installer" CreateVersion="17.1.2" version="19.0" Modules="enterprise" RootPath="." Language="en" Id="{8ADA5C46-1F9D-45B3-A39D-37B0D337D0DD}">
   <COMPONENT cid="caphyon.advinst.msicomp.ProjectOptionsComponent">
     <ROW Name="MigrationUninstallCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
   </COMPONENT>
@@ -19,10 +19,10 @@
     <ROW Property="IAgree" Value="No" Type="4" MsiKey="IAgree"/>
     <ROW Property="Manufacturer" Value="Lithnet"/>
     <ROW Property="NO_USER_CHECK" Comments="Skips checking username"/>
-    <ROW Property="ProductCode" Value="1033:{22DA1CFF-DCEC-4576-B208-06B457D8084B} " Type="16"/>
+    <ROW Property="ProductCode" Value="1033:{730B479E-7A2C-4941-8FB2-F35ED71B9A07} " Type="16"/>
     <ROW Property="ProductLanguage" Value="1033"/>
     <ROW Property="ProductName" Value="Lithnet Access Manager Service"/>
-    <ROW Property="ProductVersion" Value="1.0.7929.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
+    <ROW Property="ProductVersion" Value="1.0.7933.0" Type="32" TargetFile="Lithnet.AccessManager.Service.exe"/>
     <ROW Property="SecureCustomProperties" Value="OLDPRODUCTS;AI_NEWERPRODUCTFOUND;AI_SETUPEXEPATH;SETUPEXEDIR"/>
     <ROW Property="UpgradeCode" Value="{D17AC68C-2F91-4344-A3BF-B13404566A40}"/>
     <ROW Property="WindowsType9X" MultiBuildValue="DefaultBuild:Windows 9x/ME" ValueLocId="-"/>
@@ -152,6 +152,7 @@
     <ROW Component="MessagePack.Annotations.dll" ComponentId="{64FB74EE-5049-4007-8F34-55EAC5330E6B}" Directory_="APPDIR" Attributes="0" KeyPath="MessagePack.Annotations.dll"/>
     <ROW Component="MessagePack.dll" ComponentId="{654DBA7F-A873-4763-87F6-87715D3D5417}" Directory_="APPDIR" Attributes="0" KeyPath="MessagePack.dll"/>
     <ROW Component="Microsoft.ApplicationInsights.dll" ComponentId="{CCAB9053-5AF7-457A-A78C-91225A603750}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.ApplicationInsights.dll"/>
+    <ROW Component="Microsoft.AspNetCore.Authentication.JwtBearer.dll" ComponentId="{919AAC4D-5EA8-40FE-B0F2-9672A9242E69}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Authentication.JwtBearer.dll"/>
     <ROW Component="Microsoft.AspNetCore.Authentication.OpenIdConnect.dll" ComponentId="{DE9EF7CD-C011-4037-9BFA-5F5A59BF28E1}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Authentication.OpenIdConnect.dll"/>
     <ROW Component="Microsoft.AspNetCore.Authentication.WsFederation.dll" ComponentId="{3D8926F8-1B85-4750-A6EE-4B9456DE7D94}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Authentication.WsFederation.dll"/>
     <ROW Component="Microsoft.AspNetCore.Cryptography.Internal.dll" ComponentId="{5FA995F1-2707-4CE4-AAB5-055218A8114F}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.AspNetCore.Cryptography.Internal.dll"/>
@@ -173,6 +174,11 @@
     <ROW Component="Microsoft.Extensions.Configuration.Abstractions.dll" ComponentId="{CE2F1CDA-DC3A-4D9A-97F6-5BBDB001E26E}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.Abstractions.dll"/>
     <ROW Component="Microsoft.Extensions.Configuration.Abstractions.dll_1" ComponentId="{D3668822-29E1-4D60-B2DD-76DB74135FBC}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.Abstractions.dll_1"/>
     <ROW Component="Microsoft.Extensions.Configuration.Binder.dll" ComponentId="{012A3F2C-E337-4336-987A-53AB68E94C1C}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.Binder.dll"/>
+    <ROW Component="Microsoft.Extensions.Configuration.CommandLine.dll" ComponentId="{115891B9-C886-4B26-B7B6-357D5353C960}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.CommandLine.dll"/>
+    <ROW Component="Microsoft.Extensions.Configuration.EnvironmentVariables.dll" ComponentId="{7F4D11E5-CE30-48EC-AF4B-68D3D1E009C1}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.EnvironmentVariables.dll"/>
+    <ROW Component="Microsoft.Extensions.Configuration.FileExtensions.dll" ComponentId="{FE4F78B3-3E97-4BD4-B847-DF39B92A9B16}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.FileExtensions.dll"/>
+    <ROW Component="Microsoft.Extensions.Configuration.Json.dll" ComponentId="{255CA7F6-48AB-4928-AA34-77FEBB7B597B}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.Json.dll"/>
+    <ROW Component="Microsoft.Extensions.Configuration.UserSecrets.dll" ComponentId="{6DAE1FB2-AD62-4AB1-B354-5F5049706E05}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.UserSecrets.dll"/>
     <ROW Component="Microsoft.Extensions.Configuration.dll" ComponentId="{4C553EEB-4916-46C7-A002-260614BC7592}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Configuration.dll"/>
     <ROW Component="Microsoft.Extensions.DependencyInjection.Abstractions.dll" ComponentId="{B3FEEEBE-4A5F-4468-AAD8-9086B2F8BA25}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.DependencyInjection.Abstractions.dll"/>
     <ROW Component="Microsoft.Extensions.DependencyInjection.Abstractions.dll_1" ComponentId="{19F68A2B-F446-42A5-B6B1-313B0D334872}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Extensions.DependencyInjection.Abstractions.dll_1"/>
@@ -180,13 +186,21 @@
     <ROW Component="Microsoft.Extensions.FileProviders.Abstractions.dll" ComponentId="{8A26B84E-D1EB-4A1F-8E29-5CFA9B7ECEB1}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.FileProviders.Abstractions.dll"/>
     <ROW Component="Microsoft.Extensions.FileProviders.Abstractions.dll_1" ComponentId="{D7880797-3FBD-474E-8200-3C71FF56B1BB}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Extensions.FileProviders.Abstractions.dll_1"/>
     <ROW Component="Microsoft.Extensions.FileProviders.Embedded.dll" ComponentId="{D90D8CD1-FCCA-4E0D-A44B-F7A518C40FD0}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.FileProviders.Embedded.dll"/>
+    <ROW Component="Microsoft.Extensions.FileProviders.Physical.dll" ComponentId="{5563A070-E454-4D7E-AEAA-D9204D872D95}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.FileProviders.Physical.dll"/>
+    <ROW Component="Microsoft.Extensions.FileSystemGlobbing.dll" ComponentId="{89A6E1CF-3F3A-4699-BA8B-130066572321}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.FileSystemGlobbing.dll"/>
     <ROW Component="Microsoft.Extensions.Hosting.Abstractions.dll" ComponentId="{7D9CA9E6-B862-4BF9-91D1-545218D994A8}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Hosting.Abstractions.dll"/>
     <ROW Component="Microsoft.Extensions.Hosting.Abstractions.dll_1" ComponentId="{D6A7C339-DEBE-4958-A51D-F728375101C0}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Extensions.Hosting.Abstractions.dll_1"/>
+    <ROW Component="Microsoft.Extensions.Hosting.WindowsServices.dll" ComponentId="{0CF686AE-B0EA-41E1-9202-72AFAC8307E2}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Hosting.WindowsServices.dll"/>
+    <ROW Component="Microsoft.Extensions.Hosting.dll" ComponentId="{0597E2A3-B2CC-48D3-BFD3-23D7F0F619A8}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Hosting.dll"/>
     <ROW Component="Microsoft.Extensions.Logging.Abstractions.dll" ComponentId="{810BE558-18A5-42E7-8A91-B2B8E5F4A474}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.Abstractions.dll"/>
     <ROW Component="Microsoft.Extensions.Logging.Abstractions.dll_1" ComponentId="{7FF634D0-3CCA-4F58-9348-80B65C4AC707}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Extensions.Logging.Abstractions.dll_1"/>
+    <ROW Component="Microsoft.Extensions.Logging.Configuration.dll" ComponentId="{CBE6B7AE-0DF5-4F45-92BF-EB3C1E00F1BA}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.Configuration.dll"/>
+    <ROW Component="Microsoft.Extensions.Logging.Console.dll" ComponentId="{75FFF4F7-13B8-4E1E-AFC8-95EEE7867DF8}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.Console.dll"/>
     <ROW Component="Microsoft.Extensions.Logging.Debug.dll" ComponentId="{8D01DB01-6C66-4E36-AB36-C290CCEFE39B}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.Debug.dll"/>
     <ROW Component="Microsoft.Extensions.Logging.EventLog.dll" ComponentId="{19E98E05-8FE8-4584-9161-2FCFDBBD8A11}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.EventLog.dll"/>
+    <ROW Component="Microsoft.Extensions.Logging.EventSource.dll" ComponentId="{DB1A8C9E-0CA0-4B02-9E12-5096923EFFEB}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.EventSource.dll"/>
     <ROW Component="Microsoft.Extensions.Logging.dll" ComponentId="{0FC3ADF8-4BF6-49ED-9820-A8FA643D276A}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Logging.dll"/>
+    <ROW Component="Microsoft.Extensions.Options.ConfigurationExtensions.dll" ComponentId="{0C2823BC-3D68-4643-9CBB-C0A56C119431}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Options.ConfigurationExtensions.dll"/>
     <ROW Component="Microsoft.Extensions.Options.dll" ComponentId="{4EA295F0-69CA-4F41-A933-14FF8AE2E9D5}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Options.dll"/>
     <ROW Component="Microsoft.Extensions.Primitives.dll" ComponentId="{6E3A5759-974D-45BB-9C4F-F756D71128AF}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Extensions.Primitives.dll"/>
     <ROW Component="Microsoft.Extensions.Primitives.dll_1" ComponentId="{4F7DD03E-F0B6-4404-884A-5CF3F9A16620}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="Microsoft.Extensions.Primitives.dll_1"/>
@@ -228,6 +242,7 @@
     <ROW Component="Microsoft.Xaml.Behaviors.dll" ComponentId="{CDCD8458-38E7-42E1-99DB-695B365ACCE3}" Directory_="APPDIR" Attributes="0" KeyPath="Microsoft.Xaml.Behaviors.dll"/>
     <ROW Component="NJsonSchema.dll" ComponentId="{0DF2306F-10F4-42B1-85B6-031CE00F7C33}" Directory_="APPDIR" Attributes="0" KeyPath="NJsonSchema.dll"/>
     <ROW Component="NLog.Extensions.Logging.dll" ComponentId="{F82A9837-0E86-4516-8154-FC85F1338912}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.Extensions.Logging.dll"/>
+    <ROW Component="NLog.Web.AspNetCore.dll" ComponentId="{3F26E9D7-5581-4E7C-B193-AA1B6C6C5DEF}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.Web.AspNetCore.dll"/>
     <ROW Component="NLog.dll" ComponentId="{A90F678F-CC68-43FA-98D6-DA6CA2B42D39}" Directory_="APPDIR" Attributes="0" KeyPath="NLog.dll"/>
     <ROW Component="NLog.dll_1" ComponentId="{3AA445C8-D5E1-403D-8353-C231F885C6C8}" Directory_="Lithnet.AccessManager.PowerShell_Directory" Attributes="0" KeyPath="NLog.dll_1"/>
     <ROW Component="NamedPipeServerStream.NetFrameworkVersion.dll" ComponentId="{A47C277D-A77D-4860-B385-82A58C7044D2}" Directory_="APPDIR" Attributes="0" KeyPath="NamedPipeServerStream.NetFrameworkVersion.dll"/>
@@ -988,6 +1003,21 @@
     <ROW File="Lithnet.Licensing.Core.dll" Component_="Lithnet.Licensing.Core.dll" FileName="LITHNE~8.DLL|Lithnet.Licensing.Core.dll" Attributes="0" SourcePath="output\Lithnet.Licensing.Core.dll" SelfReg="false"/>
     <ROW File="passworddisplayoptions.js" Component_="clipboard.js" FileName="PASSWO~1.JS|password-display-options.js" Attributes="0" SourcePath="output\wwwroot\js\password-display-options.js" SelfReg="false"/>
     <ROW File="System.Security.Principal.Windows.dll" Component_="System.Security.Principal.Windows.dll" FileName="SYSTE~37.DLL|System.Security.Principal.Windows.dll" Attributes="0" SourcePath="output\System.Security.Principal.Windows.dll" SelfReg="false"/>
+    <ROW File="Microsoft.AspNetCore.Authentication.JwtBearer.dll" Component_="Microsoft.AspNetCore.Authentication.JwtBearer.dll" FileName="MICROS~2.DLL|Microsoft.AspNetCore.Authentication.JwtBearer.dll" Attributes="0" SourcePath="output\Microsoft.AspNetCore.Authentication.JwtBearer.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Configuration.CommandLine.dll" Component_="Microsoft.Extensions.Configuration.CommandLine.dll" FileName="MICRO~15.DLL|Microsoft.Extensions.Configuration.CommandLine.dll" Attributes="0" SourcePath="output\Microsoft.Extensions.Configuration.CommandLine.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Configuration.EnvironmentVariables.dll" Component_="Microsoft.Extensions.Configuration.EnvironmentVariables.dll" FileName="MICRO~17.DLL|Microsoft.Extensions.Configuration.EnvironmentVariables.dll" Attributes="0" SourcePath="output\Microsoft.Extensions.Configuration.EnvironmentVariables.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Configuration.FileExtensions.dll" Component_="Microsoft.Extensions.Configuration.FileExtensions.dll" FileName="MICRO~18.DLL|Microsoft.Extensions.Configuration.FileExtensions.dll" Attributes="0" SourcePath="output\Microsoft.Extensions.Configuration.FileExtensions.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Configuration.Json.dll" Component_="Microsoft.Extensions.Configuration.Json.dll" FileName="MICRO~19.DLL|Microsoft.Extensions.Configuration.Json.dll" Attributes="0" SourcePath="output\Microsoft.Extensions.Configuration.Json.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Configuration.UserSecrets.dll" Component_="Microsoft.Extensions.Configuration.UserSecrets.dll" FileName="MICRO~20.DLL|Microsoft.Extensions.Configuration.UserSecrets.dll" Attributes="0" SourcePath="output\Microsoft.Extensions.Configuration.UserSecrets.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.FileProviders.Physical.dll" Component_="Microsoft.Extensions.FileProviders.Physical.dll" FileName="MICRO~25.DLL|Microsoft.Extensions.FileProviders.Physical.dll" Attributes="0" SourcePath="output\Microsoft.Extensions.FileProviders.Physical.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.FileSystemGlobbing.dll" Component_="Microsoft.Extensions.FileSystemGlobbing.dll" FileName="MICRO~26.DLL|Microsoft.Extensions.FileSystemGlobbing.dll" Attributes="0" SourcePath="output\Microsoft.Extensions.FileSystemGlobbing.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Hosting.dll" Component_="Microsoft.Extensions.Hosting.dll" FileName="MICRO~28.DLL|Microsoft.Extensions.Hosting.dll" Attributes="0" SourcePath="output\Microsoft.Extensions.Hosting.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Hosting.WindowsServices.dll" Component_="Microsoft.Extensions.Hosting.WindowsServices.dll" FileName="MICRO~29.DLL|Microsoft.Extensions.Hosting.WindowsServices.dll" Attributes="0" SourcePath="output\Microsoft.Extensions.Hosting.WindowsServices.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Logging.Configuration.dll" Component_="Microsoft.Extensions.Logging.Configuration.dll" FileName="MICRO~31.DLL|Microsoft.Extensions.Logging.Configuration.dll" Attributes="0" SourcePath="output\Microsoft.Extensions.Logging.Configuration.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Logging.Console.dll" Component_="Microsoft.Extensions.Logging.Console.dll" FileName="MICRO~32.DLL|Microsoft.Extensions.Logging.Console.dll" Attributes="0" SourcePath="output\Microsoft.Extensions.Logging.Console.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Logging.EventSource.dll" Component_="Microsoft.Extensions.Logging.EventSource.dll" FileName="MICRO~36.DLL|Microsoft.Extensions.Logging.EventSource.dll" Attributes="0" SourcePath="output\Microsoft.Extensions.Logging.EventSource.dll" SelfReg="false"/>
+    <ROW File="Microsoft.Extensions.Options.ConfigurationExtensions.dll" Component_="Microsoft.Extensions.Options.ConfigurationExtensions.dll" FileName="MICRO~37.DLL|Microsoft.Extensions.Options.ConfigurationExtensions.dll" Attributes="0" SourcePath="output\Microsoft.Extensions.Options.ConfigurationExtensions.dll" SelfReg="false"/>
+    <ROW File="NLog.Web.AspNetCore.dll" Component_="NLog.Web.AspNetCore.dll" FileName="NLOGWE~1.DLL|NLog.Web.AspNetCore.dll" Attributes="0" SourcePath="output\NLog.Web.AspNetCore.dll" SelfReg="false"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.custcomp.AiControlConditionAliasComponent">
     <ROW AliasRowId="ExitDialog#LaunchProdCheckBox#Hide#((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))" AliasRowOperation="2" Condition="(((NOT AI_INSTALL) AND (NOT AI_PATCH)) OR ((CTRLS &lt;&gt; 2) AND (CTRLS &lt;&gt; 3))) OR NOT IS_STANDALONE_OR_NOT_CLUSTERED_OR_ON_ACTIVE_NODE"/>
@@ -1694,6 +1724,21 @@
     <ROW Feature_="MainFeature" Component_="System.Diagnostics.DiagnosticSource.dll_1"/>
     <ROW Feature_="MainFeature" Component_="Lithnet.Licensing.Core.dll"/>
     <ROW Feature_="MainFeature" Component_="System.Security.Principal.Windows.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.AspNetCore.Authentication.JwtBearer.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Configuration.CommandLine.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Configuration.EnvironmentVariables.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Configuration.FileExtensions.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Configuration.Json.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Configuration.UserSecrets.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.FileProviders.Physical.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.FileSystemGlobbing.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Hosting.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Hosting.WindowsServices.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Logging.Configuration.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Logging.Console.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Logging.EventSource.dll"/>
+    <ROW Feature_="MainFeature" Component_="Microsoft.Extensions.Options.ConfigurationExtensions.dll"/>
+    <ROW Feature_="MainFeature" Component_="NLog.Web.AspNetCore.dll"/>
   </COMPONENT>
   <COMPONENT cid="caphyon.advinst.msicomp.MsiIconsComponent">
     <ROW Name="accessmanager.exe" SourcePath="..\Lithnet.AccessManager\access-manager.ico" Index="0"/>
