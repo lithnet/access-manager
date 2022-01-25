@@ -14,7 +14,8 @@ call action-core-build-agent.bat
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 ECHO [92mSigning installers with EV certificate[0m
-"%SIGNTOOLPATH%\signtool.exe" sign /sha1 %EVCSCERTTHUMBPRINT% /d "Lithnet Access Manager" /t http://timestamp.digicert.com /fd sha256 /v "%amsBuildFolder%\*"
+"%SIGNTOOLPATH%\signtool.exe" sign /sha1 %EVCSCERTTHUMBPRINT% /d "Lithnet Access Manager" /t http://timestamp.digicert.com /fd sha256 /v "%amsBuildFolder%\*.exe"
+"%SIGNTOOLPATH%\signtool.exe" sign /sha1 %EVCSCERTTHUMBPRINT% /d "Lithnet Access Manager" /t http://timestamp.digicert.com /fd sha256 /v "%amsBuildFolder%\*.msi"
 if %errorlevel% neq 0 ECHO [91mBuild failed[0m && exit /b %errorlevel%
 
 ECHO %version%| clip

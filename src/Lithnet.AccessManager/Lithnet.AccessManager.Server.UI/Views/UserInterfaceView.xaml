@@ -130,7 +130,13 @@
                      SelectedItem="{Binding SelectedAuthZDisplayOrderItem}"
                      BorderBrush="{DynamicResource MahApps.Brushes.Control.Border}"
                      BorderThickness="1"
-                     Margin="5"/>
+                     Margin="5">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Converter={StaticResource EnumDescriptionConverter}}"></TextBlock>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
 
 
             <StackPanel Orientation="Vertical" Margin="0 5 5 5" Width="35"

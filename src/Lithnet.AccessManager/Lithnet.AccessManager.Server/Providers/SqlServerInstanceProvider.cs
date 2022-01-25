@@ -44,7 +44,7 @@ namespace Lithnet.AccessManager.Server.Providers
 
         public void InitializeDb()
         {
-            this.licenseManager.ThrowOnMissingFeature(LicensedFeatures.ExternalSql);
+            this.licenseManager.ThrowOnMissingFeature(LicensedFeatures.HighAvailability);
 
             this.logger.LogTrace("Initializing external DB");
             this.ConnectionString = this.highAvailabilityOptions.ConnectionString;

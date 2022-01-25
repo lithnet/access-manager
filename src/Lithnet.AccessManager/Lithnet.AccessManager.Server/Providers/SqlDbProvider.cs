@@ -42,7 +42,7 @@ namespace Lithnet.AccessManager.Server
 
         private void InitializeDb()
         {
-            if (licenseManager.IsFeatureEnabled(LicensedFeatures.ExternalSql) && highAvailabilityOptions.UseExternalSql)
+            if (licenseManager.IsFeatureEnabled(LicensedFeatures.HighAvailability) && highAvailabilityOptions.UseExternalSql)
             {
                 this.activeInstanceProvider = this.sqlServerInstanceProvider;
             }
