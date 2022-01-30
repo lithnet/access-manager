@@ -210,7 +210,7 @@ namespace Lithnet.AccessManager
         {
             this.discoveryServices.FindDcAndExecuteWithRetry(this.discoveryServices.GetDomainNameDns(ou), dc =>
             {
-                DirectoryEntry oude = new DirectoryEntry($"LDAP://{dc}/{ou}");
+                DirectoryEntry oude = new DirectoryEntry($"LDAP://{dc}/{ou.EscapeAdsiComponent()}");
                 string samAccountName = name;
                 if (name.Contains('\\'))
                 {
@@ -290,7 +290,7 @@ namespace Lithnet.AccessManager
 
         public IGroup CreateTtlGroup(string accountName, string displayName, string description, string ou, string targetDc, TimeSpan ttl, GroupType groupType, bool removeAccountOperators)
         {
-            DirectoryEntry container = new DirectoryEntry($"LDAP://{targetDc}/{ou}");
+            DirectoryEntry container = new DirectoryEntry($"LDAP://{targetDc}/{ou.EscapeAdsiComponent()}");
             dynamic[] objectClasses = new dynamic[] { "dynamicObject", "group" };
 
             DirectoryEntry group = container.Children.Add($"CN={accountName}", "group");
@@ -645,7 +645,7 @@ namespace Lithnet.AccessManager
 
                 return this.discoveryServices.FindDcAndExecuteWithRetry(result.Domain, dc2 =>
                 {
-                    var de = new DirectoryEntry($"LDAP://{dc2}/{result.Name}");
+                    var de = new DirectoryEntry($"LDAP://{dc2}/{result.Name.EscapeAdsiComponent()}");
                     _ = de.Guid;
                     return de;
                 });

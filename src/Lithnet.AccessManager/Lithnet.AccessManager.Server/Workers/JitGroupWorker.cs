@@ -286,7 +286,7 @@ namespace Lithnet.AccessManager.Server.Workers
         private IList<SearchResult> GetGroups(JitGroupMapping mapping)
         {
             string filter = $"(&(objectCategory=group))";
-            string path = $"LDAP://{mapping.GroupOU}";
+            string path = $"LDAP://{mapping.GroupOU.EscapeAdsiComponent()}";
             return this.GetObjects(path, SearchScope.OneLevel, filter);
         }
 
@@ -294,7 +294,7 @@ namespace Lithnet.AccessManager.Server.Workers
         {
             logger.LogTrace($"Searching in {path} ({scope}) with filter '{filter}'");
 
-            DirectorySearcher d = new DirectorySearcher
+            using DirectorySearcher d = new DirectorySearcher
             {
                 SearchRoot = new DirectoryEntry(path),
                 SearchScope = scope,
@@ -306,7 +306,7 @@ namespace Lithnet.AccessManager.Server.Workers
             d.PropertiesToLoad.Add("samAccountName");
             d.PropertiesToLoad.Add("msDS-PrincipalName");
 
-            SearchResultCollection result = d.FindAll();
+            using SearchResultCollection result = d.FindAll();
 
             logger.LogTrace($"{result.Count} items found");
             return result.OfType<SearchResult>().ToList();
@@ -315,7 +315,7 @@ namespace Lithnet.AccessManager.Server.Workers
         private IList<SearchResult> GetObjects(string server, string ou, string objectCategory, SearchScope scope, long lowUsn, long highUsn)
         {
             string filter = $"(&(objectCategory={objectCategory})(uSNCreated<={highUsn})(uSNCreated>={lowUsn + 1}))";
-            string path = $"LDAP://{server}/{ou}";
+            string path = $"LDAP://{server}/{ou.EscapeAdsiComponent()}";
             return this.GetObjects(path, scope, filter);
         }
 

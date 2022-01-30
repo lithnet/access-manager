@@ -46,7 +46,7 @@ namespace Lithnet.AccessManager.Server.Authorization
             {
                 if (target.Type == TargetType.Container)
                 {
-                    DirectoryEntry de = new DirectoryEntry($"LDAP://{target.Target}");
+                    DirectoryEntry de = new DirectoryEntry($"LDAP://{target.Target.EscapeAdsiComponent()}");
                     return de.Guid;
                 }
                 else

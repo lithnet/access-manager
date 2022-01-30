@@ -255,7 +255,7 @@ string.Join(", ", computer.PrincipalsUniqueToThisLevel)
         {
             DirectorySearcher d = new DirectorySearcher
             {
-                SearchRoot = new DirectoryEntry($"LDAP://{settings.ImportOU}"),
+                SearchRoot = new DirectoryEntry($"LDAP://{settings.ImportOU.EscapeAdsiComponent()}"),
                 SearchScope = SearchScope.Subtree,
                 Filter = "(&(objectCategory=computer))",
                 PropertyNamesOnly = true,
@@ -272,7 +272,7 @@ string.Join(", ", computer.PrincipalsUniqueToThisLevel)
 
         protected ImportResults PerformComputerDiscovery(IComputerPrincipalProvider provider)
         {
-            OUPrincipalMapping ou = new OUPrincipalMapping($"LDAP://{settings.ImportOU}", settings.ImportOU);
+            OUPrincipalMapping ou = new OUPrincipalMapping($"LDAP://{settings.ImportOU.EscapeAdsiComponent()}", settings.ImportOU);
 
             ImportResults results = new ImportResults
             {
