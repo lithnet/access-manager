@@ -95,13 +95,13 @@ namespace Lithnet.AccessManager.Server
                 {
                     this.logger.LogTrace("Creating a new dynamic group {groupName} in {ou} with TTL of {ttl}", groupName, mapping.GroupOU, grantedExpiry);
                     dynamicGroup = this.directory.CreateTtlGroup(groupName, groupName, description, mapping.GroupOU, dc, grantedExpiry, mapping.GroupType, true);
-                    this.logger.LogInformation(EventIDs.JitDynamicGroupCreated, "Created a new dynamic group {group} on domain controller {dc}", dynamicGroup.Path, grantedExpiry);
+                    this.logger.LogInformation(EventIDs.JitDynamicGroupCreated, "Created a new dynamic group {group} on domain controller {dc}", dynamicGroup.Path, grantedExpiry, dc);
                 }
 
-                this.logger.LogTrace("Adding user {user} to dynamic group {dynamicGroup} on domain controller {dc}", user.MsDsPrincipalName, dynamicGroup.Path);
+                this.logger.LogTrace("Adding user {user} to dynamic group {dynamicGroup} on domain controller {dc}", user.MsDsPrincipalName, dynamicGroup.Path, dc);
                 dynamicGroup.AddMember(user);
 
-                this.logger.LogTrace("Adding dynamic group {dynamicGroup} to the JIT group {jitGroup} on domain controller {dc}", dynamicGroup.Path, group.Path);
+                this.logger.LogTrace("Adding dynamic group {dynamicGroup} to the JIT group {jitGroup} on domain controller {dc}", dynamicGroup.Path, group.Path, dc);
                 group.AddMember(dynamicGroup);
 
                 return true;
@@ -144,7 +144,7 @@ namespace Lithnet.AccessManager.Server
                 this.logger.LogTrace("Adding user {user} to group {group}", user.MsDsPrincipalName, group.Path);
 
                 group.AddMember(user, requestedExpiry);
-                this.logger.LogInformation(EventIDs.JitPamAccessGranted, "User {user} was added to group {group} with a membership expiry of {ttl} on domain controller {dc}", user.MsDsPrincipalName, group.MsDsPrincipalName, requestedExpiry);
+                this.logger.LogInformation(EventIDs.JitPamAccessGranted, "User {user} was added to group {group} with a membership expiry of {ttl} on domain controller {dc}", user.MsDsPrincipalName, group.MsDsPrincipalName, requestedExpiry, dc);
 
                 return true;
             });
