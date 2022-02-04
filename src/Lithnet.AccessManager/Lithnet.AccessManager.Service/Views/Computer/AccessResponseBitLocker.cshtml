@@ -44,7 +44,9 @@
                         <button class="btn btn-link">
                             <i class="fas fa-caret-down"></i>
                         </button>
-                        <div class="password-history-summary">Password ID @e.PasswordID <span class="password-history-emph">created on</span> @e.Created</div>
+                        <div class="password-history-summary">
+                            Password ID @e.PasswordID <span class="password-history-emph">created on</span> <span data-aspnet-utc-time="@(uiOptions.Value.ShowDatesInServerTimeZone ? null : e.Created.ToUnixEpochMilliseconds()) ">@e.Created</span>
+                        </div>
                     </div>
                     <div id="password-details-@index" class="collapse" aria-labelledby="password-summary-@index" data-parent="#history-panel">
                         <div class="card-body">

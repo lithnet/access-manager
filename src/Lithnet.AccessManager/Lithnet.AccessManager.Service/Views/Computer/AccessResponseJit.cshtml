@@ -3,6 +3,8 @@
 }
 
 @model Lithnet.AccessManager.Service.Models.JitDetailsModel
+@inject Microsoft.Extensions.Options.IOptionsSnapshot<Lithnet.AccessManager.Server.Configuration.UserInterfaceOptions> uiOptions;
+
 
 <div class="form-container">
 
@@ -28,13 +30,8 @@
 
         <section>
             <label class="title">Access expires</label>
-            <p class="lead">@Model.ValidUntil</p>
+            <p class="lead" data-aspnet-utc-time="@(uiOptions.Value.ShowDatesInServerTimeZone ? null : Model.ValidUntil.ToUnixEpochMilliseconds())">@Model.ValidUntil</p>
         </section>
-
-        @*<p>User <strong>@Model.Username</strong> now has just-in-time access to <strong>@Model.ComputerName</strong></p>
-        <p>
-            This remains valid until <strong>@Model.ValidUntil</strong>.
-        </p>*@
 
         <footer>
             @Html.ActionLink(UIMessages.ButtonNewRequest, "AccessRequest", "Computer", null, new { @class = "btn btn-outline-secondary" })

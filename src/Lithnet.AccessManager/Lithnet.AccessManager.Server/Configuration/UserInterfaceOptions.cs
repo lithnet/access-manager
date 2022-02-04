@@ -18,5 +18,7 @@ namespace Lithnet.AccessManager.Server.Configuration
         public PhoneticSettings PhoneticSettings { get; set; } = new PhoneticSettings();
 
         public List<AccessMask> AuthZDisplayOrder { get; set; } = new List<AccessMask> ();
+
+        public bool ShowDatesInServerTimeZone { get; set; }
     }
 }
