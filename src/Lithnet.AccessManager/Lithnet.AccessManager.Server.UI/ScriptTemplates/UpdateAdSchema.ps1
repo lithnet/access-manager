@@ -96,8 +96,38 @@ else
 $schemaMasterRootDse.Put("schemaUpdateNow", 1)
 $schemaMasterRootDse.SetInfo()
 
-$computerClass = Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&(ldapDisplayName=computer)(objectclass=classSchema))" 
-$computerClass | Set-ADObject -Server $schemaMaster.HostName -Add @{ mayContain = @("lithnetAdminPassword" , "lithnetAdminPasswordHistory", "lithnetAdminPasswordExpiry") } 
+$computerClass = Get-ADObject -SearchBase $schemaNC -Server $schemaMaster.HostName -LdapFilter "(&(ldapDisplayName=computer)(objectclass=classSchema))" -Properties *
+if (-not $computerClass.mayContain.ValueList.Contains("lithnetAdminPassword"))
+{
+     $computerClass | Set-ADObject -Server $schemaMaster.HostName -Add @{ mayContain = @("lithnetAdminPassword") }
+     Write-Host "The attribute lithnetAdminPassword was added to the computer class"
+}
+else
+{
+     Write-Host "The attribute lithnetAdminPassword was already present on the computer class"
+}
+
+
+if (-not $computerClass.mayContain.ValueList.Contains("lithnetAdminPasswordHistory"))
+{
+     $computerClass | Set-ADObject -Server $schemaMaster.HostName -Add @{ mayContain = @("lithnetAdminPasswordHistory") }
+     Write-Host "The attribute lithnetAdminPasswordHistory was added to the computer class"
+}
+else
+{
+     Write-Host "The attribute lithnetAdminPasswordHistory was already present on the computer class"
+}
+
+
+if (-not $computerClass.mayContain.ValueList.Contains("lithnetAdminPasswordExpiry"))
+{
+     $computerClass | Set-ADObject -Server $schemaMaster.HostName -Add @{ mayContain = @("lithnetAdminPasswordExpiry") }
+     Write-Host "The attribute lithnetAdminPasswordExpiry was added to the computer class"
+}
+else
+{
+     Write-Host "The attribute lithnetAdminPasswordExpiry was already present on the computer class"
+}
 
 $schemaMasterRootDse.Put("schemaUpdateNow", 1)
 $schemaMasterRootDse.SetInfo()
