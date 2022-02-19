@@ -129,6 +129,15 @@ namespace Lithnet.AccessManager.Server.UI
                 appconfig = ApplicationConfig.Load(pathProvider.ConfigFile);
                 var hosting = HostingOptions.Load(pathProvider.HostingConfigFile);
 
+                try
+                {
+                    AmsLicenseManager.InitializeForestData();
+                }
+                catch (Exception ex)
+                {
+                    this.logger.LogCritical(ex, "Unable to initialize forest data");
+                }
+
                 //Config
                 builder.Bind<IApplicationConfig>().ToInstance(appconfig);
                 builder.Bind<AuthenticationOptions>().ToInstance(appconfig.Authentication);
