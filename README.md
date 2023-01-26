@@ -1,4 +1,8 @@
-![](https://github.com/lithnet/access-manager/wiki/images/access-manager-logo.png)
+![](https://github.com/lithnet/access-manager/
+
+
+
+/images/access-manager-logo.png)
 # Lithnet Access Manager
 Lithnet Access Manager is a tool that allows you to safely delegate sensitive administrative access to computers in your Active Directory environment in a modern and user-friendly way.
 
@@ -52,21 +56,21 @@ The webhook functionality makes it really easy to get alerts via Slack or Micros
 ![](https://github.com/lithnet/access-manager/wiki/images/auditing-example-slack.png)
 
 ### Modern authentication options
-The web app supports traditional integrated windows authentication, smart card authentication, as well as external authentication providers such as [ADFS](https://github.com/lithnet/access-manager/wiki/Setting-up-authentication-with-ADFS) or 3rd party OpenID Connect providers such as [Azure AD](https://github.com/lithnet/access-manager/wiki/Setting-up-authentication-with-Azure-AD) and [Okta](https://github.com/lithnet/access-manager/wiki/Setting-up-authentication-with-Okta). Using an external authentication provider allows you the option of providing additional protections for the application such as multi-factor authentication.
+The web app supports traditional integrated windows authentication, smart card authentication, as well as external authentication providers such as [ADFS](https://docs.lithnet.io/ams/configuration/setting-up-authentication/setting-up-authentication-with-adfs) or 3rd party OpenID Connect providers such as [Azure AD](https://docs.lithnet.io/ams/configuration/setting-up-authentication/setting-up-authentication-with-azure-ad) and [Okta](https://docs.lithnet.io/ams/configuration/setting-up-authentication/setting-up-authentication-with-okta). Using an external authentication provider allows you the option of providing additional protections for the application such as multi-factor authentication.
 
 ## Editions
-Access Manager comes in two editions. Standard edition is free for all organizations to use. It provides the core capability to defend against ransomware attacks, and support is provided by the GitHub Access Manager community. Enterprise edition is our paid offering that includes additional features such as high availability, advanced authorization scripting, and comes with full support by Lithnet. See our [comparison guide](https://github.com/lithnet/access-manager/wiki/Access-Manager-Editions) for more details.
+Access Manager comes in two editions. Standard edition is free for all organizations to use. It provides the core capability to defend against ransomware attacks, and support is provided by the GitHub Access Manager community. Enterprise edition is our paid offering that includes additional features such as high availability, advanced authorization scripting, and comes with full support by Lithnet. See our [comparison guide](https://docs.lithnet.io/ams/access-manager-editions) for more details.
 
 To get a free enterprise edition trial license, or to enquire about Enterprise edition pricing, please email support@lithnet.io.
 
 ## Guides
-*   [Getting started](https://github.com/lithnet/access-manager/wiki/Getting-Started)
+*   [Getting started](https://docs.lithnet.io/ams/installation/getting-started)
 
 ## Download the app
-Download the [current release](https://github.com/lithnet/access-manager/releases/latest)
+Download the [current release](https://lithnet.io/products/access-manager/downloads)
 
 ## Help and support
-Please read our [getting support guide](https://github.com/lithnet/access-manager/wiki/Getting-support) if you need help or encounter a problem
+Please read our [getting support guide](https://docs.lithnet.io/ams/help-and-support/getting-support) if you need help or encounter a problem
 
 ## Keep up to date
 *   [Visit our blog](http://blog.lithnet.io)
