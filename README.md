@@ -1,4 +1,5 @@
-![](https://github.com/lithnet/access-manager/images/access-manager-logo.png)
+<img src="https://images.squarespace-cdn.com/content/v1/61ae2a2d4b4792139fe57231/95ce39a4-5673-496d-a096-d3ff87c9ca6c/Lithnet_ProductLogos-01.png?format=500w">
+
 # Lithnet Access Manager
 Lithnet Access Manager is a tool that allows you to safely delegate sensitive administrative access to computers in your Active Directory environment in a modern and user-friendly way.
 
