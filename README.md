@@ -1,8 +1,4 @@
-![](https://github.com/lithnet/access-manager/
-
-
-
-/images/access-manager-logo.png)
+![](https://github.com/lithnet/access-manager/images/access-manager-logo.png)
 # Lithnet Access Manager
 Lithnet Access Manager is a tool that allows you to safely delegate sensitive administrative access to computers in your Active Directory environment in a modern and user-friendly way.
 
@@ -25,8 +21,7 @@ We recommend you have a look at our other product [Lithnet Password Protection f
 ### Web-based access to local admin passwords
 Access Manager provides a simple web-based and mobile-friendly interface for accessing local admin passwords. There's no need for admins to install custom software, or have access to AD administrative tools to access LAPS passwords. 
 
-<img src="https://github.com/lithnet/access-manager/wiki/images/web-request-laps.gif" Width="400"/>
-
+<img src="https://images.squarespace-cdn.com/content/v1/61ae2a2d4b4792139fe57231/edb5e590-c52d-4d4f-b5ec-06afd0e48691/web-request-laps.gif?format=400w">
 Administrators also have the option of forcing an expiry time when a password is accessed. This ensures that the password is rotated after use.
 
 We use LAPS passwords ourselves, so we know they can be painful at times. We try to take away as much of that pain as possible. From using fonts where you can actually see the difference between an lower-case L and a capital I, to showing a breakdown of the password using the NATO phonetic alphabet to make it easy to read it out to someone. Ever find yourself needing to type a LAPS password into a Windows logon screen? Have access manager read the password to you while you type!
@@ -36,17 +31,17 @@ Whether you use Microsoft LAPS, or the Lithnet Access Manager agent, the user ex
 ### Access historical local admin passwords
 Deploying the Lithnet Access Manager Agent to your fleet allows you to upgrade to encrypted local admin passwords and gain the benefit of having previous local admin passwords stored in the directory as well. This means no more issues getting locked out of computers when they are restored from backup or reverted from a snapshot.
 
-<img src="https://github.com/lithnet/access-manager/wiki/images/web-request-laps-history.gif" Width="400"/>
+<img src="https://images.squarespace-cdn.com/content/v1/61ae2a2d4b4792139fe57231/e2cc6884-aa2a-4b88-9c92-eb714cd6a9ae/web-request-laps-history.gif?format=400w"/>
 
 ### Just-in-time administrative access to computers
 Using the same web interface, users can request that their account be added to a group that is a member of the local administrators group of the computer. This access is temporary and automatically removed after the allowed time period. Access Manager makes use of the Active Directory time-based membership feature in Windows Server 2016 and later domain functional levels, or time-based (dynamic) objects in earlier versions of AD.
 
-<img src="https://github.com/lithnet/access-manager/wiki/images/web-request-jit.gif" Width="400"/>
+<img src="https://images.squarespace-cdn.com/content/v1/61ae2a2d4b4792139fe57231/1fdc69a4-1b3c-4f52-a0be-14393d735b46/web-request-jit.gif?format=400w">
 
 ### Easy access to BitLocker recovery passwords
 Authorized users can also request access to the BitLocker recovery passwords for a computer through the same easy-to-use web interface.
 
-<img src="https://github.com/lithnet/access-manager/wiki/images/web-request-bitlocker.gif" Width="400"/>
+<img src="https://images.squarespace-cdn.com/content/v1/61ae2a2d4b4792139fe57231/89e2e421-e033-49a4-818b-60a80ff8cb84/web-request-bitlocker.gif?format=400w">
 
 ### Audit success and failure event logs
 All success and failure events are logged to the Windows event log and a file. Optionally, you can send audit events via email, webhooks, and even PowerShell.
