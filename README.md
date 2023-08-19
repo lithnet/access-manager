@@ -57,7 +57,7 @@ The web app supports traditional integrated windows authentication, smart card a
 ## Editions
 Access Manager comes in two editions. Standard edition is free for all organizations to use. It provides the core capability to defend against ransomware attacks, and support is provided by the GitHub Access Manager community. Enterprise edition is our paid offering that includes additional features such as high availability, advanced authorization scripting, and comes with full support by Lithnet. See our [comparison guide](https://docs.lithnet.io/ams/access-manager-editions) for more details.
 
-To get a free enterprise edition trial license, or to enquire about Enterprise edition pricing, please email support@lithnet.io.
+To get a free enterprise edition trial license, or to enquire about Enterprise edition pricing, please fill out our [request form](https://lithnet.io/products/access-manager/quote) and a member of our team will reach out to assist you.
 
 ## Guides
 *   [Getting started](https://docs.lithnet.io/ams/installation/getting-started)
