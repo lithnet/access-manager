@@ -31,4 +31,4 @@ If applicable, add screenshots to help explain your problem.
 Add any other context about the problem here.
 
 **Logs**
-Please paste the relevant sections of the application log file here. If your log files contain PII, you can send the logs to support@lithnet.io, and provide a link to this issue from when you save this request. *Note* issues will not be looked at unless they are logged in github first.
+Please paste the relevant sections of the application log file here. 
