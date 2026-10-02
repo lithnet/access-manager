@@ -1,9 +1,6 @@
 <img src="https://images.squarespace-cdn.com/content/v1/61ae2a2d4b4792139fe57231/95ce39a4-5673-496d-a096-d3ff87c9ca6c/Lithnet_ProductLogos-01.png?format=500w">
 
 # Lithnet Access Manager
-
-> **Note:** This repository contains the source code for Access Manager v2.0. The `v1` branch contains the source code for v1, under the MIT license. For the current version, see the [documentation](https://docs.lithnet.io/ams) and the [downloads page](https://lithnet.io/products/access-manager/downloads).
-
 Lithnet Access Manager is a tool that allows you to safely delegate sensitive administrative access to computers in your Active Directory environment in a modern and user-friendly way.
 
 It provides a web-based interface that allows users to request local admin passwords, bitlocker recovery keys, and grant just-in-time administrative access to their own accounts. 
