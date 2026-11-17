@@ -14,8 +14,6 @@ Modern authentication is a key feature of Access Manager, with support for OpenI
 ## Defend against ransomware and other lateral movement-based attacks
 Access Manager has one simple goal. To reduce the likelihood and impact of a wide-spread compromise in your environment by removing permanent administrative access to your workstations and servers. By making sure every computer has a unique local admin password (through the use of Microsoft LAPS or the Lithnet Access Manager Agent), and removing all other members of the built-in local `Administrators` group, you can limit the ability for credential-stealing ransomware to move laterally across your environment. Access Manager makes it as seamless as possible for admins to access LAPS passwords, or grant themselves temporary just-in-time admin access. Access Manager isn't a silver bullet guaranteed to protect you from these sort of attacks, but it forms a fundamental part of a defence-in-depth strategy against them. 
 
-We're a big believer in not having to pay for security 'minimums'. These days, attackers have a treasure-trove of commodity credential-stealing tools at their disposal. They don't have to pay for them, and we believe you shouldn't have to pay to defend against them. That's why Access Manager has a free Community edition for up to 100 devices, and why our code is available on GitHub for anyone to review. 
-
 We recommend you have a look at our other product [Lithnet Password Protection for Active Directory](https://github.com/lithnet/ad-password-protection), for a tool to help strengthen your environment against commodity password-based attacks. 
 
 ## Features
